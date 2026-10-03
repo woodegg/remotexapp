@@ -6,6 +6,12 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+## 0.14.3 — 2026-10-03
+
+Target: `0.14.3`. First release from the reviewed public source repository.
+SDK `0.29.1`, App Package versions, APIs, and runtime behavior are unchanged
+from `0.14.2`.
+
 - Correct the supported-version security guidance and Go dependency notices;
   include the `x/sys` license in packaged and installed releases.
 - Redact a historical test result's private address and reject private IPv4

@@ -1,0 +1,77 @@
+{
+  "date": "2026-08-27",
+  "feature": "Distinguish orderly XFCE Logout from an unexpected session exit",
+  "outcome": "passed",
+  "liveBinaries": {
+    "remoteXAppdSha256": "188afc120b3f1b12d3555e7dc7fc63dc608c04f784bc080c40a577ad31f566a6",
+    "novncInputSha256": "304f77f9c0452c03195ac2eccd0062d7b46d915c8cff267bcb59ea598f37e8d5",
+    "remoteXAppStatusSha256": "3ee10fb239c7f201d773d2d422b6bac96d90e7fb9ef9b442c2714ce028d46a91"
+  },
+  "isolated": {
+    "managerPort": 1993,
+    "display": ":31",
+    "rfbPort": 5931,
+    "gatewayPort": 39031,
+    "instanceId": "xfce-logout-test-625c66758366",
+    "beforeLogout": {
+      "sessionGeneration": 1,
+      "sessionState": "running",
+      "applicationState": "ready",
+      "attachedClients": 1
+    },
+    "afterLogout": {
+      "sessionGeneration": 1,
+      "sessionState": "stopped",
+      "applicationState": "exited",
+      "summary": "XFCE session logged out",
+      "attachedClients": 1,
+      "error": null
+    },
+    "afterReattach": {
+      "sessionGeneration": 2,
+      "sessionState": "running",
+      "applicationState": "ready",
+      "attachedClients": 1
+    },
+    "cleaned": true
+  },
+  "production": {
+    "managerPort": 1991,
+    "display": ":2",
+    "managedId": "test-host-xfce",
+    "instanceId": "xfce-desktop-688676b680f5",
+    "beforeLogout": {
+      "sessionGeneration": 1,
+      "sessionState": "running",
+      "applicationState": "ready",
+      "attachedClients": 1
+    },
+    "afterLogout": {
+      "sessionGeneration": 1,
+      "sessionState": "stopped",
+      "applicationState": "exited",
+      "summary": "XFCE session logged out",
+      "attachedClients": 1,
+      "error": null
+    },
+    "afterReattach": {
+      "sessionGeneration": 2,
+      "sessionState": "running",
+      "applicationState": "ready",
+      "attachedClients": 1
+    },
+    "finalVacant": {
+      "state": "server-ready",
+      "sessionGeneration": 2,
+      "sessionState": "stopped",
+      "applicationState": "stopped",
+      "attachedClients": 0,
+      "inputArtifacts": 0,
+      "error": null
+    }
+  },
+  "migration": {
+    "legacyRuntimeWithoutStatusFileAppearsStopped": true,
+    "statusSchemaRepublishedBeforeEverySessionGeneration": true
+  }
+}

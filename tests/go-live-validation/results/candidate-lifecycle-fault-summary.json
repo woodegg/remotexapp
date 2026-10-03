@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "collectedAt": "2026-08-27T06:04:19-04:00",
+  "manager": "http://127.0.0.1:1992",
+  "results": {
+    "invalidEdgeURLRejectedBeforeAllocation": true,
+    "edgeDepth24": true,
+    "edgeIncognitoAndURLArguments": true,
+    "edgeResize": {
+      "from": "900x640",
+      "to": "1100x760",
+      "passed": true
+    },
+    "edgeReconnectMs": 59.533,
+    "edgeCleanup": true,
+    "managedGatewayFaultRecoveryMs": 722,
+    "managedVNCFaultRecoveryMs": 697,
+    "sessionFaultObservedMs": 54,
+    "sessionFaultStatus": "Mousepad exit code 137",
+    "desiredStopStartRecovery": true,
+    "managerRestartAdoptedRuntimeIDs": true,
+    "managerRestartPreservedRegistryInodes": true,
+    "managerRestartPreservedUnitPIDs": true,
+    "anonymousAutostartConflictDetected": true,
+    "managedXFCEMigrationResolvedAutostartConflict": true,
+    "cleanProfileSingleFallbackClipman": true,
+    "cleanProfileAttachMs": 4506,
+    "configuredProfileSinglePanelClipman": true,
+    "configuredProfileAttachMs": 2470,
+    "isolatedCleanup": true
+  }
+}

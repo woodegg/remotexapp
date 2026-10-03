@@ -1,0 +1,50 @@
+{
+  "experiment": "P06",
+  "outcome": "accepted",
+  "date": "2026-08-27",
+  "sdkVersion": "0.7.0-candidate",
+  "sampleMillis": 5200,
+  "instanceId": "mousepad-no-clipman-580ccb28cb7f",
+  "phases": {
+    "hiddenDemandOff": {
+      "healthRequests": 0,
+      "instanceRequests": 3,
+      "diagnosticEvents": 0,
+      "diagnosticDOMMutations": 0,
+      "diagnosticsTimerActive": false
+    },
+    "visibleDemandOn": {
+      "healthRequests": 5,
+      "instanceRequests": 2,
+      "diagnosticEvents": 6,
+      "diagnosticDOMMutations": 6,
+      "diagnosticsTimerActive": true
+    },
+    "hiddenAgain": {
+      "healthRequests": 0,
+      "instanceRequests": 3,
+      "diagnosticEvents": 0,
+      "diagnosticDOMMutations": 0,
+      "diagnosticsTimerActive": false
+    }
+  },
+  "unchangedControls": {
+    "instancePollIntervalMillis": 2000,
+    "cursorWatchdogIntervalMillis": 5000,
+    "rfbQueueCapacity": 8
+  },
+  "automatedCorrectness": {
+    "text": "P06你好abc",
+    "textServerMillis": 1.028,
+    "clipboardRoundTripExact": true,
+    "detachReconnectPassed": true
+  },
+  "interactiveCorrectness": {
+    "passed": true,
+    "totalRfbConnections": 6,
+    "totalInputConnections": 7,
+    "successfulTextCommits": 51,
+    "clientEventRecords": 0
+  },
+  "status": "Accepted after automated browser measurements and interactive input, resize, reconnect, and diagnostics-toggle validation"
+}

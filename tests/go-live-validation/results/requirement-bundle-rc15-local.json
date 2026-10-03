@@ -1,0 +1,64 @@
+{
+  "date": "2026-08-28",
+  "release": "0.1.0-rc.15",
+  "outcome": "passed",
+  "environment": {
+    "scope": "isolated local user services",
+    "productionRuntimeModified": false,
+    "authMode": "none",
+    "listen": "loopback only"
+  },
+  "releaseGate": {
+    "releaseCheck": "passed",
+    "goRace": "passed",
+    "packageRelease": "passed",
+    "artifactSha256": "7a3e4629e90b3e798e2ec3e98708cabc2d79fe63bf7939cd08cb9f24c53f5509"
+  },
+  "requirements": {
+    "DEP-010": {
+      "overrideRejection": ["geometry", "allowClientResize"],
+      "tigerVNCGeometry": "1280x720",
+      "acceptSetDesktopSize": false,
+      "framebufferBefore": "1280x720",
+      "framebufferAfterViewportChange": "1280x720",
+      "browserScaling": true
+    },
+    "SDK-001": {
+      "finiteLimit": 2,
+      "finiteAttempts": 2,
+      "unlimitedAttemptsObserved": 5,
+      "unlimitedExhausted": false
+    },
+    "SDK-002": {
+      "initialConnectionCounted": false,
+      "explicitReconnectReset": true,
+      "attemptsAfterSuccess": 0
+    },
+    "SDK-003": {
+      "exhaustedEvents": 1,
+      "timerCleared": true,
+      "channelsCleared": true,
+      "intentionalDisconnectStoppedUnlimitedRetry": true
+    },
+    "DEP-011": {
+      "proxy": "nginx",
+      "mountPath": "/tools/remotexapp",
+      "inferredBasePath": "/tools/remotexapp",
+      "explicitBaseURLRequired": false,
+      "sdkAssetsApiHealthRfbInputPassed": true,
+      "outsidePrefixStatus": 404
+    },
+    "DEP-012": {
+      "combinedDisablePassed": true,
+      "independentDisablePassed": true,
+      "disabledPageStatus": 404,
+      "viewerURLRedacted": true,
+      "sdkApiHealthRetained": true
+    }
+  },
+  "humanUAT": {
+    "status": "accepted",
+    "date": "2026-08-28"
+  },
+  "remainingGate": null
+}

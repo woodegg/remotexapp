@@ -1,0 +1,59 @@
+{
+  "date": "2026-09-03",
+  "release": {
+    "tag": "v0.5.1-rc.1",
+    "tagObject": "962e9b48a39998717fc40ec80f8aade04899cde6",
+    "commit": "d1d1fab8fc75e7194acbd5bd8329f2f89d3e7f64",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/v0.5.1-rc.1",
+    "publishedAt": "2026-09-03T21:43:12Z",
+    "latest": false,
+    "draft": false,
+    "prerelease": true,
+    "verifyWorkflow": "https://github.com/woodegg/remotexapp/actions/runs/33809264783",
+    "releaseWorkflow": "https://github.com/woodegg/remotexapp/actions/runs/33809275785",
+    "workflowResult": "passed",
+    "sdkVersion": "0.21.1",
+    "appPackageABI": "remotexapp/v1"
+  },
+  "artifacts": {
+    "formalArchiveSha256": "cd75801f468cc1b3a71e62b90a87330b560dbe086423d54b5a4f039b833078c2",
+    "formalArchiveBytes": 7940906,
+    "formalGoVersion": "go1.22.12",
+    "downloadedChecksumVerification": "passed",
+    "downloadedSensitiveDataCheck": "passed",
+    "downloadedCommitVerification": "passed",
+    "downloadedSDKVerification": "passed",
+    "downloadedAppPackageChecksums": "passed",
+    "downloadedAppCatalogValidation": "passed",
+    "downloadedHealthAndReadiness": "passed",
+    "embeddedSDKAsset": "sdk-S4T4SPMN.js",
+    "embeddedSDKAssetSha256": "49aaa18d34d5007df48ac6f2c6f8e62cce8df04a1bd1453b8ffbd2518e7df405",
+    "embeddedConsoleAsset": "console-T7I6EFFS.js",
+    "embeddedConsoleAssetSha256": "b2c98f471f2ab47285f2c89213d6c0c1f47feb4deca29d30f5cd8faef54fe6d9",
+    "formalBinarySha256": {
+      "remotexappd": "74f9b7e05bc1b18803989a65b5890608bb0387bf7a7ddd5937cb27ad08086073",
+      "novnc-input": "e8f23180f3b6f418bb395cd64c167d472e0e11767a621280f170e88e9ccbb177",
+      "remotexapp-status": "fdaab380382f1163b5c649a7d8fc8e20ae6b34d001bc5a9af5e993586abfa6c8",
+      "remotexapp-operator-helper": "11d956353d7db9519eab0e86e9095358f7ae2d01a825bf5b67f061c8d1afa9e4"
+    },
+    "appPackageSha256": {
+      "edge-1.0.0": "0ab9d97f549fe24657f4d45ffe04d6c6f4cf82338cce0ca48a04f3d025235a37",
+      "firefox-esr-2.1.0": "3e53e2e1cb313b23f2c14ea8d3522ec0212ae455eb87d40b1e0007d9a04fb50f",
+      "libreoffice-3.0.0": "5df5178c9715a490e818a37be32be65c2c2305fc5a4978e552ea8f235f5127ae",
+      "mousepad-2.0.0": "c7f2db2c16ac1f03535f0669e1dc37924eb23149d2afb0421e9da08d381fdb95",
+      "xfce-user-desktop-2.0.0": "644dd1da938fd4f43c5b46a50f4e79e47f2d210b5c0b2f0679fc5737bcead199"
+    },
+    "localGateArchiveSha256": "17b0fc7f97c9b2a7f55e69667d0b8fc760acc709b96fc153a793f678001599ab",
+    "sameSourceCommit": true,
+    "formalSha256SumsAuthoritative": true
+  },
+  "acceptance": {
+    "clp025ThroughClp029": "accepted",
+    "humanUAT": "accepted",
+    "supportingEvidence": "clipboard-prompt-reliability-0.5.1-rc.1-human-uat.json"
+  },
+  "deploymentBoundary": {
+    "formalArtifactDeployedLocally": false,
+    "sandboxChanged": false
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "lightview-1.0.9-formal-publication",
+  "commit": "b85984431c6d28c32b1aa1deeb7e12d282ff1a37",
+  "startedAt": "2026-09-18T18:55:06Z",
+  "completedAt": "2026-09-18T18:57:56Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "github-release",
+    "name": "woodegg/remotexapp lightview-v1.0.9"
+  },
+  "artifact": {
+    "name": "lightview-1.0.9.tar.gz",
+    "sha256": "3007a833253fe7ccf385502fa1a3beca7a1b1714839a931bbc1048ae96014ddd"
+  },
+  "app": {
+    "id": "lightview",
+    "version": "1.0.9",
+    "contentSha256": "75ae754b6a26de21859b14e749caa836b04934f9deaeb93ff4eb75601af8a479"
+  },
+  "release": {
+    "id": "RE_kwDOUGRp2s4XWRxy",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/lightview-v1.0.9",
+    "tag": "lightview-v1.0.9",
+    "tagObject": "20dc7cfbd44708995bd43d86065b25243b96ace7",
+    "peeledCommit": "b85984431c6d28c32b1aa1deeb7e12d282ff1a37",
+    "publishedAt": "2026-09-18T18:57:42Z",
+    "draft": false,
+    "prerelease": false
+  },
+  "candidateEvidence": "tests/evidence/v1/lightview-1.0.9-candidate.json",
+  "hostedVerify": "https://github.com/woodegg/remotexapp/actions/runs/35382951647",
+  "scenarios": [
+    {
+      "id": "annotated-remote-tag-peels-to-qualified-source",
+      "result": "passed"
+    },
+    {
+      "id": "hosted-Verify-all-steps-passed",
+      "result": "passed"
+    },
+    {
+      "id": "clean-tag-source-package-byte-identical-to-live-tested-package",
+      "result": "passed"
+    },
+    {
+      "id": "release-only-App-archive-and-checksum",
+      "result": "passed"
+    },
+    {
+      "id": "fresh-download-checksum-and-byte-comparison",
+      "result": "passed"
+    },
+    {
+      "id": "formal-release-not-draft-or-prerelease",
+      "result": "passed"
+    },
+    {
+      "id": "Core-v0.13.0-remains-Latest",
+      "result": "passed"
+    },
+    {
+      "id": "isolated-test-services-stopped-and-local-listeners-remain-loopback",
+      "result": "passed"
+    }
+  ],
+  "limitations": [
+    "See candidate evidence for test-only WebKit sandbox exception and accelerated vacancy timer.",
+    "Only actual Lightview 0.1.9 is qualified by this run; other version banners are launcher fixtures.",
+    "No Core/SDK release, endpoint deployment, sandbox operation or separate interactive UAT claim."
+  ]
+}

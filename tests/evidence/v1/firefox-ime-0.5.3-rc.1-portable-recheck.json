@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "local:ffx007-portable-recheck-20260908",
+  "commit": "14523d4c624498c71e18c245a50fe4a4dd1b7d99",
+  "startedAt": "2026-09-08T01:44:00Z",
+  "completedAt": "2026-09-08T01:47:36Z",
+  "result": "passed",
+  "toolchain": { "go": "go1.26.8", "node": "v22.22.3" },
+  "environment": { "kind": "local", "name": "development-worktree-portable-recheck" },
+  "artifact": {
+    "name": "remotexapp-0.5.3-rc.1-linux-amd64.tar.gz",
+    "sha256": "77b9d4d5336e59f9020ce397cd1fb7d8c3b17cfc256e12d571587ebd5d23f628"
+  },
+  "scenarios": [
+    { "id": "make-check", "result": "passed" },
+    { "id": "coverage-check", "result": "passed" },
+    { "id": "release-ci", "result": "passed" }
+  ],
+  "details": {
+    "goCoveragePercent": 56.9,
+    "sdkCoveragePercent": { "lines": 83.66, "branches": 69.87, "functions": 77.04 },
+    "qualification": "Development worktree gate only. Uncommitted docs, error-reporting harness changes and an unrelated pre-existing TODO edit remain; this is not a clean immutable UAT candidate and must not be deployed or promoted.",
+    "releaseCIIncludes": ["source-and-binary-vulnerability-scans", "race", "offline-system-staging", "archive-sensitive-data-check"],
+    "remainingBlocker": "Immediate Firefox runtime restart fails on a pinned control port in TIME_WAIT. Manager scope expansion awaits operator approval. Full live acceptance remains failed; no deployment performed.",
+    "priorFailure": "firefox-ime-0.5.3-rc.1-development-gate.json retains the original disk-full and live-restart failures. This recheck resolves only the portable gate failure."
+  }
+}

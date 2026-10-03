@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "label": "libreoffice-template-local-1991",
+  "collectedAt": "2026-08-28T04:16:04-04:00",
+  "managerURL": "http://test-host:1991",
+  "version": "0.1.0-rc.16",
+  "source": "8a8f35e96e47-dirty",
+  "deployment": {
+    "mode": "central real-user",
+    "listener": "0.0.0.0:1991",
+    "authMode": "none",
+    "temporaryInsecureTestMode": true,
+    "shareRelease": "/usr/local/share/remotexapp/releases/0.1.0-rc.16",
+    "libexecRelease": "/usr/local/libexec/remotexapp/releases/0.1.0-rc.16",
+    "installedPreflight": true,
+    "templateCount": 5
+  },
+  "upgradeAdoption": {
+    "existingXFCEInstanceIdStable": true,
+    "existingXFCEVncPidStable": true,
+    "existingXFCEServerPidStable": true,
+    "existingXFCEGatewayPidStable": true,
+    "managerRestartedTwice": true
+  },
+  "documents": {
+    "root": "STATE_DIR/documents",
+    "pptx": "sample.pptx",
+    "docx": "sample.docx",
+    "xlsx": "sample.xlsx",
+    "allReadableMode0600": true,
+    "allZipContainersValid": true
+  },
+  "libreofficeSmoke": {
+    "input": "sample.pptx",
+    "display": ":10",
+    "controlPort": 21000,
+    "controlListener": "127.0.0.1",
+    "windowManager": "matchbox-window-manager",
+    "unoImplementation": "SdXImpressDocument",
+    "exactRequestedDocumentActive": true,
+    "applicationStatus": "ready",
+    "browserAttached": true,
+    "cleanStopCompleted": true,
+    "forced": false,
+    "allSmokeResourcesRemoved": true
+  },
+  "serviceAfterSmoke": {
+    "health": "ok",
+    "activeInstances": 1,
+    "attachedClients": 0,
+    "existingXFCEHealthy": true
+  },
+  "uat": {
+    "accepted": false,
+    "remaining": "human LibreOffice interaction and application-control UAT"
+  },
+  "result": "deployed-pending-uat"
+}

@@ -1,0 +1,30 @@
+{
+  "result": "accepted",
+  "date": "2026-09-02",
+  "acceptance": {
+    "explicitOperatorConfirmation": true,
+    "promotion": "0.4.0-rc.3 to 0.4.0",
+    "stableGitHubReleaseAuthorized": true,
+    "candidateTag": "v0.4.0-rc.3",
+    "candidateCommit": "e66a7273aa8797f2114a506dcfca4a4ef07dd45d",
+    "candidateArchiveSha256": "fa99973cb0fc25011ddd2a8f61f9a98544e7b762216932bd94942a4ac5cea454",
+    "sdkVersion": "0.20.0",
+    "appPackageABI": "remotexapp/v1"
+  },
+  "promotionBoundary": {
+    "functionalChangesAllowed": false,
+    "allowedChanges": [
+      "RemoteXApp version metadata",
+      "stable acceptance evidence",
+      "current support and release documentation"
+    ],
+    "localDeployment": "not authorized",
+    "sandboxDeployment": "not authorized"
+  },
+  "supportingEvidence": [
+    "rich-clipboard-0.4.0-rc.1-local-1991.json",
+    "rich-clipboard-0.4.0-rc.2-local-1991.json",
+    "rich-clipboard-0.4.0-rc.3-human-uat.json",
+    "rich-clipboard-0.4.0-rc.3-formal-publication.json"
+  ]
+}

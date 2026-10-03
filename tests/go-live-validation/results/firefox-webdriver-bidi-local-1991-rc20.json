@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "label": "firefox-webdriver-bidi-local-1991-rc20",
+  "collectedAt": "2026-08-28T07:24:50-04:00",
+  "managerURL": "http://127.0.0.1:1991",
+  "release": {
+    "version": "0.1.0-rc.20",
+    "commit": "7e0118a65e8c",
+    "sdk": "0.14.0",
+    "firefoxDriver": "1.1.0",
+    "artifactChecksum": "pass",
+    "publicationGate": "pass",
+    "libexec": "/usr/local/libexec/remotexapp/releases/0.1.0-rc.20",
+    "share": "/usr/local/share/remotexapp/releases/0.1.0-rc.20",
+    "ownership": "root:root"
+  },
+  "deployment": {
+    "mode": "central real-user for ubuntu",
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "allowInsecurePublic": true,
+    "policy": "temporary local test only",
+    "consoleEnabled": true,
+    "kioskEnabled": true
+  },
+  "existingRuntimeAdoption": {
+    "instanceId": "xfce-desktop-b7e29409f21f",
+    "vncPidPreserved": 1183502,
+    "serverPidPreserved": 1183509,
+    "gatewayPidPreserved": 1183526
+  },
+  "firefox": {
+    "instanceId": "firefox-esr-80befd4548e2",
+    "controlAddress": "127.0.0.1",
+    "controlPort": 21000,
+    "controlWebSocketUrl": "ws://127.0.0.1:21000/session",
+    "listenerAbsentBeforeAttach": true,
+    "listenerLoopbackOnly": true,
+    "realChromeNoVNCAttach": true,
+    "driverStatusMatchedInstance": true,
+    "sessionNew": "success",
+    "browsingContextGetTree": "success",
+    "scriptEvaluateResult": 42,
+    "sessionEnd": "success",
+    "readyAfterSessionEnd": true
+  },
+  "managerRestartAdoption": {
+    "managerPidChanged": "1968511 -> 1972766",
+    "firefoxPidPreserved": 1969829,
+    "serverPidPreserved": 1969430,
+    "gatewayPidPreserved": 1969459,
+    "sessionUnitPidPreserved": 1969709,
+    "sessionGenerationPreserved": 1,
+    "controlPortPreserved": 21000,
+    "postRestartProtocolProbe": "success",
+    "chromeSdkReattached": true
+  },
+  "singleSessionRecovery": {
+    "abruptControllerExitLeftReadyFalse": true,
+    "secondSessionNewWasRejected": true,
+    "normalStopReleasedOrphan": true,
+    "replacementRuntimeAcceptedSession": true,
+    "persistentProfilePreserved": true,
+    "integrationGuidanceUpdated": true
+  },
+  "cleanup": {
+    "gracefulApiStop": "completed",
+    "controlListenerReleased": true,
+    "runtimeManifestRemoved": true,
+    "runtimeDirectoryRemoved": true,
+    "persistentProfilePreserved": true,
+    "onlyExistingXfceRuntimeActive": true,
+    "managerStillServingRc20": true
+  },
+  "result": "pass"
+}

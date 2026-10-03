@@ -1,0 +1,246 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "core-session-services-0.12.0-rc.2-repaired-local-uat-ready",
+  "commit": "b7f4f98c7204a9468edef24204de1ed7f3d7a191",
+  "startedAt": "2026-09-14T04:50:05.178Z",
+  "completedAt": "2026-09-14T05:32:38Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "22.22.3"
+  },
+  "environment": {
+    "kind": "local-Ubuntu-X11",
+    "name": "isolated-live-gates-and-loopback-1991-2992"
+  },
+  "artifact": {
+    "name": "remotexapp-0.12.0-rc.2-linux-amd64.tar.gz",
+    "sha256": "eb97b7941be80035f00e58f417da5f5c7dc161dcdb096c20a0fedcd62835a98f"
+  },
+  "scenarios": [
+    {
+      "id": "repaired-seven-App-dynamic-matrix-361-checkpoints-2235-HTTP-assertions",
+      "result": "passed"
+    },
+    {
+      "id": "make-release-ci-check-race-coverage-source-four-binary-vulnerability-immutable-staging",
+      "result": "passed"
+    },
+    {
+      "id": "make-nightly-portable-20-shuffled-Go-and-20-Node-runs-three-fuzz-targets",
+      "result": "passed"
+    },
+    {
+      "id": "exact-package-synthetic-plugin-install-lifecycle-update-rollback-no-Core-rebuild",
+      "result": "passed"
+    },
+    {
+      "id": "shipped-Viewer-raw-input-Unicode-clipboard-four-formats-resize-reconnect",
+      "result": "passed"
+    },
+    {
+      "id": "Firefox-18-focus-rounds-54-raw-key-and-108-sendText-actual-readbacks",
+      "result": "passed"
+    },
+    {
+      "id": "optional-documents-explicit-save-unsaved-normal-force-and-real-60-second-idle-cleanup",
+      "result": "passed"
+    },
+    {
+      "id": "Kate-KWrite-private-controls-six-App-Core-pin-upgrades-and-durable-crash-boundaries",
+      "result": "passed"
+    },
+    {
+      "id": "Edge-CDP-Firefox-BiDi-actions-cancellation-foreign-session-protection-and-Manager-crash",
+      "result": "passed"
+    },
+    {
+      "id": "disposable-XFCE-Xfconf-Thunar-natural-logout-relogin-borrowed-bus",
+      "result": "passed"
+    },
+    {
+      "id": "disposable-XFCE-real-Viewer-fixed-framebuffer-Unicode-clipboard-before-after-Manager-restart",
+      "result": "passed"
+    },
+    {
+      "id": "service-loss-App-preservation-startup-crash-blocked-host-force-and-other-runtime-independence",
+      "result": "passed"
+    },
+    {
+      "id": "old-stack-stopped-cutover-mixed-contract-rejection-preserved-profile-document-intent",
+      "result": "passed"
+    },
+    {
+      "id": "P16-final-installable-archive-five-paired-fresh-warm-resource-and-cleanup-gates",
+      "result": "passed"
+    },
+    {
+      "id": "two-local-deployments-exact-binaries-loopback-config-enabled-membership-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "Manager-update-preserves-existing-desktop-pin-generation-and-services",
+      "result": "passed"
+    },
+    {
+      "id": "desktop-graceful-explicit-upgrade-same-ID-new-Core-generation-old-owned-processes-gone",
+      "result": "passed"
+    },
+    {
+      "id": "both-local-served-Viewers-Manager-restart-reconnect-Unicode-clipboard-readback",
+      "result": "passed"
+    },
+    {
+      "id": "both-local-disposable-Viewers-input-service-failure-reject-Unicode-preserve-SDK-raw-RFB",
+      "result": "passed"
+    },
+    {
+      "id": "post-deployment-Manager-warning-journal-empty",
+      "result": "passed"
+    },
+    {
+      "id": "final-make-check-doc-evidence-sensitive-scan-exact-installed-and-served-SDK-identity",
+      "result": "passed"
+    },
+    {
+      "id": "no-orphaned-supervisor-test-processes-after-final-repeated-gates",
+      "result": "passed"
+    },
+    {
+      "id": "human-native-IME-desktop-and-application-UAT",
+      "result": "skipped",
+      "reason": "Ready for operator UAT; no human acceptance or formal publication claimed."
+    }
+  ],
+  "details": {
+    "version": "0.12.0-rc.2",
+    "sdkVersion": "0.28.0",
+    "servedSDKAsset": "assets/sdk-RP3YDZQR.js",
+    "servedSDKSHA256": "ea55b3ce9d1dd0a07c631b2a69683a1c9df3b0fd2667ebadc91eed973f7c3b11",
+    "sourceState": "Dirty working-tree UAT candidate based on the full commit above, not a clean tagged/hosted release. No commit, push, publication, sandbox deployment or production-gateway changes.",
+    "requirements": "SVC-001 through SVC-010; fixes SVC-F01 through SVC-F09; bwrap, Docker and audio excluded.",
+    "dynamicEvidence": "core-session-services-0.12.0-rc.2-state-matrix.json",
+    "subsequentCompletionAudit": "core-session-services-0.12.0-rc.2-xfce-saved-session.json: later saved-session restoration and repeated real Viewer/Manager/fault tests passed; no product/deployment change or human acceptance.",
+    "artifactContinuity": "Instrumented dynamic matrices used archive A; the linked matrix evidence proves identical four Core binaries/helpers/App scripts and normalized test manifests with final installable archive B. Exact B packages (XFCE display relocation and explicit test fixtures declared), real Viewer, cutover, P16 and both deployments use B. Subsequent source edits are tests/docs only; four binaries and runtime helpers remain byte-identical. No old immutable App package was overwritten.",
+    "appVersions": {
+      "edge": "2.0.1",
+      "firefox-esr": "3.0.1",
+      "kate": "2.0.1",
+      "kwrite": "2.0.1",
+      "libreoffice": "4.0.0",
+      "mousepad": "4.0.0",
+      "xfce-user-desktop": "3.0.0"
+    },
+    "binarySHA256": {
+      "manager": "72c5f03a1e8039412dbb44ae4c517acf24e3ac21a037a104c448581abdce2000",
+      "supervisor": "091584132104666ae23b521aedb1404a95d957855a7de0320166716c36887c71",
+      "gateway": "d2734f95f6198f9f1a3221647d49f4cff9c721946ce9c242bc9a5f517cf8feaf",
+      "operator": "40a678132812aa6174b529ff0a125b462a471142cd3bdbf86880f3c60e0daedd"
+    },
+    "goCoveragePercent": 62.2,
+    "sdkCoveragePercent": {
+      "lines": 86.07,
+      "branches": 78.62,
+      "functions": 82.16
+    },
+    "security": "Pinned govulncheck source call paths and all four binaries: no known vulnerabilities found; module metadata/checksums, sensitive-data, workflow and evidence checks passed.",
+    "repeatability": {
+      "goIterations": 20,
+      "nodeIterations": 20,
+      "fuzz": [
+        {
+          "target": "FuzzValidateClipboardPNG",
+          "executions": 294720
+        },
+        {
+          "target": "FuzzManagerClipboardMultipart",
+          "executions": 301218
+        },
+        {
+          "target": "FuzzBoundedJSONParameter",
+          "executions": 129480
+        }
+      ],
+      "thresholdsRelaxed": false
+    },
+    "performance": {
+      "result": "passed",
+      "samplesPerVersion": 5,
+      "resultFile": "../../performance/core-session-services/results-2026-09-14.json",
+      "medianLaunchOverheadMs": 390.203505999998,
+      "medianWarmRestartOverheadMs": 405.19041599999946,
+      "medianMemoryOverheadMiB": 4.03515625,
+      "extraProcesses": 1,
+      "gates": {
+        "launch": true,
+        "memory": true,
+        "warmRestart": true,
+        "idleCPU": true,
+        "processes": true,
+        "cleanup": true,
+        "serviceCounts": true
+      }
+    },
+    "endpoints": [
+      {
+        "port": 1991,
+        "listen": "127.0.0.1:1991",
+        "authMode": "none",
+        "console": true,
+        "kiosk": true,
+        "enabledPackages": 7,
+        "runtimeUser": "ubuntu",
+        "ready": true
+      },
+      {
+        "port": 2992,
+        "listen": "127.0.0.1:2992",
+        "authMode": "none",
+        "console": false,
+        "kiosk": true,
+        "enabledPackages": 6,
+        "runtimeUser": "ubuntu",
+        "ready": true
+      }
+    ],
+    "desktop": {
+      "id": "xfce-user-desktop-8cdcaa0b5159",
+      "forced": false,
+      "generation": 3,
+      "coreVersion": "0.12.0-rc.2",
+      "coreSHA256": "84d8b6ac203b2ffa3e636fb75d018251c7fc54a10fa9eca59164ba9ceffc7cea",
+      "busPID": 694,
+      "oldOwnedProcessesGone": true
+    },
+    "deploymentPolicy": "1991/2992 Manager updates initially preserved the running desktop's old pin/generation/services. A separate explicit graceful upgrade then applied rc.2 to the same desktop ID, generation 1 to 3. Default HOME/Xauthority remain; account bus PID 694 predates the old desktop. Only disposable test Apps were force-stopped/fault-injected. Old Core/App releases and retired rc.1 cutover registries remain recoverable.",
+    "failureDisposition": [
+      "Original rc.1 lifecycle blockers and intermediate failures are retained in the linked matrix history; all final repaired dynamic/live gates passed.",
+      "Four patch-version increments prevent immutable-package conflicts caused by earlier manifest formatting cleanup; installed old packages and runtime pins were never overwritten.",
+      "The first deployed-desktop verification incorrectly expected a changed IBus socket pathname. Upgrade had completed successfully. Corrected the check to require generation/PID changes with stable runtime path; no second upgrade occurred.",
+      "Read-only verification initially ran a user-bus probe as root, which D-Bus rejected. Running the same probe as the owning ubuntu UID passed; authentication policy was not changed."
+    ],
+    "limits": [
+      "No finite suite exhausts every event ordering; full OS reboot, disk-full/power-loss durability, long-duration load, every unsaved-dialog variant and full six-hour/48-hour waits are not claimed.",
+      "Native browser/OS IME and final human UAT remain operator tasks; current architecture intentionally requires explicit restart after terminal service failure.",
+      "The original IBus portal activation warning is separate from the verified direct IBus/Unicode path, not claimed fixed."
+    ],
+    "rawEvidence": {
+      "archiveAndDeployment": "/tmp/remotexapp-svc-rc2-uat.TRwcTC",
+      "plugin": "/tmp/remotexapp-app-package-e2e.k8adlB",
+      "shipped": "/tmp/remotexapp-shipped-e2e.8ykvJ1",
+      "documents": "/tmp/remotexapp-document-e2e-ZlEchU",
+      "upgradeKDE": "/tmp/remotexapp-upgrade-kde-e2e-nMtfuP",
+      "actions": "/tmp/remotexapp-actions-e2e-DgnqpH",
+      "xfce": "/var/tmp/remotexapp-conn-user.zntAvN/result.json",
+      "xfceViewer": "/var/tmp/remotexapp-conn-user.kFhPvP/served-viewer.json",
+      "serviceFaults": "/tmp/remotexapp-svc-e2e-rKDgkQ",
+      "cutover": "/tmp/remotexapp-svc-cutover-b9fYlt",
+      "performance": "/tmp/remotexapp-svc-perf-OVKPk3",
+      "releaseCI": "/tmp/remotexapp-svc-rc2-release-ci.log",
+      "nightly": "/tmp/remotexapp-svc-final-nightly.log",
+      "finalHandoffCheck": "/tmp/remotexapp-svc-final-handoff-check.log",
+      "postDeployment": "/tmp/remotexapp-svc-deployment-check-Wzyv8H"
+    }
+  }
+}

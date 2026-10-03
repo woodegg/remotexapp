@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "audit",
+  "runId": "github-actions:33894579226",
+  "commit": "4ceb7e9d49b72b33035eb84f3efcad003ff2f314",
+  "startedAt": "2026-09-04T16:20:30Z",
+  "completedAt": "2026-09-04T16:22:35Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.23.2"
+  },
+  "environment": {
+    "kind": "github-hosted",
+    "name": "ubuntu-latest"
+  },
+  "scenarios": [
+    {
+      "id": "candidate-release-gates-before-race",
+      "result": "passed"
+    },
+    {
+      "id": "race-xvfb-display-allocation",
+      "result": "failed",
+      "detail": "scan-then-bind chose :118, then Xvfb reported that its listening socket was already in use"
+    }
+  ],
+  "details": {
+    "failedTest": "TestXClipboardBridgeOfferExpiryWithoutClipman",
+    "replacement": "Xvfb -displayfd",
+    "workflowRun": "https://github.com/woodegg/remotexapp/actions/runs/33894579226"
+  }
+}

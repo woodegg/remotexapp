@@ -1,0 +1,259 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "sandbox-0.8.1-authorized-force-runtime-upgrade:2026-09-10",
+  "commit": "63db996e91a013ee5443ceddaeba370e11a25cd4",
+  "startedAt": "2026-09-10T14:41:55Z",
+  "completedAt": "2026-09-10T14:41:55Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "approved-sandbox-runtime-upgrade",
+    "name": "sandbox00/02/03/07/10 production 1991"
+  },
+  "scenarios": [
+    {
+      "id": "force-upgrade-four-remaining-runtimes",
+      "result": "passed"
+    },
+    {
+      "id": "existing-current-sandbox02-03-not-restarted",
+      "result": "passed"
+    },
+    {
+      "id": "actual-rfb-activation-app-readiness-ibus-and-connection-descriptors",
+      "result": "passed"
+    },
+    {
+      "id": "all-six-runtime-versions-current-and-no-shutdown-errors",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "timestamps": "Evidence collected at completion; raw operations precede collection.",
+    "authorization": "Operator explicitly requested runtime forced upgrade after blocked graceful rollout.",
+    "coreVersion": "0.8.1",
+    "coreCommit": "7c252209b250c69e55cf939b6cf25c3d024991ac",
+    "operations": [
+      {
+        "host": "02",
+        "id": "xfce-user-desktop-3616fd55d920",
+        "result": "already-current",
+        "core": "0.8.1"
+      },
+      {
+        "host": "03",
+        "id": "xfce-user-desktop-7eaf5f60925b",
+        "result": "already-current",
+        "core": "0.8.1"
+      },
+      {
+        "host": "00",
+        "id": "xfce-user-desktop-eefbf64deda7",
+        "action": "upgrade-start",
+        "generation": 1,
+        "oldCore": "0.5.3"
+      },
+      {
+        "host": "00",
+        "id": "xfce-user-desktop-eefbf64deda7",
+        "result": "upgraded",
+        "generation": 2,
+        "core": {
+          "version": "0.8.1",
+          "commit": "7c252209b250c69e55cf939b6cf25c3d024991ac",
+          "sha256": "f8a16a16d9540a0d923218d24519d117e69ba29a0a68e7bc0be4e0afb1bb9a58"
+        },
+        "app": {
+          "id": "xfce-user-desktop",
+          "version": "2.0.0",
+          "sha256": "44e01c8147f807b25d70b797cf6823f1a4078355482888ccf46a98a93381910e"
+        },
+        "state": "server-ready",
+        "sessionState": "stopped"
+      },
+      {
+        "host": "00",
+        "id": "firefox-esr-6d5cd5583aae",
+        "action": "upgrade-start",
+        "generation": 1,
+        "oldCore": "0.5.3"
+      },
+      {
+        "host": "00",
+        "id": "firefox-esr-6d5cd5583aae",
+        "result": "upgraded",
+        "generation": 2,
+        "core": {
+          "version": "0.8.1",
+          "commit": "7c252209b250c69e55cf939b6cf25c3d024991ac",
+          "sha256": "f8a16a16d9540a0d923218d24519d117e69ba29a0a68e7bc0be4e0afb1bb9a58"
+        },
+        "app": {
+          "id": "firefox-esr",
+          "version": "2.1.1",
+          "sha256": "e13af9ebbb79a3a2fe41974279c49b7e21a764eb7db4fefb4392370d001e28f3"
+        },
+        "state": "server-ready",
+        "sessionState": "stopped"
+      },
+      {
+        "host": "07",
+        "id": "xfce-user-desktop-0c83d8920508",
+        "action": "upgrade-start",
+        "generation": 1,
+        "oldCore": "0.5.3"
+      },
+      {
+        "host": "07",
+        "id": "xfce-user-desktop-0c83d8920508",
+        "result": "upgraded",
+        "generation": 2,
+        "core": {
+          "version": "0.8.1",
+          "commit": "7c252209b250c69e55cf939b6cf25c3d024991ac",
+          "sha256": "f8a16a16d9540a0d923218d24519d117e69ba29a0a68e7bc0be4e0afb1bb9a58"
+        },
+        "app": {
+          "id": "xfce-user-desktop",
+          "version": "2.0.0",
+          "sha256": "44e01c8147f807b25d70b797cf6823f1a4078355482888ccf46a98a93381910e"
+        },
+        "state": "server-ready",
+        "sessionState": "stopped"
+      },
+      {
+        "host": "10",
+        "id": "xfce-user-desktop-3f5cfb7fc1a6",
+        "action": "upgrade-start",
+        "generation": 1,
+        "oldCore": "0.5.3"
+      },
+      {
+        "host": "10",
+        "id": "xfce-user-desktop-3f5cfb7fc1a6",
+        "result": "upgraded",
+        "generation": 2,
+        "core": {
+          "version": "0.8.1",
+          "commit": "7c252209b250c69e55cf939b6cf25c3d024991ac",
+          "sha256": "f8a16a16d9540a0d923218d24519d117e69ba29a0a68e7bc0be4e0afb1bb9a58"
+        },
+        "app": {
+          "id": "xfce-user-desktop",
+          "version": "2.0.0",
+          "sha256": "44e01c8147f807b25d70b797cf6823f1a4078355482888ccf46a98a93381910e"
+        },
+        "state": "server-ready",
+        "sessionState": "stopped"
+      }
+    ],
+    "hosts": [
+      {
+        "sandbox": "00",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-eefbf64deda7",
+            "sessionState": "running",
+            "sessionGeneration": 3,
+            "core": "0.8.1",
+            "updateAvailable": false,
+            "upgradePhase": "completed",
+            "application": "ready",
+            "shutdown": null,
+            "error": null,
+            "attachedClients": 0
+          },
+          {
+            "id": "firefox-esr-6d5cd5583aae",
+            "sessionState": "running",
+            "sessionGeneration": 3,
+            "core": "0.8.1",
+            "updateAvailable": false,
+            "upgradePhase": "completed",
+            "application": "ready",
+            "shutdown": null,
+            "error": null,
+            "attachedClients": 0
+          }
+        ]
+      },
+      {
+        "sandbox": "02",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-3616fd55d920",
+            "sessionState": "running",
+            "sessionGeneration": 2,
+            "core": "0.8.1",
+            "updateAvailable": false,
+            "upgradePhase": "completed",
+            "application": "ready",
+            "shutdown": null,
+            "error": null,
+            "attachedClients": 0
+          }
+        ]
+      },
+      {
+        "sandbox": "03",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-7eaf5f60925b",
+            "sessionState": "running",
+            "sessionGeneration": 3,
+            "core": "0.8.1",
+            "updateAvailable": false,
+            "upgradePhase": "completed",
+            "application": "ready",
+            "shutdown": null,
+            "error": null,
+            "attachedClients": 0
+          }
+        ]
+      },
+      {
+        "sandbox": "07",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-0c83d8920508",
+            "sessionState": "running",
+            "sessionGeneration": 3,
+            "core": "0.8.1",
+            "updateAvailable": false,
+            "upgradePhase": "completed",
+            "application": "ready",
+            "shutdown": null,
+            "error": null,
+            "attachedClients": 0
+          }
+        ]
+      },
+      {
+        "sandbox": "10",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-3f5cfb7fc1a6",
+            "sessionState": "running",
+            "sessionGeneration": 3,
+            "core": "0.8.1",
+            "updateAvailable": false,
+            "upgradePhase": "completed",
+            "application": "ready",
+            "shutdown": null,
+            "error": null,
+            "attachedClients": 0
+          }
+        ]
+      }
+    ],
+    "localRuntimesChanged": false,
+    "profilesDeleted": false,
+    "gatewayChanged": false,
+    "forceScope": "Per-request force only; no host shutdown-policy change",
+    "limitations": "Forced termination can discard unsaved application data. Verification used LXD/container-loopback, not the production gateway."
+  }
+}

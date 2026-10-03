@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "label": "libreoffice-driver-v2-formal-local",
+  "collectedAt": "2026-08-28T13:06:22-04:00",
+  "managerURL": "http://127.0.0.1:2099",
+  "source": "ef4dc334a752-dirty",
+  "releaseVersion": "0.1.0-rc.20",
+  "candidate": {
+    "templateId": "libreoffice",
+    "driverVersion": "2.0.0",
+    "activation": "immediate",
+    "displayMode": "dynamic",
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 10,
+    "allowClientResize": true,
+    "isolatedManager": true,
+    "existingPort1991Unchanged": true
+  },
+  "successfulLaunch": {
+    "createToReadyMs": 3982,
+    "exactDocumentUnoReady": true,
+    "staleLockWasReplaced": true,
+    "portableSeedSettingsPresent": ["ooLocale", "ooSetupInstCompleted"],
+    "controlAddress": "127.0.0.1",
+    "controlPort": 21000
+  },
+  "browserSdk": {
+    "realHeadlessChromeNoVnc": true,
+    "connected": true,
+    "framebufferBefore": "1280x720",
+    "framebufferAfterClientResize": "900x640",
+    "reconnectMs": 93.597,
+    "finalRfbState": "connected",
+    "finalInputState": "connected"
+  },
+  "destructiveStop": {
+    "unsavedUnoModificationCreated": true,
+    "normalStopForcedFlag": false,
+    "stopMs": 209,
+    "shutdownState": "completed",
+    "sourceDocumentHashUnchanged": true,
+    "documentLockRemoved": true,
+    "applicationProcessesRemoved": true,
+    "controlPortReleased": true
+  },
+  "launchFailureCases": {
+    "finalComponentSymlinkReplacement": {
+      "responseMs": 579,
+      "httpStatus": 409,
+      "driverErrorPreserved": true,
+      "outsideTargetNotLaunched": true,
+      "outsideLockNotCreated": true
+    },
+    "unremovableDocumentLock": {
+      "responseMs": 550,
+      "httpStatus": 409,
+      "driverErrorPreserved": true,
+      "libreOfficeNotStarted": true,
+      "lockRetainedUntilOperatorPermissionRepair": true
+    },
+    "staleGenerationCannotFailNewStartup": "unit-pass",
+    "liveReadinessPidTakesPrecedence": "unit-pass"
+  },
+  "cleanup": {
+    "testInstancesStopped": true,
+    "transientUnitsRemoved": true,
+    "listenersReleased": true,
+    "applicationProcessesRemoved": true,
+    "isolatedManagerStopped": true,
+    "temporaryTreesMovedToTrash": true
+  },
+  "result": "pass-pending-human-uat"
+}

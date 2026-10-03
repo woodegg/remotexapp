@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RemoteXApp console</title>
+</head>
+<body>
+  <main id="remotexapp-console" aria-live="polite">Loading RemoteXApp console…</main>
+  <script type="module">
+    const resolveConsoleEntry = path => {
+      let base = '';
+      let matched = false;
+      for (const marker of ['/remotexapps/', '/sdk/']) {
+        const index = path.lastIndexOf(marker);
+        if (index >= 0) { base = path.slice(0, index); matched = true; break; }
+      }
+      if (!matched && path !== '/') base = path.replace(/\/$/, '');
+      return `${base}/console/index.js`;
+    };
+    await import(resolveConsoleEntry(location.pathname));
+  </script>
+</body>
+</html>

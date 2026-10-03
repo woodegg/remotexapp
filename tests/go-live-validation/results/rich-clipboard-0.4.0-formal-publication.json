@@ -1,0 +1,61 @@
+{
+  "date": "2026-09-02",
+  "release": {
+    "tag": "v0.4.0",
+    "tagObject": "7d0b50e60e8dbeb2e277f708e8db963c13a8ee5c",
+    "commit": "292a20ba5d7e13efab54a4ed39f52a89b5356840",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/v0.4.0",
+    "publishedAt": "2026-09-02T23:51:06Z",
+    "latest": true,
+    "draft": false,
+    "prerelease": false,
+    "verifyWorkflow": "https://github.com/woodegg/remotexapp/actions/runs/33696734332",
+    "releaseWorkflow": "https://github.com/woodegg/remotexapp/actions/runs/33696815093",
+    "workflowResult": "passed",
+    "sdkVersion": "0.20.0",
+    "appPackageABI": "remotexapp/v1"
+  },
+  "artifacts": {
+    "formalArchiveSha256": "c12ccf4db75ee693ef27142786439086f22b6209ad63f8be0e21c5a7d114d871",
+    "formalArchiveBytes": 7934913,
+    "formalGoVersion": "go1.22.12",
+    "downloadedChecksumVerification": "passed",
+    "downloadedSensitiveDataCheck": "passed",
+    "downloadedCommitVerification": "passed",
+    "downloadedSDKVerification": "passed",
+    "downloadedAppPackageChecksums": "passed",
+    "embeddedSDKAsset": "sdk-FSQSIVR4.js",
+    "embeddedConsoleAsset": "console-KSH57N6V.js",
+    "formalBinarySha256": {
+      "remotexappd": "9f41df15ada10b5cf6c2ff32f1667eece983d9d97b6e6887eb5096718473ee72",
+      "novnc-input": "dd29e6ed5c12a51288a45ae50519c597bf1f800e5d15a4760fa34bd072388de3",
+      "remotexapp-status": "48094d9ba906214072f7169acb623b323f259ced94a50229e964d7d0e6e38aaa",
+      "remotexapp-operator-helper": "12f406373bf78ed74b9ac9261d2a67cfe4329bff383a6a04915b9107f2944f3c"
+    },
+    "localGateArchiveSha256": "18b1e567dc403e9f9e97193a8c09a0d060f64b405573a6a29cdfa9ae13021138",
+    "localGateGoVersion": "go1.22.2",
+    "sameSourceCommit": true,
+    "formalSha256SumsAuthoritative": true
+  },
+  "promotion": {
+    "candidateTag": "v0.4.0-rc.3",
+    "candidateCommit": "e66a7273aa8797f2114a506dcfca4a4ef07dd45d",
+    "functionalChangesFromCandidate": false,
+    "sdkVersionChanged": false,
+    "appPackagesChanged": false,
+    "generatedAssetsChanged": false,
+    "humanUAT": "accepted"
+  },
+  "appPackages": {
+    "edge": "1.0.0",
+    "firefox-esr": "2.1.0",
+    "libreoffice": "3.0.0",
+    "mousepad": "2.0.0",
+    "xfce-user-desktop": "2.0.0"
+  },
+  "deploymentBoundary": {
+    "local1991Version": "0.4.0-rc.2",
+    "formalArtifactDeployedLocally": false,
+    "sandboxChanged": false
+  }
+}

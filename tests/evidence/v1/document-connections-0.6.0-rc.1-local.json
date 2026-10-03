@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "local:mpd001-lof001-conn001-1991-2992",
+  "commit": "0e04b050470b91015170111df7ae6c3956f63d80",
+  "startedAt": "2026-09-10T05:02:20Z",
+  "completedAt": "2026-09-10T05:14:43Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "v22.22.3"},
+  "environment": {"kind": "local", "name": "local-1991-and-2992-only"},
+  "artifact": {
+    "name": "remotexapp-0.6.0-rc.1-linux-amd64.tar.gz",
+    "sha256": "7335f857b49da9a7f37e51db3a2e6b4d33b204086d857781ef2ffed96d550076"
+  },
+  "scenarios": [
+    {"id": "hosted-verify-34439258006", "result": "passed"},
+    {"id": "hosted-candidate-34439257842-release-ci-race-coverage-vulnerability", "result": "passed"},
+    {"id": "exact-archive-checksum-identity-synthetic-abi-install-update-rollback", "result": "passed"},
+    {"id": "exact-archive-four-app-input-resize-status-control-clipboard-lifecycle", "result": "passed"},
+    {"id": "optional-file-invalid-matrix-unicode-spaces-real-editor-readback", "result": "passed"},
+    {"id": "mousepad-normal-destructive-stop-original-file-and-other-instance-preserved", "result": "passed"},
+    {"id": "mousepad-explicit-save-then-force-stop", "result": "passed"},
+    {"id": "mousepad-real-60-second-no-viewer-unsaved-stop", "result": "passed"},
+    {"id": "libreoffice-startcenter-uno-dirty-untitled-stop-adoption-session-restart", "result": "passed"},
+    {"id": "synthetic-private-dbus-actual-connection-public-no-leak-adoption-restart", "result": "passed"},
+    {"id": "connection-auth-schema-legacy-unavailable-stale-revision-process-sdk-contract", "result": "passed"},
+    {"id": "both-managers-exact-candidate-binary-and-sdk-bytes", "result": "passed"},
+    {"id": "both-editors-both-endpoints-blank-launch-and-normal-stop", "result": "passed"},
+    {"id": "both-editors-both-endpoints-file-launch-actual-dbus-x11-connections", "result": "passed"},
+    {"id": "both-editors-both-endpoints-full-two-viewer-clipboard-and-app-paste-readback", "result": "passed"},
+    {"id": "distinct-manager-tokens-cross-manager-denial", "result": "passed"},
+    {"id": "existing-xfce-id-generation-pin-retained-legacy-bus-unavailable", "result": "passed"},
+    {"id": "loopback-health-ready-catalog-console-policy-no-restart-loop-cleanup", "result": "passed"},
+    {"id": "fresh-user-home-xfce-live-in-disposable-account", "result": "skipped"},
+    {"id": "human-uat", "result": "skipped"}
+  ],
+  "details": {
+    "version": "0.6.0-rc.1",
+    "sdkVersion": "0.23.0",
+    "sdkAsset": "sdk-OGNGVD3G.js",
+    "sdkSha256": "5302514427a58269f1e5fb5fc7dc3f7de5e3094fbbe5b44f64a6b20afd44b0b9",
+    "managerSha256": "3b1bdf41829206c0d3a99393263654304e086410a6f631f72b66ff47b97f1d60",
+    "updatedApps": {"mousepad": "3.0.0", "libreoffice": "3.1.0"},
+    "endpoints": [
+      {"listen": "127.0.0.1:1991", "console": true, "kiosk": true, "authMode": "none", "templates": 5, "activeRuntimes": 1, "managerRestarts": 0},
+      {"listen": "127.0.0.1:2992", "console": false, "kiosk": true, "authMode": "none", "templates": 4, "activeRuntimes": 0, "managerRestarts": 0}
+    ],
+    "connectionsCapability": "separate owner-only 64-hex token files; only paths configured in user-service drop-ins; credentials excluded from evidence",
+    "otherConfigurationPreserved": true,
+    "desktop": {
+      "id": "xfce-user-desktop-35bb2815f740",
+      "generation": 4,
+      "sessionState": "running",
+      "gatewayVersionRetained": "0.5.3",
+      "forcedStop": false,
+      "connectionUnavailable": ["sessionBus"]
+    },
+    "uat": "pending; use new candidate runtimes",
+    "publication": "not authorized; no release tag or GitHub Release created",
+    "sandboxDeployment": "not authorized; none performed",
+    "limitations": [
+      "Fresh user-home XFCE live E2E requires a disposable account and was not run on the occupied local desktop. User-bus schema/scope has unit coverage; the retained real XFCE verified legacy availability only.",
+      "Headless browser tests do not prove native OS focus behavior or native permission prompts; Human UAT remains pending.",
+      "Existing runtime pins are retained; Manager replacement cannot add new private metadata to an old running Driver."
+    ],
+    "deploymentCorrection": "The test App root is user-owned. Its install-root protection rejected an initial root invocation before service selection. Retried package installation/activation as the owning user without relaxing permissions; final rollout and smoke passed.",
+    "evidenceLogs": [
+      "document-exact-candidate.log",
+      "document-final-check.log",
+      "document-deploy-2992-retry.log",
+      "document-deploy-1991.log",
+      "document-post2992.log",
+      "document-post1991.log"
+    ]
+  }
+}

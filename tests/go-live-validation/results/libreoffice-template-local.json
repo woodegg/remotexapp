@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "label": "libreoffice-template-local",
+  "collectedAt": "2026-08-28T03:58:00-04:00",
+  "managerURL": "http://127.0.0.1:2099",
+  "source": "8a8f35e96e47-dirty",
+  "deployment": {
+    "mode": "isolated local candidate",
+    "existingPort1991Modified": false,
+    "classCatalog": "libreoffice template only",
+    "authMode": "none",
+    "loopbackOnly": true,
+    "temporaryStateRemoved": true
+  },
+  "template": {
+    "id": "libreoffice",
+    "runMode": "isolated",
+    "displayMode": "dynamic",
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 10,
+    "allowClientResize": true,
+    "vacantTimeout": "60s",
+    "vacantAction": "stop-instance",
+    "windowManager": "matchbox-window-manager"
+  },
+  "fileBoundary": {
+    "absoluteApprovedDocumentAccepted": true,
+    "outsidePathRejectedBeforeInstanceCreation": true,
+    "outsidePathHTTPStatus": 409,
+    "activeInstancesAfterRejectedRequest": 0,
+    "canonicalPathReturned": true
+  },
+  "application": {
+    "visibleWindow": "LibreOffice Writer",
+    "wmClass": "libreoffice-writer",
+    "unoImplementation": "SwXTextDocument",
+    "exactRequestedDocumentActive": true,
+    "applicationStatus": "ready",
+    "statusControlPortMatchedInstance": true
+  },
+  "control": {
+    "firstInstancePort": 21000,
+    "secondConcurrentInstancePort": 21001,
+    "uniquePerActiveInstance": true,
+    "listenerAddress": "127.0.0.1",
+    "rawUNOExposedByManager": false,
+    "externalProbePassed": true
+  },
+  "browser": {
+    "sdkState": "connected",
+    "rfbAttached": true,
+    "initialFramebuffer": "1280x720",
+    "resizedFramebuffer": "900x553",
+    "resizedDepth": 16
+  },
+  "restartAdoption": {
+    "sameRuntimeId": true,
+    "sameVncGatewaySessionAndApplicationPids": true,
+    "sameSessionGeneration": true,
+    "sameControlPort": true,
+    "browserReconnected": true,
+    "unoProbeAfterRestart": true
+  },
+  "shutdown": {
+    "cleanAPIStopCompleted": true,
+    "cleanAPIStopMilliseconds": 342,
+    "unsavedDocumentModifiedThroughUNO": true,
+    "unsavedStopHTTPStatus": 409,
+    "unsavedSessionPreserved": true,
+    "explicitForceHTTPStatus": 200,
+    "explicitForceMilliseconds": 1110,
+    "forced": true,
+    "vacancyTriggeredAtSeconds": 60,
+    "vacancyReason": "idle-timeout",
+    "runtimeUnitsInactive": true,
+    "runtimePortsRemoved": true,
+    "runtimeDirectoryRemoved": true,
+    "ephemeralProfileRemoved": true
+  },
+  "automatedGates": {
+    "makeCheck": true,
+    "targetedGoTests": true,
+    "shellSyntax": true,
+    "deploymentArchitecture": true
+  },
+  "uat": {
+    "accepted": false,
+    "remaining": "human document interaction and application-control UAT"
+  },
+  "result": "implemented-pending-uat"
+}

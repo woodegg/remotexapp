@@ -1,0 +1,60 @@
+{
+  "date": "2026-09-02",
+  "release": {
+    "tag": "v0.3.0",
+    "tagObject": "5fe2814bb3d9ad2bacc9df722c00353347947911",
+    "commit": "c719df9bb88cfa086a0c4881b1a268678fdadfcb",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/v0.3.0",
+    "publishedAt": "2026-09-02T06:02:29Z",
+    "latest": true,
+    "draft": false,
+    "prerelease": false,
+    "verifyWorkflow": "https://github.com/woodegg/remotexapp/actions/runs/33596921853",
+    "releaseWorkflow": "https://github.com/woodegg/remotexapp/actions/runs/33597019022",
+    "workflowResult": "passed",
+    "sdkVersion": "0.18.0",
+    "appPackageABI": "remotexapp/v1"
+  },
+  "artifacts": {
+    "formalArchiveSha256": "3b4c49afc8fec2aec6121822d573170f022a09bd0667de0ed93fd58001c3de69",
+    "formalArchiveBytes": 7718626,
+    "formalGoVersion": "go1.22.12",
+    "downloadedChecksumVerification": "passed",
+    "downloadedSensitiveDataCheck": "passed",
+    "downloadedCommitVerification": "passed",
+    "downloadedCatalogVerification": "passed",
+    "formalBinarySha256": {
+      "remotexappd": "c63d79110caaa5d42e98b2b3af278513e6c59b2eb6e2cee98eff5a60aadb152b",
+      "novnc-input": "0fd9f13e3fd2c3a09abe48f6ecc21aa883aea3bcb6be574e38fd67e9f4848098",
+      "remotexapp-status": "765e99ee4c5b2a4c7286ec4d114e952919b78592b0d93d40a81293c86ff227b9",
+      "remotexapp-operator-helper": "28ca0388db76f44f25e45fd77e444ec3bfa61f102d304c8f4d2127dc46a6b7ab"
+    },
+    "localGateArchiveSha256": "1d8dc8bb211848c32ca4f4c5768220a6945c53e1f31f382afacb194e425b569d",
+    "localGateGoVersion": "go1.22.2",
+    "localGateRepeatedExactly": true,
+    "sameSourceCommit": true,
+    "formalSha256SumsAuthoritative": true
+  },
+  "acceptance": {
+    "candidateVersion": "0.3.0-rc.1",
+    "candidateCommit": "cfddd717e14d4673c61d0e7ea4f0feed5712ff8b",
+    "candidateToFinalChangedOnlyVersionDocsAndEvidence": true,
+    "cat001ThroughCat008": "accepted",
+    "humanUAT": "accepted"
+  },
+  "catalog": {
+    "edge": "1.0.0",
+    "firefox-esr": "2.1.0",
+    "libreoffice": "3.0.0",
+    "mousepad": "2.0.0",
+    "xfce-user-desktop": "2.0.0",
+    "allDepth16": true,
+    "xfceDesktopAbsent": true
+  },
+  "deploymentBoundary": {
+    "local1991Version": "0.3.0-rc.1",
+    "local1991Commit": "cfddd717e14d",
+    "formalArtifactDeployedLocally": false,
+    "sandboxChanged": false
+  }
+}

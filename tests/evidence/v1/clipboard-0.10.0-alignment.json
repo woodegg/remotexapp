@@ -1,0 +1,227 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "clipboard-0.10.0-eight-endpoints:2026-09-12",
+  "commit": "732a3cfd890cf3c4fa23b565796217beed6acb40",
+  "startedAt": "2026-09-12T20:24:00Z",
+  "completedAt": "2026-09-12T20:26:07Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8"
+  },
+  "environment": {
+    "kind": "local-and-LXD",
+    "name": "eight-approved-endpoints"
+  },
+  "artifact": {
+    "name": "remotexapp-0.10.0-linux-amd64.tar.gz",
+    "sha256": "1f60d1e2cf157fc1c4fd4f52059aebf10cb29211e8d9875a7d9236e678605c21"
+  },
+  "scenarios": [
+    {
+      "id": "independent-formal-download-and-byte-identity",
+      "result": "passed"
+    },
+    {
+      "id": "stage-all-before-selection",
+      "result": "passed"
+    },
+    {
+      "id": "two-manager-starts-per-endpoint",
+      "result": "passed"
+    },
+    {
+      "id": "exact-running-binary-and-served-assets",
+      "result": "passed"
+    },
+    {
+      "id": "configuration-App-selectors-and-runtime-pins-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "ready-connections-actions-and-empty-warning-journals",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "version": "0.10.0",
+    "sdkVersion": "0.27.3",
+    "managerDrift": "none",
+    "runtimeDrift": "intentional-preserved-pins-not-upgraded",
+    "apps": "unchanged",
+    "sdkSHA256": "abf951882691ddd69bf23cef342fa263b37c9bb06e0cfe8e51bd014a891b2890",
+    "consoleSHA256": "24465f9b6709083677dd733e27535577a4a3c9d0205410b01953ff19fa112c2d",
+    "endpoints": [
+      {
+        "endpoint": "local-prod",
+        "port": 1991,
+        "version": "0.10.0",
+        "commit": "732a3cfd890c",
+        "sdk": "0.27.3",
+        "identity": "passed",
+        "warningJournal": "empty",
+        "runtimePins": "preserved-not-upgraded",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-44ea8c2186ee",
+            "sessionGeneration": 7,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.0.0"
+          },
+          {
+            "id": "edge-b9b309c92005",
+            "sessionGeneration": 1,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.10.0-dev.20260912-clp039-3s",
+            "app": "1.1.0"
+          }
+        ]
+      },
+      {
+        "endpoint": "local-test",
+        "port": 2992,
+        "version": "0.10.0",
+        "commit": "732a3cfd890c",
+        "sdk": "0.27.3",
+        "identity": "passed",
+        "warningJournal": "empty",
+        "runtimePins": "preserved-not-upgraded",
+        "runtimes": []
+      },
+      {
+        "endpoint": "sandbox00-prod",
+        "port": 1991,
+        "version": "0.10.0",
+        "commit": "732a3cfd890c",
+        "sdk": "0.27.3",
+        "identity": "passed",
+        "warningJournal": "empty",
+        "runtimePins": "preserved-not-upgraded",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-eefbf64deda7",
+            "sessionGeneration": 5,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.0.0"
+          }
+        ]
+      },
+      {
+        "endpoint": "sandbox00-test",
+        "port": 2991,
+        "version": "0.10.0",
+        "commit": "732a3cfd890c",
+        "sdk": "0.27.3",
+        "identity": "passed",
+        "warningJournal": "empty",
+        "runtimePins": "preserved-not-upgraded",
+        "runtimes": []
+      },
+      {
+        "endpoint": "sandbox02-prod",
+        "port": 1991,
+        "version": "0.10.0",
+        "commit": "732a3cfd890c",
+        "sdk": "0.27.3",
+        "identity": "passed",
+        "warningJournal": "empty",
+        "runtimePins": "preserved-not-upgraded",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-3616fd55d920",
+            "sessionGeneration": 4,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.0.0"
+          }
+        ]
+      },
+      {
+        "endpoint": "sandbox03-prod",
+        "port": 1991,
+        "version": "0.10.0",
+        "commit": "732a3cfd890c",
+        "sdk": "0.27.3",
+        "identity": "passed",
+        "warningJournal": "empty",
+        "runtimePins": "preserved-not-upgraded",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-7eaf5f60925b",
+            "sessionGeneration": 5,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.0.0"
+          }
+        ]
+      },
+      {
+        "endpoint": "sandbox07-prod",
+        "port": 1991,
+        "version": "0.10.0",
+        "commit": "732a3cfd890c",
+        "sdk": "0.27.3",
+        "identity": "passed",
+        "warningJournal": "empty",
+        "runtimePins": "preserved-not-upgraded",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-0c83d8920508",
+            "sessionGeneration": 5,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.0.0"
+          }
+        ]
+      },
+      {
+        "endpoint": "sandbox10-prod",
+        "port": 1991,
+        "version": "0.10.0",
+        "commit": "732a3cfd890c",
+        "sdk": "0.27.3",
+        "identity": "passed",
+        "warningJournal": "empty",
+        "runtimePins": "preserved-not-upgraded",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-3f5cfb7fc1a6",
+            "sessionGeneration": 5,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.0.0"
+          },
+          {
+            "id": "edge-0590c1aab19b",
+            "sessionGeneration": 3,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "1.1.0"
+          },
+          {
+            "id": "firefox-esr-6bc26c9f617a",
+            "sessionGeneration": 1,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.2.0"
+          }
+        ]
+      }
+    ],
+    "network": "One direct private-IP health probe per sandbox timed out. LXD administration and container-loopback checks passed; no firewall or production gateway changes or external-path acceptance claim.",
+    "runtimeAdoption": "Existing 0.9.1 runtimes require separately approved upgrade/restart for consistency-capable clipboard approvals. Runtime generations were preserved; no forced session replacement.",
+    "publicationEvidence": "tests/evidence/v1/clipboard-0.10.0-publication.json",
+    "localAuditDirectory": "/tmp/remotexapp-0100-ops.GiFyaM"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "testedAt": "2026-08-27T20:22:00-04:00",
+  "environment": "test-host local experiment",
+  "release": "0.1.0-rc.9",
+  "sdkVersion": "0.10.0",
+  "template": "xfce-user-desktop",
+  "driverVersion": "1.1.0",
+  "managedId": "local-user-desktop",
+  "runtimeId": "xfce-user-desktop-d8a3b97759f4",
+  "runMode": "user-home",
+  "results": {
+    "catalogHasOnlyRunMode": true,
+    "homeIsPasswdHome": true,
+    "userDBusAddress": "unix:path=/run/user/1000/bus",
+    "userBusOwnedBySession": false,
+    "xauthorityPath": "/home/tester/.Xauthority",
+    "otherDisplayCookiesPreserved": true,
+    "cleanEnvironmentXdpyinfoWithoutXauthority": true,
+    "cleanEnvironmentMousepadVisibleWithoutXauthority": true,
+    "browserRfbConnected": true,
+    "browserInputConnected": true,
+    "browserReconnectPassed": true,
+    "displayRestored": "1920x1080x16",
+    "testClientsAfterCleanup": 0
+  },
+  "deployment": {
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "productionSecure": false
+  },
+  "humanUAT": "pending"
+}

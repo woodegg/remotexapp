@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "edge-2.0.2-formal-publication",
+  "commit": "360b3dfe096917d53662c112b654a7a19b3b26d0",
+  "startedAt": "2026-09-17T04:13:50Z",
+  "completedAt": "2026-09-17T04:14:48Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "github-release",
+    "name": "woodegg/remotexapp edge-v2.0.2"
+  },
+  "artifact": {
+    "name": "edge-2.0.2.tar.gz",
+    "sha256": "aa0e33cb60db69c211582a52b702b50dbcad4397a274ff969996a713895e84f7"
+  },
+  "release": {
+    "id": "RE_kwDOUGRp2s4XRXn4",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/edge-v2.0.2",
+    "tag": "edge-v2.0.2",
+    "tagObject": "589d1446b33520aea8d8cf8467e00d507a06c770",
+    "peeledCommit": "360b3dfe096917d53662c112b654a7a19b3b26d0",
+    "publishedAt": "2026-09-17T04:14:01Z",
+    "draft": false,
+    "prerelease": false
+  },
+  "scenarios": [
+    { "id": "annotated-tag-exists-remotely-and-peels-to-accepted-source", "result": "passed" },
+    { "id": "release-publishes-only-archive-and-checksum", "result": "passed" },
+    { "id": "downloaded-checksum-valid-and-archive-byte-identical-to-UAT", "result": "passed" },
+    { "id": "downloaded-manifest-id-version-and-ABI", "result": "passed" },
+    { "id": "release-is-formal-not-draft-or-prerelease", "result": "passed" },
+    { "id": "RemoteXApp-Core-v0.12.2-remains-Latest", "result": "passed" },
+    { "id": "sandbox-deployment", "result": "skipped", "reason": "Publication approval did not authorize sandbox deployment." }
+  ],
+  "retainedEvidence": {
+    "downloadDirectory": "/tmp/remotexapp-app-release-verify",
+    "acceptedUAT": "tests/evidence/v1/edge-2.0.2-lightview-1.0.6-local-uat.json"
+  },
+  "limitations": [
+    "This independent App Package release does not change Core or SDK.",
+    "Publication does not deploy or upgrade any endpoint."
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "edge-2.0.2-lightview-1.0.6-formal-alignment",
+  "commit": "49b85aea5ea3358b223bc0a5025392867889c49b",
+  "startedAt": "2026-09-17T04:20:00Z",
+  "completedAt": "2026-09-17T04:36:00Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.27.1",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "local-and-lxd-App-alignment",
+    "name": "two local endpoints, sandbox00 production/test, and five additional sandbox production endpoints"
+  },
+  "artifact": {
+    "name": "edge-2.0.2.tar.gz",
+    "sha256": "aa0e33cb60db69c211582a52b702b50dbcad4397a274ff969996a713895e84f7"
+  },
+  "artifacts": {
+    "edge": {
+      "release": "edge-v2.0.2",
+      "tagCommit": "360b3dfe096917d53662c112b654a7a19b3b26d0",
+      "archive": "edge-2.0.2.tar.gz",
+      "archiveSha256": "aa0e33cb60db69c211582a52b702b50dbcad4397a274ff969996a713895e84f7",
+      "contentSha256": "bb297977dac98ed06d623f2a33b06106e5b60130c0abec2073748e6d53592f8e"
+    },
+    "lightview": {
+      "release": "lightview-v1.0.6",
+      "tagCommit": "360b3dfe096917d53662c112b654a7a19b3b26d0",
+      "archive": "lightview-1.0.6.tar.gz",
+      "archiveSha256": "bc424aabdf8484734e4f35c75ff00345268343c237eb9f093724bd79e5d3f381",
+      "contentSha256": "0d524da1866a039e981844340a30a9d06f474c62e947e643e1b81eb934e7ed99"
+    }
+  },
+  "scope": {
+    "edge": "all established local and sandbox App footprints",
+    "lightview": "existing local, sandbox00 and sandbox01 footprints only",
+    "coreChanged": false,
+    "sdkChanged": false,
+    "containerRebooted": false,
+    "forceUsed": false
+  },
+  "targets": [
+    {"name":"local-production","listener":"127.0.0.1:1991","core":"0.12.2","edge":"2.0.2","lightview":"1.0.6","result":"passed"},
+    {"name":"local-test","listener":"127.0.0.1:2992","core":"0.12.0-rc.2","edge":"2.0.2","lightview":"1.0.6","result":"passed"},
+    {"name":"sandbox00-production","listener":"0.0.0.0:1991","core":"0.12.2","edge":"2.0.2","lightview":"1.0.6","result":"passed"},
+    {"name":"sandbox00-test","listener":"127.0.0.1:2991","core":"0.12.2","edge":"2.0.2","lightview":"not-installed","result":"passed"},
+    {"name":"sandbox01-production","listener":"0.0.0.0:1991","core":"0.12.2","edge":"2.0.2","lightview":"1.0.6","result":"passed"},
+    {"name":"sandbox02-production","listener":"0.0.0.0:1991","core":"0.12.2","edge":"2.0.2","lightview":"not-installed","result":"passed"},
+    {"name":"sandbox03-production","listener":"0.0.0.0:1991","core":"0.12.2","edge":"2.0.2","lightview":"not-installed","result":"passed"},
+    {"name":"sandbox07-production","listener":"0.0.0.0:1991","core":"0.12.2","edge":"2.0.2","lightview":"not-installed","result":"passed"},
+    {"name":"sandbox10-production","listener":"0.0.0.0:1991","core":"0.12.2","edge":"2.0.2","lightview":"not-installed","result":"passed"}
+  ],
+  "runtimeUpgrade": {
+    "endpoint": "sandbox00-production",
+    "id": "edge-c9438344f969",
+    "fromAppVersion": "2.0.1",
+    "toAppVersion": "2.0.2",
+    "initialGeneration": 1,
+    "postUpgradeGeneration": 2,
+    "verifiedRunningGeneration": 3,
+    "operation": "upgrade-and-restart",
+    "phase": "completed",
+    "force": false
+  },
+  "scenarios": [
+    {"id":"exact-formal-App-archives-and-content-seals","result":"passed"},
+    {"id":"stage-without-selector-change-then-transactional-activation","result":"passed"},
+    {"id":"two-consecutive-Manager-starts-and-durable-adoption-per-changed-endpoint","result":"passed"},
+    {"id":"existing-LightView-footprint-retained-at-1.0.6","result":"passed"},
+    {"id":"old-Edge-runtime-explicit-upgrade-and-restart-without-force","result":"passed"},
+    {"id":"Edge-real-RFB-WebSocket-ready-CDP-descriptor-and-openUrl","result":"passed"},
+    {"id":"unrelated-runtime-identities-generations-and-pins-preserved","result":"passed"},
+    {"id":"local-listeners-remain-loopback-only","result":"passed"},
+    {"id":"sandbox-listeners-auth-and-Console-kiosk-policy-preserved","result":"passed"},
+    {"id":"post-activation-service-warning-and-restart-loop-check","result":"passed"},
+    {"id":"CloudDrive-functional-tests","result":"skipped","reason":"CloudDrive maintenance; document-root availability is non-fatal."},
+    {"id":"sandbox-container-reboot","result":"skipped","reason":"Not authorized or required for App Package alignment."}
+  ],
+  "drift": "none"
+}

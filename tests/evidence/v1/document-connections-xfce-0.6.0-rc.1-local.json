@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "local:conn001-user-home-xfce-followup",
+  "commit": "0e04b050470b91015170111df7ae6c3956f63d80",
+  "startedAt": "2026-09-10T05:27:11Z",
+  "completedAt": "2026-09-10T05:29:03Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "v22.22.3"},
+  "environment": {"kind": "local", "name": "local-1991-user-home-xfce"},
+  "scenarios": [
+    {"id": "operator-authorized-normal-stop-managed-desktop-and-start-current-pins", "result": "passed"},
+    {"id": "sdk-getConnections-explicit-capability-ready-generation-stable-revision", "result": "passed"},
+    {"id": "reported-display-default-user-xauthority-real-x11-1280x720-16bit", "result": "passed"},
+    {"id": "reported-user-bus-ListNames-and-default-bus-GetId-match", "result": "passed"},
+    {"id": "xfce-session-manager-bus-owner-and-introspection", "result": "passed"},
+    {"id": "no-unavailable-fields-application-omitted-as-designed", "result": "passed"},
+    {"id": "missing-capability-403-stale-generation-409-no-store", "result": "passed"},
+    {"id": "viewer-rfb-input-connected-reconnect-fixed-framebuffer-browser-scaling", "result": "passed"}
+  ],
+  "details": {
+    "version": "0.6.0-rc.1",
+    "sdkVersion": "0.23.0",
+    "appVersion": "2.0.0",
+    "previousRuntimeId": "xfce-user-desktop-35bb2815f740",
+    "runtimeId": "xfce-user-desktop-44ea8c2186ee",
+    "sessionGeneration": 1,
+    "display": ":1",
+    "sessionBusScope": "user",
+    "defaultUserHomeAndXauthorityPreserved": true,
+    "gatewayStatusAndCommonHelperPins": "0.6.0-rc.1",
+    "forceUsed": false,
+    "application": "omitted: desktop has no dedicated application-control descriptor",
+    "unavailable": [],
+    "viewerReconnectMS": 66.95,
+    "finalState": "managed desktop left running; temporary test browser closed",
+    "scope": "only local 1991 desktop; no sandbox or 2992 runtime changed",
+    "supersedes": "Fresh user-home connection coverage gap recorded in document-connections-0.6.0-rc.1-local.json. This is focused connection/Viewer validation, not a new full clipboard or desktop UAT run."
+  }
+}

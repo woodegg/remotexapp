@@ -1,0 +1,251 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "ubuntu-host-compatibility-0.12.1-rc.1-development",
+  "commit": "2e683b9f74f6cdf1f78da0adc348debd79224ca5",
+  "workspaceDirty": true,
+  "startedAt": "2026-09-14T08:23:58.222Z",
+  "completedAt": "2026-09-14T08:37:37Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "22.22.3"
+  },
+  "environment": {
+    "kind": "provisioned-Ubuntu-24.04.4-local-disposable-runtimes",
+    "name": "loopback-21996-and-21997-not-deployed-services",
+    "ibus": "1.5.29-2",
+    "mousepad": "0.6.1-1build2",
+    "kateAndKwrite": "4:23.08.5-0ubuntu3",
+    "qt": "5.15.13+dfsg-1ubuntu1"
+  },
+  "sourceTarget": {
+    "core": "0.12.1-rc.1",
+    "sdk": "0.28.0",
+    "mousepad": "4.0.1"
+  },
+  "binaries": {
+    "remotexappd": "6d58c3f68321422c0eea60a438b7ebf923485284a011f000e8530de5d09f58b8",
+    "remotexapp-status": "58d95484e98c10d996fa7476a5afbcfdcdb87938c0530a244f8c4c8c3274e117",
+    "novnc-input": "7b277eb31419e957557753c2c026b432389046f834b6c1707459789e7a28b2e5",
+    "remotexapp-operator-helper": "d8d4f5afaf17a54833f30f6e6fac0bd0fb2c14e77f36f874268e70f4a41ec5aa"
+  },
+  "scenarios": [
+    {
+      "id": "portable-make-check",
+      "result": "passed",
+      "javascriptTests": 158
+    },
+    {
+      "id": "race-full-go-and-repeated-startup-failures",
+      "result": "passed"
+    },
+    {
+      "id": "coverage-floors",
+      "result": "passed",
+      "goStatements": 62.3,
+      "sdkLines": 86.07,
+      "sdkBranches": 78.62,
+      "sdkFunctions": 82.16
+    },
+    {
+      "id": "source-vulnerability-scan",
+      "result": "passed"
+    },
+    {
+      "id": "host-checks-positive-negative",
+      "result": "passed",
+      "pythonTests": 12
+    },
+    {
+      "id": "actual-user-all-App-gtk3-gtk4-qt5-uno-gi-pidfd-bus-checks",
+      "result": "passed"
+    },
+    {
+      "id": "offline-system-staging-and-immutable-helper-installation",
+      "result": "passed"
+    },
+    {
+      "id": "archive-build-and-sensitive-data-check",
+      "result": "passed",
+      "qualification": "development package only; not a clean hosted publication candidate"
+    },
+    {
+      "id": "main-mousepad",
+      "result": "passed",
+      "passedCheckpoints": 34,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 270
+    },
+    {
+      "id": "main-libreoffice",
+      "result": "passed",
+      "passedCheckpoints": 34,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 270
+    },
+    {
+      "id": "main-kate",
+      "result": "passed",
+      "passedCheckpoints": 33,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 260
+    },
+    {
+      "id": "main-kwrite",
+      "result": "passed",
+      "passedCheckpoints": 33,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 260
+    },
+    {
+      "id": "main-firefox-esr",
+      "result": "passed",
+      "passedCheckpoints": 35,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 280
+    },
+    {
+      "id": "main-edge",
+      "result": "passed",
+      "passedCheckpoints": 35,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 280
+    },
+    {
+      "id": "main-xfce-user-desktop",
+      "result": "passed",
+      "passedCheckpoints": 33,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 270
+    },
+    {
+      "id": "interaction-mousepad",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "interaction-libreoffice",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "interaction-kate",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "interaction-kwrite",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "interaction-firefox-esr",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "interaction-edge",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "interaction-xfce-user-desktop",
+      "result": "passed",
+      "passedCheckpoints": 7,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "mousepad-1-upgrade-4.0.0-to-4.0.1",
+      "result": "passed"
+    },
+    {
+      "id": "mousepad-2-readback-Mousepad",
+      "result": "passed"
+    },
+    {
+      "id": "mousepad-3-readback-Org.xfce.mousepad",
+      "result": "passed"
+    },
+    {
+      "id": "mousepad-4-wrong-class-rejected-runtime",
+      "result": "passed"
+    },
+    {
+      "id": "mousepad-5-upgrade-4.0.0-sandbox.ubuntu2604.1-to-4.0.1",
+      "result": "passed"
+    },
+    {
+      "id": "mousepad-6-readback-Mousepad",
+      "result": "passed"
+    },
+    {
+      "id": "mousepad-7-readback-Org.xfce.mousepad",
+      "result": "passed"
+    },
+    {
+      "id": "mousepad-8-wrong-class-rejected-runtime",
+      "result": "passed"
+    },
+    {
+      "id": "pristine-ubuntu-24.04-and-26.04-full-acceptance",
+      "result": "skipped",
+      "reason": "No approved fresh VM/container target provisioned; local LXD unix socket unavailable. Existing live sandboxes not authorized."
+    },
+    {
+      "id": "native-ubuntu-26.04-mousepad-qt6-missing-module-and-full-reboot-matrix",
+      "result": "skipped",
+      "reason": "Requires the fresh-host gate; local class and version fixtures are not native distro certification."
+    },
+    {
+      "id": "clean-exact-archive-all-App-Viewer-all-clipboard-format-cold-load-acceptance",
+      "result": "skipped",
+      "reason": "Broader publication acceptance gate remains pending; this record covers local lifecycle, interaction and Mousepad text-readback tests."
+    }
+  ],
+  "supersededFailures": [
+    {
+      "id": "initial-main-all-seven-connections-409",
+      "result": "failed",
+      "cause": "New supervisor progress incremented public revision without private connection revision. Repaired with paired pre-Driver writes; full rerun passed.",
+      "rawEvidence": "/var/tmp/remotexapp-svc-matrix.Q4N7kk/evidence/result.json"
+    },
+    {
+      "id": "mousepad-harness-catalog-refresh",
+      "result": "failed",
+      "cause": "Harness assumed selectors auto-reload. Corrected to explicitly restart only its temporary Manager, preserving running pins.",
+      "rawLog": "/tmp/remotexapp-u26-mousepad-e2e.log"
+    },
+    {
+      "id": "mousepad-harness-wire-ack",
+      "result": "failed",
+      "cause": "Harness expected SDK-normalized empty error on the raw wire; success omits the error field. Corrected to require text-ack without error and actual document readback.",
+      "rawLog": "/tmp/remotexapp-u26-mousepad-e2e-fixed.log"
+    }
+  ],
+  "retainedEvidence": {
+    "main": "/var/tmp/remotexapp-svc-matrix.zZTgzZ/evidence/result.json",
+    "interaction": "/var/tmp/remotexapp-svc-matrix.N29EcQ/evidence/result.json",
+    "mousepad": "/tmp/remotexapp-u26-mousepad-XA5X9T/result.json"
+  },
+  "limitations": [
+    "Base commit plus uncommitted work; not evidence that the base Git commit contains these fixes.",
+    "State matrix uses documented test-only App versions/barriers and a relocated XFCE display under a disposable UID.",
+    "Mousepad old-version selectors use current Driver scripts; WM_CLASS is changed on owned test windows. Native Ubuntu 26.04 and archived downstream upgrade remain unverified.",
+    "No local 1991/2992 or sandbox deployment/restart; no production gateway testing; no workaround retirement; no UAT or publication.",
+    "Whole-host reboot is distinct from Manager crash/restart and was not exercised."
+  ]
+}

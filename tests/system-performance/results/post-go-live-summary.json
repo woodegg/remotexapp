@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "collectedAt": "2026-08-27T06:10:37-04:00",
+  "deployment": {
+    "managerSha256": "4c63e0327e4a91c2ce602acaea379b0dc00709a0774b0bc971329fc01a226460",
+    "gatewaySha256": "3553839051eab9b79f8a7ec8257260bcfa6a3491131701180c8f0d14a9480ab0",
+    "statusSha256": "3cf0bc00fa90ce2ab91b06945d8408e1259436ada3cddb0306d95cc890d4013b",
+    "sdkVersion": "0.8.0",
+    "listen": "0.0.0.0:1991",
+    "service": "remotexapp.service",
+    "managedXFCE": "test-host-xfce"
+  },
+  "serverOnlyXFCE": {
+    "pssKiB": {"before": 156537, "after": 80903, "changePercent": -48.3},
+    "memoryCurrentBytes": {"before": 142700544, "after": 33792000, "changePercent": -76.3}
+  },
+  "mousepad": {
+    "attachedPssKiB": {"before": 169585, "after": 124410, "changePercent": -26.6},
+    "attachMs": {"before": 1184, "after": 796, "changePercent": -32.8},
+    "phaseCpuUsec": {
+      "static": {"before": 25995, "after": 16472, "changePercent": -36.6},
+      "input": {"before": 3013833, "after": 2663215, "changePercent": -11.6},
+      "scroll": {"before": 771313, "after": 717494, "changePercent": -7.0}
+    },
+    "rfbDownBitsPerSecond": {
+      "static": {"before": 237.5, "after": 237.5, "changePercent": 0.0},
+      "input": {"before": 127349.6, "after": 127631.6, "changePercent": 0.2},
+      "scroll": {"before": 35430.2, "after": 36592.1, "changePercent": 3.3}
+    },
+    "inputRoundTripMs": {"p50Before": 1.3, "p50After": 1.0, "p95Before": 3.0, "p95After": 2.9},
+    "reconnectMs": {"before": 31, "after": 25},
+    "correctness": {"requests": 600, "errors": 0, "utf8Bytes": 780, "clipboardExact": true, "resize": true, "cleanup": true}
+  },
+  "xfceDesktop": {
+    "attachedPssKiB": {"before": 433741, "after": 393179, "changePercent": -9.4},
+    "attachMs": {"before": 1029, "after": 3597, "changePercent": 249.6},
+    "phaseCpuUsec": {
+      "static": {"before": 274776, "after": 38259, "changePercent": -86.1},
+      "input": {"before": 2617639, "after": 2436058, "changePercent": -6.9},
+      "scroll": {"before": 1550550, "after": 1692970, "changePercent": 9.2}
+    },
+    "rfbDownBitsPerSecond": {
+      "static": {"before": 307787.6, "after": 298.2, "changePercent": -99.9},
+      "input": {"before": 82614.5, "after": 73112.4, "changePercent": -11.5},
+      "scroll": {"before": 37224.3, "after": 40947.2, "changePercent": 10.0}
+    },
+    "inputRoundTripMs": {"p50Before": 1.3, "p50After": 1.0, "p95Before": 3.5, "p95After": 2.1},
+    "reconnectMs": {"before": 43, "after": 35},
+    "correctness": {"requests": 600, "errors": 0, "utf8Bytes": 780, "clipboardExact": true, "fixedResize": true, "sessionCleanup": true}
+  },
+  "browserAssets": {
+    "requests": {"before": 45, "after": 3, "changePercent": -93.3},
+    "transferBytes": {"before": 549477, "after": 182088, "changePercent": -66.9}
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-31",
+  "scope": "unified operator console release train; local deployment only",
+  "result": "passed",
+  "artifact": {
+    "version": "0.2.0-rc.9",
+    "commit": "1d0fddb31692",
+    "sdkVersion": "0.18.0",
+    "sha256": "dca0141c59bb61f5ab40864ecc25d2b23428bb4cb21fbde12369273cd430aefa"
+  },
+  "releaseGate": {
+    "makeCheck": "passed",
+    "goRace": "passed",
+    "releaseCI": "passed",
+    "sdkAndConsoleTests": 44,
+    "sensitiveDataCheck": "passed",
+    "deterministicPackage": "passed"
+  },
+  "console": {
+    "oneHashedBundle": true,
+    "routes": [
+      "/",
+      "/sdk/console.html",
+      "/sdk/minimal.html",
+      "/remotexapps/{id}/kiosk.html"
+    ],
+    "modes": [
+      "operator",
+      "launch",
+      "viewer"
+    ],
+    "reversePrefixMatrix": "passed",
+    "realChromeModes": "passed",
+    "launchDraftSurvivedRefresh": true,
+    "viewerLifecycleControls": false,
+    "environmentRequestsObserved": 0
+  },
+  "runtimeRestart": {
+    "staleGenerationRejectedBeforeStop": true,
+    "anonymousSingletonPreservedIdentityAndAllocation": true,
+    "managedUserHomePreservedRegistrationIdentityAndAllocation": true,
+    "blockedUnsavedMousepadStatus": 409,
+    "blockedSessionPreserved": true,
+    "forcedMousepadGeneration": "1 -> 2",
+    "forcedMousepadBrowserReconnect": "connected",
+    "operatorConsoleEdgeGeneration": "1 -> 2",
+    "operatorConsoleEdgeParametersPreserved": true,
+    "operatorConsoleEdgeResourcesPreserved": true,
+    "crashWindowManifestRecovery": "passed"
+  },
+  "serviceRestart": {
+    "deploymentMode": "central user service",
+    "temporaryAuthMode": "trusted-header",
+    "operationId": "operator-5a8416ddc022e400a59c7707",
+    "operationState": "succeeded",
+    "managerPidChanged": true,
+    "helperPidPreserved": true,
+    "runtimeIdsGenerationsAllocationsAndPidsPreserved": true,
+    "missingConfirmationRejected": true,
+    "crossOriginRejected": true,
+    "arbitraryUnitRejected": true,
+    "rateLimitStatus": 503
+  },
+  "applicationRegression": {
+    "apps": [
+      "edge",
+      "firefox-esr",
+      "libreoffice",
+      "mousepad"
+    ],
+    "checks": [
+      "input",
+      "resize",
+      "readiness",
+      "generic-status",
+      "control-probes",
+      "exit",
+      "shutdown",
+      "restart-adoption",
+      "profile-persistence",
+      "cleanup"
+    ],
+    "result": "passed"
+  },
+  "finalDeployment": {
+    "listenAddress": "0.0.0.0:1991",
+    "operatorUrl": "http://127.0.0.1:1991/",
+    "authMode": "none",
+    "serviceRestartCapability": false,
+    "operatorHelper": "disabled and inactive",
+    "activeInstances": 2,
+    "attachedClients": 0,
+    "runtimeSessions": "stopped",
+    "serviceNRestarts": 0,
+    "sandboxDeployment": false,
+    "testResidueRemoved": true
+  },
+  "rejectedCandidates": {
+    "0.2.0-rc.6": "same-ID singleton recreation returned the old in-memory record",
+    "0.2.0-rc.7": "empty root prefix constructed a nested console loader URL",
+    "0.2.0-rc.8": "Unix helper request and response sides waited for each other"
+  },
+  "humanUAT": "pending"
+}

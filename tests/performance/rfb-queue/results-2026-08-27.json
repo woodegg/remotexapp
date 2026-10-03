@@ -1,0 +1,50 @@
+{
+  "experiment": "P05",
+  "outcome": "accepted",
+  "date": "2026-08-27",
+  "harness": {
+    "sourceBytes": 33554432,
+    "sourceFrames": 512,
+    "sourceFrameBytes": 65536,
+    "initialClientStallMillis": 1000,
+    "clientDelayPerWebSocketMessageMillis": 2,
+    "independentProcessesPerCapacity": 5
+  },
+  "median": {
+    "queue256": {
+      "maxQueueDepth": 256,
+      "heapAllocIncreaseBytes": 16967408,
+      "upstreamSendMillis": 1007.618,
+      "clientDrainMillis": 1180.556,
+      "finalFrameGeneratedToClientMillis": 1156.133,
+      "averageSourceFrameAgeMillis": 1564.230,
+      "maximumSourceFrameAgeMillis": 2126.823
+    },
+    "queue8": {
+      "maxQueueDepth": 8,
+      "heapAllocIncreaseBytes": 714936,
+      "upstreamSendMillis": 1233.721,
+      "clientDrainMillis": 1223.606,
+      "finalFrameGeneratedToClientMillis": 975.848,
+      "averageSourceFrameAgeMillis": 1051.333,
+      "maximumSourceFrameAgeMillis": 1592.989
+    },
+    "queue1": {
+      "maxQueueDepth": 1,
+      "heapAllocIncreaseBytes": 256024,
+      "upstreamSendMillis": 1207.291,
+      "clientDrainMillis": 1195.463,
+      "finalFrameGeneratedToClientMillis": 989.164,
+      "averageSourceFrameAgeMillis": 1123.598,
+      "maximumSourceFrameAgeMillis": 1648.242
+    }
+  },
+  "queue8RelativeToQueue256": {
+    "heapAllocReductionPercent": 95.8,
+    "averageSourceFrameAgeReductionPercent": 32.8,
+    "maximumSourceFrameAgeReductionPercent": 25.1,
+    "finalFrameAgeReductionPercent": 15.6
+  },
+  "candidate": 8,
+  "status": "Accepted after automated relay, real noVNC/Mousepad, and interactive input validation"
+}

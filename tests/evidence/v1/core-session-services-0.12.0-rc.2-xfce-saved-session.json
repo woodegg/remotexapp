@@ -1,0 +1,196 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "core-session-services-0.12.0-rc.2-xfce-saved-session-completion-audit",
+  "commit": "b7f4f98c7204a9468edef24204de1ed7f3d7a191",
+  "startedAt": "2026-09-14T05:45:58Z",
+  "completedAt": "2026-09-14T06:00:12.688Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "22.22.3"
+  },
+  "environment": {
+    "kind": "local-Ubuntu-disposable-UID-X11",
+    "name": "serial-loopback-21994-saved-XFCE-session-gate"
+  },
+  "artifact": {
+    "name": "remotexapp-0.12.0-rc.2-linux-amd64.tar.gz",
+    "sha256": "eb97b7941be80035f00e58f417da5f5c7dc161dcdb096c20a0fedcd62835a98f"
+  },
+  "scenarios": [
+    {
+      "id": "real-XSMP-save-logout-and-automatic-command-window-restore",
+      "result": "passed"
+    },
+    {
+      "id": "old-editor-exits-new-editor-opens-original-document-with-current-generation-environment",
+      "result": "passed"
+    },
+    {
+      "id": "exactly-one-current-generation-IBus-engine-PID-start-cgroup-no-autostart-takeover",
+      "result": "passed"
+    },
+    {
+      "id": "borrowed-account-bus-unchanged-across-logout-restore-restart",
+      "result": "passed"
+    },
+    {
+      "id": "restored-editor-served-SDK-Unicode-clipboard-readback-before-after-Manager-adoption",
+      "result": "passed"
+    },
+    {
+      "id": "post-restore-runtime-restart-and-IBus-failure-bounded-unavailability-without-App-replacement",
+      "result": "passed"
+    },
+    {
+      "id": "temporary-account-HOME-cleanup-and-direct-invocation-refusal",
+      "result": "passed"
+    },
+    {
+      "id": "human-native-IME-desktop-and-application-UAT",
+      "result": "skipped",
+      "reason": "Not operator-accepted; automated saved-session testing does not substitute for human UAT."
+    }
+  ],
+  "details": {
+    "finalMakeCheck": {
+      "result": "passed",
+      "log": "/tmp/remotexapp-svc-rc2-saved-session-final-check.log"
+    },
+    "finalReadOnlyAudit": {
+      "checkedAt": "2026-09-14T06:00:12.688Z",
+      "local": [
+        {
+          "port": 1991,
+          "ready": true,
+          "version": "0.12.0-rc.2",
+          "console": true
+        },
+        {
+          "port": 2992,
+          "ready": true,
+          "version": "0.12.0-rc.2",
+          "console": false
+        }
+      ],
+      "desktop": {
+        "id": "xfce-user-desktop-8cdcaa0b5159",
+        "generation": 3,
+        "state": "running",
+        "application": "ready",
+        "connectionsHTTP": 200,
+        "borrowedBus": true
+      }
+    },
+    "scope": "Completion audit of the named saved-session behavior in docs/session-services-release.md, supplementing SVC-001/002/007/008/010 and the existing seven-App matrices. No new requirement or product behavior change.",
+    "exactArtifact": "Frozen installable archive B, same as both deployed local endpoints. Only XFCE display/ports are relocated in the test package; Core binaries, App script and all other shipped policy remain unchanged. No old immutable package is overwritten.",
+    "fixture": "Fresh locked UID/HOME/account bus per execution; SaveOnExit enabled in that HOME. XFCE Terminal is an actual XSMP client with a saved Mousepad document command. The test never fabricates a saved-session file or relaunches the terminal/editor after login. Mousepad crash-backup restoration is disabled only in this disposable profile to isolate XFCE restoration from the prelude's intentionally terminated editor.",
+    "finalHarnessRuns": 2,
+    "precedingFullRun": "Attempt 5 passed the full expanded suite. Attempts 6/7 use the final identical harness, additionally measuring and asserting the five-second fault-degradation bound and final App/generation continuity.",
+    "runs": [
+      {
+        "attempt": 5,
+        "path": "/var/tmp/remotexapp-conn-user.KUQTRY",
+        "result": "passed",
+        "checks": 13,
+        "faultProbeStatuses": [
+          200
+        ],
+        "generations": [
+          2,
+          3
+        ],
+        "sha256": {
+          "result.json": "d1121ab9311dce3eb34861706643f5f77e9cb0c5156ae0ebd3345fa6da494bb3",
+          "evidence/saved-session.json": "79a139231c6e913afd0dfcd5917fc1e9bef1f5d9f1efbb245dacdb4247d2003e",
+          "evidence/saved-session-viewer.json": "cf2b78d767ebff0f664862e0073df5c563466ae47e70035705381a8aa5223e33",
+          "evidence/served-viewer.json": "1d8e60d99eae8a068451f1e387f39d881b331ae7a1897899af44b4e3e983ad79"
+        }
+      },
+      {
+        "attempt": 6,
+        "path": "/var/tmp/remotexapp-conn-user.OW60mx",
+        "result": "passed",
+        "checks": 13,
+        "faultProbeStatuses": [
+          200
+        ],
+        "faultElapsedMs": 2.829752000005101,
+        "generations": [
+          2,
+          3
+        ],
+        "sha256": {
+          "result.json": "bba0b0cfeb2d21551fb94851440dcda684399fc3d2fa9d3037e7528f8c0bd4a5",
+          "evidence/saved-session.json": "ca348ab181ae9512b389b0d9bd0d4daf760d1410b468141628b0e4207a1cc329",
+          "evidence/saved-session-viewer.json": "0dccdfb08743be160c3b3bc6adc81fc010f87e01cde965dd9470baa34491ee20",
+          "evidence/served-viewer.json": "c3fa96543f042a612e631da4af97bfecdfa284c735dbb318c97bf76b314ec5f2"
+        }
+      },
+      {
+        "attempt": 7,
+        "path": "/var/tmp/remotexapp-conn-user.E8AOwD",
+        "result": "passed",
+        "checks": 13,
+        "faultProbeStatuses": [
+          409,
+          200
+        ],
+        "faultElapsedMs": 110.79651800000283,
+        "generations": [
+          2,
+          3
+        ],
+        "sha256": {
+          "result.json": "f5c12e683079ca886e9f0251455eb78c2c8a542f1083ea77a263a165020aa945",
+          "evidence/saved-session.json": "db86e9f3116c76d5f0a8d79d95ce6c55d97358374d42026cb550c45faa7969f3",
+          "evidence/saved-session-viewer.json": "b7979b6df40da7623f190388e10d12bacf949727cb796b835e59f80aa7de2d6b",
+          "evidence/served-viewer.json": "3401cb0f6afba9c81be0e98826ab2027982eff66705fcaa0b15a7caa7d0e8a5f"
+        }
+      }
+    ],
+    "harnessSHA256": "ba098ca86a4d548063fe89c48a6601253f11f368fa79a9b292f6aaef6e7f1d41",
+    "wrapperSHA256": "7db457f1620658693a523382507f9822b69f349bd6463317afbfbb371ef784e6",
+    "failureDisposition": [
+      {
+        "attempts": [
+          1,
+          2
+        ],
+        "result": "failed",
+        "logs": [
+          "/tmp/remotexapp-svc-rc2-saved-session-1.log",
+          "/tmp/remotexapp-svc-rc2-saved-session-2.log"
+        ],
+        "disposition": "Preparation stopped before saved logout: a Mousepad modal hid the expected document after the Viewer prelude killed its unsaved editor. Disabled Mousepad's independent after-a-crash restoration only in the disposable profile; the real document then opened. No Core/App fix claimed."
+      },
+      {
+        "attempts": [
+          3
+        ],
+        "result": "failed",
+        "logs": [
+          "/tmp/remotexapp-svc-rc2-saved-session-3.log"
+        ],
+        "disposition": "Test process classifier counted Manager's --ibus-engine PATH argument as a running engine. Match the Python interpreter plus script argv instead; retain exact PID/start/cgroup and whole-fixture-UID duplicate checks."
+      },
+      {
+        "attempts": [
+          4
+        ],
+        "result": "failed",
+        "logs": [
+          "/tmp/remotexapp-svc-rc2-saved-session-4.log"
+        ],
+        "completedSubchecks": "/var/tmp/remotexapp-conn-user.0kpQEc/evidence/saved-session.json",
+        "disposition": "Saved restore and real Viewer checks passed. The subsequent immediate IBus-death query raced identity validation and returned fail-closed 409. The corrected test records transition responses and requires bounded stable not-running/omitted IBus with no App/generation replacement. Attempt 7 reproduced 409 then 200 within 111 ms. No API change or weaker identity validation."
+      }
+    ],
+    "limits": [
+      "This is XFCE session/command restoration, not recovery of every application's private unsaved-document state.",
+      "Native browser/OS IME human UAT remains required. No full OS reboot, production fault injection, sandbox changes, commit/push or formal publication."
+    ],
+    "localDeployment": "No deployment/configuration changes. Both local Managers remain active on loopback 1991/2992 with exact rc.2 binary hashes; no Manager warning journal entries during this audit."
+  }
+}

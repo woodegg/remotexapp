@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "candidate",
+  "runId": "github-actions:34183500632",
+  "commit": "1e4b32e54598b9c9e81ff65f2725deacea40a583",
+  "startedAt": "2026-09-08T03:26:57Z",
+  "completedAt": "2026-09-08T03:28:43.015Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.23.2"
+  },
+  "environment": {
+    "kind": "github-hosted",
+    "name": "woodegg/remotexapp"
+  },
+  "artifact": {
+    "name": "remotexapp-0.5.3-linux-amd64.tar.gz",
+    "sha256": "09d9108fe0c4f7cd7c3ce9f641e596222e7d6723910311a319ad672d1f4047a2"
+  },
+  "scenarios": [
+    {
+      "id": "release-ci",
+      "result": "passed"
+    },
+    {
+      "id": "generated-source-cleanliness",
+      "result": "passed"
+    },
+    {
+      "id": "source-vulnerability-scan",
+      "result": "passed"
+    },
+    {
+      "id": "binary-vulnerability-scan",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "version": "0.5.3",
+    "sdkVersion": "0.21.1"
+  }
+}

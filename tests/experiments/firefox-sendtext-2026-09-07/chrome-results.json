@@ -1,0 +1,186 @@
+[
+  {
+    "field": "plain",
+    "text": "AsciiProbe",
+    "before": {
+      "focus": true,
+      "active": "plain",
+      "value": "x"
+    },
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 1,
+        "value": "AsciiProbe",
+        "serverMs": 1.086,
+        "roundTripMs": 2,
+        "error": ""
+      }
+    },
+    "after": {
+      "active": "plain",
+      "value": "xAsciiProbe"
+    }
+  },
+  {
+    "field": "plain",
+    "text": "中文测试",
+    "before": {
+      "focus": true,
+      "active": "plain",
+      "value": "x"
+    },
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 2,
+        "value": "中文测试",
+        "serverMs": 0.917,
+        "roundTripMs": 1.5999999046325684,
+        "error": ""
+      }
+    },
+    "after": {
+      "active": "plain",
+      "value": "xAsciiProbe中文测试"
+    }
+  },
+  {
+    "field": "area",
+    "text": "AsciiProbe",
+    "before": {
+      "focus": true,
+      "active": "area",
+      "value": "x"
+    },
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 3,
+        "value": "AsciiProbe",
+        "serverMs": 1.402,
+        "roundTripMs": 2.200000286102295,
+        "error": ""
+      }
+    },
+    "after": {
+      "active": "area",
+      "value": "xAsciiProbe"
+    }
+  },
+  {
+    "field": "area",
+    "text": "中文测试",
+    "before": {
+      "focus": true,
+      "active": "area",
+      "value": "x"
+    },
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 4,
+        "value": "中文测试",
+        "serverMs": 0.491,
+        "roundTripMs": 0.9000000953674316,
+        "error": ""
+      }
+    },
+    "after": {
+      "active": "area",
+      "value": "xAsciiProbe中文测试"
+    }
+  },
+  {
+    "field": "pass",
+    "text": "AsciiProbe",
+    "before": {
+      "focus": true,
+      "active": "pass",
+      "value": "x"
+    },
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 5,
+        "value": "AsciiProbe",
+        "serverMs": 0.817,
+        "roundTripMs": 1.799999713897705,
+        "error": ""
+      }
+    },
+    "after": {
+      "active": "pass",
+      "value": "x"
+    }
+  },
+  {
+    "field": "pass",
+    "text": "中文测试",
+    "before": {
+      "focus": true,
+      "active": "pass",
+      "value": "x"
+    },
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 6,
+        "value": "中文测试",
+        "serverMs": 0.774,
+        "roundTripMs": 1.700000286102295,
+        "error": ""
+      }
+    },
+    "after": {
+      "active": "pass",
+      "value": "x"
+    }
+  },
+  {
+    "field": "edit",
+    "text": "AsciiProbe",
+    "before": {
+      "focus": true,
+      "active": "edit",
+      "value": "x "
+    },
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 7,
+        "value": "AsciiProbe",
+        "serverMs": 0.881,
+        "roundTripMs": 1.700000286102295,
+        "error": ""
+      }
+    },
+    "after": {
+      "active": "edit",
+      "value": "xAsciiProbe"
+    }
+  },
+  {
+    "field": "edit",
+    "text": "中文测试",
+    "before": {
+      "focus": true,
+      "active": "edit",
+      "value": "x "
+    },
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 8,
+        "value": "中文测试",
+        "serverMs": 1.155,
+        "roundTripMs": 1.700000286102295,
+        "error": ""
+      }
+    },
+    "after": {
+      "active": "edit",
+      "value": "xAsciiProbe中文测试"
+    }
+  }
+]

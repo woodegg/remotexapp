@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-08-27T15:04:32-04:00",
+  "sourceCommit": "0da7d0c24602",
+  "mode": "central real-user",
+  "runtimeIdentity": {
+    "user": "tester",
+    "uid": 1000,
+    "linger": true
+  },
+  "installation": {
+    "binaryRoot": "/usr/local/libexec/remotexapp",
+    "shareRoot": "/usr/local/share/remotexapp",
+    "unit": "/etc/systemd/user/remotexapp.service",
+    "globalConfig": "/etc/remotexapp/remotexapp.env",
+    "userConfig": "/etc/remotexapp/users/tester.env",
+    "state": "/home/tester/.local/state/remotexapp",
+    "oldUserLocalInstallRemoved": true,
+    "statePreserved": true,
+    "migrationBackupCreated": false
+  },
+  "sha256": {
+    "remotexappd": "1ea38662e936050773c892ef7834a305e65f84b994c5fad33f25875e731c8d7b",
+    "novnc-input": "f4919116db05ca030d315228230f07b5b56948758682615978b949aeafb5502d",
+    "remotexapp-status": "579c72a841c3a69e016375376ed676c6d8a39e663199e8107e5472e8648be9f0"
+  },
+  "service": {
+    "enabled": true,
+    "active": true,
+    "listen": "127.0.0.1:1991",
+    "authMode": "trusted-header",
+    "unauthenticatedApiStatus": 401,
+    "health": "ok",
+    "ready": true,
+    "managedRegistrationAdopted": "test-host-xfce"
+  },
+  "browserSmoke": {
+    "proxy": "ephemeral loopback identity-header proxy",
+    "connected": true,
+    "framebuffer": "1280x720",
+    "fixedResizePreserved": true,
+    "rfbState": "connected",
+    "inputState": "connected",
+    "reconnectMilliseconds": 60.55,
+    "vacancyCleanup": {
+      "attachedClients": 0,
+      "sessionState": "stopped"
+    }
+  },
+  "remainingGate": "configure and validate the permanent authenticated identity proxy",
+  "result": "central backend deployment passed"
+}

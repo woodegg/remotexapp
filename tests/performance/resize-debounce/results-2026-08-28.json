@@ -1,0 +1,80 @@
+{
+  "experiment": "P15",
+  "outcome": "accepted",
+  "date": "2026-08-28",
+  "primaryVariable": "RemoteXAppClient remote-resize scheduling policy",
+  "scope": "Isolated manager 127.0.0.1:2098, dynamic display :10, real Chrome/noVNC/TigerVNC/Mousepad/IBus stack; production port 1991 unchanged",
+  "sdkVersion": "0.15.0",
+  "compatibility": {
+    "resizeDebounceMillis": 0,
+    "resizeMaxWait": "Infinity",
+    "scaleViewport": false,
+    "before": "1000x613",
+    "after": "930x650",
+    "convergeMillis": 63.537258
+  },
+  "trailing": {
+    "resizeDebounceMillis": 300,
+    "resizeMaxWait": "Infinity",
+    "scaleViewport": true,
+    "burstSpacingMillis": 50,
+    "targets": ["920x620", "980x660", "1040x700", "1100x740"],
+    "framebufferDuringBurst": ["1000x613", "1000x613", "1000x613", "1000x613"],
+    "cssBoundsDuringBurst": ["920x563.953125", "980x600.734375", "1040x637.515625", "1100x674.296875"],
+    "afterQuiet": "1100x740",
+    "flush": {
+      "target": "960x680",
+      "convergeMillis": 84.83302,
+      "beatConfiguredDebounce": true
+    },
+    "reconnect": {
+      "target": "1020x710",
+      "convergeMillis": 121.140361,
+      "initialNegotiationNotDebounced": true
+    }
+  },
+  "finiteMaximumWait": {
+    "resizeDebounceMillis": 200,
+    "resizeMaxWaitMillis": 400,
+    "changeSpacingMillis": 80,
+    "firstProgressMillis": 440.196165,
+    "firstProgressFramebuffer": "1060x700",
+    "final": "1140x740"
+  },
+  "imeAndInputRegression": {
+    "primaryFallback": "670,343",
+    "primaryRefocused": true,
+    "freshRemoteCaretMillis": 33.8,
+    "freshRemoteCaret": "3,31",
+    "rightClickChangedAnchorOrFocus": false,
+    "compositionChangedFocus": false,
+    "textAcknowledgement": "P15中",
+    "browserRoundTripMillis": 12.8,
+    "serverMillis": 5.174,
+    "textErrors": 0,
+    "clipboardExact": true,
+    "clipboardSha256": "95eb174020e8f6cfdaf93540e8540f093a2b6378623e12b254220b06ff61ee56",
+    "clipboardNote": "Four iterative successful harness runs produced four exact P15中 values."
+  },
+  "deterministicCoverage": [
+    "latest-size trailing coalescing",
+    "finite maximum-wait progress",
+    "explicit flush",
+    "newer target retained across one in-flight request",
+    "fixed policy remains scale-only",
+    "connection-disposal timer cancellation",
+    "primary mouse/touch/pen fallback",
+    "right/middle/non-primary exclusion",
+    "late fresh-caret authority",
+    "composition and queued/in-flight focus safety"
+  ],
+  "candidateBinaries": {
+    "remotexappdSha256": "2772419b9ba2c3263bbc93f8aa605dc140b01cedcedf4e5d3534710826592dee",
+    "novncInputSha256": "dfba32344dfe7067370319b1e85c02237a1901ff8822312e699a321005d4ac6a",
+    "remotexappStatusSha256": "a75d6efe4b0a0ee2550dcdace38f5e27776aea6b4f0e78138c6963c4fa6eb016"
+  },
+  "productionPort1991": "Existing rc.20 service remained HTTP 200 and was not rebuilt or restarted",
+  "subsequentDeployment": "The exact rc.21 commit later repeated automated resize, IME/input, reconnect, adoption, and cleanup gates on port 1991; see tests/go-live-validation/results/ime-resize-rc21-local-1991.json",
+  "cleanup": "Isolated Chrome, instance, manager, display, ports, and temporary state removed after candidate validation",
+  "status": "Accepted: compatibility, trailing debounce, finite maximum wait, flush, reconnect, resize policy, input correctness, lifecycle cleanup, and native-IME/resize visual UAT passed; human UAT accepted 2026-08-29"
+}

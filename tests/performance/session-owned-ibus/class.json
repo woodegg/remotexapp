@@ -1,0 +1,32 @@
+{
+  "id": "xfce-session-input",
+  "name": "Experiment: XFCE with session-owned D-Bus and IBus",
+  "singleton": true,
+  "profileRef": "session-owned-ibus",
+  "runMode": "shared",
+  "server": {
+    "activation": "auto",
+    "driver": "./server.sh",
+    "displayMode": "fixed",
+    "display": 31,
+    "rfbPort": 5931,
+    "gatewayPort": 39031,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 5,
+    "allowClientResize": false,
+    "readinessPids": ["server.pid"]
+  },
+  "session": {
+    "activation": "on-attach",
+    "driver": "./session.sh",
+    "readinessPid": "xfce.pid",
+    "vacantTimeout": "10s",
+    "vacantAction": "stop-session"
+  },
+  "input": {
+    "backend": "ibus",
+    "lifecycle": "session",
+    "allowedWmClasses": ["*"]
+  }
+}

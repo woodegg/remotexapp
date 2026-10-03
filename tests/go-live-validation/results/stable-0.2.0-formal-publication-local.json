@@ -1,0 +1,108 @@
+{
+  "date": "2026-09-01",
+  "release": {
+    "tag": "v0.2.0",
+    "commit": "9ef470c0139902c8b88f7354f6f0d68b7f8ee5a0",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/v0.2.0",
+    "latest": true,
+    "draft": false,
+    "prerelease": false,
+    "verifyWorkflow": "https://github.com/woodegg/remotexapp/actions/runs/33533234374",
+    "releaseWorkflow": "https://github.com/woodegg/remotexapp/actions/runs/33533357524",
+    "workflowResult": "passed",
+    "sdkVersion": "0.18.0",
+    "appPackageABI": "remotexapp/v1"
+  },
+  "artifacts": {
+    "formalArchiveSha256": "7d8665d5e477542ecea79cc4c20dac23797fa8f3c82b78022408a4d55a3e0123",
+    "formalArchiveBytes": 7717514,
+    "formalGoVersion": "go1.22.12",
+    "downloadedChecksumVerification": "passed",
+    "downloadedSensitiveDataCheck": "passed",
+    "downloadedCommitVerification": "passed",
+    "localGateArchiveSha256": "bb392e0a089da0216afb6b6211dddf33870eed45fc0eaf315305931e344208d2",
+    "localGateGoVersion": "go1.22.2",
+    "sameSourceCommit": true,
+    "formalSha256SumsAuthoritative": true,
+    "formalBinarySha256": {
+      "remotexappd": "06045013e6792748470cc9720294a0a7c13b0a252b74e60e2d0e4c5d5497d761",
+      "novnc-input": "270e2c4de758895c59e1a3b2adfbe63a7a694837b4e2625ab04449aba6f34571",
+      "remotexapp-status": "e0b1aa29a546866a34d1a48392ec2cfdb9b7331d7acfb0ad8eceaa0de15900ce",
+      "remotexapp-operator-helper": "df4f373b73bc1d21abb4bfa97c40cb19e43d5899fd6b1de26a4551a84a9faeda"
+    }
+  },
+  "local1991": {
+    "deploymentMode": "central real user",
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "version": "0.2.0",
+    "commit": "9ef470c01399",
+    "coreSelector": "releases/0.2.0",
+    "shareSelector": "releases/0.2.0",
+    "retainedCandidate": "0.2.0-candidate-ca1d0b26bf8f",
+    "runtimeIdentityAndGenerationPreserved": true,
+    "childPidsPreserved": true,
+    "runtimeBeforeAndAfter": [
+      {
+        "id": "xfce-desktop-9d44b8f76981",
+        "managedInstanceId": null,
+        "sessionGeneration": 1,
+        "state": "server-ready",
+        "sessionState": "stopped",
+        "attachedClients": 0
+      },
+      {
+        "id": "xfce-user-desktop-2b1e40bfa08e",
+        "managedInstanceId": "ubuntu-desktop",
+        "sessionGeneration": 3,
+        "state": "server-ready",
+        "sessionState": "running",
+        "attachedClients": 0
+      }
+    ],
+    "childMainPids": [
+      2241117,
+      2241124,
+      2241141,
+      2517040,
+      2517046,
+      2517051,
+      2517269
+    ],
+    "managerMainPid": 2676084,
+    "managerRestartCount": 0,
+    "warningJournalCount": 0,
+    "routes": {
+      "root": 200,
+      "console": 200,
+      "minimal": 200,
+      "kiosk": 200
+    },
+    "templateCount": 6,
+    "appSelectors": {
+      "edge": "1.0.0",
+      "firefox-esr": "2.0.0",
+      "libreoffice": "3.0.0",
+      "mousepad": "2.0.0",
+      "xfce-desktop": "2.0.0",
+      "xfce-user-desktop": "2.0.0"
+    },
+    "formalComponentSmoke": {
+      "templateId": "mousepad",
+      "runtimeId": "mousepad-c7b50a2e6dfe",
+      "serverReady": true,
+      "formalComponentPaths": true,
+      "forcedCleanup": true,
+      "runtimeDirectoryRemoved": true,
+      "manifestRemoved": true,
+      "unitsRemoved": true,
+      "stoppedMemoryRecordRemovedByManagerRestart": true
+    }
+  },
+  "sandbox00FormalAlignment": {
+    "status": "pending-separate-approval",
+    "currentCoreCommit": "ca1d0b26bf8f",
+    "currentArtifact": "accepted stable candidate",
+    "changedByThisGate": false
+  }
+}

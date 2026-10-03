@@ -1,0 +1,267 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "boot-storage-recovery-0.12.2-stable-publication",
+  "commit": "c1cecabe076e6ca69660cc14c55475059bf5ffbc",
+  "startedAt": "2026-09-14T14:40:28Z",
+  "completedAt": "2026-09-14T15:11:04Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "nodeLocal": "22.22.3",
+    "nodeHosted": "22.23.2",
+    "nodeSandbox": "22.23.1"
+  },
+  "environment": {
+    "kind": "github-hosted-disposable-local-X11-and-sandbox00-production",
+    "name": "boot-and-storage-recovery-final-candidate-no-container-reboot"
+  },
+  "artifact": {
+    "name": "remotexapp-0.12.2-linux-amd64.tar.gz",
+    "sha256": "86cf8002f485e4f33ea504a43e2b718d548304def38b76ce95162b91fd1a7485"
+  },
+  "scenarios": [
+    {
+      "id": "hosted-Verify-and-candidate",
+      "result": "passed"
+    },
+    {
+      "id": "independent-clean-clone-release-ci-byte-identical-archive",
+      "result": "passed"
+    },
+    {
+      "id": "five-focused-storage-race-repetitions",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-App-Package-ABI",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-seven-shipped-Apps-Viewer-input-clipboard-controls",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-document-save-discard-idle-adoption",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-KDE-upgrade-restart-interrupted-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-browser-actions-cancel-Manager-crash",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-XFCE-temporary-UID-logout-saved-session-current-input",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-Core-session-service-fault-refusal-cleanup",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-boot-simulation-storage-outage-recovery-and-allowlist-security",
+      "result": "passed"
+    },
+    {
+      "id": "sandbox00-observed-storage-startup-error-with-healthy-Manager",
+      "result": "passed"
+    },
+    {
+      "id": "sandbox00-two-Manager-restarts-seven-App-identity-and-real-IO",
+      "result": "passed"
+    },
+    {
+      "id": "sandbox00-owned-XFCE-logout-stopped-session-restart-and-stale-generation",
+      "result": "passed"
+    },
+    {
+      "id": "sandbox00-boot-config-paired-2991-unchanged-and-owned-test-cleanup",
+      "result": "passed"
+    },
+    {
+      "id": "annotated-tag-stable-Latest-publication-no-rebuild",
+      "result": "passed"
+    },
+    {
+      "id": "published-three-assets-downloaded-and-byte-verified",
+      "result": "passed"
+    },
+    {
+      "id": "final-candidate-sandbox00-whole-container-reboot",
+      "result": "skipped",
+      "reason": "Operator explicitly requires new human approval. No container reboot after that restriction; boot identity and paired 2991 PID were verified unchanged. Earlier candidate boot tests do not satisfy this pending final-byte gate."
+    },
+    {
+      "id": "CloudDrive-functional-I-O",
+      "result": "skipped",
+      "reason": "Operator declared maintenance and excluded CloudDrive tests. Native Manager startup reported the existing ENOTCONN error without exiting; all functional document tests used local HOME/private fixtures."
+    },
+    {
+      "id": "native-Ubuntu-26.04-Qt6-physical-host-power-loss",
+      "result": "skipped",
+      "reason": "Executed native hosts use Ubuntu 24.04; these target/platform cases remain unverified."
+    }
+  ],
+  "details": {
+    "version": "0.12.2",
+    "sdkVersion": "0.28.0",
+    "requirements": [
+      "BR-001",
+      "BR-002",
+      "BR-003",
+      "BR-004",
+      "BR-005",
+      "BR-006",
+      "U26-06"
+    ],
+    "qualification": "Implementation published at operator request. BR-005 final-container-reboot acceptance remains pending new approval; publication does not close that unexecuted gate or claim new human UAT.",
+    "publication": {
+      "tag": "v0.12.2",
+      "releaseURL": "https://github.com/woodegg/remotexapp/releases/tag/v0.12.2",
+      "isDraft": false,
+      "isPrerelease": false,
+      "latest": true,
+      "publishedAt": "2026-09-14T15:06:24Z",
+      "verifyRun": 34857043292,
+      "candidateRun": 34857077191,
+      "releaseRun": 34859892908,
+      "assets": [
+        "remotexapp-0.12.2-linux-amd64.tar.gz",
+        "SHA256SUMS",
+        "candidate-evidence.json"
+      ],
+      "repositoryVisibility": "private-unchanged"
+    },
+    "appVersions": {
+      "edge": "2.0.1",
+      "firefox-esr": "3.0.1",
+      "kate": "2.0.1",
+      "kwrite": "2.0.1",
+      "mousepad": "4.0.1",
+      "libreoffice": "4.0.0",
+      "xfce-user-desktop": "3.0.0"
+    },
+    "storage": {
+      "startup": "Syntactically valid explicit allowlist retained without filesystem I/O; one asynchronous diagnostic per root, one-second reporting deadline.",
+      "fileAccess": "Canonical directory containment and readable regular-file checks remain on actual requests; roots are re-resolved on use, with no parent/default fallback.",
+      "managed": "Private intent load validates syntax, not online file availability. New registration, launch and upgrade still validate files.",
+      "limits": "A stalled diagnostic may leave one lookup worker per configured root until the OS responds. This is not a new deadline for all file operations, filesystem isolation, or mount-health monitoring.",
+      "exactFixture": "/tmp/remotexapp-boot-e2e-5WLK4b/result.json",
+      "fixtureSHA256": "4ddbb477cee07fd9dd27d6eccde766819b3fde09aef44fe3968c6a286898360c"
+    },
+    "sandbox": {
+      "passed": true,
+      "version": "0.12.2",
+      "commit": "c1cecabe076e",
+      "bootUnchanged": true,
+      "configurationUnchanged": true,
+      "test2991Unchanged": true,
+      "servicesActive": [
+        "remotexapp",
+        "remotexapp-test",
+        "webagenticos",
+        "webagenticos-files",
+        "webagenticos-converter",
+        "webagenticos-test",
+        "webagenticos-test-files",
+        "webagenticos-test-converter"
+      ],
+      "binaryHashes": {
+        "remotexappd": "df9acf7a8c89d7b270972de9caed6b946e2c1f16937943d334d9b5d5afbc4c75",
+        "novnc-input": "0b664f09cecd0a72d33a6393cc61ef69ffec99e848664812a14238067e85e164",
+        "remotexapp-status": "79f164986c60554aca55330749abbc2c0360ba86a15959da2c3138221087f608",
+        "remotexapp-operator-helper": "2b560459fc2bfb232259d7b5f567df3224dcf30b76f29be1e088d0ceba159d82"
+      },
+      "active": [
+        {
+          "id": "xfce-user-desktop-f31cd83ed8fe",
+          "templateId": "xfce-user-desktop",
+          "generation": 3
+        },
+        {
+          "id": "edge-c53b147ebcac",
+          "templateId": "edge",
+          "generation": 1
+        },
+        {
+          "id": "firefox-esr-91597530425f",
+          "templateId": "firefox-esr",
+          "generation": 1
+        }
+      ],
+      "cloudDrive": "functional tests skipped; startup diagnostic expected",
+      "checks": [
+        "seven-shipped-Apps-real-Viewer-X11-IBus-bus-clipboard-connections-and-stale-generation",
+        "same-boot-Manager-restart-1-seven-App-identities-preserved",
+        "same-boot-Manager-restart-2-seven-App-identities-preserved",
+        "XFCE-owned-D-Bus-logout-then-public-stopped-session-restart-retains-ID-pins-new-generation-real-input-and-stale-request-rejection",
+        "XFCE-real-served-SDK-Unicode-saved-document-readback-after-each-executed-transition"
+      ],
+      "containerRebootRounds": 0,
+      "documentStorage": "local HOME only",
+      "xfceLogoutQualification": "Existing host xfce4-session-logout wrapper deliberately no-ops --logout. Preserve host policy; verified org.xfce.SessionManager owner PID and runtime cgroup before normal D-Bus Logout(false,true), then used stopped-session API restart. Running-session Driver logout is not claimed to work around that wrapper.",
+      "nativeOS": "Ubuntu 24.04.4",
+      "privateCheckpoint": "/home/.remotexapp-0122-20260914",
+      "rootSnapshot": "remotexapp-0122-predeploy-20260914-root",
+      "homeSnapshot": "remotexapp-0122-predeploy-20260914-home",
+      "scope": "Only production 1991 deployed. Paired 2991 retains 0.11.0, its PID and configuration. Local 1991/2992, other sandboxes and production gateway were not upgraded. WAOS web entry was temporarily quiesced and restored; other named user services are active."
+    },
+    "earlierCandidate": "Unpublished c5d5444 passed two Manager restarts and two real sandbox00 reboots before the latest no-reboot restriction. It was superseded by de10484 cancelled-shutdown eligibility and then c1cecab storage-startup repair. Those prior boot passes are historical only.",
+    "failureDisposition": [
+      "Initial release metadata target formatting and local boot fixture socket/idle/workspace assumptions failed; corrected before later candidates. Earlier real-target fixture sampled framebuffer before Viewer reconnected; corrected to wait for connected state and positive framebuffer.",
+      "Initial deployment inherited umask 077 and failed immutable App mode/seal comparison. Retained evidence, restored public installer umask 022, reran successfully without seal bypass. Snapshot thaw used unsupported lxc unpause; immediately restored the paused target with lxc start.",
+      "Normal XFCE stop blocked because of the existing host logout wrapper. Used verified normal D-Bus logout, not force or wrapper modification. A deployment helper incorrectly expected a stopped managed manifest to be deleted; retained its completed/stopped record and restored managed intent after exact owned units were dead.",
+      "de10484 activation failed with CloudDrive ENOTCONN; stopped failed-start retries and restored WAOS. This exposed BR-006. Superseded unpublished candidate trees and state were retained rather than overwritten or purged.",
+      "First storage tests assumed HTTP 400 instead of the existing 409 file-launch contract; corrected test expectation. Added control-character configuration rejection. Focused race and full final gates passed.",
+      "First clean-clone release-ci stopped immediately on ambient Go 1.27.1. Reran with explicit GOTOOLCHAIN=go1.26.8; full gate passed and archive is byte-identical to hosted Go 1.26.8.",
+      "Final target verifier initially expected ss to print 0.0.0.0:1991, but it printed *:1991. Independently verified the wildcard listener belongs to the sandbox Manager, corrected only the fixture format check, and reran the entire final verifier successfully. Tag workflow had already been triggered before this format-only verifier rerun; all exact-archive and target seven-App tests had passed. No target configuration or product code changed."
+    ],
+    "rawEvidenceDirectory": "/tmp/remotexapp-0122-release.Zw0goq",
+    "logs": [
+      {
+        "name": "document-roots-race.log",
+        "sha256": "985d497750e18e00df9f2e8f936b0d6871b9b2170e8b71ac3b6dc62609490941"
+      },
+      {
+        "name": "document-roots-check.log",
+        "sha256": "d1a71186fcbb862e3eae2583294281e6fd6499c95f3e7aded190260a2dc8c034"
+      },
+      {
+        "name": "document-roots-release-ci.log",
+        "sha256": "39041b8fb84117bbc59157e3ea17d2ee0859a20a6f326b556fc81a385ab3efed"
+      },
+      {
+        "name": "document-roots-release-ci-pinned.log",
+        "sha256": "49084aa1592bd2c818c90057b0055747072bf85a4445d716c252835ca8798b71"
+      },
+      {
+        "name": "storage-exact-e2e.log",
+        "sha256": "04d664dba1d1e256288f8ad75df777208309f3df22cd67968f898d9cbeb40de6"
+      },
+      {
+        "name": "storage-sandbox-deploy.log",
+        "sha256": "881f725b3749d89ed6a2676b88a0061625ea91a3a226d8c552943872b60158e6"
+      },
+      {
+        "name": "storage-sandbox-manager-tests.log",
+        "sha256": "25240cc37d1c55fed00b50aa1cf518fec6b46046942ffc849eeea1c28320fbf0"
+      },
+      {
+        "name": "sandbox-restart-result.json",
+        "sha256": "a6f5e89a78e88a2a5141440757f7b9e61f93a878506aaca44d67da31424d7d15"
+      },
+      {
+        "name": "storage-sandbox-final-verification.json",
+        "sha256": "56a69e316fba2a762eea90ec00e4f1f7b54c63e77050dd957e025496aefad6b4"
+      },
+      {
+        "name": "storage-sandbox-journal.log",
+        "sha256": "4831d6de9e65482b043d236b4cbcd3a4410623efc68570d05aa54b448f1aebd2"
+      }
+    ],
+    "unrelatedWork": "Preserved/excluded user edits in docs/app-driver-sandbox-todo.md, incoming field-report paragraph in production-handover.md and local release-tray/. Local sandbox deployment playbook remains ignored."
+  }
+}

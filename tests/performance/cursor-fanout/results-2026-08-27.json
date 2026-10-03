@@ -1,0 +1,82 @@
+{
+  "experiment": "P11",
+  "outcome": "accepted",
+  "date": "2026-08-27",
+  "controlledHarness": {
+    "events": 32,
+    "slowWriterDelayMillis": 10,
+    "independentRuns": 5,
+    "baseline": {
+      "medianPublishMillis": 324.436503,
+      "medianFastLatestMillis": 324.436343,
+      "medianFastDeliveredSnapshots": 32,
+      "medianSlowLatestMillis": 324.433242,
+      "medianSlowDeliveredSnapshots": 32
+    },
+    "candidate": {
+      "medianPublishMillis": 0.013211,
+      "medianFastLatestMillis": 0.023242,
+      "medianFastDeliveredSnapshots": 1,
+      "medianSlowLatestMillis": 10.791494,
+      "medianSlowDeliveredSnapshots": 1
+    },
+    "publishSpeedup": 24558.1,
+    "publishLatencyReductionPercent": 99.9959
+  },
+  "candidatePeerOverhead": {
+    "peers": 1000,
+    "addedGoroutines": 1000,
+    "normalBuildRuns": 5,
+    "medianHeapIncreaseBytes": 1031256,
+    "medianStackInUseIncreaseBytes": 2162688,
+    "medianCombinedBytesPerPeer": 3193.9,
+    "writerGoroutinesAfterCleanup": 0
+  },
+  "contextualRealStack": {
+    "managerPorts": [1992, 1993],
+    "candidateDisplay": 11,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 15,
+    "activeRfbConnectionsPerGateway": 1,
+    "activeInputConnectionsPerGateway": 1,
+    "sampleSeconds": 30,
+    "samples": 5,
+    "baselineAverageRssKiB": 9498.4,
+    "candidateAverageRssKiB": 9966.4,
+    "baselineAveragePssKiB": 7080.4,
+    "candidateAveragePssKiB": 7447.4,
+    "baselineCpuTicks": 1,
+    "candidateCpuTicks": 0,
+    "note": "Whole-process memory is contextual because the deployed baseline binary predates other accepted changes; controlled marginal cost comes from the 1000-peer harness."
+  },
+  "browser": {
+    "exactClipboardText": "P11 中文 input reconnect OK P11 cursor cache P11 clipboard exact",
+    "firstTextServerMillis": 0.852,
+    "firstTextRoundTripMillis": 2.0,
+    "reconnectMillis": 35.987,
+    "cursorFirstRun": {
+      "initialSequence": 6,
+      "pushedSequence": 7,
+      "cachedSequence": 7
+    },
+    "cursorSecondRun": {
+      "initialSequence": 7,
+      "pushedSequence": 8,
+      "cachedSequence": 8
+    },
+    "resize": {
+      "before": "1280x720",
+      "after": "1100x673"
+    },
+    "rfbStateAfterReconnect": "connected",
+    "inputStateAfterReconnect": "connected"
+  },
+  "binaries": {
+    "baselineGatewaySha256": "4e99d0a7055398ef32386a43fb244dd03df811d6a03917d5c8db8220afe762e3",
+    "candidateGatewaySha256": "6f9840bb27ccd1e6e551f83343a922aa306a87c5a72f3dfe12c6c2805436175d"
+  },
+  "productionPort1991": "HTTP 200 throughout; not rebuilt or restarted",
+  "cleanup": "All isolated services stopped; temporary runtime moved to trash",
+  "status": "Accepted: deterministic isolation/coalescing, race tests and real noVNC/IBus/cursor-cache/reconnect/clipboard checks passed"
+}

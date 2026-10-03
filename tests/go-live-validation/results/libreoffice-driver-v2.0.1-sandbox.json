@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "label": "libreoffice-driver-v2.0.1-sandbox",
+  "collectedAt": "2026-08-28",
+  "candidate": {
+    "templateId": "libreoffice",
+    "sandboxDriverVersion": "2.0.1-sandbox.1",
+    "repositoryDriverVersion": "2.0.1",
+    "activation": "immediate"
+  },
+  "freeDocumentLaunch": {
+    "createToReadyMs": 7085,
+    "visibleWindowAndUnoReady": true,
+    "leaseRecordedLiveOwnerPid": true
+  },
+  "sameDriverContention": {
+    "responseMs": 766,
+    "httpStatus": 409,
+    "error": "LibreOffice document is already active in another RemoteXApp session",
+    "existingSessionPreserved": true
+  },
+  "staleRecovery": {
+    "deadOwnerPidSeeded": true,
+    "staleDocumentLockSeeded": true,
+    "createToReadyMs": 8372,
+    "leaseReplacedWithLiveOwner": true
+  },
+  "crossVersionContention": {
+    "existingDriverVersion": "2.0.0",
+    "existingSessionAttachedAndReady": true,
+    "responseMs": 816,
+    "httpStatus": 409,
+    "error": "LibreOffice document is already open by another local process",
+    "existingDocumentLockUnchanged": true,
+    "existingSessionPreserved": true,
+    "failedCandidateLeaseRemoved": true
+  },
+  "cleanup": {
+    "testInstancesForceStopped": true,
+    "runtimeManifestsRemoved": true,
+    "runtimeDirectoriesRemoved": true,
+    "ephemeralProfilesRemoved": true,
+    "documentLocksRemoved": true,
+    "documentLeasesRemoved": true,
+    "listenersReleased": true
+  },
+  "result": "pass-pending-human-uat"
+}

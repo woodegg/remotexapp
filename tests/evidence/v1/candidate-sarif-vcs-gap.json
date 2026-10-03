@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "audit",
+  "runId": "github-actions:33893261401",
+  "commit": "5c79354308ef5e0853a98db8cdd3fc170b89d9f2",
+  "startedAt": "2026-09-04T16:06:21Z",
+  "completedAt": "2026-09-04T16:08:42Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.23.2"
+  },
+  "environment": {
+    "kind": "github-hosted",
+    "name": "ubuntu-latest"
+  },
+  "scenarios": [
+    {
+      "id": "release-ci",
+      "result": "passed"
+    },
+    {
+      "id": "candidate-vcs-cleanliness",
+      "result": "failed",
+      "detail": "Gitleaks left untracked results.sarif before Go built the candidate binaries"
+    },
+    {
+      "id": "clean-clone-reproduction",
+      "result": "passed",
+      "detail": "The same commit produced four vcs.modified=false binaries without the hosted scanner output"
+    }
+  ],
+  "details": {
+    "scannerOutput": "results.sarif",
+    "verifierMessage": "remotexappd was built from a modified worktree",
+    "workflowRun": "https://github.com/woodegg/remotexapp/actions/runs/33893261401"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-03",
+  "candidate": {
+    "remoteXAppVersion": "0.5.1-rc.1",
+    "sdkVersion": "0.21.1",
+    "sourceCommit": "b6e6b2fb19e4",
+    "releaseArtifactSha256": "b49758d7535a772488b01edf743c121e99f5dedaf2c5594f9a4100fbaa7485dc",
+    "sdkAsset": "sdk-S4T4SPMN.js",
+    "sdkAssetSha256": "49aaa18d34d5007df48ac6f2c6f8e62cce8df04a1bd1453b8ffbd2518e7df405"
+  },
+  "automated": {
+    "releaseCI": "passed",
+    "sdkSubtests": 78,
+    "isolatedAppCatalogE2E": "passed",
+    "isolatedApps": [
+      "edge",
+      "firefox-esr",
+      "libreoffice",
+      "mousepad"
+    ],
+    "checks": [
+      "rich plain/html/rtf/png transfer",
+      "unsupported rtf omission without same-Viewer rebound",
+      "plain-text fallback and MIME-order-independent suppression",
+      "authorized normalized readback and write/reconcile serialization",
+      "genuine subsequent local clipboard change",
+      "per-Viewer suppression isolation",
+      "wildcard direct-child CSS prompt geometry and hit testing",
+      "direction, state, accessible-name and cleanup behavior",
+      "input, resize, readiness, control probes, restart adoption, shutdown and cleanup"
+    ]
+  },
+  "deployment": {
+    "local1991": {
+      "listener": "0.0.0.0:1991",
+      "console": true,
+      "kiosk": true,
+      "versionCommitVerified": true,
+      "existingRuntimePreserved": "xfce-user-desktop-2c5cf858536f generation 1",
+      "postDeploymentTwoViewerE2E": "passed"
+    },
+    "local2991": {
+      "listener": "127.0.0.1:2991",
+      "console": false,
+      "kiosk": true,
+      "versionCommitVerified": true,
+      "postDeploymentTwoViewerE2E": "passed"
+    },
+    "warningLogs": "clear",
+    "temporaryRuntimesAndBrowsers": "cleaned"
+  },
+  "authorizationBoundary": {
+    "humanUAT": "pending",
+    "sandboxDeployment": "not authorized",
+    "gitTag": "not authorized",
+    "githubPublication": "not authorized"
+  },
+  "result": "ready-for-human-uat"
+}

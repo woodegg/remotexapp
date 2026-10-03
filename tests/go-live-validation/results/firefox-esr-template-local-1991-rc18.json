@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "label": "firefox-esr-template-local-1991-rc18",
+  "collectedAt": "2026-08-28T06:49:00-04:00",
+  "source": "faabc2adc2cf",
+  "artifact": {
+    "version": "0.1.0-rc.18",
+    "file": "remotexapp-0.1.0-rc.18-linux-amd64.tar.gz",
+    "sha256": "0aca90cc6a8fdfedf3a1c70b7f18693fd1011edf73c5ee63129868a45a0ebc9b",
+    "checksumVerified": true,
+    "installedFilesMatchedArtifact": true
+  },
+  "deployment": {
+    "mode": "central real-user",
+    "runtimeUser": "ubuntu",
+    "managerURL": "http://127.0.0.1:1991",
+    "listener": "0.0.0.0:1991",
+    "authMode": "none",
+    "allowInsecurePublic": true,
+    "temporaryTestPolicy": true,
+    "releasePath": "/usr/local/libexec/remotexapp/releases/0.1.0-rc.18",
+    "templates": 6,
+    "installedPreflightPassed": true
+  },
+  "upgradeAdoption": {
+    "existingRuntimeId": "xfce-desktop-b7e29409f21f",
+    "vncPid": 1183502,
+    "serverPid": 1183509,
+    "gatewayPid": 1183526,
+    "pidsPreservedAcrossInstallAndTwoManagerRestarts": true
+  },
+  "firefox": {
+    "packageVersion": "140.14.0esr+build1-0ubuntu0.24.04.1~mt1",
+    "firstRuntimeId": "firefox-esr-24f9ccb29a4c",
+    "secondRuntimeId": "firefox-esr-e30c962f757f",
+    "newRuntimeIdAfterCompleteStop": true,
+    "profileRef": "default",
+    "profileReused": true,
+    "wmClass": "firefox-esr",
+    "applicationStatus": "ready",
+    "visibleWindow": true
+  },
+  "browser": {
+    "realChromeNoVNC": true,
+    "sdkState": "connected",
+    "rfbState": "connected",
+    "inputState": "connected",
+    "framebufferBefore": "1280x720",
+    "framebufferAfterResize": "900x640",
+    "mixedTextAck": "Deployed中文",
+    "mixedTextError": "",
+    "manualReconnectMilliseconds": 111.52
+  },
+  "managerRestart": {
+    "firefoxRuntimeIdPreserved": true,
+    "vncServerGatewaySessionAndApplicationPidsPreserved": true,
+    "sessionGenerationPreserved": true,
+    "sdkAutomaticReconnect": true
+  },
+  "shutdown": {
+    "lastDetachIdleOverride": "8s",
+    "lastDetachStoppedCompleteInstance": true,
+    "runtimeManifestRemoved": true,
+    "runtimeDirectoryRemoved": true,
+    "profilePreserved": true,
+    "userAltF4ReportedExited": true,
+    "userAltF4StoppedCompleteInstance": true,
+    "sdkSessionEnded": true,
+    "sdkDidNotAutoReconnectAfterCleanExit": true
+  },
+  "finalState": {
+    "health": "ok",
+    "activeInstances": 1,
+    "activeRuntime": "xfce-desktop-b7e29409f21f",
+    "activeFirefoxTestUnits": 0,
+    "temporaryBrowserStateRemoved": true
+  },
+  "uat": {
+    "accepted": false,
+    "remaining": "human Firefox browser interaction and shared-profile UAT"
+  },
+  "result": "deployed-pending-uat"
+}

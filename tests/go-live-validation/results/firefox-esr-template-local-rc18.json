@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "label": "firefox-esr-template-local-rc18",
+  "collectedAt": "2026-08-28T06:44:00-04:00",
+  "managerURL": "http://127.0.0.1:2099",
+  "source": "e836cfb0b518-dirty",
+  "deployment": {
+    "mode": "isolated local candidate",
+    "existingPort1991Modified": false,
+    "classCatalog": "firefox-esr template only",
+    "authMode": "none",
+    "loopbackOnly": true,
+    "temporaryStateRemoved": true
+  },
+  "dependency": {
+    "package": "firefox-esr",
+    "version": "140.14.0esr+build1-0ubuntu0.24.04.1~mt1",
+    "source": "existing administrator-enabled Ubuntu Mozilla Team PPA",
+    "preflightPassed": true
+  },
+  "template": {
+    "id": "firefox-esr",
+    "name": "firefox-esr",
+    "driverVersion": "1.0.0",
+    "singleton": true,
+    "profileRef": "default",
+    "runMode": "shared",
+    "workspaceMode": "persistent",
+    "displayMode": "dynamic",
+    "geometry": "1280x720",
+    "depth": 24,
+    "frameRate": 5,
+    "allowClientResize": true,
+    "sessionActivation": "on-attach",
+    "vacantTimeout": "6h",
+    "vacantAction": "stop-instance"
+  },
+  "application": {
+    "startURL": "https://example.com",
+    "visibleWindow": "Example Domain — Mozilla Firefox",
+    "wmClassBeforeStableOverride": "firefox-esr-esr140",
+    "wmClassAfterStableOverride": "firefox-esr",
+    "applicationStatus": "ready",
+    "matchboxWindowManager": true
+  },
+  "browser": {
+    "sdkState": "connected",
+    "rfbState": "connected",
+    "inputState": "connected",
+    "initialFramebuffer": "1280x720",
+    "resizedFramebuffer": "900x640",
+    "unicodeTextAck": "RemoteXApp中文",
+    "unicodeTextError": ""
+  },
+  "restartAdoption": {
+    "sameRuntimeId": true,
+    "sameVncServerGatewayAndSessionPids": true,
+    "sameSessionGeneration": true,
+    "runningFirefoxPreserved": true,
+    "sdkAutomaticReconnect": true
+  },
+  "profileAndSingleton": {
+    "completeStopRemovedRuntimeDirectory": true,
+    "completeStopPreservedProfile": true,
+    "subsequentCreateUsedNewRuntimeId": true,
+    "subsequentCreateReusedProfile": true,
+    "duplicateActiveCreateReturnedSameRuntime": true
+  },
+  "shutdown": {
+    "gracefulAPIStopCompleted": true,
+    "userAltF4ReportedExited": true,
+    "userAltF4StoppedInstanceImmediately": true,
+    "userAltF4StoppedSDKReconnect": true,
+    "attachedClientCancelledVacancyTimer": true,
+    "detachedIdleStopPassedWithThreeSecondOverride": true,
+    "neverAttachedIdleStopPassedWithThreeSecondOverride": true,
+    "runtimeUnitsInactive": true,
+    "runtimeManifestRemoved": true,
+    "runtimeDirectoryRemoved": true,
+    "persistentProfilePreserved": true
+  },
+  "automatedGates": {
+    "makeCheck": true,
+    "targetedGoTests": true,
+    "shellSyntax": true,
+    "deploymentArchitecture": true
+  },
+  "uat": {
+    "accepted": false,
+    "remaining": "human Firefox browser interaction and shared-profile UAT"
+  },
+  "result": "implemented-pending-uat"
+}

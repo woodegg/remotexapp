@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-02",
+  "scope": "CLP-001 through CLP-016; local deployment only",
+  "result": "passed",
+  "candidate": {
+    "version": "0.4.0-rc.2",
+    "sourceCandidate": "5ebef8a7a7c1977c2a3986417fd809ccf2c77fa3c8e593c02893986a062fefb4",
+    "sdkVersion": "0.19.0",
+    "appPackageABI": "remotexapp/v1",
+    "supersedes": "0.4.0-rc.1 rejected during Human UAT",
+    "humanUAT": "pending"
+  },
+  "artifacts": {
+    "localReleaseArchiveSha256": "71828d350459a9e5241c896c04af640b80d58c1a00cb479367c4b7372607d50b",
+    "binarySha256": {
+      "remotexappd": "64c84abc92aab3634b0f1a0124e2b9fd7991c9aa6929c75e401fb5f03bd95d92",
+      "novnc-input": "67ed549ed5e35b7ad3af28ff776d1e3d5390a0cf5bffa407933b33b0400d0c33",
+      "remotexapp-status": "5520d1e1826943f742f19dd4df9cf2b6a39faad3e9d8992f037be3d0b0f0b5fd",
+      "remotexapp-operator-helper": "dcc6c205dc3d211c7f766de5bec04ec98683b491a594149f4d88a87c12b77493"
+    },
+    "installedBinariesMatchCandidate": true
+  },
+  "automatedGates": {
+    "makeCheck": "passed",
+    "makeReleaseCI": "passed",
+    "sdkTests": 59,
+    "goRaceAndVet": "passed",
+    "sensitiveDataCheck": "passed",
+    "offlineImmutableStagingAndTamperRejection": "passed",
+    "x11NormalAndINCRBothDirections": "passed",
+    "clipmanExpiryRegression": {
+      "runs": 3,
+      "offerMetadataExpiredWhileCurrentPNGRemainedPasteable": true,
+      "explicitClearPreventedOldTextReplay": true,
+      "gatewayExitAfterClearPreventedOldTextReplay": true
+    },
+    "noClipmanExpiryRegression": {
+      "repeatPasteAfterForcedMetadataExpiry": true,
+      "generationCleanupRemovedContent": true,
+      "externalOwnerCanReplaceTombstone": true
+    },
+    "immediateClipboardManagerRequestRace": "passed under Go race detector",
+    "isolatedShippedAppE2E": {
+      "result": "passed",
+      "apps": ["edge", "firefox-esr", "libreoffice", "mousepad"],
+      "clipboard": "all formats on Mousepad; bidirectional smoke on every other isolated App",
+      "lifecycle": "input, resize, readiness, controls, exit, shutdown, adoption, persistence, cleanup"
+    }
+  },
+  "local1991": {
+    "deploymentMode": "central real user",
+    "listen": "0.0.0.0:1991",
+    "authMode": "none with explicit insecure-public test opt-in",
+    "coreAndShareSelectors": "releases/0.4.0-rc.2",
+    "managerService": "active with zero automatic restarts",
+    "managedApplication": "ubuntu-desktop",
+    "runtimeTemplate": "xfce-user-desktop@2.0.0",
+    "runtimeId": "xfce-user-desktop-2c5cf858536f",
+    "runtimeGeneration": 1,
+    "runtimeGatewayMatchesCandidate": true,
+    "clipboardSocket": "owner-only mode 0600",
+    "viewerCountDuringTest": 2,
+    "viewerCountAfterCleanup": 0,
+    "fullClipboardChecks": [
+      "capabilities and explicit modes",
+      "all four formats browser to X11",
+      "multi-Viewer non-consuming acceptance",
+      "browser Clipboard API read",
+      "XFixes remote change to browser",
+      "view-only receive and send rejection",
+      "reconnect list recovery",
+      "permission-dependent auto degradation",
+      "standard Console prompt stack",
+      "reload resets policy"
+    ],
+    "realClipmanTTL": {
+      "waitedPastOfferTTL": true,
+      "offerListEmpty": true,
+      "currentPNGStillExactAndPasteable": true,
+      "oldTextTargetAbsent": true,
+      "explicitCancelLeftEmptyClipboard": true
+    },
+    "journalPayloadPatternMatches": 0,
+    "journalWarnings": 0,
+    "temporaryViewersRemaining": 0,
+    "readyForHumanUAT": true
+  },
+  "authorizationBoundary": {
+    "sandboxChanged": false,
+    "tagCreated": false,
+    "githubPublished": false
+  }
+}

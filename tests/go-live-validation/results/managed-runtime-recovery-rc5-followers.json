@@ -1,0 +1,72 @@
+{
+  "date": "2026-08-31",
+  "release": "0.2.0-rc.5",
+  "sourceCommit": "8c03c485adc5",
+  "artifactSha256": "a011a513c36ce6f3b0bf7cf491bcdeee91f0da1fdd33d1058685306cd63af7ad",
+  "authorization": "sandbox02, sandbox03, sandbox07, and sandbox10 deployment plus all-runtime restart approved by operator",
+  "targets": {
+    "sandbox02": {
+      "previousRuntimeId": "xfce-user-desktop-ef6f0804f4f9",
+      "finalRuntimeIds": [
+        "xfce-user-desktop-0c9bcad8e7e4"
+      ],
+      "finalManifestCount": 1,
+      "finalActiveUnitCount": 3
+    },
+    "sandbox03": {
+      "previousRuntimeId": "xfce-user-desktop-fa94fc2b6a48",
+      "finalRuntimeIds": [
+        "xfce-user-desktop-c28a0a1ff9bf"
+      ],
+      "finalManifestCount": 1,
+      "finalActiveUnitCount": 3
+    },
+    "sandbox07": {
+      "preActivationRestartCountSample": 4979,
+      "legacyManagedManifestCount": 3,
+      "durablePointerRuntimeId": "xfce-user-desktop-d7110a41f338",
+      "startupRepair": "passed; selected the durable pointer and retired two stale records",
+      "finalRuntimeIds": [
+        "xfce-user-desktop-db5f78f0e02f"
+      ],
+      "finalManifestCount": 1,
+      "finalActiveUnitCount": 3,
+      "lxdContainerRestarted": false
+    },
+    "sandbox10": {
+      "preActivationRestartCountSample": 4973,
+      "legacyManagedManifestCount": 2,
+      "durablePointerRuntimeId": "xfce-user-desktop-f52afe82abd0",
+      "startupRepair": "passed; selected the durable pointer and preserved two anonymous records",
+      "restartedAnonymousRuntimes": {
+        "firefox-esr-1feb0fefabf7": "firefox-esr-28ba410a2a21",
+        "edge-abe09f89acc9": "edge-27a1fd9c2f33"
+      },
+      "restartedManagedRuntime": {
+        "xfce-user-desktop-f52afe82abd0": "xfce-user-desktop-7293a9e21626"
+      },
+      "finalManifestCount": 3,
+      "finalActiveUnitCount": 9
+    }
+  },
+  "fleetAcceptance": {
+    "coreSelectors": "0.2.0-rc.5 on all four targets",
+    "appSelectors": "unchanged and consistent on all four targets",
+    "templates": 6,
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "documentRoots": "/home/sandbox:/mnt/CloudDrive:/mnt/MyDrive",
+    "consoleAndKiosk": "enabled and HTTP verified",
+    "runtimeState": "all server-ready with stopped sessions and zero attached clients",
+    "runtimeManifestCardinality": "one manifest per API runtime",
+    "managedDesktopPolicy": "user-home, fixed 1280x720, client resize disabled",
+    "managerService": "active/running with NRestarts=0 on all four targets",
+    "warningJournalCountAfterFinalRestart": 0,
+    "processOwner": "sandbox; no root remotexappd",
+    "containerLoopbackHealth": "two consecutive checks passed",
+    "buildHostPrivateAddressHealth": "timed out; existing network route/firewall dependency not changed",
+    "productionGatewayUsed": false
+  },
+  "humanUAT": "pending",
+  "formalGitHubPublication": "pending"
+}

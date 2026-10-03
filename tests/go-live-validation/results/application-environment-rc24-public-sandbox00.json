@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-29",
+  "candidate": {
+    "version": "0.1.0-rc.24",
+    "commit": "3a5d73efc3e8",
+    "sdkVersion": "0.16.0",
+    "servedSDKIndexSha256": "3f28a8ed61e78db3f004be2edf467b7a888adba9701f8d549b7d5e8246b960f3",
+    "artifactSha256": "8391f8dc5e36fb177c1ad5a93c7d1136af08bb73db8b5297f916f5e47281aceb"
+  },
+  "configuration": {
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "allowInsecurePublic": true,
+    "expectedWithoutExplicitOptIn": 403,
+    "expectedWithExplicitOptIn": 200
+  },
+  "automatedGates": {
+    "focusedEnvironmentTests": "passed",
+    "makeCheck": "passed",
+    "goRace": "passed",
+    "releaseCI": "passed",
+    "sensitiveDataCheck": "passed",
+    "deploymentArchitectureCheck": "passed"
+  },
+  "local1991": {
+    "managerVersionAndCommitMatch": true,
+    "sdkMethod": "getApplicationEnvironment",
+    "templateId": "mousepad",
+    "sessionGeneration": 1,
+    "httpStatus": 200,
+    "environmentVariableCount": 53,
+    "exactProcfsEnvironmentMatch": true,
+    "workingDirectoryMatch": true,
+    "forcedCleanupComplete": true
+  },
+  "sandbox00": {
+    "managerVersionAndCommitMatch": true,
+    "managedId": "sandbox-desktop",
+    "runtimeId": "xfce-user-desktop-755fb2c3666a",
+    "driverVersion": "1.2.0",
+    "runtimeRelease": "0.1.0-rc.24",
+    "sessionGeneration": 1,
+    "httpStatus": 200,
+    "cacheControl": "no-store",
+    "environmentVariableCount": 43,
+    "exactProcfsEnvironmentMatch": true,
+    "workingDirectoryMatch": true,
+    "userHomeContract": true,
+    "staleGenerationStatus": 409,
+    "attachedClientsAfterValidation": 0
+  },
+  "productionGatewayAcceptance": {
+    "requests": 1,
+    "responseStructureValid": true,
+    "responsePersisted": false,
+    "aggressiveTestingPerformed": false,
+    "gatewayStateChanged": false
+  },
+  "privacy": {
+    "environmentValuesRecordedInEvidence": false,
+    "environmentValuesPrintedByValidation": false,
+    "environmentResponsePersistedAfterValidation": false
+  },
+  "uat": {
+    "accepted": true,
+    "acceptedAt": "2026-08-29",
+    "scope": "EXP-007 public sandbox opt-in and deployment"
+  },
+  "result": "pass"
+}

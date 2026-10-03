@@ -1,0 +1,85 @@
+{
+  "experiment": "P10",
+  "outcome": "accepted",
+  "date": "2026-08-27",
+  "host": "test-host",
+  "status": "Accepted after steady-state syscall measurement, temporary/managed/restart/fallback fault injection, Full XFCE validation and exact browser input readback",
+  "baseline": {
+    "remoteXAppdSha256": "b903efc884ed19b0b86c5bfe784612137c6d0104bae41581c8fc81f2568084bb",
+    "binaryBytes": 9488424,
+    "windowSeconds": 30,
+    "sessionPidFileOpens": 60,
+    "sessionKillZeroProbes": 60,
+    "recurringMonitorGoroutinesPerSession": 1
+  },
+  "candidate": {
+    "remoteXAppdSha256": "c49dbd537739dc8d0064edcc96c6a68bac04c540e6e0edd50b75d8b6f056b222",
+    "binaryBytes": 9509016,
+    "windowSeconds": 30,
+    "sessionPidFileOpens": 0,
+    "sessionKillZeroProbes": 0,
+    "watchRegistrationsDuringWindow": 0,
+    "recurringMonitorGoroutinesPerSession": 0,
+    "watchDescriptorsPerRunningSession": 1,
+    "sharedHostObserver": {
+      "additionalFileDescriptors": 0,
+      "additionalGoroutines": 0
+    }
+  },
+  "resourceComparison": {
+    "windowSeconds": 20,
+    "cpuTicks": {
+      "baseline": 1,
+      "candidate": 1,
+      "clockTicksPerSecond": 100
+    },
+    "threads": {
+      "baseline": 8,
+      "candidate": 8
+    },
+    "fiveSampleAverage": {
+      "baselinePssKiB": 9925.2,
+      "candidatePssKiB": 9336.4,
+      "baselineRssKiB": 11423.2,
+      "candidateRssKiB": 10834.4,
+      "interpretation": "within Go heap/process variation; no causal memory saving claimed"
+    }
+  },
+  "exitDetectionMilliseconds": {
+    "temporaryNormalMousepad": 112,
+    "temporarySigkillMousepad": 62,
+    "managedNormalAfterManagerRestart": 118,
+    "explicitPollFallbackNormal": 219,
+    "fullXfceSigterm": 206
+  },
+  "restartAdoption": {
+    "runtimeIdUnchanged": true,
+    "registryInodeUnchanged": true,
+    "vncGatewaySessionWatchesRestored": 3,
+    "adoptedSessionExitObserved": true
+  },
+  "interaction": {
+    "text": "P10 中文 input reconnect OK",
+    "clipboardExact": true,
+    "serverMilliseconds": 0.903,
+    "roundTripMilliseconds": 2.0,
+    "sdkReconnectMilliseconds": 39.819,
+    "framebufferBefore": "1100x760",
+    "framebufferAfter": "900x640",
+    "pointerTarget": { "x": 550, "y": 380 },
+    "pointerActual": { "x": 550, "y": 380 },
+    "finalRfbState": "connected",
+    "finalInputState": "connected"
+  },
+  "fullXfce": {
+    "productionDriverReachedRunning": true,
+    "sessionExitObserved": true,
+    "excludedAttempt": "P03b experimental Clipman-readiness driver missed the manager deadline before any P10 watch was registered"
+  },
+  "deployment": {
+    "port1991Rebuilt": false,
+    "port1991Restarted": false,
+    "port1991FinalHttpStatus": 200,
+    "isolatedServicesStopped": true
+  }
+}

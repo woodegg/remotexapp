@@ -1,0 +1,81 @@
+{
+  "experiment": "P08",
+  "outcome": "accepted",
+  "date": "2026-08-27",
+  "host": "test-host",
+  "samplesPerMode": 5,
+  "baseline": {
+    "launcher": "wrapper",
+    "managerSha256": "a453bcb63116896a90fc54fe8b6a749498c4b10508e3e604f109addceca0f248",
+    "createMillis": [563, 611, 614, 592, 596],
+    "memoryCurrentBytes": [43241472, 42762240, 42831872, 42831872, 42799104],
+    "tasks": [24, 24, 24, 24, 24],
+    "totalPssKiB": [48238, 48260, 48309, 48382, 48305],
+    "wrapperPssKiB": [5249, 5244, 5284, 5280, 5287],
+    "median": {
+      "createMillis": 596,
+      "memoryCurrentBytes": 42831872,
+      "tasks": 24,
+      "totalPssKiB": 48305,
+      "wrapperPssKiB": 5280
+    }
+  },
+  "candidate": {
+    "launcher": "direct",
+    "managerSha256": "dea23ea2bf6c05a3d2475e93efc56e391e97eba806b3c5364ebdc95169f14f13",
+    "acceptedDefaultManagerSha256": "8fb67a5360038a87f612d9522b56e470eb6b43c27e0aeba9501dd5a593aabedb",
+    "createMillis": [619, 516, 731, 538, 491],
+    "memoryCurrentBytes": [32165888, 32141312, 32133120, 32145408, 32137216],
+    "tasks": [22, 22, 22, 22, 22],
+    "totalPssKiB": [37441, 37443, 37424, 37438, 37379],
+    "perlProcessCount": [0, 0, 0, 0, 0],
+    "median": {
+      "createMillis": 538,
+      "memoryCurrentBytes": 32141312,
+      "tasks": 22,
+      "totalPssKiB": 37438,
+      "perlProcessCount": 0
+    }
+  },
+  "candidateRelativeToBaseline": {
+    "createTimeReductionPercent": 9.7,
+    "memoryCurrentReductionPercent": 25.0,
+    "totalPssReductionPercent": 22.5,
+    "taskReductionPercent": 8.3
+  },
+  "correctness": {
+    "xauthorityMode": "0600",
+    "xdpyinfoAuthenticated": true,
+    "clientResizePassed": true,
+    "text": "P08 中文 input reconnect OK",
+    "clipboardRoundTripExact": true,
+    "firstServerMillis": 2.782,
+    "secondServerMillis": 0.807,
+    "reconnectMillis": 59.1,
+    "finalRfbState": "connected",
+    "finalInputState": "connected",
+    "wrapperCompatibilitySmokePassed": true,
+    "defaultDirectSmokePassed": true,
+    "interactivePassed": true,
+    "interactiveTotalRfbConnections": 7,
+    "interactiveTotalInputConnections": 7,
+    "interactiveCompletedTextRequests": 46,
+    "interactiveTextErrors": 0,
+    "interactiveClientEventRecords": 0
+  },
+  "crashInjection": {
+    "target": "isolated Xtigervnc MainPID only",
+    "vncUnitAfterSignal": "failed",
+    "gatewayUnitAutomaticallyDeactivated": true,
+    "sessionUnitAutomaticallyDeactivated": true,
+    "serverUnitAutomaticallyDeactivated": true,
+    "allUnitsInactiveAfterApiStop": true,
+    "ephemeralPathsRemovedAfterApiStop": true,
+    "managerSnapshotAutoReconciled": false
+  },
+  "isolation": {
+    "managerPort": 1992,
+    "livePort1991Restarted": false
+  },
+  "status": "Accepted after automated measurements, failure injection, compatibility smoke, and manual interactive regression"
+}

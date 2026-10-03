@@ -1,0 +1,28 @@
+{
+  "result": "accepted",
+  "date": "2026-09-03",
+  "acceptedAt": "2026-09-03T05:47:21Z",
+  "acceptance": {
+    "explicitOperatorConfirmation": true,
+    "formalGitHubReleaseAuthorized": true,
+    "candidateVersion": "0.5.0-rc.1",
+    "candidateCommit": "b12ed4046ff6a52768af61bbb8f1f8a47333eace",
+    "sdkVersion": "0.21.0",
+    "appPackageABI": "remotexapp/v1"
+  },
+  "supportingValidation": {
+    "makeCheck": "passed",
+    "makeReleaseCheck": "passed",
+    "makeReleaseCI": "passed",
+    "sdkSubtests": 74,
+    "realBrowserMultiViewer": "passed",
+    "local1991": "deployed and healthy",
+    "local2991": "deployed and healthy",
+    "supportingEvidence": "client-active-clipboard-0.5.0-rc.1-local.json"
+  },
+  "releaseGate": {
+    "clp018ThroughClp024": "accepted",
+    "githubPrereleasePublication": "authorized but not yet completed",
+    "sandboxDeployment": "not authorized"
+  }
+}

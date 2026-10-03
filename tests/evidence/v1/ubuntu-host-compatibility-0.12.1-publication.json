@@ -1,0 +1,184 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "ubuntu-host-compatibility-0.12.1-stable-publication",
+  "commit": "0300acdfd0037fdd4ad0616148389282fb248161",
+  "startedAt": "2026-09-14T11:53:36Z",
+  "completedAt": "2026-09-14T12:25:07Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "nodeLocal": "22.22.3",
+    "nodeHosted": "22.23.2"
+  },
+  "environment": {
+    "kind": "github-hosted-and-disposable-local-X11",
+    "name": "Ubuntu-compatibility-stable-publication-no-deployment"
+  },
+  "artifact": {
+    "name": "remotexapp-0.12.1-linux-amd64.tar.gz",
+    "sha256": "0b3c3aabad65766e8e46fd783b228fc7caed0a6eeffbd38220a3138e9bea02e6"
+  },
+  "scenarios": [
+    {
+      "id": "operator-UAT-acceptance-stable-not-RC",
+      "result": "passed"
+    },
+    {
+      "id": "hosted-Verify-and-Release-candidate",
+      "result": "passed"
+    },
+    {
+      "id": "independent-clean-clone-release-ci-byte-identical-archive",
+      "result": "passed"
+    },
+    {
+      "id": "startup-stage-and-bounded-probe-five-race-repetitions",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-App-Package-ABI",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-shipped-Apps-Viewer-input-rich-clipboard-controls",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-document-save-discard-idle-and-adoption",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-KDE-controls-restart-upgrade-interrupted-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-browser-actions-cancel-and-Manager-crash",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-XFCE-disposable-UID-logout-saved-session-current-input",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-service-faults-refusal-force-startup-adoption-cleanup",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-Mousepad-eight-upgrade-class-input-checks",
+      "result": "passed"
+    },
+    {
+      "id": "annotated-tag-unchanged-candidate-publication",
+      "result": "passed"
+    },
+    {
+      "id": "downloaded-stable-Latest-checksum-VCS-clean-build-and-byte-comparison",
+      "result": "passed"
+    },
+    {
+      "id": "published-archive-sensitive-data-scan",
+      "result": "passed"
+    },
+    {
+      "id": "native-clean-Ubuntu-26.04-Qt6-Mousepad-0.7-full-host-reboot",
+      "result": "skipped",
+      "reason": "Not executed; explicitly disclosed before operator acceptance and retained as a release/platform qualification."
+    }
+  ],
+  "details": {
+    "version": "0.12.1",
+    "sdkVersion": "0.28.0",
+    "tag": "v0.12.1",
+    "releaseURL": "https://github.com/woodegg/remotexapp/releases/tag/v0.12.1",
+    "publication": {
+      "isPrerelease": false,
+      "isDraft": false,
+      "latest": true,
+      "publishedAt": "2026-09-14T12:23:45Z",
+      "verifyRun": 34841526267,
+      "candidateRun": 34841541812,
+      "releaseRun": 34843145873,
+      "candidateURL": "https://github.com/woodegg/remotexapp/actions/runs/34841541812",
+      "releaseRunURL": "https://github.com/woodegg/remotexapp/actions/runs/34843145873",
+      "assets": [
+        "remotexapp-0.12.1-linux-amd64.tar.gz",
+        "SHA256SUMS",
+        "candidate-evidence.json"
+      ],
+      "repositoryVisibility": "private-unchanged"
+    },
+    "appVersions": {
+      "edge": "2.0.1",
+      "firefox-esr": "3.0.1",
+      "kate": "2.0.1",
+      "kwrite": "2.0.1",
+      "mousepad": "4.0.1",
+      "libreoffice": "4.0.0",
+      "xfce-user-desktop": "3.0.0"
+    },
+    "uatProvenance": "ubuntu-host-compatibility-0.12.1-uat.json records operator acceptance of the disclosed development snapshot. Stable promotion changes release/build identity, documentation and test-only fixture timing; no product behavior changes or second human UAT on stable bytes are claimed.",
+    "exactArchiveResult": "All seven suites in scripts/test-release-candidate.sh passed on the first invocation against the final hosted archive. Eight separate Mousepad checks then passed against that same extracted archive. No existing deployment or runtime was a fault target.",
+    "mousepad": {
+      "checks": 8,
+      "resultPath": "/tmp/remotexapp-u26-mousepad-bkTgut/result.json",
+      "resultSHA256": "17e64021c10f5044e5850c79e60c8940a86e21632c80fa8869f440ff2531fefd",
+      "qualification": "Old version selectors use current Driver scripts; only owned test windows have WM_CLASS changed. This is not a native Mousepad 0.7 test or archived downstream-binary migration."
+    },
+    "xfce": {
+      "temporaryUID": 1002,
+      "display": 93,
+      "productionDesktopTouched": false,
+      "savedSession": "Real saved document window restored without test relaunch; current input environment, IBus/Unicode, Viewer readback and borrowed account-bus continuity passed.",
+      "ibusFaultProbeHTTPStatuses": [
+        200
+      ],
+      "ibusFaultDetectionMs": 3.7802950000041164,
+      "resultPath": "/var/tmp/remotexapp-conn-user.bBCvjs/result.json",
+      "resultSHA256": "347844d955338962622c9b53e2c4fd6a7248a28637355e07447c847857819abc"
+    },
+    "failureDisposition": [
+      "First hosted candidate 34840789381 at 9724379e877f2d1358e8384b0529becdb03675de passed, but independent local race validation failed: the 900ms whole-fixture deadline expired at a healthy earlier stage. Repetition then exposed a one-second public-status polling window. Both fixture waits now allow five seconds, with unchanged stage/leakage assertions and separate bounded-probe/cancellation tests. Five race repetitions and the full final local/hosted gates passed. Production deadlines are unchanged; original failed logs are retained. The earlier candidate was not tagged or released.",
+      "A linked-worktree local release-ci passed but its four binaries lacked VCS metadata and did not match hosted bytes. It was rejected as release evidence. An independent ordinary clean clone reran the complete gate; all four binaries and the full archive match the hosted candidate byte-for-byte. Only the verified hosted bytes were tested and published."
+    ],
+    "rawEvidenceDirectory": "/tmp/remotexapp-stable-0.12.1.n8IdGF",
+    "logs": [
+      {
+        "name": "make-check-final.log",
+        "sha256": "d1ef1909e8dbf29b766741deb204984e344a6b5ef3377c4c067f652be3d97251"
+      },
+      {
+        "name": "release-ci.log",
+        "sha256": "ac6b8a0f5e8bfc3496f35ae9943eece5466fb8f9f5f132356054c4530578d9c8"
+      },
+      {
+        "name": "stage-race-repeat.log",
+        "sha256": "6a551d87ccbed6f9193d947aae93713ada064838e8f0ebb7f7aeb9f3604cb33a"
+      },
+      {
+        "name": "stage-race-repeat-bounded.log",
+        "sha256": "40ef50570283eed3592e90d8a9ffc4c121a68b92994214186a26be9a837e8f11"
+      },
+      {
+        "name": "release-ci-final.log",
+        "sha256": "7d745865f7de81a9cfff57de818f2132caf4a8b5ce19bdf60587748c6265b5cf"
+      },
+      {
+        "name": "release-ci-clone.log",
+        "sha256": "f192abe7c9aef74a3cb112c2e7b43eada47aa44c83db854915f55bc4d6162aef"
+      },
+      {
+        "name": "exact-candidate-e2e.log",
+        "sha256": "4260f82d69b41e5f31cda7ceb16437a90d561fa3ddd904648b42a6e3ffdb622f"
+      },
+      {
+        "name": "mousepad-exact-candidate.log",
+        "sha256": "acb5e1e3c6b68831772121e1de6ea026fb72159c92ad6812d8d1bb026131a6e1"
+      }
+    ],
+    "platformQualification": "Executed native tests use the provisioned Ubuntu 24.04.4 developer host, Qt5 and Mousepad 0.6.1. Clean host Ubuntu 26.04, Qt6/Mousepad 0.7 and whole-host reboot validation remain unexecuted, not retroactively passed by UAT acceptance.",
+    "scope": "Accepted U26-01 through U26-05 and U26-07/U26-08 documentation scope released. U26-06/U26-09 and structured error APIs, dashboards, audio and bwrap remain deferred.",
+    "deployment": "None. No local 1991/2992 or sandbox deployment, existing runtime restart/upgrade, gateway mutation or downstream workaround retirement.",
+    "unrelatedWork": "Preserved and excluded existing docs/app-driver-sandbox-todo.md changes, local release-tray/ and the incoming field-report paragraph in docs/production-handover.md."
+  }
+}

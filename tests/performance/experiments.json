@@ -1,0 +1,20 @@
+[
+  { "id": "P01", "directory": "lean-ibus", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P02", "directory": "input-tracing", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P03", "directory": "no-clipman", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P03b", "directory": "xfce-session-clipman", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P04", "directory": "depth-ab", "outcome": "rejected", "results": "results-2026-08-27.json" },
+  { "id": "P05", "directory": "rfb-queue", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P06", "directory": "diagnostics-demand", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P07", "directory": "assets-bundle", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P08", "directory": "direct-xtigervnc", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P09a", "directory": "managed-persistence", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P09b", "directory": "managed-observer", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P10", "directory": "session-observer", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P11", "directory": "cursor-fanout", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P12", "directory": "text-batching", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P13", "directory": "text-logging", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P14", "directory": "session-owned-ibus", "outcome": "accepted", "results": "results-2026-08-27.json" },
+  { "id": "P15", "directory": "resize-debounce", "outcome": "accepted", "results": "results-2026-08-28.json" },
+  { "id": "P16", "directory": "core-session-services", "outcome": "accepted", "results": "results-2026-09-14.json" }
+]

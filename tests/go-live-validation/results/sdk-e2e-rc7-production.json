@@ -1,0 +1,82 @@
+{
+  "date": "2026-08-27",
+  "release": "0.1.0-rc.7",
+  "driverVersion": "1.3.0",
+  "outcome": "passed",
+  "deployment": {
+    "mode": "central-real-user",
+    "user": "tester",
+    "managerPort": 1991,
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "securityStatus": "temporary insecure test configuration"
+  },
+  "binarySha256": {
+    "remotexappd": "310dd613f12857937e8cd024e6bdb89b35f5b2a602fd050107e2c8b36d36624b",
+    "novncInput": "f5a1204b9bef1f72ed442474b53d6d2d0809f1d3e7accf46c8d24d0a01be1c20",
+    "remotexappStatus": "0b2421816f6354777e9aae8e28b7edb8769c5253448a180c272b9c8d63955fed"
+  },
+  "upgrade": {
+    "adoptedDriverVersion": "1.2.0",
+    "availableDriverVersion": "1.3.0",
+    "vncPidPreserved": 4086440,
+    "serverPidPreserved": 4086463,
+    "gatewayPidPreserved": 4086472,
+    "explicitStoppedToRunningTransition": true,
+    "updateStatusAfterTransition": "current"
+  },
+  "sdkScenarios": {
+    "manualDisconnectReconnect": {
+      "unicodeText": "SDK reconnect 中文 input",
+      "textRoundTripMs": 2.8,
+      "finalState": "connected"
+    },
+    "mousepadUserClose": {
+      "terminalEvent": "sessionended",
+      "reason": "application-exited",
+      "sdkErrors": 0,
+      "automaticReconnect": false,
+      "applicationState": "exited"
+    },
+    "mousepadUnsavedStop": {
+      "unicodeText": "Production SDK blocked 中文 document",
+      "textRoundTripMs": 1.5,
+      "httpStatus": 409,
+      "shutdownState": "blocked",
+      "sessionPreserved": true,
+      "explicitForcePassed": true
+    },
+    "edgeImmediateStop": {
+      "applicationReadyMs": 3288,
+      "visibleWindowRequiredBeforeReady": true,
+      "sdkStopPassed": true
+    },
+    "xfce": {
+      "unicodeTextRoundTripMs": 0.9,
+      "fixedFramebuffer": "1280x720",
+      "manualReconnectPassed": true,
+      "managerRestartReconnectPassed": true,
+      "managerRestartSdkErrors": 0,
+      "allLayerPidsPreservedAcrossRestart": true,
+      "managedSdkStopElapsedMs": 239.1
+    }
+  },
+  "automatedGate": {
+    "releaseCheck": "passed",
+    "goRace": "passed",
+    "sdkTests": 14,
+    "isolatedPrivateTmpScenarios": "passed"
+  },
+  "final": {
+    "managedId": "test-host-xfce",
+    "runtimeInstanceId": "xfce-desktop-74d5879b0426",
+    "desiredState": "running",
+    "observedState": "running",
+    "runtimeState": "server-ready",
+    "sessionState": "stopped",
+    "attachedClients": 0,
+    "appliedDriverVersion": "1.3.0",
+    "updateStatus": "current"
+  },
+  "remainingGate": "human visual and interactive UAT"
+}

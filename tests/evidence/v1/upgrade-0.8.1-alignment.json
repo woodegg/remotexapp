@@ -1,0 +1,629 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "formal-0.8.1-manager-alignment-and-runtime-recovery:2026-09-10",
+  "commit": "7c252209b250c69e55cf939b6cf25c3d024991ac",
+  "startedAt": "2026-09-10T14:34:11Z",
+  "completedAt": "2026-09-10T14:38:33Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "approved-eight-endpoint-alignment",
+    "name": "local 1991/2992; sandbox00 1991/2991; sandbox02/03/07/10 1991"
+  },
+  "artifact": {
+    "name": "remotexapp-0.8.1-linux-amd64.tar.gz",
+    "sha256": "80fdfcb298c81bc130807a3e104e1330241a449768782947d0e205d3d2930715"
+  },
+  "scenarios": [
+    {
+      "id": "hosted-verify-candidate-publication-and-independent-byte-verification",
+      "result": "passed"
+    },
+    {
+      "id": "complete-exact-candidate-local-e2e-including-fixed-display-upgrade-and-disposable-uid-xfce",
+      "result": "passed"
+    },
+    {
+      "id": "eight-endpoint-two-start-manager-alignment-health-binary-sdk-catalog-config",
+      "result": "passed"
+    },
+    {
+      "id": "sandbox02-03-failed-upgrade-recovery-and-real-xfce-rfb-ibus-connections",
+      "result": "passed"
+    },
+    {
+      "id": "sandbox00-xfce-graceful-upgrade",
+      "result": "failed",
+      "reason": "HTTP 409 shutdown-blocked. XFCE did not exit; force not authorized. Old runtime survives."
+    },
+    {
+      "id": "remaining-sandbox-runtime-upgrades",
+      "result": "skipped",
+      "reason": "Batch paused after sandbox00 XFCE blocked; sandbox00 Firefox and sandbox07/10 untouched."
+    },
+    {
+      "id": "private-ip-http-acceptance",
+      "result": "skipped",
+      "reason": "All five direct build-host private-IP requests timed out; container-loopback checks passed. Gateway/firewall unchanged."
+    }
+  ],
+  "details": {
+    "managerAlignment": "passed",
+    "configurationDrift": "none",
+    "runtimeUpgradeComplete": false,
+    "forceUsed": false,
+    "localRuntimesUpgraded": false,
+    "publication": {
+      "url": "https://github.com/woodegg/remotexapp/releases/tag/v0.8.1",
+      "latest": true,
+      "prerelease": false,
+      "verifyRun": 34488317932,
+      "candidateRun": 34488317268,
+      "releaseRun": 34489759398,
+      "exactE2ELog": "/tmp/081-exact-e2e.log",
+      "authorization": "Explicit operator hotfix publication, all-environment deployment, then sandbox runtime recovery; no claim of additional human UAT."
+    },
+    "managerSha256": "bf534fda8026c85273c739df23bc46b532fc0bcf721c35c1bb329cfba5afa061",
+    "sdkVersion": "0.25.1",
+    "sdkSha256": "9a0b4c6c472adc5ffae8d888e65fa42be4b69abd0da84adeebf1a71fe3ac1be1",
+    "endpoints": [
+      {
+        "name": "sandbox00-1991",
+        "version": "0.8.1",
+        "commit": "7c252209b250",
+        "webFeatures": {
+          "console": true,
+          "kiosk": true
+        },
+        "startedAt": "2026-09-10T14:34:16Z",
+        "completedAt": "2026-09-10T14:35:12Z",
+        "service": "MainPID=789070\nNRestarts=0\nActiveState=active\n",
+        "listener": "LISTEN 0      4096               *:1991             *:*    users:((\"remotexappd\",pid=789070,fd=8))",
+        "templates": [
+          {
+            "driverVersion": "1.0.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.1.1",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          },
+          {
+            "driverVersion": "2.0.0",
+            "id": "xfce-user-desktop"
+          }
+        ],
+        "preUpgradeRuntimes": [
+          {
+            "createdAt": "2026-09-10T02:42:53.696744331-04:00",
+            "id": "firefox-esr-6d5cd5583aae",
+            "sessionGeneration": 1,
+            "sessionState": "running"
+          },
+          {
+            "createdAt": "2026-09-08T00:02:30.919979288-04:00",
+            "id": "xfce-user-desktop-eefbf64deda7",
+            "sessionGeneration": 1,
+            "sessionState": "running"
+          }
+        ],
+        "servedAssetsMatch": true,
+        "runtimesAndPinsPreservedDuringManagerAlignment": true,
+        "configurationPreserved": true
+      },
+      {
+        "name": "sandbox02-1991",
+        "version": "0.8.1",
+        "commit": "7c252209b250",
+        "webFeatures": {
+          "console": true,
+          "kiosk": true
+        },
+        "startedAt": "2026-09-10T14:34:14Z",
+        "completedAt": "2026-09-10T14:35:26Z",
+        "service": "MainPID=1187730\nNRestarts=0\nActiveState=active\n",
+        "listener": "LISTEN 0      4096               *:1991             *:*    users:((\"remotexappd\",pid=1187730,fd=8))",
+        "templates": [
+          {
+            "driverVersion": "1.0.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.1.1",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          },
+          {
+            "driverVersion": "2.0.0",
+            "id": "xfce-user-desktop"
+          }
+        ],
+        "preUpgradeRuntimes": [
+          {
+            "createdAt": "2026-09-07T23:44:13.030844317-04:00",
+            "id": "xfce-user-desktop-3616fd55d920",
+            "sessionGeneration": 0,
+            "sessionState": "stopped"
+          }
+        ],
+        "servedAssetsMatch": true,
+        "runtimesAndPinsPreservedDuringManagerAlignment": true,
+        "configurationPreserved": true
+      },
+      {
+        "name": "sandbox03-1991",
+        "version": "0.8.1",
+        "commit": "7c252209b250",
+        "webFeatures": {
+          "console": true,
+          "kiosk": true
+        },
+        "startedAt": "2026-09-10T14:34:15Z",
+        "completedAt": "2026-09-10T14:35:38Z",
+        "service": "MainPID=2406775\nNRestarts=0\nActiveState=active\n",
+        "listener": "LISTEN 0      4096               *:1991             *:*    users:((\"remotexappd\",pid=2406775,fd=8))",
+        "templates": [
+          {
+            "driverVersion": "1.0.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.1.1",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          },
+          {
+            "driverVersion": "2.0.0",
+            "id": "xfce-user-desktop"
+          }
+        ],
+        "preUpgradeRuntimes": [
+          {
+            "createdAt": "2026-09-08T00:02:32.447280625-04:00",
+            "id": "xfce-user-desktop-7eaf5f60925b",
+            "sessionGeneration": 1,
+            "sessionState": "stopped"
+          }
+        ],
+        "servedAssetsMatch": true,
+        "runtimesAndPinsPreservedDuringManagerAlignment": true,
+        "configurationPreserved": true
+      },
+      {
+        "name": "sandbox07-1991",
+        "version": "0.8.1",
+        "commit": "7c252209b250",
+        "webFeatures": {
+          "console": true,
+          "kiosk": true
+        },
+        "startedAt": "2026-09-10T14:34:12Z",
+        "completedAt": "2026-09-10T14:35:47Z",
+        "service": "MainPID=2959193\nNRestarts=0\nActiveState=active\n",
+        "listener": "LISTEN 0      4096               *:1991             *:*    users:((\"remotexappd\",pid=2959193,fd=8))",
+        "templates": [
+          {
+            "driverVersion": "1.0.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.1.1",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          },
+          {
+            "driverVersion": "2.0.0",
+            "id": "xfce-user-desktop"
+          }
+        ],
+        "preUpgradeRuntimes": [
+          {
+            "createdAt": "2026-09-07T23:44:14.422976694-04:00",
+            "id": "xfce-user-desktop-0c83d8920508",
+            "sessionGeneration": 1,
+            "sessionState": "running"
+          }
+        ],
+        "servedAssetsMatch": true,
+        "runtimesAndPinsPreservedDuringManagerAlignment": true,
+        "configurationPreserved": true
+      },
+      {
+        "name": "sandbox10-1991",
+        "version": "0.8.1",
+        "commit": "7c252209b250",
+        "webFeatures": {
+          "console": true,
+          "kiosk": true
+        },
+        "startedAt": "2026-09-10T14:34:15Z",
+        "completedAt": "2026-09-10T14:35:58Z",
+        "service": "MainPID=1808888\nNRestarts=0\nActiveState=active\n",
+        "listener": "LISTEN 0      4096               *:1991             *:*    users:((\"remotexappd\",pid=1808888,fd=8))",
+        "templates": [
+          {
+            "driverVersion": "1.0.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.1.1",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          },
+          {
+            "driverVersion": "2.0.0",
+            "id": "xfce-user-desktop"
+          }
+        ],
+        "preUpgradeRuntimes": [
+          {
+            "createdAt": "2026-09-08T00:02:33.407107083-04:00",
+            "id": "xfce-user-desktop-3f5cfb7fc1a6",
+            "sessionGeneration": 1,
+            "sessionState": "running"
+          }
+        ],
+        "servedAssetsMatch": true,
+        "runtimesAndPinsPreservedDuringManagerAlignment": true,
+        "configurationPreserved": true
+      },
+      {
+        "name": "sandbox00-2991",
+        "version": "0.8.1",
+        "commit": "7c252209b250",
+        "webFeatures": {
+          "console": false,
+          "kiosk": true
+        },
+        "startedAt": "2026-09-10T14:34:24Z",
+        "completedAt": "2026-09-10T14:34:49Z",
+        "service": "MainPID=788621\nNRestarts=0\nActiveState=active\n",
+        "listener": "LISTEN 0      4096       127.0.0.1:2991       0.0.0.0:*    users:((\"remotexappd\",pid=788621,fd=8))",
+        "templates": [
+          {
+            "driverVersion": "1.0.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.1.1",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          }
+        ],
+        "preUpgradeRuntimes": [],
+        "servedAssetsMatch": true,
+        "runtimesAndPinsPreservedDuringManagerAlignment": true,
+        "configurationPreserved": true
+      },
+      {
+        "name": "local-1991",
+        "version": "0.8.1",
+        "commit": "7c252209b250",
+        "webFeatures": {
+          "console": true,
+          "kiosk": true
+        },
+        "startedAt": "2026-09-10T14:34:11Z",
+        "completedAt": "2026-09-10T14:35:01Z",
+        "service": "MainPID=3685733\nNRestarts=0\nActiveState=active\n",
+        "listener": "LISTEN 0      4096                     127.0.0.1:1991       0.0.0.0:*    users:((\"remotexappd\",pid=3685733,fd=8))",
+        "templates": [
+          {
+            "driverVersion": "1.0.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.1.1",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          },
+          {
+            "driverVersion": "2.0.0",
+            "id": "xfce-user-desktop"
+          }
+        ],
+        "preUpgradeRuntimes": [
+          {
+            "createdAt": "2026-09-10T01:27:20.256436218-04:00",
+            "id": "xfce-user-desktop-44ea8c2186ee",
+            "sessionGeneration": 1,
+            "sessionState": "running"
+          }
+        ],
+        "servedAssetsMatch": true,
+        "runtimesAndPinsPreservedDuringManagerAlignment": true,
+        "configurationPreserved": true
+      },
+      {
+        "name": "local-2992",
+        "version": "0.8.1",
+        "commit": "7c252209b250",
+        "webFeatures": {
+          "console": false,
+          "kiosk": true
+        },
+        "startedAt": "2026-09-10T14:34:11Z",
+        "completedAt": "2026-09-10T14:34:36Z",
+        "service": "MainPID=3684699\nNRestarts=0\nActiveState=active\n",
+        "listener": "LISTEN 0      4096                     127.0.0.1:2992       0.0.0.0:*    users:((\"remotexappd\",pid=3684699,fd=8))",
+        "templates": [
+          {
+            "driverVersion": "1.0.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.1.1",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          }
+        ],
+        "preUpgradeRuntimes": [],
+        "servedAssetsMatch": true,
+        "runtimesAndPinsPreservedDuringManagerAlignment": true,
+        "configurationPreserved": true
+      }
+    ],
+    "runtimeResults": [
+      {
+        "name": "sandbox00",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-eefbf64deda7",
+            "state": "server-ready",
+            "sessionState": "shutdown-blocked",
+            "sessionGeneration": 1,
+            "currentCore": "0.5.3",
+            "updateAvailable": true,
+            "upgrade": {
+              "id": "upgrade-d801935f63c5",
+              "phase": "blocked",
+              "targetRevision": "6c6baaab01087b48bf112947b252f12c80bfc64ed86c39f915b2cc4536ff246a",
+              "errorCode": "shutdown-blocked",
+              "message": "Runtime upgrade did not complete",
+              "updatedAt": "2026-09-10T10:36:47.975389376-04:00"
+            },
+            "shutdown": {
+              "requestId": "shutdown-21b5c607278b",
+              "generation": 1,
+              "reason": "api-upgrade",
+              "scope": "instance",
+              "state": "blocked",
+              "requestedAt": "2026-09-10T10:36:33.618533902-04:00",
+              "blockedAt": "2026-09-10T10:36:47.967064258-04:00",
+              "warningAt": "2026-09-10T11:36:47.967064258-04:00",
+              "message": "XFCE logout is blocked by an application or user decision",
+              "forced": false
+            },
+            "attachedClients": 0
+          },
+          {
+            "id": "firefox-esr-6d5cd5583aae",
+            "state": "server-ready",
+            "sessionState": "running",
+            "sessionGeneration": 1,
+            "currentCore": "0.5.3",
+            "updateAvailable": true,
+            "upgrade": null,
+            "shutdown": null,
+            "attachedClients": 0
+          }
+        ]
+      },
+      {
+        "name": "sandbox02",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-3616fd55d920",
+            "state": "server-ready",
+            "sessionState": "running",
+            "sessionGeneration": 2,
+            "currentCore": "0.8.1",
+            "updateAvailable": false,
+            "upgrade": {
+              "id": "upgrade-43502b73559b",
+              "phase": "completed",
+              "targetRevision": "6c6baaab01087b48bf112947b252f12c80bfc64ed86c39f915b2cc4536ff246a",
+              "updatedAt": "2026-09-10T10:36:25.313542016-04:00"
+            },
+            "shutdown": null,
+            "attachedClients": 0
+          }
+        ]
+      },
+      {
+        "name": "sandbox03",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-7eaf5f60925b",
+            "state": "server-ready",
+            "sessionState": "running",
+            "sessionGeneration": 3,
+            "currentCore": "0.8.1",
+            "updateAvailable": false,
+            "upgrade": {
+              "id": "upgrade-013047414c44",
+              "phase": "completed",
+              "targetRevision": "6c6baaab01087b48bf112947b252f12c80bfc64ed86c39f915b2cc4536ff246a",
+              "updatedAt": "2026-09-10T10:36:29.998931471-04:00"
+            },
+            "shutdown": null,
+            "attachedClients": 0
+          }
+        ]
+      },
+      {
+        "name": "sandbox07",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-0c83d8920508",
+            "state": "server-ready",
+            "sessionState": "running",
+            "sessionGeneration": 1,
+            "currentCore": "0.5.3",
+            "updateAvailable": true,
+            "upgrade": null,
+            "shutdown": null,
+            "attachedClients": 0
+          }
+        ]
+      },
+      {
+        "name": "sandbox10",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-3f5cfb7fc1a6",
+            "state": "server-ready",
+            "sessionState": "running",
+            "sessionGeneration": 1,
+            "currentCore": "0.5.3",
+            "updateAvailable": true,
+            "upgrade": null,
+            "shutdown": null,
+            "attachedClients": 0
+          }
+        ]
+      }
+    ],
+    "recovery": {
+      "sandbox02": {
+        "generation": 2,
+        "display": ":1",
+        "application": "ready",
+        "connections": "ready",
+        "ibus": "runtime"
+      },
+      "sandbox03": {
+        "generation": 3,
+        "display": ":1",
+        "application": "ready",
+        "connections": "ready",
+        "ibus": "runtime"
+      }
+    }
+  }
+}

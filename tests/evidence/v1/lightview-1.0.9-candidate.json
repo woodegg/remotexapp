@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "candidate",
+  "runId": "lightview-1.0.9-capability-qualification",
+  "commit": "14f114959aa2f39f1c78d33135a869a43f512802",
+  "startedAt": "2026-09-18T18:40:00Z",
+  "completedAt": "2026-09-18T18:52:01Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "isolated-local-test",
+    "name": "dedicated disposable user; Manager loopback 21996; headed Chrome under Xvfb"
+  },
+  "artifact": {
+    "name": "lightview-1.0.9.tar.gz",
+    "sha256": "3007a833253fe7ccf385502fa1a3beca7a1b1714839a931bbc1048ae96014ddd"
+  },
+  "app": {
+    "id": "lightview",
+    "version": "1.0.9",
+    "contentSha256": "75ae754b6a26de21859b14e749caa836b04934f9deaeb93ff4eb75601af8a479",
+    "hostDependency": {
+      "release": "woodegg/lightview v0.1.9",
+      "tagCommit": "3c167207378651512ddfb51a4a08ff486dc15fc5",
+      "archiveSha256": "3ca10b3ec2bf07fc17451356735d1e6faf73875dd358025214717ecb9bc90fd9",
+      "binarySha256": "b3a2ff625c65d50f66f2c91016757f47bf89bfc7bcb59090e0818827eea70b94"
+    }
+  },
+  "scenarios": [
+    {
+      "id": "deterministic-package",
+      "result": "passed"
+    },
+    {
+      "id": "missing-dependency-fails-closed",
+      "result": "passed"
+    },
+    {
+      "id": "package-only-upgrade-and-rollback",
+      "result": "passed"
+    },
+    {
+      "id": "singleton-two-Viewer-sharing",
+      "result": "passed"
+    },
+    {
+      "id": "private-descriptor-low-memory-WebGL-disabled",
+      "result": "passed"
+    },
+    {
+      "id": "real-Viewer-resize-IME-clipboard",
+      "result": "passed"
+    },
+    {
+      "id": "bounded-openUrl",
+      "result": "passed"
+    },
+    {
+      "id": "stable-socket-soft-hard-WebKit-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "Manager-restart-adoption",
+      "result": "passed"
+    },
+    {
+      "id": "ordinary-restart-profile-continuity",
+      "result": "passed"
+    },
+    {
+      "id": "crash-stale-socket-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "socket-substitution-control-fails-closed-and-runtime-recovers",
+      "result": "passed"
+    },
+    {
+      "id": "native-app-exit-stop-instance-cleanup",
+      "result": "passed"
+    },
+    {
+      "id": "graceful-stop-and-recreated-profile-continuity",
+      "result": "passed"
+    },
+    {
+      "id": "simulated-six-hour-vacancy-stop-instance",
+      "result": "passed"
+    },
+    {
+      "id": "real-launcher-five-version-banners",
+      "result": "passed"
+    },
+    {
+      "id": "old-driver-red-regression-four-banners-rejected",
+      "result": "passed"
+    },
+    {
+      "id": "missing-required-control-status-fields-rejected",
+      "result": "passed"
+    },
+    {
+      "id": "make-check",
+      "result": "passed"
+    },
+    {
+      "id": "make-test-race",
+      "result": "passed"
+    },
+    {
+      "id": "make-coverage-check",
+      "result": "passed"
+    },
+    {
+      "id": "make-vuln-check",
+      "result": "passed"
+    }
+  ],
+  "limitations": [
+    "Build container requires a test-only WebKit sandbox override; production sandboxing was not qualified and the override is not packaged.",
+    "Six-hour vacancy policy is checked statically; live timer is accelerated to sixty seconds.",
+    "Future and historical version banners are launcher fixtures, not certification of those real executables.",
+    "Initial fixture setup failed because inherited umask produced a group-writable install root; final run uses umask 077.",
+    "No endpoint deployment, Core/SDK change, or interactive human UAT is claimed."
+  ]
+}

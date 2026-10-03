@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "operator:firefox-ime-0.5.3-20260908",
+  "commit": "2c3c962b44e8c08b3a7f946308ab711b06daef1f",
+  "startedAt": "2026-09-08T03:25:08Z",
+  "completedAt": "2026-09-08T03:25:08Z",
+  "result": "passed",
+  "toolchain": { "go": "go1.26.8", "node": "v22.22.3" },
+  "environment": { "kind": "human-uat", "name": "local-1991" },
+  "artifact": {
+    "name": "remotexapp-0.5.3-rc.1-linux-amd64.tar.gz",
+    "sha256": "33c5f35a81492b42823996b2392cafe7f777e72aee5ea8bfd858357a72c93a7f"
+  },
+  "scenarios": [
+    { "id": "human-uat-accepted", "result": "passed" },
+    { "id": "formal-stable-publication-authorized", "result": "passed" }
+  ],
+  "details": {
+    "operatorRequest": "UAT accept, do formal release",
+    "requirements": ["FFX-007", "RTM-017"],
+    "stableTarget": "0.5.3",
+    "promotionScope": "Stable version metadata and acceptance documentation only; runtime implementation, SDK bundle and App Package remain the accepted candidate behavior. Build the stable hosted candidate once, test those exact bytes, and publish unchanged.",
+    "deploymentAuthorized": false,
+    "local1991Remains": "0.5.3-rc.1 until separately aligned"
+  }
+}

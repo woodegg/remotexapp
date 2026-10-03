@@ -1,0 +1,77 @@
+{
+  "apiVersion": "remotexapp/v1",
+  "id": "libreoffice",
+  "name": "LibreOffice",
+  "driverVersion": "4.0.0",
+  "singleton": false,
+  "profileRef": "temporary",
+  "runMode": "isolated",
+  "ports": {
+    "control": {
+      "kind": "loopback-tcp",
+      "port": 0
+    }
+  },
+  "parameters": {
+    "filePath": {
+      "type": "file",
+      "maxLength": 4096
+    }
+  },
+  "driver": {
+    "config": {
+      "protocol": "libreoffice-uno"
+    }
+  },
+  "overrides": {
+    "allowed": ["geometry", "frameRate", "allowClientResize"]
+  },
+  "dependencies": {
+    "executables": ["cut", "find", "fuser", "jq", "libreoffice", "matchbox-window-manager", "python3", "sed", "seq", "sha256sum", "sleep", "xdotool"],
+    "pythonModules": ["uno"]
+  },
+  "server": {
+    "activation": "on-demand",
+    "driver": "server.sh",
+    "displayMode": "dynamic",
+    "display": 0,
+    "rfbPort": 0,
+    "gatewayPort": 0,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 10,
+    "allowClientResize": true,
+    "readinessPids": ["server.pid"],
+    "readinessTimeout": "10s"
+  },
+  "session": {
+    "services": "core-v1",
+    "activation": "immediate",
+    "driver": "session.sh",
+    "shutdownDriver": "shutdown.sh",
+    "readinessPid": "libreoffice.pid",
+    "readinessTimeout": "45s",
+    "vacantTimeout": "60s",
+    "vacantAction": "stop-instance",
+    "status": {
+      "mode": "driver",
+      "details": {
+        "application": {
+          "type": "enum",
+          "values": ["libreoffice"]
+        },
+        "control": {
+          "type": "json",
+          "maxBytes": 4096,
+          "maxDepth": 4,
+          "maxItems": 32
+        }
+      }
+    }
+  },
+  "input": {
+    "backend": "ibus",
+    "lifecycle": "session",
+    "allowedWmClasses": ["libreoffice-writer", "libreoffice-calc", "libreoffice-impress", "libreoffice-draw", "libreoffice-base", "libreoffice-math", "libreoffice-startcenter"]
+  }
+}

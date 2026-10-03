@@ -1,0 +1,32 @@
+{
+  "date": "2026-08-27",
+  "candidate": "0.1.0-rc.6",
+  "driverVersion": "1.2.0",
+  "outcome": "passed",
+  "regression": "manager graceful hook can reach the private session bus with PrivateTmp=yes",
+  "manager": {
+    "privateTmp": true,
+    "port": 1993,
+    "binarySha256": "8252c91b2be09ea5567eb10f68602e027a4a97cab70320ef829ea7b3dedf6ae2"
+  },
+  "runtime": {
+    "display": ":31",
+    "application": "xfce-desktop",
+    "applicationStateBeforeStop": "ready",
+    "busAddressPrefix": "unix:path=/run/user/1000/remotexappd/",
+    "busSocketPresent": true
+  },
+  "gracefulStop": {
+    "httpStatus": 200,
+    "elapsedMs": 2420,
+    "shutdownState": "completed",
+    "finalRuntimeState": "stopped",
+    "forced": false
+  },
+  "productionIssueReproduced": {
+    "release": "0.1.0-rc.5",
+    "symptom": "XFCE logout could not connect because the session bus was under host /tmp",
+    "failureMode": "fail-safe shutdown-blocked timeout; session retained",
+    "dataLoss": false
+  }
+}

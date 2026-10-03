@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "audit",
+  "runId": "github-actions:33897655130",
+  "commit": "2e0dbbd87629fa034148a83d71f0ccf71fb13aca",
+  "startedAt": "2026-09-04T16:53:50Z",
+  "completedAt": "2026-09-04T16:54:18Z",
+  "result": "completed",
+  "toolchain": {"go": "go1.26.8", "node": "v22"},
+  "environment": {"kind": "github-hosted", "name": "ubuntu-latest"},
+  "scenarios": [
+    {"id": "candidate-identity-and-bytes", "result": "passed"},
+    {"id": "release-archive-sensitive-data-scan", "result": "failed"}
+  ],
+  "details": {
+    "cause": "Release runner did not install the ripgrep executable required by scripts/check-sensitive-data.sh",
+    "workflowRun": "https://github.com/woodegg/remotexapp/actions/runs/33897655130",
+    "correction": "Install ripgrep explicitly in release.yml and enforce that dependency in scripts/check-workflows.mjs"
+  }
+}

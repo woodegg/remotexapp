@@ -1,0 +1,1499 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "local:ffx007-1991-uat-ready",
+  "commit": "2c3c962b44e8c08b3a7f946308ab711b06daef1f",
+  "startedAt": "2026-09-08T02:13:59Z",
+  "completedAt": "2026-09-08T02:20:10Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "local",
+    "name": "local-1991-only"
+  },
+  "artifact": {
+    "name": "remotexapp-0.5.3-rc.1-linux-amd64.tar.gz",
+    "sha256": "33c5f35a81492b42823996b2392cafe7f777e72aee5ea8bfd858357a72c93a7f"
+  },
+  "scenarios": [
+    {
+      "id": "exact-candidate-commit-cleanliness-and-checksum",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-synthetic-app-abi-e2e",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-four-shipped-app-e2e",
+      "result": "passed"
+    },
+    {
+      "id": "firefox-fresh-reused-and-restarted-readback",
+      "result": "passed"
+    },
+    {
+      "id": "pinned-control-port-50-repeat-race",
+      "result": "passed"
+    },
+    {
+      "id": "installed-preflight-and-four-binary-byte-comparison",
+      "result": "passed"
+    },
+    {
+      "id": "existing-desktop-adoption-without-recreation",
+      "result": "passed"
+    },
+    {
+      "id": "configuration-checksums-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "deployed-firefox-readback-and-immediate-restart",
+      "result": "passed"
+    },
+    {
+      "id": "same-runtime-port-and-profile-after-restart",
+      "result": "passed"
+    },
+    {
+      "id": "hostname-console-and-viewer-http-200",
+      "result": "passed"
+    },
+    {
+      "id": "local-2991-version-and-service-pid-unchanged",
+      "result": "passed"
+    },
+    {
+      "id": "test-viewer-cleanup",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "version": "0.5.3-rc.1",
+    "sdkVersion": "0.21.1",
+    "firefoxDriverVersion": "2.1.1",
+    "firefoxAppContentSha256": "e13af9ebbb79a3a2fe41974279c49b7e21a764eb7db4fefb4392370d001e28f3",
+    "firefoxAppArchiveSha256": "f42c104e351bc6552625b78061ab46d4501ee52725bf2b0966a51878eb6d97c0",
+    "runningManagerSha256": "1edb7a1a6273c7d1fb6b869a37469b05c6da53d9c5060d0a4158fa44dc878995",
+    "listener": "0.0.0.0:1991",
+    "authMode": "none",
+    "allowInsecurePublic": true,
+    "exposeInternals": false,
+    "preservedDesktop": {
+      "id": "xfce-user-desktop-2c5cf858536f",
+      "identityGenerationProfileStateUnchanged": true
+    },
+    "uatRuntime": {
+      "id": "firefox-esr-432ed9e74fd9",
+      "profileRef": "ffx007-uat",
+      "generationBefore": 1,
+      "generationAfter": 2,
+      "controlAddress": "127.0.0.1",
+      "controlPort": 21000,
+      "viewerPath": "/remotexapps/firefox-esr-432ed9e74fd9/kiosk.html",
+      "state": "ready"
+    },
+    "finalHealth": {
+      "activeInstances": 2,
+      "attachedClients": 0,
+      "status": "ok"
+    },
+    "local2991": {
+      "version": "0.5.2",
+      "commit": "815eae926ef7",
+      "pid": 1461542,
+      "unchanged": true
+    },
+    "scope": "Local 1991 only; no sandbox access, push, tag or GitHub publication. Human UAT pending.",
+    "limitations": "The four-App candidate gate excludes user-home creation in the shared host account; the existing local XFCE desktop was preserved, not recreated. A pre-existing corrupt historical journal file was reported by journalctl; readable post-deployment warning entries were empty.",
+    "buildEnvironment": "Linked-worktree build lacked VCS stamps and was rejected. Accepted artifact was built once from a normal clean local clone of the same commit; all four binaries embed exact commit and vcs.modified=false.",
+    "harnessAdaptation": "Post-deployment readback harness accepts an explicit operator-supplied Xauthority when host paths are hidden; deployed source artifact and exposure policy were not changed.",
+    "totalExactTextReadbacks": 180,
+    "matrix": [
+      {
+        "name": "candidate-fresh",
+        "result": "passed",
+        "instanceId": "firefox-esr-56c03e146f9e",
+        "driverVersion": "2.1.1",
+        "browserVersion": "140.15.0",
+        "control": {
+          "kind": "loopback-tcp",
+          "address": "127.0.0.1",
+          "port": 21002
+        },
+        "checks": [
+          "actual-readback",
+          "ASCII",
+          "Unicode",
+          "RFB",
+          "tab-window-focus",
+          "native-chrome-focus-return",
+          "viewer-reconnect",
+          "BiDi-lifecycle"
+        ],
+        "observations": [
+          {
+            "round": 0,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          }
+        ]
+      },
+      {
+        "name": "candidate-reused",
+        "result": "passed",
+        "instanceId": "firefox-esr-d3b0cd0181a0",
+        "driverVersion": "2.1.1",
+        "browserVersion": "140.15.0",
+        "control": {
+          "kind": "loopback-tcp",
+          "address": "127.0.0.1",
+          "port": 21001
+        },
+        "checks": [
+          "actual-readback",
+          "ASCII",
+          "Unicode",
+          "RFB",
+          "tab-window-focus",
+          "native-chrome-focus-return",
+          "viewer-reconnect",
+          "BiDi-lifecycle"
+        ],
+        "observations": [
+          {
+            "round": 0,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          }
+        ]
+      },
+      {
+        "name": "candidate-restarted",
+        "result": "passed",
+        "instanceId": "firefox-esr-d3b0cd0181a0",
+        "driverVersion": "2.1.1",
+        "browserVersion": "140.15.0",
+        "control": {
+          "kind": "loopback-tcp",
+          "address": "127.0.0.1",
+          "port": 21001
+        },
+        "checks": [
+          "actual-readback",
+          "ASCII",
+          "Unicode",
+          "RFB",
+          "tab-window-focus",
+          "native-chrome-focus-return",
+          "viewer-reconnect",
+          "BiDi-lifecycle"
+        ],
+        "observations": [
+          {
+            "round": 0,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          }
+        ]
+      },
+      {
+        "name": "deployed-fresh",
+        "result": "passed",
+        "instanceId": "firefox-esr-432ed9e74fd9",
+        "driverVersion": "2.1.1",
+        "browserVersion": "140.15.0",
+        "control": {
+          "kind": "loopback-tcp",
+          "address": "127.0.0.1",
+          "port": 21000
+        },
+        "checks": [
+          "actual-readback",
+          "ASCII",
+          "Unicode",
+          "RFB",
+          "tab-window-focus",
+          "native-chrome-focus-return",
+          "viewer-reconnect",
+          "BiDi-lifecycle"
+        ],
+        "observations": [
+          {
+            "round": 0,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          }
+        ]
+      },
+      {
+        "name": "deployed-restarted",
+        "result": "passed",
+        "instanceId": "firefox-esr-432ed9e74fd9",
+        "driverVersion": "2.1.1",
+        "browserVersion": "140.15.0",
+        "control": {
+          "kind": "loopback-tcp",
+          "address": "127.0.0.1",
+          "port": 21000
+        },
+        "checks": [
+          "actual-readback",
+          "ASCII",
+          "Unicode",
+          "RFB",
+          "tab-window-focus",
+          "native-chrome-focus-return",
+          "viewer-reconnect",
+          "BiDi-lifecycle"
+        ],
+        "observations": [
+          {
+            "round": 0,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 0,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 1,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 2,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 3,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 4,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "plain",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "plain",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "area",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "area",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "edit",
+            "text": "AsciiProbe",
+            "actual": "xAsciiProbe",
+            "ack": true
+          },
+          {
+            "round": 5,
+            "field": "edit",
+            "text": "中文测试",
+            "actual": "xAsciiProbe中文测试",
+            "ack": true
+          }
+        ]
+      }
+    ]
+  }
+}

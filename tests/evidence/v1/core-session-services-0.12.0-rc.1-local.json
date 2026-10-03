@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "core-session-services-0.12.0-rc.1-local-uat-ready",
+  "commit": "b7f4f98c7204a9468edef24204de1ed7f3d7a191",
+  "startedAt": "2026-09-14T01:38:38Z",
+  "completedAt": "2026-09-14T03:04:37Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "22.22.3"},
+  "environment": {"kind": "local-Ubuntu-X11", "name": "loopback-1991-and-2992"},
+  "artifact": {
+    "name": "remotexapp-0.12.0-rc.1-linux-amd64.tar.gz",
+    "sha256": "57a9dc17b2740361936ab2eb8d32c475ab2cd7284b768b9ad7a341ae81be4f36"
+  },
+  "scenarios": [
+    {"id": "make-check-race-coverage-source-and-four-binary-vulnerability-scans", "result": "passed"},
+    {"id": "immutable-staging-idempotence-tamper-and-catalog-rollback", "result": "passed"},
+    {"id": "supervisor-ownership-second-owner-rejection-readiness-timeout-service-fault-cleanup", "result": "passed"},
+    {"id": "strict-private-record-generation-PID-starttime-cgroup-and-old-contract-rejection", "result": "passed"},
+    {"id": "exact-archive-synthetic-plugin-lifecycle-no-rebuild", "result": "passed"},
+    {"id": "exact-archive-shipped-browser-IME-clipboard-resize-reconnect-lifecycle", "result": "passed"},
+    {"id": "exact-archive-optional-documents-unsaved-normal-force-and-idle-cleanup", "result": "passed"},
+    {"id": "exact-archive-Kate-KWrite-controls-seven-App-upgrade-crash-recovery", "result": "passed"},
+    {"id": "exact-archive-Edge-CDP-Firefox-BiDi-actions-cancellation-adoption", "result": "passed"},
+    {"id": "exact-archive-disposable-UID-XFCE-Xfconf-Thunar-logout-relogin-borrowed-bus", "result": "passed"},
+    {"id": "exact-archive-service-loss-live-App-preservation-startup-crash-blocked-host-force", "result": "passed"},
+    {"id": "stopped-cutover-reject-mixed-stack-preserve-profile-document-and-managed-intent", "result": "passed"},
+    {"id": "P16-five-paired-fresh-and-warm-launches-resources-and-cleanup", "result": "passed"},
+    {"id": "two-local-deployments-same-archive-loopback-config-and-selector-membership-preserved", "result": "passed"},
+    {"id": "local-desktop-graceful-clean-cutover-new-Core-owned-generation-ready", "result": "passed"},
+    {"id": "both-served-Viewers-Manager-restart-same-processes-Unicode-and-clipboard-readback", "result": "passed"},
+    {"id": "both-disposable-live-Viewers-service-fault-reject-Unicode-retain-SDK-raw-RFB-input", "result": "passed"},
+    {"id": "human-native-IME-and-desktop-UAT", "result": "skipped", "reason": "Ready for operator UAT; not accepted yet."}
+  ],
+  "details": {
+    "version": "0.12.0-rc.1",
+    "sdkVersion": "0.28.0",
+    "sourceState": "Dirty working-tree UAT candidate based on the recorded commit; not a clean hosted candidate, tag or formal release. No commit, push, publication or sandbox deployment performed.",
+    "artifactContinuity": "The same frozen archive was used for final real-App suites, cutover rehearsal, P16 and both deployments. All four binaries and runtime helper/App scripts match the checkout. Four source manifests had whitespace-only cleanup after freezing (Edge, Firefox, Kate, KWrite); parsed JSON equality was verified. Docs and test harnesses were subsequently completed. A formal release requires a clean committed candidate and its normal gates.",
+    "requirements": "SVC-001 through SVC-010; bwrap, Docker and audio excluded.",
+    "goCoveragePercent": 62.3,
+    "sdkCoveragePercent": {"lines": 86.07, "branches": 78.62, "functions": 82.16},
+    "knownVulnerabilities": "Source call-graph and all four packaged binaries: none found by the pinned govulncheck gate.",
+    "appVersions": {"edge": "2.0.0", "firefox-esr": "3.0.0", "mousepad": "4.0.0", "libreoffice": "4.0.0", "kate": "2.0.0", "kwrite": "2.0.0", "xfce-user-desktop": "3.0.0"},
+    "managerSHA256": "4cfe954a26ebc4b08fcbb585020719c9f856af89d4fab8f25ee54b85aa68c9dc",
+    "supervisorSHA256": "04f497423b498057d5216e80d9731d193fa148eb6ec93a94554cae166eec6000",
+    "sdkSHA256": "ea55b3ce9d1dd0a07c631b2a69683a1c9df3b0fd2667ebadc91eed973f7c3b11",
+    "consoleSHA256": "2dbcb6880a0e02c59d2628cdc4b4646edb3a38ac77557719b6c36c833ee3b251",
+    "novncSHA256": "dfb7784a88506a20a3c460f2e0784424cca11ba24575ae39503e8d310a86092f",
+    "endpoints": [
+      {"port": 1991, "listen": "127.0.0.1:1991", "authMode": "none", "console": true, "kiosk": true, "enabledPackages": 7, "runtimeUser": "ubuntu", "ready": true},
+      {"port": 2992, "listen": "127.0.0.1:2992", "authMode": "none", "console": false, "kiosk": true, "enabledPackages": 6, "runtimeUser": "ubuntu", "ready": true}
+    ],
+    "desktop": {"managedId": "ubuntu-desktop", "previousRuntimeId": "xfce-user-desktop-44ea8c2186ee", "runtimeId": "xfce-user-desktop-8cdcaa0b5159", "display": ":1", "generation": 1, "state": "ready", "borrowedUserBus": true, "ownedIBusAndUnicode": true, "forcedStop": false},
+    "cutover": "Old local desktop exited gracefully; persistent HOME/profile/configuration intent retained. Old runtime IDs are not redirected. Retired registry directories remain recoverable; no broad state/HOME deletion. Only disposable test Apps were force-stopped or fault-injected.",
+    "retiredRegistryDirectories": ["${HOME}/.local/state/remotexapp-svc-retired-OHRaIH", "${HOME}/.local/state/remotexapp-svc-retired-d19BkN"],
+    "rawEvidence": {
+      "candidateAndDeployment": "/tmp/remotexapp-svc-candidate.HX2b3X",
+      "shippedApps": "/tmp/remotexapp-shipped-e2e.Wz1nQM",
+      "documents": "/tmp/remotexapp-document-e2e-ONOZBq",
+      "upgradeKDE": "/tmp/remotexapp-upgrade-kde-e2e-F8Au7S",
+      "actions": "/tmp/remotexapp-actions-e2e-2Eltbg",
+      "userHome": "/var/tmp/remotexapp-conn-user.naE76e/result.json",
+      "faults": "/tmp/remotexapp-svc-e2e-aAKj1v",
+      "cutover": "/tmp/remotexapp-svc-cutover-cvwYiz",
+      "performance": "/tmp/remotexapp-svc-perf-vkHuKm",
+      "postDeployment": "/tmp/remotexapp-svc-deployment-check-KEaSPU"
+    },
+    "failureDisposition": [
+      "Initial D-Bus readiness flags were invalid; corrected to dbus-send --bus=ADDRESS and verified against real buses.",
+      "Fault injection exposed App-ready versus supervisor-ready startup race; Manager now commits only joint readiness. Original startup generation/deadline are persisted and resumed after Manager loss.",
+      "GTK can exit itself after private D-Bus loss. Supervisor now preserves the infrastructure cause rather than reporting a clean user exit; no transparent App-survival claim.",
+      "One early Firefox raw-key readback was empty after a fixed 100 ms wait; cause was not established. Added bounded observable readback without resending the key and failure diagnostics. Final exact-archive run passed all 18 focus rounds, 54 raw-key readbacks and 108 sendText readbacks.",
+      "An exploratory document test collided with another live suite's dynamic X display allocation. Final suites ran serially and passed; ports alone do not isolate display allocation.",
+      "Expanded user-home harness initially reused a generation from before logout and correctly received 409. It now uses the returned post-login generation; final run passed.",
+      "Cutover harness initially requested disallowed Mousepad idle overrides. Policy was moved into its disposable fixture; no product override rules were relaxed.",
+      "Immutable staging test contained a hardcoded old Mousepad version. It now reads the manifest; staged byte-tamper and rollback gates pass.",
+      "Initial performance counter included the existing AT-SPI D-Bus as a duplicate session bus. Final counter separates the owned session endpoint and retains total D-Bus count; thresholds unchanged.",
+      "Sensitive-data check matched a scenario label suffix as a token pattern. Renamed only that label; no credential finding or scanner weakening.",
+      "New local XFCE IBus log contains a portal activation warning. Its runtime-private IBus protocol and selected remote-unicode engine were verified; portal mode/Flatpak is not selected. This warning is not claimed fixed. Native-IME UAT remains pending."
+    ]
+  }
+}

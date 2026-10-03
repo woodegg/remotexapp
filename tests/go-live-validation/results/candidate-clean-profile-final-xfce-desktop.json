@@ -1,0 +1,1634 @@
+{
+  "schemaVersion": 1,
+  "label": "candidate-clean-profile-final",
+  "classId": "xfce-desktop",
+  "instanceId": "xfce-desktop-e6149403a11a",
+  "collectedAt": "2026-08-27T06:04:00-04:00",
+  "display": ":13",
+  "createOrLookupMs": 14,
+  "attachToSessionMs": 4506,
+  "clipboard": {
+    "exact": true,
+    "sha256": "a0dc265687e4c5ebf538e126cb95b10387368d5a492389ed10c3af2c8a8a6f80"
+  },
+  "runtimeHashes": {
+    "manager": "4c63e0327e4a91c2ce602acaea379b0dc00709a0774b0bc971329fc01a226460",
+    "gateway": "3553839051eab9b79f8a7ec8257260bcfa6a3491131701180c8f0d14a9480ab0"
+  },
+  "measurement": {
+    "schemaVersion": 1,
+    "managerURL": "http://127.0.0.1:1992",
+    "instanceID": "xfce-desktop-e6149403a11a",
+    "sdkVersion": "0.8.0",
+    "workload": {
+      "staticSeconds": 1,
+      "inputRequests": 12,
+      "inputIntervalMS": 20,
+      "scrollSeconds": 1,
+      "scrollEvents": 9
+    },
+    "expected": {
+      "characters": 13,
+      "utf8Bytes": 15,
+      "sha256": "a0dc265687e4c5ebf538e126cb95b10387368d5a492389ed10c3af2c8a8a6f80"
+    },
+    "browserLoad": {
+      "observedConnectedMs": 4863.60000038147,
+      "navigationResponseEndMs": 269.1000003814697,
+      "domContentLoadedMs": 294.90000009536743,
+      "totalResourceRequests": 9,
+      "staticRequests": 3,
+      "staticTransferBytes": 182088,
+      "staticEncodedBytes": 181188,
+      "staticDecodedBytes": 181188,
+      "staticDurationSumMs": 11.999999523162842,
+      "cachedStaticRequests": 0,
+      "staticPaths": [
+        "/assets/novnc-PE3TB3DL.js",
+        "/assets/sdk-S4KCHU5P.js",
+        "/sdk/index.js"
+      ]
+    },
+    "memoryAtAttached": {
+      "managerPssKiB": 12591,
+      "vncPssKiB": 37061,
+      "serverPssKiB": 15980,
+      "gatewayPssKiB": 5591,
+      "sessionPssKiB": 254232,
+      "benchmarkAppPssKiB": 18537,
+      "vncMemoryCurrentBytes": 34033664,
+      "serverMemoryCurrentBytes": 16846848,
+      "gatewayMemoryCurrentBytes": 3375104,
+      "sessionMemoryCurrentBytes": 218427392,
+      "vncTasks": 1,
+      "serverTasks": 21,
+      "gatewayTasks": 6,
+      "sessionTasks": 200,
+      "benchmarkAppPID": 2874527
+    },
+    "phases": {
+      "static": {
+        "durationMs": 1038,
+        "rfbToBrowserBytes": 118,
+        "browserToRfbBytes": 40,
+        "textRequests": 0,
+        "textErrors": 0,
+        "textInputBytes": 0,
+        "textServerMicroseconds": 0,
+        "manager": {
+          "cpuTicks": 1,
+          "readSyscalls": 20,
+          "writeSyscalls": 9
+        },
+        "app": {
+          "cpuTicks": 0,
+          "readSyscalls": 2,
+          "writeSyscalls": 4,
+          "readBytes": 16,
+          "writeBytes": 500
+        },
+        "cgroups": {
+          "vnc": {
+            "cpuUsec": 1104,
+            "cpuTicks": 0,
+            "readSyscalls": 0,
+            "writeSyscalls": 13,
+            "readBytes": 0,
+            "writeBytes": 464
+          },
+          "server": {
+            "cpuUsec": 0,
+            "cpuTicks": 0,
+            "readSyscalls": 0,
+            "writeSyscalls": 0,
+            "readBytes": 0,
+            "writeBytes": 0
+          },
+          "gateway": {
+            "cpuUsec": 1013,
+            "cpuTicks": 0,
+            "readSyscalls": 14,
+            "writeSyscalls": 7,
+            "readBytes": 362,
+            "writeBytes": 587
+          },
+          "session": {
+            "cpuUsec": 950,
+            "cpuTicks": 0,
+            "readSyscalls": 0,
+            "writeSyscalls": 13,
+            "readBytes": 0,
+            "writeBytes": 2487
+          }
+        }
+      },
+      "input": {
+        "durationMs": 271,
+        "rfbToBrowserBytes": 10800,
+        "browserToRfbBytes": 40,
+        "textRequests": 12,
+        "textErrors": 0,
+        "textInputBytes": 15,
+        "textServerMicroseconds": 7975,
+        "manager": {
+          "cpuTicks": 0,
+          "readSyscalls": 93,
+          "writeSyscalls": 47
+        },
+        "app": {
+          "cpuTicks": 2,
+          "readSyscalls": 75,
+          "writeSyscalls": 136,
+          "readBytes": 600,
+          "writeBytes": 5305
+        },
+        "cgroups": {
+          "vnc": {
+            "cpuUsec": 31017,
+            "cpuTicks": 2,
+            "readSyscalls": 0,
+            "writeSyscalls": 1089,
+            "readBytes": 0,
+            "writeBytes": 41684
+          },
+          "server": {
+            "cpuUsec": 13912,
+            "cpuTicks": 2,
+            "readSyscalls": 188,
+            "writeSyscalls": 300,
+            "readBytes": 1504,
+            "writeBytes": 2808
+          },
+          "gateway": {
+            "cpuUsec": 6727,
+            "cpuTicks": 2,
+            "readSyscalls": 90,
+            "writeSyscalls": 70,
+            "readBytes": 13752,
+            "writeBytes": 14069
+          },
+          "session": {
+            "cpuUsec": 19640,
+            "cpuTicks": 2,
+            "readSyscalls": 13,
+            "writeSyscalls": 998,
+            "readBytes": 104,
+            "writeBytes": 409480
+          }
+        }
+      },
+      "scroll": {
+        "durationMs": 1091,
+        "rfbToBrowserBytes": 0,
+        "browserToRfbBytes": 108,
+        "textRequests": 0,
+        "textErrors": 0,
+        "textInputBytes": 0,
+        "textServerMicroseconds": 0,
+        "manager": {
+          "cpuTicks": 0,
+          "readSyscalls": 27,
+          "writeSyscalls": 13
+        },
+        "app": {
+          "cpuTicks": 0,
+          "readSyscalls": 1,
+          "writeSyscalls": 11,
+          "readBytes": 8,
+          "writeBytes": 684
+        },
+        "cgroups": {
+          "vnc": {
+            "cpuUsec": 4633,
+            "cpuTicks": 0,
+            "readSyscalls": 0,
+            "writeSyscalls": 203,
+            "readBytes": 0,
+            "writeBytes": 7836
+          },
+          "server": {
+            "cpuUsec": 0,
+            "cpuTicks": 0,
+            "readSyscalls": 0,
+            "writeSyscalls": 0,
+            "readBytes": 0,
+            "writeBytes": 0
+          },
+          "gateway": {
+            "cpuUsec": 1580,
+            "cpuTicks": 0,
+            "readSyscalls": 21,
+            "writeSyscalls": 19,
+            "readBytes": 396,
+            "writeBytes": 539
+          },
+          "session": {
+            "cpuUsec": 6062,
+            "cpuTicks": 1,
+            "readSyscalls": 4,
+            "writeSyscalls": 103,
+            "readBytes": 32,
+            "writeBytes": 1904
+          }
+        }
+      }
+    },
+    "input": {
+      "requests": 12,
+      "durationMs": 221.80000019073486,
+      "roundTripMs": {
+        "min": 0.9000000953674316,
+        "p50": 1.200000286102295,
+        "p95": 2,
+        "max": 2,
+        "mean": 1.325000007947286
+      },
+      "serverMs": {
+        "min": 0.473,
+        "p50": 0.611,
+        "p95": 1.302,
+        "max": 1.302,
+        "mean": 0.6645833333333333
+      }
+    },
+    "resize": {
+      "expected": false,
+      "observed": false,
+      "correct": true,
+      "before": {
+        "width": 1280,
+        "height": 720,
+        "cssWidth": 1125.328125,
+        "cssHeight": 633
+      },
+      "after": {
+        "width": 1280,
+        "height": 720,
+        "cssWidth": 900,
+        "cssHeight": 506.25
+      },
+      "targetViewport": {
+        "width": 900,
+        "height": 640
+      }
+    },
+    "reconnectMs": 37,
+    "finalClient": {
+      "state": "connected",
+      "rfbState": "connected",
+      "inputState": "connected",
+      "framebuffer": {
+        "width": 1280,
+        "height": 720,
+        "cssWidth": 900,
+        "cssHeight": 506.25
+      }
+    },
+    "snapshots": {
+      "attached": {
+        "label": "attached",
+        "epochMs": 1787825034411,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 574,
+          "rfbToBrowserBytes": 1201587,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 0,
+          "textLogLevel": "errors",
+          "textRequests": 0,
+          "textServerMicroseconds": 0,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 11.713889209
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":13"
+        },
+        "manager": {
+          "pid": 2859515,
+          "cpuTicks": 37,
+          "rssKiB": 14088,
+          "pssKiB": 12591,
+          "privateKiB": 12588,
+          "readSyscalls": 5192,
+          "writeSyscalls": 1858,
+          "readBytes": 4289642,
+          "writeBytes": 5173508
+        },
+        "app": {
+          "pid": 2874527,
+          "cpuTicks": 25,
+          "rssKiB": 50048,
+          "pssKiB": 18537,
+          "privateKiB": 16772,
+          "readSyscalls": 938,
+          "writeSyscalls": 377,
+          "readBytes": 1693363,
+          "writeBytes": 161974
+        },
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-vnc.service",
+            "cpuUsec": 403408,
+            "memoryCurrentBytes": 34033664,
+            "memoryPeakBytes": 34476032,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 37061,
+            "privateKiB": 32428,
+            "cpuTicks": 37,
+            "readSyscalls": 855,
+            "writeSyscalls": 18646,
+            "readBytes": 1569200,
+            "writeBytes": 1771351,
+            "pids": [
+              2873287
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-server.service",
+            "cpuUsec": 164390,
+            "memoryCurrentBytes": 16846848,
+            "memoryPeakBytes": 19013632,
+            "tasks": 21,
+            "processCount": 6,
+            "pssKiB": 15980,
+            "privateKiB": 14816,
+            "cpuTicks": 8,
+            "readSyscalls": 1236,
+            "writeSyscalls": 557,
+            "readBytes": 2354114,
+            "writeBytes": 7674,
+            "pids": [
+              2873293,
+              2873301,
+              2873303,
+              2873310,
+              2873320,
+              2873327
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-gateway.service",
+            "cpuUsec": 18263,
+            "memoryCurrentBytes": 3375104,
+            "memoryPeakBytes": 3883008,
+            "tasks": 6,
+            "processCount": 1,
+            "pssKiB": 5591,
+            "privateKiB": 3060,
+            "cpuTicks": 1,
+            "readSyscalls": 276,
+            "writeSyscalls": 145,
+            "readBytes": 1259369,
+            "writeBytes": 1210157,
+            "pids": [
+              2873347
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-session.service",
+            "cpuUsec": 6143921,
+            "memoryCurrentBytes": 218427392,
+            "memoryPeakBytes": 226598912,
+            "tasks": 200,
+            "processCount": 38,
+            "pssKiB": 254232,
+            "privateKiB": 208436,
+            "cpuTicks": 452,
+            "readSyscalls": 40468,
+            "writeSyscalls": 39864,
+            "readBytes": 34204449,
+            "writeBytes": 5849501,
+            "pids": [
+              2873801,
+              2873808,
+              2873809,
+              2873839,
+              2873846,
+              2873851,
+              2873858,
+              2873865,
+              2873888,
+              2873910,
+              2873992,
+              2874010,
+              2874019,
+              2874060,
+              2874076,
+              2874091,
+              2874092,
+              2874113,
+              2874114,
+              2874118,
+              2874131,
+              2874153,
+              2874195,
+              2874256,
+              2874271,
+              2874279,
+              2874281,
+              2874282,
+              2874296,
+              2874311,
+              2874371,
+              2874397,
+              2874404,
+              2874418,
+              2874424,
+              2874436,
+              2874477,
+              2874485
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "4.06 3.85 3.57 9/4531 3677942",
+          "memAvailableKiB": 29112616
+        }
+      },
+      "staticStart": {
+        "label": "static-start",
+        "epochMs": 1787825034464,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 574,
+          "rfbToBrowserBytes": 1201587,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 0,
+          "textLogLevel": "errors",
+          "textRequests": 0,
+          "textServerMicroseconds": 0,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 11.785543996
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":13"
+        },
+        "manager": {
+          "pid": 2859515,
+          "cpuTicks": 37,
+          "rssKiB": 14088,
+          "pssKiB": 12591,
+          "privateKiB": 12588,
+          "readSyscalls": 5201,
+          "writeSyscalls": 1862,
+          "readBytes": 4290490,
+          "writeBytes": 5175519
+        },
+        "app": {
+          "pid": 2874527,
+          "cpuTicks": 25,
+          "rssKiB": 50048,
+          "pssKiB": 18537,
+          "privateKiB": 16772,
+          "readSyscalls": 938,
+          "writeSyscalls": 377,
+          "readBytes": 1693363,
+          "writeBytes": 161974
+        },
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-vnc.service",
+            "cpuUsec": 403426,
+            "memoryCurrentBytes": 34033664,
+            "memoryPeakBytes": 34476032,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 37061,
+            "privateKiB": 32428,
+            "cpuTicks": 37,
+            "readSyscalls": 855,
+            "writeSyscalls": 18646,
+            "readBytes": 1569200,
+            "writeBytes": 1771351,
+            "pids": [
+              2873287
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-server.service",
+            "cpuUsec": 164390,
+            "memoryCurrentBytes": 16846848,
+            "memoryPeakBytes": 19013632,
+            "tasks": 21,
+            "processCount": 6,
+            "pssKiB": 15980,
+            "privateKiB": 14816,
+            "cpuTicks": 8,
+            "readSyscalls": 1236,
+            "writeSyscalls": 557,
+            "readBytes": 2354114,
+            "writeBytes": 7674,
+            "pids": [
+              2873293,
+              2873301,
+              2873303,
+              2873310,
+              2873320,
+              2873327
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-gateway.service",
+            "cpuUsec": 18478,
+            "memoryCurrentBytes": 3387392,
+            "memoryPeakBytes": 3883008,
+            "tasks": 6,
+            "processCount": 1,
+            "pssKiB": 5603,
+            "privateKiB": 3072,
+            "cpuTicks": 1,
+            "readSyscalls": 278,
+            "writeSyscalls": 146,
+            "readBytes": 1259549,
+            "writeBytes": 1210582,
+            "pids": [
+              2873347
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-session.service",
+            "cpuUsec": 6143921,
+            "memoryCurrentBytes": 218427392,
+            "memoryPeakBytes": 226598912,
+            "tasks": 200,
+            "processCount": 38,
+            "pssKiB": 254228,
+            "privateKiB": 208436,
+            "cpuTicks": 452,
+            "readSyscalls": 40468,
+            "writeSyscalls": 39864,
+            "readBytes": 34204449,
+            "writeBytes": 5849501,
+            "pids": [
+              2873801,
+              2873808,
+              2873809,
+              2873839,
+              2873846,
+              2873851,
+              2873858,
+              2873865,
+              2873888,
+              2873910,
+              2873992,
+              2874010,
+              2874019,
+              2874060,
+              2874076,
+              2874091,
+              2874092,
+              2874113,
+              2874114,
+              2874118,
+              2874131,
+              2874153,
+              2874195,
+              2874256,
+              2874271,
+              2874279,
+              2874281,
+              2874282,
+              2874296,
+              2874311,
+              2874371,
+              2874397,
+              2874404,
+              2874418,
+              2874424,
+              2874436,
+              2874477,
+              2874485
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "4.06 3.85 3.57 6/4532 3677943",
+          "memAvailableKiB": 29090700
+        }
+      },
+      "staticEnd": {
+        "label": "static-end",
+        "epochMs": 1787825035502,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 614,
+          "rfbToBrowserBytes": 1201705,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 0,
+          "textLogLevel": "errors",
+          "textRequests": 0,
+          "textServerMicroseconds": 0,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 12.838548584
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":13"
+        },
+        "manager": {
+          "pid": 2859515,
+          "cpuTicks": 38,
+          "rssKiB": 14088,
+          "pssKiB": 12591,
+          "privateKiB": 12588,
+          "readSyscalls": 5221,
+          "writeSyscalls": 1871,
+          "readBytes": 4291523,
+          "writeBytes": 5177715
+        },
+        "app": {
+          "pid": 2874527,
+          "cpuTicks": 25,
+          "rssKiB": 50048,
+          "pssKiB": 18537,
+          "privateKiB": 16772,
+          "readSyscalls": 940,
+          "writeSyscalls": 381,
+          "readBytes": 1693379,
+          "writeBytes": 162474
+        },
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-vnc.service",
+            "cpuUsec": 404530,
+            "memoryCurrentBytes": 34029568,
+            "memoryPeakBytes": 34476032,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 37061,
+            "privateKiB": 32428,
+            "cpuTicks": 37,
+            "readSyscalls": 855,
+            "writeSyscalls": 18659,
+            "readBytes": 1569200,
+            "writeBytes": 1771815,
+            "pids": [
+              2873287
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-server.service",
+            "cpuUsec": 164390,
+            "memoryCurrentBytes": 16846848,
+            "memoryPeakBytes": 19013632,
+            "tasks": 21,
+            "processCount": 6,
+            "pssKiB": 15981,
+            "privateKiB": 14816,
+            "cpuTicks": 8,
+            "readSyscalls": 1236,
+            "writeSyscalls": 557,
+            "readBytes": 2354114,
+            "writeBytes": 7674,
+            "pids": [
+              2873293,
+              2873301,
+              2873303,
+              2873310,
+              2873320,
+              2873327
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-gateway.service",
+            "cpuUsec": 19491,
+            "memoryCurrentBytes": 3399680,
+            "memoryPeakBytes": 3911680,
+            "tasks": 6,
+            "processCount": 1,
+            "pssKiB": 5615,
+            "privateKiB": 3084,
+            "cpuTicks": 1,
+            "readSyscalls": 292,
+            "writeSyscalls": 153,
+            "readBytes": 1259911,
+            "writeBytes": 1211169,
+            "pids": [
+              2873347
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-session.service",
+            "cpuUsec": 6144871,
+            "memoryCurrentBytes": 218439680,
+            "memoryPeakBytes": 226598912,
+            "tasks": 200,
+            "processCount": 38,
+            "pssKiB": 254232,
+            "privateKiB": 208436,
+            "cpuTicks": 452,
+            "readSyscalls": 40468,
+            "writeSyscalls": 39877,
+            "readBytes": 34204449,
+            "writeBytes": 5851988,
+            "pids": [
+              2873801,
+              2873808,
+              2873809,
+              2873839,
+              2873846,
+              2873851,
+              2873858,
+              2873865,
+              2873888,
+              2873910,
+              2873992,
+              2874010,
+              2874019,
+              2874060,
+              2874076,
+              2874091,
+              2874092,
+              2874113,
+              2874114,
+              2874118,
+              2874131,
+              2874153,
+              2874195,
+              2874256,
+              2874271,
+              2874279,
+              2874281,
+              2874282,
+              2874296,
+              2874311,
+              2874371,
+              2874397,
+              2874404,
+              2874418,
+              2874424,
+              2874436,
+              2874477,
+              2874485
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "4.06 3.85 3.57 11/4532 3677995",
+          "memAvailableKiB": 29093412
+        }
+      },
+      "inputStart": {
+        "label": "input-start",
+        "epochMs": 1787825035851,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 744,
+          "rfbToBrowserBytes": 1203030,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 0,
+          "textLogLevel": "errors",
+          "textRequests": 0,
+          "textServerMicroseconds": 0,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 13.196395795
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":13"
+        },
+        "manager": {
+          "pid": 2859515,
+          "cpuTicks": 38,
+          "rssKiB": 14100,
+          "pssKiB": 12603,
+          "privateKiB": 12600,
+          "readSyscalls": 5316,
+          "writeSyscalls": 1924,
+          "readBytes": 4328497,
+          "writeBytes": 5214753
+        },
+        "app": {
+          "pid": 2874527,
+          "cpuTicks": 25,
+          "rssKiB": 50048,
+          "pssKiB": 18536,
+          "privateKiB": 16772,
+          "readSyscalls": 950,
+          "writeSyscalls": 418,
+          "readBytes": 1693459,
+          "writeBytes": 162947
+        },
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-vnc.service",
+            "cpuUsec": 409937,
+            "memoryCurrentBytes": 34033664,
+            "memoryPeakBytes": 34566144,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 37065,
+            "privateKiB": 32432,
+            "cpuTicks": 38,
+            "readSyscalls": 856,
+            "writeSyscalls": 19022,
+            "readBytes": 1569222,
+            "writeBytes": 2060675,
+            "pids": [
+              2873287
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-server.service",
+            "cpuUsec": 167678,
+            "memoryCurrentBytes": 16855040,
+            "memoryPeakBytes": 19013632,
+            "tasks": 21,
+            "processCount": 6,
+            "pssKiB": 15989,
+            "privateKiB": 14824,
+            "cpuTicks": 8,
+            "readSyscalls": 1281,
+            "writeSyscalls": 643,
+            "readBytes": 2354474,
+            "writeBytes": 8362,
+            "pids": [
+              2873293,
+              2873301,
+              2873303,
+              2873310,
+              2873320,
+              2873327
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-gateway.service",
+            "cpuUsec": 21488,
+            "memoryCurrentBytes": 3420160,
+            "memoryPeakBytes": 3940352,
+            "tasks": 6,
+            "processCount": 1,
+            "pssKiB": 5631,
+            "privateKiB": 3100,
+            "cpuTicks": 1,
+            "readSyscalls": 326,
+            "writeSyscalls": 174,
+            "readBytes": 1261920,
+            "writeBytes": 1213646,
+            "pids": [
+              2873347
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-session.service",
+            "cpuUsec": 6154093,
+            "memoryCurrentBytes": 218472448,
+            "memoryPeakBytes": 226598912,
+            "tasks": 200,
+            "processCount": 38,
+            "pssKiB": 254271,
+            "privateKiB": 208456,
+            "cpuTicks": 453,
+            "readSyscalls": 40468,
+            "writeSyscalls": 40037,
+            "readBytes": 34204449,
+            "writeBytes": 5856248,
+            "pids": [
+              2873801,
+              2873808,
+              2873809,
+              2873839,
+              2873846,
+              2873851,
+              2873858,
+              2873865,
+              2873888,
+              2873910,
+              2873992,
+              2874010,
+              2874019,
+              2874060,
+              2874076,
+              2874091,
+              2874092,
+              2874113,
+              2874114,
+              2874118,
+              2874131,
+              2874153,
+              2874195,
+              2874256,
+              2874271,
+              2874279,
+              2874281,
+              2874282,
+              2874296,
+              2874311,
+              2874371,
+              2874397,
+              2874404,
+              2874418,
+              2874424,
+              2874436,
+              2874477,
+              2874485
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "4.06 3.85 3.57 12/4530 3678006",
+          "memAvailableKiB": 29088814
+        }
+      },
+      "inputEnd": {
+        "label": "input-end",
+        "epochMs": 1787825036122,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 784,
+          "rfbToBrowserBytes": 1213830,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 15,
+          "textLogLevel": "errors",
+          "textRequests": 12,
+          "textServerMicroseconds": 7975,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 13.450508754
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":13"
+        },
+        "manager": {
+          "pid": 2859515,
+          "cpuTicks": 38,
+          "rssKiB": 14100,
+          "pssKiB": 12603,
+          "privateKiB": 12600,
+          "readSyscalls": 5409,
+          "writeSyscalls": 1971,
+          "readBytes": 4343714,
+          "writeBytes": 5231825
+        },
+        "app": {
+          "pid": 2874527,
+          "cpuTicks": 27,
+          "rssKiB": 54016,
+          "pssKiB": 22067,
+          "privateKiB": 19972,
+          "readSyscalls": 1025,
+          "writeSyscalls": 554,
+          "readBytes": 1694059,
+          "writeBytes": 168252
+        },
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-vnc.service",
+            "cpuUsec": 440954,
+            "memoryCurrentBytes": 34033664,
+            "memoryPeakBytes": 34566144,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 37065,
+            "privateKiB": 32432,
+            "cpuTicks": 40,
+            "readSyscalls": 856,
+            "writeSyscalls": 20111,
+            "readBytes": 1569222,
+            "writeBytes": 2102359,
+            "pids": [
+              2873287
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-server.service",
+            "cpuUsec": 181590,
+            "memoryCurrentBytes": 16863232,
+            "memoryPeakBytes": 19013632,
+            "tasks": 21,
+            "processCount": 6,
+            "pssKiB": 15997,
+            "privateKiB": 14832,
+            "cpuTicks": 10,
+            "readSyscalls": 1469,
+            "writeSyscalls": 943,
+            "readBytes": 2355978,
+            "writeBytes": 11170,
+            "pids": [
+              2873293,
+              2873301,
+              2873303,
+              2873310,
+              2873320,
+              2873327
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-gateway.service",
+            "cpuUsec": 28215,
+            "memoryCurrentBytes": 3440640,
+            "memoryPeakBytes": 4206592,
+            "tasks": 6,
+            "processCount": 1,
+            "pssKiB": 5655,
+            "privateKiB": 3124,
+            "cpuTicks": 3,
+            "readSyscalls": 416,
+            "writeSyscalls": 244,
+            "readBytes": 1275672,
+            "writeBytes": 1227715,
+            "pids": [
+              2873347
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-session.service",
+            "cpuUsec": 6173733,
+            "memoryCurrentBytes": 218476544,
+            "memoryPeakBytes": 226598912,
+            "tasks": 200,
+            "processCount": 38,
+            "pssKiB": 254275,
+            "privateKiB": 208460,
+            "cpuTicks": 455,
+            "readSyscalls": 40481,
+            "writeSyscalls": 41035,
+            "readBytes": 34204553,
+            "writeBytes": 6265728,
+            "pids": [
+              2873801,
+              2873808,
+              2873809,
+              2873839,
+              2873846,
+              2873851,
+              2873858,
+              2873865,
+              2873888,
+              2873910,
+              2873992,
+              2874010,
+              2874019,
+              2874060,
+              2874076,
+              2874091,
+              2874092,
+              2874113,
+              2874114,
+              2874118,
+              2874131,
+              2874153,
+              2874195,
+              2874256,
+              2874271,
+              2874279,
+              2874281,
+              2874282,
+              2874296,
+              2874311,
+              2874371,
+              2874397,
+              2874404,
+              2874418,
+              2874424,
+              2874436,
+              2874477,
+              2874485
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "4.06 3.85 3.57 15/4533 3678028",
+          "memAvailableKiB": 29088550
+        }
+      },
+      "scrollStart": {
+        "label": "scroll-start",
+        "epochMs": 1787825036627,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 974,
+          "rfbToBrowserBytes": 1215409,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 15,
+          "textLogLevel": "errors",
+          "textRequests": 12,
+          "textServerMicroseconds": 7975,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 13.972809311
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":13"
+        },
+        "manager": {
+          "pid": 2859515,
+          "cpuTicks": 38,
+          "rssKiB": 14100,
+          "pssKiB": 12603,
+          "privateKiB": 12600,
+          "readSyscalls": 5456,
+          "writeSyscalls": 1996,
+          "readBytes": 4346604,
+          "writeBytes": 5235878
+        },
+        "app": {
+          "pid": 2874527,
+          "cpuTicks": 28,
+          "rssKiB": 54016,
+          "pssKiB": 22067,
+          "privateKiB": 19972,
+          "readSyscalls": 1041,
+          "writeSyscalls": 630,
+          "readBytes": 1694187,
+          "writeBytes": 171284
+        },
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-vnc.service",
+            "cpuUsec": 447035,
+            "memoryCurrentBytes": 34033664,
+            "memoryPeakBytes": 34578432,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 37065,
+            "privateKiB": 32432,
+            "cpuTicks": 42,
+            "readSyscalls": 856,
+            "writeSyscalls": 20518,
+            "readBytes": 1569222,
+            "writeBytes": 2116367,
+            "pids": [
+              2873287
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-server.service",
+            "cpuUsec": 185405,
+            "memoryCurrentBytes": 16879616,
+            "memoryPeakBytes": 19013632,
+            "tasks": 21,
+            "processCount": 6,
+            "pssKiB": 16012,
+            "privateKiB": 14848,
+            "cpuTicks": 11,
+            "readSyscalls": 1542,
+            "writeSyscalls": 1075,
+            "readBytes": 2356562,
+            "writeBytes": 12226,
+            "pids": [
+              2873293,
+              2873301,
+              2873303,
+              2873310,
+              2873320,
+              2873327
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-gateway.service",
+            "cpuUsec": 30383,
+            "memoryCurrentBytes": 3461120,
+            "memoryPeakBytes": 4206592,
+            "tasks": 6,
+            "processCount": 1,
+            "pssKiB": 5675,
+            "privateKiB": 3144,
+            "cpuTicks": 3,
+            "readSyscalls": 454,
+            "writeSyscalls": 274,
+            "readBytes": 1277891,
+            "writeBytes": 1230078,
+            "pids": [
+              2873347
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-session.service",
+            "cpuUsec": 6182095,
+            "memoryCurrentBytes": 218488832,
+            "memoryPeakBytes": 226598912,
+            "tasks": 200,
+            "processCount": 38,
+            "pssKiB": 254277,
+            "privateKiB": 208464,
+            "cpuTicks": 456,
+            "readSyscalls": 40482,
+            "writeSyscalls": 41171,
+            "readBytes": 34204561,
+            "writeBytes": 6288948,
+            "pids": [
+              2873801,
+              2873808,
+              2873809,
+              2873839,
+              2873846,
+              2873851,
+              2873858,
+              2873865,
+              2873888,
+              2873910,
+              2873992,
+              2874010,
+              2874019,
+              2874060,
+              2874076,
+              2874091,
+              2874092,
+              2874113,
+              2874114,
+              2874118,
+              2874131,
+              2874153,
+              2874195,
+              2874256,
+              2874271,
+              2874279,
+              2874281,
+              2874282,
+              2874296,
+              2874311,
+              2874371,
+              2874397,
+              2874404,
+              2874418,
+              2874424,
+              2874436,
+              2874477,
+              2874485
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "4.06 3.85 3.57 7/4531 3678032",
+          "memAvailableKiB": 29084957
+        }
+      },
+      "scrollEnd": {
+        "label": "scroll-end",
+        "epochMs": 1787825037718,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 1082,
+          "rfbToBrowserBytes": 1215409,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 15,
+          "textLogLevel": "errors",
+          "textRequests": 12,
+          "textServerMicroseconds": 7975,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 15.065099134
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":13"
+        },
+        "manager": {
+          "pid": 2859515,
+          "cpuTicks": 38,
+          "rssKiB": 14100,
+          "pssKiB": 12603,
+          "privateKiB": 12600,
+          "readSyscalls": 5483,
+          "writeSyscalls": 2009,
+          "readBytes": 4347673,
+          "writeBytes": 5238110
+        },
+        "app": {
+          "pid": 2874527,
+          "cpuTicks": 28,
+          "rssKiB": 54016,
+          "pssKiB": 22067,
+          "privateKiB": 19972,
+          "readSyscalls": 1042,
+          "writeSyscalls": 641,
+          "readBytes": 1694195,
+          "writeBytes": 171968
+        },
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-vnc.service",
+            "cpuUsec": 451668,
+            "memoryCurrentBytes": 34037760,
+            "memoryPeakBytes": 34578432,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 37065,
+            "privateKiB": 32432,
+            "cpuTicks": 42,
+            "readSyscalls": 856,
+            "writeSyscalls": 20721,
+            "readBytes": 1569222,
+            "writeBytes": 2124203,
+            "pids": [
+              2873287
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-server.service",
+            "cpuUsec": 185405,
+            "memoryCurrentBytes": 16879616,
+            "memoryPeakBytes": 19013632,
+            "tasks": 21,
+            "processCount": 6,
+            "pssKiB": 16013,
+            "privateKiB": 14848,
+            "cpuTicks": 11,
+            "readSyscalls": 1542,
+            "writeSyscalls": 1075,
+            "readBytes": 2356562,
+            "writeBytes": 12226,
+            "pids": [
+              2873293,
+              2873301,
+              2873303,
+              2873310,
+              2873320,
+              2873327
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-gateway.service",
+            "cpuUsec": 31963,
+            "memoryCurrentBytes": 3469312,
+            "memoryPeakBytes": 4206592,
+            "tasks": 6,
+            "processCount": 1,
+            "pssKiB": 5683,
+            "privateKiB": 3152,
+            "cpuTicks": 3,
+            "readSyscalls": 475,
+            "writeSyscalls": 293,
+            "readBytes": 1278287,
+            "writeBytes": 1230617,
+            "pids": [
+              2873347
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-session.service",
+            "cpuUsec": 6188157,
+            "memoryCurrentBytes": 218488832,
+            "memoryPeakBytes": 226598912,
+            "tasks": 200,
+            "processCount": 38,
+            "pssKiB": 254282,
+            "privateKiB": 208464,
+            "cpuTicks": 457,
+            "readSyscalls": 40486,
+            "writeSyscalls": 41274,
+            "readBytes": 34204593,
+            "writeBytes": 6290852,
+            "pids": [
+              2873801,
+              2873808,
+              2873809,
+              2873839,
+              2873846,
+              2873851,
+              2873858,
+              2873865,
+              2873888,
+              2873910,
+              2873992,
+              2874010,
+              2874019,
+              2874060,
+              2874076,
+              2874091,
+              2874092,
+              2874113,
+              2874114,
+              2874118,
+              2874131,
+              2874153,
+              2874195,
+              2874256,
+              2874271,
+              2874279,
+              2874281,
+              2874282,
+              2874296,
+              2874311,
+              2874371,
+              2874397,
+              2874404,
+              2874418,
+              2874424,
+              2874436,
+              2874477,
+              2874485
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "3.97 3.84 3.57 7/4538 3678096",
+          "memAvailableKiB": 29088896
+        }
+      },
+      "final": {
+        "label": "final",
+        "epochMs": 1787825040058,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 1650,
+          "rfbToBrowserBytes": 2379977,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 15,
+          "textLogLevel": "errors",
+          "textRequests": 12,
+          "textServerMicroseconds": 7975,
+          "totalInputConnections": 2,
+          "totalRfbConnections": 2,
+          "uptimeSeconds": 17.390209537
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":13"
+        },
+        "manager": {
+          "pid": 2859515,
+          "cpuTicks": 40,
+          "rssKiB": 14124,
+          "pssKiB": 12627,
+          "privateKiB": 12624,
+          "readSyscalls": 5689,
+          "writeSyscalls": 2122,
+          "readBytes": 5518782,
+          "writeBytes": 6413246
+        },
+        "app": {
+          "pid": 2874527,
+          "cpuTicks": 28,
+          "rssKiB": 54016,
+          "pssKiB": 22067,
+          "privateKiB": 19972,
+          "readSyscalls": 1050,
+          "writeSyscalls": 663,
+          "readBytes": 1694259,
+          "writeBytes": 174064
+        },
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-vnc.service",
+            "cpuUsec": 485440,
+            "memoryCurrentBytes": 34557952,
+            "memoryPeakBytes": 34955264,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 37654,
+            "privateKiB": 32948,
+            "cpuTicks": 45,
+            "readSyscalls": 857,
+            "writeSyscalls": 21021,
+            "readBytes": 1569223,
+            "writeBytes": 2127704,
+            "pids": [
+              2873287
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-server.service",
+            "cpuUsec": 186821,
+            "memoryCurrentBytes": 16826368,
+            "memoryPeakBytes": 19013632,
+            "tasks": 19,
+            "processCount": 6,
+            "pssKiB": 16014,
+            "privateKiB": 14848,
+            "cpuTicks": 11,
+            "readSyscalls": 1560,
+            "writeSyscalls": 1105,
+            "readBytes": 2356706,
+            "writeBytes": 12466,
+            "pids": [
+              2873293,
+              2873301,
+              2873303,
+              2873310,
+              2873320,
+              2873327
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-gateway.service",
+            "cpuUsec": 47033,
+            "memoryCurrentBytes": 5165056,
+            "memoryPeakBytes": 5468160,
+            "tasks": 7,
+            "processCount": 1,
+            "pssKiB": 7359,
+            "privateKiB": 4828,
+            "cpuTicks": 4,
+            "readSyscalls": 631,
+            "writeSyscalls": 403,
+            "readBytes": 2446231,
+            "writeBytes": 2397625,
+            "pids": [
+              2873347
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-e6149403a11a-session.service",
+            "cpuUsec": 6194193,
+            "memoryCurrentBytes": 218603520,
+            "memoryPeakBytes": 226598912,
+            "tasks": 200,
+            "processCount": 38,
+            "pssKiB": 254278,
+            "privateKiB": 208464,
+            "cpuTicks": 458,
+            "readSyscalls": 40486,
+            "writeSyscalls": 41322,
+            "readBytes": 34204593,
+            "writeBytes": 6322338,
+            "pids": [
+              2873801,
+              2873808,
+              2873809,
+              2873839,
+              2873846,
+              2873851,
+              2873858,
+              2873865,
+              2873888,
+              2873910,
+              2873992,
+              2874010,
+              2874019,
+              2874060,
+              2874076,
+              2874091,
+              2874092,
+              2874113,
+              2874114,
+              2874118,
+              2874131,
+              2874153,
+              2874195,
+              2874256,
+              2874271,
+              2874279,
+              2874281,
+              2874282,
+              2874296,
+              2874311,
+              2874371,
+              2874397,
+              2874404,
+              2874418,
+              2874424,
+              2874436,
+              2874477,
+              2874485
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "3.97 3.84 3.57 10/4527 3678259",
+          "memAvailableKiB": 29065480
+        }
+      }
+    }
+  }
+}

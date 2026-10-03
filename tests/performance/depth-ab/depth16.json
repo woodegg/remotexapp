@@ -1,0 +1,34 @@
+{
+  "id": "mousepad-depth16",
+  "name": "Experiment P04A: Mousepad depth 16",
+  "singleton": false,
+  "profileRef": "p04-depth16",
+  "runMode": "isolated",
+  "server": {
+    "activation": "on-demand",
+    "driver": "../no-clipman/x11-server.sh",
+    "displayMode": "dynamic",
+    "display": 0,
+    "rfbPort": 0,
+    "gatewayPort": 0,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 15,
+    "allowClientResize": true,
+    "readinessPids": ["server.pid"]
+  },
+  "session": {
+    "activation": "on-attach",
+    "driver": "../../../apps/mousepad/session.sh",
+    "readinessPid": "mousepad.pid",
+    "vacantTimeout": "10m",
+    "vacantAction": "stop-instance",
+    "status": {
+      "mode": "driver",
+      "details": {
+        "application": {"type": "enum", "values": ["mousepad"]}
+      }
+    }
+  },
+  "input": {"backend": "ibus", "allowedWmClasses": ["Mousepad"]}
+}

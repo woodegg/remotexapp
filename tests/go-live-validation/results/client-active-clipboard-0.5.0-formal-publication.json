@@ -1,0 +1,65 @@
+{
+  "date": "2026-09-03",
+  "release": {
+    "tag": "v0.5.0",
+    "tagObject": "b55890928bfc68259f362bb28464ecdfec6f55bb",
+    "commit": "639e3d599ad5adb3f3927a78e7e80286e74e8b93",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/v0.5.0",
+    "publishedAt": "2026-09-03T06:12:36Z",
+    "latest": true,
+    "draft": false,
+    "prerelease": false,
+    "verifyWorkflow": "https://github.com/woodegg/remotexapp/actions/runs/33721951286",
+    "releaseWorkflow": "https://github.com/woodegg/remotexapp/actions/runs/33722022614",
+    "workflowResult": "passed",
+    "sdkVersion": "0.21.0",
+    "appPackageABI": "remotexapp/v1"
+  },
+  "promotion": {
+    "acceptedCandidate": "v0.5.0-rc.1",
+    "functionalDiffFromCandidate": "none",
+    "allowedDifference": "core version and release documentation only"
+  },
+  "artifacts": {
+    "formalArchive": "remotexapp-0.5.0-linux-amd64.tar.gz",
+    "formalArchiveSha256": "7427ffcbbaa6ccceadf201806716ec1db1ae70b6bf71c05e145f0350915fce94",
+    "formalArchiveBytes": 7940536,
+    "formalGoVersion": "go1.22.12",
+    "downloadedChecksumVerification": "passed",
+    "downloadedSensitiveDataCheck": "passed",
+    "downloadedCommitVerification": "passed",
+    "downloadedSDKVerification": "passed",
+    "downloadedAppPackageChecksums": "passed",
+    "downloadedAppCatalogValidation": "passed",
+    "downloadedHealthAndReadiness": "passed",
+    "embeddedSDKAsset": "sdk-EOHGZQIS.js",
+    "embeddedSDKAssetSha256": "b0d5ba2be5260581bc29e8983c2a362d460deee303132a0f8afc2a5ff9a1d0a2",
+    "embeddedConsoleAsset": "console-T7I6EFFS.js",
+    "embeddedConsoleAssetSha256": "b2c98f471f2ab47285f2c89213d6c0c1f47feb4deca29d30f5cd8faef54fe6d9",
+    "formalBinarySha256": {
+      "remotexappd": "edbc9902391644c5639f5ad2931e9d8fdbd6857499797ef98426b930ec88de1e",
+      "novnc-input": "c11104963ab1b1bbf091db4fff21c51754cd92868e9d91143fd01277b23a32d4",
+      "remotexapp-status": "bd26942a46cc265340211944a1d92258e6c74c20e46ac70b9741bad0b8041af7",
+      "remotexapp-operator-helper": "e278556b42850d1437ffee99fc17cc52a838cadeedb417e34d7c18e1f1fe94d8"
+    },
+    "appPackageSha256": {
+      "edge-1.0.0": "0ab9d97f549fe24657f4d45ffe04d6c6f4cf82338cce0ca48a04f3d025235a37",
+      "firefox-esr-2.1.0": "3e53e2e1cb313b23f2c14ea8d3522ec0212ae455eb87d40b1e0007d9a04fb50f",
+      "libreoffice-3.0.0": "5df5178c9715a490e818a37be32be65c2c2305fc5a4978e552ea8f235f5127ae",
+      "mousepad-2.0.0": "c7f2db2c16ac1f03535f0669e1dc37924eb23149d2afb0421e9da08d381fdb95",
+      "xfce-user-desktop-2.0.0": "644dd1da938fd4f43c5b46a50f4e79e47f2d210b5c0b2f0679fc5737bcead199"
+    },
+    "formalSha256SumsAuthoritative": true
+  },
+  "acceptance": {
+    "clp018ThroughClp024": "accepted",
+    "humanUAT": "accepted",
+    "stablePromotion": "accepted",
+    "supportingEvidence": "client-active-clipboard-0.5.0-stable-acceptance.json"
+  },
+  "deploymentBoundary": {
+    "formalArtifactDeployedToAuthorizedFleet": true,
+    "supportingEvidence": "client-active-clipboard-0.5.0-fleet-deployment.json",
+    "otherTargetsChanged": false
+  }
+}

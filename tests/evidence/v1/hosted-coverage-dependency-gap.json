@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "audit",
+  "runId": "github-actions:33891275723",
+  "commit": "bcb57ad99ceadcd7175fe4e12278e376cef15e71",
+  "startedAt": "2026-09-04T15:45:11Z",
+  "completedAt": "2026-09-04T15:46:39Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.23.2"
+  },
+  "environment": {
+    "kind": "github-hosted",
+    "name": "ubuntu-latest"
+  },
+  "scenarios": [
+    {
+      "id": "make-check",
+      "result": "passed"
+    },
+    {
+      "id": "coverage-environment-audit",
+      "result": "failed",
+      "detail": "X11 integration tests skipped because their executable dependencies were absent"
+    }
+  ],
+  "details": {
+    "observedGoStatementCoveragePercent": 53.2,
+    "expectedGoStatementCoveragePercent": 56.8,
+    "missingExecutables": [
+      "Xvfb",
+      "xclip",
+      "dbus-run-session",
+      "xfce4-clipman"
+    ],
+    "workflowRun": "https://github.com/woodegg/remotexapp/actions/runs/33891275723"
+  }
+}

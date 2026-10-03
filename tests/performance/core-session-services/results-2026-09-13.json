@@ -1,0 +1,222 @@
+{
+  "experiment": "P16",
+  "outcome": "accepted",
+  "status": "Measured local non-regression gates passed; human UAT is separate.",
+  "timestamp": "2026-09-14T02:51:50.792Z",
+  "method": "five alternating fresh-runtime/profile Mousepad launches and warm same-runtime session restarts per version; host binary caches warm (no global cache drop); 2 s settle, 5 s idle; session cgroup counters; one host; no other test suites",
+  "identity": {
+    "baseline": {
+      "version": "0.11.0",
+      "managerSHA256": "66078e46aeea288393ddb297ca3ab0ceb32919304a9e56487d79fabf4f9072cb",
+      "supervisorSHA256": "e96e4621dc700ab874b299150e318934ea4dafd7af1d88aa27bebd5b92fbe083"
+    },
+    "candidate": {
+      "version": "0.12.0-rc.1",
+      "managerSHA256": "4cfe954a26ebc4b08fcbb585020719c9f856af89d4fab8f25ee54b85aa68c9dc",
+      "supervisorSHA256": "04f497423b498057d5216e80d9731d193fa148eb6ec93a94554cae166eec6000"
+    }
+  },
+  "samples": {
+    "baseline": [
+      {
+        "iteration": 0,
+        "launchMs": 1149.1227880000001,
+        "warmRestartMs": 1468.3328030000011,
+        "memoryBytes": 72089600,
+        "idleCPUPercent": 0.0432948719042614,
+        "processes": 15,
+        "serviceCounts": {
+          "dbus": 1,
+          "allDBus": 2,
+          "ibus": 1,
+          "engine": 1,
+          "supervisor": 0
+        },
+        "cleanupMs": 146.34855700000116,
+        "appVersion": "3.0.0"
+      },
+      {
+        "iteration": 1,
+        "launchMs": 1227.6993969999967,
+        "warmRestartMs": 1230.546064000002,
+        "memoryBytes": 72077312,
+        "idleCPUPercent": 0.04764600598505139,
+        "processes": 15,
+        "serviceCounts": {
+          "dbus": 1,
+          "allDBus": 2,
+          "ibus": 1,
+          "engine": 1,
+          "supervisor": 0
+        },
+        "cleanupMs": 145.66904899999645,
+        "appVersion": "3.0.0"
+      },
+      {
+        "iteration": 2,
+        "launchMs": 1227.1394569999975,
+        "warmRestartMs": 1256.3850479999965,
+        "memoryBytes": 72044544,
+        "idleCPUPercent": 0.04429189453403154,
+        "processes": 15,
+        "serviceCounts": {
+          "dbus": 1,
+          "allDBus": 2,
+          "ibus": 1,
+          "engine": 1,
+          "supervisor": 0
+        },
+        "cleanupMs": 146.25079800000094,
+        "appVersion": "3.0.0"
+      },
+      {
+        "iteration": 3,
+        "launchMs": 1225.242094000001,
+        "warmRestartMs": 1343.8520149999968,
+        "memoryBytes": 72097792,
+        "idleCPUPercent": 0.042678051744938876,
+        "processes": 15,
+        "serviceCounts": {
+          "dbus": 1,
+          "allDBus": 2,
+          "ibus": 1,
+          "engine": 1,
+          "supervisor": 0
+        },
+        "cleanupMs": 146.60246199999528,
+        "appVersion": "3.0.0"
+      },
+      {
+        "iteration": 4,
+        "launchMs": 1220.9934420000063,
+        "warmRestartMs": 1358.940299000009,
+        "memoryBytes": 72024064,
+        "idleCPUPercent": 0.04383202665481462,
+        "processes": 15,
+        "serviceCounts": {
+          "dbus": 1,
+          "allDBus": 2,
+          "ibus": 1,
+          "engine": 1,
+          "supervisor": 0
+        },
+        "cleanupMs": 142.96809199999552,
+        "appVersion": "3.0.0"
+      }
+    ],
+    "candidate": [
+      {
+        "iteration": 0,
+        "launchMs": 1802.5013770000005,
+        "warmRestartMs": 1910.4406159999999,
+        "memoryBytes": 76304384,
+        "idleCPUPercent": 0.043635053482116826,
+        "processes": 16,
+        "serviceCounts": {
+          "dbus": 1,
+          "allDBus": 2,
+          "ibus": 1,
+          "engine": 1,
+          "supervisor": 1
+        },
+        "cleanupMs": 157.5543370000014,
+        "appVersion": "4.0.0"
+      },
+      {
+        "iteration": 1,
+        "launchMs": 1755.5144940000027,
+        "warmRestartMs": 1798.5617420000017,
+        "memoryBytes": 76275712,
+        "idleCPUPercent": 0.042638177388541296,
+        "processes": 16,
+        "serviceCounts": {
+          "dbus": 1,
+          "allDBus": 2,
+          "ibus": 1,
+          "engine": 1,
+          "supervisor": 1
+        },
+        "cleanupMs": 157.12195700000302,
+        "appVersion": "4.0.0"
+      },
+      {
+        "iteration": 2,
+        "launchMs": 1850.9345170000015,
+        "warmRestartMs": 1904.327301000012,
+        "memoryBytes": 76652544,
+        "idleCPUPercent": 0.04444648359119971,
+        "processes": 16,
+        "serviceCounts": {
+          "dbus": 1,
+          "allDBus": 2,
+          "ibus": 1,
+          "engine": 1,
+          "supervisor": 1
+        },
+        "cleanupMs": 171.7983349999995,
+        "appVersion": "4.0.0"
+      },
+      {
+        "iteration": 3,
+        "launchMs": 1704.5587220000016,
+        "warmRestartMs": 1800.2012190000096,
+        "memoryBytes": 76464128,
+        "idleCPUPercent": 0.043156086383937906,
+        "processes": 16,
+        "serviceCounts": {
+          "dbus": 1,
+          "allDBus": 2,
+          "ibus": 1,
+          "engine": 1,
+          "supervisor": 1
+        },
+        "cleanupMs": 163.87503100000322,
+        "appVersion": "4.0.0"
+      },
+      {
+        "iteration": 4,
+        "launchMs": 1650.5344209999894,
+        "warmRestartMs": 1886.9035690000019,
+        "memoryBytes": 76537856,
+        "idleCPUPercent": 0.04199240829183975,
+        "processes": 16,
+        "serviceCounts": {
+          "dbus": 1,
+          "allDBus": 2,
+          "ibus": 1,
+          "engine": 1,
+          "supervisor": 1
+        },
+        "cleanupMs": 187.41250000000582,
+        "appVersion": "4.0.0"
+      }
+    ]
+  },
+  "medians": {
+    "baseline": {
+      "launchMs": 1225.242094000001,
+      "warmRestartMs": 1343.8520149999968,
+      "memoryBytes": 72077312,
+      "idleCPUPercent": 0.04383202665481462,
+      "processes": 15,
+      "cleanupMs": 146.25079800000094
+    },
+    "candidate": {
+      "launchMs": 1755.5144940000027,
+      "warmRestartMs": 1886.9035690000019,
+      "memoryBytes": 76464128,
+      "idleCPUPercent": 0.043156086383937906,
+      "processes": 16,
+      "cleanupMs": 163.87503100000322
+    }
+  },
+  "gates": {
+    "launch": true,
+    "memory": true,
+    "warmRestart": true,
+    "idleCPU": true,
+    "processes": true,
+    "cleanup": true,
+    "serviceCounts": true
+  }
+}

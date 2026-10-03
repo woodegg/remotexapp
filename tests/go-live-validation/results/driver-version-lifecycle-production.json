@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "label": "driver-version-lifecycle-production",
+  "collectedAt": "2026-08-27T15:53:24-04:00",
+  "managerURL": "http://test-host:1991",
+  "version": "0.1.0-rc.4",
+  "source": "d93d63523e85-dirty",
+  "deployment": {
+    "mode": "central real-user",
+    "user": "tester",
+    "listener": "0.0.0.0:1991",
+    "authMode": "none",
+    "temporaryInsecureTestMode": true,
+    "libexecCurrent": "/usr/local/libexec/remotexapp/releases/0.1.0-rc.4",
+    "shareCurrent": "/usr/local/share/remotexapp/releases/0.1.0-rc.4"
+  },
+  "sha256": {
+    "remotexappd": "78228c43c887f54318a622cd793f44fbe98f0151b614852578a97b50710df2c8",
+    "novncInput": "3c428b412c3d52f0f8bb0fa26d161aea5be644349627031fd8fd37a38c7880be",
+    "remotexappStatus": "9417a0547f26f258e7915036653b8b450a80fdc6727b959698b5f4f8aa68d8f5"
+  },
+  "managedXFCE": {
+    "managedInstanceId": "test-host-xfce",
+    "runtimeInstanceId": "xfce-desktop-ae261ab524df",
+    "driverVersion": "1.0.0",
+    "appliedRelease": "0.1.0-rc.3",
+    "managerRelease": "0.1.0-rc.4",
+    "oldRuntimeAdoptionPreservedFourUnitPids": true,
+    "sessionGenerationRecovered": 1,
+    "gatewayFaultRecreatedPinnedOldRelease": true,
+    "sessionFaultState": "failed/error",
+    "reconnectGeneration": 2,
+    "fixedFramebuffer": "1280x720",
+    "fixedResizePreserved": true,
+    "framebufferColors": 4381,
+    "pointerAndWheelRfbByteDelta": 238,
+    "unicodeClipboardExact": "Driver 1.0.0 lifecycle 中文 E2E",
+    "textErrors": 0,
+    "unicodeRoundTripMilliseconds": 2.5,
+    "vacancyCleanup": true,
+    "serverLayerRetained": true
+  },
+  "mousepad": {
+    "driverVersion": "1.0.0",
+    "depth": 16,
+    "resize": "1280x720 to 900x640",
+    "reconnectMilliseconds": 80.32,
+    "unicodeClipboardExact": "Mousepad immutable 中文 reconnect E2E",
+    "unicodeRoundTripMilliseconds": 3.2,
+    "textErrors": 0,
+    "fiveSecondVacancyCleanup": true,
+    "ephemeralProfileRemoved": true
+  },
+  "edge": {
+    "driverVersion": "1.0.0",
+    "depth": 24,
+    "parameters": {
+      "startUrl": "about:blank",
+      "incognito": true
+    },
+    "processArgumentsVerified": "--inprivate about:blank",
+    "resize": "1280x720 to 900x640",
+    "reconnectMilliseconds": 190.53,
+    "framebufferColors": 1975,
+    "pointerAndWheelRfbByteDelta": 178,
+    "sixtySecondVacancyCleanup": true,
+    "ephemeralProfileRemoved": true
+  },
+  "automatedGates": {
+    "releaseCheck": true,
+    "raceTests": true,
+    "publicHealth": true,
+    "ready": true,
+    "serviceEnabledAndActive": true,
+    "immutablePublishedReleaseMutationRejectedByDesign": true
+  },
+  "uat": {
+    "accepted": true,
+    "acceptedAt": "2026-08-27T15:56:24-04:00",
+    "source": "user confirmation"
+  },
+  "remainingGate": null,
+  "result": "accepted"
+}

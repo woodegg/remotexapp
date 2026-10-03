@@ -1,0 +1,157 @@
+{
+  "result": "stable-0.5.1-aligned",
+  "date": "2026-09-03",
+  "completedAt": "2026-09-03T22:14:57Z",
+  "process": "对齐流程 (alignment process)",
+  "scope": {
+    "localEndpoints": ["1991", "2991"],
+    "sandbox00Endpoints": ["production-1991", "isolated-test-2991"],
+    "followerProductionTargets": ["sandbox02", "sandbox03", "sandbox07", "sandbox10"],
+    "operatorAuthorized": true,
+    "otherTargetsChanged": false,
+    "productionGatewayUsed": false
+  },
+  "formalArtifact": {
+    "tag": "v0.5.1",
+    "commit": "48b9da84a3514872906482db01af4acc22b9ce7e",
+    "embeddedCommit": "48b9da84a351",
+    "archive": "remotexapp-0.5.1-linux-amd64.tar.gz",
+    "archiveSha256": "1dbfa4dd3747572bb8970c5c88d5df26cd9c289a8207845790efbd7b22c60eb5",
+    "downloadedChecksumVerification": "passed",
+    "remoteChecksumVerification": "passed-on-all-five-sandboxes",
+    "installedAndRunningManagerBytesVerified": "passed-on-all-eight-endpoints",
+    "remotexappdSha256": "0fcb8155137c8339bbecc7b2677c8612525dd68d381ad0ea8e9e5a085794be2d"
+  },
+  "catalog": {
+    "productionTemplateCount": 5,
+    "isolatedTestTemplateCount": 4,
+    "allTemplateDepths": [16],
+    "productionApps": {
+      "edge": "1.0.0",
+      "firefox-esr": "2.1.0",
+      "libreoffice": "3.0.0",
+      "mousepad": "2.0.0",
+      "xfce-user-desktop": "2.0.0"
+    },
+    "isolatedTestApps": {
+      "edge": "1.0.0",
+      "firefox-esr": "2.1.0",
+      "libreoffice": "3.0.0",
+      "mousepad": "2.0.0"
+    },
+    "formalAppPackageSealsVerified": "passed-on-all-endpoints",
+    "sdkAsset": "sdk-S4T4SPMN.js",
+    "sdkAssetSha256": "49aaa18d34d5007df48ac6f2c6f8e62cce8df04a1bd1453b8ffbd2518e7df405"
+  },
+  "local": {
+    "production1991": {
+      "previousVersion": "0.5.1-rc.1",
+      "finalVersion": "0.5.1",
+      "managerPid": 3446764,
+      "listener": "0.0.0.0:1991",
+      "consoleEnabled": true,
+      "kioskEnabled": true,
+      "runtimeId": "xfce-user-desktop-2c5cf858536f",
+      "runtimeIdentityPreserved": true,
+      "managerRestartChecks": 2
+    },
+    "isolatedTest2991": {
+      "previousVersion": "0.5.1-rc.1",
+      "finalVersion": "0.5.1",
+      "managerPid": 3461933,
+      "listener": "127.0.0.1:2991",
+      "consoleEnabled": false,
+      "sdkEnabled": true,
+      "kioskEnabled": true,
+      "managerRestartChecks": "at-least-2",
+      "activeRuntimeCount": 0,
+      "onAttachKioskSmoke": "passed-and-cleaned",
+      "productionManagerPidUnchangedDuringActivationAndSmoke": true
+    }
+  },
+  "sandboxes": {
+    "common": {
+      "previousManagerVersion": "0.5.0",
+      "finalManagerVersion": "0.5.1",
+      "deploymentMode": "central-real-user",
+      "runtimeUser": "sandbox",
+      "listener": "0.0.0.0:1991",
+      "authMode": "none",
+      "allowInsecurePublic": true,
+      "documentRoots": ["/home/sandbox", "/mnt/CloudDrive", "/mnt/MyDrive"],
+      "consoleEnabled": true,
+      "kioskEnabled": true,
+      "attachedClientsAtActivation": 0,
+      "managedRegistrationPreserved": true,
+      "managerRestartChecks": 2,
+      "warningJournalCountAfterActivation": 0
+    },
+    "sandbox00": {
+      "productionManagerPid": 3173022,
+      "activeRuntimeIds": ["firefox-esr-8df9bd6681a8", "xfce-user-desktop-2e7b598b6a5a"],
+      "activeManifestCount": 2,
+      "runtimeIdentityPreserved": true,
+      "isolatedTest2991": {
+        "managerPid": 3177719,
+        "version": "0.5.1",
+        "listener": "127.0.0.1:2991",
+        "consoleEnabled": false,
+        "sdkEnabled": true,
+        "kioskEnabled": true,
+        "managerRestartChecks": "at-least-2",
+        "activeRuntimeCount": 0,
+        "onAttachKioskSmoke": "passed-and-cleaned",
+        "productionManagerPidUnchangedDuringActivationAndSmoke": true
+      }
+    },
+    "sandbox02": {
+      "managerPid": 911110,
+      "runtimeId": "xfce-user-desktop-18e0063a4730",
+      "sessionState": "stopped",
+      "activeManifestCount": 1,
+      "runtimeIdentityPreserved": true
+    },
+    "sandbox03": {
+      "managerPid": 836675,
+      "activeRuntimeIds": ["edge-426927c78bf3", "xfce-user-desktop-fe38ea6ea902"],
+      "activeManifestCount": 2,
+      "runtimeIdentityPreserved": true
+    },
+    "sandbox07": {
+      "managerPid": 954487,
+      "runtimeId": "xfce-user-desktop-5f777640df67",
+      "sessionState": "stopped",
+      "activeManifestCount": 1,
+      "runtimeIdentityPreserved": true,
+      "environmentSha256BeforeAndAfter": "e094d04c78abfd7149fdb61b21e8aec894bb0a84128d32ed77f4c737e11b0d63",
+      "managedRecordSha256BeforeAndAfter": "ec8599e030f3188f3d15313149fdd5c1ff0a7b009c05c8de7f6471ea07a28f1d"
+    },
+    "sandbox10": {
+      "managerPid": 2000560,
+      "runtimeId": "xfce-user-desktop-7f82a5db6646",
+      "sessionState": "running",
+      "activeManifestCount": 1,
+      "runtimeIdentityPreserved": true
+    }
+  },
+  "verification": {
+    "versionAndCommit": "passed-on-all-eight-endpoints",
+    "coreSelectors": "0.5.1-on-all-eight-endpoints",
+    "healthAndReadiness": "passed-twice-on-all-eight-endpoints",
+    "capabilitiesClipboard": true,
+    "managerRunsAsRoot": false,
+    "productionConsoleSDKAndKioskRoutes": "passed-on-all-six-production-endpoints",
+    "isolatedConsole404SDK200AndKioskSmoke": "passed-on-both-test-endpoints",
+    "runtimeManifestCardinality": "matched-active-runtime-count-on-all-production-endpoints",
+    "runtimeComponentsRestarted": false,
+    "runtimeComponentsRemainLockedToCreationRelease": true,
+    "postActivationWarningCount": 0,
+    "lxdContainerLoopbackChecks": "passed-on-all-sandboxes",
+    "buildHostPrivateHttp": "blocked-by-existing-network-boundary-on-all-five-sandboxes",
+    "firewallChanged": false,
+    "productionGatewayTested": false,
+    "configurationDrift": "none",
+    "catalogDrift": "none",
+    "runtimeIdentityDrift": "none"
+  }
+}

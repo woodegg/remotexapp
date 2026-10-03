@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "edge-2.0.2-lightview-1.0.6-local-uat",
+  "commit": "b5a3190865b5b46d0e203d86908752a714bdeead",
+  "workspaceDirty": true,
+  "startedAt": "2026-09-17T03:38:00Z",
+  "completedAt": "2026-09-17T04:10:17Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "local-loopback-Ubuntu-container",
+    "name": "127.0.0.1:1991-and-2992",
+    "core": "0.12.0-rc.2 unchanged",
+    "lightview": "Lightview 0.1.6 (WebKitGTK 2.52.6)"
+  },
+  "sourceTarget": {
+    "core": "0.12.2 unchanged",
+    "sdk": "0.28.0 unchanged",
+    "edge": "edge@2.0.2",
+    "lightview": "lightview@1.0.6"
+  },
+  "artifacts": {
+    "edgeArchive": "edge-2.0.2.tar.gz",
+    "edgeSha256": "aa0e33cb60db69c211582a52b702b50dbcad4397a274ff969996a713895e84f7",
+    "lightviewArchive": "lightview-1.0.6.tar.gz",
+    "lightviewSha256": "bc424aabdf8484734e4f35c75ff00345268343c237eb9f093724bd79e5d3f381",
+    "lightviewUpstreamArchiveSha256": "c30da09cf28065647e1d12644b83ca702b6c1fcebdd929636c942a421d7d1591",
+    "lightviewUpstreamBinarySha256": "e5f08585d17d02a1e63fc477ef25c3d07f5bf12e7e6b4567e1ce7300f30be9b4"
+  },
+  "scenarios": [
+    { "id": "go-sdk-console-and-all-App-regression-168-tests", "result": "passed" },
+    { "id": "Edge-clean-foreign-host-partial-PID-reuse-live-owner-socket-and-quarantine-rotation", "result": "passed" },
+    { "id": "Edge-real-CDP-getConnections-openUrl-and-profile-preservation-on-1991-and-2992", "result": "passed" },
+    { "id": "LightView-deterministic-package-dependency-upgrade-rollback-and-14-scenario-lifecycle-E2E", "result": "passed" },
+    { "id": "LightView-real-private-descriptor-openUrl-on-1991-and-2992", "result": "passed" },
+    { "id": "existing-desktop-runtime-preserved-across-Manager-restart", "result": "passed" },
+    { "id": "human-UAT", "result": "passed" }
+  ],
+  "limitations": [
+    "The App-only train does not change or publish RemoteXApp Core or SDK.",
+    "The local container retains its documented LightView WebKit sandbox test override; the App Package never sets it.",
+    "GitHub publication does not deploy or upgrade any sandbox endpoint."
+  ]
+}

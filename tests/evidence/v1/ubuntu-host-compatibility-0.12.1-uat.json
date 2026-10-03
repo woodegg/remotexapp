@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "ubuntu-host-compatibility-operator-acceptance-stable-0.12.1",
+  "commit": "2e683b9f74f6cdf1f78da0adc348debd79224ca5",
+  "startedAt": "2026-09-14T11:53:36Z",
+  "completedAt": "2026-09-14T11:53:36Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "22.22.3"},
+  "environment": {"kind": "operator-acceptance-of-disclosed-development-candidate", "name": "Ubuntu-compatibility-repair-no-deployment"},
+  "artifact": {
+    "name": "remotexapp-0.12.1-rc.1-linux-amd64.tar.gz",
+    "sha256": "4a8cd5d47d74017b5fa9ce39009ea0c326426e5754f09e6643dc349aa39699ed"
+  },
+  "scenarios": [
+    {"id": "operator-UAT-acceptance", "result": "passed"},
+    {"id": "formal-stable-not-RC-publication-authorized", "result": "passed"},
+    {"id": "native-pristine-Ubuntu-26.04-Qt6-full-host-validation", "result": "skipped", "reason": "Not performed or inferred from the operator's acceptance; remains an explicit release qualification."}
+  ],
+  "details": {
+    "operatorInstruction": "uat accept do a formal release (formal version not rc version)",
+    "sourceState": "The accepted implementation was an uncommitted development snapshot based on the commit above. The archive identifies that snapshot, not a clean/tagged release or proof of a particular deployed human-test session.",
+    "automatedEvidence": "ubuntu-host-compatibility-0.12.1-rc.1-development.json",
+    "acceptedScope": "U26-01 through U26-05 plus U26-07/U26-08 documentation. U26-06/U26-09 remain deferred.",
+    "stablePromotion": "Core 0.12.1, SDK 0.28.0, Mousepad 4.0.1. No behavior changes; release/build identity, documentation and sanitized evidence only. Carry operator acceptance over after clean hosted candidate and exact-archive local E2E. No second human test of stable bytes is claimed.",
+    "platformQualification": "Operator requested publication after the unexecuted native Ubuntu 26.04, Qt6/Mousepad 0.7 and whole-host reboot gates were explicitly disclosed. They remain unverified, not retroactively passed.",
+    "deployment": "No deployment to local 1991/2992 or sandboxes; no existing runtime restart/upgrade or downstream workaround retirement.",
+    "commitScope": "Exclude unrelated sandbox TODO edits, the local release-tray and the separately supplied incoming handover paragraph. Preserve them in the workspace."
+  }
+}

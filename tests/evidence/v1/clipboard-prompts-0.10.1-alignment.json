@@ -1,0 +1,533 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "clipboard-prompts-0.10.1-eight-endpoints",
+  "commit": "487b02116bb274debedb2080cc2921a7e54ccfe8",
+  "startedAt": "2026-09-13T02:14:19Z",
+  "completedAt": "2026-09-13T02:17:58Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8"
+  },
+  "environment": {
+    "kind": "local-and-LXD",
+    "name": "eight-approved-endpoints"
+  },
+  "artifact": {
+    "name": "remotexapp-0.10.1-linux-amd64.tar.gz",
+    "sha256": "2df1da220a98fc3ba9a7fd37c9ad120bc278c4b0514dd6a801d11f4271a74cfe"
+  },
+  "scenarios": [
+    {
+      "id": "hosted-Verify-candidate-and-formal-publication",
+      "result": "passed"
+    },
+    {
+      "id": "independent-local-and-hosted-archives-identical",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-six-suite-E2E-first-attempt",
+      "result": "passed"
+    },
+    {
+      "id": "source-history-and-artifact-sensitive-data-checks",
+      "result": "passed"
+    },
+    {
+      "id": "seven-App-archives-identical-to-0.10.0",
+      "result": "passed"
+    },
+    {
+      "id": "all-eight-staged-before-selection",
+      "result": "passed"
+    },
+    {
+      "id": "two-Manager-starts-exact-binaries-and-served-assets",
+      "result": "passed"
+    },
+    {
+      "id": "configuration-App-selectors-runtime-pins-and-client-counts-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "readiness-connections-actions-and-empty-warning-journals",
+      "result": "passed"
+    },
+    {
+      "id": "formal-served-SDK-two-local-endpoint-browser-matrix",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "version": "0.10.1",
+    "sdkVersion": "0.27.5",
+    "tag": "v0.10.1",
+    "releaseURL": "https://github.com/woodegg/remotexapp/releases/tag/v0.10.1",
+    "publication": {
+      "isPrerelease": false,
+      "isDraft": false,
+      "latest": true,
+      "publishedAt": "2026-09-13T02:13:21Z",
+      "verifyRun": 34731857233,
+      "candidateRun": 34731856884,
+      "releaseRun": 34732490694
+    },
+    "drift": "none",
+    "runtimeAlignment": "not requested; existing immutable pins intentionally retained",
+    "sdkSHA256": "e322c817b1a719e77c7352f0c82781b41ab91ffc0c6d40c2c20a27d305b49e31",
+    "consoleSHA256": "2e23a48db328fec0f742fc9a0a314d531ef75068853e3ceab053fd9a2a040c58",
+    "exactArchiveTests": [
+      "synthetic ABI lifecycle",
+      "shipped Apps input/clipboard/lifecycle",
+      "document applications",
+      "runtime upgrade and KDE controls",
+      "app actions and abnormal Manager recovery",
+      "disposable-UID user-home connections"
+    ],
+    "exactArchiveResult": "all six suites passed without rerun",
+    "browserVerification": "Both local endpoints: 12 served-SDK layout/direction/preview/keyboard/receipt cases plus expiry/failure/cancellation; transfer I/O stubbed in this UI matrix. Exact-archive shipped-App tests exercise real transfers.",
+    "networkLimitation": "All five build-host-to-private-IP:1991 probes timed out. LXD management and container-loopback health/identity/control checks passed. No firewall changes, production-gateway testing or external-access claim.",
+    "rawEvidenceDirectory": "/tmp/remotexapp-0101-ops.9ChGlQ",
+    "endpoints": [
+      {
+        "endpoint": "local-prod",
+        "kind": "local",
+        "role": "prod",
+        "port": 1991,
+        "pid": 1247360,
+        "version": "0.10.1",
+        "commit": "487b02116bb2",
+        "sdk": "0.27.5",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved-not-upgraded",
+        "templates": [
+          {
+            "driverVersion": "1.1.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.2.0",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          },
+          {
+            "driverVersion": "2.0.0",
+            "id": "xfce-user-desktop"
+          }
+        ],
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-44ea8c2186ee",
+            "sessionGeneration": 11,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.10.1-rc.1",
+            "app": "2.0.0"
+          },
+          {
+            "id": "edge-d9eb58f62d57",
+            "sessionGeneration": 1,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.10.1-rc.1",
+            "app": "1.1.0"
+          }
+        ]
+      },
+      {
+        "endpoint": "local-test",
+        "kind": "local",
+        "role": "test",
+        "port": 2992,
+        "pid": 1247697,
+        "version": "0.10.1",
+        "commit": "487b02116bb2",
+        "sdk": "0.27.5",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved-not-upgraded",
+        "templates": [
+          {
+            "driverVersion": "1.1.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.2.0",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          }
+        ],
+        "runtimes": []
+      },
+      {
+        "endpoint": "sandbox00-prod",
+        "kind": "sandbox",
+        "role": "prod",
+        "port": 1991,
+        "pid": 3022059,
+        "version": "0.10.1",
+        "commit": "487b02116bb2",
+        "sdk": "0.27.5",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved-not-upgraded",
+        "templates": [
+          {
+            "driverVersion": "1.1.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.2.0",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          },
+          {
+            "driverVersion": "2.0.0",
+            "id": "xfce-user-desktop"
+          }
+        ],
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-eefbf64deda7",
+            "sessionGeneration": 5,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.0.0"
+          }
+        ]
+      },
+      {
+        "endpoint": "sandbox00-test",
+        "kind": "sandbox",
+        "role": "test",
+        "port": 2991,
+        "pid": 3022334,
+        "version": "0.10.1",
+        "commit": "487b02116bb2",
+        "sdk": "0.27.5",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved-not-upgraded",
+        "templates": [
+          {
+            "driverVersion": "1.1.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.2.0",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          }
+        ],
+        "runtimes": []
+      },
+      {
+        "endpoint": "sandbox02-prod",
+        "kind": "sandbox",
+        "role": "prod",
+        "port": 1991,
+        "pid": 2013653,
+        "version": "0.10.1",
+        "commit": "487b02116bb2",
+        "sdk": "0.27.5",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved-not-upgraded",
+        "templates": [
+          {
+            "driverVersion": "1.1.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.2.0",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          },
+          {
+            "driverVersion": "2.0.0",
+            "id": "xfce-user-desktop"
+          }
+        ],
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-3616fd55d920",
+            "sessionGeneration": 4,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.0.0"
+          }
+        ]
+      },
+      {
+        "endpoint": "sandbox03-prod",
+        "kind": "sandbox",
+        "role": "prod",
+        "port": 1991,
+        "pid": 2979921,
+        "version": "0.10.1",
+        "commit": "487b02116bb2",
+        "sdk": "0.27.5",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved-not-upgraded",
+        "templates": [
+          {
+            "driverVersion": "1.1.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.2.0",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          },
+          {
+            "driverVersion": "2.0.0",
+            "id": "xfce-user-desktop"
+          }
+        ],
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-7eaf5f60925b",
+            "sessionGeneration": 5,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.0.0"
+          }
+        ]
+      },
+      {
+        "endpoint": "sandbox07-prod",
+        "kind": "sandbox",
+        "role": "prod",
+        "port": 1991,
+        "pid": 3799951,
+        "version": "0.10.1",
+        "commit": "487b02116bb2",
+        "sdk": "0.27.5",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved-not-upgraded",
+        "templates": [
+          {
+            "driverVersion": "1.1.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.2.0",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          },
+          {
+            "driverVersion": "2.0.0",
+            "id": "xfce-user-desktop"
+          }
+        ],
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-0c83d8920508",
+            "sessionGeneration": 5,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.0.0"
+          }
+        ]
+      },
+      {
+        "endpoint": "sandbox10-prod",
+        "kind": "sandbox",
+        "role": "prod",
+        "port": 1991,
+        "pid": 3526208,
+        "version": "0.10.1",
+        "commit": "487b02116bb2",
+        "sdk": "0.27.5",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved-not-upgraded",
+        "templates": [
+          {
+            "driverVersion": "1.1.0",
+            "id": "edge"
+          },
+          {
+            "driverVersion": "2.2.0",
+            "id": "firefox-esr"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kate"
+          },
+          {
+            "driverVersion": "1.0.0",
+            "id": "kwrite"
+          },
+          {
+            "driverVersion": "3.1.0",
+            "id": "libreoffice"
+          },
+          {
+            "driverVersion": "3.0.0",
+            "id": "mousepad"
+          },
+          {
+            "driverVersion": "2.0.0",
+            "id": "xfce-user-desktop"
+          }
+        ],
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-3f5cfb7fc1a6",
+            "sessionGeneration": 5,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.0.0"
+          },
+          {
+            "id": "edge-0590c1aab19b",
+            "sessionGeneration": 3,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "1.1.0"
+          },
+          {
+            "id": "firefox-esr-6bc26c9f617a",
+            "sessionGeneration": 1,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.1",
+            "app": "2.2.0"
+          }
+        ]
+      }
+    ]
+  }
+}

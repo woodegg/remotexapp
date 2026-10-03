@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "approved-runtime-completion:0.5.3:2026-09-08",
+  "commit": "1e4b32e54598b9c9e81ff65f2725deacea40a583",
+  "startedAt": "2026-09-08T04:02:00Z",
+  "completedAt": "2026-09-08T04:02:55Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "v22.23.1"},
+  "environment": {"kind": "approved-runtime-replacement", "name": "sandbox00/03/10 production desktops"},
+  "artifact": {"name": "remotexapp-0.5.3-linux-amd64.tar.gz", "sha256": "09d9108fe0c4f7cd7c3ce9f641e596222e7d6723910311a319ad672d1f4047a2"},
+  "scenarios": [
+    {"id": "explicit-force-approval-and-zero-viewers", "result": "passed"},
+    {"id": "managed-stop-old-manifest-removal-before-recreate", "result": "passed"},
+    {"id": "new-runtime-pins-stable-core", "result": "passed"},
+    {"id": "real-rfb-handshake-fixed-framebuffer-and-xfce-ready", "result": "passed"},
+    {"id": "clipboard-capabilities-four-formats-both-directions", "result": "passed"},
+    {"id": "manager-readiness-and-empty-post-action-warning-journal", "result": "passed"}
+  ],
+  "details": {
+    "supersedes": "firefox-ime-0.5.3-alignment.json: pending forced replacement only",
+    "runtimeCore": "0.5.3",
+    "driverVersion": "2.0.0",
+    "sessionGeneration": 1,
+    "sessionState": "running",
+    "applicationState": "ready",
+    "display": {"size": "1280x720", "depth": 16, "mode": "fixed", "allowClientResize": false},
+    "replacements": [
+      {"endpoint": "sandbox00-1991", "old": "xfce-user-desktop-2e7b598b6a5a", "new": "xfce-user-desktop-eefbf64deda7"},
+      {"endpoint": "sandbox03-1991", "old": "xfce-user-desktop-fe38ea6ea902", "new": "xfce-user-desktop-7eaf5f60925b"},
+      {"endpoint": "sandbox10-1991", "old": "xfce-user-desktop-7f82a5db6646", "new": "xfce-user-desktop-3f5cfb7fc1a6"}
+    ],
+    "profilesDeleted": false,
+    "unsavedStateLossApproved": true,
+    "managerRestarted": false,
+    "gatewayUsed": false,
+    "firewallChanged": false,
+    "limitations": ["Clipboard capability checks are not a new full clipboard-transfer E2E run.", "Prior build-host private HTTP timeout remains unresolved; validation used LXD container-loopback access."]
+  }
+}

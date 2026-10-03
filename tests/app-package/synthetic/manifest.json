@@ -1,0 +1,93 @@
+{
+  "apiVersion": "remotexapp/v1",
+  "id": "synthetic-app",
+  "name": "Synthetic App Package",
+  "driverVersion": "1.0.0",
+  "singleton": false,
+  "profileRef": "default",
+  "runMode": "isolated",
+  "ports": {
+    "control": {
+      "kind": "loopback-tcp",
+      "port": 0
+    }
+  },
+  "parameters": {
+    "message": {
+      "type": "string",
+      "default": "RemoteXApp App Package ABI v1",
+      "maxLength": 256
+    }
+  },
+  "driver": {
+    "config": {
+      "probeProtocol": "synthetic-json-line-v1"
+    }
+  },
+  "overrides": {
+    "allowed": [
+      "geometry",
+      "frameRate"
+    ]
+  },
+  "dependencies": {
+    "executables": [
+      "dbus-daemon",
+      "ibus",
+      "ibus-daemon",
+      "jq",
+      "matchbox-window-manager",
+      "python3",
+      "sed",
+      "seq",
+      "sleep",
+      "xdotool",
+      "xmessage"
+    ],
+    "pythonModules": []
+  },
+  "server": {
+    "activation": "on-demand",
+    "driver": "server.sh",
+    "displayMode": "dynamic",
+    "display": 0,
+    "rfbPort": 0,
+    "gatewayPort": 0,
+    "geometry": "800x600",
+    "depth": 16,
+    "frameRate": 5,
+    "allowClientResize": false,
+    "readinessPids": ["server.pid"],
+    "readinessTimeout": "10s"
+  },
+  "session": {
+    "services": "core-v1",
+    "activation": "immediate",
+    "driver": "session.sh",
+    "shutdownDriver": "shutdown.sh",
+    "readinessPid": "synthetic.pid",
+    "readinessTimeout": "20s",
+    "vacantTimeout": "30s",
+    "vacantAction": "stop-instance",
+    "status": {
+      "mode": "driver",
+      "details": {
+        "application": {
+          "type": "enum",
+          "values": ["synthetic-app"]
+        },
+        "control": {
+          "type": "json",
+          "maxBytes": 8192,
+          "maxDepth": 8,
+          "maxItems": 128
+        }
+      }
+    }
+  },
+  "input": {
+    "backend": "ibus",
+    "lifecycle": "session",
+    "allowedWmClasses": ["Xmessage", "xmessage"]
+  }
+}

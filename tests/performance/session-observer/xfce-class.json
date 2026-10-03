@@ -1,0 +1,31 @@
+{
+  "id": "xfce-session-observer",
+  "name": "Experiment P10: dynamic Full XFCE session",
+  "singleton": false,
+  "profileRef": "p10-xfce",
+  "runMode": "isolated",
+  "server": {
+    "activation": "on-demand",
+    "driver": "../../../drivers/common/x11-server.sh",
+    "displayMode": "dynamic",
+    "display": 0,
+    "rfbPort": 0,
+    "gatewayPort": 0,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 5,
+    "allowClientResize": false,
+    "readinessPids": ["server.pid", "clipman.pid"]
+  },
+  "session": {
+    "activation": "on-attach",
+    "driver": "../session-owned-ibus/session.sh",
+    "readinessPid": "xfce.pid",
+    "vacantTimeout": "10s",
+    "vacantAction": "stop-instance"
+  },
+  "input": {
+    "backend": "ibus",
+    "allowedWmClasses": ["*"]
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "local:clp030-034-1991-2992",
+  "commit": "4f55e629cdefab6af3ea3cd2e7b7eef1b22ba250",
+  "startedAt": "2026-09-10T02:30:49Z",
+  "completedAt": "2026-09-10T02:34:00Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "v22.22.3"},
+  "environment": {"kind": "local", "name": "local-1991-and-2992-only"},
+  "artifact": {
+    "name": "remotexapp-0.5.4-rc.1-linux-amd64.tar.gz",
+    "sha256": "87c3846fca2b51387493eea4f5795d4b6cc24fed16171a811acee9c40f890296"
+  },
+  "scenarios": [
+    {"id": "hosted-verify-34429009996", "result": "passed"},
+    {"id": "hosted-candidate-34429024119", "result": "passed"},
+    {"id": "exact-archive-checksum-identity-synthetic-abi", "result": "passed"},
+    {"id": "exact-archive-four-app-input-resize-status-control-lifecycle-cleanup", "result": "passed"},
+    {"id": "exact-archive-firefox-fresh-reused-restarted-ime-readback", "result": "passed"},
+    {"id": "local-test-port-2991-to-2992-loopback-migration", "result": "passed"},
+    {"id": "both-managers-and-sdk-exact-candidate-bytes", "result": "passed"},
+    {"id": "existing-desktop-identity-generation-state-adoption", "result": "passed"},
+    {"id": "1991-mousepad-and-libreoffice-full-two-viewer-clipboard", "result": "passed"},
+    {"id": "2992-mousepad-and-libreoffice-full-two-viewer-clipboard", "result": "passed"},
+    {"id": "both-endpoints-real-app-paste-copy-readback", "result": "passed"},
+    {"id": "empty-noop-mixed-png-whitespace-atomic-rejection", "result": "passed"},
+    {"id": "four-format-transfer-rich-rebound-genuine-change", "result": "passed"},
+    {"id": "browser-read-xfixes-broadcast-independent-dismiss", "result": "passed"},
+    {"id": "view-only-permissions-reconnect-prompt-layout-reload", "result": "passed"},
+    {"id": "loopback-listeners-ready-health-no-restart-loop", "result": "passed"},
+    {"id": "human-uat", "result": "skipped"}
+  ],
+  "details": {
+    "version": "0.5.4-rc.1",
+    "sdkVersion": "0.22.0",
+    "sdkAsset": "sdk-ZBHKSFRP.js",
+    "sdkSha256": "bab758623be81f34143e7e84290fc6216a0b6fa56a666c7fa301cad23ee264ae",
+    "managerSha256": "20caa9bbf546564a722c58861961cc0d5c9b9d20aedc4a142635bb2dbe33a1ca",
+    "appPackagesChanged": false,
+    "configAndCatalogPreservedExceptApprovedTestPort": true,
+    "endpoints": [
+      {"listen": "127.0.0.1:1991", "console": true, "kiosk": true, "authMode": "none", "activeRuntimes": 1, "managerRestarts": 0},
+      {"listen": "127.0.0.1:2992", "console": false, "kiosk": true, "authMode": "none", "activeRuntimes": 0, "managerRestarts": 0}
+    ],
+    "oldLocal2991ListenerRemoved": true,
+    "desktop": {
+      "id": "xfce-user-desktop-35bb2815f740",
+      "generation": 4,
+      "state": "server-ready",
+      "sessionState": "running",
+      "gatewayVersionRetained": "0.5.3",
+      "attachedClientsAtFinalCheck": 0,
+      "forcedStop": false
+    },
+    "uat": "pending; create new candidate runtimes to exercise gateway-side fixes",
+    "publication": "not authorized; no release tag created",
+    "sandboxDeployment": "not authorized; none performed",
+    "limitations": [
+      "Headless focus emulation isolates synthetic browser devices; it does not prove native OS focus or native permission prompts.",
+      "Exact shipped-app E2E excluded user-home XFCE to preserve the active desktop; new candidate Mousepad and LibreOffice runtimes covered deployment clipboard checks.",
+      "Existing runtime component pins are preserved; the retained desktop gateway is not upgraded by a Manager restart."
+    ],
+    "testHarnessCorrections": [
+      "CDP listening alone did not prove renderer readiness; prewarm same-origin document and SDK before allocating the five-second-vacancy Mousepad runtime. Same exact archive passed on rerun.",
+      "First production LibreOffice smoke used a fixture outside document roots and correctly received HTTP 409. Moved only the test fixture into the allowed documents directory; did not broaden configuration. Both app tests then passed."
+    ],
+    "evidenceLogs": [
+      "clp030-exact-e2e3.log",
+      "clp030-post2992.log",
+      "clp030-post1991-retry.log"
+    ]
+  }
+}

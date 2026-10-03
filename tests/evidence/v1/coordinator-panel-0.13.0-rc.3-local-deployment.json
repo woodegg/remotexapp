@@ -1,0 +1,223 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "coordinator-panel-0.13.0-rc.3-local-deployment",
+  "commit": "41665eaee8aeb7c1265d41f3ae0114094c3bd9a2",
+  "sourceDirty": true,
+  "startedAt": "2026-09-18T14:45:00Z",
+  "completedAt": "2026-09-18T14:49:09Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "project-local-test",
+    "name": "loopback 1991 and 2992"
+  },
+  "artifact": {
+    "name": "remotexapp-0.13.0-rc.3-linux-amd64.tar.gz",
+    "sha256": "b15d6f84be7777b52bd6ddb3a3a2dddf6811c5f797bbf5c749c36dea348b19e4"
+  },
+  "managerSha256": "772a441c769d01b90b00a0ab7f24c9263cf57a116793e9715f9f07b64af9dcff",
+  "sdkVersion": "0.29.1",
+  "servedSDKsha256": "a2791eb4139321b98eef87a0d6e64ed56017c2ec93bd48fba6997ce7af18b037",
+  "servedConsolesha256": "ceeac6e267561bb972f8ca34bc667fe24d8ecb383f5db4d43c0d15409c523fe6",
+  "humanUAT": "pending",
+  "publication": "not performed",
+  "sandboxOperations": false,
+  "endpoints": [
+    {
+      "port": 1991,
+      "version": {
+        "buildDate": "2026-09-18T04:41:06Z",
+        "capabilities": {
+          "appActions": true,
+          "clipboard": true,
+          "idleLease": true,
+          "runtimeRestart": true,
+          "serviceRestart": false
+        },
+        "commit": "41665eaee8ae",
+        "shutdownPolicy": {
+          "blockedWarningAfter": "1h0m0s",
+          "forceAfter": "never",
+          "graceTimeout": "15s"
+        },
+        "version": "0.13.0-rc.3",
+        "webFeatures": {
+          "console": true,
+          "kiosk": true
+        }
+      },
+      "hashes": {
+        "sdk": "a2791eb4139321b98eef87a0d6e64ed56017c2ec93bd48fba6997ce7af18b037",
+        "console": "ceeac6e267561bb972f8ca34bc667fe24d8ecb383f5db4d43c0d15409c523fe6"
+      },
+      "instances": [
+        {
+          "id": "xfce-user-desktop-8cdcaa0b5159",
+          "generation": 3,
+          "state": "running",
+          "pins": {
+            "core": {
+              "version": "0.12.0-rc.2",
+              "commit": "b7f4f98c7204a9468edef24204de1ed7f3d7a191",
+              "sha256": "84d8b6ac203b2ffa3e636fb75d018251c7fc54a10fa9eca59164ba9ceffc7cea"
+            },
+            "app": {
+              "id": "xfce-user-desktop",
+              "version": "3.0.0",
+              "sha256": "a4be8c3d5a41c664878d59ce02d7855688625d302689e0c5d040fca0629d797b"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "port": 2992,
+      "version": {
+        "buildDate": "2026-09-18T04:41:06Z",
+        "capabilities": {
+          "appActions": true,
+          "clipboard": true,
+          "idleLease": true,
+          "runtimeRestart": true,
+          "serviceRestart": false
+        },
+        "commit": "41665eaee8ae",
+        "shutdownPolicy": {
+          "blockedWarningAfter": "1h0m0s",
+          "forceAfter": "never",
+          "graceTimeout": "15s"
+        },
+        "version": "0.13.0-rc.3",
+        "webFeatures": {
+          "console": false,
+          "kiosk": true
+        }
+      },
+      "hashes": {
+        "sdk": "a2791eb4139321b98eef87a0d6e64ed56017c2ec93bd48fba6997ce7af18b037",
+        "console": "ceeac6e267561bb972f8ca34bc667fe24d8ecb383f5db4d43c0d15409c523fe6"
+      },
+      "instances": []
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "2992-served-SDK-and-Viewer",
+      "result": "passed"
+    },
+    {
+      "id": "2992-default-off-Console-control",
+      "result": "passed"
+    },
+    {
+      "id": "2992-passive-Coordinator-panel",
+      "result": "passed"
+    },
+    {
+      "id": "2992-panel-attached-receipt",
+      "result": "passed"
+    },
+    {
+      "id": "2992-panel-detached-deadline",
+      "result": "passed"
+    },
+    {
+      "id": "2992-panel-released-interest",
+      "result": "passed"
+    },
+    {
+      "id": "2992-panel-close",
+      "result": "passed"
+    },
+    {
+      "id": "2992-attached-then-detached-receipts",
+      "result": "passed"
+    },
+    {
+      "id": "2992-disconnected-App-survives-60s-template-timeout",
+      "result": "passed"
+    },
+    {
+      "id": "2992-checkbox-release",
+      "result": "passed"
+    },
+    {
+      "id": "1991-served-SDK-and-Viewer",
+      "result": "passed"
+    },
+    {
+      "id": "1991-default-off-Console-control",
+      "result": "passed"
+    },
+    {
+      "id": "1991-passive-Coordinator-panel",
+      "result": "passed"
+    },
+    {
+      "id": "1991-panel-attached-receipt",
+      "result": "passed"
+    },
+    {
+      "id": "1991-panel-detached-deadline",
+      "result": "passed"
+    },
+    {
+      "id": "1991-panel-released-interest",
+      "result": "passed"
+    },
+    {
+      "id": "1991-panel-close",
+      "result": "passed"
+    },
+    {
+      "id": "1991-attached-then-detached-receipts",
+      "result": "passed"
+    },
+    {
+      "id": "1991-disconnected-App-survives-60s-template-timeout",
+      "result": "passed"
+    },
+    {
+      "id": "1991-checkbox-release",
+      "result": "passed"
+    },
+    {
+      "id": "make-check",
+      "result": "passed"
+    },
+    {
+      "id": "exact-running-binary-and-served-assets",
+      "result": "passed"
+    },
+    {
+      "id": "unchanged-loopback-bindings-and-config-hashes",
+      "result": "passed"
+    },
+    {
+      "id": "unchanged-App-selectors",
+      "result": "passed"
+    },
+    {
+      "id": "existing-XFCE-generation-3-and-core-pin-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "two-real-browser-Tabs-fixture-backed-leader-takeover",
+      "result": "passed"
+    },
+    {
+      "id": "no-warning-journal-entries-or-restart-loop",
+      "result": "passed"
+    }
+  ],
+  "rawEvidence": {
+    "deployment": "/tmp/remotexapp-lease-deployment-aifb5v/result.json",
+    "browser": "/tmp/remotexapp-coordinator-panel-L9aZGT/result.json",
+    "build": "/tmp/remotexapp-coordinator-rc3-build.log"
+  },
+  "qualification": "Actual served kiosk UI tested with owned temporary Mousepad runtimes serially across both endpoints; separate cross-Tab panel fixture exercises browser coordination, not a second server lease test. No existing runtime restart/upgrade. New RC.3 archive and root-owned staging preserve RC.2 rollback. 2992 directory required sudo; the initial unprivileged copy failed before selector changes."
+}

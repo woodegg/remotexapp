@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "local:kate-kwrite-control-discovery-research",
+  "commit": "767f16cdc8059e12dfd12e99e02a9397f0c90218",
+  "startedAt": "2026-09-10T05:42:37Z",
+  "completedAt": "2026-09-10T05:42:45Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8"},
+  "environment": {"kind": "local", "name": "disposable-xvfb-private-dbus-kde-control-probe"},
+  "scenarios": [
+    {"id": "two-kate-two-kwrite-distinct-live-pids-and-service-owners", "result": "passed"},
+    {"id": "visible-process-owned-windows-and-shared-interface-introspection", "result": "passed"},
+    {"id": "unicode-space-file-tokenOpenUrl-actual-editor-readback", "result": "passed"},
+    {"id": "setCursor-and-openInput-unicode-actual-editor-readback", "result": "passed"},
+    {"id": "status-helper-private-payload-bus-matching-revisions-mode0600-no-public-leak", "result": "passed"},
+    {"id": "fixture-files-unchanged-and-own-editor-process-cleanup", "result": "passed"},
+    {"id": "real-kate-kwrite-app-packages-manager-getConnections-lifecycle", "result": "skipped"}
+  ],
+  "details": {
+    "katePackage": "4:23.08.5-0ubuntu3",
+    "kwritePackage": "4:23.08.5-0ubuntu3",
+    "statusHelperCore": "0.6.0-rc.1",
+    "statusHelperCommit": "0e04b050470b91015170111df7ae6c3956f63d80",
+    "probe": "tests/experiments/kde-control/probe.py",
+    "probeSource": "new working-tree research script over the recorded base commit, not a published App Package",
+    "launches": [
+      {"app": "kate", "foregroundPid": 2604359, "service": "org.kde.kate-2604359", "uniqueName": ":1.1"},
+      {"app": "kwrite", "foregroundPid": 2604497, "service": "org.kde.kwrite-2604497", "uniqueName": ":1.23"},
+      {"app": "kate", "foregroundPid": 2604623, "service": "org.kde.kate-2604623", "uniqueName": ":1.37"},
+      {"app": "kwrite", "foregroundPid": 2604754, "service": "org.kde.kwrite-2604754", "uniqueName": ":1.65"}
+    ],
+    "initialDiscoveryCorrection": "Kate --startanon daemonizes and exits its launcher; the successful foreground probe uses --block --startanon. KWrite never detaches and does not accept these Kate flags.",
+    "limitations": [
+      "Research validates installed 23.08.5 applications and existing private status-helper submission, not future versions or unpublished App Packages.",
+      "SetCursor was checked by successful method return; file and openInput contents were independently read back from the editors.",
+      "No UNO-equivalent arbitrary document editing/save contract or Qt action automation was certified.",
+      "App Package lifecycle, Manager getConnections integration, Matchbox and IBus acceptance remain future-train gates."
+    ]
+  }
+}

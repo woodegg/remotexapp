@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "github:34716948986:clipboard-0.10.0",
+  "commit": "732a3cfd890cf3c4fa23b565796217beed6acb40",
+  "startedAt": "2026-09-12T20:03:45Z",
+  "completedAt": "2026-09-12T20:23:59Z",
+  "result": "passed",
+  "toolchain": { "go": "go1.26.8", "node": "v22.22.3" },
+  "environment": { "kind": "github-and-local", "name": "stable-publication" },
+  "artifact": {
+    "name": "remotexapp-0.10.0-linux-amd64.tar.gz",
+    "sha256": "1f60d1e2cf157fc1c4fd4f52059aebf10cb29211e8d9875a7d9236e678605c21"
+  },
+  "scenarios": [
+    { "id": "human-UAT-accepted-CLP-035-through-040", "result": "passed" },
+    { "id": "sanitized-unpublished-evidence-history-no-remote-rewrite", "result": "passed" },
+    { "id": "hosted-Verify-candidate-and-clean-clone-release-ci", "result": "passed" },
+    { "id": "118-SDK-tests-coverage-race-vulnerability-and-sensitive-data-gates", "result": "passed" },
+    { "id": "local-and-hosted-candidate-byte-identity", "result": "passed" },
+    { "id": "exact-archive-synthetic-ABI-and-shipped-apps-clipboard-IME", "result": "passed" },
+    { "id": "exact-archive-documents-upgrade-KDE-and-crash-recovery", "result": "passed" },
+    { "id": "exact-archive-browser-actions-rerun", "result": "passed" },
+    { "id": "three-additional-Firefox-Manager-crash-recovery-repetitions", "result": "passed" },
+    { "id": "disposable-UID-user-home-connections-and-IBus", "result": "passed" },
+    { "id": "annotated-stable-tag-and-independent-formal-download", "result": "passed" }
+  ],
+  "details": {
+    "version": "0.10.0",
+    "sdkVersion": "0.27.3",
+    "apps": "unchanged",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/v0.10.0",
+    "verifyRun": 34715972814,
+    "candidateRun": 34715972943,
+    "releaseRun": 34716948986,
+    "buildOnce": "Local archive, hosted candidate and independently downloaded published archive have the same SHA-256; no rebuild after exact-archive tests.",
+    "initialFailure": {
+      "suite": "run-actions-local-e2e.mjs",
+      "location": "line 89",
+      "observation": "Initial Manager-crash fault injection timed out after 45 seconds waiting for Firefox BiDi session.status ready.",
+      "status": "unexplained-intermittent-failure",
+      "followup": "Unchanged exact suite passed on rerun. A temporary test-only extension passed three consecutive Manager-crash cases; every next action succeeded. Handler, Manager action execution and original action test are unchanged from 0.9.1. No recovery fix or confirmed root cause is claimed.",
+      "logs": ["/tmp/remotexapp-0100-local-exact-e2e.log", "/tmp/remotexapp-0100-actions-retry.log", "/tmp/remotexapp-0100-actions-stress.log"]
+    },
+    "runtimeAdoption": "Manager deployment preserves old pins. Guarded clipboard approvals require a consistency-capable gateway; old runtimes need separately approved upgrade/restart.",
+    "scopeExclusions": ["unrelated sandbox-design edits", "audio integration review package", "forced existing-runtime upgrades"]
+  }
+}

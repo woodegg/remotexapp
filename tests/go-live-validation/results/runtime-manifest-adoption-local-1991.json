@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-28",
+  "scope": "fresh local central-user deployment on port 1991",
+  "artifact": {
+    "version": "0.1.0-rc.15",
+    "commit": "113ef1189384",
+    "buildDate": "2026-08-28T04:21:36Z",
+    "qualification": "working-tree candidate; not an immutable published release"
+  },
+  "deployment": {
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "allowInsecurePublic": true,
+    "runtimeUserIsRoot": false,
+    "previousRelease": "0.1.0-rc.13",
+    "newBackupCreated": false,
+    "installedReleaseTrees": [
+      "0.1.0-rc.15"
+    ]
+  },
+  "verification": {
+    "releaseCheck": "passed",
+    "health": "ok",
+    "readiness": "ready",
+    "journalWarnings": 0,
+    "manifestMode": "0600",
+    "autoRuntime": {
+      "classId": "xfce-desktop",
+      "display": ":2",
+      "framebuffer": "1280x720",
+      "clientResize": false,
+      "restartKeptRuntimeId": true,
+      "restartKeptServerPid": true,
+      "restartKeptVncPid": true,
+      "restartKeptGatewayPid": true
+    },
+    "browserRuntime": {
+      "classId": "mousepad",
+      "browser": "Google Chrome headless via noVNC",
+      "display": ":10",
+      "sdkVersion": "0.12.0",
+      "inputAck": "Local rc15 中文 123",
+      "clipboardReadbackExact": true,
+      "explicitReconnect": "passed",
+      "managerRestartAutomaticReconnect": "passed",
+      "restartKeptServerVncGatewaySessionPids": true,
+      "unsavedStopStatus": 409,
+      "unsavedSessionPreserved": true,
+      "durableShutdownState": "blocked",
+      "forcedCleanupRemovedManifestAndUnits": true
+    },
+    "testResidueRemoved": true,
+    "finalActiveInstances": 1,
+    "finalAttachedClients": 0
+  },
+  "result": "passed"
+}

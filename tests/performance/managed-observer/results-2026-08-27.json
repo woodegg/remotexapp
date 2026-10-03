@@ -1,0 +1,78 @@
+{
+  "experiment": "P09b",
+  "outcome": "accepted",
+  "date": "2026-08-27",
+  "host": "test-host",
+  "status": "Accepted after steady-state measurement, restart/fault injection and interactive input validation",
+  "baseline": {
+    "remoteXAppdSha256": "f821d5621bfdbf9d700398a6fd480e180aea9f25a5ed9f219af877c92355017a",
+    "binaryBytes": 9460570,
+    "windowSeconds": 30,
+    "xdpyinfoExecutions": 6,
+    "gatewayHealthConnects": 6,
+    "registryFsync": 0,
+    "registryRename": 0,
+    "manager": {
+      "averageCpuPercent": 0.05,
+      "pssKiB": 8360,
+      "rssKiB": 9856,
+      "threads": 7,
+      "fileDescriptors": 7
+    }
+  },
+  "candidate": {
+    "remoteXAppdSha256": "b903efc884ed19b0b86c5bfe784612137c6d0104bae41581c8fc81f2568084bb",
+    "binaryBytes": 9488424,
+    "windowSeconds": 30,
+    "sampleWindow": "02:34:43.465170626..02:35:13.469887264",
+    "xdpyinfoExecutions": 0,
+    "gatewayHealthConnects": 0,
+    "registryFsync": 0,
+    "registryRename": 0,
+    "inotifyWatchAdds": 0,
+    "manager": {
+      "averageCpuPercent": 0.0,
+      "pssKiB": 8816,
+      "rssKiB": 10312,
+      "threads": 8,
+      "fileDescriptors": 8
+    },
+    "observer": {
+      "type": "cgroup-v2-inotify",
+      "hostFileDescriptors": 1,
+      "hostGoroutines": 1,
+      "watchDescriptorsPerRuntime": 2,
+      "safetyIntervalSeconds": 300,
+      "safetyJitterPercent": 20
+    }
+  },
+  "faultRecoveryMilliseconds": {
+    "gateway": 1596,
+    "xtigervnc": 642,
+    "gatewayAfterManagerRestart": 631,
+    "explicitPollFallbackGateway": 2840
+  },
+  "restartAdoption": {
+    "runtimeIdUnchanged": true,
+    "registryInodeUnchanged": true,
+    "initialXdpyinfo": 1,
+    "initialGatewayHealthConnect": 1,
+    "watchesAdded": 2,
+    "registryWrites": 0
+  },
+  "interaction": {
+	"userConfirmed": true,
+	"successfulTextRequestsInAcceptedGatewayJournal": 50,
+	"textErrorsInAcceptedGatewayJournal": 0,
+	"clientTraceEventsInAcceptedGatewayJournal": 0,
+    "text": "P09b 中文 input reconnect OK",
+    "clipboardExact": true,
+    "firstServerMilliseconds": 2.671,
+    "secondServerMilliseconds": 1.095,
+    "sdkReconnectMilliseconds": 65.092,
+    "resizeBefore": "780x437",
+    "resizeAfter": "1100x760",
+    "finalRfbState": "connected",
+    "finalInputState": "connected"
+  }
+}

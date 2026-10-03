@@ -1,0 +1,7 @@
+bin/
+/dist/
+/results.sarif
+.runtime/
+*.pptx
+__pycache__/
+*.pyc

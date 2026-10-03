@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "github-release:v0.5.2-rc.1",
+  "commit": "2e0dbbd87629fa034148a83d71f0ccf71fb13aca",
+  "startedAt": "2026-09-04T16:53:50Z",
+  "completedAt": "2026-09-04T16:55:16Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "v22"},
+  "environment": {"kind": "github-release", "name": "woodegg/remotexapp v0.5.2-rc.1"},
+  "artifact": {
+    "name": "remotexapp-0.5.2-rc.1-linux-amd64.tar.gz",
+    "sha256": "41ec9cbd58a09b0306c2bdca7d911a08fff8bc08b0803c6a4f5eb6ef8b04ae35"
+  },
+  "scenarios": [
+    {"id": "candidate-identity-and-bytes", "result": "passed"},
+    {"id": "local-sensitive-data-recovery-check", "result": "passed"},
+    {"id": "published-assets-redownload-and-verification", "result": "passed"}
+  ],
+  "details": {
+    "release": "https://github.com/woodegg/remotexapp/releases/tag/v0.5.2-rc.1",
+    "automatedReleaseRun": "https://github.com/woodegg/remotexapp/actions/runs/33897655130",
+    "automatedReleaseResult": "failed after candidate verification because ripgrep was absent",
+    "recovery": "Published the unchanged candidate only after local fail-closed sensitive-data verification, then redownloaded and reverified all assets",
+    "deploymentAuthorized": false
+  }
+}

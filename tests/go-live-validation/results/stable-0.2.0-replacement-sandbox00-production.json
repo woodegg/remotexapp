@@ -1,0 +1,104 @@
+{
+  "result": "production-activated-uat-pending",
+  "date": "2026-09-01",
+  "activatedAt": "2026-09-01T16:14:23Z",
+  "scope": {
+    "target": "sandbox00",
+    "productionApproved": true,
+    "humanUATAccepted": false,
+    "followersIncluded": false,
+    "productionGatewayTested": false
+  },
+  "candidate": {
+    "version": "0.2.0",
+    "commit": "ca1d0b26bf8fde9a35bdebcaec36ac48a01d604b",
+    "buildDate": "2026-09-01T13:07:44Z",
+    "archiveSha256": "a6f3baae356bd45c5d45fcee3cf937d0295ec4ec3384bc6c1cd757536c901cfd",
+    "releaseManifestValidated": true,
+    "binarySha256Validated": true,
+    "runtimeSourceUnchangedAfterCandidate": true
+  },
+  "activation": {
+    "previousVersion": "0.2.0-rc.5",
+    "previousCommit": "8c03c485adc5",
+    "selector": "releases/0.2.0",
+    "replacementUnitInstalled": true,
+    "unitSha256": "b219ff29292def9293c2ae66bc0c783c91e987acfc313e1b1143cf6a8d964c89",
+    "automaticRc5RestoreArmed": true,
+    "automaticRestoreUsed": false,
+    "managerMainPid": 873991,
+    "managerNRestarts": 0
+  },
+  "runtimeAdoption": {
+    "managedId": "sandbox-desktop",
+    "runtimeId": "xfce-user-desktop-b21da838f33e",
+    "runtimeCreatedAt": "2026-08-31T17:13:04.387528802-04:00",
+    "sessionGeneration": 2,
+    "sessionState": "running",
+    "applicationState": "ready",
+    "identityPreserved": true,
+    "createdAtPreserved": true,
+    "generationPreserved": true,
+    "childPidsPreserved": {
+      "vnc": 779363,
+      "server": 779385,
+      "gateway": 779397,
+      "session": 790876
+    }
+  },
+  "configuration": {
+    "deploymentMode": "central-real-user",
+    "runtimeUser": "sandbox",
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "allowInsecurePublic": true,
+    "consoleEnabled": true,
+    "kioskEnabled": true,
+    "serviceRestartEnabled": false,
+    "documentRoots": [
+      "runtime-user-home",
+      "CloudDrive mount",
+      "MyDrive mount"
+    ]
+  },
+  "productionSmoke": {
+    "health": "ok",
+    "ready": "ready",
+    "templates": 6,
+    "activeInstances": 1,
+    "attachedClients": 0,
+    "rootStatus": 200,
+    "minimalStatus": 200,
+    "kioskStatus": 200,
+    "applicationEnvironmentStatus": 200,
+    "applicationEnvironmentVariables": 47,
+    "applicationEnvironmentValuesRetained": false,
+    "enabledAppPackages": {
+      "edge": "1.0.0",
+      "firefox-esr": "2.0.0",
+      "libreoffice": "3.0.0",
+      "mousepad": "2.0.0",
+      "xfce-desktop": "2.0.0",
+      "xfce-user-desktop": "2.0.0"
+    },
+    "temporaryListeners": 0,
+    "temporaryAppUnits": 0,
+    "temporaryAppProcesses": 0
+  },
+  "rollback": {
+    "retainedVersion": "0.2.0-rc.5",
+    "retainedCommit": "8c03c485adc5",
+    "replacementSelectorCanStartRetainedVersion": true,
+    "verifiedDuringApprovedStaging": true
+  },
+  "releaseGate": {
+    "stb008ProductionActivation": "passed",
+    "stb008Status": "proposed",
+    "remaining": [
+      "Human UAT for Firefox ESR and WebDriver BiDi",
+      "Human UAT for LibreOffice UNO and document lifecycle"
+    ],
+    "uatAcceptanceMustBeExplicit": true,
+    "published": false
+  }
+}

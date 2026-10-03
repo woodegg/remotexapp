@@ -1,0 +1,173 @@
+{
+  "result": "automated-staging-passed",
+  "date": "2026-09-01",
+  "scope": {
+    "target": "sandbox00",
+    "stagingApproved": true,
+    "productionApproved": false,
+    "humanUAT": "pending",
+    "followersIncluded": false,
+    "productionGatewayUsed": false
+  },
+  "candidate": {
+    "version": "0.2.0",
+    "commit": "ca1d0b26bf8fde9a35bdebcaec36ac48a01d604b",
+    "buildDate": "2026-09-01T13:07:44Z",
+    "archiveSha256": "a6f3baae356bd45c5d45fcee3cf937d0295ec4ec3384bc6c1cd757536c901cfd",
+    "releaseManifestValidated": true,
+    "stagedSelectorFree": true
+  },
+  "baseline": {
+    "version": "0.2.0-rc.5",
+    "commit": "8c03c485adc5",
+    "managerMainPid": 749708,
+    "managerNRestarts": 0,
+    "managedId": "sandbox-desktop",
+    "runtimeId": "xfce-user-desktop-b21da838f33e",
+    "runtimeCreatedAt": "2026-08-31T17:13:04.387528802-04:00",
+    "sessionGeneration": 1,
+    "attachedClients": 0,
+    "childPids": {
+      "vnc": 161307,
+      "server": 161314,
+      "gateway": 161320,
+      "session": 207079
+    }
+  },
+  "activation": {
+    "sequence": [
+      "0.2.0-rc.5@8c03c485adc5",
+      "0.2.0@ca1d0b26bf8f",
+      "0.2.0-rc.5@8c03c485adc5"
+    ],
+    "replacementUnitTemporarilyInstalled": true,
+    "candidateManagerMainPid": 770150,
+    "candidateManagerMainPidAfterExplicitRestart": 770757,
+    "managerNRestarts": 0,
+    "runtimeIdentityPreserved": true,
+    "runtimeCreatedAtPreserved": true,
+    "sessionGenerationPreserved": true,
+    "initialChildPidsPreserved": true,
+    "childPidsPreservedAcrossCandidateManagerRestart": true
+  },
+  "surface": {
+    "health": "ok",
+    "ready": "ready",
+    "templates": 6,
+    "rootStatus": 200,
+    "minimalStatus": 200,
+    "kioskStatus": 200,
+    "serviceRestartCapability": false,
+    "applicationEnvironmentStatus": 200,
+    "applicationEnvironmentVariables": 47,
+    "applicationEnvironmentValuesRetained": false
+  },
+  "appE2E": {
+    "mousepad": {
+      "runtimeId": "mousepad-1f7494f7a39a",
+      "visibleReadiness": true,
+      "forceCleanup": true
+    },
+    "edge": {
+      "runtimeId": "edge-7fb4a046e9bc",
+      "controlProtocol": "cdp",
+      "controlPort": 21000,
+      "browserGetVersion": true,
+      "singletonReuse": true,
+      "forceCleanup": true
+    },
+    "firefox": {
+      "runtimeId": "firefox-esr-077faae36613",
+      "controlProtocol": "webdriver-bidi",
+      "controlPort": 21000,
+      "sessionStatus": true,
+      "forceCleanup": true
+    },
+    "libreoffice": {
+      "runtimeId": "libreoffice-84ca0606b9c1",
+      "controlProtocol": "libreoffice-uno",
+      "controlPort": 21000,
+      "requestedDocumentActive": true,
+      "documentUnchangedAfterForceStop": true,
+      "documentLockRemoved": true,
+      "forceCleanup": true
+    },
+    "sequentialControlPortReuseExpected": true,
+    "runtimeResidue": false,
+    "listenerResidue": false,
+    "processResidue": false,
+    "realSDKBrowserRepeated": false,
+    "realSDKBrowserReason": "sandbox00 has no Chrome or Chromium; the exact artifact passed the complete local Chrome SDK gate"
+  },
+  "issue5": {
+    "logoutProtocol": "org.xfce.Session.Manager.Logout(false,false)",
+    "logoutObserved": "stopped/exited",
+    "fault": "stopped the exact managed gateway transient unit",
+    "gatewayPidBefore": 161320,
+    "gatewayPidAfter": 779397,
+    "managerMainPidPreserved": 770757,
+    "managerNRestarts": 0,
+    "sameRuntimeIdentity": true,
+    "sameRuntimeCreatedAt": true,
+    "singleManifest": true,
+    "recoveredStatusNormalizedToStopped": true,
+    "generationBeforeRelaunch": 1,
+    "generationAfterRelaunch": 2,
+    "relaunchReady": true
+  },
+  "rollback": {
+    "replacementSelectorUsed": true,
+    "selectedVersion": "0.2.0-rc.5",
+    "selectedCommit": "8c03c485adc5",
+    "originalUnitRestored": true,
+    "originalUnitSha256": "406146feea38875c75d06599991a9ca6476b7a8914a283ab81a440e32de90dba",
+    "runtimeIdentityPreserved": true,
+    "runtimeCreatedAtPreserved": true,
+    "sessionGeneration": 2,
+    "childPidsPreserved": {
+      "vnc": 779363,
+      "server": 779385,
+      "gateway": 779397,
+      "session": 790876
+    },
+    "managerMainPid": 791587,
+    "managerNRestarts": 0
+  },
+  "finalState": {
+    "selectedVersion": "0.2.0-rc.5",
+    "selectedCommit": "8c03c485adc5",
+    "candidateStagedInactive": true,
+    "invalidatedCandidateRetainedWithCommitQualifiedName": true,
+    "health": "ok",
+    "templates": 6,
+    "activeInstances": 1,
+    "attachedClients": 0,
+    "managedRuntimeId": "xfce-user-desktop-b21da838f33e",
+    "managedSessionGeneration": 2,
+    "managedSessionState": "running",
+    "managedApplicationState": "ready",
+    "temporaryListeners": 0,
+    "temporaryAppUnits": 0,
+    "temporaryAppProcesses": 0
+  },
+  "observations": {
+    "managerErrors": 0,
+    "containerSystemdWarnings": [
+      "one ignored Invalid argument while systemd removed the stopped Edge transient cgroup; the unit, processes, runtime and port were all absent afterward"
+    ],
+    "harnessCorrections": [
+      "the minimal Node RFB client must omit an unsolicited WebSocket subprotocol",
+      "a control port may be reused after the previous runtime has fully stopped",
+      "gateway recovery normalizes an exited application status to stopped"
+    ]
+  },
+  "releaseGate": {
+    "stb008AutomatedPortion": "passed",
+    "stb008Status": "proposed",
+    "remaining": [
+      "explicit sandbox00 production approval",
+      "Human UAT for Firefox ESR/BiDi and LibreOffice/UNO/document lifecycle"
+    ],
+    "published": false
+  }
+}

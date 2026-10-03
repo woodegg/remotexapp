@@ -1,0 +1,156 @@
+{
+  "result": "passed",
+  "date": "2026-09-01",
+  "candidate": {
+    "version": "0.2.0",
+    "commit": "7430689f05cb25c1e2d01ee5a202c28281db0c2f",
+    "buildDate": "2026-09-01T07:12:48Z",
+    "archiveSha256": "8c6574c0abab565f3b08bbcd305522ed15d0fa64924c4cec689e3d65a589238c",
+    "libexecSelector": "releases/0.2.0",
+    "shareSelector": "releases/0.2.0"
+  },
+  "deployment": {
+    "mode": "central-real-user",
+    "user": "ubuntu",
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "allowInsecurePublic": true,
+    "temporaryWideTestOnly": true,
+    "serviceRestartCapability": false
+  },
+  "upgradeRollback": {
+    "sequence": [
+      "0.2.0-rc.10@7edefeec6ba5",
+      "0.2.0@7430689f05cb",
+      "0.2.0-rc.10@7edefeec6ba5",
+      "0.2.0@7430689f05cb"
+    ],
+    "managerPids": [
+      2241094,
+      2336932,
+      2337034,
+      2337126
+    ],
+    "runtimeIdentityPreserved": true,
+    "sessionGenerationPreserved": true,
+    "childUnitPidsPreserved": true,
+    "rollbackHealthVerified": true,
+    "finalHealthVerified": true
+  },
+  "shippedAppE2E": {
+    "isolatedManager": "127.0.0.1:21991",
+    "apps": [
+      "edge",
+      "firefox-esr",
+      "libreoffice",
+      "mousepad"
+    ],
+    "productionRuntimeApps": [
+      "xfce-desktop",
+      "xfce-user-desktop"
+    ],
+    "checks": [
+      "input",
+      "resize",
+      "readiness",
+      "generic-status",
+      "control-probes",
+      "exit",
+      "shutdown",
+      "restart-adoption",
+      "profile-persistence",
+      "cleanup"
+    ],
+    "mousepadUnsavedStopBlocked": true,
+    "mousepadForcedCleanup": true,
+    "edgeCdp": true,
+    "edgeDetachedExpiry": true,
+    "firefoxWebDriverBidi": true,
+    "libreofficeUno": true,
+    "libreofficeUnsavedSourceUnchanged": true,
+    "allTestRuntimesCleaned": true
+  },
+  "browserSDK": {
+    "userHomeReconnectMs": 74.29226500000004,
+    "fixedXfceReconnectMs": 71.05014500000016,
+    "postRecoveryUserHomeReconnectMs": 64.54010999999991,
+    "fixed1280x720ScaleOnly": true,
+    "explicitReconnect": true,
+    "automaticReconnectAcrossManagerRestart": true,
+    "finiteReconnectAttempts": 2,
+    "finiteReconnectExhaustedEvents": 1,
+    "unlimitedReconnectAttemptsObserved": 5,
+    "unlimitedReconnectExhaustedEvents": 0,
+    "childPidsPreservedAcrossManagerRestart": true,
+    "reversePrefixAndConsoleModes": "passed by candidate release tests over byte-identical accepted rc.10 web assets"
+  },
+  "logoutAndRelaunch": {
+    "managedId": "ubuntu-desktop",
+    "runtimeId": "xfce-user-desktop-2b1e40bfa08e",
+    "logoutApplicationState": "exited",
+    "logoutSessionState": "stopped",
+    "generationBeforeRelaunch": 1,
+    "generationAfterRelaunch": 2,
+    "relaunchReady": true
+  },
+  "issue4": {
+    "fixture": {
+      "display": ":13",
+      "rfbPort": 5913,
+      "gatewayPort": 39013
+    },
+    "fault": "removed the authoritative anonymous manifest while exact fixed-display units survived",
+    "oldRuntimeId": "xfce-issue4-d60d225ccc27",
+    "newRuntimeId": "xfce-issue4-389c8d3bf2c7",
+    "oldUnitsStopped": true,
+    "staleRuntimeRemoved": true,
+    "profilePreserved": true,
+    "newManifestCreated": true,
+    "newUnitsHealthy": true,
+    "managerReady": true,
+    "restartLoop": false
+  },
+  "issue5": {
+    "fault": "stopped the gateway of a managed runtime after clean XFCE logout",
+    "managedId": "ubuntu-desktop",
+    "runtimeId": "xfce-user-desktop-2b1e40bfa08e",
+    "createdAt": "2026-09-01T00:36:03.376660802-04:00",
+    "sameRuntimeIdentity": true,
+    "managerPidPreserved": true,
+    "managerNRestarts": 0,
+    "activeManifestCount": 1,
+    "baseUnitsRecreated": true
+  },
+  "finalState": {
+    "serviceActive": true,
+    "serviceMainPid": 2343869,
+    "serviceNRestarts": 0,
+    "warningJournalEntries": 0,
+    "health": "ok",
+    "templates": 6,
+    "activeInstances": 2,
+    "attachedClients": 0,
+    "managedUserHome": {
+      "runtimeId": "xfce-user-desktop-2b1e40bfa08e",
+      "sessionGeneration": 2,
+      "sessionState": "running",
+      "applicationState": "ready"
+    },
+    "anonymousFixedXfce": {
+      "runtimeId": "xfce-desktop-9d44b8f76981",
+      "sessionGeneration": 1,
+      "sessionState": "stopped",
+      "applicationState": "stopped"
+    },
+    "temporaryListenersReleased": true,
+    "temporaryUnitsRemoved": true,
+    "temporaryBrowsersRemoved": true
+  },
+  "humanUAT": {
+    "unifiedConsole": "accepted 2026-09-01",
+    "firefox": "pending",
+    "libreoffice": "pending"
+  },
+  "sandboxChanged": false,
+  "published": false
+}

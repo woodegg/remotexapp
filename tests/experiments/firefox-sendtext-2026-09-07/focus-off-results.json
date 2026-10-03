@@ -1,0 +1,134 @@
+[
+  {
+    "field": "plain",
+    "text": "AsciiProbe",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 11,
+        "value": "AsciiProbe",
+        "serverMs": 0.641,
+        "roundTripMs": 1.299999713897705,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "3a09dd24-5662-437f-a8f0-35f4200f50bc",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"plain\",\"value\":\"xAsciiProbe\"}"
+      }
+    }
+  },
+  {
+    "field": "plain",
+    "text": "中文测试",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 12,
+        "value": "中文测试",
+        "serverMs": 1.142,
+        "roundTripMs": 2.299999713897705,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "3a09dd24-5662-437f-a8f0-35f4200f50bc",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"plain\",\"value\":\"xAsciiProbe中文测试\"}"
+      }
+    }
+  },
+  {
+    "field": "area",
+    "text": "AsciiProbe",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 13,
+        "value": "AsciiProbe",
+        "serverMs": 0.892,
+        "roundTripMs": 1.5,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "3a09dd24-5662-437f-a8f0-35f4200f50bc",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"area\",\"value\":\"xAsciiProbe\"}"
+      }
+    }
+  },
+  {
+    "field": "area",
+    "text": "中文测试",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 14,
+        "value": "中文测试",
+        "serverMs": 1.52,
+        "roundTripMs": 2.6999998092651367,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "3a09dd24-5662-437f-a8f0-35f4200f50bc",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"area\",\"value\":\"xAsciiProbe中文测试\"}"
+      }
+    }
+  },
+  {
+    "field": "edit",
+    "text": "AsciiProbe",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 15,
+        "value": "AsciiProbe",
+        "serverMs": 0.489,
+        "roundTripMs": 0.8999996185302734,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "3a09dd24-5662-437f-a8f0-35f4200f50bc",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"edit\",\"value\":\"xAsciiProbe\"}"
+      }
+    }
+  },
+  {
+    "field": "edit",
+    "text": "中文测试",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 16,
+        "value": "中文测试",
+        "serverMs": 0.553,
+        "roundTripMs": 1,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "3a09dd24-5662-437f-a8f0-35f4200f50bc",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"edit\",\"value\":\"xAsciiProbe中文测试\"}"
+      }
+    }
+  }
+]

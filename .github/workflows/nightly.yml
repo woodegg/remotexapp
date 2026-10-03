@@ -1,0 +1,41 @@
+name: Nightly reliability
+
+on:
+  schedule:
+    - cron: "13 17 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-reliability
+  cancel-in-progress: true
+
+jobs:
+  reliability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.26.8"
+          cache: true
+          cache-dependency-path: go.sum
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22.x"
+      - name: Install native and web build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libx11-dev libxtst-dev libxdo3 ripgrep \
+            xvfb xclip dbus-x11 xfce4-clipman
+          npm install --global esbuild@0.20.1
+      - name: Run repeat and fuzz gates
+        env:
+          SOAK_COUNT: "20"
+          FUZZ_TIME: 30s
+        run: make nightly-portable

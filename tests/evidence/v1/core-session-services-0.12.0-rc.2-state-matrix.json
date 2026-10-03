@@ -1,0 +1,321 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "core-session-services-0.12.0-rc.2-repaired-dynamic-state-matrix",
+  "commit": "b7f4f98c7204a9468edef24204de1ed7f3d7a191",
+  "startedAt": "2026-09-14T04:50:05.178Z",
+  "completedAt": "2026-09-14T05:03:47.395Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "22.22.3"
+  },
+  "environment": {
+    "kind": "local-Ubuntu-disposable-UID-real-applications",
+    "name": "loopback-21996-isolated-managers"
+  },
+  "artifact": {
+    "name": "remotexapp-0.12.0-rc.2-linux-amd64.tar.gz",
+    "sha256": "d47210f28c62865ad584a9afe8a0c4cbb024b8cb6e8d148011a1a4175dfced7d"
+  },
+  "scenarios": [
+    {
+      "id": "main-mousepad",
+      "result": "passed",
+      "passedCheckpoints": 34,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 270
+    },
+    {
+      "id": "main-libreoffice",
+      "result": "passed",
+      "passedCheckpoints": 34,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 270
+    },
+    {
+      "id": "main-kate",
+      "result": "passed",
+      "passedCheckpoints": 33,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 260
+    },
+    {
+      "id": "main-kwrite",
+      "result": "passed",
+      "passedCheckpoints": 33,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 260
+    },
+    {
+      "id": "main-firefox-esr",
+      "result": "passed",
+      "passedCheckpoints": 37,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 280
+    },
+    {
+      "id": "main-edge",
+      "result": "passed",
+      "passedCheckpoints": 35,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 280
+    },
+    {
+      "id": "main-xfce-user-desktop",
+      "result": "passed",
+      "passedCheckpoints": 33,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 270
+    },
+    {
+      "id": "interaction-mousepad",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "interaction-libreoffice",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "interaction-kate",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "interaction-kwrite",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "interaction-firefox-esr",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "interaction-edge",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "interaction-xfce-user-desktop",
+      "result": "passed",
+      "passedCheckpoints": 7,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 10
+    },
+    {
+      "id": "transport-mousepad",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 15
+    },
+    {
+      "id": "transport-libreoffice",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 15
+    },
+    {
+      "id": "transport-kate",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 15
+    },
+    {
+      "id": "transport-kwrite",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 15
+    },
+    {
+      "id": "transport-firefox-esr",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 15
+    },
+    {
+      "id": "transport-edge",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 15
+    },
+    {
+      "id": "transport-xfce-user-desktop",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 15
+    },
+    {
+      "id": "managed-edge-edge",
+      "result": "passed",
+      "passedCheckpoints": 6,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 15
+    },
+    {
+      "id": "borrowed-bus-xfce-user-desktop",
+      "result": "passed",
+      "passedCheckpoints": 3,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 15
+    },
+    {
+      "id": "shutdown-outcomes-mousepad",
+      "result": "passed",
+      "passedCheckpoints": 4,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 20
+    },
+    {
+      "id": "shutdown-outcomes-libreoffice",
+      "result": "passed",
+      "passedCheckpoints": 4,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 20
+    },
+    {
+      "id": "shutdown-outcomes-kate",
+      "result": "passed",
+      "passedCheckpoints": 4,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 20
+    },
+    {
+      "id": "shutdown-outcomes-kwrite",
+      "result": "passed",
+      "passedCheckpoints": 4,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 20
+    },
+    {
+      "id": "shutdown-outcomes-firefox-esr",
+      "result": "passed",
+      "passedCheckpoints": 4,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 20
+    },
+    {
+      "id": "shutdown-outcomes-edge",
+      "result": "passed",
+      "passedCheckpoints": 4,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 20
+    },
+    {
+      "id": "shutdown-outcomes-xfce-user-desktop",
+      "result": "passed",
+      "passedCheckpoints": 4,
+      "failedCheckpoints": 0,
+      "recordedHTTPAssertions": 20
+    }
+  ],
+  "details": {
+    "requirements": "SVC-001 through SVC-010; bwrap, Docker and audio excluded",
+    "supersedesFailedGate": "core-session-services-0.12.0-rc.1-state-matrix.json",
+    "sourceState": "Dirty working-tree candidate; not a clean committed/tagged release. No deployment/publication is evidenced by this file.",
+    "passedCheckpoints": 361,
+    "recordedHTTPAssertions": 2235,
+    "failedCheckpoints": 0,
+    "fixedFindings": [
+      "SVC-F01 failed-session resurrection and offline failure",
+      "SVC-F02 interrupted-upgrade startup replacement",
+      "SVC-F03 KDE canonical App versus Driver identity",
+      "SVC-F04 duplicate on-attach restart and stale generation",
+      "SVC-F05 orphan shutdown-hook descendants and cross-Manager overlap",
+      "SVC-F06 stale managed state kills surviving App on transport loss",
+      "SVC-F07 managed recovery reuses generation",
+      "SVC-F08 repeated TERM interrupts supervisor cleanup",
+      "SVC-F09 stale global X endpoints after abnormal VNC exit"
+    ],
+    "instrumentation": [
+      "Real shipped applications and App scripts; outer startup/shutdown barriers, test patch versions, inert old Core helper marker and XFCE display relocation.",
+      "Managed Edge comparison changes only vacancy action to stop-session to satisfy managed eligibility; six-hour timeout does not expire.",
+      "Borrowed-bus test pauses/resumes only the disposable account's validated bus PID; never the build user's bus.",
+      "Main matrix covers startup, running, TERM/KILL adoption, concurrent restart/upgrade, stopping/launching upgrade interruption, service faults, shutdown blocking/enforcement, offline supervisor failure, Viewer reconnect rejection and explicit recovery."
+    ],
+    "finalInstallableArtifact": {
+      "name": "remotexapp-0.12.0-rc.2-linux-amd64.tar.gz",
+      "sha256": "eb97b7941be80035f00e58f417da5f5c7dc161dcdb096c20a0fedcd62835a98f",
+      "continuity": "All four Core binaries, runtime helpers and App scripts are byte-identical to matrix archive A. Edge/Kate/KWrite patch versions become 2.0.1 and Firefox 3.0.1 to avoid overwriting immutable rc.1 packages after manifest formatting cleanup. The matrix overwrites patch versions with 100+revision; serialized normalized test manifests are identical. Two changed version assertions live in excluded App tests. Exact-package Viewer suites separately test final installable archive B; do not describe these matrices as byte-identical B archive tests."
+    },
+    "failureDisposition": [
+      "The historical rc.1 failures remain recorded, not reclassified as expected behavior.",
+      "An early repair run waited a fixed 150 ms for a test shutdown barrier and aborted. The harness now waits for the actual entered marker; the full final run passes.",
+      "Intermediate managed XFCE transport run exposed stale X ownership after VNC death. Added validated ownership cleanup and authoritative failure ordering; all final transport runs pass.",
+      "Short-deadline race-test subprocesses use GORACE=atexit_sleep_ms=0 to remove instrumentation's one-second exit sleep; production deadlines and performance thresholds are unchanged.",
+      "Supervisor fixture cleanup now asserts actual child exit. 128 positively identified orphaned test fixtures from deleted temporary directories were terminated; real Apps and files were not removed.",
+      "Harness display search now remains within supported 90-99; final matrices had already selected supported displays."
+    ],
+    "limits": [
+      "361 checkpoints include related assertions, not 361 independent exhaustive interleavings.",
+      "No full OS reboot, disk-full or power-loss durability experiment, long-duration load, every unsaved-dialog variant, or full six-hour/48-hour wall-clock wait.",
+      "Activation/input WebSockets in the state matrix do not replace real rendered RFB Viewer and native-IME tests.",
+      "Exact-package E2E, performance, actual deployment and human UAT are separate gates."
+    ],
+    "rawEvidence": [
+      {
+        "mode": "main",
+        "path": "/var/tmp/remotexapp-svc-matrix.FuGd85/evidence/result.json",
+        "sha256": "b1f5f2a1ca83813e602e0150b493eb2bee2d9b1a4d7a4bb6a97224e8353741e6",
+        "startedAt": "2026-09-14T04:53:22.094Z",
+        "completedAt": "2026-09-14T04:59:10.876Z"
+      },
+      {
+        "mode": "interaction",
+        "path": "/var/tmp/remotexapp-svc-matrix.zoyusg/evidence/result.json",
+        "sha256": "401085e1c759645a3feaf1fe5ac2fcfb3354261b3d2757095b3df3e15c59d335",
+        "startedAt": "2026-09-14T04:59:26.866Z",
+        "completedAt": "2026-09-14T05:00:49.643Z"
+      },
+      {
+        "mode": "transport",
+        "path": "/var/tmp/remotexapp-svc-matrix.M7bjxt/evidence/result.json",
+        "sha256": "029f7fbe6b99f4a28fa384a22b4b7d6b3b688d22ca0d9b715b3e4f776ac666d1",
+        "startedAt": "2026-09-14T05:01:05.800Z",
+        "completedAt": "2026-09-14T05:02:26.999Z"
+      },
+      {
+        "mode": "managed-edge",
+        "path": "/var/tmp/remotexapp-svc-matrix.V2XNJr/evidence/result.json",
+        "sha256": "d24232006c111cf74b5fe9961377cdd305eb881b1e6eddccc313fdc79f900d04",
+        "startedAt": "2026-09-14T05:02:42.998Z",
+        "completedAt": "2026-09-14T05:02:52.317Z"
+      },
+      {
+        "mode": "borrowed-bus",
+        "path": "/var/tmp/remotexapp-svc-matrix.AdJCEJ/evidence/result.json",
+        "sha256": "b4c97477cc39390630b19686e84d0802aabc394f4142d2689041b6e87a18da81",
+        "startedAt": "2026-09-14T05:03:08.246Z",
+        "completedAt": "2026-09-14T05:03:47.395Z"
+      },
+      {
+        "mode": "shutdown-outcomes",
+        "path": "/var/tmp/remotexapp-svc-matrix.z351ni/evidence/result.json",
+        "sha256": "a09e986d5f26f856c1bb9d712c53e2b7931a29ecaf3a0d4e54b1f0f598d2e394",
+        "startedAt": "2026-09-14T04:50:05.178Z",
+        "completedAt": "2026-09-14T04:53:06.164Z"
+      }
+    ]
+  }
+}

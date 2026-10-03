@@ -1,0 +1,225 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "candidate",
+  "runId": "idle-lease-0.13.0-rc.2-isolated-qualification",
+  "commit": "41665eaee8aeb7c1265d41f3ae0114094c3bd9a2",
+  "startedAt": "2026-09-18T14:10:00Z",
+  "completedAt": "2026-09-18T14:17:34Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "local-disposable-account",
+    "name": "isolated loopback 21997, separate UID"
+  },
+  "artifact": {
+    "name": "remotexapp-0.13.0-rc.2-linux-amd64.tar.gz",
+    "sha256": "1449f80f830bd42c46634561a3214a7ac95c9bcd3bae9366c025dc8e7aaf6ffe"
+  },
+  "source": {
+    "dirty": true,
+    "note": "Uncommitted local UAT candidate based on the commit field; not a clean or published Git revision."
+  },
+  "components": {
+    "core": "0.13.0-rc.2",
+    "sdk": "0.29.0",
+    "managerSha256": "e4280489731b37670e5de0f06e298420e09442c721d8327e078002645271efdf",
+    "sdkSha256": "d8f4ca3826e3c9a0296802cd3d60e804acf64de49293fa3fa92985b967a847c2"
+  },
+  "scenarios": [
+    {
+      "id": "make-check-Go-SDK-console-vet-dependency-sensitive-data-gates",
+      "result": "passed"
+    },
+    {
+      "id": "full-Go-race-suite",
+      "result": "passed"
+    },
+    {
+      "id": "non-regressing-Go-and-SDK-coverage-floors",
+      "result": "passed"
+    },
+    {
+      "id": "govulncheck-no-known-reachable-vulnerabilities",
+      "result": "passed"
+    },
+    {
+      "id": "immutable-staging-selection-and-rollback-tests",
+      "result": "passed"
+    },
+    {
+      "id": "fresh-Driver-terminal-status-overrides-ready-cache",
+      "result": "passed"
+    },
+    {
+      "id": "timer-runtime-generation-and-deadline-race-fences",
+      "result": "passed"
+    },
+    {
+      "id": "SDK-scoping-privacy-bounds-release-and-stale-response-tests",
+      "result": "passed"
+    },
+    {
+      "id": "mousepad: no-Viewer-renewal-survives-timeout",
+      "result": "passed"
+    },
+    {
+      "id": "Manager-adoption-keeps-generation-and-renewal",
+      "result": "passed"
+    },
+    {
+      "id": "mousepad: expiry-stopped-no-resurrection",
+      "result": "passed"
+    },
+    {
+      "id": "libreoffice: no-Viewer-renewal-survives-timeout",
+      "result": "passed"
+    },
+    {
+      "id": "libreoffice: expiry-stopped-no-resurrection",
+      "result": "passed"
+    },
+    {
+      "id": "kate: no-Viewer-renewal-survives-timeout",
+      "result": "passed"
+    },
+    {
+      "id": "kate: expiry-stopped-no-resurrection",
+      "result": "passed"
+    },
+    {
+      "id": "kwrite: no-Viewer-renewal-survives-timeout",
+      "result": "passed"
+    },
+    {
+      "id": "kwrite: expiry-stopped-no-resurrection",
+      "result": "passed"
+    },
+    {
+      "id": "edge: renewal-does-not-start-on-attach",
+      "result": "passed"
+    },
+    {
+      "id": "edge: no-Viewer-renewal-survives-timeout",
+      "result": "passed"
+    },
+    {
+      "id": "edge: expiry-stopped-no-resurrection",
+      "result": "passed"
+    },
+    {
+      "id": "firefox-esr: renewal-does-not-start-on-attach",
+      "result": "passed"
+    },
+    {
+      "id": "firefox-esr: no-Viewer-renewal-survives-timeout",
+      "result": "passed"
+    },
+    {
+      "id": "firefox-esr: expiry-stopped-no-resurrection",
+      "result": "passed"
+    },
+    {
+      "id": "lightview: renewal-does-not-start-on-attach",
+      "result": "passed"
+    },
+    {
+      "id": "lightview: no-Viewer-renewal-survives-timeout",
+      "result": "passed"
+    },
+    {
+      "id": "lightview: expiry-stopped-no-resurrection",
+      "result": "passed"
+    },
+    {
+      "id": "xfce-user-desktop: renewal-does-not-start-on-attach",
+      "result": "passed"
+    },
+    {
+      "id": "xfce-user-desktop: no-Viewer-renewal-survives-timeout",
+      "result": "passed"
+    },
+    {
+      "id": "xfce-user-desktop: expiry-server-ready-no-resurrection",
+      "result": "passed"
+    },
+    {
+      "id": "XFCE-relogin-new-generation-and-logout-wins-over-lease",
+      "result": "passed"
+    },
+    {
+      "id": "real-browser-frozen-leader-awake-Tab-takeover",
+      "result": "passed"
+    },
+    {
+      "id": "release-one-Tab-other-Tab-keeps-App",
+      "result": "passed"
+    },
+    {
+      "id": "last-Tab-release-expires-App",
+      "result": "passed"
+    },
+    {
+      "id": "all-Tabs-frozen-expiry-resume-does-not-revive",
+      "result": "passed"
+    },
+    {
+      "id": "runtime-restart-invalidates-old-generation",
+      "result": "passed"
+    },
+    {
+      "id": "upgrade-new-pin-invalidates-old-generation",
+      "result": "passed"
+    },
+    {
+      "id": "explicit-force-stop-wins-over-granted-lease",
+      "result": "passed"
+    },
+    {
+      "id": "blocked-shutdown-rejects-lease-host-force-survives-adoption",
+      "result": "passed"
+    },
+    {
+      "id": "natural-App-exit-wins-over-continuing-renewals",
+      "result": "passed"
+    },
+    {
+      "id": "managed-desired-stop-wins-over-granted-lease",
+      "result": "passed"
+    }
+  ],
+  "measurements": {
+    "sdkUnitTests": 145,
+    "sdkCoverage": {
+      "lines": 87.96,
+      "branches": 79.81,
+      "functions": 83.55
+    },
+    "coordinatorLineCoverage": 98.69,
+    "liveScenarios": 32
+  },
+  "fixtures": [
+    "Eight prefixed App packages, unchanged shipped App scripts except declared Mousepad shutdown-refusal wrapper.",
+    "12-second test vacancy policy; relocated XFCE fixed display; separate account home and session bus.",
+    "Managed Mousepad comparison uses shared/persistent workspace and stop-session; test-only versions exercise upgrade."
+  ],
+  "limitations": [
+    "Human UAT and GitHub publication remain pending; no sandbox deployment.",
+    "All browser Tabs suspended can lose a lease. Silent peer retention is five minutes; very short deadlines may not survive six-second failover/network delays.",
+    "Local WebKit tests use the build-container sandbox exception on the disposable account only; normal production WebKit sandbox support is not certified by this run.",
+    "Cross-Manager concurrent host X-display allocation is not fixed by this train. Live suites must be serialized."
+  ],
+  "priorAttemptDispositions": [
+    "Initial live harness faults (restrictive installation umask, bootstrap lease during first browser startup, user-home requiring managed intent, occupied fixed display, managed persistent workspace) were corrected; the final full run passed.",
+    "Local browser harness had an escaped-selector syntax error; corrected in its separate final deployment gate.",
+    "Concurrent live Managers reproduced display 17 allocation contention, confirmed by TigerVNC journal; separate local qualification is serialized.",
+    "RC.1 qualification was superseded/aborted after the fresh Driver-status guard produced immutable RC.2; no RC.1 failed or aborted run is counted as final acceptance."
+  ],
+  "rawEvidence": {
+    "result": "/tmp/remotexapp-lease-e2e-M8PdbF/result.json",
+    "log": "/tmp/remotexapp-idle-rc2-e2e.log"
+  },
+  "cleanup": "Owned App units stopped; disposable-account linger disabled and user terminated. Evidence retained."
+}

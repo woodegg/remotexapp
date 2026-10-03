@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "github-actions:34431094343",
+  "commit": "af20cfa56b1e0386aea45f8a4250935765a31f96",
+  "startedAt": "2026-09-10T02:51:56Z",
+  "completedAt": "2026-09-10T02:53:30Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8"},
+  "environment": {"kind": "github-release", "name": "woodegg/remotexapp"},
+  "artifact": {
+    "name": "remotexapp-0.5.4-linux-amd64.tar.gz",
+    "sha256": "15ab50b8127068998984a931ab532a624cbd9ee24918d5910a027125e010e63e"
+  },
+  "scenarios": [
+    {"id": "runtime-source-sdk-and-apps-unchanged-from-accepted-rc1", "result": "passed"},
+    {"id": "hosted-verify-34430589463", "result": "passed"},
+    {"id": "hosted-stable-candidate-34430589081", "result": "passed"},
+    {"id": "stable-exact-archive-synthetic-abi-and-four-app-e2e", "result": "passed"},
+    {"id": "annotated-tag-matches-version-and-candidate-commit", "result": "passed"},
+    {"id": "publish-candidate-without-rebuild", "result": "passed"},
+    {"id": "independent-download-checksum-vcs-and-sensitive-data", "result": "passed"},
+    {"id": "published-archive-byte-identical-to-tested-stable-candidate", "result": "passed"},
+    {"id": "normal-latest-non-draft-non-prerelease", "result": "passed"}
+  ],
+  "details": {
+    "tag": "v0.5.4",
+    "release": "https://github.com/woodegg/remotexapp/releases/tag/v0.5.4",
+    "candidateRun": "https://github.com/woodegg/remotexapp/actions/runs/34430589081",
+    "releaseRun": "https://github.com/woodegg/remotexapp/actions/runs/34431094343",
+    "sdkVersion": "0.22.0",
+    "appPackagesChanged": false,
+    "liveE2E": {
+      "apps": ["mousepad", "edge", "firefox-esr", "libreoffice"],
+      "checks": ["input", "resize", "readiness", "generic-status", "control-probes", "clipboard-rebound", "prompt-layout", "exit", "shutdown", "restart-adoption", "profile-persistence", "cleanup"],
+      "log": "clp054-stable-e2e.log",
+      "userHomeIncluded": false
+    },
+    "deploymentPerformed": false,
+    "local1991And2992": "accepted 0.5.4-rc.1 remains deployed; formal alignment requires separate approval",
+    "sandboxes": "not accessed or deployed"
+  }
+}

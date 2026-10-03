@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "label": "libreoffice-driver-v1.1-sandbox",
+  "collectedAt": "2026-08-28",
+  "candidate": {
+    "templateId": "libreoffice",
+    "driverVersion": "1.1.0",
+    "activation": "immediate",
+    "displayMode": "dynamic",
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 10,
+    "allowClientResize": true
+  },
+  "firstRunStatusTimelineMs": {
+    "stopped": 141,
+    "starting": 684,
+    "preparingProfile": 777,
+    "startingInput": 859,
+    "startingLibreOffice": 1358,
+    "loadingDocument": 3211,
+    "ready": 9609
+  },
+  "immediateCreateToReadySeconds": [9.661, 8.950, 9.276, 9.260, 7.952],
+  "immediateCreateToReadyAverageSeconds": 9.0198,
+  "priorCreatePlusAttachAverageSeconds": 8.9154,
+  "timingInterpretation": "The generated full profile seed produced no measurable launch improvement; activation modes make the two averages observational rather than a controlled performance comparison.",
+  "startupSafety": {
+    "staleLockRemovedBeforeLaunch": true,
+    "unremovableLockRejectedBeforeApplication": true,
+    "missingFileAfterCreateRejectedBeforeApplication": true,
+    "unreadableFileAfterCreateRejectedBeforeApplication": true,
+    "exactDocumentUnoReadiness": true
+  },
+  "shutdownSafety": {
+    "unsavedUnoModificationCreated": true,
+    "normalStopUsedDedicatedDestructiveHook": true,
+    "sourceDocumentHashUnchanged": true,
+    "documentLockRemoved": true,
+    "applicationProcessesRemoved": true,
+    "controlPortReleased": true,
+    "averageStopSeconds": 0.353
+  },
+  "formalRepositoryDifference": "The repository retains only portable setup-complete and locale seed settings, not the generated host-specific full profile, and uses driverVersion 2.0.0 because destructive normal stop is an incompatible lifecycle contract.",
+  "cleanup": {
+    "candidateLibreOfficeInstancesRemoved": true,
+    "candidateLibreOfficeProcessesRemoved": true,
+    "onlyExistingXfceRuntimeActive": true
+  },
+  "result": "pass-formalization-candidate"
+}

@@ -1,0 +1,179 @@
+{
+  "result": "passed",
+  "date": "2026-09-01",
+  "candidate": {
+    "version": "0.2.0",
+    "commit": "ca1d0b26bf8fde9a35bdebcaec36ac48a01d604b",
+    "buildDate": "2026-09-01T13:07:44Z",
+    "archiveSha256": "a6f3baae356bd45c5d45fcee3cf937d0295ec4ec3384bc6c1cd757536c901cfd",
+    "reproducibleArchive": true,
+    "libexecSelector": "releases/0.2.0",
+    "shareSelector": "releases/0.2.0"
+  },
+  "replacementReason": {
+    "invalidatedCommit": "7430689f05cb25c1e2d01ee5a202c28281db0c2f",
+    "sandboxDiscovery": "the selector required the optional operator helper in retained rc.5",
+    "localDiscovery": "the replacement shared unit passed a service-restart flag unknown to retained rc.5",
+    "fix": "strict executable manifests for new releases, a legacy three-binary fallback, and environment-native optional service-restart policy"
+  },
+  "releaseAutomation": {
+    "makeCheck": "passed",
+    "makeReleaseCheck": "passed",
+    "makeReleaseCI": "passed",
+    "race": "passed",
+    "sensitiveData": "passed",
+    "metadata": "passed",
+    "immutableStaging": "passed",
+    "repackagedShaMatched": true,
+    "appsWebNoVNCDependenciesUnchangedFromInvalidatedCandidate": true
+  },
+  "binarySha256": {
+    "remotexappd": "e96f7afb2c6b6775df192b9ad61677c15f156985512bc2260e1d69ac3bab63f8",
+    "novnc-input": "4c2d0ca6f4118e344a13b603685c96a9aae7601672fba59c7f49abcd73d3a6c8",
+    "remotexapp-status": "29bc15181a64f8c214de555b6d4ea6ac691b58a8ca7c3fb273545782efc8c61b",
+    "remotexapp-operator-helper": "c7fb475e0e235c56f8a5eb45b4a9129ac6f0ca862396d01d8e83e6d929021a7c"
+  },
+  "webAssetSha256": {
+    "sdk": "24d6b169024168c724ac238ea833028cc7eff8a8e098ccc77f236bea50375961",
+    "console": "f3916c7292f4e2bd92820b39d92f3a0aca3cf7d81d98222945c41ebc752ede87",
+    "novnc": "d797c02b220446cd37de1229d75ca48cdf07518368ca23a4c4c95c27dd12eaed"
+  },
+  "deployment": {
+    "mode": "central-real-user",
+    "user": "ubuntu",
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "allowInsecurePublic": true,
+    "temporaryWideTestOnly": true,
+    "serviceRestartCapability": false,
+    "releaseManifestValidated": true
+  },
+  "upgradeRollback": {
+    "sequence": [
+      "0.2.0-rc.10@7edefeec6ba5",
+      "0.2.0@ca1d0b26bf8f",
+      "0.2.0-rc.5@8c03c485adc5",
+      "0.2.0@ca1d0b26bf8f"
+    ],
+    "legacyRc5StartedUnderReplacementUnit": true,
+    "runtimeIdentityPreserved": true,
+    "sessionGenerationPreserved": true,
+    "unitRecordsCompared": 8,
+    "activeChildPidsCompared": 7,
+    "childUnitPidsPreserved": true,
+    "stoppedSessionPidRemainedZero": true,
+    "managerNRestarts": 0
+  },
+  "serviceRestartEnvironment": {
+    "isolatedManager": "127.0.0.1:21992",
+    "authenticatedTrustedHeader": true,
+    "environmentTrueExposedCapability": true,
+    "malformedBooleanRejected": true,
+    "productionServiceNotRestarted": true,
+    "workDir": "/tmp/remotexapp-operator-env.rGBW8a"
+  },
+  "shippedAppE2E": {
+    "isolatedManager": "127.0.0.1:21991",
+    "workDir": "/tmp/remotexapp-shipped-e2e.LSSaen",
+    "apps": [
+      "edge",
+      "firefox-esr",
+      "libreoffice",
+      "mousepad"
+    ],
+    "checks": [
+      "input",
+      "resize",
+      "readiness",
+      "generic-status",
+      "control-probes",
+      "exit",
+      "shutdown",
+      "restart-adoption",
+      "profile-persistence",
+      "cleanup"
+    ]
+  },
+  "browserSDK": {
+    "runtimeId": "xfce-user-desktop-2b1e40bfa08e",
+    "workDir": "/tmp/remotexapp-stable-live-browser.wJuiYv",
+    "fixed1280x720ScaleOnly": true,
+    "explicitReconnectMs": 62.529195999999956,
+    "finiteReconnectAttempts": 2,
+    "finiteReconnectExhaustedEvents": 1,
+    "finiteResidualChannelsCleared": true,
+    "unlimitedReconnectAttemptsObserved": 5,
+    "unlimitedReconnectExhaustedEvents": 0,
+    "automaticReconnectAcrossManagerRestart": true,
+    "childPidsPreservedAcrossManagerRestart": true
+  },
+  "issue4": {
+    "workDir": "/tmp/remotexapp-stable-issue4.GY0GQ9",
+    "fixture": {
+      "display": ":13",
+      "rfbPort": 5913,
+      "gatewayPort": 39013
+    },
+    "fault": "removed the authoritative anonymous manifest while exact fixed-display units survived",
+    "oldRuntimeId": "xfce-issue4-3efc8cf36ee4",
+    "newRuntimeId": "xfce-issue4-eddbc5c91606",
+    "oldUnitsStopped": true,
+    "staleRuntimeRemoved": true,
+    "profilePreserved": true,
+    "newManifestCreated": true,
+    "managerReady": true,
+    "restartLoop": false,
+    "cleanup": true
+  },
+  "issue5": {
+    "fault": "stopped the gateway of a managed runtime after clean XFCE logout",
+    "managedId": "ubuntu-desktop",
+    "runtimeId": "xfce-user-desktop-2b1e40bfa08e",
+    "createdAt": "2026-09-01T00:36:03.376660802-04:00",
+    "generationBeforeRelaunch": 2,
+    "generationAfterRelaunch": 3,
+    "sameRuntimeIdentity": true,
+    "singleManifest": true,
+    "managerPidPreserved": true,
+    "managerNRestarts": 0,
+    "relaunchReady": true
+  },
+  "finalState": {
+    "serviceActive": true,
+    "serviceMainPid": 2518936,
+    "serviceNRestarts": 0,
+    "warningJournalEntries": 0,
+    "health": "ok",
+    "templates": 6,
+    "activeInstances": 2,
+    "attachedClients": 0,
+    "managedUserHome": {
+      "runtimeId": "xfce-user-desktop-2b1e40bfa08e",
+      "sessionGeneration": 3,
+      "sessionState": "running",
+      "applicationState": "ready"
+    },
+    "anonymousFixedXfce": {
+      "runtimeId": "xfce-desktop-9d44b8f76981",
+      "sessionGeneration": 1,
+      "sessionState": "stopped"
+    },
+    "temporaryListenersReleased": true,
+    "temporaryUnitsRemoved": true,
+    "temporaryBrowsersRemoved": true
+  },
+  "sandbox00": {
+    "firstAttempt": "defect discovery only",
+    "selectedVersionAfterRecovery": "0.2.0-rc.5",
+    "selectedCommitAfterRecovery": "8c03c485adc5",
+    "replacementCandidateDeployed": false,
+    "newStagingApprovalRequired": true,
+    "productionApproved": false
+  },
+  "humanUAT": {
+    "unifiedConsole": "accepted 2026-09-01",
+    "firefox": "pending on replacement candidate",
+    "libreoffice": "pending on replacement candidate"
+  },
+  "published": false
+}

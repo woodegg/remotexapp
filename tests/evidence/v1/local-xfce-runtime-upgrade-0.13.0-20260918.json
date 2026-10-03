@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "local-xfce-runtime-upgrade-0.13.0-20260918",
+  "commit": "2d8068687ead065ecc54a07ed03602bcc5c144ee",
+  "startedAt": "2026-09-18T17:58:36Z",
+  "completedAt": "2026-09-18T18:00:00Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "project-local-test",
+    "name": "1991 existing XFCE desktop display :1"
+  },
+  "authorization": "restart and upgrade runtime",
+  "runtime": {
+    "id": "xfce-user-desktop-8cdcaa0b5159",
+    "managedId": "ubuntu-desktop",
+    "oldCore": "0.12.0-rc.2",
+    "newCore": "0.13.0",
+    "app": "xfce-user-desktop@3.0.0",
+    "beforeGeneration": 5,
+    "serverReadyGeneration": 6,
+    "readySessionGeneration": 7
+  },
+  "operation": {
+    "force": false,
+    "phase": "completed",
+    "id": "upgrade-361a6e3b69ba",
+    "targetRevision": "01fdc819b36e5f2548889480d84be59232b50b5cceed85397d4051f3eb5a145f"
+  },
+  "scenarios": [
+    {
+      "id": "generation-and-target-guarded-upgrade-completed",
+      "result": "passed"
+    },
+    {
+      "id": "normal-shutdown-no-forced-kill",
+      "result": "passed"
+    },
+    {
+      "id": "same-ID-managed-association-App-version-retained",
+      "result": "passed"
+    },
+    {
+      "id": "new-core-pin-and-running-gateway-supervisor-binary-hashes-match-0.13.0",
+      "result": "passed"
+    },
+    {
+      "id": "served-kiosk_real-browser-connected-1280x720",
+      "result": "passed"
+    },
+    {
+      "id": "RFB-attach-activates-session-generation-7",
+      "result": "passed"
+    },
+    {
+      "id": "managed-running-no-error-and-XFCE-ready",
+      "result": "passed"
+    },
+    {
+      "id": "connection-descriptor-D-Bus-X11-and-stale-generation-rejection",
+      "result": "passed"
+    },
+    {
+      "id": "IBus-GetGlobalEngine-remote-unicode",
+      "result": "passed"
+    },
+    {
+      "id": "local-Managers-remain-loopback",
+      "result": "passed"
+    }
+  ],
+  "rawEvidence": {
+    "browser": "/tmp/remotexapp-desktop-recovery-browser-fb8cRP/result.json"
+  },
+  "limitations": [
+    "Only local 1991 XFCE runtime upgraded; 2992 and sandboxes not modified.",
+    "Input-service protocol checks passed; no new text injection/readback test is claimed.",
+    "Earlier LightView package-identity exception is unrelated and remains unchanged."
+  ],
+  "references": [
+    "local-xfce-runtime-recovery-20260918.json",
+    "runtime-coordinator-0.13.0-local-deployment.json"
+  ]
+}

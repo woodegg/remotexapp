@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "core-session-services-0.12.0-stable-publication",
+  "commit": "3037ca136f58914e6b51262cc377c346ccd259dd",
+  "startedAt": "2026-09-14T06:11:04Z",
+  "completedAt": "2026-09-14T06:35:22Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "nodeLocal": "22.22.3",
+    "nodeHosted": "22.23.2"
+  },
+  "environment": {
+    "kind": "github-hosted-and-disposable-local-X11",
+    "name": "stable-publication-no-deployment-alignment"
+  },
+  "artifact": {
+    "name": "remotexapp-0.12.0-linux-amd64.tar.gz",
+    "sha256": "79675a298e644b8f804e9574e9b650d1d869fdbf864c571696ae4500d17fc92f"
+  },
+  "scenarios": [
+    {"id": "operator-UAT-acceptance-metadata-only-stable-promotion", "result": "passed"},
+    {"id": "hosted-Verify-and-Release-candidate", "result": "passed"},
+    {"id": "independent-local-release-ci-identical-archive", "result": "passed"},
+    {"id": "exact-archive-App-Package-ABI-no-rebuild", "result": "passed"},
+    {"id": "exact-archive-shipped-Apps-Viewer-input-clipboard-controls", "result": "passed"},
+    {"id": "exact-archive-document-optional-file-save-discard-idle", "result": "passed"},
+    {"id": "exact-archive-KDE-control-restart-upgrade-interrupted-recovery", "result": "passed"},
+    {"id": "exact-archive-browser-actions-cancel-and-Manager-crash", "result": "passed"},
+    {"id": "exact-archive-XFCE-disposable-UID-real-saved-session-and-input", "result": "passed"},
+    {"id": "exact-archive-service-faults-refusal-force-startup-adoption-cleanup", "result": "passed"},
+    {"id": "old-stack-stopped-cutover-preserves-document-profile-intent", "result": "passed"},
+    {"id": "annotated-tag-and-no-rebuild-publication", "result": "passed"},
+    {"id": "downloaded-stable-Latest-checksum-VCS-and-byte-comparison", "result": "passed"}
+  ],
+  "details": {
+    "version": "0.12.0",
+    "sdkVersion": "0.28.0",
+    "tag": "v0.12.0",
+    "releaseURL": "https://github.com/woodegg/remotexapp/releases/tag/v0.12.0",
+    "publication": {
+      "isPrerelease": false,
+      "isDraft": false,
+      "latest": true,
+      "publishedAt": "2026-09-14T06:34:24Z",
+      "verifyRun": 34812603937,
+      "candidateRun": 34812603355,
+      "releaseRun": 34814001681,
+      "candidateURL": "https://github.com/woodegg/remotexapp/actions/runs/34812603355",
+      "releaseRunURL": "https://github.com/woodegg/remotexapp/actions/runs/34814001681",
+      "assets": ["remotexapp-0.12.0-linux-amd64.tar.gz", "SHA256SUMS", "candidate-evidence.json"],
+      "repositoryVisibility": "private-unchanged"
+    },
+    "uatProvenance": "core-session-services-0.12.0-uat.json records human acceptance of the dirty local rc.2 archive. Stable changes release/build identity and documentation only; no second human UAT on stable bytes is claimed. Accepted rc.2 matrix/repeat/performance evidence retains its own identity.",
+    "contentContinuity": "All seven App trees, deterministic App archives, Core shell helpers, Unicode component and SDK assets match accepted rc.2. The clean clone omits only empty historical Driver directories present in the dirty rc.2 package. No App behavior or SDK change during promotion.",
+    "appVersions": {
+      "edge": "2.0.1",
+      "firefox-esr": "3.0.1",
+      "kate": "2.0.1",
+      "kwrite": "2.0.1",
+      "mousepad": "4.0.0",
+      "libreoffice": "4.0.0",
+      "xfce-user-desktop": "3.0.0"
+    },
+    "exactArchiveResult": "All seven suites passed on the first invocation of scripts/test-release-candidate.sh; the separate stopped-cutover rehearsal passed on its first invocation. No production code or test change was needed during stable validation.",
+    "xfce": {
+      "temporaryUID": 1002,
+      "display": 93,
+      "savedSession": "Original saved document window restored without test relaunch; current input environment, single IBus/Unicode, real Viewer readback and borrowed-bus continuity passed.",
+      "ibusFaultProbeHTTPStatuses": [200],
+      "ibusFaultDetectionMs": 4.018677999993088,
+      "productionDesktopTouched": false,
+      "resultPath": "/var/tmp/remotexapp-conn-user.uoRLyL/result.json",
+      "resultSHA256": "c8783130369fc39f5b4b632e39198ec0a8e1e959ca24f6cfdd011a6c8491665b"
+    },
+    "cutover": {
+      "baseline": "0.11.0 / 73c8a6f75a2c",
+      "scope": "Disposable managed Mousepad fixture on loopback 21997, not an environment deployment.",
+      "checks": "Graceful old stop; mixed catalog and old records rejected; interrupted offline conversion preserves recoverable records/document/profile/intent; new schema-2 runtime; same-generation supervisor adoption on new Manager restart.",
+      "resultPath": "/tmp/remotexapp-svc-cutover-tRaqIk/result.json",
+      "resultSHA256": "048b9fca925481498637e79182f42768c2656cf46f88d1301167869f1c5763d6"
+    },
+    "failureDisposition": "First independent local release-ci invocation stopped immediately at the toolchain guard because the temporary clone resolved Go 1.27.1 from PATH. Explicit GOTOOLCHAIN=go1.26.8 restored the pinned environment; the complete gate then passed and matched hosted bytes. No dependency pin, test or threshold was relaxed. Original setup-failure log is retained.",
+    "rawEvidenceDirectory": "/tmp/remotexapp-0120-release.358vyY",
+    "logs": [
+      {"name": "precommit-check.log", "sha256": "16801fd30e8b7631b6af9da6be57277fe76a50b7def37dff84945791f1990154"},
+      {"name": "local-release-ci.log", "sha256": "7b78ab9a22c1904078f0c370476ceb5383297945ff3335d8518ad51d0a299952"},
+      {"name": "local-release-ci-pinned.log", "sha256": "f173e39327a818553767fd2175eed9eba3ac165cd54c604d92fb3f83af1a1d42"},
+      {"name": "exact-candidate-e2e.log", "sha256": "049869185a0902aef4f613b49ee903ed06f1713c3aaf4bf12ec46ca91d676db6"},
+      {"name": "cutover-e2e.log", "sha256": "dad029dedec994b09e2d881ce8426368d354e62fd48009abd0f1a299f0e43a28"}
+    ],
+    "deployment": "None requested or performed. Local 127.0.0.1:1991 and :2992 still select accepted rc.2; no sandbox, gateway or existing runtime upgrade. Test fixtures are disposable; real user desktop is not a fault target.",
+    "scopeAndLimits": "SVC-001 through SVC-010 accepted and closed. Executed tests are bounded coverage, not proof of every possible interleaving. Bwrap, Docker and audio are excluded. Apps remain trusted same-UID code; old-architecture deployment needs the documented stopped-system cutover.",
+    "unrelatedWork": "Existing docs/app-driver-sandbox-todo.md changes and untracked release-tray/ drafts preserved and excluded from commits/artifacts. Previously untracked rc.1 evidence had private HOME prefixes sanitized before first commit; raw private evidence remains local."
+  }
+}

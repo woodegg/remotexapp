@@ -1,0 +1,33 @@
+{
+  "experiment": "P03b",
+  "outcome": "accepted",
+  "status": "Accepted after three lifecycle generations and interactive Full XFCE validation",
+  "date": "2026-08-27",
+  "isolation": {
+    "managerPort": 1992,
+    "display": 11,
+    "vacancySeconds": 10
+  },
+  "generations": {
+    "generation1": {
+      "duplicateClipmanDetected": true,
+      "bothContainedAndCleaned": true
+    },
+    "generation2": {
+      "sessionClipmanProcesses": 1,
+      "serverClipmanProcesses": 0,
+      "privateSessionDBus": true,
+      "vacancyCleanupPassed": true
+    },
+    "generation3": {
+      "realNoVNCSession": true,
+      "interactivePassed": true,
+      "successfulTextCommits": 33,
+      "clientEventRecords": 0
+    }
+  },
+  "connectedSessionContext": {
+    "memoryCurrentMiBApproximate": 234,
+    "tasks": 176
+  }
+}

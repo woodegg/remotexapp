@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-29",
+  "candidate": {
+    "version": "0.1.0-rc.22",
+    "commit": "573f24879c76",
+    "manager": "http://127.0.0.1:2098",
+    "installedPort1991Changed": false
+  },
+  "runtime": {
+    "managedId": "rc22-managed-mousepad",
+    "runtimeId": "mousepad-08555b04662c",
+    "display": 13,
+    "driverVersion": "1.5.0",
+    "workspaceMode": "persistent"
+  },
+  "browser": {
+    "client": "headless Chrome with bundled SDK/noVNC",
+    "rfbConnected": true,
+    "inputConnected": true,
+    "committedText": "rc22 managed blocked force test",
+    "textAckError": ""
+  },
+  "normalStop": {
+    "httpStatus": 409,
+    "elapsedSeconds": 4.142667,
+    "managedDesiredState": "stopped",
+    "managedObservedState": "shutdown-blocked",
+    "runtimeDesiredState": "running",
+    "sessionState": "shutdown-blocked",
+    "shutdownState": "blocked",
+    "allRuntimeUnitsActive": true
+  },
+  "restartAdoption": {
+    "managerRestarted": true,
+    "runtimeIdPreserved": true,
+    "sessionState": "shutdown-blocked",
+    "attachedClients": 0,
+    "unitPidsBefore": {
+      "vnc": 4054317,
+      "server": 4054340,
+      "gateway": 4054346,
+      "session": 4054741
+    },
+    "unitPidsAfter": {
+      "vnc": 4054317,
+      "server": 4054340,
+      "gateway": 4054346,
+      "session": 4054741
+    }
+  },
+  "attachmentCancellation": {
+    "tested": true,
+    "result": "an automatic browser reattachment cancelled the first blocked request as designed; the no-client restart then retained the second blocked request"
+  },
+  "explicitForce": {
+    "request": {
+      "desiredState": "stopped",
+      "force": true
+    },
+    "httpStatus": 200,
+    "elapsedSeconds": 0.162505,
+    "managedDesiredState": "stopped",
+    "managedObservedState": "stopped",
+    "runtimeReferenceCleared": true,
+    "runtimeManifestRemoved": true,
+    "runtimeDirectoryRemoved": true,
+    "allRuntimeUnitsInactive": true,
+    "rfbAndGatewayPortsClosed": true,
+    "persistentProfilePreserved": true,
+    "healthActiveInstances": 0,
+    "healthAttachedClients": 0
+  },
+  "result": "pass"
+}

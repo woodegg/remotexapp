@@ -1,0 +1,20 @@
+# Filtered native IME trace; unrelated Widget/key-event logging omitted.
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0 OnFocusWindow(aWindow=0x754b9a784c00), mLastFocusedWindow=0x0
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0 OnCommitCompositionNative(aContext=0x754b98260870), current context=0x754b98260870, active context=0x754b98260870, commitString="x", mProcessingKeyEvent=0x754b92b14560, IsComposingOn(aContext)=false
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0   OnCommitCompositionNative(), we'll send normal key event
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0 OnCommitCompositionNative(aContext=0x754b98260870), current context=0x754b98260870, active context=0x754b98260870, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0 DispatchCompositionCommitEvent(aContext=0x754b98260870, aCommitString=0x7ffe5f5cfd58, ("AsciiProbe"))
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0   DispatchCompositionCommitEvent(), mContentSelection={ HasRange()=false }
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0 OnCommitCompositionNative(aContext=0x754b98260870), current context=0x754b98260870, active context=0x754b98260870, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0 DispatchCompositionCommitEvent(aContext=0x754b98260870, aCommitString=0x7ffe5f5cfd58, ("中文测试"))
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0   DispatchCompositionCommitEvent(), mContentSelection={ HasRange()=false }
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0 OnCommitCompositionNative(aContext=0x754b98260870), current context=0x754b98260870, active context=0x754b98260870, commitString="x", mProcessingKeyEvent=0x754b930fee20, IsComposingOn(aContext)=false
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0   OnCommitCompositionNative(), we'll send normal key event
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0 OnCommitCompositionNative(aContext=0x754b98260870), current context=0x754b98260870, active context=0x754b98260870, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0 DispatchCompositionCommitEvent(aContext=0x754b98260870, aCommitString=0x7ffe5f5cfd58, ("AsciiProbe"))
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0   DispatchCompositionCommitEvent(), mContentSelection={ HasRange()=false }
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0 OnCommitCompositionNative(aContext=0x754b98260870), current context=0x754b98260870, active context=0x754b98260870, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0 DispatchCompositionCommitEvent(aContext=0x754b98260870, aCommitString=0x7ffe5f5cfd58, ("中文测试"))
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0   DispatchCompositionCommitEvent(), mContentSelection={ HasRange()=false }
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0 OnCommitCompositionNative(aContext=0x754b98260870), current context=0x754b98260870, active context=0x754b98260870, commitString="x", mProcessingKeyEvent=0x754b85f162e0, IsComposingOn(aContext)=false
+[Parent 2104440: Main Thread]: I/IMEHandler 0x754bb3df07a0   OnCommitCompositionNative(), we'll send normal key event

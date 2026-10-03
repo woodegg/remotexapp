@@ -1,0 +1,230 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "lightview-1.0.10-LTV-011-local-UAT",
+  "commit": "a48241809d397e80bee1e2f91107bcc59fe4575c",
+  "workspaceDirty": true,
+  "sourceKind": "uncommitted-working-tree-based-on-commit",
+  "startedAt": "2026-09-24T14:18:59Z",
+  "completedAt": "2026-09-24T14:26:27Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "project-owned-local-test",
+    "name": "isolated UID 1003 qualification plus loopback 1991/2992 deployment"
+  },
+  "artifact": {
+    "name": "lightview-1.0.10.tar.gz",
+    "sha256": "f1cfa716a4f9bad90ef11379e5ba069d82aa969b193db701e55246a840cc3804"
+  },
+  "app": {
+    "id": "lightview",
+    "version": "1.0.10",
+    "contentSha256": "3548b189dc3043b82ac56c48c1d4475aab6fc9ea87f624df3afa7fa8dc82323c"
+  },
+  "hostExecutable": {
+    "version": "Lightview 0.1.10 (WebKitGTK 2.52.6)",
+    "sha256": "7a3e3d8b790e34c0a32dd081b37b5a7bcbafe7c461c5918695c6dfaacea6204b",
+    "changed": false
+  },
+  "coreVersion": "0.13.0",
+  "sdkVersion": "0.29.1",
+  "publication": false,
+  "humanUAT": "pending",
+  "sandboxOperations": false,
+  "scenarios": [
+    {
+      "id": "deterministic-package",
+      "result": "passed"
+    },
+    {
+      "id": "missing-dependency-fails-closed",
+      "result": "passed"
+    },
+    {
+      "id": "package-only-upgrade-and-rollback",
+      "result": "passed"
+    },
+    {
+      "id": "singleton-two-Viewer-sharing",
+      "result": "passed"
+    },
+    {
+      "id": "private-descriptor-low-memory-WebGL-disabled",
+      "result": "passed"
+    },
+    {
+      "id": "real-Viewer-resize-IME-clipboard",
+      "result": "passed"
+    },
+    {
+      "id": "bounded-openUrl",
+      "result": "passed"
+    },
+    {
+      "id": "memory-policy-off-on-alternate-threshold-repeated-navigation",
+      "result": "passed"
+    },
+    {
+      "id": "stable-socket-soft-hard-WebKit-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "Manager-restart-adoption",
+      "result": "passed"
+    },
+    {
+      "id": "ordinary-restart-profile-continuity",
+      "result": "passed"
+    },
+    {
+      "id": "disabled-protection-graceful-App-upgrade-and-downgrade-rejection",
+      "result": "passed"
+    },
+    {
+      "id": "crash-stale-socket-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "socket-substitution-control-fails-closed-and-runtime-recovers",
+      "result": "passed"
+    },
+    {
+      "id": "native-app-exit-stop-instance-cleanup",
+      "result": "passed"
+    },
+    {
+      "id": "disabled-protection-graceful-stop-and-recreated-profile-continuity",
+      "result": "passed"
+    },
+    {
+      "id": "simulated-six-hour-vacancy-stop-instance",
+      "result": "passed"
+    },
+    {
+      "id": "make-check",
+      "result": "passed"
+    },
+    {
+      "id": "make-test-race",
+      "result": "passed"
+    },
+    {
+      "id": "make-coverage-check",
+      "result": "passed"
+    },
+    {
+      "id": "make-vuln-check",
+      "result": "passed"
+    },
+    {
+      "id": "sixteen-Driver-tests-five-consecutive-passes",
+      "result": "passed"
+    },
+    {
+      "id": "deterministic-Manager-HTTP-installed-sealed-App-policy-states-and-dispatch-capture",
+      "result": "passed"
+    },
+    {
+      "id": "Manager-HTTP-policy-test-three-race-runs",
+      "result": "passed"
+    },
+    {
+      "id": "real-session-startup-protection-off-and-native-quit-during-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "invalid-socket-PID-protocol-framing-URL-and-engine-negative-tests",
+      "result": "passed"
+    },
+    {
+      "id": "tampered-App-action-and-startup-catalog-rejection-bytecode-absence",
+      "result": "passed"
+    },
+    {
+      "id": "shutdown-protocol-twenty-race-repeats-with-explicit-timeout-probe",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-byte-comparison-after-live-qualification",
+      "result": "passed"
+    },
+    {
+      "id": "both-endpoints-served-Viewer-resize-reconnect-connections",
+      "result": "passed"
+    },
+    {
+      "id": "both-endpoints-protection-off-on-alternate-threshold-repeated-openUrl",
+      "result": "passed"
+    },
+    {
+      "id": "2992-graceful-stop-with-protection-disabled",
+      "result": "passed"
+    },
+    {
+      "id": "1991-approved-runtime-upgrade-normal-shutdown",
+      "result": "passed"
+    },
+    {
+      "id": "XFCE-generation-8-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "loopback-listeners-test-services-cleaned-up",
+      "result": "passed"
+    }
+  ],
+  "deployment": {
+    "ports": [
+      1991,
+      2992
+    ],
+    "listen": [
+      "127.0.0.1:1991",
+      "127.0.0.1:2992"
+    ],
+    "runtime1991": {
+      "id": "lightview-1693a7110d9d",
+      "beforeApp": "1.0.9",
+      "afterApp": "1.0.10",
+      "beforeGeneration": 1,
+      "afterGeneration": 3,
+      "operation": "upgrade-70e330f74b84",
+      "force": false,
+      "state": "ready",
+      "testPolicyRestored": "enabled / 3072 MiB"
+    },
+    "testRuntime2992": {
+      "id": "lightview-e17ceae199fc",
+      "state": "stopped"
+    },
+    "preservedDesktop": {
+      "id": "xfce-user-desktop-8cdcaa0b5159",
+      "generation": 8
+    }
+  },
+  "qualificationNotes": [
+    "The previous 1.0.9 Driver fails three new deterministic policy/quit tests before any open dispatch; the candidate passes. An initial socket-fixture ECONNRESET handling issue was corrected before the clean red/green comparison.",
+    "An initial prerelease suffix conflicted with the existing shipped-App catalog convention. The qualified/deployed immutable candidate uses unpublished 1.0.10; no Core/SDK version change.",
+    "The first expanded E2E incorrectly expected runtime downgrade; the corrected assertion confirms downgrade rejection and selector rollback without changing production policy.",
+    "One WebKit reset test raced asynchronous local-storage persistence; the final run verifies the SQLite marker is committed before destructive reset.",
+    "An existing 50ms shutdown protocol test timed out under race instrumentation. Completion/refusal now get a one-second test allowance, while the independent timeout assertion retains 50ms; twenty repeats and full race then pass.",
+    "Two complete 17-scenario runs passed on the exact candidate archive, including the final durability-aware test run."
+  ],
+  "limitations": [
+    "The build container uses a pre-existing explicit unsafe WebKit sandbox override/software rendering for live tests; the App archive does not set it, and normal production WebKit sandboxing is not qualified.",
+    "The six-hour vacancy setting is asserted statically and exercised with a sixty-second isolated test timer.",
+    "No formal GitHub release, sandbox deployment or human UAT acceptance is claimed."
+  ],
+  "rawEvidence": {
+    "finalE2E": "/tmp/remotexapp-lightview-e2e-E7tEWN/result.json",
+    "previousE2E": "/tmp/remotexapp-lightview-e2e-DPM5My/result.json",
+    "localSmoke": "/tmp/lightview110-local-smoke-result.json",
+    "sourceGates": "/tmp/lightview110-check-qualified.log",
+    "additionalGates": "/tmp/lightview110-extra-qualified.log",
+    "redRegression": "/tmp/lightview110-red.log"
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "apiVersion": "remotexapp/v1",
+  "id": "lightview",
+  "name": "LightView",
+  "driverVersion": "1.0.13",
+  "singleton": true,
+  "profileRef": "default",
+  "runMode": "shared",
+  "ports": {},
+  "parameters": {
+    "startUrl": {
+      "type": "url",
+      "default": "about:blank",
+      "allowedSchemes": [
+        "http",
+        "https",
+        "about"
+      ],
+      "maxLength": 2048
+    }
+  },
+  "driver": {
+    "config": {
+      "protocol": "lightview-json-v1",
+      "socketRelativePath": "lightview/control.sock"
+    }
+  },
+  "overrides": {
+    "allowed": []
+  },
+  "dependencies": {
+    "executables": [
+      "jq",
+      "lightview",
+      "matchbox-window-manager",
+      "python3",
+      "sed",
+      "seq",
+      "sleep",
+      "xdotool"
+    ],
+    "pythonModules": []
+  },
+  "server": {
+    "activation": "on-demand",
+    "driver": "server.sh",
+    "displayMode": "dynamic",
+    "display": 0,
+    "rfbPort": 0,
+    "gatewayPort": 0,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 5,
+    "allowClientResize": true,
+    "readinessPids": [
+      "server.pid"
+    ],
+    "readinessTimeout": "10s"
+  },
+  "session": {
+    "services": "core-v1",
+    "activation": "on-attach",
+    "driver": "session.sh",
+    "shutdownDriver": "shutdown.sh",
+    "viewerAttachDriver": "viewer-attach.sh",
+    "viewerDetachDriver": "viewer-detach.sh",
+    "readinessPid": "lightview.pid",
+    "readinessTimeout": "45s",
+    "vacantTimeout": "6h",
+    "vacantAction": "stop-instance",
+    "status": {
+      "mode": "driver",
+      "details": {
+        "application": {
+          "type": "enum",
+          "values": [
+            "lightview"
+          ]
+        },
+        "launchLowMemory": {
+          "type": "boolean"
+        }
+      },
+      "privateDetails": {
+        "application": {
+          "type": "json",
+          "maxBytes": 4096,
+          "maxDepth": 4,
+          "maxItems": 32
+        }
+      }
+    }
+  },
+  "input": {
+    "backend": "ibus",
+    "lifecycle": "session",
+    "allowedWmClasses": [
+      "lightview",
+      "Lightview",
+      "LightView"
+    ]
+  },
+  "actions": {
+    "openUrl": {
+      "handler": "open-url.py",
+      "timeout": "15s",
+      "parameters": {
+        "url": {
+          "type": "url",
+          "required": true,
+          "allowedSchemes": [
+            "http",
+            "https"
+          ],
+          "maxLength": 2048
+        }
+      },
+      "result": {
+        "requestedUrl": {
+          "type": "url",
+          "required": true,
+          "allowedSchemes": [
+            "http",
+            "https"
+          ],
+          "maxLength": 2048
+        },
+        "currentUri": {
+          "type": "url",
+          "required": true,
+          "allowedSchemes": [
+            "http",
+            "https"
+          ],
+          "maxLength": 4096
+        },
+        "title": {
+          "type": "string",
+          "required": true,
+          "maxLength": 4096
+        }
+      }
+    }
+  }
+}

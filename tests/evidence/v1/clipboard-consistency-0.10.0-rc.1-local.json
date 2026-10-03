@@ -1,0 +1,249 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "local:clipboard-consistency-0.10.0-rc.1",
+  "commit": "a8569d1e92de91e4d64d8423d53d7b513e633ae4",
+  "startedAt": "2026-09-12T19:06:09.763Z",
+  "completedAt": "2026-09-12T19:24:21Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "local",
+    "name": "local build host loopback 1991 and 2992; isolated X11 test accounts"
+  },
+  "artifact": {
+    "name": "remotexapp-0.10.0-rc.1-linux-amd64.tar.gz",
+    "sha256": "d63b742d5b37669f40d495fb8294afbc9f54c09c29794294c32a53db3c100352"
+  },
+  "scenarios": [
+    {
+      "id": "release-ci-clean-clone-vcs-identity",
+      "result": "passed"
+    },
+    {
+      "id": "clipboard-sdk-48-tests",
+      "result": "passed"
+    },
+    {
+      "id": "clipboard-native-monitor-resumption-20-repeat-race",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-six-e2e-suites",
+      "result": "passed"
+    },
+    {
+      "id": "two-manager-starts-per-local-endpoint",
+      "result": "passed"
+    },
+    {
+      "id": "served-sdk-and-novnc-exact-byte-identity",
+      "result": "passed"
+    },
+    {
+      "id": "deployed-1991-mousepad-two-viewer-clipboard",
+      "result": "passed"
+    },
+    {
+      "id": "deployed-1991-libreoffice-two-viewer-clipboard",
+      "result": "passed"
+    },
+    {
+      "id": "deployed-2992-mousepad-two-viewer-clipboard",
+      "result": "passed"
+    },
+    {
+      "id": "deployed-2992-libreoffice-two-viewer-clipboard",
+      "result": "passed"
+    },
+    {
+      "id": "configuration-runtime-pins-and-existing-xfce-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "test-runtime-cleanup-readyz-and-manager-warning-journals",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "version": "0.10.0-rc.1",
+    "sdkVersion": "0.27.0",
+    "requirements": [
+      "CLP-035",
+      "CLP-036",
+      "CLP-037",
+      "CLP-038"
+    ],
+    "humanUAT": "pending",
+    "publication": "No GitHub push, tag or Release; local source commits only.",
+    "sandboxes": "Not accessed or deployed.",
+    "bindings": [
+      "127.0.0.1:1991",
+      "127.0.0.1:2992"
+    ],
+    "features": {
+      "1991": {
+        "console": true,
+        "kiosk": true
+      },
+      "2992": {
+        "console": false,
+        "kiosk": true
+      }
+    },
+    "gatewaySha256": "40d96396a0122c97f647822515bb741ab809dbaa9a0b732c8748c6f4553244f3",
+    "sdkAsset": {
+      "name": "sdk-DF7AUPEW.js",
+      "sha256": "e26fda30c6ef9fc513b7b69ee2e0fcbd63470f10285c997a261dfaab2b1080a8"
+    },
+    "preservedRuntime": {
+      "id": "xfce-user-desktop-44ea8c2186ee",
+      "generation": 7,
+      "core": "0.9.1",
+      "sessionState": "running",
+      "attachedClients": 1,
+      "upgrade": "Not authorized; retained old pin. Use new instances for candidate clipboard UAT."
+    },
+    "testEndpointLiveRuntimes": 0,
+    "deployedClipboard": [
+      {
+        "port": 1991,
+        "app": "mousepad",
+        "instanceId": "mousepad-c4a92c784690",
+        "result": "passed",
+        "core": {
+          "version": "0.10.0-rc.1",
+          "commit": "a8569d1e92de91e4d64d8423d53d7b513e633ae4",
+          "sha256": "85fe5496655ee0de8b377b592dd5490aa255b7249ba86be2f8fdbc3f2b2a34e8"
+        },
+        "checks": [
+          "capabilities-and-explicit-modes",
+          "empty-noop-mixed-png-whitespace-and-atomic-rejection",
+          "all-formats-browser-to-x11",
+          "rich-browser-write-rebound-suppression-and-genuine-change",
+          "browser-clipboard-read-to-remote",
+          "xfixes-to-browser-and-independent-dismiss",
+          "view-only-receive-and-send-block",
+          "reconnect-list-recovery",
+          "permission-dependent-auto-degradation",
+          "host-wildcard-css-prompt-layout-direction-and-hit-testing",
+          "unchanged-native-owner-no-prompt-local-only-recovery-and-stale-yes",
+          "reload-resets-policy"
+        ],
+        "existingRuntimesPreserved": true
+      },
+      {
+        "port": 1991,
+        "app": "libreoffice",
+        "instanceId": "libreoffice-c6a48160b1a8",
+        "result": "passed",
+        "core": {
+          "version": "0.10.0-rc.1",
+          "commit": "a8569d1e92de91e4d64d8423d53d7b513e633ae4",
+          "sha256": "85fe5496655ee0de8b377b592dd5490aa255b7249ba86be2f8fdbc3f2b2a34e8"
+        },
+        "checks": [
+          "capabilities-and-explicit-modes",
+          "empty-noop-mixed-png-whitespace-and-atomic-rejection",
+          "all-formats-browser-to-x11",
+          "rich-browser-write-rebound-suppression-and-genuine-change",
+          "browser-clipboard-read-to-remote",
+          "xfixes-to-browser-and-independent-dismiss",
+          "view-only-receive-and-send-block",
+          "reconnect-list-recovery",
+          "permission-dependent-auto-degradation",
+          "host-wildcard-css-prompt-layout-direction-and-hit-testing",
+          "unchanged-native-owner-no-prompt-local-only-recovery-and-stale-yes",
+          "reload-resets-policy"
+        ],
+        "existingRuntimesPreserved": true
+      },
+      {
+        "port": 2992,
+        "app": "mousepad",
+        "instanceId": "mousepad-6bb7ddaf1db6",
+        "result": "passed",
+        "core": {
+          "version": "0.10.0-rc.1",
+          "commit": "a8569d1e92de91e4d64d8423d53d7b513e633ae4",
+          "sha256": "85fe5496655ee0de8b377b592dd5490aa255b7249ba86be2f8fdbc3f2b2a34e8"
+        },
+        "checks": [
+          "capabilities-and-explicit-modes",
+          "empty-noop-mixed-png-whitespace-and-atomic-rejection",
+          "all-formats-browser-to-x11",
+          "rich-browser-write-rebound-suppression-and-genuine-change",
+          "browser-clipboard-read-to-remote",
+          "xfixes-to-browser-and-independent-dismiss",
+          "view-only-receive-and-send-block",
+          "reconnect-list-recovery",
+          "permission-dependent-auto-degradation",
+          "host-wildcard-css-prompt-layout-direction-and-hit-testing",
+          "unchanged-native-owner-no-prompt-local-only-recovery-and-stale-yes",
+          "reload-resets-policy"
+        ],
+        "existingRuntimesPreserved": true
+      },
+      {
+        "port": 2992,
+        "app": "libreoffice",
+        "instanceId": "libreoffice-bedee41ba197",
+        "result": "passed",
+        "core": {
+          "version": "0.10.0-rc.1",
+          "commit": "a8569d1e92de91e4d64d8423d53d7b513e633ae4",
+          "sha256": "85fe5496655ee0de8b377b592dd5490aa255b7249ba86be2f8fdbc3f2b2a34e8"
+        },
+        "checks": [
+          "capabilities-and-explicit-modes",
+          "empty-noop-mixed-png-whitespace-and-atomic-rejection",
+          "all-formats-browser-to-x11",
+          "rich-browser-write-rebound-suppression-and-genuine-change",
+          "browser-clipboard-read-to-remote",
+          "xfixes-to-browser-and-independent-dismiss",
+          "view-only-receive-and-send-block",
+          "reconnect-list-recovery",
+          "permission-dependent-auto-degradation",
+          "host-wildcard-css-prompt-layout-direction-and-hit-testing",
+          "unchanged-native-owner-no-prompt-local-only-recovery-and-stale-yes",
+          "reload-resets-policy"
+        ],
+        "existingRuntimesPreserved": true
+      }
+    ],
+    "commands": [
+      "make release-ci",
+      "scripts/test-release-candidate.sh ARCHIVE SHA256SUMS candidate-evidence.json a8569d1e92de91e4d64d8423d53d7b513e633ae4",
+      "go test -race ./cmd/novnc-input -run TestXClipboardConsistencyAcrossMonitoringPause -count=20",
+      "tests/go-live-validation/check-clipboard-client.mjs (full, two viewers; both deployed endpoints and both editors)"
+    ],
+    "rejectedAttempts": [
+      {
+        "commit": "e6c8cb16bbb606a0b769d2c85f07879fbd6e8748",
+        "reason": "Worktree-built binaries lacked VCS fields; verifier refused them. A clean local clone restored exact clean VCS identity. No deployment."
+      },
+      {
+        "commit": "e6c8cb16bbb606a0b769d2c85f07879fbd6e8748",
+        "artifactSha256": "f805f86f6345c93d7df1876f878a5ee9c428043a5667cc088921fd82b156607b",
+        "reason": "Exact E2E found explicit supplied uploads incorrectly replacing the observed local baseline. Fixed in 3246c700dfc98f20a67c7399cdc86cb286b5e7df with regression; no failed candidate deployed."
+      },
+      {
+        "commit": "3246c700dfc98f20a67c7399cdc86cb286b5e7df",
+        "reason": "Full E2E passed, but an added unit repro exposed consent surviving a generation change before socket closure. Fixed in f82384ac65115a80627398467d240d940d18c793; final artifact reran every gate before deployment."
+      }
+    ],
+    "evidenceBoundary": "Controlled native/browser scenarios reproduce mechanisms and verify the fixes; the original operator incident is not attributed to a proven specific owner/event.",
+    "raceBoundary": "Observed-state checks, not atomic browser/X11 OS clipboard CAS; no timestamp winner or cross-Viewer coordinator.",
+    "logs": {
+      "releaseCI": "/tmp/remotexapp-consistency-final-ci.log",
+      "exactE2E": "/tmp/remotexapp-consistency-final-e2e.log",
+      "shipped": "/tmp/remotexapp-shipped-e2e.JepZ6I",
+      "userHome": "/var/tmp/remotexapp-conn-user.5N0jGo/result.json",
+      "local1991": "/tmp/remotexapp-consistency-local-1991",
+      "local2992": "/tmp/remotexapp-consistency-local-2992"
+    }
+  }
+}

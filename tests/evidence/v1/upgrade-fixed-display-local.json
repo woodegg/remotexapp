@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "upgrade-fixed-display-self-reservation:2026-09-10",
+  "commit": "df5cb7ebaa72e841f4530a6018756f33e6afc53d",
+  "startedAt": "2026-09-10T14:12:59Z",
+  "completedAt": "2026-09-10T14:16:53Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "v22.22.3"},
+  "environment": {"kind": "disposable-local", "name": "loopback 21993, fixed fixture display 89; production desktops untouched"},
+  "scenarios": [
+    {"id": "pre-fix-unit-reproduction-self-collision", "result": "passed"},
+    {"id": "post-fix-fixed-allocation-durable-release-and-foreign-owner-live-listener-guards-ten-repeats", "result": "passed"},
+    {"id": "make-check", "result": "passed"},
+    {"id": "make-test-race-and-upgrade-race-three-repeats", "result": "passed"},
+    {"id": "real-managed-fixed-display-upgrade-readiness-connections-home-and-re-adoption", "result": "passed"},
+    {"id": "six-app-upgrade-sdk-browser-and-five-crash-phase-e2e", "result": "passed"},
+    {"id": "kate-kwrite-control-and-sixty-second-idle-exit", "result": "passed"},
+    {"id": "sandbox-recovery", "result": "skipped", "reason": "Fix not packaged or deployed; sandbox02/03 remain failed pending corrected Manager rollout."}
+  ],
+  "details": {
+    "sourceIdentity": "Working-tree patch on the recorded commit, not published 0.8.0 bytes",
+    "codeAndTestDiffSha256": "184989656959ed878696bc26314fb01df6acf399ad78ca3df553b665bb6f1fbd",
+    "diffPaths": ["cmd/remotexappd/upgrade.go", "cmd/remotexappd/upgrade_test.go", "tests/app-package/run-upgrade-kde-local-e2e.mjs"],
+    "e2eResult": "/tmp/remotexapp-upgrade-kde-e2e-iEzslB/result.json",
+    "e2eLog": "/tmp/upgrade-self-reservation-e2e.log",
+    "fullCheckLog": "/tmp/upgrade-self-reservation-final-check.log",
+    "fullRaceLog": "/tmp/upgrade-self-reservation-full-race.log",
+    "sandboxWritesDuringFix": false,
+    "deployedLocalServicesChanged": false,
+    "userHomeXfceE2E": "Not run: real fixed-display lifecycle is covered with a disposable managed Mousepad fixture; existing user desktop is preserved."
+  }
+}

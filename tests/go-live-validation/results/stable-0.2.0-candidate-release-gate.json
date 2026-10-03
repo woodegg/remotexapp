@@ -1,0 +1,58 @@
+{
+  "target": "0.2.0",
+  "sdkVersion": "0.18.0",
+  "candidateCommit": "7430689f05cb25c1e2d01ee5a202c28281db0c2f",
+  "candidateCommitTime": "2026-09-01T03:12:48-04:00",
+  "host": {
+    "os": "ubuntu 24.04",
+    "kernel": "Linux 6.8.0-136-generic",
+    "architecture": "x86_64",
+    "go": "go1.22.2 linux/amd64",
+    "node": "v22.22.3"
+  },
+  "commands": {
+    "makeReleaseCheck": "passed",
+    "makeReleaseCi": "passed",
+    "repeatPackageRelease": "passed",
+    "archiveChecksumVerification": "passed",
+    "embeddedAppPackageChecksumVerification": "passed"
+  },
+  "coverage": {
+    "releaseMetadata": "passed",
+    "sensitiveData": "passed",
+    "novncProvenanceAndCompatibility": "passed",
+    "generatedAssets": "passed",
+    "performanceDocuments": "passed",
+    "goTests": "passed",
+    "sdkTests": "passed",
+    "appPackageTests": "passed",
+    "shippedAppTests": "passed",
+    "goVet": "passed",
+    "goRace": "passed",
+    "deploymentArchitecture": "passed",
+    "immutableStaging": "passed",
+    "hostPreflight": "passed"
+  },
+  "artifact": {
+    "path": "dist/remotexapp-0.2.0-linux-amd64.tar.gz",
+    "sha256": "8c6574c0abab565f3b08bbcd305522ed15d0fa64924c4cec689e3d65a589238c",
+    "repeatSha256": "8c6574c0abab565f3b08bbcd305522ed15d0fa64924c4cec689e3d65a589238c",
+    "checksumFile": "dist/SHA256SUMS",
+    "allSixAppPackagesVerified": true
+  },
+  "binaries": {
+    "remotexappdSha256": "dd1ea5bae93f0e3978ff98106cab92fd291ae86523a4e1d1337c65863b026c5f",
+    "novncInputSha256": "24690b82e47148273103422ddd1fdc3ac5cfe90b930c36d702381209137af6fb",
+    "statusHelperSha256": "2d1508488ae0fe99a3888dacc77c1694b260bf76a4ee3416dfa7da46054802e5",
+    "operatorHelperSha256": "343b3302e983c404d02187c539c8280b9cd8d95c542117ae9d1d123cbfdba88d"
+  },
+  "generatedAssets": {
+    "sdk-AAKBITTH.js": "24d6b169024168c724ac238ea833028cc7eff8a8e098ccc77f236bea50375961",
+    "console-EHWN76EV.js": "f3916c7292f4e2bd92820b39d92f3a0aca3cf7d81d98222945c41ebc752ede87",
+    "novnc-JT77R2V6.js": "d797c02b220446cd37de1229d75ca48cdf07518368ca23a4c4c95c27dd12eaed"
+  },
+  "treeCleanAfterGate": true,
+  "publication": false,
+  "deployment": false,
+  "finalEvidenceCommitGateStillRequired": true
+}

@@ -1,0 +1,104 @@
+{
+  "date": "2026-09-02",
+  "candidate": {
+    "version": "0.3.0-rc.1",
+    "commit": "cfddd717e14d4673c61d0e7ea4f0feed5712ff8b",
+    "sdkVersion": "0.18.0",
+    "appPackageABI": "remotexapp/v1",
+    "humanUAT": "pending"
+  },
+  "artifacts": {
+    "localReleaseArchiveSha256": "88117bffe1e14f22f51c9b9724103b75c510309789a51b555ea102d5a99d8334",
+    "binarySha256": {
+      "remotexappd": "c0d07e03e022d06821aa10f50151017b90eed65ba23ab02759daf10ab3e69385",
+      "novnc-input": "8423f57acaa3b9e97141f8c27d6c3769118e4adc7af229678f97f33b3d789e8b",
+      "remotexapp-status": "3361a27b20874154500b8b4cce0be446841fc237e34fdc99a6d0ce0cad843f93",
+      "remotexapp-operator-helper": "fc3e86bfd45b3c440fb46e335250026ea93ef84015fd2fee219358e0ce088129"
+    },
+    "installedBinariesMatchCandidate": true
+  },
+  "automatedGates": {
+    "makeReleaseCheck": "passed",
+    "makeReleaseCI": "passed",
+    "sensitiveDataCheck": "passed",
+    "raceAndVet": "passed",
+    "offlineSystemTransition": "passed",
+    "fullShippedRealE2E": {
+      "result": "passed",
+      "apps": [
+        "edge",
+        "firefox-esr",
+        "libreoffice",
+        "mousepad"
+      ],
+      "checks": [
+        "input",
+        "resize",
+        "readiness",
+        "generic-status",
+        "control-probes",
+        "exit",
+        "shutdown",
+        "restart-adoption",
+        "profile-persistence",
+        "cleanup"
+      ]
+    },
+    "localManagedUserHomeE2E": "passed"
+  },
+  "upgradeRollbackUpgrade": {
+    "baselineVersion": "0.2.0",
+    "baselineTemplateCount": 6,
+    "candidateTemplateCount": 5,
+    "retiredRuntimeHadZeroClients": true,
+    "retiredRuntimeAndManifestRemovedBeforeActivation": true,
+    "durableRetiredReferencesAfterActivation": 0,
+    "rollbackRestoredFirefoxVersion": "2.0.0",
+    "rollbackRestoredFirefoxDepth": 24,
+    "rollbackRestoredXfceDesktop": true,
+    "managedRuntimeIdentityPreserved": true,
+    "managedChildPidsPreservedAcrossAllManagerRestarts": true,
+    "injectedCommitHealthFailureRestoredAndVerifiedPriorRelease": true
+  },
+  "local1991": {
+    "deploymentMode": "central real user",
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "version": "0.3.0-rc.1",
+    "commit": "cfddd717e14d",
+    "coreSelector": "releases/0.3.0-rc.1",
+    "templateCount": 5,
+    "appSelectors": {
+      "edge": "1.0.0",
+      "firefox-esr": "2.1.0",
+      "libreoffice": "3.0.0",
+      "mousepad": "2.0.0",
+      "xfce-user-desktop": "2.0.0"
+    },
+    "firefox": {
+      "actualVncDepth": 16,
+      "webdriverBiDiSessionStatus": "passed",
+      "dynamicResize": "passed",
+      "sdkReconnect": "passed",
+      "unicodeInputAcknowledgement": "passed",
+      "forcedCleanup": "passed"
+    },
+    "managedUserDesktop": {
+      "state": "server-ready",
+      "sessionState": "running",
+      "attachedClients": 0,
+      "framebuffer": "1280x720x16",
+      "clientResizeBlocked": true,
+      "browserScaleAndReconnect": "passed"
+    },
+    "finalRuntimeCount": 1,
+    "managerRestartCount": 0,
+    "warningJournalCount": 0,
+    "ready": true
+  },
+  "authorizationBoundary": {
+    "sandboxChanged": false,
+    "tagCreated": false,
+    "githubPublished": false
+  }
+}

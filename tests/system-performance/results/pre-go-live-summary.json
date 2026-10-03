@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "label": "pre-go-live",
+  "date": "2026-08-27",
+  "runtimeHashes": {
+    "manager": "163f86469f20632747b73aeba0de92a92b12d980d030f0fcf473e1bdfb655ee7",
+    "gateway": "4e99d0a7055398ef32386a43fb244dd03df811d6a03917d5c8db8220afe762e3",
+    "status": "3cf0bc00fa90ce2ab91b06945d8408e1259436ada3cddb0306d95cc890d4013b"
+  },
+  "xfceServerOnly": {
+    "vncPssKiB": 151190,
+    "gatewayPssKiB": 5347,
+    "vncMemoryCurrentBytes": 132382720,
+    "gatewayMemoryCurrentBytes": 10317824,
+    "vncTasks": 58
+  },
+  "classes": {
+    "mousepad": {
+      "sdkVersion": "0.5.0",
+      "createMs": 578,
+      "attachToSessionMs": 1184,
+      "attachedTotalPssKiB": 169585,
+      "attachedCgroupMemoryCurrentBytes": 152272896,
+      "staticRfbBitsPerSecond": 237.542,
+      "inputRfbBitsPerSecond": 127349.565,
+      "scrollRfbBitsPerSecond": 35430.246,
+      "inputRoundTripP50Ms": 1.3,
+      "inputRoundTripP95Ms": 3.0,
+      "inputServerP50Ms": 0.601,
+      "inputServerP95Ms": 1.346,
+      "coldStaticRequests": 45,
+      "coldStaticTransferBytes": 549477,
+      "reconnectMs": 31,
+      "clipboardExact": true,
+      "resizeCorrect": true
+    },
+    "xfce-desktop": {
+      "sdkVersion": "0.5.0",
+      "lookupMs": 9,
+      "attachToSessionMs": 1029,
+      "attachedTotalPssKiB": 433741,
+      "attachedCgroupMemoryCurrentBytesExcludingBenchmarkApp": 356470784,
+      "benchmarkAppPssKiB": 21310,
+      "staticRfbBitsPerSecond": 307787.639,
+      "inputRfbBitsPerSecond": 82614.539,
+      "scrollRfbBitsPerSecond": 37224.256,
+      "inputRoundTripP50Ms": 1.3,
+      "inputRoundTripP95Ms": 3.5,
+      "inputServerP50Ms": 0.567,
+      "inputServerP95Ms": 1.364,
+      "coldStaticRequests": 45,
+      "coldStaticTransferBytes": 549477,
+      "reconnectMs": 43,
+      "clipboardExact": true,
+      "resizeCorrect": true,
+      "sessionStoppedAfterDetach": true,
+      "serverRemainedReady": true
+    }
+  },
+  "workload": {
+    "staticSeconds": 30,
+    "inputRequests": 600,
+    "inputIntervalMillis": 50,
+    "inputDurationSeconds": 30,
+    "scrollSeconds": 30,
+    "characters": 660,
+    "utf8Bytes": 780
+  },
+  "excludedRun": {
+    "artifact": "pre-go-live-xfce-invalid-recovery-dialog.json",
+    "reason": "The persistent XFCE HOME presented a Mousepad recovery dialog instead of an editor. ACKs therefore did not prove application delivery; the run is retained but excluded."
+  },
+  "status": "Valid pre-go-live system baseline: exact Mousepad and Full XFCE application readback, resize policy, reconnect and lifecycle cleanup passed"
+}

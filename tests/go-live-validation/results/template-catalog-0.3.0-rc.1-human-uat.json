@@ -1,0 +1,31 @@
+{
+  "result": "accepted",
+  "date": "2026-09-02",
+  "acceptedAt": "2026-09-02T05:54:16Z",
+  "acceptance": {
+    "explicitOperatorConfirmation": true,
+    "formalReleaseAuthorized": true,
+    "candidateVersion": "0.3.0-rc.1",
+    "candidateCommit": "cfddd717e14d4673c61d0e7ea4f0feed5712ff8b",
+    "target": "local-1991"
+  },
+  "scope": {
+    "fiveAppCatalog": true,
+    "firefoxDepth16": true,
+    "firefoxWebDriverBiDi": true,
+    "inputResizeAndReconnect": true,
+    "managedUserDesktopFixedScaling": true,
+    "xfceDesktopRetirement": true,
+    "upgradeRollbackAndRecovery": true
+  },
+  "supportingAutomation": {
+    "localCandidate": "template-catalog-0.3.0-rc.1-local-1991.json",
+    "makeReleaseCheck": "passed",
+    "makeReleaseCI": "passed"
+  },
+  "releaseGate": {
+    "cat001ThroughCat008": "accepted",
+    "githubPublication": "authorized but not yet completed",
+    "sandboxDeployment": "not authorized"
+  }
+}

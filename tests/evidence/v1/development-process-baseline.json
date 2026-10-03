@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "audit",
+  "runId": "development-process-audit:2026-09-04",
+  "commit": "7f178acfeb661d13eae3822a67d7cbaeca03cadf",
+  "startedAt": "2026-09-04T14:20:00Z",
+  "completedAt": "2026-09-04T14:43:00Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.22.2",
+    "testedUpgrade": "go1.26.8",
+    "node": "v22"
+  },
+  "environment": {
+    "kind": "local",
+    "name": "isolated-development-audit"
+  },
+  "scenarios": [
+    {"id": "make-check", "result": "passed", "durationMs": 5280},
+    {"id": "release-ci-go1.22.2", "result": "passed", "durationMs": 19560},
+    {"id": "release-ci-go1.26.8-warm", "result": "passed", "durationMs": 20680},
+    {"id": "go-tests-20-repetitions", "result": "passed", "durationMs": 74430},
+    {"id": "node-tests-20-repetitions", "result": "passed", "durationMs": 40000},
+    {"id": "app-abi-e2e", "result": "passed", "durationMs": 3940},
+    {"id": "four-app-real-e2e-go1.26.8", "result": "passed", "durationMs": 73180},
+    {"id": "instrumented-real-e2e", "result": "passed", "durationMs": 76230}
+  ],
+  "details": {
+    "goUnitStatementCoveragePercent": 56.8,
+    "sdkLineCoveragePercent": 83.6,
+    "sdkBranchCoveragePercent": 69.87,
+    "managerIntegrationStatementCoveragePercent": 45.0,
+    "formalReleaseGoVersion": "go1.22.12",
+    "formalReleaseSourceVulnerabilityFindings": 35,
+    "go1.26.8BinaryVulnerabilityFindings": 0,
+    "githubVerifyRuns": 64,
+    "githubVerifyFailures": 20,
+    "githubReleaseRuns": 19,
+    "githubReleaseFailures": 3
+  }
+}

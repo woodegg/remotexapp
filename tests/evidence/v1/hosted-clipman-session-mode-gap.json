@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "audit",
+  "runId": "github-actions:33891756458",
+  "commit": "6db9e4599b0b6a598443e95a3c60175a80111585",
+  "startedAt": "2026-09-04T15:50:13Z",
+  "completedAt": "2026-09-04T15:51:30Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.23.2"
+  },
+  "environment": {
+    "kind": "github-hosted",
+    "name": "ubuntu-latest"
+  },
+  "scenarios": [
+    {
+      "id": "x11-dependencies-installed",
+      "result": "passed"
+    },
+    {
+      "id": "clipman-five-second-cold-start",
+      "result": "failed",
+      "detail": "Clipman remained alive but did not own CLIPBOARD_MANAGER within the fixture's five-second deadline"
+    }
+  ],
+  "details": {
+    "productionArguments": [
+      "--sm-client-disable"
+    ],
+    "previousStartupDeadlineSeconds": 5,
+    "orphanProcessesObserved": [
+      "dbus-daemon",
+      "xfce4-clipman"
+    ],
+    "workflowRun": "https://github.com/woodegg/remotexapp/actions/runs/33891756458"
+  }
+}

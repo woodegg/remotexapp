@@ -1,0 +1,31 @@
+{
+  "experiment": "P02",
+  "outcome": "accepted",
+  "status": "Accepted after seven-run synthetic measurement and interactive input regression",
+  "date": "2026-08-27",
+  "eventsPerRun": 50000,
+  "runsPerMode": 7,
+  "medianMilliseconds": {
+    "traceOn": 1662.35,
+    "traceOff": 0.88
+  },
+  "traceOn": {
+    "webSocketMessages": 50000,
+    "webSocketBytes": 4900000,
+    "diagnosticEvents": 50000
+  },
+  "traceOff": {
+    "webSocketMessages": 0,
+    "webSocketBytes": 0,
+    "diagnosticEvents": 0
+  },
+  "derivedPerEvent": {
+    "avoidedWebSocketBytesApproximate": 98,
+    "avoidedSyntheticMicrosecondsApproximate": 33
+  },
+  "interactive": {
+    "passed": true,
+    "successfulTextCommits": 27,
+    "clientEventRecords": 0
+  }
+}

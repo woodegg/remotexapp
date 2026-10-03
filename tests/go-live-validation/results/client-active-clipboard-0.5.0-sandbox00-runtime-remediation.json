@@ -1,0 +1,77 @@
+{
+  "result": "passed",
+  "date": "2026-09-03",
+  "completedAt": "2026-09-03T11:52:14Z",
+  "scope": {
+    "target": "sandbox00:1991",
+    "managedInstanceId": "sandbox-desktop",
+    "otherRuntimeLifecycleOperations": 0,
+    "operatorApprovedSessionReplacement": true
+  },
+  "trigger": {
+    "operation": "clipboard synchronization from the Unified Console",
+    "httpStatus": 409,
+    "error": "clipboard is unavailable for this pinned runtime",
+    "missingSocket": "/run/user/1001/remotexappd/c9c926c84d0f/clipboard.sock"
+  },
+  "cause": {
+    "managerVersion": "0.5.0",
+    "managerCommit": "639e3d599ad5",
+    "oldRuntimeId": "xfce-user-desktop-c9c926c84d0f",
+    "oldRuntimeCreatedAt": "2026-09-01T13:23:04.354332441-04:00",
+    "oldPinnedGateway": "/usr/local/libexec/remotexapp/releases/0.2.0/novnc-input",
+    "oldRuntimeHadClipboardSocket": false,
+    "managerOrRuntimeRestartCanUpgradePinnedComponents": false
+  },
+  "fleetObservationBeforeRemediation": {
+    "local1991DesktopClipboardCapabilitiesHttp": 200,
+    "sandbox00DesktopClipboardCapabilitiesHttp": 409,
+    "sandbox02DesktopClipboardCapabilitiesHttp": 409,
+    "sandbox03DesktopClipboardCapabilitiesHttp": 409,
+    "sandbox07DesktopClipboardCapabilitiesHttp": 409,
+    "sandbox10DesktopClipboardCapabilitiesHttp": 409,
+    "followersChanged": false
+  },
+  "shutdown": {
+    "attachedClientsBeforeRequest": 0,
+    "gracefulAttemptedFirst": true,
+    "gracefulResult": "shutdown-blocked",
+    "gracefulMessage": "XFCE logout is blocked by an application or user decision",
+    "requestId": "shutdown-58733b9cbd54",
+    "forceUsedAfterBlock": true,
+    "oldRuntimeManifestRemoved": true,
+    "oldRuntimeSocketDirectoryRemoved": true
+  },
+  "replacement": {
+    "newRuntimeId": "xfce-user-desktop-2e7b598b6a5a",
+    "createdAt": "2026-09-03T07:49:11.380437219-04:00",
+    "appPackage": "xfce-user-desktop@2.0.0",
+    "gateway": "/usr/local/libexec/remotexapp/releases/0.5.0/novnc-input",
+    "statusHelper": "/usr/local/libexec/remotexapp/releases/0.5.0/remotexapp-status",
+    "coreDriverDirectory": "/usr/local/share/remotexapp/releases/0.5.0/drivers/common",
+    "clipboardSocketPresent": true,
+    "finalSessionGeneration": 1,
+    "finalAttachedClients": 0
+  },
+  "clipboardE2E": {
+    "browser": "temporary loopback headless Microsoft Edge viewer",
+    "mode": "smoke",
+    "capabilitiesHttp": 200,
+    "protocolVersion": 1,
+    "directions": ["toLocal", "toRemote"],
+    "formats": ["text/plain", "text/html", "text/rtf", "image/png"],
+    "checks": [
+      "capabilities-and-explicit-modes",
+      "all-formats-browser-to-x11",
+      "xfixes-to-browser-and-independent-dismiss"
+    ],
+    "temporaryViewerStopped": true,
+    "warningJournalCount": 0
+  },
+  "remainingFleetBoundary": {
+    "sandbox02": "legacy desktop runtime remains pinned and clipboard-unavailable",
+    "sandbox03": "legacy desktop runtime remains pinned and clipboard-unavailable",
+    "sandbox07": "legacy desktop runtime remains pinned and clipboard-unavailable",
+    "sandbox10": "legacy desktop runtime remains pinned and clipboard-unavailable"
+  }
+}

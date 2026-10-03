@@ -1,0 +1,32 @@
+{
+  "experiment": "P03",
+  "outcome": "accepted",
+  "status": "Accepted for disposable single-app instances after process attribution and interactive validation",
+  "date": "2026-08-27",
+  "serverBeforeAttach": {
+    "memoryCurrentBytes": 41463808,
+    "tasks": 23
+  },
+  "serverAfter60Seconds": {
+    "memoryCurrentBytes": 41381888,
+    "tasks": 20
+  },
+  "p01SteadyServerMiBApproximate": 62,
+  "savingVersusP01MiBApproximate": 22.5,
+  "savingVersusP01PercentApproximate": 36,
+  "absentProcesses": [
+    "xfce4-clipman",
+    "at-spi-bus-launcher",
+    "xfconfd",
+    "xdg-desktop-portal",
+    "xdg-document-portal",
+    "xdg-permission-store",
+    "xdg-desktop-portal-gtk"
+  ],
+  "interactive": {
+    "passed": true,
+    "successfulTextCommits": 4,
+    "clientEventRecords": 0,
+    "inApplicationClipboardPassed": true
+  }
+}

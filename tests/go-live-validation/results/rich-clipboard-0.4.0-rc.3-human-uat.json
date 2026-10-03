@@ -1,0 +1,40 @@
+{
+  "result": "accepted",
+  "date": "2026-09-02",
+  "acceptedAt": "2026-09-02T23:31:20Z",
+  "acceptance": {
+    "explicitOperatorConfirmation": true,
+    "formalGitHubReleaseAuthorized": true,
+    "candidateVersion": "0.4.0-rc.3",
+    "candidateCommit": "d6373f083257d19b8cf277458794607617232d35",
+    "sdkVersion": "0.20.0",
+    "appPackageABI": "remotexapp/v1"
+  },
+  "supportingValidation": {
+    "makeCheck": "passed",
+    "makeReleaseCheck": "passed",
+    "makeReleaseCI": "passed",
+    "sdkSubtests": 68,
+    "realBrowser": {
+      "browser": "Google Chrome 149 headless",
+      "origin": "http://127.0.0.1:21991",
+      "exactCandidateVersion": "0.4.0-rc.3",
+      "exactCandidateCommit": "d6373f083257",
+      "secureContext": true,
+      "checkAccessChangedClipboard": false,
+      "directButtonClickReadState": "granted",
+      "directButtonClickReadVerified": true,
+      "requestReadAccessChangedClipboard": false
+    },
+    "completeClipboardTrain": [
+      "rich-clipboard-0.4.0-rc.1-local-1991.json",
+      "rich-clipboard-0.4.0-rc.2-local-1991.json"
+    ]
+  },
+  "releaseGate": {
+    "clp001ThroughClp017": "accepted",
+    "githubPublication": "authorized but not yet completed",
+    "local1991Replacement": "not performed; remains 0.4.0-rc.2",
+    "sandboxDeployment": "not authorized"
+  }
+}

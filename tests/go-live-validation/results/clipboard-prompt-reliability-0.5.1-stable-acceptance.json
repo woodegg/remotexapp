@@ -1,0 +1,39 @@
+{
+  "result": "accepted",
+  "date": "2026-09-03",
+  "acceptedAt": "2026-09-03T21:54:45Z",
+  "acceptance": {
+    "explicitOperatorConfirmation": true,
+    "promotion": "0.5.1-rc.1 to 0.5.1",
+    "stableGitHubReleaseAuthorized": true,
+    "candidateTag": "v0.5.1-rc.1",
+    "candidateCommit": "d1d1fab8fc75e7194acbd5bd8329f2f89d3e7f64",
+    "candidateArchiveSha256": "cd75801f468cc1b3a71e62b90a87330b560dbe086423d54b5a4f039b833078c2",
+    "sdkVersion": "0.21.1",
+    "appPackageABI": "remotexapp/v1"
+  },
+  "promotionBoundary": {
+    "functionalChangesAllowed": false,
+    "allowedChanges": [
+      "RemoteXApp version metadata",
+      "stable acceptance evidence",
+      "current support, release, and alignment documentation"
+    ],
+    "authorizedDeploymentTargets": [
+      "local:1991",
+      "local:2991",
+      "sandbox00:1991",
+      "sandbox00:2991",
+      "sandbox02:1991",
+      "sandbox03:1991",
+      "sandbox07:1991",
+      "sandbox10:1991"
+    ],
+    "otherDeploymentTargets": "not authorized"
+  },
+  "supportingEvidence": [
+    "clipboard-prompt-reliability-0.5.1-rc.1-local.json",
+    "clipboard-prompt-reliability-0.5.1-rc.1-human-uat.json",
+    "clipboard-prompt-reliability-0.5.1-rc.1-formal-publication.json"
+  ]
+}

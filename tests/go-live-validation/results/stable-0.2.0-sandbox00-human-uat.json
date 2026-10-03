@@ -1,0 +1,48 @@
+{
+  "result": "accepted",
+  "date": "2026-09-01",
+  "acceptedAt": "2026-09-01T16:30:47Z",
+  "acceptance": {
+    "explicitOperatorConfirmation": true,
+    "formalReleaseAuthorized": true,
+    "candidateVersion": "0.2.0",
+    "candidateCommit": "ca1d0b26bf8fde9a35bdebcaec36ac48a01d604b",
+    "target": "sandbox00"
+  },
+  "scope": {
+    "unifiedConsole": "accepted 2026-09-01",
+    "firefoxESR": {
+      "launchAndVisibleWindow": true,
+      "webdriverBiDiControl": true,
+      "inputAndReconnect": true,
+      "destructiveStopAndRelaunch": true
+    },
+    "libreOffice": {
+      "documentLaunchAndVisibleWindow": true,
+      "unoControl": true,
+      "input": true,
+      "explicitSaveBoundary": true,
+      "destructiveStop": true,
+      "lockCleanupAndRelaunch": true
+    }
+  },
+  "supportingAutomation": {
+    "localCandidate": "stable-0.2.0-replacement-local-1991.json",
+    "sandboxStaging": "stable-0.2.0-replacement-sandbox00-staging.json",
+    "sandboxProduction": "stable-0.2.0-replacement-sandbox00-production.json"
+  },
+  "productionStateAtAcceptance": {
+    "version": "0.2.0",
+    "commit": "ca1d0b26bf8f",
+    "health": "ok",
+    "managerNRestarts": 0,
+    "attachedClients": 0
+  },
+  "releaseGate": {
+    "stb003": "accepted",
+    "stb008": "accepted",
+    "firefoxRequirements": "accepted",
+    "libreOfficeRequirements": "accepted",
+    "githubPublication": "authorized but not yet completed"
+  }
+}

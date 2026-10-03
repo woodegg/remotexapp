@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "operator:clp030-034-acceptance",
+  "commit": "4f55e629cdefab6af3ea3cd2e7b7eef1b22ba250",
+  "startedAt": "2026-09-10T02:42:52Z",
+  "completedAt": "2026-09-10T02:42:52Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8"},
+  "environment": {"kind": "local", "name": "local-1991-and-2992"},
+  "scenarios": [{"id": "operator-human-uat-acceptance", "result": "passed"}],
+  "details": {
+    "operatorInstruction": "uat pass, current release is close and do formal release",
+    "acceptedCandidate": "0.5.4-rc.1",
+    "stableTarget": "0.5.4",
+    "sdkVersion": "0.22.0",
+    "requirements": ["CLP-030", "CLP-031", "CLP-032", "CLP-033", "CLP-034"],
+    "train": "closed",
+    "publicationAuthorized": true,
+    "additionalDeploymentAuthorized": false
+  }
+}

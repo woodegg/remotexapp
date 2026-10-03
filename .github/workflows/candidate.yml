@@ -1,0 +1,61 @@
+name: Release candidate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-candidate-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.0
+        with:
+          fetch-depth: 0
+      - name: Scan Git history for secrets
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.26.8"
+          cache: true
+          cache-dependency-path: go.sum
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22.x"
+      - name: Install native and web build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libx11-dev libxtst-dev libxdo3 ripgrep rsync \
+            xvfb xclip dbus-x11 xfce4-clipman
+          npm install --global esbuild@0.20.1
+      - name: Mark candidate start
+        run: printf 'CANDIDATE_STARTED_AT=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+      - name: Build and validate candidate
+        run: make release-ci
+      - name: Verify generated sources are committed
+        run: git diff --exit-code -- cmd/remotexappd/web/assets cmd/remotexappd/web/sdk/generated-asset-urls.js docs/current-state.md
+      - name: Record candidate evidence
+        run: |
+          node scripts/create-candidate-evidence.mjs dist/candidate-evidence.json
+          node scripts/check-evidence.mjs dist/candidate-evidence.json
+          archive="$(find dist -maxdepth 1 -type f -name 'remotexapp-*.tar.gz' -print -quit)"
+          scripts/verify-release-candidate.sh "$archive" dist/SHA256SUMS dist/candidate-evidence.json "$GITHUB_SHA"
+      - name: Upload immutable candidate
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-candidate-${{ github.sha }}
+          path: |
+            dist/remotexapp-*.tar.gz
+            dist/SHA256SUMS
+            dist/candidate-evidence.json
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0

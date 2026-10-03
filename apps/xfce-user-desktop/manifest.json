@@ -1,0 +1,59 @@
+{
+  "apiVersion": "remotexapp/v1",
+  "id": "xfce-user-desktop",
+  "name": "Unix user XFCE desktop",
+  "driverVersion": "3.0.1",
+  "singleton": true,
+  "profileRef": "user",
+  "runMode": "user-home",
+  "ports": {},
+  "parameters": {},
+  "driver": {
+    "config": {}
+  },
+  "overrides": {
+    "allowed": []
+  },
+  "dependencies": {
+    "executables": ["grep", "install", "pgrep", "python3", "sed", "seq", "sleep", "startxfce4", "tr", "xprop", "xfce4-clipman", "xfce4-session-logout"],
+    "pythonModules": []
+  },
+  "server": {
+    "activation": "on-demand",
+    "driver": "server.sh",
+    "displayMode": "fixed",
+    "display": 1,
+    "rfbPort": 5901,
+    "gatewayPort": 39001,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 10,
+    "allowClientResize": false,
+    "readinessPids": ["server.pid"],
+    "readinessTimeout": "10s"
+  },
+  "session": {
+    "services": "core-v1",
+    "activation": "on-attach",
+    "driver": "session.sh",
+    "shutdownDriver": "shutdown.sh",
+    "readinessPid": "xfce.pid",
+    "readinessTimeout": "75s",
+    "vacantTimeout": "48h",
+    "vacantAction": "stop-session",
+    "status": {
+      "mode": "driver",
+      "details": {
+        "application": {
+          "type": "enum",
+          "values": ["xfce-desktop"]
+        }
+      }
+    }
+  },
+  "input": {
+    "backend": "ibus",
+    "lifecycle": "session",
+    "allowedWmClasses": ["*"]
+  }
+}

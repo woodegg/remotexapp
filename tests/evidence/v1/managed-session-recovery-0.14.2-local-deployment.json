@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "RTM-019-021-core-0.14.2-local-manager-deployment",
+  "commit": "ba5c574677a241c70ff783180eb0ab18851bb095",
+  "workspaceDirty": true,
+  "sourceKind": "uncommitted-working-tree-based-on-commit",
+  "startedAt": "2026-10-02T14:28:40Z",
+  "completedAt": "2026-10-02T14:32:33Z",
+  "result": "completed",
+  "toolchain": {"go": "go1.26.8", "node": "v22.22.3"},
+  "environment": {"kind": "project-owned-local-test", "name": "loopback 1991 and 2992"},
+  "artifact": {
+    "name": "remotexapp-0.14.2-linux-amd64.tar.gz",
+    "sha256": "420d1bb8479a5c90dbf86b99f0da4556fa525817651c4de9213221da71c60e03"
+  },
+  "coreVersion": "0.14.2",
+  "sdkVersion": "0.29.1",
+  "publication": false,
+  "humanUAT": "pending",
+  "sandboxOperations": false,
+  "endpoints": [
+    {"listen": "127.0.0.1:1991", "coreVersion": "0.14.2", "console": true, "kiosk": true, "ready": true},
+    {"listen": "127.0.0.1:2992", "coreVersion": "0.14.2", "console": false, "kiosk": true, "ready": true}
+  ],
+  "preservedRuntime": {
+    "id": "xfce-user-desktop-8cdcaa0b5159",
+    "generation": 11,
+    "state": "server-ready",
+    "sessionState": "running",
+    "pinnedCoreVersion": "0.13.0",
+    "pinnedAppVersion": "3.0.0",
+    "attachedClients": 0
+  },
+  "scenarios": [
+    {"id": "portable-release-ci-and-exact-archive-disposable-uid-XFCE-E2E", "result": "passed"},
+    {"id": "2992-manager-0.14.2-ready-no-runtimes-console-disabled", "result": "passed"},
+    {"id": "1991-manager-0.14.2-ready-original-XFCE-generation-and-X11-preserved", "result": "passed"},
+    {"id": "1991-generation-11-connection-descriptor-ready", "result": "passed"},
+    {"id": "system-shipped-App-restaging", "result": "failed"}
+  ],
+  "notes": [
+    "Both Manager selectors use the same exact 0.14.2 archive; prior 0.14.1-rc.1 selectors remain available for rollback. Neither XFCE nor any other runtime was restarted or upgraded.",
+    "System staging published the immutable 0.14.2 Core directories but stopped before App restaging: an existing inactive edge/2.0.4 installation differed by Python __pycache__ and installer seal metadata. Existing App selectors were preserved; Core Manager deployment proceeded from byte-verified staged directories without overwriting that App.",
+    "The 1991 XFCE session input service record was already degraded at 07:01 local time, before the 10:30 deployment. Manager reports ibus not-running while X11, App status, and generation-11 connection descriptor remain ready. Do not claim IME UAT passed on this old pinned runtime.",
+    "No human UAT acceptance, GitHub publication, sandbox operation, runtime upgrade, or desktop restart is claimed."
+  ]
+}

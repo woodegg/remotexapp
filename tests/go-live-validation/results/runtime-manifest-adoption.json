@@ -1,0 +1,72 @@
+{
+  "date": "2026-08-28",
+  "scope": "isolated local user-systemd and real-browser validation only; installed port 1991 remained on 0.1.0-rc.13 and was not restarted or modified",
+  "requirements": [
+    "RTM-007",
+    "RTM-008",
+    "RTM-009"
+  ],
+  "automated": {
+    "focusedGoTests": "pass",
+    "fullGoTests": "pass",
+    "goRace": "pass",
+    "makeCheck": "pass",
+    "releaseCheck": "pass"
+  },
+  "scenarios": [
+    {
+      "name": "healthy managed and anonymous adoption",
+      "result": "pass",
+      "details": [
+        "one running anonymous Mousepad and one managed fixed XFCE runtime were adopted across repeated manager restarts",
+        "the anonymous VNC/server/gateway/session PIDs remained 1078600/1078606/1078612/1079008",
+        "the managed XFCE VNC/server/gateway/session PIDs remained 1078529/1078550/1078559/1091908",
+        "runtime IDs, locked driver versions, session generations, and the Mousepad unsaved document remained intact",
+        "real Chrome observed the interruption and the SDK automatically reconnected RFB and input channels"
+      ]
+    },
+    {
+      "name": "graceful state and restored session observer",
+      "result": "pass",
+      "details": [
+        "an unsaved Mousepad document returned HTTP 409 and preserved its session; reattachment cancelled the blocked cleanup",
+        "after managed XFCE adoption, native XFCE logout emptied the session cgroup and was immediately classified as exited/stopped",
+        "the terminal application status was written to the unified manifest and the SDK emitted sessionended without automatic reconnect",
+        "forced anonymous stop and managed desiredState=stopped removed their manifests and exact units"
+      ]
+    },
+    {
+      "name": "unhealthy stopped-session locked recovery",
+      "result": "pass",
+      "details": [
+        "an anonymous Mousepad runtime was created from driver 1.5.0 with 1280x720 geometry and no running application session",
+        "the loaded catalog was changed to driver 9.9.0 with 1024x768 geometry and the recorded gateway unit was stopped",
+        "startup rejected adoption, stopped the remaining exact units, and recreated the same runtime ID",
+        "old VNC/server/gateway PIDs 1096283/1096331/1096336 were replaced by 1098874/1098880/1098894",
+        "the recovered runtime still reported locked driver 1.5.0 and 1280x720 while the new catalog reported 9.9.0 and 1024x768"
+      ]
+    },
+    {
+      "name": "current-binary live-session fault protection",
+      "result": "pass",
+      "details": [
+        "the release-gate binary ran on loopback 2097 with a real Chrome SDK client and accepted final adoption plus Chinese text in 1.2 ms",
+        "healthy restart retained runtime mousepad-final-2a60324218d8, session generation 1, VNC/server/gateway/session PIDs 1140947/1140972/1140977/1141910, and Mousepad PID 1141997",
+        "after the gateway was stopped, another manager restart preserved the still-live VNC/server/session and Mousepad PIDs instead of destroying the application",
+        "the API and durable manifest exposed the inactive gateway health error while keeping desiredState running and driver 1.5.0",
+        "explicit force then removed the manifest and all exact units"
+      ]
+    },
+    {
+      "name": "current-binary durable graceful-stop ordering",
+      "result": "pass",
+      "details": [
+        "a real Chrome client committed graceful durability plus Chinese text to Mousepad before stop",
+        "the unsaved application returned HTTP 409 after the shutdown hook and the manifest retained desiredState running with shutdown-blocked metadata",
+        "VNC/server/gateway/session PIDs 1168256/1168265/1168271/1168488 remained active while the save decision was unresolved",
+        "explicit force returned HTTP 200, removed the manifest, and left all exact units inactive"
+      ]
+    }
+  ],
+  "cleanup": "the isolated manager, Chrome profile, runtime units, listeners, configuration, state, and profiles were removed with recoverable trash operations"
+}

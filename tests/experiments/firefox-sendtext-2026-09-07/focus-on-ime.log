@@ -1,0 +1,39 @@
+# Filtered native IME trace; unrelated Widget/key-event logging omitted.
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: I/IMEHandler 0x7199950f1250 OnCommitCompositionNative(aContext=0x719979460640), current context=0x719979460640, active context=0x719979460640, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2103155: Main Thread]: I/IMEHandler 0x7199950f1250 DispatchCompositionCommitEvent(aContext=0x719979460640, aCommitString=0x7fff437e3d28, ("AsciiProbe"))
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2103155: Main Thread]: I/IMEHandler 0x7199950f1250 OnCommitCompositionNative(aContext=0x719979460640), current context=0x719979460640, active context=0x719979460640, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2103155: Main Thread]: I/IMEHandler 0x7199950f1250 DispatchCompositionCommitEvent(aContext=0x719979460640, aCommitString=0x7fff437e3d28, ("中文测试"))
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: I/IMEHandler 0x7199950f1250 OnCommitCompositionNative(aContext=0x719979460640), current context=0x719979460640, active context=0x719979460640, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2103155: Main Thread]: I/IMEHandler 0x7199950f1250 DispatchCompositionCommitEvent(aContext=0x719979460640, aCommitString=0x7fff437e3d28, ("AsciiProbe"))
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2103155: Main Thread]: I/IMEHandler 0x7199950f1250 OnCommitCompositionNative(aContext=0x719979460640), current context=0x719979460640, active context=0x719979460640, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2103155: Main Thread]: I/IMEHandler 0x7199950f1250 DispatchCompositionCommitEvent(aContext=0x719979460640, aCommitString=0x7fff437e3d28, ("中文测试"))
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2103155: Main Thread]: I/IMEHandler 0x7199950f1250 OnCommitCompositionNative(aContext=0x719979460640), current context=0x719979460640, active context=0x719979460640, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2103155: Main Thread]: I/IMEHandler 0x7199950f1250 DispatchCompositionCommitEvent(aContext=0x719979460640, aCommitString=0x7fff437e3d28, ("AsciiProbe"))
+[Parent 2103155: Main Thread]: E/IMEHandler 0x7199950f1250   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2103155: Main Thread]: I/IMEHandler 0x7199950f1250 OnCommitCompositionNative(aContext=0x719979460640), current context=0x719979460640, active context=0x719979460640, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2103155: Main Thread]: I/IMEHandler 0x7199950f1250 DispatchCompositionCommitEvent(aContext=0x719979460640, aCommitStri

@@ -1,0 +1,116 @@
+{
+  "experiment": "P12",
+  "outcome": "accepted",
+  "date": "2026-08-27",
+  "primaryVariable": "RemoteXAppClient ordinary-text batching delay and composition flush policy",
+  "controlledHarness": {
+    "runsPerMode": 5,
+    "burstEvents": 5,
+    "burstSpacingMillis": 10,
+    "baselineFixed40": {
+      "singleMillis": [40.305546, 40.080216, 40.70267, 40.490002, 40.689416],
+      "medianSingleMillis": 40.490002,
+      "burstFirstToSendMillis": [80.638986, 80.275706, 81.297934, 81.731785, 81.423907],
+      "medianBurstFirstToSendMillis": 81.297934,
+      "burstLastToSendMillis": [39.750864, 39.367255, 40.10575, 39.756655, 40.096162],
+      "medianBurstLastToSendMillis": 39.756655,
+      "burstSends": 1,
+      "compositionMillis": [40.347812, 40.30726, 39.471625, 40.279657, 40.955081],
+      "medianCompositionMillis": 40.30726
+    },
+    "finalSourceCompatibility40": {
+      "singleMillis": [39.453312, 40.128982, 39.668067, 40.066396, 40.613464],
+      "medianSingleMillis": 40.066396,
+      "burstFirstToSendMillis": [81.024442, 80.934119, 83.825154, 81.619338, 81.560232],
+      "medianBurstFirstToSendMillis": 81.560232,
+      "burstLastToSendMillis": [40.301657, 40.292035, 40.950463, 40.548543, 40.321858],
+      "medianBurstLastToSendMillis": 40.321858,
+      "burstSends": 1,
+      "compositionMillis": [0.011161, 0.10219, 0.0082, 0.008605, 0.007593],
+      "medianCompositionMillis": 0.008605
+    },
+    "candidate16": {
+      "singleMillis": [15.962239, 16.389489, 17.203506, 16.277617, 16.054643],
+      "medianSingleMillis": 16.277617,
+      "burstFirstToSendMillis": [57.246399, 57.331746, 57.471231, 56.571762, 57.198772],
+      "medianBurstFirstToSendMillis": 57.246399,
+      "burstLastToSendMillis": [16.411104, 16.346452, 16.495085, 16.350744, 16.391021],
+      "medianBurstLastToSendMillis": 16.391021,
+      "burstSends": 1,
+      "compositionMillis": [0.010002, 0.008584, 0.008213, 0.008105, 0.008531],
+      "medianCompositionMillis": 0.008531,
+      "singleDelayReductionPercent": 59.7985
+    },
+    "candidate8": {
+      "medianSingleMillis": 8.245742,
+      "burstSends": 5
+    },
+    "candidate0": {
+      "medianSingleMillis": 0.083398,
+      "burstSends": 5
+    }
+  },
+  "realBrowserDefault16": {
+    "sdkVersion": "0.8.0",
+    "instanceId": "mousepad-no-clipman-8ad16e913a2c",
+    "managerPort": 1992,
+    "display": 11,
+    "rfbPort": 5911,
+    "gatewayPort": 39011,
+    "inputToAckMillis": {
+      "ordinaryA": 18.5,
+      "chineseOne": 3.8,
+      "firstEnglishOne": 21.7,
+      "chineseTwo": 3.2,
+      "firstEnglishTwo": 20.6,
+      "burst": 62.2,
+      "afterReconnect": 18.1
+    },
+    "ackValues": ["A", "你好", "i", "世界", "x", "abcde", "R"],
+    "exactClipboardText": "A你好i世界xabcdeR",
+    "burstAcknowledgements": 1,
+    "staleReconnect": {
+      "queuedValue": "DROP",
+      "reconnectMillis": 27.1,
+      "acknowledgements": 0,
+      "pendingTextAfterReconnect": ""
+    },
+    "resize": { "before": "1100x673", "after": "900x640" },
+    "pointer": { "target": "540,256", "actual": "540,256" },
+    "rfbState": "connected",
+    "inputState": "connected"
+  },
+  "realBrowserCompatibility40": {
+    "inputToAckMillis": {
+      "ordinaryA": 47.2,
+      "chineseOne": 2.1,
+      "firstEnglishOne": 45.3,
+      "chineseTwo": 1.9,
+      "firstEnglishTwo": 45.3,
+      "burst": 82.8,
+      "afterReconnect": 45.2
+    },
+    "ackValues": ["A", "你好", "i", "世界", "x", "abcde", "R"],
+    "exactClipboardText": "A你好i世界xabcdeR",
+    "burstAcknowledgements": 1,
+    "staleBatchCrossedReconnect": false,
+    "resize": { "before": "900x553", "after": "1100x760" },
+    "pointer": { "target": "660,304", "actual": "660,304" }
+  },
+  "interactiveAcceptance": {
+    "instanceId": "mousepad-no-clipman-46135e2b9255",
+    "nativeOsIme": true,
+    "userResult": "work fine",
+    "completedTextRequests": 59,
+    "textErrorsOrRejections": 0,
+    "clientEventTraceRecords": 0
+  },
+  "binaries": {
+    "candidateRemoteXAppdSha256": "67470aeb3176288e6547e97cd98a6b759237097f7986ed4186530ca0e39b28cb",
+    "candidateGatewaySha256": "b9f8b8189a609e6167bf11b81546803937d9d1993e33aa28245cc12a0e17c556",
+    "candidateStatusHelperSha256": "3cf0bc00fa90ce2ab91b06945d8408e1259436ada3cddb0306d95cc890d4013b"
+  },
+  "productionPort1991": "HTTP 200 throughout; not rebuilt or restarted",
+  "cleanup": "All isolated services, displays, ports and browser processes stopped; temporary directory moved to Trash",
+  "status": "Accepted: 16 ms preserves tested burst coalescing, immediate composition removes the 40 ms timer, reconnect ownership is safe, and automated plus native-IME regression passed"
+}

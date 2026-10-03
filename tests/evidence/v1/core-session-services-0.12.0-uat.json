@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "core-session-services-0.12.0-rc.2-operator-acceptance-stable-promotion",
+  "commit": "b7f4f98c7204a9468edef24204de1ed7f3d7a191",
+  "startedAt": "2026-09-14T06:11:04Z",
+  "completedAt": "2026-09-14T06:11:04Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "22.22.3"
+  },
+  "environment": {
+    "kind": "local-loopback-UAT",
+    "name": "local-1991-and-2992"
+  },
+  "artifact": {
+    "name": "remotexapp-0.12.0-rc.2-linux-amd64.tar.gz",
+    "sha256": "eb97b7941be80035f00e58f417da5f5c7dc161dcdb096c20a0fedcd62835a98f"
+  },
+  "scenarios": [
+    {
+      "id": "operator-accepts-local-rc.2-UAT",
+      "result": "passed"
+    },
+    {
+      "id": "operator-authorizes-formal-GitHub-release",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "operatorInstruction": "uat accept. do foral release on github",
+    "requirements": "SVC-001 through SVC-010 accepted",
+    "automatedEvidence": [
+      "core-session-services-0.12.0-rc.2-local.json",
+      "core-session-services-0.12.0-rc.2-state-matrix.json",
+      "core-session-services-0.12.0-rc.2-xfce-saved-session.json"
+    ],
+    "sourceState": "Accepted UAT archive was built from the dirty working tree based on the full commit above, not a clean/tagged release.",
+    "stablePromotion": "0.12.0; SDK 0.28.0 and accepted seven App Packages unchanged. Only release/build identity, documentation and sanitized evidence may differ. Revalidate a clean hosted candidate with exact-archive live E2E before publishing its unchanged bytes. Operator acceptance is carried over for this metadata-only promotion; no second human test of the stable bytes is claimed.",
+    "deployment": "No alignment or runtime replacement authorized. Local endpoints remain rc.2; sandboxes/gateways unchanged.",
+    "confidentiality": "Replace two private HOME prefixes in previously untracked rc.1 evidence with ${HOME} before the first commit; retain directory identities and raw private evidence locally. Unrelated sandbox TODO edits and audio release-tray are excluded."
+  }
+}

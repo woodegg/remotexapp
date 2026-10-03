@@ -1,0 +1,31 @@
+{
+  "id": "xfce-session-clipman",
+  "name": "Experiment P03b: Full XFCE with session Clipman",
+  "singleton": true,
+  "profileRef": "p03b",
+  "runMode": "shared",
+  "server": {
+    "activation": "auto",
+    "driver": "./server.sh",
+    "displayMode": "fixed",
+    "display": 11,
+    "rfbPort": 5911,
+    "gatewayPort": 39011,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 5,
+    "allowClientResize": false,
+    "readinessPids": ["server.pid"]
+  },
+  "session": {
+    "activation": "on-attach",
+    "driver": "./session.sh",
+    "readinessPid": "xfce.pid",
+    "vacantTimeout": "10s",
+    "vacantAction": "stop-session"
+  },
+  "input": {
+    "backend": "ibus",
+    "allowedWmClasses": ["*"]
+  }
+}

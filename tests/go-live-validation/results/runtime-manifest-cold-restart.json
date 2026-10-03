@@ -1,0 +1,86 @@
+{
+  "date": "2026-08-28",
+  "scope": "isolated local user-systemd validation; production port 1991 was not modified",
+  "requirements": ["RTM-001", "RTM-002", "RTM-003", "RTM-004", "RTM-005", "RTM-006"],
+  "automated": {
+    "goTests": "pass",
+    "goRace": "pass",
+    "makeCheck": "pass",
+    "releaseCheck": "pass"
+  },
+  "scenarios": [
+    {
+      "name": "unified managed and anonymous restart",
+      "result": "pass",
+      "details": [
+        "one anonymous and one managed dynamic runtime wrote separate mode-0600 manifests",
+        "the runtime manifest was authoritative while the managed registry retained the documented one-release rc.15 rollback projection",
+        "manager restart retained both runtime IDs, replaced all VNC/server/gateway PIDs, and restored both gateways healthy",
+        "explicit anonymous stop and managed desiredState=stopped removed both active manifests"
+      ]
+    },
+    {
+      "name": "pre-manifest fixed autostart migration",
+      "result": "pass",
+      "details": [
+        "a fixed display :13 runtime retained its VNC/server/gateway units while its manifest was deliberately removed to model rc.15",
+        "startup stopped only the exact legacy runtime units, removed its runtime directory, and preserved profile data",
+        "template autostart created a new healthy runtime on :13, RFB 5913, and gateway 39013",
+        "all old units were inactive and the manager did not enter a restart loop"
+      ]
+    },
+    {
+      "name": "exact rc.15 rollback and roll-forward",
+      "result": "pass",
+      "details": [
+        "the immutable GitHub v0.1.0-rc.15 Linux artifact had a different remotexappd SHA-256 from the working candidate",
+        "rc.15 loaded the managed compatibility projection and retained runtime ID plus all three VNC/server/gateway PIDs",
+        "rolling forward to the candidate retained the runtime ID, replaced all three unit PIDs, and restored a healthy gateway",
+        "the unified manifest remained authoritative for the candidate while rc.15 ignored it safely"
+      ]
+    },
+    {
+      "name": "abrupt manager SIGKILL with healthy anonymous runtime",
+      "result": "pass",
+      "details": [
+        "the active anonymous runtime manifest was mode 0600 before fault injection",
+        "all VNC/server/gateway units remained active after SIGKILL",
+        "restart retained runtime ID mousepad-a889c54bc229 while replacing all three unit PIDs and returning server-ready",
+        "explicit forced stop removed the manifest"
+      ]
+    },
+    {
+      "name": "crash during partial runtime creation",
+      "result": "pass",
+      "details": [
+        "fault injection left runtime partial-start-613874e31133 with a starting manifest, active VNC unit, and inactive server unit",
+        "restart stopped the old VNC process and recreated the same runtime ID from the corrected current template",
+        "the recovered VNC PID differed and server plus gateway units became healthy",
+        "explicit forced stop removed the manifest and isolated test resources"
+      ]
+    },
+    {
+      "name": "local fixed XFCE browser and cold restart",
+      "result": "pass",
+      "details": [
+        "the candidate ran only on loopback port 2096 with fixed display :15; production port 1991 and displays :1/:2 were unchanged",
+        "real headless Chrome connected through the SDK/noVNC stack and kept the 1280x720 framebuffer while scaling CSS from 776.875x437 to 900x506.25",
+        "finite reconnect exhausted exactly once after two attempts, unlimited reconnect did not exhaust after five injected failures, and explicit reconnect reset the budget",
+        "manager restart retained runtime ID xfce-user-validation-a4ab01f6bb90, replaced all four unit PIDs, and the browser reattached to a running generation",
+        "the legacy observe-reconnect harness lost its CDP response while collecting final events, but an independent browser check confirmed connected RFB/input channels after restart",
+        "XFCE logout reported exited and disconnected without automatic reconnect; explicit reconnect started healthy generation 2"
+      ]
+    },
+    {
+      "name": "local Mousepad graceful-shutdown browser path",
+      "result": "pass",
+      "details": [
+        "real Chrome delivered Local ASCII plus Chinese text with a 2 ms round trip and a focused remote caret",
+        "an unsaved document made graceful stop return HTTP 409 while preserving the connected session",
+        "forced stop disconnected the viewer, removed the manifest, and left session/gateway/server/VNC units inactive",
+        "managed XFCE desiredState=stopped removed its manifest and all four units before test cleanup"
+      ]
+    }
+  ],
+  "cleanup": "all isolated managers, runtime units, listeners, configurations, and temporary state roots were removed"
+}

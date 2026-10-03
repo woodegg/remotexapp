@@ -1,0 +1,101 @@
+{
+  "experiment": "P13",
+  "outcome": "accepted",
+  "date": "2026-08-27",
+  "primaryVariable": "Successful committed-text gateway logging policy",
+  "scope": "Go gateway journal only; the Python private IBus engine per-commit content-free engine.log append was held constant",
+  "workload": {
+    "durationSeconds": 30,
+    "requests": 600,
+    "intervalMillis": 50,
+    "asciiCharacters": 540,
+    "chineseCharacters": 60,
+    "totalCharacters": 600,
+    "utf8Bytes": 720,
+    "display": 11,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 15,
+    "class": "mousepad-no-clipman"
+  },
+  "baseline": {
+    "gatewaySha256": "b9f8b8189a609e6167bf11b81546803937d9d1993e33aa28245cc12a0e17c556",
+    "durationMillis": 29953.1,
+    "textJournalLines": 2400,
+    "contentJournalLines": 600,
+    "textJournalBytes": 135947,
+    "cpuTicks": 65,
+    "writeSyscalls": 8433,
+    "wcharBytes": 1069867,
+    "serverMillis": { "min": 0.484, "p50": 0.611, "p95": 1.493, "max": 6.06, "mean": 0.768407 },
+    "roundTripMillis": { "min": 0.8, "p50": 1.2, "p95": 3.6, "max": 18.1, "mean": 1.636 }
+  },
+  "candidate": {
+    "gatewaySha256": "3553839051eab9b79f8a7ec8257260bcfa6a3491131701180c8f0d14a9480ab0",
+    "managerSha256": "4c63e0327e4a91c2ce602acaea379b0dc00709a0774b0bc971329fc01a226460",
+    "durationMillis": 29950.9,
+    "textLogLevel": "errors",
+    "textJournalLines": 0,
+    "contentJournalLines": 0,
+    "textJournalBytes": 0,
+    "cpuTicks": 62,
+    "writeSyscalls": 5938,
+    "wcharBytes": 929993,
+    "serverMillis": { "min": 0.446, "p50": 0.58, "p95": 1.583, "max": 6.886, "mean": 0.755188 },
+    "roundTripMillis": { "min": 0.8, "p50": 1.2, "p95": 3.7, "max": 20.3, "mean": 1.669667 },
+    "healthAfter": {
+      "textRequests": 600,
+      "textErrors": 0,
+      "textInputBytes": 720,
+      "textServerMicroseconds": 453113
+    }
+  },
+  "differences": {
+    "successfulJournalReductionPercent": 100,
+    "contentJournalReductionPercent": 100,
+    "writeSyscallReduction": 2495,
+    "writeSyscallReductionPercent": 29.585,
+    "wcharReductionBytes": 139874,
+    "wcharReductionPercent": 13.074,
+    "cpuTickDifference": -3,
+    "interpretation": "No CPU or latency speedup is claimed from one matched run; accepted benefits are lower write I/O and no plaintext success logging by default."
+  },
+  "correctness": {
+    "baselineClipboardExact": true,
+    "candidateClipboardExact": true,
+    "p12AckValues": ["A", "你好", "i", "世界", "x", "abcde", "R"],
+    "reconnectMillis": 21.5,
+    "staleBatchCrossedReconnect": false,
+    "resize": { "before": "1100x617", "after": "900x640" },
+    "pointerTarget": "540,256",
+    "rfbState": "connected",
+    "inputState": "connected",
+    "invalidRequest": {
+      "ackError": "invalid text input",
+      "textErrorsAfter": 1,
+      "rejectionLogLines": 1,
+      "contentLogged": false
+    }
+  },
+  "interactiveAcceptance": {
+    "instanceId": "mousepad-no-clipman-59fe1e05ed36",
+    "userResult": "works",
+    "activeRfbConnections": 1,
+    "activeInputConnections": 1,
+    "textRequests": 5,
+    "textInputBytes": 5,
+    "textErrors": 0,
+    "successfulTextLogLines": 0,
+    "contentLogLines": 0,
+    "clientEventLogLines": 0
+  },
+  "logLevels": {
+    "errors": "Errors only; no successful request or content logging",
+    "metadata": "Successful stages and timing without content",
+    "content": "Explicit diagnostic mode that includes typed text"
+  },
+  "productionPort1991": "HTTP 200 throughout; not rebuilt or restarted",
+  "nextCandidate": "Measure the private Python IBus engine open/append/close per successful commit as a separate experiment before changing it",
+  "cleanup": "Isolated browser, instance, display and manager stopped; temporary directory moved to Trash after final verification",
+  "status": "Accepted: default success logging and plaintext text disclosure removed, counters and error logs retained, matched stress plus automated and native-IME regression passed"
+}

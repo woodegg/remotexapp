@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "runtime-coordinator-0.13.0-local-deployment",
+  "commit": "2d8068687ead065ecc54a07ed03602bcc5c144ee",
+  "startedAt": "2026-09-18T15:58:00Z",
+  "completedAt": "2026-09-18T16:09:00Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "project-local-test",
+    "name": "loopback 1991 and 2992"
+  },
+  "artifact": {
+    "name": "remotexapp-0.13.0-linux-amd64.tar.gz",
+    "sha256": "3cef36871a4dd8ce23c12b979f66a2fdcc748b860abae05d9646491a03aceefa"
+  },
+  "managerSha256": "8a861a05e2799ca0c8de7c61951219736ed8e760ba5a21a4f4923933c29bdead",
+  "sdkVersion": "0.29.1",
+  "deployment": "Both Managers activated; acceptance has unresolved runtime-health and browser-automation exceptions.",
+  "sandboxOperations": false,
+  "runtimeRestart": false,
+  "endpoints": [
+    {
+      "port": 1991,
+      "listen": "127.0.0.1:1991",
+      "version": "0.13.0",
+      "console": true,
+      "kiosk": true,
+      "existingDesktop": {
+        "generation": 3,
+        "corePin": "0.12.0-rc.2",
+        "appPin": "3.0.0",
+        "processesPreserved": true,
+        "managedState": "failed",
+        "error": "runtime preserved with incomplete adoption health: X display is not ready"
+      }
+    },
+    {
+      "port": 2992,
+      "listen": "127.0.0.1:2992",
+      "version": "0.13.0",
+      "console": false,
+      "kiosk": true
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "public-artifact-checksum-clean-build-identity-and-sensitive-data-scan",
+      "result": "passed"
+    },
+    {
+      "id": "two-running-binaries-match-formal-artifact",
+      "result": "passed"
+    },
+    {
+      "id": "two-health-ready-version-endpoints",
+      "result": "passed"
+    },
+    {
+      "id": "loopback-listeners-config-hashes-App-selectors-and-feature-policy-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "existing-live-XFCE-ID-generation-pins-attached-count-and-manifest-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "served-SDK-and-Console-hashes-match-accepted-and-formal-bytes",
+      "result": "passed"
+    },
+    {
+      "id": "both-endpoints-new-owned-Mousepad-ready-and-getConnections",
+      "result": "passed"
+    },
+    {
+      "id": "both-endpoints-detached-idle-lease-survives-70-seconds-with-60-second-policy",
+      "result": "passed"
+    },
+    {
+      "id": "owned-test-runtime-cleanup-no-service-restart-loop",
+      "result": "passed"
+    },
+    {
+      "id": "existing-XFCE-display-health",
+      "result": "failed",
+      "reason": "xdpyinfo on display :1 times out. Observed under both stable and rolled-back RC.3; live desktop preserved, explicit restart not authorized."
+    },
+    {
+      "id": "served-kiosk_Coordinator-browser-smoke",
+      "result": "failed",
+      "reason": "Two isolated Chrome/Xvfb attempts timed out in CDP Page.navigate. Temporary Apps cleaned up. API-only acceptance does not substitute for a UI pass."
+    },
+    {
+      "id": "overwrite-same-version-LightView-package",
+      "result": "skipped",
+      "reason": "Stager rejected different content identity for installed lightview@1.0.8. Payload file contents compare equal; local package additionally contains Python bytecode cache and seal. Existing immutable App and selectors preserved."
+    }
+  ],
+  "recovery": {
+    "initialSelection": "1991 exceeded default 120-second health timeout; rollback selected RC.3 but its startup also timed out.",
+    "finalSelection": "Formal 0.13.0 activated using the existing selector with 600-second health window. Startup completed after about 135 seconds with the desktop preserved but unhealthy.",
+    "retainedRollback": "0.13.0-rc.3"
+  },
+  "drift": "Core and SDK match; App selections intentionally preserved, not fleet/package alignment.",
+  "rawEvidence": {
+    "before": "/tmp/remotexapp-0130-local-before.json",
+    "after": "/tmp/remotexapp-0130-local-after.json",
+    "api": "/tmp/remotexapp-0130-local-api-smoke.json",
+    "browserAttempts": [
+      "/tmp/remotexapp-0130-local-smoke.log",
+      "/tmp/remotexapp-0130-local-smoke-retry.log"
+    ]
+  },
+  "references": [
+    "runtime-coordinator-0.13.0-publication.json"
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "date": "2026-08-27",
+  "candidate": "0.1.0-rc.5",
+  "driverVersion": "1.1.0",
+  "outcome": "passed",
+  "scope": "isolated real-application validation; production deployment not changed",
+  "binarySha256": {
+    "remotexappdLiveRuns": [
+      "047f628fe845e30792d022fa8dc5b5e53b9cd5558e725bb2677939684c0b8df7",
+      "e648dbbf6f2a17cfdc65a5cfd07683c954847a412461b30eb7983e6c0bd9d2fa"
+    ],
+    "novncInput": "f5a1204b9bef1f72ed442474b53d6d2d0809f1d3e7accf46c8d24d0a01be1c20",
+    "remotexappStatus": "0b2421816f6354777e9aae8e28b7edb8769c5253448a180c272b9c8d63955fed"
+  },
+  "mousepad": {
+    "cleanUserExit": "passed; native Alt+F4 produced exited and immediate stop-instance",
+    "cleanApiStop": "passed; HTTP 200 without force",
+    "unsavedBlock": {
+      "outcome": "passed",
+      "httpStatus": 409,
+      "hookElapsedMs": 2886,
+      "processRetained": true,
+      "sessionState": "shutdown-blocked",
+      "warningLogged": true
+    },
+    "reconnectAndSave": {
+      "outcome": "passed",
+      "shutdownStateAfterAttach": "cancelled",
+      "savedPathClass": "external durable path",
+      "savedBytes": 39,
+      "exactContent": "Verified persistent contents 2026-08-27",
+      "finalApplicationState": "exited"
+    },
+    "explicitForce": "passed; blocked request followed by HTTP 200 force, all units inactive",
+    "hostForce": {
+      "outcome": "passed",
+      "configuredAfterBlock": "4s",
+      "observedAfterBlockMs": 4242,
+      "shutdownState": "forced"
+    },
+    "unexpectedCrash": {
+      "outcome": "passed",
+      "injection": "SIGKILL",
+      "sessionState": "failed",
+      "applicationState": "error",
+      "error": "Mousepad exit code 137"
+    }
+  },
+  "xfce": {
+    "display": ":31",
+    "userLogout": "passed; exited and stop-session retained server layer",
+    "sdkTerminalDisconnect": "passed; attached clients converged to zero",
+    "reattach": "passed; generation 1 to 2 with identical VNC and gateway PIDs",
+    "managerApiStop": "passed; private D-Bus logout hook completed without force"
+  },
+  "edge": {
+    "outcome": "passed",
+    "launchParameters": {
+      "startUrl": "about:blank",
+      "incognito": true
+    },
+    "visibleWindows": 1,
+    "apiStopHttpStatus": 200,
+    "apiStopElapsedMs": 609,
+    "processRetainedAfterStop": false,
+    "shutdownState": "completed"
+  },
+  "managedRestart": {
+    "outcome": "passed",
+    "blockedRequestPreserved": true,
+    "forceDeadlinePreserved": true,
+    "vncGatewaySessionPidsPreservedAtAdoption": true,
+    "forceAfter": "6s",
+    "finalDesiredState": "stopped",
+    "finalObservedState": "stopped",
+    "finalRuntimeReference": null
+  },
+  "regressionCoverage": [
+    "hook completed, blocked, failed, and timeout outcomes",
+    "blocked attach cancellation",
+    "request and generation timer guards",
+    "explicit and host force",
+    "managed registry restoration and convergence",
+    "SDK sessionended and no automatic reconnect"
+  ],
+  "defectsFoundAndFixed": [
+    "windowclose destroyed Mousepad hidden GTK window; use Alt+F4 on visible windows",
+    "host-forced managed runtime did not synchronously converge durable desired state"
+  ],
+  "remainingGate": "publish/deploy rc.5, repeat production smoke, then human visual UAT"
+}

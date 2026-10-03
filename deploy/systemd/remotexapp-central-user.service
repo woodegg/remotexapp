@@ -1,0 +1,55 @@
+[Unit]
+Description=RemoteXApp X11 application manager (real user)
+Documentation=file:/usr/local/share/doc/remotexapp/operations.md
+After=default.target
+
+[Service]
+Type=simple
+WorkingDirectory=/usr/local/share/remotexapp/current
+Environment=REMOTEXAPP_SHUTDOWN_GRACE_TIMEOUT=15s
+Environment=REMOTEXAPP_SHUTDOWN_BLOCKED_WARNING_AFTER=1h
+Environment=REMOTEXAPP_SHUTDOWN_FORCE_AFTER=0
+Environment=REMOTEXAPP_DISABLE_CONSOLE=false
+Environment=REMOTEXAPP_DISABLE_KIOSK=false
+Environment=REMOTEXAPP_ENABLE_SERVICE_RESTART=false
+Environment=REMOTEXAPP_APP_PACKAGE_ROOT=/usr/local/share/remotexapp/apps
+Environment=REMOTEXAPP_APPS_ENABLED=/etc/remotexapp/apps-enabled
+Environment=REMOTEXAPP_CORE_DRIVER_DIR=/usr/local/share/remotexapp/current/drivers/common
+EnvironmentFile=/etc/remotexapp/remotexapp.env
+EnvironmentFile=-/etc/remotexapp/users/%u.env
+Environment=XDG_RUNTIME_DIR=%t
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=%t/bus
+ExecStart=/usr/local/libexec/remotexapp/current/remotexappd \
+  -listen ${REMOTEXAPP_LISTEN} \
+  -state-dir %h/.local/state/remotexapp \
+  -class-config ${REMOTEXAPP_CLASS_CONFIG} \
+  -gateway-bin /usr/local/libexec/remotexapp/current/novnc-input \
+  -status-bin /usr/local/libexec/remotexapp/current/remotexapp-status \
+  -ibus-engine /usr/local/share/remotexapp/current/components/remote-unicode-engine/engine.py \
+  -auth-mode ${REMOTEXAPP_AUTH_MODE} \
+  -identity-header ${REMOTEXAPP_IDENTITY_HEADER} \
+  -trusted-proxies ${REMOTEXAPP_TRUSTED_PROXIES} \
+  -allow-insecure-public=${REMOTEXAPP_ALLOW_INSECURE_PUBLIC} \
+  -expose-internals=${REMOTEXAPP_EXPOSE_INTERNALS} \
+  -disable-console=${REMOTEXAPP_DISABLE_CONSOLE} \
+  -disable-kiosk=${REMOTEXAPP_DISABLE_KIOSK} \
+  -max-instances ${REMOTEXAPP_MAX_INSTANCES} \
+  -gateway-text-log ${REMOTEXAPP_TEXT_LOG} \
+  -vnc-launcher direct \
+  -managed-observer cgroup \
+  -session-observer cgroup \
+  -shutdown-grace-timeout ${REMOTEXAPP_SHUTDOWN_GRACE_TIMEOUT} \
+  -shutdown-blocked-warning-after ${REMOTEXAPP_SHUTDOWN_BLOCKED_WARNING_AFTER} \
+  -shutdown-force-after ${REMOTEXAPP_SHUTDOWN_FORCE_AFTER}
+Restart=on-failure
+RestartSec=2s
+TimeoutStopSec=20s
+UMask=0077
+NoNewPrivileges=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "runtime-coordinator-0.13.0-formal-publication",
+  "commit": "2d8068687ead065ecc54a07ed03602bcc5c144ee",
+  "startedAt": "2026-09-18T15:04:14Z",
+  "completedAt": "2026-09-18T15:52:28Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3",
+    "hostedNode": "v22.23.2"
+  },
+  "environment": {
+    "kind": "github-release",
+    "name": "woodegg/remotexapp v0.13.0; isolated build-host live acceptance"
+  },
+  "artifact": {
+    "name": "remotexapp-0.13.0-linux-amd64.tar.gz",
+    "sha256": "3cef36871a4dd8ce23c12b979f66a2fdcc748b860abae05d9646491a03aceefa"
+  },
+  "release": {
+    "id": "RE_kwDOUGRp2s4XV1J2",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/v0.13.0",
+    "tag": "v0.13.0",
+    "tagObject": "d045304e8ccafe7b5591c3a22f41e22df602ad25",
+    "peeledCommit": "2d8068687ead065ecc54a07ed03602bcc5c144ee",
+    "publishedAt": "2026-09-18T15:51:40Z",
+    "draft": false,
+    "prerelease": false,
+    "latest": true
+  },
+  "workflows": {
+    "candidate": 35360077301,
+    "verify": 35360077756,
+    "publication": 35364939439
+  },
+  "sdk": {
+    "version": "0.29.1",
+    "asset": "sdk-PS5XKB2J.js",
+    "sha256": "a2791eb4139321b98eef87a0d6e64ed56017c2ec93bd48fba6997ce7af18b037",
+    "unchangedFromAcceptedRC3": true
+  },
+  "scenarios": [
+    {
+      "id": "hosted-release-ci-source-coverage-race-vulnerability-build-packaging-secret-gates",
+      "result": "passed"
+    },
+    {
+      "id": "annotated-tag-and-clean-VCS-four-binary-identities",
+      "result": "passed"
+    },
+    {
+      "id": "public-release-stable-latest-exact-three-assets",
+      "result": "passed"
+    },
+    {
+      "id": "fresh-public-download-checksum-and-candidate-byte-equality",
+      "result": "passed"
+    },
+    {
+      "id": "synthetic-App-ABI-install-adopt-pin-update-rollback-no-rebuild",
+      "result": "passed"
+    },
+    {
+      "id": "shipped-Edge-Firefox-LibreOffice-Mousepad-Viewer-IME-resize-clipboard-control-lifecycle",
+      "result": "passed"
+    },
+    {
+      "id": "document-editors-optional-file-validation-destructive-stop-private-bus-UNO-idle-expiry",
+      "result": "passed"
+    },
+    {
+      "id": "KDE-SDK-upgrade-reconnect-input-controls-generation-pins-and-crash-durable-state-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "App-actions-Console-schema-Edge-CDP-Firefox-BiDi-ownership-cancellation-crash-adoption",
+      "result": "passed"
+    },
+    {
+      "id": "user-home-XFCE-default-bus-Xauthority-Viewer-IME-clipboard-logout-relogin-saved-session-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "session-services-engine-IBus-D-Bus-supervisor-faults-Manager-crash-and-forced-shutdown",
+      "result": "passed"
+    },
+    {
+      "id": "boot-marker-simulation-two-rounds-document-roots-offline-recovery-no-unwanted-revival",
+      "result": "passed"
+    },
+    {
+      "id": "eight-App-32-scenario-idle-lease-Tab-freeze-takeover-generation-and-stop-priority",
+      "result": "passed"
+    },
+    {
+      "id": "local-1991-2992-remain-RC3-with-unchanged-feature-policy",
+      "result": "passed"
+    },
+    {
+      "id": "real-host-or-sandbox-reboot",
+      "result": "skipped",
+      "reason": "Boot recovery used private boot-marker simulation, not a host reboot."
+    },
+    {
+      "id": "endpoint-or-sandbox-deployment",
+      "result": "skipped",
+      "reason": "Only GitHub publication authorized; sandbox deployment belongs to the sandbox project."
+    }
+  ],
+  "liveAcceptance": {
+    "execution": "All component gates from scripts/test-release-candidate.sh passed against the same untouched hosted archive. The first aggregate run stopped at a browser test-adapter failure; remaining gates were completed serially as separate invocations, not claimed as one successful aggregate run.",
+    "fixtureEvidence": {
+      "synthetic": "/tmp/remotexapp-app-package-e2e.IltzZo",
+      "shipped": "/tmp/remotexapp-shipped-e2e.Wjb3ka",
+      "documents": "/tmp/remotexapp-document-e2e-sCbGor",
+      "upgrade": "/tmp/remotexapp-upgrade-kde-e2e-d99CuP/result.json",
+      "actions": "/tmp/remotexapp-actions-e2e-pS1D2g",
+      "userHome": "/var/tmp/remotexapp-conn-user.emA5ll/result.json",
+      "services": "/tmp/remotexapp-svc-e2e-DfvOBR",
+      "boot": "/tmp/remotexapp-boot-e2e-TtRHSz/result.json",
+      "idleLease": "/tmp/remotexapp-lease-e2e-Lb5JaP/result.json"
+    },
+    "failedAttempts": [
+      {
+        "problem": "Headless Chrome/CDP timeouts on build host in both accepted RC.3 baseline and stable artifact.",
+        "disposition": "Use Chrome under Xvfb via a temporary launcher. Browser arguments changed only in test environment; no release bytes changed. Exact headless failure root cause not claimed."
+      },
+      {
+        "problem": "Initial Xvfb shell launcher left Chrome alive, reusing the fixed debugging port and stale Kate page during the KWrite upgrade probe.",
+        "disposition": "Replace temporary launcher with process-group signal forwarding and cleanup; stop identified test-owned browser trees; rerun upgrade suite from a fresh fixture: passed."
+      },
+      {
+        "problem": "Initial disposable-UID wrapper path was inaccessible.",
+        "disposition": "Make only temporary browser-launcher directory traversable and pass its PATH through the user-home fixture sudo boundary; fresh tests passed."
+      }
+    ],
+    "idleLeaseApps": [
+      "mousepad",
+      "libreoffice",
+      "kate",
+      "kwrite",
+      "edge",
+      "firefox-esr",
+      "lightview",
+      "xfce-user-desktop"
+    ],
+    "idleLeaseScenarioCount": 32
+  },
+  "limitations": [
+    "Human acceptance applies to RC.3 bytes, recorded separately; no second interactive UAT on the clean stable artifact is claimed.",
+    "Local browser gates used headed Chrome under Xvfb rather than headless mode due to reproduced host failures.",
+    "Disposable LightView testing uses the documented build-container WebKit sandbox exception; production sandbox support is not certified here.",
+    "Native Ubuntu 26.04/Qt6 certification, audio and multi-server coordination are outside this train.",
+    "All Tabs suspended can lose runtime keepalive; six-second leadership and five-minute silent-interest retention remain best effort.",
+    "Temporary fixture paths are local diagnostics, not portable public attachments; gate outcomes and qualifications are retained in this record.",
+    "Publication did not modify local deployments or sandboxes."
+  ],
+  "references": [
+    "runtime-coordinator-0.13.0-uat.json",
+    "coordinator-panel-0.13.0-rc.3-local-deployment.json"
+  ]
+}

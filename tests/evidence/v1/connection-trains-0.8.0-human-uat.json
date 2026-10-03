@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "operator:0.8.0-rc.3-acceptance",
+  "commit": "3a3e63a2e7e946c9cff7277c3671a75246472b19",
+  "startedAt": "2026-09-10T11:33:53Z",
+  "completedAt": "2026-09-10T11:33:53Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8"
+  },
+  "environment": {
+    "kind": "local",
+    "name": "local-1991-and-2992"
+  },
+  "scenarios": [
+    {
+      "id": "operator-human-uat-acceptance",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "operatorInstruction": "uat accept, do formal release to github",
+    "acceptedCandidate": "0.8.0-rc.3",
+    "stableTarget": "0.8.0",
+    "sdkVersion": "0.25.1",
+    "publicationAuthorized": true,
+    "additionalDeploymentAuthorized": false,
+    "edgeRecoveryAuthorized": false,
+    "previousIncident": "rc.3 singleton smoke-test incident and failed runtime-preservation evidence retained unchanged; UAT acceptance is not evidence of recovery."
+  }
+}

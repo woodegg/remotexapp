@@ -1,0 +1,94 @@
+{
+  "date": "2026-09-03",
+  "scope": "CLP-018 through CLP-024 candidate implementation and deployment to the two approved local environments",
+  "release": "0.5.0-rc.1",
+  "sdk": "0.21.0",
+  "sourceCommit": "3b209d9d2287e77f07a2ee4bb968949a017fc04a",
+  "candidateState": "working-tree candidate pending Human UAT and commit approval",
+  "artifact": {
+    "path": "dist/remotexapp-0.5.0-rc.1-linux-amd64.tar.gz",
+    "sha256": "b0628ad24f49176181642b67154a10f27038a6d70f948071eacd81ad405a3713",
+    "managerSha256": "75f1fe034fafdfee23647aa37d6e159f1b41fd6209ba202b8f54a8f4c0959acc",
+    "sdkAsset": "sdk-EOHGZQIS.js",
+    "sdkAssetSha256": "b0d5ba2be5260581bc29e8983c2a362d460deee303132a0f8afc2a5ff9a1d0a2",
+    "consoleAsset": "console-T7I6EFFS.js",
+    "consoleAssetSha256": "b2c98f471f2ab47285f2c89213d6c0c1f47feb4deca29d30f5cd8faef54fe6d9"
+  },
+  "automated": {
+    "releaseMetadata": "passed",
+    "sensitiveData": "passed",
+    "makeCheck": "passed",
+    "sdkSubtests": 74,
+    "goRace": "passed",
+    "goVet": "passed",
+    "systemStageUpgradeRollback": "passed",
+    "preflight": "passed",
+    "releaseCI": "passed"
+  },
+  "realBrowser1991": {
+    "browser": "headed Google Chrome 149 on local Xvfb",
+    "script": "tests/go-live-validation/check-client-active-clipboard.mjs",
+    "result": "passed",
+    "checks": [
+      "same and different runtime multi-window topology",
+      "inactive Clients do not read, fingerprint, or prompt",
+      "activation-time independent same-content prompts and 60-second lifetime",
+      "background connection cannot claim the active Client",
+      "remote fanout, source suppression, and per-Client loop suppression",
+      "target-scoped disconnect/reconnect, drag, minimize/restore, Ctrl+F6 switching, and Viewer-only close"
+    ],
+    "cleanup": "all created Mousepad sessions stopped; final manager restart removed stopped anonymous in-memory records"
+  },
+  "local1991": {
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "console": true,
+    "kiosk": true,
+    "catalog": ["edge", "firefox-esr", "libreoffice", "mousepad", "xfce-user-desktop"],
+    "allDepth16": true,
+    "managerBinaryMatchesCandidate": true,
+    "managedDesktop": {
+      "registration": "ubuntu-desktop",
+      "runtime": "xfce-user-desktop-2c5cf858536f",
+      "generation": 1,
+      "state": "server-ready",
+      "adoptedAcrossManagerRestarts": true
+    },
+    "nRestarts": 0,
+    "warningsAfterFinalActivation": 0
+  },
+  "realBrowser2991": {
+    "browser": "headed Google Chrome 149 on local Xvfb",
+    "script": "tests/go-live-validation/check-browser-client.mjs",
+    "application": "firefox-esr",
+    "result": "passed",
+    "framebufferBefore": "945x973",
+    "framebufferAfter": "900x640",
+    "explicitReconnectMs": 762.51,
+    "rfbState": "connected",
+    "inputState": "connected",
+    "cleanup": "test Firefox stopped forcibly; final manager restart left no runtime records"
+  },
+  "local2991": {
+    "listen": "127.0.0.1:2991",
+    "authMode": "none",
+    "console": false,
+    "kiosk": true,
+    "catalog": ["edge", "firefox-esr", "libreoffice", "mousepad"],
+    "allDepth16": true,
+    "managerBinaryMatchesCandidate": true,
+    "runtimeCount": 0,
+    "nRestarts": 0,
+    "warningsAfterFinalActivation": 0
+  },
+  "deploymentObservation": {
+    "issue": "the initial manual 2991 archive extraction preserved the temporary directory's mode 0700 and systemd returned 203/EXEC",
+    "resolution": "restored directory traversal permissions, reset the failed unit, restarted it, then verified exact candidate bytes, runtime E2E, zero final restarts, and zero warnings",
+    "scope": "local custom 2991 staging layout only; the supported system staging selector passed its automated gate and local 1991 activation"
+  },
+  "authorization": {
+    "humanUAT": "pending",
+    "sandboxDeployment": false,
+    "githubPublication": false
+  }
+}

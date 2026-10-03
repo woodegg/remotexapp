@@ -1,0 +1,93 @@
+{
+  "apiVersion": "remotexapp/v1",
+  "id": "kate",
+  "name": "Kate",
+  "driverVersion": "2.0.1",
+  "singleton": false,
+  "profileRef": "default",
+  "runMode": "isolated",
+  "ports": {},
+  "parameters": {
+    "filePath": {
+      "type": "file",
+      "maxLength": 4096
+    }
+  },
+  "driver": {
+    "config": {}
+  },
+  "overrides": {
+    "allowed": [
+      "geometry",
+      "frameRate",
+      "allowClientResize"
+    ]
+  },
+  "dependencies": {
+    "executables": [
+      "matchbox-window-manager",
+      "jq",
+      "python3",
+      "sed",
+      "seq",
+      "sleep",
+      "xdotool",
+      "kate",
+      "gdbus"
+    ],
+    "pythonModules": []
+  },
+  "server": {
+    "activation": "on-demand",
+    "driver": "server.sh",
+    "displayMode": "dynamic",
+    "display": 0,
+    "rfbPort": 0,
+    "gatewayPort": 0,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 10,
+    "allowClientResize": true,
+    "readinessPids": [
+      "server.pid"
+    ],
+    "readinessTimeout": "10s"
+  },
+  "session": {
+    "services": "core-v1",
+    "activation": "immediate",
+    "driver": "session.sh",
+    "shutdownDriver": "shutdown.sh",
+    "readinessPid": "kate.pid",
+    "readinessTimeout": "30s",
+    "vacantTimeout": "60s",
+    "vacantAction": "stop-instance",
+    "status": {
+      "mode": "driver",
+      "details": {
+        "application": {
+          "type": "enum",
+          "values": [
+            "kate"
+          ]
+        }
+      },
+      "privateDetails": {
+        "application": {
+          "type": "json",
+          "maxBytes": 4096,
+          "maxDepth": 4,
+          "maxItems": 32
+        }
+      }
+    }
+  },
+  "input": {
+    "backend": "ibus",
+    "lifecycle": "session",
+    "allowedWmClasses": [
+      "kate",
+      "Kate"
+    ]
+  }
+}

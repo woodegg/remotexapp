@@ -1,0 +1,141 @@
+{
+  "result": "formal-follower-production-aligned",
+  "date": "2026-09-01",
+  "scope": {
+    "targets": ["sandbox02", "sandbox03", "sandbox07", "sandbox10"],
+    "separatelyApprovedPostTrainRollout": true,
+    "sandbox00Included": false,
+    "local1991Included": false,
+    "productionGatewayTested": false
+  },
+  "formalArtifact": {
+    "tag": "v0.2.0",
+    "commit": "9ef470c0139902c8b88f7354f6f0d68b7f8ee5a0",
+    "archiveSha256": "7d8665d5e477542ecea79cc4c20dac23797fa8f3c82b78022408a4d55a3e0123",
+    "downloadedChecksumVerification": "passed",
+    "remoteChecksumVerification": "passed-on-all-targets",
+    "installedBinarySha256": {
+      "remotexappd": "06045013e6792748470cc9720294a0a7c13b0a252b74e60e2d0e4c5d5497d761",
+      "novnc-input": "270e2c4de758895c59e1a3b2adfbe63a7a694837b4e2625ab04449aba6f34571",
+      "remotexapp-status": "e0b1aa29a546866a34d1a48392ec2cfdb9b7331d7acfb0ad8eceaa0de15900ce",
+      "remotexapp-operator-helper": "df4f373b73bc1d21abb4bfa97c40cb19e43d5899fd6b1de26a4551a84a9faeda"
+    },
+    "runningManagerBytesVerifiedOnAllTargets": true
+  },
+  "activation": {
+    "previousVersion": "0.2.0-rc.5",
+    "previousCommit": "8c03c485adc5",
+    "previousSelector": "releases/0.2.0-rc.5",
+    "finalSelector": "releases/0.2.0",
+    "rollbackRelease": "0.2.0-rc.5",
+    "installedCentralUserPreflight": "passed-on-all-targets",
+    "managerAdoptionRestartsPerTarget": 2,
+    "managedRuntimeIdentityPreserved": true,
+    "managedRuntimeCreationIdentityPreserved": true,
+    "managedRuntimeGenerationPreserved": true,
+    "allChildPidsPreserved": true,
+    "existingRuntimeComponents": "manifest-locked-to-0.2.0-rc.5-until-runtime-recreation"
+  },
+  "targets": {
+    "sandbox02": {
+      "activatedAt": "2026-09-02T01:23:04Z",
+      "managerPid": 386864,
+      "managerNRestarts": 0,
+      "installBackup": "20260902T012257Z-386513",
+      "runtime": {
+        "id": "xfce-user-desktop-18e0063a4730",
+        "createdAt": "2026-08-31T17:14:34.895987105-04:00",
+        "generation": 0,
+        "state": "server-ready",
+        "sessionState": "stopped",
+        "attachedClients": 0
+      },
+      "childPids": {"vnc": 61043, "server": 61050, "gateway": 61055, "session": 0}
+    },
+    "sandbox03": {
+      "activatedAt": "2026-09-02T01:24:18Z",
+      "managerPid": 333522,
+      "managerNRestarts": 0,
+      "installBackup": "20260902T012412Z-333159",
+      "runtime": {
+        "id": "xfce-user-desktop-fe38ea6ea902",
+        "createdAt": "2026-08-31T17:14:42.293848721-04:00",
+        "generation": 0,
+        "state": "server-ready",
+        "sessionState": "stopped",
+        "attachedClients": 0
+      },
+      "childPids": {"vnc": 61100, "server": 61107, "gateway": 61112, "session": 0}
+    },
+    "sandbox07": {
+      "activatedAt": "2026-09-02T01:24:32Z",
+      "managerPid": 430638,
+      "managerNRestarts": 0,
+      "installBackup": "20260902T012427Z-430286",
+      "alwaysOnConfigurationChanged": false,
+      "runtime": {
+        "id": "xfce-user-desktop-5f777640df67",
+        "createdAt": "2026-08-31T17:14:49.854299276-04:00",
+        "generation": 0,
+        "state": "server-ready",
+        "sessionState": "stopped",
+        "attachedClients": 0
+      },
+      "childPids": {"vnc": 104553, "server": 104559, "gateway": 104565, "session": 0}
+    },
+    "sandbox10": {
+      "activatedAt": "2026-09-02T01:24:49Z",
+      "managerPid": 985093,
+      "managerNRestarts": 0,
+      "installBackup": "20260902T012444Z-984687",
+      "stoppedManifestlessHistoryClearedOnRestart": true,
+      "runtime": {
+        "id": "xfce-user-desktop-7f82a5db6646",
+        "createdAt": "2026-08-31T17:14:57.660919013-04:00",
+        "generation": 1,
+        "state": "server-ready",
+        "sessionState": "running",
+        "attachedClients": 0
+      },
+      "childPids": {"vnc": 126810, "server": 126817, "gateway": 126823, "session": 345640}
+    }
+  },
+  "commonConfiguration": {
+    "deploymentMode": "central-real-user",
+    "runtimeUser": "sandbox",
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "allowInsecurePublic": true,
+    "consoleEnabled": true,
+    "kioskEnabled": true,
+    "serviceRestartEnabled": false,
+    "documentRoots": ["/home/sandbox", "/mnt/CloudDrive", "/mnt/MyDrive"]
+  },
+  "commonSmoke": {
+    "health": "ok",
+    "ready": "ready",
+    "templateCount": 6,
+    "runtimeCountPerTarget": 1,
+    "manifestCountPerTarget": 1,
+    "fixedDesktopPolicyVerified": true,
+    "routes": {"root": 200, "console": 200, "minimal": 200, "kiosk": 200},
+    "enabledAppPackages": {
+      "edge": "1.0.0",
+      "firefox-esr": "2.0.0",
+      "libreoffice": "3.0.0",
+      "mousepad": "2.0.0",
+      "xfce-desktop": "2.0.0",
+      "xfce-user-desktop": "2.0.0"
+    },
+    "operatorHelperActive": false,
+    "warningJournalCountPerTarget": 0,
+    "temporaryDeploymentDirectoriesRemoved": true
+  },
+  "networkBoundary": {
+    "containerLoopbackValidation": "passed-on-all-targets",
+    "listenersVerified": "0.0.0.0:1991",
+    "buildHostPrivateHttp": "blocked-by-existing-per-sandbox-ufw-allowlists",
+    "firewallChanged": false,
+    "productionGatewayUsed": false
+  }
+}

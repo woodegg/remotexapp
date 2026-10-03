@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "local:ffx007-development-gate-20260908",
+  "commit": "14523d4c624498c71e18c245a50fe4a4dd1b7d99",
+  "startedAt": "2026-09-08T01:39:00Z",
+  "completedAt": "2026-09-08T01:42:53Z",
+  "result": "failed",
+  "toolchain": { "go": "go1.26.8", "node": "v22.22.3" },
+  "environment": { "kind": "local", "name": "isolated-shipped-app-development-port-21991" },
+  "scenarios": [
+    { "id": "driver-preference-contract-and-rewrite", "result": "passed" },
+    { "id": "fresh-profile-36-actual-text-readbacks", "result": "passed" },
+    { "id": "stale-true-profile-recreated-36-actual-text-readbacks", "result": "passed" },
+    { "id": "rfb-tab-window-focus-reconnect-bidi-lifecycle", "result": "passed" },
+    { "id": "immediate-runtime-restart-after-bidi-use", "result": "failed" },
+    { "id": "post-restart-input", "result": "skipped" },
+    { "id": "complete-candidate-release-ci", "result": "failed" },
+    { "id": "local-1991-deployment", "result": "skipped" }
+  ],
+  "details": {
+    "qualification": "Development evidence only, not an immutable candidate acceptance. Binaries were built from the modified pre-commit worktree and report base commit c07cbcb53c30; the recorded commit captures the implementation, with an additional harness change retaining HTTP error bodies.",
+    "firefoxDriverVersion": "2.1.1",
+    "firefoxVersion": "140.15.0",
+    "restartReproductions": 2,
+    "restartHTTPStatus": 500,
+    "restartError": "pinned App resource \"control\" is invalid or busy",
+    "socketEvidence": "After the second failure, ss -tan showed port 21000 in TIME-WAIT and no LISTEN entry; it was the recreated Firefox runtime's pinned control port.",
+    "sourcePath": "allocateRuntimeRequest in lifecycle.go calls controlPortBusyExcept, which uses portBusy's plain bind test in runtime.go; that test deliberately treats TIME_WAIT as busy for generic application listeners.",
+    "releaseGateEnvironmentFailure": "Go coverage link failed: no space left on device. Only completed investigation temporary directories were moved to a dedicated volatile memory-filesystem retention directory. Release gate must be rerun.",
+    "scope": "Manager changes are explicitly excluded by the locked FFX-007 train; operator approval is needed to add the restart blocker rather than weakening the test.",
+    "cleanup": "Harness stopped its disposable runtimes and manager. Local 1991 remains 0.5.2, healthy, one existing runtime, zero clients; local 2991 remains 0.5.2, healthy, zero runtimes. No deployment or sandbox access."
+  }
+}

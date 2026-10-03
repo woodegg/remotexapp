@@ -1,0 +1,56 @@
+{
+  "target": "0.2.0",
+  "sdkVersion": "0.18.0",
+  "testedCodeCommit": "fe1516d274358dc3cc2c4c3bff0ade18d9848ba1",
+  "acceptedBaseline": {
+    "tag": "v0.2.0-rc.4",
+    "commit": "e19125384bdac50c19cdba4ffa33148bc5e01d24",
+    "sdkVersion": "0.17.0",
+    "appPackageApiVersion": "remotexapp/v1"
+  },
+  "sourceCompatibility": {
+    "appPackageParserAndTestsChanged": false,
+    "shippedAppSourcesChanged": false,
+    "existingViewerAndInputClientChanged": false,
+    "baselineAppPackageParserSha256": "aa1ebd0cee8d4e9f7059dde11f9c5c6222a0bdd81628ef3c6fec1d8b6dc9bb98",
+    "candidateAppPackageParserSha256": "aa1ebd0cee8d4e9f7059dde11f9c5c6222a0bdd81628ef3c6fec1d8b6dc9bb98",
+    "baselineRemoteClientSha256": "c95ac95fe187db1920e62f63a8a13a9dc3a24d16e7c7fab3f7b3856bf1228c2b",
+    "candidateRemoteClientSha256": "c95ac95fe187db1920e62f63a8a13a9dc3a24d16e7c7fab3f7b3856bf1228c2b",
+    "sdk018Change": "additive manager methods and optional request headers only",
+    "removedSdk017Exports": []
+  },
+  "frozenApps": {
+    "edge": "1.0.0",
+    "firefox-esr": "2.0.0",
+    "libreoffice": "3.0.0",
+    "mousepad": "2.0.0",
+    "xfce-desktop": "2.0.0",
+    "xfce-user-desktop": "2.0.0"
+  },
+  "buildOnceE2E": {
+    "result": "passed",
+    "isolatedManagerPort": 21991,
+    "coreBuildSha256": "841bde03168ab63a7b3a742d15933051f21054559be7e7798719159013e29c7c",
+    "adoptedControlPort": 21000,
+    "checks": [
+      "install",
+      "launch",
+      "status",
+      "control",
+      "adopt",
+      "update",
+      "pin-old",
+      "select-new",
+      "stop",
+      "disable",
+      "rollback",
+      "no-rebuild"
+    ]
+  },
+  "downstream": {
+    "waosBuildRun": false,
+    "waosSourceChangeRequired": false,
+    "waosReleaseRequired": false,
+    "adoptionRule": "WAOS updates its exact RemoteXApp lock and reruns affected flows only when WAOS independently adopts 0.2.0"
+  }
+}

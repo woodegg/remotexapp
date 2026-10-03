@@ -1,0 +1,204 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "app-actions-0.9.0-rc.1-local-uat:2026-09-10",
+  "commit": "fc2d94e6b764b1439e0a074e9fffa74ca8a8a31d",
+  "startedAt": "2026-09-10T15:43:38Z",
+  "completedAt": "2026-09-10T16:00:52Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3",
+    "candidateNode": "v22.23.2"
+  },
+  "environment": {
+    "kind": "local-only",
+    "name": "loopback production 1991 and test 2992"
+  },
+  "artifact": {
+    "name": "remotexapp-0.9.0-rc.1-linux-amd64.tar.gz",
+    "sha256": "f90aebe4ecaf15e48bc8d41d51da7f65c6814a59316a64de0e31ed4acaf58a2a"
+  },
+  "scenarios": [
+    {
+      "id": "hosted-Verify-and-release-candidate-gate",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-complete-E2E",
+      "result": "passed"
+    },
+    {
+      "id": "schema-auth-origin-bounds-tamper-and-injection",
+      "result": "passed"
+    },
+    {
+      "id": "SDK-base-path-no-retry-stale-result-guards",
+      "result": "passed"
+    },
+    {
+      "id": "Console-schema-input-concurrent-lifecycle-safe-text",
+      "result": "passed"
+    },
+    {
+      "id": "real-Firefox-Edge-new-tab-control-ownership",
+      "result": "passed"
+    },
+    {
+      "id": "Firefox-session-creation-race-never-ends-foreign-session",
+      "result": "passed"
+    },
+    {
+      "id": "Firefox-abort-and-Manager-crash-release-owned-BiDi",
+      "result": "passed"
+    },
+    {
+      "id": "TERM-ignoring-handler-group-forced-cleanup",
+      "result": "passed"
+    },
+    {
+      "id": "slow-upload-does-not-hold-lifecycle-lock",
+      "result": "passed"
+    },
+    {
+      "id": "twenty-shuffled-race-validation-cancellation-slow-body-runs",
+      "result": "passed"
+    },
+    {
+      "id": "generic-package-action-without-rebuild",
+      "result": "passed"
+    },
+    {
+      "id": "two-local-Manager-starts-retain-config-and-runtime-pins",
+      "result": "passed"
+    },
+    {
+      "id": "post-deploy-consecutive-actions-and-owned-test-cleanup",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "version": "0.9.0-rc.1",
+    "sdkVersion": "0.26.0",
+    "appVersions": {
+      "firefox-esr": "2.2.0",
+      "edge": "1.1.0"
+    },
+    "otherAppVersionsChanged": false,
+    "candidateRun": "https://github.com/woodegg/remotexapp/actions/runs/34497530652",
+    "verifyRun": "https://github.com/woodegg/remotexapp/actions/runs/34497531346",
+    "coverage": {
+      "goStatements": 60.7,
+      "sdkLines": 85.76,
+      "sdkBranches": 76.69,
+      "sdkFunctions": 80
+    },
+    "commands": [
+      "make check",
+      "make coverage-check",
+      "make test-race",
+      "make release-ci (hosted)",
+      "scripts/test-release-candidate.sh ARCHIVE SHA256SUMS EVIDENCE COMMIT",
+      "go test -race ./cmd/remotexappd -run 'TestActionsContract|TestActionFailures|TestActionSlow' -shuffle=on -count=20"
+    ],
+    "environments": [
+      {
+        "port": 2992,
+        "version": {
+          "buildDate": "2026-09-10T15:43:38Z",
+          "capabilities": {
+            "appActions": true,
+            "clipboard": true,
+            "runtimeRestart": true,
+            "serviceRestart": false
+          },
+          "commit": "fc2d94e6b764",
+          "shutdownPolicy": {
+            "blockedWarningAfter": "1h0m0s",
+            "forceAfter": "never",
+            "graceTimeout": "15s"
+          },
+          "version": "0.9.0-rc.1",
+          "webFeatures": {
+            "console": false,
+            "kiosk": true
+          }
+        },
+        "checks": [
+          {
+            "templateId": "firefox-esr",
+            "id": "firefox-esr-eca7aec81e5d",
+            "driverVersion": "2.2.0",
+            "generation": 1,
+            "consecutiveActionsPassed": true
+          },
+          {
+            "templateId": "edge",
+            "id": "edge-1e862ea4b30c",
+            "driverVersion": "1.1.0",
+            "generation": 1,
+            "consecutiveActionsPassed": true
+          }
+        ],
+        "existingRuntimesPreserved": true,
+        "testRuntimesStopped": true,
+        "consoleStatus": 404
+      },
+      {
+        "port": 1991,
+        "version": {
+          "buildDate": "2026-09-10T15:43:38Z",
+          "capabilities": {
+            "appActions": true,
+            "clipboard": true,
+            "runtimeRestart": true,
+            "serviceRestart": false
+          },
+          "commit": "fc2d94e6b764",
+          "shutdownPolicy": {
+            "blockedWarningAfter": "1h0m0s",
+            "forceAfter": "never",
+            "graceTimeout": "15s"
+          },
+          "version": "0.9.0-rc.1",
+          "webFeatures": {
+            "console": true,
+            "kiosk": true
+          }
+        },
+        "checks": [
+          {
+            "templateId": "firefox-esr",
+            "id": "firefox-esr-2ba29cc00579",
+            "driverVersion": "2.2.0",
+            "generation": 1,
+            "consecutiveActionsPassed": true
+          },
+          {
+            "templateId": "edge",
+            "existingPreserved": "edge-4c2449107d38",
+            "driverVersion": "1.0.0",
+            "actions": []
+          }
+        ],
+        "existingRuntimesPreserved": true,
+        "testRuntimesStopped": true,
+        "consoleStatus": 200
+      }
+    ],
+    "correctedFindings": [
+      "Disable Python bytecode writes inside sealed packages",
+      "Derive deployment-gate App versions from candidate manifests",
+      "Read bounded HTTP input outside lifecycle lock with five-second read deadline",
+      "SIGTERM grace and owned-WebSocket cleanup avoid leaking Firefox BiDi sessions on cancellation"
+    ],
+    "limits": [
+      "Human UAT pending; no formal release/tag created",
+      "No sandbox deployment or production gateway access",
+      "Existing local production Edge 1.0.0 remains pinned and has no actions; explicit upgrade required for openUrl",
+      "Test Console stays disabled, kiosk enabled",
+      "Protocol cleanup is bounded best effort for an unresponsive browser; foreign/orphaned external sessions are not stolen",
+      "Temporary test runtimes stopped; their isolated test profile references do not reuse operator profiles"
+    ]
+  }
+}

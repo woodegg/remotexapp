@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "lightview-1.0.9-local-deployment",
+  "commit": "b85984431c6d28c32b1aa1deeb7e12d282ff1a37",
+  "startedAt": "2026-09-18T19:02:19Z",
+  "completedAt": "2026-09-18T19:04:52Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "project-local-test",
+    "name": "loopback 1991 and 2992"
+  },
+  "artifact": {
+    "name": "lightview-1.0.9.tar.gz",
+    "sha256": "3007a833253fe7ccf385502fa1a3beca7a1b1714839a931bbc1048ae96014ddd"
+  },
+  "app": {
+    "id": "lightview",
+    "previousSelectedVersion": "1.0.6",
+    "version": "1.0.9",
+    "installedContentSha256": "266bd9fcd9fa0fe13eea2e96145babca8d9566db45d7bdc837141712b37d9734",
+    "executableVersion": "0.1.9"
+  },
+  "coreVersion": "0.13.0",
+  "sdkVersion": "0.29.1",
+  "endpoints": [
+    {
+      "port": 1991,
+      "listen": "127.0.0.1:1991",
+      "testRuntime": "lightview-9e502f133c3d"
+    },
+    {
+      "port": 2992,
+      "listen": "127.0.0.1:2992",
+      "testRuntime": "lightview-f4f8ca7195f1"
+    }
+  ],
+  "preservedDesktop": {
+    "id": "xfce-user-desktop-8cdcaa0b5159",
+    "sessionGeneration": 7,
+    "driverVersion": "3.0.0",
+    "applicationState": "ready",
+    "statusRevision": 11
+  },
+  "scenarios": [
+    {
+      "id": "fresh-GitHub-release-download-checksum",
+      "result": "passed"
+    },
+    {
+      "id": "immutable-package-install-and-activation-both-endpoints",
+      "result": "passed"
+    },
+    {
+      "id": "both-Managers-restart-and-ready",
+      "result": "passed"
+    },
+    {
+      "id": "both-catalogs-select-LightView-1.0.9",
+      "result": "passed"
+    },
+    {
+      "id": "both-served-Viewer-connect-resize-reconnect",
+      "result": "passed"
+    },
+    {
+      "id": "both-getConnections-private-Unix-control-and-native-status",
+      "result": "passed"
+    },
+    {
+      "id": "both-native-low-memory-384MiB-and-worker-threshold-3072MiB",
+      "result": "passed"
+    },
+    {
+      "id": "both-invokeAction-openUrl",
+      "result": "passed"
+    },
+    {
+      "id": "both-test-runtime-graceful-stop-and-test-browser-cleanup",
+      "result": "passed"
+    },
+    {
+      "id": "existing-XFCE-generation-and-ready-status-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "both-listeners-remain-loopback",
+      "result": "passed"
+    }
+  ],
+  "limitations": [
+    "Local pre-existing WebKit sandbox override and software-renderer environment were retained unchanged; this does not qualify normal production sandboxing.",
+    "Installed content seals include file permission modes: this deployment uses 0644/0755 versus the isolated candidate user's umask-077 0600/0700; downloaded archive bytes are identical.",
+    "No host executable, Core/SDK, sandbox environment or existing application runtime was upgraded or restarted."
+  ],
+  "rawEvidence": "/tmp/lightview109-local-smoke-result.json"
+}

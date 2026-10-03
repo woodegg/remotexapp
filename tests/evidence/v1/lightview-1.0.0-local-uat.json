@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "lightview-1.0.0-local-uat-1991-2992",
+  "commit": "de173858834e8e6fec2b0b07af787cef41b6505f",
+  "workspaceDirty": true,
+  "startedAt": "2026-09-16T20:40:00Z",
+  "completedAt": "2026-09-16T22:28:16Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "local-loopback-Ubuntu-container",
+    "name": "127.0.0.1:1991-and-2992",
+    "deployedCore": "0.12.0-rc.2",
+    "lightview": "Lightview 0.1.0 (WebKitGTK 2.52.6)"
+  },
+  "sourceTarget": {
+    "core": "0.12.2-unchanged",
+    "sdk": "0.28.0-unchanged",
+    "app": "lightview@1.0.0"
+  },
+  "artifact": {
+    "name": "lightview-1.0.0.tar.gz",
+    "sha256": "ee38e81dbf0ae907282e972c72a5b95d45229418f5dc0e2bdb7d4f68488d0d07"
+  },
+  "artifacts": {
+    "archiveSha256": "ee38e81dbf0ae907282e972c72a5b95d45229418f5dc0e2bdb7d4f68488d0d07",
+    "installedContentSha256": "d743d3e1d648ea12a3bfbefe0ff3e4587b4428ced6f96c662eb57ab2c4e76116",
+    "lightviewBinarySha256": "645bf2d11f47e7ad2e401e65d6d3eb6e32060b92dbbc78f7f3eac125f1560b99"
+  },
+  "scenarios": [
+    {
+      "id": "make-check-coverage-race-source-and-binary-vulnerability-system-stage-integration",
+      "result": "passed"
+    },
+    {
+      "id": "complete-live-e2e-existing-App-regression-and-host-preflight",
+      "result": "passed"
+    },
+    {
+      "id": "twenty-run-shuffled-Go-and-Node-soak-plus-three-ten-second-fuzz-targets",
+      "result": "passed"
+    },
+    {
+      "id": "lightview-deterministic-package-dependency-failure-install-upgrade-rollback",
+      "result": "passed"
+    },
+    {
+      "id": "lightview-shared-two-Viewer-private-socket-low-memory-WebGL-resize-IME-clipboard-openUrl",
+      "result": "passed"
+    },
+    {
+      "id": "lightview-Manager-adoption-restart-crash-stale-and-substituted-socket-native-exit-profile-vacancy",
+      "result": "passed",
+      "checks": 14
+    },
+    {
+      "id": "2992-package-only-deploy-real-Viewer-resize-Unicode-connections-openUrl",
+      "result": "passed",
+      "instanceId": "lightview-6c3b751dfed6"
+    },
+    {
+      "id": "1991-package-only-deploy-real-Viewer-resize-Unicode-connections-openUrl",
+      "result": "passed",
+      "instanceId": "lightview-9c28a2085b50"
+    },
+    {
+      "id": "1991-existing-XFCE-runtime-preservation-across-Manager-restart",
+      "result": "passed",
+      "instanceId": "xfce-user-desktop-8cdcaa0b5159",
+      "sessionGeneration": 3,
+      "manifestSha256": "d89458b6c907d2db03129573659b9db8484d24f4f08225f7a6dcd5524dff939e"
+    },
+    {
+      "id": "human-UAT",
+      "result": "passed"
+    }
+  ],
+  "retainedEvidence": {
+    "lightviewE2E": "/tmp/remotexapp-lightview-e2e-olp9qX/result.json",
+    "shippedAppsE2E": "/tmp/remotexapp-shipped-e2e.fVbOPz",
+    "documentE2E": "/tmp/remotexapp-document-e2e-7U3IZh",
+    "upgradeKDEE2E": "/tmp/remotexapp-upgrade-kde-e2e-hV4HQi/result.json"
+  },
+  "limitations": [
+    "The local container blocks WebKitGTK bubblewrap. Local UAT uses WEBKIT_DISABLE_SANDBOX_THIS_IS_DANGEROUS=1 with software rendering in the user-manager environment; the App Package never sets it and production hosts must support the normal WebKit sandbox.",
+    "Local 1991 and 2992 retain their pre-existing Core 0.12.0-rc.2. Automated candidate E2E used Core 0.12.2; no Core or SDK deployment was in this App-only train.",
+    "No GitHub publication or sandbox deployment was authorized or performed."
+  ]
+}

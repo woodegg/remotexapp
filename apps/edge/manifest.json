@@ -1,0 +1,145 @@
+{
+  "apiVersion": "remotexapp/v1",
+  "id": "edge",
+  "name": "Microsoft Edge",
+  "driverVersion": "2.0.4",
+  "singleton": true,
+  "profileRef": "default",
+  "runMode": "shared",
+  "ports": {
+    "control": {
+      "kind": "loopback-tcp",
+      "port": 0
+    }
+  },
+  "parameters": {
+    "startUrl": {
+      "type": "url",
+      "default": "about:blank",
+      "allowedSchemes": [
+        "http",
+        "https",
+        "about"
+      ],
+      "maxLength": 2048
+    },
+    "incognito": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "driver": {
+    "config": {
+      "protocol": "cdp",
+      "probeTimeoutSeconds": 2
+    }
+  },
+  "overrides": {
+    "allowed": []
+  },
+  "dependencies": {
+    "executables": [
+      "cut",
+      "date",
+      "jq",
+      "matchbox-window-manager",
+      "microsoft-edge",
+      "python3",
+      "sed",
+      "seq",
+      "sleep",
+      "xdotool"
+    ],
+    "pythonModules": []
+  },
+  "server": {
+    "activation": "on-demand",
+    "driver": "server.sh",
+    "displayMode": "dynamic",
+    "display": 0,
+    "rfbPort": 0,
+    "gatewayPort": 0,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 5,
+    "allowClientResize": true,
+    "readinessPids": [
+      "server.pid"
+    ],
+    "readinessTimeout": "10s"
+  },
+  "session": {
+    "services": "core-v1",
+    "activation": "on-attach",
+    "driver": "session.sh",
+    "shutdownDriver": "shutdown.sh",
+    "readinessPid": "edge.pid",
+    "readinessTimeout": "45s",
+    "vacantTimeout": "6h",
+    "vacantAction": "stop-instance",
+    "status": {
+      "mode": "driver",
+      "details": {
+        "application": {
+          "type": "enum",
+          "values": [
+            "edge"
+          ]
+        },
+        "control": {
+          "type": "json",
+          "maxBytes": 16384,
+          "maxDepth": 8,
+          "maxItems": 128
+        }
+      }
+    }
+  },
+  "input": {
+    "backend": "ibus",
+    "lifecycle": "session",
+    "allowedWmClasses": [
+      "microsoft-edge"
+    ]
+  },
+  "actions": {
+    "openUrl": {
+      "handler": "open-url.py",
+      "timeout": "15s",
+      "parameters": {
+        "url": {
+          "type": "url",
+          "required": true,
+          "allowedSchemes": [
+            "http",
+            "https"
+          ],
+          "maxLength": 2048
+        },
+        "disposition": {
+          "type": "enum",
+          "values": [
+            "new-tab"
+          ],
+          "default": "new-tab"
+        }
+      },
+      "result": {
+        "tabId": {
+          "type": "string",
+          "required": true,
+          "maxLength": 256
+        },
+        "url": {
+          "type": "url",
+          "required": true,
+          "allowedSchemes": [
+            "http",
+            "https"
+          ],
+          "maxLength": 2048
+        }
+      }
+    }
+  }
+}

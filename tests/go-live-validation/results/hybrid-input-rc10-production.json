@@ -1,0 +1,42 @@
+{
+  "label": "hybrid-input-rc10-production",
+  "date": "2026-08-27",
+  "managerURL": "http://127.0.0.1:1991",
+  "release": "0.1.0-rc.10",
+  "sdkVersion": "0.11.0",
+  "sdkAsset": "sdk-3S5MAJDJ.js",
+  "sdkSHA256": "99cb264da36b248d29fd884a230d23c1d9e3c40b23581fda31015886517bf9b9",
+  "managerSHA256": "84f841a7166c8b2c122edc28866986f9e17d260af9c955a70fc4611ee937aa54",
+  "novncInputSHA256": "f5a1204b9bef1f72ed442474b53d6d2d0809f1d3e7accf46c8d24d0a01be1c20",
+  "instance": {
+    "id": "xfce-desktop-3f1d7e2dd1ea",
+    "managedInstanceId": "test-host-xfce",
+    "driverVersion": "1.5.0",
+    "display": ":2",
+    "adoptedAcrossManagerRestart": true
+  },
+  "asciiPolkit": {
+    "input": "abc12",
+    "rfbKeyDown": 5,
+    "rfbKeyUp": 5,
+    "ibusCommitDelta": 0,
+    "passwordBullets": 5,
+    "backspaceCleared": true,
+    "stuckKeys": 0,
+    "stuckModifiers": 0,
+    "result": "passed"
+  },
+  "unicodePolkit": {
+    "input": "你好",
+    "rfbCharacterEvents": 0,
+    "rfbSafetyModifierReleases": 8,
+    "ibusCommitDelta": 1,
+    "ibusBytes": 6,
+    "ibusCharacters": 2,
+    "passwordFieldRemainedEmpty": true,
+    "staleMousepadContextReceivedCommit": true,
+    "result": "known limitation IME-004"
+  },
+  "automatedStatus": "passed",
+  "humanUAT": "accepted 2026-08-27"
+}

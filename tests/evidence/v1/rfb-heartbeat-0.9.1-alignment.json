@@ -1,0 +1,318 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "rfb-heartbeat-0.9.1-eight-endpoint-alignment:2026-09-12",
+  "commit": "02f473632cb935d8356b2979fe1968d02801870f",
+  "startedAt": "2026-09-12T13:07:47Z",
+  "completedAt": "2026-09-12T13:16:00Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8"
+  },
+  "environment": {
+    "kind": "local-and-LXD",
+    "name": "eight-approved-endpoints"
+  },
+  "artifact": {
+    "name": "remotexapp-0.9.1-linux-amd64.tar.gz",
+    "sha256": "1e26b19b3f85552cc4f978eb90181c05159196252c3855d6ae65c2514ebb83b7"
+  },
+  "scenarios": [
+    {
+      "id": "hosted-Verify-and-candidate",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-App-ABI-shipped-apps-documents-upgrade-KDE-actions",
+      "result": "passed"
+    },
+    {
+      "id": "disposable-UID-user-home-retry-and-cleanup",
+      "result": "passed"
+    },
+    {
+      "id": "annotated-stable-release-and-independent-download",
+      "result": "passed"
+    },
+    {
+      "id": "stage-all-before-sequential-selection",
+      "result": "passed"
+    },
+    {
+      "id": "two-manager-starts-config-and-pins-preserved-before-upgrade",
+      "result": "passed"
+    },
+    {
+      "id": "all-seven-live-runtimes-force-upgraded",
+      "result": "passed"
+    },
+    {
+      "id": "all-live-gateway-bytes-match-formal-artifact",
+      "result": "passed"
+    },
+    {
+      "id": "all-live-runtimes-ready-and-30-second-ping-pong",
+      "result": "passed"
+    },
+    {
+      "id": "build-host-direct-private-HTTP",
+      "result": "failed",
+      "reason": "All five private-IP requests timed out in 3 seconds; container-loopback checks passed. No firewall or production-gateway changes."
+    }
+  ],
+  "details": {
+    "version": "0.9.1",
+    "sdkVersion": "0.26.0",
+    "drift": "none",
+    "verifyRun": 34694734161,
+    "candidateRun": 34694740528,
+    "releaseRun": 34695494299,
+    "releaseUrl": "https://github.com/woodegg/remotexapp/releases/tag/v0.9.1",
+    "isPrerelease": false,
+    "appPackages": "unchanged",
+    "gatewaySha256": "a39c6d33ae5c59dc4204982ca351eca5d3b11f0b1d5bde3185d81135a16de582",
+    "authorization": "Operator accepted local UAT and explicitly approved formal publication, all eight deployments, and forced upgrades including Edge and other live apps.",
+    "e2eLog": "/tmp/remotexapp-091-exact-e2e.log",
+    "e2eCleanupIncident": "All functional suites passed; first user-home harness exit was 1 because temporary UID1002 retained gvfsd-trash at cleanup. Process subsequently exited; exact test account/home removed. Full user-home sub-gate rerun on fresh UID1003 passed with exit 0 (/tmp/remotexapp-091-user-home-retry.log).",
+    "sandbox10VerifierIncident": "Both upgrades completed. Initial minimal RFB verifier omitted desktop resize capability and TigerVNC closed it when another shared viewer resized Edge (Client does not support desktop size). Added SetEncodings DesktopSize/ExtendedDesktopSize to the temporary verifier and reran verification only; both connections passed without another runtime restart.",
+    "runtimeScope": "Seven live runtimes: six XFCE desktops and sandbox10 Edge. Stopped historical records were not relaunched. Both test endpoints have no live runtime.",
+    "networkLimitation": "Local listeners are 127.0.0.1:1991/2992; sandbox00 test remains loopback 2991; sandbox production remains 0.0.0.0:1991. Build-host private HTTP remains blocked; no Cloudflare-path acceptance claimed.",
+    "endpoints": [
+      {
+        "name": "local-prod",
+        "port": 1991,
+        "managerVersion": "0.9.1",
+        "managerCommit": "02f473632cb9",
+        "sdkVersion": "0.26.0",
+        "configuration": "preserved",
+        "binaryAndAssetHashes": "passed",
+        "warningJournal": "empty",
+        "gatewayBytes": "match-formal-artifact",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-44ea8c2186ee",
+            "sessionGeneration": 7,
+            "state": "server-ready",
+            "sessionState": "running",
+            "core": "0.9.1",
+            "app": "2.0.0",
+            "updateAvailable": false,
+            "applicationState": "ready"
+          }
+        ],
+        "heartbeat": [
+          {
+            "id": "xfce-user-desktop-44ea8c2186ee",
+            "pingCount": 2,
+            "pingIntervals": [
+              30
+            ]
+          }
+        ]
+      },
+      {
+        "name": "local-test",
+        "port": 2992,
+        "managerVersion": "0.9.1",
+        "managerCommit": "02f473632cb9",
+        "sdkVersion": "0.26.0",
+        "configuration": "preserved",
+        "binaryAndAssetHashes": "passed",
+        "warningJournal": "empty",
+        "gatewayBytes": "match-formal-artifact",
+        "runtimes": [],
+        "heartbeat": []
+      },
+      {
+        "name": "00-prod",
+        "port": 1991,
+        "managerVersion": "0.9.1",
+        "managerCommit": "02f473632cb9",
+        "sdkVersion": "0.26.0",
+        "configuration": "preserved",
+        "binaryAndAssetHashes": "passed",
+        "warningJournal": "empty",
+        "gatewayBytes": "match-formal-artifact",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-eefbf64deda7",
+            "sessionGeneration": 5,
+            "state": "server-ready",
+            "sessionState": "running",
+            "core": "0.9.1",
+            "app": "2.0.0",
+            "updateAvailable": false,
+            "applicationState": "ready"
+          }
+        ],
+        "heartbeat": [
+          {
+            "id": "xfce-user-desktop-eefbf64deda7",
+            "pingCount": 2,
+            "pingIntervals": [
+              29.999
+            ]
+          }
+        ]
+      },
+      {
+        "name": "00-test",
+        "port": 2991,
+        "managerVersion": "0.9.1",
+        "managerCommit": "02f473632cb9",
+        "sdkVersion": "0.26.0",
+        "configuration": "preserved",
+        "binaryAndAssetHashes": "passed",
+        "warningJournal": "empty",
+        "gatewayBytes": "match-formal-artifact",
+        "runtimes": [],
+        "heartbeat": []
+      },
+      {
+        "name": "02-prod",
+        "port": 1991,
+        "managerVersion": "0.9.1",
+        "managerCommit": "02f473632cb9",
+        "sdkVersion": "0.26.0",
+        "configuration": "preserved",
+        "binaryAndAssetHashes": "passed",
+        "warningJournal": "empty",
+        "gatewayBytes": "match-formal-artifact",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-3616fd55d920",
+            "sessionGeneration": 4,
+            "state": "server-ready",
+            "sessionState": "running",
+            "core": "0.9.1",
+            "app": "2.0.0",
+            "updateAvailable": false,
+            "applicationState": "ready"
+          }
+        ],
+        "heartbeat": [
+          {
+            "id": "xfce-user-desktop-3616fd55d920",
+            "pingCount": 2,
+            "pingIntervals": [
+              29.999
+            ]
+          }
+        ]
+      },
+      {
+        "name": "03-prod",
+        "port": 1991,
+        "managerVersion": "0.9.1",
+        "managerCommit": "02f473632cb9",
+        "sdkVersion": "0.26.0",
+        "configuration": "preserved",
+        "binaryAndAssetHashes": "passed",
+        "warningJournal": "empty",
+        "gatewayBytes": "match-formal-artifact",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-7eaf5f60925b",
+            "sessionGeneration": 5,
+            "state": "server-ready",
+            "sessionState": "running",
+            "core": "0.9.1",
+            "app": "2.0.0",
+            "updateAvailable": false,
+            "applicationState": "ready"
+          }
+        ],
+        "heartbeat": [
+          {
+            "id": "xfce-user-desktop-7eaf5f60925b",
+            "pingCount": 2,
+            "pingIntervals": [
+              30.006
+            ]
+          }
+        ]
+      },
+      {
+        "name": "07-prod",
+        "port": 1991,
+        "managerVersion": "0.9.1",
+        "managerCommit": "02f473632cb9",
+        "sdkVersion": "0.26.0",
+        "configuration": "preserved",
+        "binaryAndAssetHashes": "passed",
+        "warningJournal": "empty",
+        "gatewayBytes": "match-formal-artifact",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-0c83d8920508",
+            "sessionGeneration": 5,
+            "state": "server-ready",
+            "sessionState": "running",
+            "core": "0.9.1",
+            "app": "2.0.0",
+            "updateAvailable": false,
+            "applicationState": "ready"
+          }
+        ],
+        "heartbeat": [
+          {
+            "id": "xfce-user-desktop-0c83d8920508",
+            "pingCount": 2,
+            "pingIntervals": [
+              29.998
+            ]
+          }
+        ]
+      },
+      {
+        "name": "10-prod",
+        "port": 1991,
+        "managerVersion": "0.9.1",
+        "managerCommit": "02f473632cb9",
+        "sdkVersion": "0.26.0",
+        "configuration": "preserved",
+        "binaryAndAssetHashes": "passed",
+        "warningJournal": "empty",
+        "gatewayBytes": "match-formal-artifact",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-3f5cfb7fc1a6",
+            "sessionGeneration": 5,
+            "state": "server-ready",
+            "sessionState": "running",
+            "core": "0.9.1",
+            "app": "2.0.0",
+            "updateAvailable": false,
+            "applicationState": "ready"
+          },
+          {
+            "id": "edge-0590c1aab19b",
+            "sessionGeneration": 3,
+            "state": "server-ready",
+            "sessionState": "running",
+            "core": "0.9.1",
+            "app": "1.1.0",
+            "updateAvailable": false,
+            "applicationState": "ready"
+          }
+        ],
+        "heartbeat": [
+          {
+            "id": "xfce-user-desktop-3f5cfb7fc1a6",
+            "pingCount": 2,
+            "pingIntervals": [
+              29.999
+            ]
+          },
+          {
+            "id": "edge-0590c1aab19b",
+            "pingCount": 2,
+            "pingIntervals": [
+              29.997
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

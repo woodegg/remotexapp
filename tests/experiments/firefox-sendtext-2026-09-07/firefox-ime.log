@@ -1,0 +1,294 @@
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 Init(), mOwnerWindow=7691a0657100, mContext=7691a05fe100 (im="ibus"), mIsIMInAsyncKeyHandlingMode=true, mIsKeySnooped=false, mSimpleContext=0, mDummyContext=7691a05fec60, gtk_im_multicontext_get_context_id()="ibus", PR_GetEnv("XMODIFIERS")="@im=ibus"
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType=text })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=true),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Blurred, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Focused), mIMEFocusState=IMEFocusState::Blurred, sLastFocusedContext=0x0
+[Parent 2074034: Main Thread]: D/IMEHandler 0x7691bccf2090 EnsureToCacheContentSelection(), Succeeded, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetCursorPosition(aContext=0x7691a05fe100), mCompositionTargetRange={ mOffset=4294967295, mLength=4294967295 }, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetCursorPosition(), FAILED, due to no focused window
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnSelectionChange(aCaller=0x7691a0657100, aIMENotification={ mSelectionChangeData={ mOffset=0, mString="" (Length()=0), GetWritingMode()=h-ltr, mReversed=false, mCausedByComposition=false, mCausedBySelectionEvent=false, mOccurredDuringComposition=false } }), mCompositionState=NotComposing, mIsDeletingSurrounding=false, mRetrieveSurroundingSignalReceived=false, isSelectionRangeChanged=false
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=false),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Focused, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Blurred), mIMEFocusState=IMEFocusState::Focused, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType=text })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=true),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Blurred, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Focused), mIMEFocusState=IMEFocusState::Blurred, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: D/IMEHandler 0x7691bccf2090 EnsureToCacheContentSelection(), Succeeded, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetCursorPosition(aContext=0x7691a05fe100), mCompositionTargetRange={ mOffset=4294967295, mLength=4294967295 }, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetCursorPosition(), FAILED, due to no focused window
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType=text })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x7691923fd060): { type=GDK_KEY_PRESS, keyval=x, unicode=0x78, state=, time=3975011205, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x7691923fd060): { type=GDK_KEY_RELEASE, keyval=x, unicode=0x78, state=, time=3975011205, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnSelectionChange(aCaller=0x7691a0657100, aIMENotification={ mSelectionChangeData={ mOffset=1, mString="" (Length()=0), GetWritingMode()=h-ltr, mReversed=false, mCausedByComposition=false, mCausedBySelectionEvent=false, mOccurredDuringComposition=false } }), mCompositionState=NotComposing, mIsDeletingSurrounding=false, mRetrieveSurroundingSignalReceived=false, isSelectionRangeChanged=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("AsciiProbe"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("中文测试"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=false),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Focused, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Blurred), mIMEFocusState=IMEFocusState::Focused, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType=textarea })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=true),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Blurred, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Focused), mIMEFocusState=IMEFocusState::Blurred, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: D/IMEHandler 0x7691bccf2090 EnsureToCacheContentSelection(), Succeeded, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetCursorPosition(aContext=0x7691a05fe100), mCompositionTargetRange={ mOffset=4294967295, mLength=4294967295 }, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetCursorPosition(), FAILED, due to no focused window
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType=textarea })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x769192598240): { type=GDK_KEY_PRESS, keyval=x, unicode=0x78, state=, time=3975013158, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x769192598240): { type=GDK_KEY_RELEASE, keyval=x, unicode=0x78, state=, time=3975013158, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnSelectionChange(aCaller=0x7691a0657100, aIMENotification={ mSelectionChangeData={ mOffset=1, mString="" (Length()=0), GetWritingMode()=h-ltr, mReversed=false, mCausedByComposition=false, mCausedBySelectionEvent=false, mOccurredDuringComposition=false } }), mCompositionState=NotComposing, mIsDeletingSurrounding=false, mRetrieveSurroundingSignalReceived=false, isSelectionRangeChanged=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("AsciiProbe"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("中文测试"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=false),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Focused, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Blurred), mIMEFocusState=IMEFocusState::Focused, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=PASSWORD }, mHTMLInputType=password })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=true),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Blurred, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Focused), mIMEFocusState=IMEFocusState::Blurred, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: D/IMEHandler 0x7691bccf2090 EnsureToCacheContentSelection(), Succeeded, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetCursorPosition(aContext=0x7691a05fe100), mCompositionTargetRange={ mOffset=4294967295, mLength=4294967295 }, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetCursorPosition(), FAILED, due to no focused window
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=PASSWORD }, mHTMLInputType=password })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x76919d7ada20): { type=GDK_KEY_PRESS, keyval=x, unicode=0x78, state=, time=3975015094, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x76919d7ad200): { type=GDK_KEY_RELEASE, keyval=x, unicode=0x78, state=, time=3975015094, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnSelectionChange(aCaller=0x7691a0657100, aIMENotification={ mSelectionChangeData={ mOffset=1, mString="" (Length()=0), GetWritingMode()=h-ltr, mReversed=false, mCausedByComposition=false, mCausedBySelectionEvent=false, mOccurredDuringComposition=false } }), mCompositionState=NotComposing, mIsDeletingSurrounding=false, mRetrieveSurroundingSignalReceived=false, isSelectionRangeChanged=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("AsciiProbe"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("中文测试"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=false),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Focused, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Blurred), mIMEFocusState=IMEFocusState::Focused, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=true),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Blurred, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Focused), mIMEFocusState=IMEFocusState::Blurred, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: D/IMEHandler 0x7691bccf2090 EnsureToCacheContentSelection(), Succeeded, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetCursorPosition(aContext=0x7691a05fe100), mCompositionTargetRange={ mOffset=4294967295, mLength=4294967295 }, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetCursorPosition(), FAILED, due to no focused window
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnSelectionChange(aCaller=0x7691a0657100, aIMENotification={ mSelectionChangeData={ mOffset=1, mString="" (Length()=0), GetWritingMode()=h-ltr, mReversed=false, mCausedByComposition=false, mCausedBySelectionEvent=false, mOccurredDuringComposition=false } }), mCompositionState=NotComposing, mIsDeletingSurrounding=false, mRetrieveSurroundingSignalReceived=false, isSelectionRangeChanged=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x769190a64b00): { type=GDK_KEY_PRESS, keyval=x, unicode=0x78, state=, time=3975017036, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x769190a64d80): { type=GDK_KEY_RELEASE, keyval=x, unicode=0x78, state=, time=3975017036, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("AsciiProbe"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("中文测试"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=false),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Focused, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Blurred), mIMEFocusState=IMEFocusState::Focused, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x76919f86aba0): { type=GDK_KEY_PRESS, keyval=x, unicode=0x78, state=, time=3975018958, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x76919f86aba0): { type=GDK_KEY_RELEASE, keyval=x, unicode=0x78, state=, time=3975018958, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnBlurWindow(aWindow=0x7691a0657100), mLastFocusedWindow=0x0, mIMEFocusState=IMEFocusState::Blurred
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType=text })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=true),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Blurred, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Focused), mIMEFocusState=IMEFocusState::Blurred, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: D/IMEHandler 0x7691bccf2090 EnsureToCacheContentSelection(), Succeeded, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetCursorPosition(aContext=0x7691a05fe100), mCompositionTargetRange={ mOffset=4294967295, mLength=4294967295 }, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetCursorPosition(), FAILED, due to no focused window
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType=text })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x76919e5f9ac0): { type=GDK_KEY_PRESS, keyval=x, unicode=0x78, state=, time=3975122502, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x76919e5f9ac0): { type=GDK_KEY_RELEASE, keyval=x, unicode=0x78, state=, time=3975122503, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnSelectionChange(aCaller=0x7691a0657100, aIMENotification={ mSelectionChangeData={ mOffset=1, mString="" (Length()=0), GetWritingMode()=h-ltr, mReversed=false, mCausedByComposition=false, mCausedBySelectionEvent=false, mOccurredDuringComposition=false } }), mCompositionState=NotComposing, mIsDeletingSurrounding=false, mRetrieveSurroundingSignalReceived=false, isSelectionRangeChanged=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("AsciiProbe"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("中文测试"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=false),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Focused, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Blurred), mIMEFocusState=IMEFocusState::Focused, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType=textarea })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=true),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Blurred, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Focused), mIMEFocusState=IMEFocusState::Blurred, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: D/IMEHandler 0x7691bccf2090 EnsureToCacheContentSelection(), Succeeded, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetCursorPosition(aContext=0x7691a05fe100), mCompositionTargetRange={ mOffset=4294967295, mLength=4294967295 }, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetCursorPosition(), FAILED, due to no focused window
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType=textarea })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x7691a7cb5160): { type=GDK_KEY_PRESS, keyval=x, unicode=0x78, state=, time=3975124433, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x7691a7cb5160): { type=GDK_KEY_RELEASE, keyval=x, unicode=0x78, state=, time=3975124434, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnSelectionChange(aCaller=0x7691a0657100, aIMENotification={ mSelectionChangeData={ mOffset=1, mString="" (Length()=0), GetWritingMode()=h-ltr, mReversed=false, mCausedByComposition=false, mCausedBySelectionEvent=false, mOccurredDuringComposition=false } }), mCompositionState=NotComposing, mIsDeletingSurrounding=false, mRetrieveSurroundingSignalReceived=false, isSelectionRangeChanged=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("AsciiProbe"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("中文测试"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=false),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Focused, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Blurred), mIMEFocusState=IMEFocusState::Focused, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=PASSWORD }, mHTMLInputType=password })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=true),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Blurred, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Focused), mIMEFocusState=IMEFocusState::Blurred, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: D/IMEHandler 0x7691bccf2090 EnsureToCacheContentSelection(), Succeeded, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetCursorPosition(aContext=0x7691a05fe100), mCompositionTargetRange={ mOffset=4294967295, mLength=4294967295 }, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetCursorPosition(), FAILED, due to no focused window
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=PASSWORD }, mHTMLInputType=password })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x769192597340): { type=GDK_KEY_PRESS, keyval=x, unicode=0x78, state=, time=3975126367, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x769192597340): { type=GDK_KEY_RELEASE, keyval=x, unicode=0x78, state=, time=3975126367, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnSelectionChange(aCaller=0x7691a0657100, aIMENotification={ mSelectionChangeData={ mOffset=1, mString="" (Length()=0), GetWritingMode()=h-ltr, mReversed=false, mCausedByComposition=false, mCausedBySelectionEvent=false, mOccurredDuringComposition=false } }), mCompositionState=NotComposing, mIsDeletingSurrounding=false, mRetrieveSurroundingSignalReceived=false, isSelectionRangeChanged=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("AsciiProbe"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("中文测试"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=false),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Focused, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Blurred), mIMEFocusState=IMEFocusState::Focused, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=true),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Blurred, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Focused), mIMEFocusState=IMEFocusState::Blurred, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: D/IMEHandler 0x7691bccf2090 EnsureToCacheContentSelection(), Succeeded, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetCursorPosition(aContext=0x7691a05fe100), mCompositionTargetRange={ mOffset=4294967295, mLength=4294967295 }, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetCursorPosition(), FAILED, due to no focused window
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnSelectionChange(aCaller=0x7691a0657100, aIMENotification={ mSelectionChangeData={ mOffset=1, mString="" (Length()=0), GetWritingMode()=h-ltr, mReversed=false, mCausedByComposition=false, mCausedBySelectionEvent=false, mOccurredDuringComposition=false } }), mCompositionState=NotComposing, mIsDeletingSurrounding=false, mRetrieveSurroundingSignalReceived=false, isSelectionRangeChanged=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnSelectionChange(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x76919f86a560): { type=GDK_KEY_PRESS, keyval=x, unicode=0x78, state=, time=3975128299, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x76919f86a560): { type=GDK_KEY_RELEASE, keyval=x, unicode=0x78, state=, time=3975128299, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="AsciiProbe", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("AsciiProbe"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnCommitCompositionNative(aContext=0x7691a05fe100), current context=0x7691a05fe100, active context=0x7691a05fe100, commitString="中文测试", mProcessingKeyEvent=0x0, IsComposingOn(aContext)=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 DispatchCompositionCommitEvent(aContext=0x7691a05fe100, aCommitString=0x7ffc12b2ce38, ("中文测试"))
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   DispatchCompositionCommitEvent(), FAILED, there are no focused window in this module
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=false),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Focused, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Blurred), mIMEFocusState=IMEFocusState::Focused, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x76919f86a100): { type=GDK_KEY_PRESS, keyval=x, unicode=0x78, state=, time=3975130230, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler >>>>>>>>>>>>>>>>
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnKeyEvent(aCaller=0x7691a0657100, aEvent(0x76919f86a100): { type=GDK_KEY_RELEASE, keyval=x, unicode=0x78, state=, time=3975130230, hardware_keycode=53, group=0 }, aKeyboardEventWasDispatched=false)
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090   OnKeyEvent(), mMaybeInDeadKeySequence=false, mCompositionState=NotComposing, current context=7691a05fe100, active context=7691a05fe100, mIMContextID=IBus, mIsIMInAsyncKeyHandlingMode=true
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   OnKeyEvent(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType=text })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=true),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Blurred, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Focused), mIMEFocusState=IMEFocusState::Blurred, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: D/IMEHandler 0x7691bccf2090 EnsureToCacheContentSelection(), Succeeded, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetCursorPosition(aContext=0x7691a05fe100), mCompositionTargetRange={ mOffset=4294967295, mLength=4294967295 }, mContentSelection={ HasRange()=false }
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetCursorPosition(), FAILED, due to no focused window
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=ENABLED }, mHTMLInputType=text })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the caller isn't focused window, mLastFocusedWindow=0x0
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 OnFocusChangeInGecko(aFocus=false),mCompositionState=NotComposing, mIMEFocusState=IMEFocusState::Focused, mSetInputPurposeAndInputHints=false
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 NotifyIMEOfFocusChange(aIMEFocusState=IMEFocusState::Blurred), mIMEFocusState=IMEFocusState::Focused, sLastFocusedContext=0x7691bccf2090
+[Parent 2074034: Main Thread]: I/IMEHandler 0x7691bccf2090 SetInputContext(aCaller=0x7691a0657100, aContext={ mIMEState={ mEnabled=DISABLED }, mHTMLInputType= })
+[Parent 2074034: Main Thread]: E/IMEHandler 0x7691bccf2090   SetInputContext(), FAILED, the cal

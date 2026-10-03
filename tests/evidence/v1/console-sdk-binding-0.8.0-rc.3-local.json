@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "local:console-sdk-binding-rc3",
+  "commit": "3a3e63a2e7e946c9cff7277c3671a75246472b19",
+  "startedAt": "2026-09-10T09:16:24Z",
+  "completedAt": "2026-09-10T09:32:17Z",
+  "result": "failed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "local",
+    "name": "local-1991-and-2992-only"
+  },
+  "artifact": {
+    "name": "remotexapp-0.8.0-rc.3-linux-amd64.tar.gz",
+    "sha256": "042fc924c9cbb55675fe5b919438ac7de6bcfce8a39901eca9c23a79182d7c7e"
+  },
+  "scenarios": [
+    {
+      "id": "local-release-ci",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-ABI-four-app-document-suites",
+      "result": "passed"
+    },
+    {
+      "id": "upgrade-and-cache-suites-after-test-fixture-correction",
+      "result": "passed"
+    },
+    {
+      "id": "user-home-XFCE-suite",
+      "result": "passed"
+    },
+    {
+      "id": "cache-regression-root-and-nested-prefix-exact-candidate-assets",
+      "result": "passed"
+    },
+    {
+      "id": "both-Managers-selection-health-config-and-pins",
+      "result": "passed"
+    },
+    {
+      "id": "2992-post-deployment-six-app-checks",
+      "result": "passed"
+    },
+    {
+      "id": "1991-post-test-runtime-preservation",
+      "result": "failed"
+    },
+    {
+      "id": "deployed-existing-Edge-cache-regression",
+      "result": "failed"
+    }
+  ],
+  "details": {
+    "version": "0.8.0-rc.3",
+    "sdkVersion": "0.25.1",
+    "consoleAsset": "console-H3AGT7HZ.js",
+    "consoleSha256": "92146499644dfaabbff6383d496aae656c153cac8475e3dc8c5d8d19b1937bba",
+    "sdkAsset": "sdk-45U36BXO.js",
+    "managerSha256": "6c085f9a06517cfa17f7647706fe12d12a655711d0615d183e2e7869bc4ec879",
+    "endpoints": [
+      "127.0.0.1:1991",
+      "127.0.0.1:2992"
+    ],
+    "bothManagersReady": true,
+    "configurationPreserved": true,
+    "consolePolicy": {
+      "1991": true,
+      "2992": false
+    },
+    "incident": {
+      "runtime": "edge-721897a6883d",
+      "cause": "post-deployment smoke assumed createInstance with unique profileRef created a new runtime; Edge singleton reused pre-existing runtime, which was then stopped by smoke cleanup",
+      "stoppedAt": "2026-09-10T09:32:17Z",
+      "state": "stopped",
+      "persistentDefaultProfileDirectoryRetained": true,
+      "recreated": false,
+      "operatorNotified": true,
+      "operatorDirectionPending": true,
+      "unsavedSessionRecovery": "not guaranteed"
+    },
+    "xfce": {
+      "id": "xfce-user-desktop-44ea8c2186ee",
+      "generation": 1,
+      "preserved": true
+    },
+    "testFixtureCorrection": "Cache regression initially consumed Kate's 60-second idle budget. Moved it to independent six-hour Edge fixture. Reran complete upgrade/cache suite and separate XFCE suite against unchanged candidate bytes; preceding exact-archive suites already passed.",
+    "publication": "none",
+    "sandboxDeployment": "none",
+    "cloudflareChanges": "none",
+    "uat": "not accepted",
+    "logs": [
+      "/tmp/rc3-release-ci.log",
+      "/tmp/rc3-exact-e2e.log",
+      "/tmp/rc3-upgrade-cache-retry.log",
+      "/tmp/rc3-xfce-e2e.log",
+      "/tmp/remotexapp-upgrade-kde-e2e-xjISOo/console-sdk-cache-result.jsonl",
+      "/tmp/rc3-deploy-1991.log",
+      "/tmp/rc3-deploy-2992.log",
+      "/tmp/rc3-smoke-1991.log",
+      "/tmp/rc3-smoke-2992.log",
+      "/tmp/rc3-deployed-edge-cache.log"
+    ]
+  }
+}

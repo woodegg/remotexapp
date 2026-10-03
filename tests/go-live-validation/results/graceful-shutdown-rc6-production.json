@@ -1,0 +1,76 @@
+{
+  "date": "2026-08-27",
+  "release": "0.1.0-rc.6",
+  "driverVersion": "1.2.0",
+  "outcome": "passed",
+  "deployment": {
+    "mode": "central-real-user",
+    "user": "tester",
+    "managerPort": 1991,
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "securityStatus": "temporary insecure test configuration",
+    "libexecRelease": "/usr/local/libexec/remotexapp/releases/0.1.0-rc.6",
+    "shareRelease": "/usr/local/share/remotexapp/releases/0.1.0-rc.6"
+  },
+  "binarySha256": {
+    "remotexappd": "a12e439a27623b6cc438c3e75a6e03f3041df10ee59e4e353149896418f87652",
+    "novncInput": "f5a1204b9bef1f72ed442474b53d6d2d0809f1d3e7accf46c8d24d0a01be1c20",
+    "remotexappStatus": "0b2421816f6354777e9aae8e28b7edb8769c5253448a180c272b9c8d63955fed"
+  },
+  "rc5FailSafeDiscovery": {
+    "gracefulStopHttpStatus": 409,
+    "elapsedMs": 15019,
+    "state": "shutdown-blocked",
+    "visibleError": "Could not connect: No such file or directory",
+    "cause": "session bus under host /tmp was invisible through manager PrivateTmp",
+    "processRetained": true,
+    "dataLoss": false,
+    "recovery": "new attachment cancelled shutdown; manual session-bus logout drained safely"
+  },
+  "upgrade": {
+    "rc5DriverAdoptedBeforeTransition": "1.1.0",
+    "availableDriverBeforeTransition": "1.2.0",
+    "vncPidPreservedAtAdoption": 4066334,
+    "gatewayPidPreservedAtAdoption": 4066348,
+    "explicitStoppedToRunningTransition": true,
+    "updateStatusAfterTransition": "current"
+  },
+  "browser": {
+    "framebuffer": "1280x720 fixed",
+    "rfbState": "connected",
+    "inputState": "connected",
+    "reconnectMs": 63.04429
+  },
+  "privateSessionBus": {
+    "addressPrefix": "unix:path=/run/user/1000/remotexappd/",
+    "socketPresent": true,
+    "managerPrivateTmp": true
+  },
+  "managedGracefulStop": {
+    "httpStatus": 200,
+    "elapsedMs": 3237,
+    "observedState": "stopped",
+    "error": null,
+    "forced": false
+  },
+  "final": {
+    "managedId": "test-host-xfce",
+    "runtimeInstanceId": "xfce-desktop-86cd7c75d715",
+    "desiredState": "running",
+    "observedState": "running",
+    "runtimeState": "server-ready",
+    "sessionState": "stopped",
+    "attachedClients": 0,
+    "appliedDriverVersion": "1.2.0",
+    "updateStatus": "current",
+    "health": "ok",
+    "readiness": "ready"
+  },
+  "rollback": {
+    "previousRelease": "/usr/local/libexec/remotexapp/releases/0.1.0-rc.5",
+    "previousShareRelease": "/usr/local/share/remotexapp/releases/0.1.0-rc.5",
+    "installerBackup": "/var/lib/remotexapp-install-backups/20260827T212313Z-4083286"
+  },
+  "remainingGate": "human visual and interactive UAT"
+}

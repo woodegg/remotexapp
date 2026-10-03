@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "lightview-1.0.6-formal-publication",
+  "commit": "360b3dfe096917d53662c112b654a7a19b3b26d0",
+  "startedAt": "2026-09-17T04:14:02Z",
+  "completedAt": "2026-09-17T04:14:48Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "github-release",
+    "name": "woodegg/remotexapp lightview-v1.0.6"
+  },
+  "artifact": {
+    "name": "lightview-1.0.6.tar.gz",
+    "sha256": "bc424aabdf8484734e4f35c75ff00345268343c237eb9f093724bd79e5d3f381"
+  },
+  "release": {
+    "id": "RE_kwDOUGRp2s4XRXoy",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/lightview-v1.0.6",
+    "tag": "lightview-v1.0.6",
+    "tagObject": "51e2c6870038482bf952c4f6cbb6e0ff1c5cb8a5",
+    "peeledCommit": "360b3dfe096917d53662c112b654a7a19b3b26d0",
+    "publishedAt": "2026-09-17T04:14:14Z",
+    "draft": false,
+    "prerelease": false
+  },
+  "scenarios": [
+    { "id": "annotated-tag-exists-remotely-and-peels-to-accepted-source", "result": "passed" },
+    { "id": "release-publishes-only-archive-and-checksum", "result": "passed" },
+    { "id": "downloaded-checksum-valid-and-archive-byte-identical-to-UAT", "result": "passed" },
+    { "id": "downloaded-manifest-id-version-and-ABI", "result": "passed" },
+    { "id": "release-is-formal-not-draft-or-prerelease", "result": "passed" },
+    { "id": "upstream-Lightview-v0.1.6-remains-formal-and-checksummed", "result": "passed" },
+    { "id": "RemoteXApp-Core-v0.12.2-remains-Latest", "result": "passed" },
+    { "id": "sandbox-deployment", "result": "skipped", "reason": "Publication approval did not authorize sandbox deployment." }
+  ],
+  "retainedEvidence": {
+    "downloadDirectory": "/tmp/remotexapp-app-release-verify",
+    "acceptedUAT": "tests/evidence/v1/edge-2.0.2-lightview-1.0.6-local-uat.json"
+  },
+  "limitations": [
+    "The Lightview host binary is separately provisioned and is not embedded in the App Package.",
+    "Production hosts must support normal WebKit sandboxing; the local test override is not packaged.",
+    "Publication does not deploy or upgrade any endpoint."
+  ]
+}

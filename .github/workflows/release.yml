@@ -1,0 +1,78 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.26.8"
+          cache: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "22.x"
+      - name: Install release verification dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ripgrep
+      - name: Reject lightweight, mismatched, or reused tags
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$(git cat-file -t "$GITHUB_REF_NAME")" = tag || {
+            echo "release tag must be annotated" >&2
+            exit 1
+          }
+          test "$GITHUB_REF_NAME" = "v$(<VERSION)" || {
+            echo "release tag does not match VERSION" >&2
+            exit 1
+          }
+          reused="$(gh run list --workflow release.yml --branch "$GITHUB_REF_NAME" --limit 100 --json databaseId,headSha --jq ".[] | select(.databaseId != $GITHUB_RUN_ID and .headSha != \"$GITHUB_SHA\") | .databaseId" | head -n 1)"
+          test -z "$reused" || {
+            echo "tag $GITHUB_REF_NAME previously ran at another commit (run $reused); refusing moved tag" >&2
+            exit 1
+          }
+      - name: Download exact successful candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          candidate_run="$(gh run list --workflow candidate.yml --commit "$GITHUB_SHA" --status success --limit 20 --json databaseId,headSha --jq ".[0].databaseId // empty")"
+          test -n "$candidate_run" || {
+            echo "no successful Release candidate workflow exists for $GITHUB_SHA" >&2
+            exit 1
+          }
+          mkdir -p dist
+          gh run download "$candidate_run" --name "release-candidate-$GITHUB_SHA" --dir dist
+      - name: Verify candidate identity and bytes
+        run: |
+          archive="$(find dist -maxdepth 1 -type f -name 'remotexapp-*.tar.gz' -print -quit)"
+          scripts/verify-release-candidate.sh "$archive" dist/SHA256SUMS dist/candidate-evidence.json "$GITHUB_SHA"
+          scripts/check-sensitive-data.sh "$archive"
+      - name: Publish unchanged candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          prerelease=()
+          if [[ "$(<VERSION)" == *-* ]]; then
+            prerelease=(--prerelease)
+          fi
+          gh release create "$GITHUB_REF_NAME" dist/*.tar.gz dist/SHA256SUMS dist/candidate-evidence.json \
+            --verify-tag --title "RemoteXApp $(<VERSION)" --generate-notes "${prerelease[@]}"

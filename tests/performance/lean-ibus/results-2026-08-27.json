@@ -1,0 +1,38 @@
+{
+  "experiment": "P01",
+  "outcome": "accepted",
+  "status": "Accepted after automated Unicode/caret validation and interactive input, resize and reconnect checks",
+  "date": "2026-08-27",
+  "host": "test-host",
+  "isolation": {
+    "managerPort": 1992,
+    "display": 11,
+    "productionPort1991Changed": false
+  },
+  "timingMilliseconds": {
+    "createToServerReady": 578,
+    "sessionUnitToDriverReady": 34,
+    "textServer": 1.292
+  },
+  "steadyMemoryMiBApproximate": {
+    "baselineServer": 101,
+    "candidateServer": 62,
+    "baselineSession": 41,
+    "candidateSession": 38,
+    "candidateActiveInstanceMin": 102,
+    "candidateActiveInstanceMax": 105
+  },
+  "serverTasks": {
+    "baseline": 58,
+    "candidate": 48
+  },
+  "correctness": {
+    "text": "P01你好abc",
+    "clipboardExact": true,
+    "cursorSequenceBefore": 5,
+    "cursorSequenceAfter": 6,
+    "cursorXBefore": 3,
+    "cursorXAfter": 87,
+    "interactivePassed": true
+  }
+}

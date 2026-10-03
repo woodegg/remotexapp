@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-02",
+  "scope": "CLP-001 through CLP-015; local deployment only",
+  "result": "passed",
+  "candidate": {
+    "version": "0.4.0-rc.1",
+    "sourceCandidate": "17d559ebe813906a1055445e7d543d667a7c10917b4ff46c96d8832c2bef6b1b",
+    "sdkVersion": "0.19.0",
+    "appPackageABI": "remotexapp/v1",
+    "humanUAT": "pending"
+  },
+  "artifacts": {
+    "localReleaseArchiveSha256": "8f2716fd9a3631c3fde387bc172a212070cfa0b24bab6c199644e4ca9753d098",
+    "binarySha256": {
+      "remotexappd": "78839c0d36ba3511faad634c05db7e8643263ae65a267055e1b31a5746cfc9af",
+      "novnc-input": "da385c676eb1b0c99f9ae1944e5997eb4195bc0f3426437e690b91485096307f",
+      "remotexapp-status": "5520d1e1826943f742f19dd4df9cf2b6a39faad3e9d8992f037be3d0b0f0b5fd",
+      "remotexapp-operator-helper": "dcc6c205dc3d211c7f766de5bec04ec98683b491a594149f4d88a87c12b77493"
+    },
+    "installedBinariesMatchCandidate": true
+  },
+  "automatedGates": {
+    "makeCheck": "passed",
+    "makeReleaseCI": "passed",
+    "sdkTests": 59,
+    "goRaceAndVet": "passed",
+    "sensitiveDataCheck": "passed",
+    "offlineImmutableStagingAndTamperRejection": "passed",
+    "x11NormalAndINCRBothDirections": "passed",
+    "richX11TargetNegotiation": "passed",
+    "isolatedShippedAppE2E": {
+      "result": "passed",
+      "apps": ["edge", "firefox-esr", "libreoffice", "mousepad"],
+      "clipboard": "all formats on Mousepad; bidirectional smoke on every other isolated App",
+      "lifecycle": "input, resize, readiness, controls, exit, shutdown, adoption, persistence, cleanup"
+    }
+  },
+  "local1991": {
+    "deploymentMode": "central real user",
+    "listen": "0.0.0.0:1991",
+    "authMode": "none with explicit insecure-public test opt-in",
+    "coreAndShareSelectors": "releases/0.4.0-rc.1",
+    "managerService": "active with zero automatic restarts",
+    "managedApplication": "ubuntu-desktop",
+    "runtimeTemplate": "xfce-user-desktop@2.0.0",
+    "runtimeGeneration": 2,
+    "runtimeGatewayMatchesCandidate": true,
+    "clipboardSocket": "owner-only mode 0600",
+    "viewerCountDuringTest": 2,
+    "viewerCountAfterCleanup": 0,
+    "fullClipboardChecks": [
+      "capabilities and explicit modes",
+      "all four formats browser to X11",
+      "multi-Viewer non-consuming acceptance",
+      "browser Clipboard API read",
+      "XFixes remote change to browser",
+      "view-only receive and send rejection",
+      "reconnect list recovery",
+      "permission-dependent auto degradation",
+      "standard Console prompt stack",
+      "reload resets policy"
+    ],
+    "generationCleanup": {
+      "oldGenerationRejected": true,
+      "newGenerationReplayedOffers": 0,
+      "twoViewersReconnected": true
+    },
+    "journalPayloadPatternMatches": 0,
+    "temporaryBrowserUnitsRemaining": 0,
+    "readyForHumanUAT": true
+  },
+  "authorizationBoundary": {
+    "sandboxChanged": false,
+    "tagCreated": false,
+    "githubPublished": false
+  }
+}

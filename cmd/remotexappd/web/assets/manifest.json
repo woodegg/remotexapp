@@ -1,0 +1,10 @@
+{
+  "formatVersion": 1,
+  "sdk": "sdk-PS5XKB2J.js",
+  "console": "console-CJZTKMBR.js",
+  "novnc": "novnc-2RHTOO33.js",
+  "novncVersion": "1.7.0",
+  "novncCommit": "63107bd06d9e1f6136ff21aeda8cd62cbf0d433e",
+  "novncArchiveSha256": "06dac239be3973ed79a00e357a68aab996e6ed2fd496ee2cc6e6a34020344ac9",
+  "esbuildVersion": "0.20.1"
+}

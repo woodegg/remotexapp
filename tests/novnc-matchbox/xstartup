@@ -1,0 +1,36 @@
+#!/bin/sh
+set -eu
+
+# Matchbox is optional.  A single full-screen application does not need a
+# window manager, which lowers the server footprint and removes WM behavior
+# from the test.
+if [ "${USE_MATCHBOX:-0}" = "1" ]; then
+  matchbox-window-manager -use_titlebar no &
+fi
+
+if [ "${TEST_APP:-browser}" = "browser" ]; then
+  exec python3 "${MINIMAL_BROWSER_SCRIPT}"
+fi
+
+# Do not reuse LibreOffice running on another X display for the same user.
+libreoffice \
+  --impress \
+  --nologo \
+  --nodefault \
+  --nofirststartwizard \
+  --norestore \
+  --nolockcheck \
+  --accept="socket,host=127.0.0.1,port=2002;urp;StarOffice.ComponentContext" \
+  "-env:UserInstallation=file://${LIBREOFFICE_PROFILE}" \
+  "${PPTX_PATH}" &
+libreoffice_pid=$!
+
+if [ "${IMPRESS_MINIMAL_UI:-1}" = "1" ]; then
+  python3 "${IMPRESS_UI_CONFIG_SCRIPT}" >"${IMPRESS_UI_CONFIG_LOG}" 2>&1 || true
+fi
+
+python3 "${IMPRESS_SLIDE_COUNTER_SCRIPT}" >"${IMPRESS_SLIDE_COUNTER_LOG}" 2>&1 &
+slide_counter_pid=$!
+printf '%s\n' "$slide_counter_pid" >"${IMPRESS_SLIDE_COUNTER_PID}"
+
+wait "$libreoffice_pid"

@@ -1,0 +1,67 @@
+{
+  "experiment": "P04",
+  "outcome": "rejected",
+  "status": "Rejected: retain depth 16 for the generic stack",
+  "date": "2026-08-27",
+  "workload": "x11perf -sync -repeat 1 -time 30 -scroll500",
+  "common": {
+    "geometry": "1280x720",
+    "frameRate": 15,
+    "client": "headless Google Chrome with the built-in noVNC kiosk",
+    "encoding": "Tight",
+    "clientPixelFormat": "depth 24 (32bpp) little-endian bgr888"
+  },
+  "depth16": {
+    "instanceId": "mousepad-depth16-56001ffbc647",
+    "memoryCurrentBytes": 47124480,
+    "tasks": 23,
+    "static10Seconds": {
+      "rfbToBrowserBytes": 892,
+      "browserToRfbBytes": 300,
+      "vncCpuUsec": 6301,
+      "gatewayCpuUsec": 7605
+    },
+    "scroll": {
+      "operations": 600000,
+      "millisecondsPerOperation": 0.0452,
+      "operationsPerSecond": 22100,
+      "derivedElapsedSeconds": 27.12,
+      "rfbToBrowserBytes": 19808,
+      "browserToRfbBytes": 460,
+      "vncCpuUsec": 23941287,
+      "gatewayCpuUsec": 18153,
+      "rfbToBrowserBytesPerOperation": 0.03301,
+      "vncCpuUsecPerOperation": 39.90
+    }
+  },
+  "depth24": {
+    "instanceId": "mousepad-depth24-026849c72344",
+    "memoryCurrentBytes": 51863552,
+    "tasks": 23,
+    "static10Seconds": {
+      "rfbToBrowserBytes": 892,
+      "browserToRfbBytes": 300,
+      "vncCpuUsec": 5524,
+      "gatewayCpuUsec": 6566
+    },
+    "scroll": {
+      "operations": 500000,
+      "millisecondsPerOperation": 0.0763,
+      "operationsPerSecond": 13100,
+      "derivedElapsedSeconds": 38.15,
+      "rfbToBrowserBytes": 15175,
+      "browserToRfbBytes": 440,
+      "vncCpuUsec": 34208562,
+      "gatewayCpuUsec": 22967,
+      "rfbToBrowserBytesPerOperation": 0.03035,
+      "vncCpuUsecPerOperation": 68.42
+    }
+  },
+  "depth24RelativeToDepth16": {
+    "x11ThroughputPercent": 59.3,
+    "vncCpuUsecPerOperationPercent": 171.5,
+    "rfbToBrowserBytesPerOperationPercent": 91.9,
+    "memoryCurrentDeltaBytes": 4739072
+  },
+  "decision": "Retain depth 16 for the generic Mousepad stack. Depth 24 is still required for app classes, such as WeChat, whose rendering is incorrect at depth 16."
+}

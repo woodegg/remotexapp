@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "lightview-1.0.0-local-sandbox00-sandbox01",
+  "commit": "422cb0a2c12d11f15ff20894f760838104bc9fb1",
+  "startedAt": "2026-09-16T22:33:00Z",
+  "completedAt": "2026-09-16T22:48:17Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "local-and-lxd",
+    "name": "local loopback 1991/2992 and two sandbox production 1991 endpoints"
+  },
+  "artifact": {
+    "name": "lightview-1.0.0.tar.gz",
+    "sha256": "ee38e81dbf0ae907282e972c72a5b95d45229418f5dc0e2bdb7d4f68488d0d07"
+  },
+  "artifacts": {
+    "app": {
+      "release": "lightview-v1.0.0",
+      "archive": "lightview-1.0.0.tar.gz",
+      "archiveSha256": "ee38e81dbf0ae907282e972c72a5b95d45229418f5dc0e2bdb7d4f68488d0d07",
+      "contentSha256": "d743d3e1d648ea12a3bfbefe0ff3e4587b4428ced6f96c662eb57ab2c4e76116",
+      "packageMetadataSha256": "a915794568e4261fe8807791b6d50811c23715b0e5602dc63f54888291725c22"
+    },
+    "hostDependency": {
+      "release": "woodegg/lightview v0.1.0",
+      "archive": "lightview-0.1.0-ubuntu24.04-x86_64.tar.gz",
+      "archiveSha256": "b06afe9da213509d69ec812f32766690b06e22fa1fc74785b66fb3da00e158b8",
+      "binarySha256": "3e490c18546597d0a729ea9018aa234e53afd19b849805060e4ec60cee1686d5",
+      "versionOutput": "Lightview 0.1.0 (WebKitGTK 2.52.6)"
+    }
+  },
+  "targets": [
+    {
+      "name": "local-1991",
+      "listener": "127.0.0.1:1991",
+      "core": "0.12.0-rc.2",
+      "coreCommit": "b7f4f98c7204",
+      "app": "lightview@1.0.0",
+      "result": "passed"
+    },
+    {
+      "name": "local-2992",
+      "listener": "127.0.0.1:2992",
+      "core": "0.12.0-rc.2",
+      "coreCommit": "b7f4f98c7204",
+      "app": "lightview@1.0.0",
+      "result": "passed"
+    },
+    {
+      "name": "sandbox00-1991",
+      "listener": "0.0.0.0:1991",
+      "core": "0.12.2",
+      "coreCommit": "c1cecabe076e",
+      "app": "lightview@1.0.0",
+      "preservedRuntime": {
+        "id": "xfce-user-desktop-3bee742877b1",
+        "generation": 43,
+        "serverPid": 946,
+        "vncPid": 855,
+        "gatewayPid": 959,
+        "sessionPid": 52766,
+        "attachedClients": 1
+      },
+      "result": "passed"
+    },
+    {
+      "name": "sandbox01-1991",
+      "listener": "0.0.0.0:1991",
+      "core": "0.12.2",
+      "coreCommit": "c1cecabe076e",
+      "app": "lightview@1.0.0",
+      "preservedRuntime": {
+        "id": "xfce-user-desktop-0af0e5b5918b",
+        "generation": 6,
+        "serverPid": 619,
+        "vncPid": 546,
+        "gatewayPid": 688,
+        "attachedClients": 0
+      },
+      "result": "passed"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "formal-public-App-and-host-dependency-assets-downloaded-and-checksummed",
+      "result": "passed"
+    },
+    {
+      "id": "App-installed-without-activation-before-selector-switch",
+      "result": "passed"
+    },
+    {
+      "id": "two-consecutive-Manager-health-and-catalog-checks-after-activation",
+      "result": "passed"
+    },
+    {
+      "id": "real-Viewer-attach-visible-window-and-ready-low-memory-status",
+      "result": "passed"
+    },
+    {
+      "id": "private-Unix-connection-descriptor-and-native-status",
+      "result": "passed"
+    },
+    {
+      "id": "openUrl-action-returned-Example-Domain",
+      "result": "passed"
+    },
+    {
+      "id": "test-runtime-and-control-socket-cleanup-followed-by-Manager-adoption",
+      "result": "passed"
+    },
+    {
+      "id": "unrelated-runtime-identity-generation-and-processes-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "warning-journals-empty-and-local-listeners-loopback-only",
+      "result": "passed"
+    },
+    {
+      "id": "sandbox00-container-reboot",
+      "result": "skipped",
+      "reason": "Not authorized and not required for App Package activation."
+    },
+    {
+      "id": "sandbox00-2991",
+      "result": "skipped",
+      "reason": "The request named sandbox00, not its separately gated staging endpoint; its LightView selector remains absent."
+    }
+  ],
+  "qualifications": [
+    "The local endpoints intentionally remain on Core 0.12.0-rc.2; this App-only deployment did not change Core or SDK.",
+    "Sandbox01 was initially stopped and was started for the authorized deployment; it was not rebooted.",
+    "The official Lightview 0.1.0 release binary differs from the earlier local-build UAT hash, so the full Viewer/control smoke was repeated on every target.",
+    "The local container retains its separately documented WebKit sandbox override; both sandbox targets used their normal production service environment."
+  ]
+}

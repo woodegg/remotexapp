@@ -1,0 +1,83 @@
+{
+  "date": "2026-08-31",
+  "release": "0.2.0-rc.5",
+  "sourceCommit": "8c03c485adc5",
+  "artifact": {
+    "name": "remotexapp-0.2.0-rc.5-linux-amd64.tar.gz",
+    "sha256": "a011a513c36ce6f3b0bf7cf491bcdeee91f0da1fdd33d1058685306cd63af7ad"
+  },
+  "scope": ["Issue #5", "RTM-010"],
+  "automatedGates": {
+    "makeCheck": "passed",
+    "goRace": "passed",
+    "goVet": "passed",
+    "releaseCI": "passed",
+    "sensitiveData": "passed",
+    "immutableStage": "passed"
+  },
+  "abnormalRegression": {
+    "sameIdentityReplacement": "passed",
+    "failedCreationRetry": "passed",
+    "unitCleanupFailure": "passed without replacement",
+    "runtimeDirectoryCleanupFailure": "passed without replacement",
+    "crashPoints": [
+      "old units stopped",
+      "creating manifest published",
+      "locked creation failed",
+      "managed pointer not yet published"
+    ],
+    "legacyDuplicateSelection": [
+      "durable managed pointer",
+      "unique live application",
+      "unique healthy runtime",
+      "newest all-unhealthy runtime"
+    ],
+    "ambiguousMultipleLive": "failed closed without record deletion",
+    "staleCleanupFailure": "failed closed without record deletion"
+  },
+  "local1991": {
+    "deploymentMode": "central real user ubuntu",
+    "listen": "0.0.0.0:1991",
+    "runtimeIdBefore": "xfce-user-desktop-12c0f10fb07d",
+    "runtimeIdAfter": "xfce-user-desktop-12c0f10fb07d",
+    "createdAtPreserved": true,
+    "managedManifestCount": 1,
+    "managerRestartCountAfterInjection": 0,
+    "realSystemdGatewayFault": "recovered",
+    "realChromeNoVNCRFB": "passed",
+    "fixedFramebuffer": "1280x720 preserved",
+    "explicitSDKReconnect": "passed",
+    "managerRestartAutomaticReconnect": "passed"
+  },
+  "sandbox00": {
+    "deploymentMode": "central real user sandbox",
+    "previousRelease": "0.2.0-rc.4",
+    "previousCommit": "b21524c08d6e",
+    "historicalRestartCountBeforeActivation": 254,
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "runtimeIdBefore": "xfce-user-desktop-2e3cb747be7b",
+    "runtimeIdAfter": "xfce-user-desktop-2e3cb747be7b",
+    "createdAtPreserved": true,
+    "managedManifestCountBefore": 1,
+    "managedManifestCountAfter": 1,
+    "realSystemdGatewayFault": "recovered",
+    "managerRestartCountAfterInjection": 0,
+    "postRecoveryManagerRestart": "passed",
+    "runtimeUnitPidsPreservedAcrossFinalRestart": true,
+    "templates": 6,
+    "activeInstances": 2,
+    "attachedClients": 0,
+    "warningJournalCount": 0,
+    "finalService": "active/running"
+  },
+  "excluded": {
+    "sdkChange": true,
+    "appPackageChange": true,
+    "driverOrTemplateChange": true,
+    "waosChange": true,
+    "followerSandboxDeployment": true,
+    "productionGatewayTesting": true
+  },
+  "humanUAT": "pending"
+}

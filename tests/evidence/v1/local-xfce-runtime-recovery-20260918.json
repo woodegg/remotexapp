@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "local-xfce-runtime-recovery-20260918",
+  "commit": "2d8068687ead065ecc54a07ed03602bcc5c144ee",
+  "startedAt": "2026-09-18T16:25:00Z",
+  "completedAt": "2026-09-18T16:31:00Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "project-local-test",
+    "name": "1991 existing XFCE desktop display :1"
+  },
+  "authorization": "Operator explicitly approved desktop runtime restart and its unsaved-work risk.",
+  "runtime": {
+    "id": "xfce-user-desktop-8cdcaa0b5159",
+    "managedId": "ubuntu-desktop",
+    "display": ":1",
+    "beforeGeneration": 3,
+    "serverReadyGeneration": 4,
+    "readySessionGeneration": 5,
+    "corePin": "0.12.0-rc.2",
+    "appPin": "3.0.0",
+    "upgraded": false
+  },
+  "manager": {
+    "version": "0.13.0",
+    "sdk": "0.29.1",
+    "restarted": false
+  },
+  "recovery": [
+    "Generation-guarded force restart accepted; old gateway clipboard deactivation/teardown remained blocked.",
+    "Stopped only this runtime's gateway; forced termination unblocked cleanup. Initial restart returned HTTP 500 for unit-stop timeouts.",
+    "Managed reconciliation recovered the same ID with preserved pins and a new server generation. A guarded retry using stale generation 3 returned 409 without a second teardown.",
+    "RFB attachment activated the new XFCE session at generation 5; application and managed status recovered."
+  ],
+  "scenarios": [
+    {
+      "id": "X11-responsive-1280x720",
+      "result": "passed"
+    },
+    {
+      "id": "existing-ID-and-component-pins-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "managed-running-no-error",
+      "result": "passed"
+    },
+    {
+      "id": "application-ready-new-session-generation",
+      "result": "passed"
+    },
+    {
+      "id": "real-browser-served-kiosk_connected-1280x720-canvas",
+      "result": "passed"
+    },
+    {
+      "id": "RFB-WebSocket-attach",
+      "result": "passed"
+    },
+    {
+      "id": "connection-descriptor-current-generation-stable-revision-stale-generation-rejected",
+      "result": "passed"
+    },
+    {
+      "id": "account-D-Bus-query-and-X11-connection",
+      "result": "passed"
+    },
+    {
+      "id": "private-IBus-GetGlobalEngine-remote-unicode",
+      "result": "passed"
+    },
+    {
+      "id": "both-Manager-ready-and-loopback-bindings-preserved",
+      "result": "passed"
+    }
+  ],
+  "limitations": [
+    "This is restart/recovery, not a runtime component upgrade.",
+    "No actual Unicode typing/readback or full two-endpoint Coordinator UI rerun is claimed.",
+    "Initial ListEngines assertion was unsuitable for a dynamically registered engine; GetGlobalEngine confirmed remote-unicode.",
+    "Prior LightView package-identity conflict remains unresolved; no App package was overwritten.",
+    "No sandbox changes."
+  ],
+  "rawEvidence": {
+    "browser": "/tmp/remotexapp-desktop-recovery-browser-iespBg/result.json"
+  },
+  "references": [
+    "runtime-coordinator-0.13.0-local-deployment.json"
+  ]
+}

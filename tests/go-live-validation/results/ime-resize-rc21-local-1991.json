@@ -1,0 +1,90 @@
+{
+  "releaseCandidate": "0.1.0-rc.21",
+  "date": "2026-08-28",
+  "commit": "1e0b0ad49c8b",
+  "sdkVersion": "0.15.0",
+  "deployment": {
+    "mode": "central real-user service for ubuntu",
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "warning": "Temporary local UAT policy only; not a production-secure listener",
+    "binaryRelease": "/usr/local/libexec/remotexapp/releases/0.1.0-rc.21",
+    "sharedRelease": "/usr/local/share/remotexapp/releases/0.1.0-rc.21",
+    "ownerMode": "root:root 0755",
+    "managerPidBefore": 1972766,
+    "managerPidAfter": 3482732,
+    "health": { "status": "ok", "ready": true, "version": "0.1.0-rc.21" }
+  },
+  "fixedRuntimeAdoption": {
+    "instanceId": "xfce-desktop-b7e29409f21f",
+    "state": "server-ready",
+    "display": ":2",
+    "vncPidBeforeAfter": [1183502, 1183502],
+    "serverPidBeforeAfter": [1183509, 1183509],
+    "gatewayPidBeforeAfter": [1183526, 1183526],
+    "result": "manager replacement adopted the existing locked runtime without replacing its units"
+  },
+  "automatedBrowserE2E": {
+    "stack": "installed SDK 0.15, noVNC 1.7, WebSockets, TigerVNC, Matchbox, Mousepad, private IBus, Chrome CDP",
+    "template": "mousepad",
+    "display": ":10",
+    "trailing": {
+      "resizeDebounceMillis": 300,
+      "resizeMaxWait": "Infinity",
+      "before": "1000x613",
+      "framebufferDuringFourChangeBurst": ["1000x613", "1000x613", "1000x613", "1000x613"],
+      "afterQuiet": "1100x740",
+      "flushTarget": "960x680",
+      "flushConvergeMillis": 67.29,
+      "reconnectTarget": "1020x710",
+      "reconnectConvergeMillis": 65.56
+    },
+    "finiteMaximumWait": {
+      "resizeDebounceMillis": 200,
+      "resizeMaxWaitMillis": 400,
+      "firstProgressMillis": 441.09,
+      "final": "1140x740"
+    },
+    "compatibility": {
+      "resizeDebounceMillis": 0,
+      "before": "1000x613",
+      "after": "930x650",
+      "convergeMillis": 106.47,
+      "scaleViewport": false
+    },
+    "imeAndInput": {
+      "primaryFallback": "670,343",
+      "focusAndBlurCount": [1, 1],
+      "freshRemoteCaret": "3,30",
+      "freshRemoteCaretMillis": 390.3,
+      "rightClickChangedAnchorOrFocus": false,
+      "compositionChangedFocus": false,
+      "textAcknowledgement": "P15中",
+      "serverMillis": 0.786,
+      "browserRoundTripMillis": 2.8
+    }
+  },
+  "verification": {
+    "makeCheck": "passed",
+    "makeTestRace": "passed",
+    "makeReleaseCheck": "passed",
+    "makeReleaseCi": "passed on the exact commit",
+    "archiveChecksum": "c637f85ba4e40282b5bf68e161830a5f244a6f96d3ead6d374ceca0f47b5053a",
+    "archiveSensitiveDataScan": "passed",
+    "installedBinariesSha256": {
+      "remotexappd": "b270883b22a8d7983f5fa43120996db0a6651bbe6d66075da282e5dd94962531",
+      "novnc-input": "89233eb8eb9ea9e970942a06b9a81b88fcf4e91fa1bcfdcf9fbfc966a2f9e8a5",
+      "remotexapp-status": "fa3c6f8e7754f9574fb40fbbef373e5d620c6e6b2ca378078cf85aa113d0509b"
+    }
+  },
+  "cleanup": "The automated dynamic runtime, Chrome profiles, units, display, and ports were removed; the pre-existing fixed XFCE runtime remained healthy",
+  "humanUAT": {
+    "status": "accepted",
+    "acceptedAt": "2026-08-29",
+    "acceptedBy": "user confirmation",
+    "instanceId": "mousepad-02ef12443faa",
+    "viewerPath": "/remotexapps/mousepad-02ef12443faa/kiosk.html?resizeDebounce=300&resizeMaxWait=Infinity&diagnostics=on",
+    "scope": "Native IME candidate-window placement and interactive resize appearance"
+  },
+  "status": "Accepted for publication: automated release, deployment, adoption, lifecycle, input, reconnect, and resize gates passed; human UAT accepted 2026-08-29"
+}

@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "lightview-1.0.11-formal-publication",
+  "commit": "752b4ca15de2cf26fd459b4a0fd57c0f4c46f6f8",
+  "startedAt": "2026-09-29T08:03:00Z",
+  "completedAt": "2026-09-29T08:07:27Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "v22.22.3"},
+  "environment": {"kind": "github-release", "name": "woodegg/remotexapp lightview-v1.0.11"},
+  "artifact": {
+    "name": "lightview-1.0.11.tar.gz",
+    "sha256": "fa9ffa7e6207ad282658f50ca6ade3d1eb918d98013f8a6233da1eb96490ac9c"
+  },
+  "app": {
+    "id": "lightview",
+    "version": "1.0.11",
+    "contentSha256": "ff5bc6ea1a44db70e420a95d4fa91cef63b7b97ede57671803b7e2b6799c8448"
+  },
+  "release": {
+    "id": "RE_kwDOUGRp2s4Xx0UB",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/lightview-v1.0.11",
+    "tag": "lightview-v1.0.11",
+    "tagObject": "8a7caeeee21e747dc8d1f1668d65af7bc5323425",
+    "peeledCommit": "752b4ca15de2cf26fd459b4a0fd57c0f4c46f6f8",
+    "publishedAt": "2026-09-29T08:06:53Z",
+    "draft": false,
+    "prerelease": false
+  },
+  "candidateEvidence": "tests/evidence/v1/lightview-1.0.11-local-uat.json",
+  "hostedVerify": "https://github.com/woodegg/remotexapp/actions/runs/36540396140",
+  "acceptance": "Operator requested formal promotion after local qualification; no separate interactive human-UAT result is claimed.",
+  "scenarios": [
+    {"id": "annotated-remote-tag-peels-to-qualified-source", "result": "passed"},
+    {"id": "local-race-coverage-vulnerability-module-and-sensitive-data-gates", "result": "passed"},
+    {"id": "hosted-Verify-all-steps-passed", "result": "passed"},
+    {"id": "clean-committed-source-package-byte-identical-to-local-UAT", "result": "passed"},
+    {"id": "release-only-App-archive-and-checksum", "result": "passed"},
+    {"id": "fresh-GitHub-download-checksum-and-byte-comparison", "result": "passed"},
+    {"id": "formal-release-not-draft-or-prerelease", "result": "passed"},
+    {"id": "Core-v0.13.0-remains-Latest", "result": "passed"}
+  ],
+  "limitations": [
+    "No Core/SDK/host executable change, new deployment, runtime restart or sandbox operation during publication.",
+    "Local UAT candidate was qualified on host Lightview 0.1.10; arbitrary future host versions are not certified."
+  ]
+}

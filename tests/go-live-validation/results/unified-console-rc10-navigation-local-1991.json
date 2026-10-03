@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-01",
+  "scope": "CON-010 managed-application navigation; local deployment only",
+  "result": "passed",
+  "artifact": {
+    "version": "0.2.0-rc.10",
+    "commit": "7edefeec6ba5",
+    "sdkVersion": "0.18.0",
+    "sha256": "43cc6fb3df010d17769b2b844da6e14d5ff53ca6658b75f4855499e52ee26035"
+  },
+  "releaseGate": {
+    "makeCheck": "passed",
+    "sdkAndConsoleTests": 47,
+    "goRace": "passed",
+    "releaseCI": "passed",
+    "sensitiveDataCheck": "passed",
+    "deterministicPackageAndOfflineStaging": "passed"
+  },
+  "realBrowserNavigation": {
+    "browser": "Google Chrome headless CDP",
+    "headings": [
+      "Applications",
+      "Managed applications",
+      "Standalone runtimes"
+    ],
+    "managedApplicationCount": 1,
+    "managedRuntimeNestedUnderDetails": true,
+    "managedRuntimeDuplicatedInStandaloneList": false,
+    "runningManagedPrimaryAction": "Connect",
+    "stoppedManagedPrimaryAction": "Start and connect",
+    "standaloneOpenAction": "Open standalone and connect",
+    "managedCreateAction": "Create managed application and connect",
+    "viewerReconnect": "passed",
+    "legacyFlatNavigationTermsVisible": false,
+    "temporaryStoppedRegistrationRemoved": true
+  },
+  "finalDeployment": {
+    "listenAddress": "0.0.0.0:1991",
+    "operatorUrl": "http://127.0.0.1:1991/",
+    "authMode": "none",
+    "serviceRestartCapability": false,
+    "operatorHelper": "disabled and inactive",
+    "activeInstances": 2,
+    "managedApplications": 1,
+    "standaloneRuntimes": 1,
+    "attachedClients": 0,
+    "serviceNRestarts": 0,
+    "warningJournalEntries": 0,
+    "sandboxDeployment": false,
+    "testResidueRemoved": true
+  },
+  "humanUAT": "accepted 2026-09-01"
+}

@@ -1,0 +1,53 @@
+{
+  "candidate": "0.2.0-rc.1",
+  "sdkVersion": "0.17.0",
+  "testedCodeCommit": "b0ae37ad2c37d99ab4b3b75791f5a5771c12bf70",
+  "artifact": {
+    "path": "dist/remotexapp-0.2.0-rc.1-linux-amd64.tar.gz",
+    "sha256": "718f0ea1631725ecd663776db4d3508d26d8d499afa60976fd9ac94b0537e2ec"
+  },
+  "binaries": {
+    "remotexappdSha256": "92435c6e764f5deec7b43085ed9ffbc0588c4f58b53d63405084c61578925f59",
+    "novncInputSha256": "2afadfd23ea9cb453e3c98f45936effc38e03b4a35ea2f6900a32b8d412f3042",
+    "statusHelperSha256": "bf5eeeba411a7fd96c6b5a32682e2f2252caa1dc0313d718630ea4eebc1faa7d"
+  },
+  "sdkBundle": {
+    "file": "cmd/remotexappd/web/assets/sdk-4JN2V2Q2.js",
+    "sha256": "1bca82f0d2fb86ead2200f43aae5ee3d885e4c21a43f01f46204b49b149c72a3"
+  },
+  "gates": {
+    "releaseCi": "passed",
+    "race": "passed",
+    "sensitiveData": "passed",
+    "buildOncePackageInstallUpdateDisableRollback": "passed",
+    "sixShippedAppRealX11": "passed",
+    "userHome": "passed",
+    "localInstall": "passed",
+    "coreRollbackToRc24AndRestore": "passed",
+    "immediateFixedDisplayRestartAfterTimeWait": "passed",
+    "localBrowserInputAndScaling": "passed"
+  },
+  "shippedApps": [
+    "edge-browser",
+    "firefox-esr",
+    "libreoffice",
+    "mousepad",
+    "xfce-desktop",
+    "xfce-user-desktop"
+  ],
+  "localDeployment": {
+    "mode": "central-real-user",
+    "user": "ubuntu",
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "allowInsecurePublic": true,
+    "managedInstance": "ubuntu-desktop",
+    "template": "xfce-user-desktop",
+    "driverVersion": "2.0.0",
+    "humanUat": "pending"
+  },
+  "sandbox00": {
+    "deployed": false,
+    "approvalRequiredBeforeStagingOrProduction": true
+  }
+}

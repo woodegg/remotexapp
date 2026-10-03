@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "idle-lease-0.13.0-rc.2-local-UAT-deployment",
+  "commit": "41665eaee8aeb7c1265d41f3ae0114094c3bd9a2",
+  "startedAt": "2026-09-18T14:14:00Z",
+  "completedAt": "2026-09-18T14:22:16Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "project-local-test",
+    "name": "loopback 1991 and 2992"
+  },
+  "artifact": {
+    "name": "remotexapp-0.13.0-rc.2-linux-amd64.tar.gz",
+    "sha256": "1449f80f830bd42c46634561a3214a7ac95c9bcd3bae9366c025dc8e7aaf6ffe"
+  },
+  "sourceDirty": true,
+  "humanUAT": "pending",
+  "publication": "not authorized or performed",
+  "endpoints": [
+    {
+      "url": "http://127.0.0.1:1991",
+      "version": "0.13.0-rc.2",
+      "sdk": "0.29.0",
+      "console": true,
+      "kiosk": true
+    },
+    {
+      "url": "http://127.0.0.1:2992",
+      "version": "0.13.0-rc.2",
+      "sdk": "0.29.0",
+      "console": false,
+      "kiosk": true
+    }
+  ],
+  "managerSha256": "e4280489731b37670e5de0f06e298420e09442c721d8327e078002645271efdf",
+  "servedSDKsha256": "d8f4ca3826e3c9a0296802cd3d60e804acf64de49293fa3fa92985b967a847c2",
+  "scenarios": [
+    {
+      "id": "2992-served-SDK-and-Viewer",
+      "result": "passed"
+    },
+    {
+      "id": "2992-default-off-Console-control",
+      "result": "passed"
+    },
+    {
+      "id": "2992-attached-then-detached-receipts",
+      "result": "passed"
+    },
+    {
+      "id": "2992-disconnected-App-survives-60s-template-timeout",
+      "result": "passed"
+    },
+    {
+      "id": "2992-checkbox-release",
+      "result": "passed"
+    },
+    {
+      "id": "1991-served-SDK-and-Viewer",
+      "result": "passed"
+    },
+    {
+      "id": "1991-default-off-Console-control",
+      "result": "passed"
+    },
+    {
+      "id": "1991-attached-then-detached-receipts",
+      "result": "passed"
+    },
+    {
+      "id": "1991-disconnected-App-survives-60s-template-timeout",
+      "result": "passed"
+    },
+    {
+      "id": "1991-checkbox-release",
+      "result": "passed"
+    },
+    {
+      "id": "2992-served-SDK-framebuffer",
+      "result": "passed"
+    },
+    {
+      "id": "2992-getConnections-and-EXP007-final-environment",
+      "result": "passed"
+    },
+    {
+      "id": "2992-actual-Unicode-clipboard-readback-before-and-after",
+      "result": "passed"
+    },
+    {
+      "id": "2992-Manager-restart-attached-Viewer-reconnect",
+      "result": "passed"
+    },
+    {
+      "id": "2992-supervisor-Driver-service-identities-and-generation-unchanged",
+      "result": "passed"
+    },
+    {
+      "id": "2992-engine-fault-rejects-Unicode-SDK-raw-RFB-key-readback-and-Viewer-survive",
+      "result": "passed"
+    },
+    {
+      "id": "1991-served-SDK-framebuffer",
+      "result": "passed"
+    },
+    {
+      "id": "1991-getConnections-and-EXP007-final-environment",
+      "result": "passed"
+    },
+    {
+      "id": "1991-actual-Unicode-clipboard-readback-before-and-after",
+      "result": "passed"
+    },
+    {
+      "id": "1991-Manager-restart-attached-Viewer-reconnect",
+      "result": "passed"
+    },
+    {
+      "id": "1991-supervisor-Driver-service-identities-and-generation-unchanged",
+      "result": "passed"
+    },
+    {
+      "id": "1991-ibus-fault-rejects-Unicode-SDK-raw-RFB-key-readback-and-Viewer-survive",
+      "result": "passed"
+    },
+    {
+      "id": "both-running-process-executables-match-candidate-bytes",
+      "result": "passed"
+    },
+    {
+      "id": "both-served-SDK-bundles-match-candidate-bytes",
+      "result": "passed"
+    },
+    {
+      "id": "both-listeners-remain-loopback-only",
+      "result": "passed"
+    },
+    {
+      "id": "existing-XFCE-generation-and-older-component-pin-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "only-owned-test-runtimes-stopped-no-other-active-test-Apps-remain",
+      "result": "passed"
+    },
+    {
+      "id": "unchanged-2992-console-disabled-policy",
+      "result": "passed"
+    }
+  ],
+  "preservation": {
+    "existingDesktop": {
+      "state": "server-ready",
+      "sessionState": "running",
+      "sessionGeneration": 3,
+      "corePin": "0.12.0-rc.2"
+    },
+    "forceUpgradeOfExistingRuntimes": false,
+    "sandboxOperations": false
+  },
+  "rawEvidence": {
+    "ui": "/tmp/remotexapp-lease-deployment-vcmN46/result.json",
+    "services": "/tmp/remotexapp-svc-deployment-check-3Sb7Cq/result.json"
+  },
+  "qualification": "The local UI gate was run after isolated qualification and after Manager-restart regression, serially across endpoints, to avoid shared X-display allocation races and reset-grace confounding. See candidate evidence for prior failed-attempt dispositions."
+}

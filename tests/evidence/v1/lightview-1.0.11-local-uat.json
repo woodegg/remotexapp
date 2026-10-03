@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "lightview-1.0.11-LTV-012-local-UAT",
+  "commit": "4dff5eb8591cc493e2a25fa210a6cda756313a04",
+  "workspaceDirty": true,
+  "sourceKind": "uncommitted-working-tree-based-on-commit",
+  "startedAt": "2026-09-29T07:27:00Z",
+  "completedAt": "2026-09-29T07:33:55Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "v22.22.3"},
+  "environment": {"kind": "project-owned-local-test", "name": "isolated UID 1003 and loopback 1991/2992"},
+  "artifact": {
+    "name": "lightview-1.0.11.tar.gz",
+    "sha256": "fa9ffa7e6207ad282658f50ca6ade3d1eb918d98013f8a6233da1eb96490ac9c"
+  },
+  "app": {
+    "id": "lightview",
+    "version": "1.0.11",
+    "contentSha256": "ff5bc6ea1a44db70e420a95d4fa91cef63b7b97ede57671803b7e2b6799c8448"
+  },
+  "coreVersion": "0.13.0",
+  "sdkVersion": "0.29.1",
+  "hostExecutable": {"version": "0.1.10", "sha256": "7a3e3d8b790e34c0a32dd081b37b5a7bcbafe7c461c5918695c6dfaacea6204b", "changed": false},
+  "publication": false,
+  "humanUAT": "pending",
+  "sandboxOperations": false,
+  "endpoints": [
+    {"listen": "127.0.0.1:1991", "lightviewId": "lightview-f0bd39223e52", "generation": 1, "state": "server-ready", "appState": "ready", "leftForUAT": true},
+    {"listen": "127.0.0.1:2992", "lightviewId": "lightview-9aac92cb0a85", "generation": 1, "state": "stopped", "leftForUAT": false}
+  ],
+  "preservedRuntime": {"id": "xfce-user-desktop-8cdcaa0b5159", "generation": 11, "driverVersion": "3.0.0"},
+  "scenarios": [
+    {"id": "focused-Driver-suspended-recovering-security-regressions", "result": "passed"},
+    {"id": "make-check-with-required-go1.26.8", "result": "passed"},
+    {"id": "clean-source-reproducible-package-and-no-bytecode", "result": "passed"},
+    {"id": "isolated-exact-App-18-scenario-real-browser-E2E-including-hibernation", "result": "passed"},
+    {"id": "both-installed-catalog-seals-and-health", "result": "passed"},
+    {"id": "2992-served-Viewer-hibernation-HTTP-action-wakeup-PID-preserved", "result": "passed"},
+    {"id": "1991-served-Viewer-hibernation-HTTP-action-wakeup-PID-preserved", "result": "passed"},
+    {"id": "1991-XFCE-runtime-generation-preserved", "result": "passed"}
+  ],
+  "notes": [
+    "The isolated E2E result is retained at /tmp/remotexapp-lightview-e2e-gSrDlG/result.json. Both deployed endpoints use the identical archive SHA-256 above.",
+    "An ignored old Python __pycache__ existed in the source directory. The archive was built from a clean source copy; inspection confirmed no bytecode in the candidate, and a second clean export produced the same archive hash.",
+    "The initial isolated E2E attempt inherited a permissive umask and was rejected by the App installer. Rerunning with umask 022 completed all 18 scenarios. No package or Manager security rule was weakened.",
+    "The 2992 smoke runtime was stopped after verification. The 1991 LightView runtime remains available for human UAT; no existing XFCE runtime was restarted. No formal GitHub release or sandbox deployment was performed."
+  ]
+}

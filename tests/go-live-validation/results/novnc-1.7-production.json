@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "label": "novnc-1.7-production-smoke",
+  "collectedAt": "2026-08-27T14:23:58-04:00",
+  "managerURL": "http://127.0.0.1:1991",
+  "deployedCommit": "cb473fc332b4295dcb4f6ff773fb42be36ece774",
+  "version": "0.1.0-rc.1",
+  "instanceId": "xfce-desktop-eafccb412376",
+  "managedInstanceId": "test-host-xfce",
+  "display": ":2",
+  "browser": "Google Chrome 149.0.7827.102",
+  "rollbackBackup": "/home/tester/.local/state/remotexapp-install-backups/20260827T182136Z",
+  "ci": {
+    "run": "https://github.com/woodegg/remotexapp/actions/runs/33102968511",
+    "result": "success"
+  },
+  "runtimeHashes": {
+    "manager": "0739d83263cdf69a8b2750bb5856ca476d0277f8f4cd8bcdf1fc15157c16cc4e",
+    "gateway": "dbd1092475fdc8a7e05487b384d5909eb2f417f1baacf75bf57b4486e10a6b7b",
+    "status": "1e395aabdf319bec22a23b14fc51332bd6a26154f65be596bf65c2e365b51dd7"
+  },
+  "checks": {
+    "serviceActive": true,
+    "ready": true,
+    "managedRuntimeAdopted": true,
+    "rfbConnected": true,
+    "inputConnected": true,
+    "framebufferOpaqueAndVaried": true,
+    "framebuffer": "1280x720",
+    "fixedResizePreserved": true,
+    "pointerAndWheel": true,
+    "wheelEvents": 10,
+    "wheelRfbByteDelta": 358,
+    "textValues": ["NoVNC17 中文 input", " reconnect OK"],
+    "clipboardExact": true,
+    "textErrors": 0,
+    "connectionReconnectMs": 62.166,
+    "textReconnectMs": 100.396,
+    "servedAssetExact": true,
+    "vacancyCleanup": true,
+    "serverLayerRetained": true,
+    "sessionStopped": true,
+    "inputSocketRemoved": true
+  },
+  "uat": {
+    "accepted": true,
+    "acceptedAt": "2026-08-27T14:30:04-04:00",
+    "source": "user confirmation"
+  },
+  "remainingGate": null,
+  "result": "accepted"
+}

@@ -1,0 +1,108 @@
+{
+  "experiment": "P14",
+  "outcome": "accepted",
+  "date": "2026-08-27",
+  "primaryVariable": "Ownership of the private D-Bus, IBus daemon and Unicode engine: persistent server layer versus on-demand session layer",
+  "scope": "Isolated manager port 1992, display :31, RFB 5931 and gateway 39031; production port 1991 was not rebuilt or restarted",
+  "candidate": {
+    "classId": "xfce-session-input",
+    "instanceId": "xfce-session-input-2aeab5d422c7",
+    "inputLifecycle": "session",
+    "serverOnly": {
+      "memoryCurrentBytes": 204800,
+      "tasks": 1,
+      "processes": ["/usr/bin/sleep infinity"],
+      "dbusProcesses": 0,
+      "ibusProcesses": 0,
+      "unicodeEngineProcesses": 0,
+      "inputRuntimeArtifacts": 0
+    },
+    "gatewayWithoutSession": {
+      "memoryCurrentBytes": 1880064,
+      "tasks": 6,
+      "missingSocketLogLinesAfterFourSeconds": 1
+    },
+    "binaries": {
+      "remoteXAppdSha256": "6470eedc5de988bd44a7296d52753ab537beb4b19d4d76e1cc0b9f0a8d6a634e",
+      "novncInputSha256": "304f77f9c0452c03195ac2eccd0062d7b46d915c8cff267bcb59ea598f37e8d5",
+      "remoteXAppStatusSha256": "3ee10fb239c7f201d773d2d422b6bac96d90e7fb9ef9b442c2714ce028d46a91"
+    }
+  },
+  "comparisonSnapshot": {
+    "productionServerLayer": {
+      "memoryCurrentBytes": 16887808,
+      "tasks": 18
+    },
+    "candidateServerLayer": {
+      "memoryCurrentBytes": 204800,
+      "tasks": 1
+    },
+    "directServerLayerMemoryReductionBytes": 16683008,
+    "directServerLayerTaskReduction": 17,
+    "note": "Only the server-unit delta is attributed to lifecycle ownership; VNC and gateway snapshots had different live workloads and heap ages."
+  },
+  "lifecycle": {
+    "sessionGenerationsTested": 2,
+    "attachToReadyMillis": [4798, 3747],
+    "detachCleanupExact": true,
+    "sessionDbusRemoved": true,
+    "sessionIbusRemoved": true,
+    "unicodeEngineRemoved": true,
+    "gatewayReconnectsWhenSessionReturns": true
+  },
+  "correctness": {
+    "englishChineseSwitchAndFirstCharacter": true,
+    "textRoundTripServerMillis": [1.295, 1.883, 0.941, 0.532, 0.546, 0.593],
+    "textRoundTripBrowserServerMillis": [2.3, 3.0, 1.5, 1.9, 4.8, 1.0],
+    "inputReconnectMillis": [37.21, 51.315],
+    "cursorPushAndCachedSnapshot": true,
+    "cursorSequenceMonotonicAcrossSessionRestart": true,
+    "cursorSequenceMonotonicAcrossEngineSwitch": true,
+    "exactApplicationText": "B2首字：好D4；B2重连E5；B2切换首字F6",
+    "exactApplicationTextSha256": "a6f72a4b15506acef9c2328eead20a2fc833669443857ae85057f2313badd9d3",
+    "clipboardExact": true
+  },
+  "productionIntegrity": {
+    "managerPid": 2881468,
+    "managerStart": "2026-08-27T06:06:53-04:00",
+    "consoleHttpStatus": 200,
+    "remoteXAppdSha256": "4c63e0327e4a91c2ce602acaea379b0dc00709a0774b0bc971329fc01a226460",
+    "novncInputSha256": "3553839051eab9b79f8a7ec8257260bcfa6a3491131701180c8f0d14a9480ab0",
+    "remoteXAppStatusSha256": "3cf0bc00fa90ce2ab91b06945d8408e1259436ada3cddb0306d95cc890d4013b"
+  },
+  "goLive": {
+    "managedId": "test-host-xfce",
+    "oldRuntimeId": "xfce-desktop-3a4e151e1d2b",
+    "newRuntimeId": "xfce-desktop-688676b680f5",
+    "liveServerMemoryCurrentBytes": 212992,
+    "liveServerTasks": 1,
+    "preDeployServerMemoryCurrentBytes": 16887808,
+    "preDeployServerTasks": 18,
+    "memoryReductionBytes": 16674816,
+    "memoryReductionPercent": 98.7388,
+    "xfceAttachMillis": 4188,
+    "xfceReconnectMillis": 34,
+    "mousepadAttachMillis": 1013,
+    "mousepadReconnectMillis": 34,
+    "edgeExactText": "LiveEdge你好Z9",
+    "allProductionClassesSessionOwned": true,
+    "isolatedPort1992Stopped": true,
+    "liveBinaries": {
+      "remoteXAppdSha256": "6470eedc5de988bd44a7296d52753ab537beb4b19d4d76e1cc0b9f0a8d6a634e",
+      "novncInputSha256": "304f77f9c0452c03195ac2eccd0062d7b46d915c8cff267bcb59ea598f37e8d5",
+      "remoteXAppStatusSha256": "3ee10fb239c7f201d773d2d422b6bac96d90e7fb9ef9b442c2714ce028d46a91"
+    }
+  },
+  "subsequentLifecycleFollowUp": {
+    "scope": "No change to the P14 resource variable; add generation-safe XFCE orderly-logout status and legacy-runtime schema upgrade",
+    "remoteXAppdSha256": "188afc120b3f1b12d3555e7dc7fc63dc608c04f784bc080c40a577ad31f566a6",
+    "isolatedLogoutValidation": true,
+    "productionLogoutValidation": true,
+    "reattachGeneration": 2,
+    "finalInputArtifacts": 0,
+    "evidence": "tests/go-live-validation/results/production-xfce-logout-status.json"
+  },
+  "deployment": "Live on port 1991 for XFCE, Mousepad and Edge; parser default remains server only for external backward compatibility",
+  "cleanup": "All isolated port-1992 services stopped. Live detached display :2 retains only VNC, gateway and one-task server anchor; session input PIDs and sockets are absent.",
+  "status": "Accepted and deployed: all production drivers use session-owned D-Bus/IBus/engine; isolated and live application, lifecycle and cleanup checks passed"
+}

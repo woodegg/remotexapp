@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "LTV-013-lightview-1.0.12-core-0.14.1-rc.1-local-deployment",
+  "commit": "0d2d5c30909614e84d97bee0e7301f4b6c3e7b30",
+  "workspaceDirty": true,
+  "sourceKind": "uncommitted-working-tree-based-on-commit",
+  "startedAt": "2026-10-02T05:40:00Z",
+  "completedAt": "2026-10-02T05:47:19Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "v22.22.3"},
+  "environment": {"kind": "project-owned-local-test", "name": "loopback 1991 and 2992"},
+  "artifact": {
+    "name": "remotexapp-0.14.1-rc.1-linux-amd64.tar.gz",
+    "sha256": "065818f0dd0217458df670fc3aa8bcfbbff6febca2f7d2a85f793755fed446eb"
+  },
+  "app": {
+    "id": "lightview",
+    "version": "1.0.12",
+    "archiveSha256": "bc7b95d70e73369f6c4241e9b8dd24b4ef104a322d0003a13c3272c69177f8c1",
+    "contentSha256": "fddda65cc3f79f22c811ce881b3106abac362f25cc8a8a2c4c29e81d9fffef99"
+  },
+  "coreVersion": "0.14.1-rc.1",
+  "sdkVersion": "0.29.1",
+  "publication": false,
+  "humanUAT": "pending",
+  "sandboxOperations": false,
+  "endpoints": [
+    {"listen": "127.0.0.1:1991", "lightviewId": "lightview-048cb41015cd", "generation": 1, "state": "server-ready", "appState": "ready", "leftForUAT": true},
+    {"listen": "127.0.0.1:2992", "lightviewId": "lightview-8c984cfd2537", "generation": 1, "state": "server-ready", "appState": "ready", "leftForUAT": true}
+  ],
+  "preservedRuntime": {"id": "xfce-user-desktop-8cdcaa0b5159", "generation": 11, "driverVersion": "3.0.0", "vncMainPID": 1942151, "sessionMainPID": 2309458},
+  "scenarios": [
+    {"id": "pinned-go1.26.8-make-check-and-race", "result": "passed"},
+    {"id": "isolated-19-scenario-exact-package-real-browser-E2E", "result": "passed"},
+    {"id": "core-and-App-archive-checksums-verified", "result": "passed"},
+    {"id": "both-catalogs-health-loopback-and-running-Core-identity", "result": "passed"},
+    {"id": "2992-real-native-suspension-Viewer-reattach-and-idle-policy-restore", "result": "passed"},
+    {"id": "1991-real-native-suspension-Viewer-reattach-and-idle-policy-restore", "result": "passed"},
+    {"id": "both-deployed-real-Chrome-Viewer-resize-reconnect", "result": "passed"},
+    {"id": "1991-XFCE-runtime-generation-and-component-PIDs-preserved", "result": "passed"}
+  ],
+  "notes": [
+    "The same Core and LightView archives were staged independently into 2992 and 1991; existing immutable releases remain available for rollback.",
+    "The 1991 XFCE runtime remains pinned to Core 0.13.0 by design; only its Manager was restarted. No XFCE runtime restart or upgrade occurred.",
+    "Both LightView UAT runtimes are detached and retain the ordinary six-hour vacancy policy. Their native idle intervals are restored to 3600 seconds.",
+    "No human UAT acceptance, GitHub publication, or sandbox operation is claimed."
+  ]
+}

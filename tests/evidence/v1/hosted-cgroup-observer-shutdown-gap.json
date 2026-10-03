@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "audit",
+  "runId": "github-actions:33899661776",
+  "commit": "74139387f3d4f02783fb53c6f276edf9e6715272",
+  "startedAt": "2026-09-04T17:16:12Z",
+  "completedAt": "2026-09-04T17:17:20Z",
+  "result": "completed",
+  "toolchain": {"go": "go1.26.8", "node": "v22.23.2"},
+  "environment": {"kind": "github-hosted", "name": "ubuntu-latest"},
+  "scenarios": [
+    {"id": "make-check", "result": "passed"},
+    {"id": "coverage-cgroup-observer-event", "result": "failed"},
+    {"id": "local-same-process-200-repetitions", "result": "failed"},
+    {"id": "local-fresh-process-30-repetitions", "result": "passed"}
+  ],
+  "details": {
+    "failedTest": "TestCgroupRuntimeObserverReportsEmptySessionUnit",
+    "sameProcessFailures": 4,
+    "sameProcessRuns": 200,
+    "freshProcessFailures": 0,
+    "freshProcessRuns": 30,
+    "replacementSameProcessRuns": 500,
+    "replacementRaceRuns": 100,
+    "replacementFailures": 0,
+    "cause": "Close returned without reliably waking and joining the inotify reader goroutine",
+    "correction": "Poll inotify with an explicit wake pipe and join the reader before closing descriptors",
+    "workflowRun": "https://github.com/woodegg/remotexapp/actions/runs/33899661776"
+  }
+}

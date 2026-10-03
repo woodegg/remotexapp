@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "lightview-1.0.10-formal-publication",
+  "commit": "51c1d46b6a73a59267d8f2233cc71e73cfdd2037",
+  "startedAt": "2026-09-24T14:57:32Z",
+  "completedAt": "2026-09-24T15:01:05Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "v22.22.3"},
+  "environment": {"kind": "github-release", "name": "woodegg/remotexapp lightview-v1.0.10"},
+  "artifact": {
+    "name": "lightview-1.0.10.tar.gz",
+    "sha256": "f1cfa716a4f9bad90ef11379e5ba069d82aa969b193db701e55246a840cc3804"
+  },
+  "app": {
+    "id": "lightview",
+    "version": "1.0.10",
+    "contentSha256": "3548b189dc3043b82ac56c48c1d4475aab6fc9ea87f624df3afa7fa8dc82323c"
+  },
+  "release": {
+    "id": "RE_kwDOUGRp2s4Xl22k",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/lightview-v1.0.10",
+    "tag": "lightview-v1.0.10",
+    "tagObject": "05854fe8c5a3b7cf93585d961731f5c7b88ad09b",
+    "peeledCommit": "51c1d46b6a73a59267d8f2233cc71e73cfdd2037",
+    "publishedAt": "2026-09-24T15:00:50Z",
+    "draft": false,
+    "prerelease": false
+  },
+  "candidateEvidence": "tests/evidence/v1/lightview-1.0.10-local-uat.json",
+  "hostedVerify": "https://github.com/woodegg/remotexapp/actions/runs/36016575531",
+  "acceptance": "Operator requested formal promotion after local qualification; no separate interactive human-UAT result claimed.",
+  "scenarios": [
+    {"id": "annotated-remote-tag-peels-to-qualified-source", "result": "passed"},
+    {"id": "hosted-Verify-all-steps-passed", "result": "passed"},
+    {"id": "clean-source-local-make-check", "result": "passed"},
+    {"id": "exported-tracked-shell-syntax-check", "result": "passed"},
+    {"id": "focused-Driver-tests-16-pass", "result": "passed"},
+    {"id": "HTTP-policy-and-shutdown-protocol-three-race-repeats", "result": "passed"},
+    {"id": "clean-source-package-byte-identical-to-live-tested-package", "result": "passed"},
+    {"id": "release-only-App-archive-and-checksum", "result": "passed"},
+    {"id": "fresh-download-checksum-and-byte-comparison", "result": "passed"},
+    {"id": "formal-release-not-draft-or-prerelease", "result": "passed"},
+    {"id": "Core-v0.13.0-remains-Latest", "result": "passed"}
+  ],
+  "qualificationNotes": [
+    "The clean git-archive export lacks .git, so make check's tracked-shell discovery printed a git error and skipped that subcheck. Every tracked shell file in the export was subsequently syntax-checked using the source repository's tracked path list. Hosted Verify ran the normal check in a full checkout.",
+    "Local clean-check log: /tmp/lightview110-publication-clean-check.log. Exact-package live tests and prior full race/coverage/vulnerability logs are recorded in candidate evidence."
+  ],
+  "limitations": [
+    "See candidate evidence for the local-only WebKit sandbox override and accelerated vacancy test.",
+    "Actual Lightview 0.1.10 was qualified; arbitrary future executable versions are not certified.",
+    "No Core/SDK release, new deployment, runtime restart or sandbox operation during publication."
+  ]
+}

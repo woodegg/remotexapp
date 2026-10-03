@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "label": "novnc-1.7-isolated-e2e",
+  "collectedAt": "2026-08-27T14:17:40-04:00",
+  "managerURL": "http://127.0.0.1:1992",
+  "instanceId": "mousepad-50f20065d1b2",
+  "display": ":10",
+  "browser": "Google Chrome 149.0.7827.102",
+  "novnc": {
+    "release": "v1.7.0",
+    "commit": "63107bd06d9e1f6136ff21aeda8cd62cbf0d433e",
+    "asset": "novnc-2F7OOK4M.js",
+    "bytes": 189149,
+    "sha256": "b173b864fc69017a06adbbb3a6f36b8f56c74ee200b576f1d6ca1c4b98cfcb55",
+    "servedAssetExact": true
+  },
+  "runtimeHashes": {
+    "manager": "b0a3907c6037b47a2e2619d805807f2ad8da3b567a9039a4dadca2fdb8ac9a9e",
+    "gateway": "e30dca65a2b8f35a7425a30e9150d42e7bb8ca27462ed28e6bd3fb7e7aab2b67",
+    "status": "75b27cfc00f1ef01539c95200a707639ccb147d8cdb403493f385cf08b98a6d9"
+  },
+  "checks": {
+    "rfbConnected": true,
+    "inputConnected": true,
+    "framebufferOpaqueAndVaried": true,
+    "framebufferBefore": "900x553",
+    "framebufferAfter": "1100x760",
+    "pointerDispatched": true,
+    "wheelEvents": 10,
+    "wheelRfbByteDelta": 120,
+    "textValues": ["A", "你好", "i", "世界", "x", "abcde", "R"],
+    "clipboardExact": true,
+    "clipboardUtf8Bytes": 21,
+    "textRequests": 7,
+    "textErrors": 0,
+    "staleTextCrossedReconnect": false,
+    "reconnectMs": 18.5,
+    "vacancyCleanup": true,
+    "unitsRemoved": true,
+    "portsClosed": true,
+    "inputSocketRemoved": true
+  },
+  "result": "passed"
+}

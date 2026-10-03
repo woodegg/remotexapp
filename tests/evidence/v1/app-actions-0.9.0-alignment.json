@@ -1,0 +1,317 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "app-actions-0.9.0-eight-endpoint-alignment:2026-09-10",
+  "commit": "5969c1488d900fb8493c4bda4e822427e9701e42",
+  "startedAt": "2026-09-10T19:30:10Z",
+  "completedAt": "2026-09-10T19:33:29Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8"
+  },
+  "environment": {
+    "kind": "local-and-LXD",
+    "name": "eight-approved-endpoints"
+  },
+  "artifact": {
+    "name": "remotexapp-0.9.0-linux-amd64.tar.gz",
+    "sha256": "e97ebaea2e4ea573fbe9a9cea8fefd871268877232db4a51056e2c01e452c396"
+  },
+  "scenarios": [
+    {
+      "id": "formal-artifact-identity",
+      "result": "passed"
+    },
+    {
+      "id": "stage-everywhere-before-activation",
+      "result": "passed"
+    },
+    {
+      "id": "two-start-health-and-runtime-adoption-per-endpoint",
+      "result": "passed"
+    },
+    {
+      "id": "installed-and-running-binary-byte-equality",
+      "result": "passed"
+    },
+    {
+      "id": "SDK-and-Console-asset-hashes",
+      "result": "passed"
+    },
+    {
+      "id": "App-catalog-version-alignment",
+      "result": "passed"
+    },
+    {
+      "id": "configuration-listener-auth-document-roots-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "pre-existing-runtime-pins-and-generations-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "test-manager-switch-preserves-production-PID",
+      "result": "passed"
+    },
+    {
+      "id": "running-session-connections-and-action-discovery",
+      "result": "passed"
+    },
+    {
+      "id": "no-new-warning-journal",
+      "result": "passed"
+    },
+    {
+      "id": "build-host-direct-private-HTTP-to-five-sandboxes",
+      "result": "failed"
+    },
+    {
+      "id": "production-gateway-validation",
+      "result": "skipped"
+    }
+  ],
+  "details": {
+    "drift": "none",
+    "driftScope": "Manager release, SDK and selected App catalog; existing runtime pins intentionally retained.",
+    "sdkVersion": "0.26.0",
+    "appVersions": {
+      "edge": "1.1.0",
+      "firefox-esr": "2.2.0",
+      "kate": "1.0.0",
+      "kwrite": "1.0.0",
+      "libreoffice": "3.1.0",
+      "mousepad": "3.0.0",
+      "xfce-user-desktop": "2.0.0"
+    },
+    "testCatalog": "Six dynamic Apps; XFCE remains excluded. Console disabled, kiosk enabled.",
+    "networkLimitation": "All five direct build-host private HTTP probes timed out at 5 seconds. Container-loopback checks passed. No firewall or production gateway mutation or testing.",
+    "runtimePolicy": "No runtime restart/upgrade/create/stop performed by this rollout. Existing local pins remain rc.1; sandbox old pins remain 0.8.1. New naturally created runtimes use stable 0.9.0.",
+    "concurrentActivity": "After sandbox00 activation checks, final audit observed a new Edge runtime and stopped Kate/LibreOffice records. These were not created or stopped by the deployment scripts; they were left untouched.",
+    "rollback": "Retained immutable previous release and App selectors on each host.",
+    "endpoints": [
+      {
+        "kind": "local",
+        "role": "prod",
+        "port": 1991,
+        "pid": 139798,
+        "version": "0.9.0",
+        "commit": "5969c1488d90",
+        "sdk": "0.26.0",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-44ea8c2186ee",
+            "sessionGeneration": 3,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.0-rc.1",
+            "app": "2.0.0"
+          },
+          {
+            "id": "edge-4c2449107d38",
+            "sessionGeneration": 3,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.0-rc.1",
+            "app": "1.1.0"
+          }
+        ],
+        "target": "local",
+        "evidenceDirectory": "/tmp/remotexapp-090-local-prod"
+      },
+      {
+        "kind": "local",
+        "role": "test",
+        "port": 2992,
+        "pid": 140059,
+        "version": "0.9.0",
+        "commit": "5969c1488d90",
+        "sdk": "0.26.0",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved",
+        "runtimes": [],
+        "target": "local",
+        "evidenceDirectory": "/tmp/remotexapp-090-local-test"
+      },
+      {
+        "kind": "sandbox",
+        "role": "prod",
+        "port": 1991,
+        "pid": 1002412,
+        "version": "0.9.0",
+        "commit": "5969c1488d90",
+        "sdk": "0.26.0",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-eefbf64deda7",
+            "sessionGeneration": 3,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.8.1",
+            "app": "2.0.0"
+          },
+          {
+            "id": "firefox-esr-6d5cd5583aae",
+            "sessionGeneration": 3,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.8.1",
+            "app": "2.1.1"
+          },
+          {
+            "id": "edge-7a1f8b0e3eca",
+            "sessionGeneration": 1,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.9.0",
+            "app": "1.1.0"
+          }
+        ],
+        "target": "sandbox00",
+        "evidenceDirectory": "/tmp/remotexapp-090-align.2Ra4aE/prod-evidence"
+      },
+      {
+        "kind": "sandbox",
+        "role": "test",
+        "port": 2991,
+        "pid": 1002638,
+        "version": "0.9.0",
+        "commit": "5969c1488d90",
+        "sdk": "0.26.0",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved",
+        "runtimes": [],
+        "target": "sandbox00",
+        "evidenceDirectory": "/tmp/remotexapp-090-align.2Ra4aE/test-evidence"
+      },
+      {
+        "kind": "sandbox",
+        "role": "prod",
+        "port": 1991,
+        "pid": 1256312,
+        "version": "0.9.0",
+        "commit": "5969c1488d90",
+        "sdk": "0.26.0",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-3616fd55d920",
+            "sessionGeneration": 2,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.8.1",
+            "app": "2.0.0"
+          }
+        ],
+        "target": "sandbox02",
+        "evidenceDirectory": "/tmp/remotexapp-090-align.Z02t5t/prod-evidence"
+      },
+      {
+        "kind": "sandbox",
+        "role": "prod",
+        "port": 1991,
+        "pid": 2454258,
+        "version": "0.9.0",
+        "commit": "5969c1488d90",
+        "sdk": "0.26.0",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-7eaf5f60925b",
+            "sessionGeneration": 3,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.8.1",
+            "app": "2.0.0"
+          }
+        ],
+        "target": "sandbox03",
+        "evidenceDirectory": "/tmp/remotexapp-090-align.G1uYrv/prod-evidence"
+      },
+      {
+        "kind": "sandbox",
+        "role": "prod",
+        "port": 1991,
+        "pid": 3043915,
+        "version": "0.9.0",
+        "commit": "5969c1488d90",
+        "sdk": "0.26.0",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-0c83d8920508",
+            "sessionGeneration": 3,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.8.1",
+            "app": "2.0.0"
+          }
+        ],
+        "target": "sandbox07",
+        "evidenceDirectory": "/tmp/remotexapp-090-align.GVXwpB/prod-evidence"
+      },
+      {
+        "kind": "sandbox",
+        "role": "prod",
+        "port": 1991,
+        "pid": 1907254,
+        "version": "0.9.0",
+        "commit": "5969c1488d90",
+        "sdk": "0.26.0",
+        "binaryAndAssetHashes": "passed",
+        "connectionsAndActions": "passed",
+        "warningJournal": "empty",
+        "configuration": "preserved",
+        "runtimePins": "preserved",
+        "runtimes": [
+          {
+            "id": "xfce-user-desktop-3f5cfb7fc1a6",
+            "sessionGeneration": 3,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.8.1",
+            "app": "2.0.0"
+          },
+          {
+            "id": "edge-dcd5c6485ab9",
+            "sessionGeneration": 1,
+            "sessionState": "running",
+            "applicationState": "ready",
+            "core": "0.8.1",
+            "app": "1.0.0"
+          }
+        ],
+        "target": "sandbox10",
+        "evidenceDirectory": "/tmp/remotexapp-090-align.0ADRcH/prod-evidence"
+      }
+    ]
+  }
+}

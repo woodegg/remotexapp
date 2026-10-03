@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "local:upg001-004-kte001-kwr001-1991-2992",
+  "commit": "a3f4a2569d4f765a3e8fc049ba34687e284b534c",
+  "startedAt": "2026-09-10T07:02:11Z",
+  "completedAt": "2026-09-10T07:16:18Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "v22.22.3"},
+  "environment": {"kind": "local", "name": "local-1991-and-2992-only"},
+  "artifact": {
+    "name": "remotexapp-0.7.0-rc.1-linux-amd64.tar.gz",
+    "sha256": "b5b7dd6bc60e8ad8ded3759a413739fd750c4258f2cb2120ad80e3a1130a938b"
+  },
+  "scenarios": [
+    {"id": "hosted-verify-34447919409", "result": "passed"},
+    {"id": "hosted-candidate-34447918987-release-ci-race-coverage-vulnerability", "result": "passed"},
+    {"id": "local-make-check-and-three-repeated-upgrade-race-runs", "result": "passed"},
+    {"id": "exact-archive-identity-synthetic-abi-install-update-rollback", "result": "passed"},
+    {"id": "exact-archive-four-app-input-resize-control-clipboard-lifecycle", "result": "passed"},
+    {"id": "exact-archive-document-optional-file-no-save-connection-regressions", "result": "passed"},
+    {"id": "independent-kate-kwrite-optional-file-invalid-inputs-three-dbus-controls-gui-readback", "result": "passed"},
+    {"id": "kde-explicit-save-normal-and-force-no-save-stop-other-instance-preserved", "result": "passed"},
+    {"id": "kde-clean-app-exit-and-modified-blank-real-60-second-vacancy-stop", "result": "passed"},
+    {"id": "six-real-apps-adoption-ordinary-restart-retains-pin-explicit-core-only-upgrade", "result": "passed"},
+    {"id": "kde-browser-resize-bound-sdk-upgrade-reconnect-clipboard-policy-ime-readback", "result": "passed"},
+    {"id": "sigkill-durable-stopping-launching-blocked-failed-launched-before-complete-single-owner", "result": "passed"},
+    {"id": "managed-app-and-core-upgrade-preserves-association-parameters-persistent-home", "result": "passed"},
+    {"id": "unit-preflight-veto-force-failure-stale-request-error-scope-surviving-session-observer", "result": "passed"},
+    {"id": "sdk-validation-cancellation-lost-response-no-blind-retry-and-console-label-contract", "result": "passed"},
+    {"id": "both-managers-exact-binary-sdk-bytes-loopback-health-ready-catalog-no-restart-loop", "result": "passed"},
+    {"id": "both-endpoints-four-editor-file-connections-no-update-guard-no-save-stop", "result": "passed"},
+    {"id": "both-endpoints-kde-browser-resize-ime-actual-readback-reconnect", "result": "passed"},
+    {"id": "existing-xfce-id-generation-pin-and-default-user-bus-preserved", "result": "passed"},
+    {"id": "deployed-console-dom-current-old-pin-available-new-release-distinct-actions", "result": "passed"},
+    {"id": "live-user-home-xfce-upgrade", "result": "skipped"},
+    {"id": "human-uat", "result": "skipped"}
+  ],
+  "details": {
+    "version": "0.7.0-rc.1",
+    "sdkVersion": "0.24.0",
+    "sdkAsset": "sdk-GQRCZLMK.js",
+    "sdkSha256": "c7cbad7e83fe4c02d8982bbfa9532b1429d88dcfd33a088ea31d953dc46b6546",
+    "managerSha256": "aa51e4c8d134e38d1836c45ead7ec681d694218231a4b8a8801ec05d8beb700a",
+    "addedApps": {"kate": "1.0.0", "kwrite": "1.0.0"},
+    "unchangedApps": {"edge": "1.0.0", "firefox-esr": "2.1.1", "libreoffice": "3.1.0", "mousepad": "3.0.0", "xfce-user-desktop": "2.0.0"},
+    "endpoints": [
+      {"listen": "127.0.0.1:1991", "console": true, "kiosk": true, "authMode": "none", "templates": 7, "activeRuntimes": 1, "managerRestarts": 0},
+      {"listen": "127.0.0.1:2992", "console": false, "kiosk": true, "authMode": "none", "templates": 6, "activeRuntimes": 0, "managerRestarts": 0}
+    ],
+    "configurationPreserved": true,
+    "connectionsCapability": "existing separate owner-only token files and user-service drop-ins retained; credentials excluded from evidence",
+    "desktop": {"id": "xfce-user-desktop-44ea8c2186ee", "generation": 1, "sessionState": "running", "coreVersionRetained": "0.6.0-rc.1", "availableCoreVersion": "0.7.0-rc.1", "upgradeEligible": true, "runtimeRestarted": false, "forcedStop": false},
+    "uat": "pending; use new candidate runtimes for editor acceptance",
+    "publication": "not authorized; no release tag or GitHub Release created",
+    "sandboxDeployment": "not authorized; none performed",
+    "limitations": [
+      "Live user-home XFCE upgrade was not performed on the occupied desktop. User-home/fixed-display compatibility has unit coverage; deployed old desktop identity, user D-Bus and version visibility were verified without replacement.",
+      "Crash tests inject exact durable phase records and then SIGKILL/restart the real Manager; they are not timed process kills at every instruction inside the shutdown driver.",
+      "Headless browser tests do not prove native OS focus or permission prompts; Human UAT remains pending."
+    ],
+    "evidenceLogs": [
+      "/tmp/upgrade-final-check.log",
+      "/tmp/upgrade-final-race.log",
+      "/tmp/upgrade-exact-final.log",
+      "/tmp/remotexapp-shipped-e2e.cplZRk",
+      "/tmp/remotexapp-document-e2e-RmCezj",
+      "/tmp/remotexapp-upgrade-kde-e2e-V3ynAa/result.json",
+      "/tmp/upgrade-deploy-2992.log",
+      "/tmp/upgrade-deploy-1991.log",
+      "/tmp/upgrade-local-smoke-sB5Y5s/result.json",
+      "/tmp/upgrade-local-smoke-gNXFHH/result.json",
+      "/tmp/upgrade-console-readonly.log"
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "remotexapp-sdk",
+  "version": "0.29.1",
+  "private": true,
+  "type": "module"
+}

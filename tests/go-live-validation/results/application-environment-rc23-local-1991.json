@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-29",
+  "candidate": {
+    "version": "0.1.0-rc.23",
+    "sdkVersion": "0.16.0",
+    "manager": "http://127.0.0.1:1991",
+    "authMode": "none",
+    "listenerLoopbackOnly": true
+  },
+  "automatedGates": {
+    "makeCheck": "passed",
+    "goRace": "passed",
+    "releaseCI": "passed",
+    "sensitiveDataCheck": "passed",
+    "deploymentArchitectureCheck": "passed"
+  },
+  "apiContract": {
+    "route": "POST /api/instances/{id}/status/environment",
+    "sdkMethod": "getApplicationEnvironment(instanceId, { sessionGeneration })",
+    "exactResponseFields": [
+      "instanceId",
+      "sessionGeneration",
+      "applicationState",
+      "environment",
+      "workingDirectory"
+    ],
+    "cacheControl": "no-store",
+    "staleGenerationRejected": true,
+    "nonPostMethodRejected": true,
+    "noProcessIdOrCommandResult": true,
+    "noRuntimeSnapshot": true,
+    "unauthenticatedNonLoopbackRejectedByRegression": true
+  },
+  "templates": {
+    "mousepad": {
+      "driverVersion": "1.6.0",
+      "environmentVariableCount": 53,
+      "exactProcfsMatch": true,
+      "workingDirectoryMatch": true,
+      "normalShutdown": "passed"
+    },
+    "edge-browser": {
+      "driverVersion": "1.6.0",
+      "environmentVariableCount": 53,
+      "exactProcfsMatch": true,
+      "workingDirectoryMatch": true,
+      "normalShutdown": "passed"
+    },
+    "libreoffice": {
+      "driverVersion": "2.1.0",
+      "environmentVariableCount": 56,
+      "exactProcfsMatch": true,
+      "workingDirectoryMatch": true,
+      "normalShutdown": "passed",
+      "documentLockRemoved": true
+    },
+    "firefox-esr": {
+      "driverVersion": "1.2.0",
+      "environmentVariableCount": 57,
+      "exactProcfsMatch": true,
+      "workingDirectoryMatch": true,
+      "normalShutdown": "passed"
+    },
+    "xfce-desktop": {
+      "driverVersion": "1.6.0",
+      "environmentVariableCount": 53,
+      "exactProcfsMatch": true,
+      "workingDirectoryMatch": true,
+      "normalShutdown": "passed"
+    },
+    "xfce-user-desktop": {
+      "driverVersion": "1.2.0",
+      "environmentVariableCount": 53,
+      "exactProcfsMatch": true,
+      "workingDirectoryMatch": true,
+      "userHomeResourcesMatch": true,
+      "managerRestartAdoptedSameRuntimeAndGeneration": true,
+      "postAdoptionLookup": "passed",
+      "managedNormalShutdown": "passed"
+    }
+  },
+  "crossVersionAdoption": {
+    "mousepadDriverVersion": "1.5.0",
+    "firefoxDriverVersion": "1.1.0",
+    "managerRestartPreservedSessions": true,
+    "environmentLookupsBeforeReplacement": "exact procfs match"
+  },
+  "privacy": {
+    "environmentValuesRecordedInEvidence": false,
+    "environmentValuesPrintedByValidation": false,
+    "environmentValuesFoundInManagerJournal": false
+  },
+  "uat": {
+    "accepted": true,
+    "acceptedAt": "2026-08-29"
+  },
+  "cleanup": {
+    "managedTestRegistrations": 0,
+    "testDocumentLockPresent": false,
+    "testSessionsStopped": true,
+    "managerHealthy": true,
+    "listener": "127.0.0.1:1991"
+  },
+  "result": "pass"
+}

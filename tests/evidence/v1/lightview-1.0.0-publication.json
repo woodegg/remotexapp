@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "lightview-1.0.0-formal-publication",
+  "commit": "422cb0a2c12d11f15ff20894f760838104bc9fb1",
+  "startedAt": "2026-09-16T22:29:29Z",
+  "completedAt": "2026-09-16T22:30:30Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "github-release",
+    "name": "woodegg/remotexapp lightview-v1.0.0"
+  },
+  "artifact": {
+    "name": "lightview-1.0.0.tar.gz",
+    "sha256": "ee38e81dbf0ae907282e972c72a5b95d45229418f5dc0e2bdb7d4f68488d0d07"
+  },
+  "release": {
+    "id": "RE_kwDOUGRp2s4XQ8LD",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/lightview-v1.0.0",
+    "tag": "lightview-v1.0.0",
+    "tagObject": "653b4aae18d1de1e2c91bb473c017cfb348f8d2d",
+    "peeledCommit": "422cb0a2c12d11f15ff20894f760838104bc9fb1",
+    "publishedAt": "2026-09-16T22:29:56Z",
+    "draft": false,
+    "prerelease": false
+  },
+  "scenarios": [
+    {
+      "id": "annotated-tag-exists-remotely-and-peels-to-accepted-source",
+      "result": "passed"
+    },
+    {
+      "id": "release-publishes-only-archive-and-checksum",
+      "result": "passed"
+    },
+    {
+      "id": "downloaded-checksum-valid-and-archive-byte-identical-to-UAT",
+      "result": "passed"
+    },
+    {
+      "id": "downloaded-manifest-id-version-ABI-and-core-services-identity",
+      "result": "passed"
+    },
+    {
+      "id": "release-is-formal-not-draft-or-prerelease",
+      "result": "passed"
+    },
+    {
+      "id": "RemoteXApp-Core-v0.12.2-remains-Latest",
+      "result": "passed"
+    },
+    {
+      "id": "sandbox-deployment",
+      "result": "skipped",
+      "reason": "Publication approval did not authorize sandbox deployment."
+    }
+  ],
+  "retainedEvidence": {
+    "downloadDirectory": "/tmp/lightview-publication-verify.q1H5xV",
+    "acceptedUAT": "tests/evidence/v1/lightview-1.0.0-local-uat.json"
+  },
+  "limitations": [
+    "The LightView host binary is separately provisioned and is not embedded in the App Package.",
+    "Production hosts must support normal WebKit sandboxing; the local-container UAT qualification remains documented separately.",
+    "Publication does not deploy or upgrade any endpoint."
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "github-actions:34473201571",
+  "commit": "c097bbcdb032f1ddae18d18942e17a0d5f7f9825",
+  "startedAt": "2026-09-10T11:47:44Z",
+  "completedAt": "2026-09-10T11:49:10Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "github-release",
+    "name": "woodegg/remotexapp"
+  },
+  "artifact": {
+    "name": "remotexapp-0.8.0-linux-amd64.tar.gz",
+    "sha256": "241306d688c14d0b0cc0746f7beb003c6f5c892a8772e046723af0694a541556"
+  },
+  "scenarios": [
+    {
+      "id": "runtime-source-assets-and-Apps-unchanged-from-accepted-rc3",
+      "result": "passed"
+    },
+    {
+      "id": "hosted-verify-34472005167",
+      "result": "passed"
+    },
+    {
+      "id": "hosted-candidate-34472004424",
+      "result": "passed"
+    },
+    {
+      "id": "stable-exact-archive-full-E2E",
+      "result": "passed"
+    },
+    {
+      "id": "stale-SDK-entry-root-and-subpath-exact-asset-browser-regression",
+      "result": "passed"
+    },
+    {
+      "id": "disposable-user-XFCE-IBus-adoption-restart",
+      "result": "passed"
+    },
+    {
+      "id": "annotated-tag-exact-commit",
+      "result": "passed"
+    },
+    {
+      "id": "release-without-rebuild",
+      "result": "passed"
+    },
+    {
+      "id": "independent-download-checksum-vcs-sensitive-data",
+      "result": "passed"
+    },
+    {
+      "id": "published-archive-identical-to-tested-candidate",
+      "result": "passed"
+    },
+    {
+      "id": "normal-latest-non-prerelease-non-draft",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "tag": "v0.8.0",
+    "release": "https://github.com/woodegg/remotexapp/releases/tag/v0.8.0",
+    "candidateRun": "https://github.com/woodegg/remotexapp/actions/runs/34472004424",
+    "releaseRun": "https://github.com/woodegg/remotexapp/actions/runs/34473201571",
+    "sdkVersion": "0.25.1",
+    "appPackagesChangedFromUAT": false,
+    "liveE2ELog": "/tmp/stable080-exact-e2e.log",
+    "consoleCacheResult": "/tmp/remotexapp-upgrade-kde-e2e-QkSkZS/console-sdk-cache-result.jsonl",
+    "userHomeResult": "/var/tmp/remotexapp-conn-user.sWIXQS/result.json",
+    "deploymentPerformed": false,
+    "edgeRecoveryPerformed": false,
+    "local1991And2992": "remain on rc.3; no stable alignment performed",
+    "sandboxes": "not accessed or deployed",
+    "incident": "prior rc.3 singleton smoke-test incident remains recorded; publication does not certify runtime recovery"
+  }
+}

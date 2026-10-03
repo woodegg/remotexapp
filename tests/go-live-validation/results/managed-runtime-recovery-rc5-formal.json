@@ -1,0 +1,101 @@
+{
+  "date": "2026-08-31",
+  "release": {
+    "tag": "v0.2.0-rc.5",
+    "commit": "8c03c485adc5f0de56f7199d73c2c77e8373992f",
+    "prerelease": true,
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/v0.2.0-rc.5",
+    "workflow": "https://github.com/woodegg/remotexapp/actions/runs/33439549240",
+    "workflowResult": "passed",
+    "archiveSha256": "f31ef87b9a845c9cc88e1fe86a64f3ab69f959eefc8462fa1d637e0ded622ccb",
+    "checksumVerification": "passed",
+    "goVersion": "go1.22.12"
+  },
+  "candidate": {
+    "archiveSha256": "a011a513c36ce6f3b0bf7cf491bcdeee91f0da1fdd33d1058685306cd63af7ad",
+    "goVersion": "go1.22.2",
+    "sameSourceCommit": true,
+    "retainedAs": "0.2.0-rc.5-candidate-8c03c485adc5",
+    "reasonForDifferentArchive": "the formal clean GitHub checkout used go1.22.12 and excluded local untracked empty driver directories"
+  },
+  "formalBinarySha256": {
+    "remotexappd": "807bb7fed73dc87008c53f35af907a14655ab35d5e318dc2c32c33c94f2fc8de",
+    "novnc-input": "44ab6f888d177e3c972598c7638aa8cca9caac9c2967023270871ee6088d9a3a",
+    "remotexapp-status": "4954490f6b0e89974145e29e16382fcb96a053308190ff73ca0a570e29d5dbc9"
+  },
+  "local1991": {
+    "deploymentMode": "central real user ubuntu",
+    "listen": "0.0.0.0:1991",
+    "attachedClientsBefore": 1,
+    "gracefulShutdown": "passed without force",
+    "restartedManagedRuntime": {
+      "xfce-user-desktop-12c0f10fb07d": "xfce-user-desktop-55d98b43c576"
+    },
+    "restartedAnonymousRuntime": {
+      "xfce-desktop-0946d42afe2b": "xfce-desktop-9aba479cac73"
+    },
+    "appSelectorMigration": "edge-browser@2.0.0 to edge@1.0.0",
+    "finalRuntimeIds": [
+      "xfce-user-desktop-55d98b43c576",
+      "xfce-desktop-9aba479cac73"
+    ],
+    "finalManifestCount": 2,
+    "finalAttachedClients": 0,
+    "managerRestartCount": 0,
+    "warningJournalCountAfterFinalRestart": 0
+  },
+  "targets": {
+    "sandbox00": {
+      "forcedDesktopShutdown": true,
+      "forcedReason": "zero-client XFCE graceful logout returned shutdown-blocked during the operator-approved formal alignment",
+      "finalRuntimeIds": [
+        "xfce-user-desktop-b21da838f33e",
+        "edge-e7904f7dddcc",
+        "firefox-esr-8779fe8fdd69"
+      ]
+    },
+    "sandbox02": {
+      "forcedDesktopShutdown": false,
+      "finalRuntimeIds": [
+        "xfce-user-desktop-18e0063a4730"
+      ]
+    },
+    "sandbox03": {
+      "forcedDesktopShutdown": false,
+      "finalRuntimeIds": [
+        "xfce-user-desktop-fe38ea6ea902"
+      ]
+    },
+    "sandbox07": {
+      "forcedDesktopShutdown": false,
+      "lxdContainerRestarted": false,
+      "finalRuntimeIds": [
+        "xfce-user-desktop-5f777640df67"
+      ]
+    },
+    "sandbox10": {
+      "forcedDesktopShutdown": false,
+      "finalRuntimeIds": [
+        "xfce-user-desktop-7f82a5db6646",
+        "edge-6d21ec8ea5ea",
+        "firefox-esr-c38f28ccaf10"
+      ]
+    }
+  },
+  "fleetAcceptance": {
+    "formalBinaryHashesMatchedOnEveryTarget": true,
+    "candidateDirectoriesRetainedOnEveryTarget": true,
+    "appSelectorsUnchangedAndConsistent": true,
+    "profilesAndParametersPreserved": true,
+    "runtimeState": "all server-ready with stopped sessions and zero attached clients",
+    "runtimeManifestCardinality": "one manifest per API runtime",
+    "managedDesktopPolicy": "user-home, fixed 1280x720, client resize disabled",
+    "managerRestartCount": 0,
+    "warningJournalCountAfterFinalRestart": 0,
+    "listen": "0.0.0.0:1991",
+    "authMode": "none",
+    "documentRoots": "/home/sandbox:/mnt/CloudDrive:/mnt/MyDrive",
+    "productionGatewayUsed": false
+  },
+  "humanUAT": "pending"
+}

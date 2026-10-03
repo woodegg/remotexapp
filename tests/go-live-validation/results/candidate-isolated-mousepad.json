@@ -1,0 +1,1345 @@
+{
+  "schemaVersion": 1,
+  "label": "candidate-isolated",
+  "classId": "mousepad",
+  "instanceId": "mousepad-e48db2e4e6bf",
+  "collectedAt": "2026-08-27T05:34:02-04:00",
+  "display": ":11",
+  "createOrLookupMs": 485,
+  "attachToSessionMs": 1048,
+  "clipboard": {
+    "exact": true,
+    "sha256": "dfa91b04e62012eb69f5cd02c0a1e3ee245e123cae3b271932a995ee39e365c5"
+  },
+  "runtimeHashes": {
+    "manager": "4c63e0327e4a91c2ce602acaea379b0dc00709a0774b0bc971329fc01a226460",
+    "gateway": "3553839051eab9b79f8a7ec8257260bcfa6a3491131701180c8f0d14a9480ab0"
+  },
+  "measurement": {
+    "schemaVersion": 1,
+    "managerURL": "http://127.0.0.1:1992",
+    "instanceID": "mousepad-e48db2e4e6bf",
+    "sdkVersion": "0.8.0",
+    "workload": {
+      "staticSeconds": 30,
+      "inputRequests": 600,
+      "inputIntervalMS": 50,
+      "scrollSeconds": 30,
+      "scrollEvents": 248
+    },
+    "expected": {
+      "characters": 660,
+      "utf8Bytes": 780,
+      "sha256": "dfa91b04e62012eb69f5cd02c0a1e3ee245e123cae3b271932a995ee39e365c5"
+    },
+    "browserLoad": {
+      "observedConnectedMs": 964.4000000953674,
+      "navigationResponseEndMs": 251.09999990463257,
+      "domContentLoadedMs": 318.90000009536743,
+      "totalResourceRequests": 7,
+      "staticRequests": 3,
+      "staticTransferBytes": 182088,
+      "staticEncodedBytes": 181188,
+      "staticDecodedBytes": 181188,
+      "staticDurationSumMs": 20.799999713897705,
+      "cachedStaticRequests": 0,
+      "staticPaths": [
+        "/assets/novnc-PE3TB3DL.js",
+        "/assets/sdk-S4KCHU5P.js",
+        "/sdk/index.js"
+      ]
+    },
+    "memoryAtAttached": {
+      "managerPssKiB": 9412,
+      "vncPssKiB": 24756,
+      "serverPssKiB": 16097,
+      "gatewayPssKiB": 4397,
+      "sessionPssKiB": 59856,
+      "benchmarkAppPssKiB": 0,
+      "vncMemoryCurrentBytes": 20774912,
+      "serverMemoryCurrentBytes": 16822272,
+      "gatewayMemoryCurrentBytes": 2150400,
+      "sessionMemoryCurrentBytes": 52592640,
+      "vncTasks": 1,
+      "serverTasks": 21,
+      "gatewayTasks": 6,
+      "sessionTasks": 48,
+      "benchmarkAppPID": 0
+    },
+    "phases": {
+      "static": {
+        "durationMs": 30044,
+        "rfbToBrowserBytes": 892,
+        "browserToRfbBytes": 300,
+        "textRequests": 0,
+        "textErrors": 0,
+        "textInputBytes": 0,
+        "textServerMicroseconds": 0,
+        "manager": {
+          "cpuTicks": 0,
+          "readSyscalls": 187,
+          "writeSyscalls": 76
+        },
+        "app": {
+          "cpuTicks": 0,
+          "readSyscalls": 0,
+          "writeSyscalls": 0,
+          "readBytes": 0,
+          "writeBytes": 0
+        },
+        "cgroups": {
+          "vnc": {
+            "cpuUsec": 4896,
+            "cpuTicks": 0,
+            "readSyscalls": 0,
+            "writeSyscalls": 0,
+            "readBytes": 0,
+            "writeBytes": 0
+          },
+          "server": {
+            "cpuUsec": 1135,
+            "cpuTicks": 0,
+            "readSyscalls": 6,
+            "writeSyscalls": 12,
+            "readBytes": 48,
+            "writeBytes": 96
+          },
+          "gateway": {
+            "cpuUsec": 6079,
+            "cpuTicks": 0,
+            "readSyscalls": 116,
+            "writeSyscalls": 58,
+            "readBytes": 2704,
+            "writeBytes": 2620
+          },
+          "session": {
+            "cpuUsec": 5384,
+            "cpuTicks": 0,
+            "readSyscalls": 16,
+            "writeSyscalls": 32,
+            "readBytes": 128,
+            "writeBytes": 4028
+          }
+        }
+      },
+      "input": {
+        "durationMs": 30037,
+        "rfbToBrowserBytes": 474290,
+        "browserToRfbBytes": 9060,
+        "textRequests": 600,
+        "textErrors": 0,
+        "textInputBytes": 780,
+        "textServerMicroseconds": 558022,
+        "manager": {
+          "cpuTicks": 28,
+          "readSyscalls": 6786,
+          "writeSyscalls": 3395
+        },
+        "app": {
+          "cpuTicks": 0,
+          "readSyscalls": 0,
+          "writeSyscalls": 0,
+          "readBytes": 0,
+          "writeBytes": 0
+        },
+        "cgroups": {
+          "vnc": {
+            "cpuUsec": 891389,
+            "cpuTicks": 90,
+            "readSyscalls": 0,
+            "writeSyscalls": 2704,
+            "readBytes": 0,
+            "writeBytes": 79416
+          },
+          "server": {
+            "cpuUsec": 877155,
+            "cpuTicks": 89,
+            "readSyscalls": 11583,
+            "writeSyscalls": 18494,
+            "readBytes": 92664,
+            "writeBytes": 168352
+          },
+          "gateway": {
+            "cpuUsec": 505987,
+            "cpuTicks": 52,
+            "readSyscalls": 7289,
+            "writeSyscalls": 5206,
+            "readBytes": 674214,
+            "writeBytes": 671045
+          },
+          "session": {
+            "cpuUsec": 874553,
+            "cpuTicks": 88,
+            "readSyscalls": 4039,
+            "writeSyscalls": 7154,
+            "readBytes": 32312,
+            "writeBytes": 1182849
+          }
+        }
+      },
+      "scroll": {
+        "durationMs": 30069,
+        "rfbToBrowserBytes": 136618,
+        "browserToRfbBytes": 5336,
+        "textRequests": 0,
+        "textErrors": 0,
+        "textInputBytes": 0,
+        "textServerMicroseconds": 0,
+        "manager": {
+          "cpuTicks": 6,
+          "readSyscalls": 1487,
+          "writeSyscalls": 773
+        },
+        "app": {
+          "cpuTicks": 0,
+          "readSyscalls": 0,
+          "writeSyscalls": 0,
+          "readBytes": 0,
+          "writeBytes": 0
+        },
+        "cgroups": {
+          "vnc": {
+            "cpuUsec": 367354,
+            "cpuTicks": 38,
+            "readSyscalls": 0,
+            "writeSyscalls": 4012,
+            "readBytes": 0,
+            "writeBytes": 172032
+          },
+          "server": {
+            "cpuUsec": 18561,
+            "cpuTicks": 2,
+            "readSyscalls": 309,
+            "writeSyscalls": 480,
+            "readBytes": 2472,
+            "writeBytes": 3840
+          },
+          "gateway": {
+            "cpuUsec": 86031,
+            "cpuTicks": 8,
+            "readSyscalls": 1472,
+            "writeSyscalls": 959,
+            "readBytes": 153544,
+            "writeBytes": 149117
+          },
+          "session": {
+            "cpuUsec": 282625,
+            "cpuTicks": 29,
+            "readSyscalls": 589,
+            "writeSyscalls": 3382,
+            "readBytes": 4712,
+            "writeBytes": 1078936
+          }
+        }
+      }
+    },
+    "input": {
+      "requests": 600,
+      "durationMs": 29950.89999961853,
+      "roundTripMs": {
+        "min": 0.6999998092651367,
+        "p50": 1.1999998092651367,
+        "p95": 7.099999904632568,
+        "max": 46.40000009536743,
+        "mean": 2.384500017166138
+      },
+      "serverMs": {
+        "min": 0.443,
+        "p50": 0.573,
+        "p95": 2.61,
+        "max": 8.301,
+        "mean": 0.930036666666667
+      }
+    },
+    "resize": {
+      "expected": true,
+      "observed": true,
+      "before": {
+        "width": 1280,
+        "height": 720,
+        "cssWidth": 1280,
+        "cssHeight": 720
+      },
+      "after": {
+        "width": 1280,
+        "height": 633,
+        "cssWidth": 1280,
+        "cssHeight": 633
+      },
+      "targetViewport": {
+        "width": 900,
+        "height": 640
+      }
+    },
+    "reconnectMs": 55,
+    "finalClient": {
+      "state": "connected",
+      "rfbState": "connected",
+      "inputState": "connected",
+      "framebuffer": {
+        "width": 1280,
+        "height": 633,
+        "cssWidth": 1280,
+        "cssHeight": 633
+      }
+    },
+    "snapshots": {
+      "attached": {
+        "label": "attached",
+        "epochMs": 1787823151300,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 512,
+          "rfbToBrowserBytes": 2945,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 0,
+          "textLogLevel": "errors",
+          "textRequests": 0,
+          "textServerMicroseconds": 0,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 3.565804678
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":11"
+        },
+        "manager": {
+          "pid": 2673788,
+          "cpuTicks": 4,
+          "rssKiB": 10908,
+          "pssKiB": 9412,
+          "privateKiB": 9408,
+          "readSyscalls": 920,
+          "writeSyscalls": 277,
+          "readBytes": 421850,
+          "writeBytes": 373261
+        },
+        "app": null,
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-vnc.service",
+            "cpuUsec": 98187,
+            "memoryCurrentBytes": 20774912,
+            "memoryPeakBytes": 21037056,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 24756,
+            "privateKiB": 19788,
+            "cpuTicks": 7,
+            "readSyscalls": 772,
+            "writeSyscalls": 1531,
+            "readBytes": 1564992,
+            "writeBytes": 362871,
+            "pids": [
+              2676573
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-server.service",
+            "cpuUsec": 150183,
+            "memoryCurrentBytes": 16822272,
+            "memoryPeakBytes": 18976768,
+            "tasks": 21,
+            "processCount": 6,
+            "pssKiB": 16097,
+            "privateKiB": 14820,
+            "cpuTicks": 8,
+            "readSyscalls": 1191,
+            "writeSyscalls": 560,
+            "readBytes": 2319747,
+            "writeBytes": 7662,
+            "pids": [
+              2676579,
+              2676587,
+              2676589,
+              2676596,
+              2676605,
+              2676611
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-gateway.service",
+            "cpuUsec": 13471,
+            "memoryCurrentBytes": 2150400,
+            "memoryPeakBytes": 2662400,
+            "tasks": 6,
+            "processCount": 1,
+            "pssKiB": 4397,
+            "privateKiB": 1860,
+            "cpuTicks": 1,
+            "readSyscalls": 198,
+            "writeSyscalls": 106,
+            "readBytes": 60591,
+            "writeBytes": 11249,
+            "pids": [
+              2676629
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-session.service",
+            "cpuUsec": 689141,
+            "memoryCurrentBytes": 52592640,
+            "memoryPeakBytes": 53432320,
+            "tasks": 48,
+            "processCount": 12,
+            "pssKiB": 59856,
+            "privateKiB": 49328,
+            "cpuTicks": 56,
+            "readSyscalls": 2835,
+            "writeSyscalls": 1867,
+            "readBytes": 2612647,
+            "writeBytes": 1321212,
+            "pids": [
+              2676864,
+              2676877,
+              2676878,
+              2676879,
+              2676899,
+              2676906,
+              2676908,
+              2676920,
+              2676940,
+              2676956,
+              2676997,
+              2677012
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "0.89 1.70 2.17 5/4309 3450181",
+          "memAvailableKiB": 29021111
+        }
+      },
+      "staticStart": {
+        "label": "static-start",
+        "epochMs": 1787823151315,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 532,
+          "rfbToBrowserBytes": 2997,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 0,
+          "textLogLevel": "errors",
+          "textRequests": 0,
+          "textServerMicroseconds": 0,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 3.586228133
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":11"
+        },
+        "manager": {
+          "pid": 2673788,
+          "cpuTicks": 5,
+          "rssKiB": 11052,
+          "pssKiB": 9556,
+          "privateKiB": 9552,
+          "readSyscalls": 936,
+          "writeSyscalls": 284,
+          "readBytes": 423274,
+          "writeBytes": 375978
+        },
+        "app": null,
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-vnc.service",
+            "cpuUsec": 98413,
+            "memoryCurrentBytes": 20774912,
+            "memoryPeakBytes": 21037056,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 24756,
+            "privateKiB": 19788,
+            "cpuTicks": 7,
+            "readSyscalls": 772,
+            "writeSyscalls": 1531,
+            "readBytes": 1564992,
+            "writeBytes": 362871,
+            "pids": [
+              2676573
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-server.service",
+            "cpuUsec": 150183,
+            "memoryCurrentBytes": 16822272,
+            "memoryPeakBytes": 18976768,
+            "tasks": 21,
+            "processCount": 6,
+            "pssKiB": 16097,
+            "privateKiB": 14820,
+            "cpuTicks": 8,
+            "readSyscalls": 1191,
+            "writeSyscalls": 560,
+            "readBytes": 2319747,
+            "writeBytes": 7662,
+            "pids": [
+              2676579,
+              2676587,
+              2676589,
+              2676596,
+              2676605,
+              2676611
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-gateway.service",
+            "cpuUsec": 13950,
+            "memoryCurrentBytes": 2154496,
+            "memoryPeakBytes": 2662400,
+            "tasks": 6,
+            "processCount": 1,
+            "pssKiB": 4397,
+            "privateKiB": 1860,
+            "cpuTicks": 1,
+            "readSyscalls": 200,
+            "writeSyscalls": 107,
+            "readBytes": 60771,
+            "writeBytes": 11670,
+            "pids": [
+              2676629
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-session.service",
+            "cpuUsec": 689141,
+            "memoryCurrentBytes": 52592640,
+            "memoryPeakBytes": 53432320,
+            "tasks": 48,
+            "processCount": 12,
+            "pssKiB": 59856,
+            "privateKiB": 49328,
+            "cpuTicks": 56,
+            "readSyscalls": 2835,
+            "writeSyscalls": 1867,
+            "readBytes": 2612647,
+            "writeBytes": 1321212,
+            "pids": [
+              2676864,
+              2676877,
+              2676878,
+              2676879,
+              2676899,
+              2676906,
+              2676908,
+              2676920,
+              2676940,
+              2676956,
+              2676997,
+              2677012
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "0.89 1.70 2.17 10/4309 3450181",
+          "memAvailableKiB": 29010945
+        }
+      },
+      "staticEnd": {
+        "label": "static-end",
+        "epochMs": 1787823181359,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 832,
+          "rfbToBrowserBytes": 3889,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 0,
+          "textLogLevel": "errors",
+          "textRequests": 0,
+          "textServerMicroseconds": 0,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 33.6254255
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":11"
+        },
+        "manager": {
+          "pid": 2673788,
+          "cpuTicks": 5,
+          "rssKiB": 11296,
+          "pssKiB": 9800,
+          "privateKiB": 9796,
+          "readSyscalls": 1123,
+          "writeSyscalls": 360,
+          "readBytes": 441305,
+          "writeBytes": 403098
+        },
+        "app": null,
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-vnc.service",
+            "cpuUsec": 103309,
+            "memoryCurrentBytes": 20774912,
+            "memoryPeakBytes": 21041152,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 24757,
+            "privateKiB": 19788,
+            "cpuTicks": 7,
+            "readSyscalls": 772,
+            "writeSyscalls": 1531,
+            "readBytes": 1564992,
+            "writeBytes": 362871,
+            "pids": [
+              2676573
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-server.service",
+            "cpuUsec": 151318,
+            "memoryCurrentBytes": 16740352,
+            "memoryPeakBytes": 18976768,
+            "tasks": 18,
+            "processCount": 6,
+            "pssKiB": 16099,
+            "privateKiB": 14820,
+            "cpuTicks": 8,
+            "readSyscalls": 1197,
+            "writeSyscalls": 572,
+            "readBytes": 2319795,
+            "writeBytes": 7758,
+            "pids": [
+              2676579,
+              2676587,
+              2676589,
+              2676596,
+              2676605,
+              2676611
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-gateway.service",
+            "cpuUsec": 20029,
+            "memoryCurrentBytes": 2207744,
+            "memoryPeakBytes": 2727936,
+            "tasks": 6,
+            "processCount": 1,
+            "pssKiB": 4453,
+            "privateKiB": 1916,
+            "cpuTicks": 1,
+            "readSyscalls": 316,
+            "writeSyscalls": 165,
+            "readBytes": 63475,
+            "writeBytes": 14290,
+            "pids": [
+              2676629
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-session.service",
+            "cpuUsec": 694525,
+            "memoryCurrentBytes": 52428800,
+            "memoryPeakBytes": 53432320,
+            "tasks": 42,
+            "processCount": 12,
+            "pssKiB": 59862,
+            "privateKiB": 49328,
+            "cpuTicks": 56,
+            "readSyscalls": 2851,
+            "writeSyscalls": 1899,
+            "readBytes": 2612775,
+            "writeBytes": 1325240,
+            "pids": [
+              2676864,
+              2676877,
+              2676878,
+              2676879,
+              2676899,
+              2676906,
+              2676908,
+              2676920,
+              2676940,
+              2676956,
+              2676997,
+              2677012
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "0.98 1.65 2.14 16/4278 3451587",
+          "memAvailableKiB": 29027517
+        }
+      },
+      "inputStart": {
+        "label": "input-start",
+        "epochMs": 1787823181691,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 962,
+          "rfbToBrowserBytes": 5190,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 0,
+          "textLogLevel": "errors",
+          "textRequests": 0,
+          "textServerMicroseconds": 0,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 33.959527313
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":11"
+        },
+        "manager": {
+          "pid": 2673788,
+          "cpuTicks": 5,
+          "rssKiB": 11348,
+          "pssKiB": 9852,
+          "privateKiB": 9848,
+          "readSyscalls": 1165,
+          "writeSyscalls": 381,
+          "readBytes": 444328,
+          "writeBytes": 408601
+        },
+        "app": null,
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-vnc.service",
+            "cpuUsec": 105007,
+            "memoryCurrentBytes": 20779008,
+            "memoryPeakBytes": 21057536,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 24761,
+            "privateKiB": 19792,
+            "cpuTicks": 7,
+            "readSyscalls": 772,
+            "writeSyscalls": 1606,
+            "readBytes": 1564992,
+            "writeBytes": 394151,
+            "pids": [
+              2676573
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-server.service",
+            "cpuUsec": 154158,
+            "memoryCurrentBytes": 16756736,
+            "memoryPeakBytes": 18976768,
+            "tasks": 18,
+            "processCount": 6,
+            "pssKiB": 16115,
+            "privateKiB": 14836,
+            "cpuTicks": 8,
+            "readSyscalls": 1253,
+            "writeSyscalls": 669,
+            "readBytes": 2320243,
+            "writeBytes": 8534,
+            "pids": [
+              2676579,
+              2676587,
+              2676589,
+              2676596,
+              2676605,
+              2676611
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-gateway.service",
+            "cpuUsec": 21879,
+            "memoryCurrentBytes": 2224128,
+            "memoryPeakBytes": 2727936,
+            "tasks": 6,
+            "processCount": 1,
+            "pssKiB": 4469,
+            "privateKiB": 1932,
+            "cpuTicks": 1,
+            "readSyscalls": 350,
+            "writeSyscalls": 185,
+            "readBytes": 65356,
+            "writeBytes": 16316,
+            "pids": [
+              2676629
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-session.service",
+            "cpuUsec": 699132,
+            "memoryCurrentBytes": 52445184,
+            "memoryPeakBytes": 53432320,
+            "tasks": 42,
+            "processCount": 12,
+            "pssKiB": 59892,
+            "privateKiB": 49348,
+            "cpuTicks": 56,
+            "readSyscalls": 2864,
+            "writeSyscalls": 1964,
+            "readBytes": 2612879,
+            "writeBytes": 1326041,
+            "pids": [
+              2676864,
+              2676877,
+              2676878,
+              2676879,
+              2676899,
+              2676906,
+              2676908,
+              2676920,
+              2676940,
+              2676956,
+              2676997,
+              2677012
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "0.98 1.65 2.14 8/4280 3451595",
+          "memAvailableKiB": 29016248
+        }
+      },
+      "inputEnd": {
+        "label": "input-end",
+        "epochMs": 1787823211728,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 10022,
+          "rfbToBrowserBytes": 479480,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 780,
+          "textLogLevel": "errors",
+          "textRequests": 600,
+          "textServerMicroseconds": 558022,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 63.954392456
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":11"
+        },
+        "manager": {
+          "pid": 2673788,
+          "cpuTicks": 33,
+          "rssKiB": 11548,
+          "pssKiB": 10052,
+          "privateKiB": 10048,
+          "readSyscalls": 7951,
+          "writeSyscalls": 3776,
+          "readBytes": 1132722,
+          "writeBytes": 1107692
+        },
+        "app": null,
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-vnc.service",
+            "cpuUsec": 996396,
+            "memoryCurrentBytes": 27082752,
+            "memoryPeakBytes": 27607040,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 30912,
+            "privateKiB": 25944,
+            "cpuTicks": 97,
+            "readSyscalls": 772,
+            "writeSyscalls": 4310,
+            "readBytes": 1564992,
+            "writeBytes": 473567,
+            "pids": [
+              2676573
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-server.service",
+            "cpuUsec": 1031313,
+            "memoryCurrentBytes": 16904192,
+            "memoryPeakBytes": 18976768,
+            "tasks": 18,
+            "processCount": 6,
+            "pssKiB": 16235,
+            "privateKiB": 14956,
+            "cpuTicks": 97,
+            "readSyscalls": 12836,
+            "writeSyscalls": 19163,
+            "readBytes": 2412907,
+            "writeBytes": 176886,
+            "pids": [
+              2676579,
+              2676587,
+              2676589,
+              2676596,
+              2676605,
+              2676611
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-gateway.service",
+            "cpuUsec": 527866,
+            "memoryCurrentBytes": 5578752,
+            "memoryPeakBytes": 6098944,
+            "tasks": 8,
+            "processCount": 1,
+            "pssKiB": 7655,
+            "privateKiB": 5120,
+            "cpuTicks": 53,
+            "readSyscalls": 7639,
+            "writeSyscalls": 5391,
+            "readBytes": 739570,
+            "writeBytes": 687361,
+            "pids": [
+              2676629
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-session.service",
+            "cpuUsec": 1573685,
+            "memoryCurrentBytes": 52514816,
+            "memoryPeakBytes": 53432320,
+            "tasks": 42,
+            "processCount": 12,
+            "pssKiB": 60742,
+            "privateKiB": 49852,
+            "cpuTicks": 144,
+            "readSyscalls": 6903,
+            "writeSyscalls": 9118,
+            "readBytes": 2645191,
+            "writeBytes": 2508890,
+            "pids": [
+              2676864,
+              2676877,
+              2676878,
+              2676879,
+              2676899,
+              2676906,
+              2676908,
+              2676920,
+              2676940,
+              2676956,
+              2676997,
+              2677012
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "2.08 1.84 2.19 13/4290 3453010",
+          "memAvailableKiB": 28995714
+        }
+      },
+      "scrollStart": {
+        "label": "scroll-start",
+        "epochMs": 1787823212269,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 10272,
+          "rfbToBrowserBytes": 494988,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 780,
+          "textLogLevel": "errors",
+          "textRequests": 600,
+          "textServerMicroseconds": 558022,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 64.532153817
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":11"
+        },
+        "manager": {
+          "pid": 2673788,
+          "cpuTicks": 33,
+          "rssKiB": 11560,
+          "pssKiB": 10064,
+          "privateKiB": 10060,
+          "readSyscalls": 8041,
+          "writeSyscalls": 3821,
+          "readBytes": 1151471,
+          "writeBytes": 1127313
+        },
+        "app": null,
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-vnc.service",
+            "cpuUsec": 1026464,
+            "memoryCurrentBytes": 27172864,
+            "memoryPeakBytes": 27607040,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 30996,
+            "privateKiB": 26028,
+            "cpuTicks": 99,
+            "readSyscalls": 772,
+            "writeSyscalls": 4427,
+            "readBytes": 1564992,
+            "writeBytes": 478255,
+            "pids": [
+              2676573
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-server.service",
+            "cpuUsec": 1041621,
+            "memoryCurrentBytes": 16912384,
+            "memoryPeakBytes": 18976768,
+            "tasks": 18,
+            "processCount": 6,
+            "pssKiB": 16243,
+            "privateKiB": 14964,
+            "cpuTicks": 97,
+            "readSyscalls": 12972,
+            "writeSyscalls": 19386,
+            "readBytes": 2413995,
+            "writeBytes": 178670,
+            "pids": [
+              2676579,
+              2676587,
+              2676589,
+              2676596,
+              2676605,
+              2676611
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-gateway.service",
+            "cpuUsec": 535639,
+            "memoryCurrentBytes": 5582848,
+            "memoryPeakBytes": 6098944,
+            "tasks": 8,
+            "processCount": 1,
+            "pssKiB": 7663,
+            "privateKiB": 5128,
+            "cpuTicks": 53,
+            "readSyscalls": 7733,
+            "writeSyscalls": 5455,
+            "readBytes": 754020,
+            "writeBytes": 701824,
+            "pids": [
+              2676629
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-session.service",
+            "cpuUsec": 1591098,
+            "memoryCurrentBytes": 52563968,
+            "memoryPeakBytes": 53432320,
+            "tasks": 43,
+            "processCount": 12,
+            "pssKiB": 60758,
+            "privateKiB": 49868,
+            "cpuTicks": 145,
+            "readSyscalls": 6943,
+            "writeSyscalls": 9248,
+            "readBytes": 2645511,
+            "writeBytes": 2535690,
+            "pids": [
+              2676864,
+              2676877,
+              2676878,
+              2676879,
+              2676899,
+              2676906,
+              2676908,
+              2676920,
+              2676940,
+              2676956,
+              2676997,
+              2677012
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "3.04 2.05 2.26 8/4291 3453059",
+          "memAvailableKiB": 28996233
+        }
+      },
+      "scrollEnd": {
+        "label": "scroll-end",
+        "epochMs": 1787823242338,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 15608,
+          "rfbToBrowserBytes": 631606,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 780,
+          "textLogLevel": "errors",
+          "textRequests": 600,
+          "textServerMicroseconds": 558022,
+          "totalInputConnections": 1,
+          "totalRfbConnections": 1,
+          "uptimeSeconds": 94.603118503
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":11"
+        },
+        "manager": {
+          "pid": 2673788,
+          "cpuTicks": 39,
+          "rssKiB": 11652,
+          "pssKiB": 10160,
+          "privateKiB": 10156,
+          "readSyscalls": 9528,
+          "writeSyscalls": 4594,
+          "readBytes": 1319719,
+          "writeBytes": 1304650
+        },
+        "app": null,
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-vnc.service",
+            "cpuUsec": 1393818,
+            "memoryCurrentBytes": 27176960,
+            "memoryPeakBytes": 27959296,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 31000,
+            "privateKiB": 26032,
+            "cpuTicks": 137,
+            "readSyscalls": 772,
+            "writeSyscalls": 8439,
+            "readBytes": 1564992,
+            "writeBytes": 650287,
+            "pids": [
+              2676573
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-server.service",
+            "cpuUsec": 1060182,
+            "memoryCurrentBytes": 16912384,
+            "memoryPeakBytes": 18976768,
+            "tasks": 18,
+            "processCount": 6,
+            "pssKiB": 16243,
+            "privateKiB": 14964,
+            "cpuTicks": 99,
+            "readSyscalls": 13281,
+            "writeSyscalls": 19866,
+            "readBytes": 2416467,
+            "writeBytes": 182510,
+            "pids": [
+              2676579,
+              2676587,
+              2676589,
+              2676596,
+              2676605,
+              2676611
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-gateway.service",
+            "cpuUsec": 621670,
+            "memoryCurrentBytes": 5681152,
+            "memoryPeakBytes": 6201344,
+            "tasks": 8,
+            "processCount": 1,
+            "pssKiB": 7759,
+            "privateKiB": 5224,
+            "cpuTicks": 61,
+            "readSyscalls": 9205,
+            "writeSyscalls": 6414,
+            "readBytes": 907564,
+            "writeBytes": 850941,
+            "pids": [
+              2676629
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-session.service",
+            "cpuUsec": 1873723,
+            "memoryCurrentBytes": 52551680,
+            "memoryPeakBytes": 53432320,
+            "tasks": 42,
+            "processCount": 12,
+            "pssKiB": 60771,
+            "privateKiB": 49880,
+            "cpuTicks": 174,
+            "readSyscalls": 7532,
+            "writeSyscalls": 12630,
+            "readBytes": 2650223,
+            "writeBytes": 3614626,
+            "pids": [
+              2676864,
+              2676877,
+              2676878,
+              2676879,
+              2676899,
+              2676906,
+              2676908,
+              2676920,
+              2676940,
+              2676956,
+              2676997,
+              2677012
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "3.36 2.19 2.30 3/4286 3454574",
+          "memAvailableKiB": 28976833
+        }
+      },
+      "final": {
+        "label": "final",
+        "epochMs": 1787823242703,
+        "health": {
+          "activeInputConnections": 1,
+          "activeRfbConnections": 1,
+          "browserToRfbBytes": 16170,
+          "rfbToBrowserBytes": 641331,
+          "status": "ok",
+          "textErrors": 0,
+          "textInputBytes": 780,
+          "textLogLevel": "errors",
+          "textRequests": 600,
+          "textServerMicroseconds": 558022,
+          "totalInputConnections": 2,
+          "totalRfbConnections": 2,
+          "uptimeSeconds": 94.96612136
+        },
+        "instance": {
+          "state": "server-ready",
+          "sessionState": "running",
+          "sessionGeneration": 1,
+          "attachedClients": 1,
+          "display": ":11"
+        },
+        "manager": {
+          "pid": 2673788,
+          "cpuTicks": 41,
+          "rssKiB": 12368,
+          "pssKiB": 10908,
+          "privateKiB": 10904,
+          "readSyscalls": 9677,
+          "writeSyscalls": 4668,
+          "readBytes": 1337188,
+          "writeBytes": 1324440
+        },
+        "app": null,
+        "cgroups": {
+          "vnc": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-vnc.service",
+            "cpuUsec": 1412388,
+            "memoryCurrentBytes": 22405120,
+            "memoryPeakBytes": 27959296,
+            "tasks": 1,
+            "processCount": 1,
+            "pssKiB": 26439,
+            "privateKiB": 21384,
+            "cpuTicks": 138,
+            "readSyscalls": 773,
+            "writeSyscalls": 8836,
+            "readBytes": 1564993,
+            "writeBytes": 664143,
+            "pids": [
+              2676573
+            ]
+          },
+          "server": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-server.service",
+            "cpuUsec": 1061981,
+            "memoryCurrentBytes": 16912384,
+            "memoryPeakBytes": 18976768,
+            "tasks": 18,
+            "processCount": 6,
+            "pssKiB": 16243,
+            "privateKiB": 14964,
+            "cpuTicks": 99,
+            "readSyscalls": 13307,
+            "writeSyscalls": 19907,
+            "readBytes": 2416675,
+            "writeBytes": 182838,
+            "pids": [
+              2676579,
+              2676587,
+              2676589,
+              2676596,
+              2676605,
+              2676611
+            ]
+          },
+          "gateway": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-gateway.service",
+            "cpuUsec": 629151,
+            "memoryCurrentBytes": 5763072,
+            "memoryPeakBytes": 6287360,
+            "tasks": 8,
+            "processCount": 1,
+            "pssKiB": 7839,
+            "privateKiB": 5304,
+            "cpuTicks": 63,
+            "readSyscalls": 9338,
+            "writeSyscalls": 6512,
+            "readBytes": 920618,
+            "writeBytes": 863031,
+            "pids": [
+              2676629
+            ]
+          },
+          "session": {
+            "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-mousepad-e48db2e4e6bf-session.service",
+            "cpuUsec": 1887660,
+            "memoryCurrentBytes": 52547584,
+            "memoryPeakBytes": 53432320,
+            "tasks": 42,
+            "processCount": 12,
+            "pssKiB": 60771,
+            "privateKiB": 49880,
+            "cpuTicks": 175,
+            "readSyscalls": 7554,
+            "writeSyscalls": 12746,
+            "readBytes": 2650399,
+            "writeBytes": 3656702,
+            "pids": [
+              2676864,
+              2676877,
+              2676878,
+              2676879,
+              2676899,
+              2676906,
+              2676908,
+              2676920,
+              2676940,
+              2676956,
+              2676997,
+              2677012
+            ]
+          }
+        },
+        "host": {
+          "loadavg": "3.36 2.19 2.30 6/4286 3454582",
+          "memAvailableKiB": 28968805
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "apiVersion": "remotexapp/v1",
+  "id": "example-app",
+  "name": "Example App",
+  "driverVersion": "1.0.0",
+  "singleton": false,
+  "profileRef": "default",
+  "runMode": "isolated",
+  "ports": {},
+  "parameters": {},
+  "driver": {"config": {}},
+  "overrides": {"allowed": []},
+  "dependencies": {
+    "executables": ["matchbox-window-manager", "sh", "xmessage", "xdotool"],
+    "pythonModules": []
+  },
+  "server": {
+    "activation": "on-demand",
+    "driver": "server.sh",
+    "displayMode": "dynamic",
+    "display": 0,
+    "rfbPort": 0,
+    "gatewayPort": 0,
+    "geometry": "800x600",
+    "depth": 16,
+    "frameRate": 5,
+    "allowClientResize": false,
+    "readinessPids": ["server.pid"],
+    "readinessTimeout": "10s"
+  },
+  "session": {
+    "services": "core-v1",
+    "activation": "on-attach",
+    "driver": "session.sh",
+    "shutdownDriver": "shutdown.sh",
+    "readinessPid": "example.pid",
+    "readinessTimeout": "15s",
+    "vacantTimeout": "5s",
+    "vacantAction": "stop-instance",
+    "status": {
+      "mode": "driver",
+      "details": {"application": {"type": "enum", "values": ["example-app"]}}
+    }
+  },
+  "input": {
+    "backend": "ibus",
+    "lifecycle": "session",
+    "allowedWmClasses": ["Xmessage"]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "runtime-coordinator-0.13.0-rc.3-human-acceptance",
+  "commit": "41665eaee8aeb7c1265d41f3ae0114094c3bd9a2",
+  "startedAt": "2026-09-18T15:01:00Z",
+  "completedAt": "2026-09-18T15:01:45Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "project-local-test",
+    "name": "accepted loopback 1991 and 2992 RC.3 candidate"
+  },
+  "artifact": {
+    "name": "remotexapp-0.13.0-rc.3-linux-amd64.tar.gz",
+    "sha256": "b15d6f84be7777b52bd6ddb3a3a2dddf6811c5f797bbf5c749c36dea348b19e4"
+  },
+  "sourceDirty": true,
+  "authorization": {
+    "message": "uat accpeted, do formal release to github",
+    "scope": "Promote accepted behavior to formal 0.13.0 / SDK 0.29.1; no deployment authorization"
+  },
+  "scenarios": [
+    {
+      "id": "operator-accepted-RTC-007-and-idle-lease-UAT",
+      "result": "passed"
+    },
+    {
+      "id": "formal-GitHub-publication-authorized",
+      "result": "passed"
+    }
+  ],
+  "qualification": "User acceptance applies to the deployed RC.3 bytes, not a future clean CI archive. Stable promotion changes version metadata/documentation only; exact hosted candidate validation must be recorded separately. No claim of a second interactive UAT on rebuilt bytes.",
+  "references": [
+    "coordinator-panel-0.13.0-rc.3-local-deployment.json",
+    "idle-lease-0.13.0-rc.2-candidate.json"
+  ]
+}

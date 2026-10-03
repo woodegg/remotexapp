@@ -1,0 +1,456 @@
+{
+  "schemaVersion": 1,
+  "label": "pre-go-live",
+  "collectedAt": "2026-08-27T05:05:32-04:00",
+  "host": {
+    "hostname": "test-host",
+    "kernel": "Linux 6.8.0-136-generic x86_64 GNU/Linux",
+    "cpuModel": "Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz",
+    "logicalCpuCount": 4,
+    "loadavg": "1.78 1.88 2.33 1/4096 3354187"
+  },
+  "manager": {
+    "command": ".runtime/remotexappd-bin -listen 0.0.0.0:1991 -state-dir .runtime/remotexappd-poc -class-config configs/remotexapp-classes -gateway-bin .runtime/novnc-input-bin -status-bin .runtime/remotexapp-status-bin",
+    "process": {
+      "pid": 1863624,
+      "pssKiB": 12636,
+      "privateKiB": 12632,
+      "rssKiB": 14132,
+      "cpuTicks": 390
+    }
+  },
+  "runtimeHashes": {
+    "manager": "163f86469f20632747b73aeba0de92a92b12d980d030f0fcf473e1bdfb655ee7",
+    "gateway": "4e99d0a7055398ef32386a43fb244dd03df811d6a03917d5c8db8220afe762e3",
+    "status": "3cf0bc00fa90ce2ab91b06945d8408e1259436ada3cddb0306d95cc890d4013b"
+  },
+  "repositoryHashes": {
+    "manager": "4c63e0327e4a91c2ce602acaea379b0dc00709a0774b0bc971329fc01a226460",
+    "gateway": "3553839051eab9b79f8a7ec8257260bcfa6a3491131701180c8f0d14a9480ab0",
+    "status": "3cf0bc00fa90ce2ab91b06945d8408e1259436ada3cddb0306d95cc890d4013b"
+  },
+  "configHashes": [
+    {
+      "sha256": "7c11ac80173b4d21752c6a5b037876e22625d4b6cf8488b6914d9c3a685a2f61",
+      "path": "configs/remotexapp-classes/edge-browser.json"
+    },
+    {
+      "sha256": "057b8af6aebe97aeee390383898ee5e7920e2be068c3f2dac93530a63a45668d",
+      "path": "configs/remotexapp-classes/mousepad.json"
+    },
+    {
+      "sha256": "731144613d91f7d17eb73c1c51841e9a362a9815d0a9103aa94084c4c228d09f",
+      "path": "configs/remotexapp-classes/xfce-desktop.json"
+    },
+    {
+      "sha256": "30c33957b2bf177012c81fdb31f007aae23bbc5a87ef41d57bdc31d6e9f9dfee",
+      "path": "drivers/common/x11-server.sh"
+    },
+    {
+      "sha256": "139af1b653dc8119215f6e0005c758293449a88c954a32e2bb00f2c148c0e129",
+      "path": "drivers/xfce-desktop/server.sh"
+    },
+    {
+      "sha256": "2daed7547f30cdf506a34c7634ff91b88ac5df4742a01bec43446b07d2391871",
+      "path": "drivers/xfce-desktop/session.sh"
+    },
+    {
+      "sha256": "e3e98acc13a29115729a9a5d17b83ba12788e55131c98edc64f83323dc8ed5b3",
+      "path": "tests/ibus-remote-unicode/engine.py"
+    }
+  ],
+  "classes": [
+    {
+      "display": {
+        "allowClientResize": true,
+        "depth": 24,
+        "frameRate": 5,
+        "mode": "dynamic",
+        "number": 0,
+        "size": "1280x720"
+      },
+      "drivers": {
+        "server": "/home/tester/dev/remotexapp/drivers/common/x11-server.sh",
+        "session": "/home/tester/dev/remotexapp/drivers/edge-browser/session.sh"
+      },
+      "id": "edge-browser",
+      "input": {
+        "allowedWmClasses": [
+          "microsoft-edge"
+        ],
+        "backend": "ibus"
+      },
+      "name": "Temporary Microsoft Edge",
+      "parameters": {
+        "incognito": {
+          "type": "boolean",
+          "default": false
+        },
+        "startUrl": {
+          "type": "url",
+          "default": "about:blank",
+          "maxLength": 2048,
+          "allowedSchemes": [
+            "http",
+            "https",
+            "about"
+          ]
+        }
+      },
+      "profileMode": "isolated",
+      "profileRef": "temporary",
+      "readiness": {
+        "serverPids": [
+          "server.pid",
+          "clipman.pid"
+        ],
+        "sessionPid": "edge.pid"
+      },
+      "serverActivation": "on-demand",
+      "sessionActivation": "on-attach",
+      "singleton": false,
+      "status": {
+        "details": {},
+        "mode": ""
+      },
+      "vacantAction": "stop-instance",
+      "vacantTimeout": "60s"
+    },
+    {
+      "display": {
+        "allowClientResize": true,
+        "depth": 16,
+        "frameRate": 15,
+        "mode": "dynamic",
+        "number": 0,
+        "size": "1280x720"
+      },
+      "drivers": {
+        "server": "/home/tester/dev/remotexapp/drivers/common/x11-server.sh",
+        "session": "/home/tester/dev/remotexapp/drivers/mousepad/session.sh"
+      },
+      "id": "mousepad",
+      "input": {
+        "allowedWmClasses": [
+          "Mousepad"
+        ],
+        "backend": "ibus"
+      },
+      "name": "Matchbox + Mousepad",
+      "parameters": {},
+      "profileMode": "isolated",
+      "profileRef": "default",
+      "readiness": {
+        "serverPids": [
+          "server.pid",
+          "clipman.pid"
+        ],
+        "sessionPid": "mousepad.pid"
+      },
+      "serverActivation": "on-demand",
+      "sessionActivation": "on-attach",
+      "singleton": false,
+      "status": {
+        "details": {
+          "application": {
+            "type": "enum",
+            "values": [
+              "mousepad"
+            ]
+          }
+        },
+        "mode": "driver"
+      },
+      "vacantAction": "stop-instance",
+      "vacantTimeout": "5s"
+    },
+    {
+      "display": {
+        "allowClientResize": false,
+        "depth": 16,
+        "frameRate": 5,
+        "mode": "fixed",
+        "number": 2,
+        "size": "1280x720"
+      },
+      "drivers": {
+        "server": "/home/tester/dev/remotexapp/drivers/xfce-desktop/server.sh",
+        "session": "/home/tester/dev/remotexapp/drivers/xfce-desktop/session.sh"
+      },
+      "id": "xfce-desktop",
+      "input": {
+        "allowedWmClasses": [
+          "*"
+        ],
+        "backend": "ibus"
+      },
+      "name": "Private D-Bus XFCE desktop",
+      "parameters": {},
+      "profileMode": "shared",
+      "profileRef": "xfce-driver-test",
+      "readiness": {
+        "serverPids": [
+          "server.pid",
+          "clipman.pid"
+        ],
+        "sessionPid": "xfce.pid"
+      },
+      "serverActivation": "auto",
+      "sessionActivation": "on-attach",
+      "singleton": true,
+      "status": {
+        "details": {},
+        "mode": ""
+      },
+      "vacantAction": "stop-session",
+      "vacantTimeout": "10s"
+    }
+  ],
+  "instances": [
+    {
+      "id": "xfce-desktop-4bd9fb10a47c",
+      "classId": "xfce-desktop",
+      "templateId": "xfce-desktop",
+      "profileRef": "xfce-driver-test",
+      "workspaceMode": "persistent",
+      "effectivePolicy": {
+        "display": {
+          "mode": "fixed",
+          "number": 2,
+          "size": "1280x720",
+          "depth": 16,
+          "frameRate": 5,
+          "allowClientResize": false
+        },
+        "workspaceMode": "persistent",
+        "sessionActivation": "on-attach",
+        "idleTimeout": "10s",
+        "idleAction": "stop-session",
+        "singleton": true
+      },
+      "sessionGeneration": 1,
+      "state": "server-ready",
+      "display": ":2",
+      "viewerUrl": "/remotexapps/xfce-desktop-4bd9fb10a47c/kiosk.html",
+      "createdAt": "2026-08-26T23:53:35.577474728-04:00",
+      "sessionState": "stopped",
+      "attachedClients": 0,
+      "homePath": "/home/tester/dev/remotexapp/.runtime/remotexappd-poc/profiles/xfce-desktop/xfce-driver-test",
+      "runtimePath": "/home/tester/dev/remotexapp/.runtime/remotexappd-poc/instances/xfce-desktop-4bd9fb10a47c",
+      "socketRuntimePath": "/run/user/1000/remotexappd/4bd9fb10a47c",
+      "internalRfbAddress": "127.0.0.1:5902",
+      "internalGatewayAddress": "127.0.0.1:39002",
+      "vncUnit": "remotexapp-xfce-desktop-4bd9fb10a47c-vnc.service",
+      "gatewayUnit": "remotexapp-xfce-desktop-4bd9fb10a47c-gateway.service",
+      "sessionUnit": "remotexapp-xfce-desktop-4bd9fb10a47c-session.service"
+    },
+    {
+      "id": "mousepad-868542e2b9ca",
+      "classId": "mousepad",
+      "templateId": "mousepad",
+      "profileRef": "default",
+      "workspaceMode": "ephemeral",
+      "effectivePolicy": {
+        "display": {
+          "mode": "dynamic",
+          "number": 0,
+          "size": "1280x720",
+          "depth": 16,
+          "frameRate": 15,
+          "allowClientResize": true
+        },
+        "workspaceMode": "ephemeral",
+        "sessionActivation": "on-attach",
+        "idleTimeout": "10s",
+        "idleAction": "stop-session",
+        "singleton": false
+      },
+      "sessionGeneration": 1,
+      "state": "server-ready",
+      "display": ":10",
+      "viewerUrl": "/remotexapps/mousepad-868542e2b9ca/kiosk.html",
+      "createdAt": "2026-08-26T23:53:42.069690743-04:00",
+      "sessionState": "stopped",
+      "attachedClients": 0,
+      "homePath": "/home/tester/dev/remotexapp/.runtime/remotexappd-poc/profiles/mousepad/default/mousepad-868542e2b9ca",
+      "runtimePath": "/home/tester/dev/remotexapp/.runtime/remotexappd-poc/instances/mousepad-868542e2b9ca",
+      "socketRuntimePath": "/run/user/1000/remotexappd/868542e2b9ca",
+      "internalRfbAddress": "127.0.0.1:5910",
+      "internalGatewayAddress": "127.0.0.1:39010",
+      "vncUnit": "remotexapp-mousepad-868542e2b9ca-vnc.service",
+      "gatewayUnit": "remotexapp-mousepad-868542e2b9ca-gateway.service",
+      "sessionUnit": "remotexapp-mousepad-868542e2b9ca-session.service"
+    },
+    {
+      "id": "mousepad-2a4b9708c700",
+      "classId": "mousepad",
+      "templateId": "mousepad",
+      "profileRef": "system-benchmark-harness-smoke",
+      "workspaceMode": "ephemeral",
+      "effectivePolicy": {
+        "display": {
+          "mode": "dynamic",
+          "number": 0,
+          "size": "1280x720",
+          "depth": 16,
+          "frameRate": 15,
+          "allowClientResize": true
+        },
+        "workspaceMode": "ephemeral",
+        "sessionActivation": "on-attach",
+        "idleTimeout": "5s",
+        "idleAction": "stop-instance",
+        "singleton": false
+      },
+      "sessionGeneration": 1,
+      "state": "stopped",
+      "display": ":11",
+      "createdAt": "2026-08-27T05:03:26.653161435-04:00",
+      "sessionState": "stopped",
+      "attachedClients": 0,
+      "homePath": "/home/tester/dev/remotexapp/.runtime/remotexappd-poc/profiles/mousepad/system-benchmark-harness-smoke/mousepad-2a4b9708c700",
+      "runtimePath": "/home/tester/dev/remotexapp/.runtime/remotexappd-poc/instances/mousepad-2a4b9708c700",
+      "socketRuntimePath": "/run/user/1000/remotexappd/2a4b9708c700",
+      "internalRfbAddress": "127.0.0.1:5911",
+      "internalGatewayAddress": "127.0.0.1:39011",
+      "vncUnit": "remotexapp-mousepad-2a4b9708c700-vnc.service",
+      "gatewayUnit": "remotexapp-mousepad-2a4b9708c700-gateway.service",
+      "sessionUnit": "remotexapp-mousepad-2a4b9708c700-session.service"
+    },
+    {
+      "id": "mousepad-a7cf7ffed570",
+      "classId": "mousepad",
+      "templateId": "mousepad",
+      "profileRef": "system-benchmark-harness-smoke",
+      "workspaceMode": "ephemeral",
+      "effectivePolicy": {
+        "display": {
+          "mode": "dynamic",
+          "number": 0,
+          "size": "1280x720",
+          "depth": 16,
+          "frameRate": 15,
+          "allowClientResize": true
+        },
+        "workspaceMode": "ephemeral",
+        "sessionActivation": "on-attach",
+        "idleTimeout": "5s",
+        "idleAction": "stop-instance",
+        "singleton": false
+      },
+      "sessionGeneration": 1,
+      "state": "stopped",
+      "display": ":11",
+      "createdAt": "2026-08-27T05:03:56.192239378-04:00",
+      "sessionState": "stopped",
+      "attachedClients": 0,
+      "homePath": "/home/tester/dev/remotexapp/.runtime/remotexappd-poc/profiles/mousepad/system-benchmark-harness-smoke/mousepad-a7cf7ffed570",
+      "runtimePath": "/home/tester/dev/remotexapp/.runtime/remotexappd-poc/instances/mousepad-a7cf7ffed570",
+      "socketRuntimePath": "/run/user/1000/remotexappd/a7cf7ffed570",
+      "internalRfbAddress": "127.0.0.1:5911",
+      "internalGatewayAddress": "127.0.0.1:39011",
+      "vncUnit": "remotexapp-mousepad-a7cf7ffed570-vnc.service",
+      "gatewayUnit": "remotexapp-mousepad-a7cf7ffed570-gateway.service",
+      "sessionUnit": "remotexapp-mousepad-a7cf7ffed570-session.service"
+    }
+  ],
+  "xfceServerOnly": {
+    "vnc": {
+      "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-4bd9fb10a47c-vnc.service",
+      "memoryCurrentBytes": 132382720,
+      "memoryPeakBytes": 266600448,
+      "tasks": 58,
+      "cpuUsec": 5822662,
+      "processCount": 17,
+      "pssKiB": 151190,
+      "privateKiB": 120524,
+      "commands": [
+        {
+          "pid": 1863658,
+          "command": "/usr/bin/perl /usr/bin/tigervncserver :2 -geometry 1280x720 -depth 16 -FrameRate 5 -localhost=1 -rfbport 5902 -SecurityTypes None -AcceptSetDesktopSize=0 -xstartup /home/tester/dev/remotexapp/drivers/xfce-desktop/server.sh"
+        },
+        {
+          "pid": 1863659,
+          "command": "/usr/bin/Xtigervnc :2 -AcceptSetDesktopSize=0 -FrameRate 5 -localhost=1 -desktop test-host.lxd:2 (tester) -rfbport 5902 -SecurityTypes None -auth /home/tester/dev/remotexapp/.runtime/remotexappd-poc/profiles/xfce-desktop/xfce-driver-test/.Xauthority -geometry 1280x720 -depth 16"
+        },
+        {
+          "pid": 1863663,
+          "command": "/bin/sh /home/tester/dev/remotexapp/drivers/xfce-desktop/server.sh"
+        },
+        {
+          "pid": 1863670,
+          "command": "/usr/bin/dbus-daemon --syslog --fork --print-pid 5 --print-address 7 --session"
+        },
+        {
+          "pid": 1863672,
+          "command": "ibus-daemon --panel=disable --address=unix:path=/run/user/1000/remotexappd/4bd9fb10a47c/ibus.sock -rx"
+        },
+        {
+          "pid": 1863673,
+          "command": "python3 /home/tester/dev/remotexapp/tests/ibus-remote-unicode/engine.py --socket /run/user/1000/remotexappd/4bd9fb10a47c/unicode.sock --log /home/tester/dev/remotexapp/.runtime/remotexappd-poc/instances/xfce-desktop-4bd9fb10a47c/engine.log"
+        },
+        {
+          "pid": 1863680,
+          "command": "/usr/libexec/gvfsd"
+        },
+        {
+          "pid": 1863689,
+          "command": "/usr/libexec/ibus-dconf"
+        },
+        {
+          "pid": 1863690,
+          "command": "/usr/libexec/ibus-extension-gtk3"
+        },
+        {
+          "pid": 1863692,
+          "command": "/usr/libexec/ibus-x11 --kill-daemon"
+        },
+        {
+          "pid": 1863694,
+          "command": "/usr/libexec/ibus-portal"
+        },
+        {
+          "pid": 1863710,
+          "command": "/usr/libexec/at-spi-bus-launcher"
+        },
+        {
+          "pid": 1863717,
+          "command": "/usr/bin/dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 11 --address=unix:path=/run/user/1000/at-spi/bus_2"
+        },
+        {
+          "pid": 1863725,
+          "command": "/usr/libexec/at-spi2-registryd --use-gnome-session"
+        },
+        {
+          "pid": 1863727,
+          "command": "/usr/libexec/xdg-desktop-portal"
+        },
+        {
+          "pid": 1863741,
+          "command": "/usr/libexec/xdg-permission-store"
+        },
+        {
+          "pid": 1863757,
+          "command": "/usr/libexec/xdg-desktop-portal-gtk"
+        }
+      ]
+    },
+    "gateway": {
+      "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/remotexapp-xfce-desktop-4bd9fb10a47c-gateway.service",
+      "memoryCurrentBytes": 10317824,
+      "memoryPeakBytes": 15716352,
+      "tasks": 7,
+      "cpuUsec": 822712,
+      "processCount": 1,
+      "pssKiB": 5347,
+      "privateKiB": 2876,
+      "commands": [
+        {
+          "pid": 1863811,
+          "command": "/home/tester/dev/remotexapp/.runtime/novnc-input-bin -listen 127.0.0.1:39002 -display :2 -vnc-addr 127.0.0.1:5902 -novnc-dir /usr/share/novnc -text-backend ibus -ime-socket /run/user/1000/remotexappd/4bd9fb10a47c/unicode.sock -ibus-focus-class *"
+        }
+      ]
+    },
+    "session": null
+  }
+}

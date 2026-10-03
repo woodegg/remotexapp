@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "github:34503291164:app-actions-0.9.0",
+  "commit": "5969c1488d900fb8493c4bda4e822427e9701e42",
+  "startedAt": "2026-09-10T16:22:05Z",
+  "completedAt": "2026-09-10T16:40:55Z",
+  "result": "passed",
+  "toolchain": { "go": "go1.26.8" },
+  "environment": { "kind": "github-and-local-test-host", "name": "stable-publication-no-deployment" },
+  "artifact": {
+    "name": "remotexapp-0.9.0-linux-amd64.tar.gz",
+    "sha256": "e97ebaea2e4ea573fbe9a9cea8fefd871268877232db4a51056e2c01e452c396"
+  },
+  "scenarios": [
+    { "id": "local-make-check-and-hosted-Verify", "result": "passed" },
+    { "id": "hosted-release-candidate-security-coverage-race-vulnerability-gate", "result": "passed" },
+    { "id": "exact-archive-synthetic-App-ABI-no-rebuild-update-pin-rollback", "result": "passed" },
+    { "id": "exact-archive-shipped-apps-clipboard-four-formats-IME-reconnect", "result": "passed" },
+    { "id": "exact-archive-document-optional-file-save-destructive-stop-and-vacancy", "result": "passed" },
+    { "id": "exact-archive-upgrade-crash-recovery-managed-and-KDE-controls", "result": "passed" },
+    { "id": "exact-archive-real-browser-Console-openUrl-and-generic-action", "result": "passed" },
+    { "id": "Firefox-BiDi-foreign-owner-race-abort-and-Manager-crash-cleanup", "result": "passed" },
+    { "id": "disposable-UID-XFCE-dbus-ibus-Xauthority-adoption-restart", "result": "passed" },
+    { "id": "annotated-tag-stable-Latest-publication", "result": "passed" },
+    { "id": "independently-downloaded-artifact-identity-and-byte-equality", "result": "passed" },
+    { "id": "local-existing-runtime-generations-and-readiness-preserved", "result": "passed" }
+  ],
+  "details": {
+    "version": "0.9.0",
+    "sdkVersion": "0.26.0",
+    "firefoxAppVersion": "2.2.0",
+    "edgeAppVersion": "1.1.0",
+    "verifyRun": 34501634452,
+    "candidateRun": 34501634030,
+    "releaseRun": 34503291164,
+    "releaseUrl": "https://github.com/woodegg/remotexapp/releases/tag/v0.9.0",
+    "isPrerelease": false,
+    "isDraft": false,
+    "publishedAt": "2026-09-10T16:39:42Z",
+    "humanUAT": "app-actions-0.9.0-human-uat.json",
+    "e2eLog": "/tmp/remotexapp-090-stable-e2e.log",
+    "localDeployment": "Unchanged at 0.9.0-rc.1; both endpoints healthy. Existing XFCE/Edge generation 3 preserved.",
+    "sandboxDeployment": "Not authorized or performed."
+  }
+}

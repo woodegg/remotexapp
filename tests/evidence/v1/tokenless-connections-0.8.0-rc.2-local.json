@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "alignment",
+  "runId": "local:conn004-tokenless-1991-2992",
+  "commit": "a96b7bd514358dd0c0f12e33325d259e55649207",
+  "startedAt": "2026-09-10T08:42:37Z",
+  "completedAt": "2026-09-10T08:55:37Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "local",
+    "name": "local-1991-and-2992-only"
+  },
+  "artifact": {
+    "name": "remotexapp-0.8.0-rc.2-linux-amd64.tar.gz",
+    "sha256": "0a3535c8f8dfad70a71cfbd7fc1765529af521076de6b1ae3bf8f4e0a6588051"
+  },
+  "scenarios": [
+    {
+      "id": "clean-clone-local-release-ci-coverage-race-source-and-binary-vulnerability",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-ABI-install-update-rollback",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-four-app-input-resize-clipboard-lifecycle",
+      "result": "passed"
+    },
+    {
+      "id": "optional-document-no-save-and-60-second-idle",
+      "result": "passed"
+    },
+    {
+      "id": "upgrade-crash-recovery-and-KDE-editor-regression",
+      "result": "passed"
+    },
+    {
+      "id": "Console-no-token-copy-close-hostile-text-no-runtime-mutation",
+      "result": "passed"
+    },
+    {
+      "id": "disposable-user-XFCE-default-bus-IBus-adoption-restart-daemon-death",
+      "result": "passed"
+    },
+    {
+      "id": "normal-Manager-authentication-and-origin-rejection-unit-tests",
+      "result": "passed"
+    },
+    {
+      "id": "both-endpoints-six-app-token-free-IBus-protocol-read",
+      "result": "passed"
+    },
+    {
+      "id": "both-endpoints-legacy-SDK-supplied-token-ignored-compatibility",
+      "result": "passed"
+    },
+    {
+      "id": "both-endpoints-exact-binary-assets-health-and-loopback",
+      "result": "passed"
+    },
+    {
+      "id": "existing-desktop-generation-pin-and-configuration-preserved",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "version": "0.8.0-rc.2",
+    "sdkVersion": "0.25.1",
+    "managerSha256": "ab044e21cd060ef03cd3fea6a2fdd2ab0572cf2e8175baeec6ef2238291614fe",
+    "sdkAsset": "sdk-45U36BXO.js",
+    "sdkSha256": "9a0b4c6c472adc5ffae8d888e65fa42be4b69abd0da84adeebf1a71fe3ac1be1",
+    "consoleAsset": "console-OPT647D5.js",
+    "consoleSha256": "84396a561e2dd140cf39ca4eadd642b069c5a684cfdf6c460c800583f7e452e5",
+    "endpoints": [
+      {
+        "listen": "127.0.0.1:1991",
+        "console": true,
+        "authMode": "none",
+        "activeRuntimes": 1
+      },
+      {
+        "listen": "127.0.0.1:2992",
+        "console": false,
+        "authMode": "none",
+        "activeRuntimes": 0
+      }
+    ],
+    "desktop": {
+      "id": "xfce-user-desktop-44ea8c2186ee",
+      "generation": 1,
+      "coreVersionRetained": "0.6.0-rc.1",
+      "runtimeRestarted": false,
+      "ibusUnavailableReason": "metadata-missing"
+    },
+    "configurationAndAppSelectorsPreserved": true,
+    "legacyTokenConfiguration": "retained but ignored; no longer protects connection reads",
+    "uat": "pending",
+    "publication": "none; local clean-clone candidate only",
+    "sandboxDeployment": "none",
+    "testHarnessFollowup": "First exact E2E stopped on a stale test-only token variable; corrected that assertion and reran the full suite against unchanged candidate bytes successfully.",
+    "limitations": [
+      "Native clipboard permission UX remains UAT; browser tests mock clipboard writes.",
+      "No new descriptor metadata is retrofitted into existing runtime pins."
+    ],
+    "evidenceLogs": [
+      "/tmp/tokenless-rc2-release-ci.log",
+      "/tmp/tokenless-rc2-exact-e2e.log",
+      "/tmp/tokenless-rc2-exact-e2e-retry.log",
+      "/tmp/tokenless-deploy-2992.log",
+      "/tmp/tokenless-deploy-1991.log",
+      "/tmp/connections-local-smoke-YQ907b/result.json",
+      "/tmp/connections-local-smoke-1JXzEF/result.json",
+      "/tmp/remotexapp-upgrade-kde-e2e-TdmdiP/console-result.json",
+      "/var/tmp/remotexapp-conn-user.BViFqM/result.json"
+    ]
+  }
+}

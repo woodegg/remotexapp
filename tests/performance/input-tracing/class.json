@@ -1,0 +1,40 @@
+{
+  "id": "mousepad-trace-off",
+  "name": "Experiment P02: opt-in input tracing + Mousepad",
+  "singleton": false,
+  "profileRef": "p02",
+  "runMode": "isolated",
+  "server": {
+    "activation": "on-demand",
+    "driver": "../../../drivers/common/x11-server.sh",
+    "displayMode": "dynamic",
+    "display": 0,
+    "rfbPort": 0,
+    "gatewayPort": 0,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 15,
+    "allowClientResize": true,
+    "readinessPids": ["server.pid", "clipman.pid"]
+  },
+  "session": {
+    "activation": "on-attach",
+    "driver": "../../../apps/mousepad/session.sh",
+    "readinessPid": "mousepad.pid",
+    "vacantTimeout": "10m",
+    "vacantAction": "stop-instance",
+    "status": {
+      "mode": "driver",
+      "details": {
+        "application": {
+          "type": "enum",
+          "values": ["mousepad"]
+        }
+      }
+    }
+  },
+  "input": {
+    "backend": "ibus",
+    "allowedWmClasses": ["Mousepad"]
+  }
+}

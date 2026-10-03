@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "github-actions:34183810815",
+  "commit": "1e4b32e54598b9c9e81ff65f2725deacea40a583",
+  "startedAt": "2026-09-08T03:31:30Z",
+  "completedAt": "2026-09-08T03:33:18Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "node": "v22.23.2"
+  },
+  "environment": {
+    "kind": "github-release",
+    "name": "woodegg/remotexapp"
+  },
+  "artifact": {
+    "name": "remotexapp-0.5.3-linux-amd64.tar.gz",
+    "sha256": "09d9108fe0c4f7cd7c3ce9f641e596222e7d6723910311a319ad672d1f4047a2"
+  },
+  "scenarios": [
+    {
+      "id": "annotated-tag-exact-version-and-commit",
+      "result": "passed"
+    },
+    {
+      "id": "same-commit-successful-hosted-candidate",
+      "result": "passed"
+    },
+    {
+      "id": "publish-without-rebuild",
+      "result": "passed"
+    },
+    {
+      "id": "independent-download-vcs-and-checksum-verification",
+      "result": "passed"
+    },
+    {
+      "id": "download-byte-identical-to-tested-candidate",
+      "result": "passed"
+    },
+    {
+      "id": "published-archive-sensitive-data-check",
+      "result": "passed"
+    },
+    {
+      "id": "normal-non-draft-non-prerelease-latest",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "tag": "v0.5.3",
+    "release": "https://github.com/woodegg/remotexapp/releases/tag/v0.5.3",
+    "candidateRun": "https://github.com/woodegg/remotexapp/actions/runs/34183500632",
+    "releaseRun": "https://github.com/woodegg/remotexapp/actions/runs/34183810815",
+    "sdkVersion": "0.21.1",
+    "firefoxAppVersion": "2.1.1",
+    "firefoxAppArchiveSha256": "f42c104e351bc6552625b78061ab46d4501ee52725bf2b0966a51878eb6d97c0",
+    "deploymentPerformed": false,
+    "local1991": "0.5.3-rc.1 remains deployed; formal alignment requires separate approval",
+    "local2991": "unchanged",
+    "sandboxes": "not accessed or deployed"
+  }
+}

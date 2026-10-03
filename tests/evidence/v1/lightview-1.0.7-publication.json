@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "lightview-1.0.7-formal-publication",
+  "commit": "ba0f5e53e617684622a8543840d1fb77f8b3b4e8",
+  "startedAt": "2026-09-17T20:03:00Z",
+  "completedAt": "2026-09-17T20:05:32Z",
+  "result": "passed",
+  "toolchain": {"go":"go1.26.8","node":"v22.22.3"},
+  "environment": {"kind":"github-release","name":"woodegg/remotexapp lightview-v1.0.7"},
+  "artifact": {
+    "name": "lightview-1.0.7.tar.gz",
+    "sha256": "512eeed017ae52f994e2911d8f203a480a6c9c43a26e54b828298f18ef00ad61"
+  },
+  "app": {
+    "id": "lightview",
+    "version": "1.0.7",
+    "contentSha256": "c7bdecf47afc2bfdb7d24f77df9bd7990ce55e4267ce48497462774030abe199",
+    "abi": "remotexapp/v1",
+    "hostDependency": {
+      "release": "woodegg/lightview v0.1.7",
+      "tagCommit": "160f4764e211523c303f624499dec6bb4b0a90c1",
+      "archiveSha256": "61e949e1dff00f94c765a1f47584cc36aed9bbaa1dc9c1d15173edc8c6d951a0",
+      "binarySha256": "cd4340c456435f004eb082a6540e524ca6350f4f9b125955c259a286fb7caeb2"
+    }
+  },
+  "release": {
+    "id": "RE_kwDOUGRp2s4XTpCX",
+    "url": "https://github.com/woodegg/remotexapp/releases/tag/lightview-v1.0.7",
+    "tag": "lightview-v1.0.7",
+    "tagObject": "9183be03c5e08b7ab0bb52dbff0cd8e2ad3ea652",
+    "peeledCommit": "ba0f5e53e617684622a8543840d1fb77f8b3b4e8",
+    "publishedAt": "2026-09-17T20:04:57Z",
+    "draft": false,
+    "prerelease": false
+  },
+  "scenarios": [
+    {"id":"annotated-tag-exists-remotely-and-peels-to-accepted-source","result":"passed"},
+    {"id":"release-publishes-only-App-archive-and-checksum","result":"passed"},
+    {"id":"fresh-download-checksum-valid-and-byte-identical","result":"passed"},
+    {"id":"downloaded-manifest-id-version-and-App-ABI","result":"passed"},
+    {"id":"formal-release-not-draft-or-prerelease","result":"passed"},
+    {"id":"exact-upstream-tag-archive-and-installed-binary-identity","result":"passed"},
+    {"id":"deterministic-App-package-and-fail-closed-version-contract","result":"passed"},
+    {"id":"complete-source-race-and-vulnerability-gates","result":"passed"},
+    {"id":"fourteen-scenario-isolated-RemoteXApp-Viewer-control-lifecycle-E2E","result":"passed"},
+    {"id":"upstream-seven-test-image-download-and-control-integration-under-documented-local-override","result":"passed"},
+    {"id":"upstream-integration-with-normal-WebKit-sandbox","result":"skipped","reason":"The build container forbids WebKit bubblewrap mounts; the App Package does not carry the local-only test override."},
+    {"id":"separate-interactive-UI-UAT","result":"skipped","reason":"The operator explicitly authorized immediate formal publication after complete automated and real-X11 gates without a separate UI-UAT claim."},
+    {"id":"RemoteXApp-Core-v0.12.2-remains-Latest","result":"passed"},
+    {"id":"endpoint-or-sandbox-deployment","result":"skipped","reason":"Publication does not authorize deployment; sandbox deployment belongs to the sandbox project."}
+  ],
+  "limitations": [
+    "The Lightview host executable is separately provisioned and is not embedded in the App Package.",
+    "Production hosts must support normal WebKit sandboxing; the local test override is not packaged.",
+    "Prompt-free downloads are upstream browser behavior and write into the runtime user's standard Downloads directory.",
+    "Publication does not deploy or upgrade any endpoint."
+  ]
+}

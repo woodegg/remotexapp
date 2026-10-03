@@ -1,0 +1,48 @@
+{
+  "experiment": "P09a",
+  "outcome": "accepted",
+  "status": "Accepted after steady-state I/O measurement, lifecycle recovery and interactive Unicode/reconnect validation",
+  "date": "2026-08-27",
+  "host": "test-host",
+  "reconcileIntervalSeconds": 5,
+  "windowSeconds": 20,
+  "baseline": {
+    "remoteXAppdSha256": "8fb67a5360038a87f612d9522b56e470eb6b43c27e0aeba9501dd5a593aabedb",
+    "xdpyinfoExecutions": 4,
+    "gatewayHealthConnects": 4,
+    "registryFsync": 4,
+    "registryRename": 4,
+    "registryInodeBefore": 245082809,
+    "registryInodeAfter": 245082877,
+    "registryContentChanged": false
+  },
+  "candidate": {
+    "remoteXAppdSha256": "f821d5621bfdbf9d700398a6fd480e180aea9f25a5ed9f219af877c92355017a",
+    "sampleWindow": "02:18:35.631128980..02:18:55.637257992",
+    "xdpyinfoExecutions": 4,
+    "gatewayHealthConnects": 4,
+    "registryFsync": 0,
+    "registryRename": 0,
+    "registryInodeBefore": 245086779,
+    "registryInodeAfter": 245086779,
+    "registryMtimeBefore": 1787811416,
+    "registryMtimeAfter": 1787811416,
+    "registrySha256Before": "345c333448c6b49b23b7375d8d72848003c072a1e10f202f50e6e9fd33655efe",
+    "registrySha256After": "345c333448c6b49b23b7375d8d72848003c072a1e10f202f50e6e9fd33655efe"
+  },
+  "lifecycle": {
+    "gatewayFaultRecoveryMilliseconds": 2956,
+    "managerRestartAdoptedExistingRuntime": true,
+    "noOpRestartRegistryRewrite": false,
+    "transitionsPersisted": true
+  },
+  "interaction": {
+    "text": "P09a 中文 input reconnect OK",
+    "clipboardExact": true,
+    "firstServerMilliseconds": 0.653,
+    "secondServerMilliseconds": 1.566,
+    "sdkReconnectMilliseconds": 43.978,
+    "finalRfbState": "connected",
+    "finalInputState": "connected"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "operator-acceptance:0.5.2:2026-09-04",
+  "commit": "2e0dbbd87629fa034148a83d71f0ccf71fb13aca",
+  "startedAt": "2026-09-04T17:09:42Z",
+  "completedAt": "2026-09-04T17:09:42Z",
+  "result": "passed",
+  "toolchain": {"go": "go1.26.8", "node": "v22"},
+  "environment": {"kind": "human-uat", "name": "operator acceptance of exact 0.5.2-rc.1 candidate"},
+  "artifact": {
+    "name": "remotexapp-0.5.2-rc.1-linux-amd64.tar.gz",
+    "sha256": "41ec9cbd58a09b0306c2bdca7d911a08fff8bc08b0803c6a4f5eb6ef8b04ae35"
+  },
+  "scenarios": [
+    {"id": "human-uat", "result": "passed"},
+    {"id": "stable-0.5.2-promotion-authorization", "result": "passed"}
+  ],
+  "details": {
+    "candidateTag": "v0.5.2-rc.1",
+    "candidateWorkflow": "https://github.com/woodegg/remotexapp/actions/runs/33895308091",
+    "candidateRelease": "https://github.com/woodegg/remotexapp/releases/tag/v0.5.2-rc.1",
+    "applicationContractChangesAllowed": false,
+    "gateDiscoveredCorrectionsAllowed": true,
+    "stablePublicationAuthorized": true,
+    "deploymentAuthorized": false
+  }
+}

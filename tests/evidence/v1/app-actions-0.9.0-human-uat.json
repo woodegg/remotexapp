@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "operator:app-actions-0.9.0-rc.1-acceptance",
+  "commit": "fc2d94e6b764b1439e0a074e9fffa74ca8a8a31d",
+  "startedAt": "2026-09-10T16:21:06Z",
+  "completedAt": "2026-09-10T16:21:06Z",
+  "result": "passed",
+  "toolchain": { "go": "go1.26.8" },
+  "environment": { "kind": "local", "name": "loopback-1991-and-2992" },
+  "scenarios": [{ "id": "operator-human-uat-acceptance", "result": "passed" }],
+  "details": {
+    "operatorInstruction": "uat pass, make a formal release",
+    "acceptedCandidate": "0.9.0-rc.1",
+    "stableTarget": "0.9.0",
+    "sdkVersion": "0.26.0",
+    "publicationAuthorized": true,
+    "additionalDeploymentAuthorized": false,
+    "runtimeUpgrade": "Separately authorized local XFCE and Edge force upgrades completed; generation 3, ready, connection reads passed. Edge 1.1.0 actions ready. No active runtimes on 2992."
+  }
+}

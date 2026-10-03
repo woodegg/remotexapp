@@ -1,0 +1,222 @@
+[
+  {
+    "field": "plain",
+    "text": "AsciiProbe",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 51,
+        "value": "AsciiProbe",
+        "serverMs": 0.494,
+        "roundTripMs": 0.9000000953674316,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "0fab7148-0d50-4b51-b0d0-1bdfc4bf6e7e",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"plain\",\"value\":\"x\"}"
+      }
+    }
+  },
+  {
+    "field": "plain",
+    "text": "中文测试",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 52,
+        "value": "中文测试",
+        "serverMs": 0.711,
+        "roundTripMs": 1.299999713897705,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "0fab7148-0d50-4b51-b0d0-1bdfc4bf6e7e",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"plain\",\"value\":\"x\"}"
+      }
+    }
+  },
+  {
+    "field": "area",
+    "text": "AsciiProbe",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 53,
+        "value": "AsciiProbe",
+        "serverMs": 0.507,
+        "roundTripMs": 1,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "0fab7148-0d50-4b51-b0d0-1bdfc4bf6e7e",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"area\",\"value\":\"x\"}"
+      }
+    }
+  },
+  {
+    "field": "area",
+    "text": "中文测试",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 54,
+        "value": "中文测试",
+        "serverMs": 3.101,
+        "roundTripMs": 5,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "0fab7148-0d50-4b51-b0d0-1bdfc4bf6e7e",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"area\",\"value\":\"x\"}"
+      }
+    }
+  },
+  {
+    "field": "pass",
+    "text": "AsciiProbe",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 55,
+        "value": "AsciiProbe",
+        "serverMs": 1.022,
+        "roundTripMs": 3.0999999046325684,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "0fab7148-0d50-4b51-b0d0-1bdfc4bf6e7e",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"pass\",\"value\":\"x\"}"
+      }
+    }
+  },
+  {
+    "field": "pass",
+    "text": "中文测试",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 56,
+        "value": "中文测试",
+        "serverMs": 0.563,
+        "roundTripMs": 1,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "0fab7148-0d50-4b51-b0d0-1bdfc4bf6e7e",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"pass\",\"value\":\"x\"}"
+      }
+    }
+  },
+  {
+    "field": "edit",
+    "text": "AsciiProbe",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 57,
+        "value": "AsciiProbe",
+        "serverMs": 0.493,
+        "roundTripMs": 0.9000000953674316,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "0fab7148-0d50-4b51-b0d0-1bdfc4bf6e7e",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"edit\",\"value\":\"x\"}"
+      }
+    }
+  },
+  {
+    "field": "edit",
+    "text": "中文测试",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 58,
+        "value": "中文测试",
+        "serverMs": 0.632,
+        "roundTripMs": 2,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "0fab7148-0d50-4b51-b0d0-1bdfc4bf6e7e",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"edit\",\"value\":\"x\"}"
+      }
+    }
+  },
+  {
+    "field": "button",
+    "text": "AsciiProbe",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 59,
+        "value": "AsciiProbe",
+        "serverMs": 0.644,
+        "roundTripMs": 1.5999999046325684,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "0fab7148-0d50-4b51-b0d0-1bdfc4bf6e7e",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"button\",\"value\":\"\"}"
+      }
+    }
+  },
+  {
+    "field": "button",
+    "text": "中文测试",
+    "ack": {
+      "ok": true,
+      "value": {
+        "id": 60,
+        "value": "中文测试",
+        "serverMs": 0.484,
+        "roundTripMs": 0.8000001907348633,
+        "error": ""
+      }
+    },
+    "state": {
+      "realm": "0fab7148-0d50-4b51-b0d0-1bdfc4bf6e7e",
+      "type": "success",
+      "result": {
+        "type": "string",
+        "value": "{\"active\":\"button\",\"value\":\"\"}"
+      }
+    }
+  }
+]

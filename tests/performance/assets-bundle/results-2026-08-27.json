@@ -1,0 +1,70 @@
+{
+  "experiment": "P07",
+  "outcome": "accepted",
+  "date": "2026-08-27",
+  "host": "test-host",
+  "browser": "Google Chrome headless, independent temporary profiles",
+  "protocol": "local HTTP",
+  "samplesPerBuild": 5,
+  "baseline": {
+    "managerSha256": "48292e18aa5ba96111adafc679a136f37a0c8a19e1ddef11d0335f0caf35aab8",
+    "assetMode": "SDK and installed noVNC source modules",
+    "coldConnectedMillis": [628.9, 529.3, 537.6, 510.3, 571.4],
+    "warmConnectedMillis": [149.8, 175.2, 91.6, 129.7, 108.7],
+    "median": {
+      "coldConnectedMillis": 537.6,
+      "warmConnectedMillis": 129.7,
+      "staticRequests": 45,
+      "coldStaticTransferBytes": 551233,
+      "coldStaticEncodedBytes": 537733,
+      "warmStaticTransferBytes": 45181,
+      "warmCachedStaticRequests": 41
+    }
+  },
+  "candidate": {
+    "managerSha256": "a453bcb63116896a90fc54fe8b6a749498c4b10508e3e604f109addceca0f248",
+    "assetMode": "stable SDK loader plus content-hashed SDK and noVNC bundles",
+    "manifest": {
+      "sdk": "sdk-3TZVH6J4.js",
+      "sdkBytes": 29497,
+      "novnc": "novnc-PE3TB3DL.js",
+      "novncBytes": 150961,
+      "novncPackageVersion": "1:1.3.0-2",
+      "esbuildVersion": "0.20.1"
+    },
+    "coldConnectedMillis": [446.9, 450.9, 387.5, 364.1, 363.1],
+    "warmConnectedMillis": [78.2, 81.4, 89.0, 73.9, 67.9],
+    "median": {
+      "coldConnectedMillis": 387.5,
+      "warmConnectedMillis": 78.2,
+      "staticRequests": 3,
+      "coldStaticTransferBytes": 181399,
+      "coldStaticEncodedBytes": 180499,
+      "warmStaticTransferBytes": 300,
+      "warmCachedStaticRequests": 2
+    }
+  },
+  "candidateRelativeToBaseline": {
+    "coldConnectionReductionPercent": 27.9,
+    "warmConnectionReductionPercent": 39.7,
+    "staticRequestReductionPercent": 93.3,
+    "coldStaticTransferReductionPercent": 67.1,
+    "warmStaticTransferReductionPercent": 99.3
+  },
+  "correctness": {
+    "firstText": "P07 中文 input",
+    "firstServerMillis": 7.876,
+    "reconnectMillis": 40.8,
+    "secondText": " reconnect OK",
+    "secondServerMillis": 2.461,
+    "finalRfbState": "connected",
+    "finalInputState": "connected",
+    "clipboardRoundTripExact": true
+  },
+  "isolation": {
+    "managerPort": 1992,
+    "display": 11,
+    "livePort1991Restarted": false
+  },
+  "status": "Accepted after five-profile load measurements and automated SDK Unicode, reconnect, and exact application readback"
+}

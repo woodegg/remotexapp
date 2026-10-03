@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "clipboard-prompts-0.10.1-rc.1-local",
+  "commit": "c556f645ab5c8963a8ac2979a4cfd0aa2f961a1a",
+  "startedAt": "2026-09-13T01:35:09Z",
+  "completedAt": "2026-09-13T01:45:11Z",
+  "result": "passed",
+  "toolchain": {"go":"go1.26.8"},
+  "environment": {"kind":"local","name":"two-loopback-endpoints"},
+  "scenarios": [
+    {"id":"served-ui-directions-layout-keyboard-preview-lifecycle","result":"passed"},
+    {"id":"actual-console-preview-dismissal","result":"passed"},
+    {"id":"two-viewer-mousepad-libreoffice-both-endpoints","result":"passed"},
+    {"id":"exact-deployment-and-existing-runtime-preservation","result":"passed"}
+  ],
+  "date": "2026-09-12",
+  "status": "local deployment verified; human UAT pending",
+  "requirements": ["CLP-041", "CLP-042", "CLP-043"],
+  "core": "0.10.1-rc.1",
+  "sdk": "0.27.4",
+  "sourceBase": "c556f645ab5c",
+  "dirtyWorkingTreeBuild": true,
+  "formalRelease": false,
+  "artifactMethod": "Unchanged 0.10.0 application/deployment files with four newly built candidate binaries; no GitHub artifact publication",
+  "managerSha256": "f1cc6761a4bb7fd22b3e9effe1a4070f7b6fec77a04cd4f19f09f9bf69b4a224",
+  "sdkAsset": "sdk-TQ3JAKN7.js",
+  "sdkSha256": "3d612a987865767b07e42cd6981c754a3289708ef5237c5094ff297c19f3cfd3",
+  "consoleAsset": "console-L3ZD5HTO.js",
+  "consoleSha256": "a8ef3ea07745d497df27c50758271c49675a79e7830899aaef8b192ef34cb1d7",
+  "endpoints": [
+    {"listen":"127.0.0.1:1991", "console":true, "kiosk":true, "ready":true},
+    {"listen":"127.0.0.1:2992", "console":false, "kiosk":true, "ready":true}
+  ],
+  "deploymentChecks": [
+    "both endpoints staged before either selection",
+    "two Manager starts on each endpoint",
+    "exact executable and served SDK/Console hashes",
+    "unchanged configuration, application selectors and existing runtime pins",
+    "existing runtime generations and session states preserved after application tests",
+    "disposable test runtimes stopped; no sandbox deployment"
+  ],
+  "verification": {
+    "makeCheck": "passed",
+    "focusedClipboardTests": 54,
+    "servedBrowserUI": {
+      "result":"passed",
+      "cases":12,
+      "directions":["toRemote","toLocal"],
+      "layouts":[{"width":800,"zoom":1},{"width":220,"zoom":1},{"width":220,"zoom":2}],
+      "checks":["real PNG thumbnail loading", "type/byte size/dimensions/text preview", "safe markup handling", "SVG direction and matched actions", "Tab/Shift+Tab/Space and focus outline", "no pre-consent write", "button-free three-second receipt", "late/expired/destroyed preview cancellation", "permission-error fallback", "retry and in-flight disabled buttons", "actual Console browser clipboard read and dismissal"],
+      "limitations":"Transfer I/O is stubbed in the 12 layout cases; actual Console case reads the isolated browser clipboard. Application suites below exercise real transfers. Console remains disabled on test endpoint."
+    },
+    "applicationSuites":[
+      {"port":1991,"application":"mousepad","viewers":2,"checks":15,"result":"passed"},
+      {"port":1991,"application":"libreoffice","viewers":2,"checks":15,"result":"passed"},
+      {"port":2992,"application":"mousepad","viewers":2,"checks":15,"result":"passed"},
+      {"port":2992,"application":"libreoffice","viewers":2,"checks":15,"result":"passed"}
+    ],
+    "applicationCoverage":"Four-format X11/browser transfer, real remote PNG/text preview before consent, local pre-consent preview without write, independent Viewer dismissal, view-only, recovery, permission degradation, hostile host CSS, stale approval and rebound suppression",
+    "screenshotsReviewed":["narrow 200-percent zoom direction/action layout","actual Console preview"]
+  },
+  "rawEvidenceDirectory":"/tmp/remotexapp-clp043.9OAQGG",
+  "runtimeUpgradeAuthorized":false,
+  "sandboxDeploymentAuthorized":false
+}

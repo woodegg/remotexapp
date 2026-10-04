@@ -1,5 +1,10 @@
 # Clipboard Prompt Reliability Release Train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 **Status:** CLP-025 through CLP-029 are accepted for RemoteXApp `0.5.1`
 and Browser SDK `0.21.1`. Implementation, complete automated and local E2E
 validation, and deployment to the local 1991 and 2991 environments passed.
@@ -7,8 +12,8 @@ Human UAT was accepted on 2026-09-03 and formal GitHub prerelease publication
 was completed on the same date. Annotated `v0.5.1-rc.1` passed both hosted
 workflows and independent artifact verification. Stable `v0.5.1` was then
 published without functional changes and its independently downloaded formal
-artifact was aligned to local 1991/2991, sandbox00 1991/2991, and
-sandbox02/03/07/10 production 1991.
+artifact was aligned to local 1991/2991, test-host-a 1991/2991, and
+test-host-c/03/07/10 production 1991.
 
 Candidate commit `b6e6b2fb19e4` passed the complete release gate, an isolated
 four-App real-browser suite with two-Viewer Mousepad and LibreOffice coverage,
@@ -16,15 +21,15 @@ and post-deployment two-Viewer checks on both local environments. Local 1991
 preserved its existing XFCE runtime and temporary wide-test listener; local
 2991 preserved its loopback, Console-disabled, kiosk-enabled policy. Exact
 evidence is
-[`clipboard-prompt-reliability-0.5.1-rc.1-local.json`](../tests/go-live-validation/results/clipboard-prompt-reliability-0.5.1-rc.1-local.json).
+[`clipboard-prompt-reliability-0.5.1-rc.1-local.json`](private-history.md).
 Human UAT was accepted on the exact candidate; acceptance evidence is
-[`clipboard-prompt-reliability-0.5.1-rc.1-human-uat.json`](../tests/go-live-validation/results/clipboard-prompt-reliability-0.5.1-rc.1-human-uat.json).
+[`clipboard-prompt-reliability-0.5.1-rc.1-human-uat.json`](private-history.md).
 Formal publication evidence is
-[`clipboard-prompt-reliability-0.5.1-rc.1-formal-publication.json`](../tests/go-live-validation/results/clipboard-prompt-reliability-0.5.1-rc.1-formal-publication.json).
+[`clipboard-prompt-reliability-0.5.1-rc.1-formal-publication.json`](private-history.md).
 Stable publication and alignment evidence are
-[`clipboard-prompt-reliability-0.5.1-formal-publication.json`](../tests/go-live-validation/results/clipboard-prompt-reliability-0.5.1-formal-publication.json)
+[`clipboard-prompt-reliability-0.5.1-formal-publication.json`](private-history.md)
 and
-[`clipboard-prompt-reliability-0.5.1-alignment.json`](../tests/go-live-validation/results/clipboard-prompt-reliability-0.5.1-alignment.json).
+[`clipboard-prompt-reliability-0.5.1-alignment.json`](private-history.md).
 
 ## Goal
 

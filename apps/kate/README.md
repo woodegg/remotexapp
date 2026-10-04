@@ -1,6 +1,6 @@
 # Kate App Package
 
-Independent isolated editor package, version 1.0.0. Omit optional `filePath`
+Independent isolated editor package, version 2.0.1. Omit optional `filePath`
 for a blank editor; supplied paths must be authorized existing readable files.
 Uses Matchbox, immediate startup, dynamic 1280x720/16-bit/10 FPS with resize,
 and stops the entire instance after 60 seconds detached. Stop forcibly exits

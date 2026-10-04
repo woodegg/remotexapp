@@ -1,7 +1,12 @@
 # RemoteXApp 0.2.0 stable release train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Status: complete. Formal `v0.2.0` was published, locally aligned, and then
-aligned on sandbox00 production under separate approval on 2026-09-01. The release is
+aligned on test-host-a production under separate approval on 2026-09-01. The release is
 core `0.2.0`, browser SDK `0.18.0`, and App Package ABI `remotexapp/v1`. The
 frozen App identities are
 `edge@1.0.0`, `firefox-esr@2.0.0`, `libreoffice@3.0.0`, `mousepad@2.0.0`,
@@ -35,8 +40,8 @@ only and require the complete publication gate to be repeated:
    support and trust boundaries. Audit every open issue and deferred or
    experimental requirement. Seal the changelog only at publication.
 2. Prove that SDK `0.18.0` and App Package ABI V1 remain compatible with the
-   accepted WAOS integration contract. RemoteXApp stable publication does not
-   require rebuilding or releasing WAOS; WAOS updates its exact dependency
+   accepted host application integration contract. RemoteXApp stable publication does not
+   require rebuilding or releasing host application; host application updates its exact dependency
    lock when that project independently adopts `0.2.0`.
 3. From a clean tree, pass sensitive-data checks, `make release-check`, and
    `make release-ci`. Verify reproducible generated assets, race tests,
@@ -47,8 +52,8 @@ only and require the complete publication gate to be repeated:
    and forced shutdown, console modes, and reverse-prefix behavior. Reproduce
    the abnormal restart conditions from GitHub Issues #4 and #5.
 5. With separate explicit approval, repeat the production-like upgrade,
-   rollback, recovery, security, application, and human UAT gate on sandbox00.
-   Neither this train lock nor a local pass authorizes sandbox00 staging or
+   rollback, recovery, security, application, and human UAT gate on test-host-a.
+   Neither this train lock nor a local pass authorizes test-host-a staging or
    production changes. Human UAT must explicitly accept Firefox ESR/BiDi and
    LibreOffice/UNO/document lifecycle; automated evidence is not acceptance.
    Unified Console UAT was accepted on 2026-09-01. Followers are outside this
@@ -65,7 +70,7 @@ only and require the complete publication gate to be repeated:
    a prerelease. Download and verify its archive and `SHA256SUMS` before use.
 9. Install the downloaded formal artifact as a new immutable release and
    repeat health, version, commit, checksum, runtime-adoption, and smoke checks
-   locally and, with another explicit approval, on sandbox00. Never replace a
+   locally and, with another explicit approval, on test-host-a. Never replace a
    candidate directory or move/reuse the tag.
 
 ## Explicitly outside the train
@@ -112,8 +117,8 @@ optional request-header support.
 The isolated build-once E2E on manager port 21991 passed install, launch,
 bounded status/control, manager adoption, package update without a core
 rebuild, old-runtime pinning, new-version selection, stop, disable, and
-rollback. This proves the provider contract without building or changing WAOS.
-The accepted WAOS release keeps its rc.4 lock until that repository
+rollback. This proves the provider contract without building or changing host application.
+The accepted host application release keeps its rc.4 lock until that repository
 independently adopts `0.2.0`. Exact hashes and checks are in
 [`stable-0.2.0-provider-compatibility.json`](../tests/app-package/stable-0.2.0-provider-compatibility.json).
 
@@ -132,9 +137,9 @@ Evidence-only commits after it may not change runtime source, generated assets,
 Apps, dependencies, or build inputs. STB-006 remains incomplete until
 `make release-ci` is repeated on the final clean evidence commit. Exact results
 are in
-[`stable-0.2.0-candidate-release-gate.json`](../tests/go-live-validation/results/stable-0.2.0-candidate-release-gate.json).
+[`stable-0.2.0-candidate-release-gate.json`](private-history.md).
 
-The first sandbox00 staging attempt later found that the selector could not
+The first test-host-a staging attempt later found that the selector could not
 explicitly choose retained rc.5 because it retroactively required the new
 optional operator helper. DEP-015 changes the release archive, so this candidate
 and digest are retained only as historical evidence. Gate 3 must be repeated.
@@ -168,12 +173,12 @@ Final local state is healthy `0.2.0 (7430689f05cb)` on the requested temporary
 zero clients, no warning entries, and no test units, listeners, or browsers.
 Firefox and LibreOffice Human UAT were still pending at this invalidated gate
 and were accepted later under Gate 5. Exact evidence is
-[`stable-0.2.0-local-1991.json`](../tests/go-live-validation/results/stable-0.2.0-local-1991.json).
+[`stable-0.2.0-local-1991.json`](private-history.md).
 
 DEP-015 invalidated the tested archive after this pass. Gate 4 must be repeated
 with the replacement artifact before sandbox staging resumes.
 
-## Gate 5 sandbox00 staging attempt — 2026-09-01
+## Gate 5 test-host-a staging attempt — 2026-09-01
 
 The operator separately approved staging only. The exact old candidate was
 uploaded and checksum-verified, staged without moving either selector, and
@@ -214,9 +219,9 @@ finite and unlimited retry policies, and automatic reconnect across manager
 restart. Issue #4 and #5 abnormal recovery were repeated, and final hygiene
 found no temporary listeners, units, or browsers. STB-007 is implemented again;
 exact evidence is
-[`stable-0.2.0-replacement-local-1991.json`](../tests/go-live-validation/results/stable-0.2.0-replacement-local-1991.json).
+[`stable-0.2.0-replacement-local-1991.json`](private-history.md).
 
-## Replacement Gate 5 automated sandbox00 staging — 2026-09-01
+## Replacement Gate 5 automated test-host-a staging — 2026-09-01
 
 The operator separately approved replacement staging, but not production. The
 checksum-verified archive was published into a new immutable `0.2.0` tree
@@ -244,7 +249,7 @@ restored the original unit checksum. Final state is healthy rc.5 with one active
 managed Desktop, zero clients, and no temporary listeners, App units, or App
 processes. The replacement candidate remains staged but inactive. Exact evidence
 is
-[`stable-0.2.0-replacement-sandbox00-staging.json`](../tests/go-live-validation/results/stable-0.2.0-replacement-sandbox00-staging.json).
+[`stable-0.2.0-replacement-test-host-a-staging.json`](private-history.md).
 
 This completed only STB-008's automated staging portion and did not itself
 authorize production. At that point STB-008 remained proposed pending separate
@@ -253,7 +258,7 @@ occurred.
 
 ## Replacement Gate 5 production activation — 2026-09-01
 
-The operator then separately approved sandbox00 production activation. Before
+The operator then separately approved test-host-a production activation. Before
 selection, the staged release manifest and all four binary digests matched the
 accepted archive, the runtime-affecting source remained identical to commit
 `ca1d0b26bf8f`, and the manager had zero clients. The artifact's shared unit
@@ -261,7 +266,7 @@ and selector activated immutable release `0.2.0`; retained rc.5 automatic
 restore was armed but not needed.
 
 Production adoption preserved Desktop runtime
-`xfce-user-desktop-b21da838f33e`, its creation time, generation 2, and all four
+`xfce-user-desktop-EXAMPLE`, its creation time, generation 2, and all four
 child PIDs. Final manager PID is `873991` with `NRestarts=0`. Health/readiness,
 six templates, root/minimal/kiosk routes, disabled service restart, EXP-007,
 and all six App selectors passed smoke checks. Configuration remains the
@@ -269,7 +274,7 @@ operator-requested `0.0.0.0:1991`, `auth-mode=none`, explicit insecure-public
 opt-in; this trusts the surrounding sandbox network and is not a generally
 secure Internet-facing mode. No temporary App process, unit, listener, or
 deployment directory remains. Exact evidence is
-[`stable-0.2.0-replacement-sandbox00-production.json`](../tests/go-live-validation/results/stable-0.2.0-replacement-sandbox00-production.json).
+[`stable-0.2.0-replacement-test-host-a-production.json`](private-history.md).
 
 Production activation alone was not Human UAT acceptance. At this point STB-008
 remained proposed until the operator explicitly accepted Firefox ESR/BiDi and
@@ -282,15 +287,15 @@ The operator explicitly accepted Firefox ESR launch, visible-window behavior,
 WebDriver BiDi control, input, reconnect, destructive stop, and relaunch, plus
 LibreOffice document launch, visible-window behavior, UNO control, input,
 explicit-save boundary, destructive no-save stop, lock cleanup, and relaunch
-on the active sandbox00 candidate. Unified Console UAT remains accepted from
+on the active test-host-a candidate. Unified Console UAT remains accepted from
 its earlier gate.
 
 STB-003 and STB-008 are accepted. LBO-001 through LBO-009 and FFX-001 through
 FFX-006 move from implemented to accepted without a source or artifact change.
 The same confirmation authorizes formal release work; it does not authorize
-follower deployment or the separately gated post-release sandbox00 artifact
+follower deployment or the separately gated post-release test-host-a artifact
 alignment. Exact evidence is
-[`stable-0.2.0-sandbox00-human-uat.json`](../tests/go-live-validation/results/stable-0.2.0-sandbox00-human-uat.json).
+[`stable-0.2.0-test-host-a-human-uat.json`](private-history.md).
 
 ## Gate 6 issue closure — 2026-09-01
 
@@ -299,7 +304,7 @@ The exact candidate evidence was attached separately to
 and
 [Issue #5](private-history.md).
 Issue #4 records the live missing-manifest fixed-display recovery; Issue #5
-records local and sandbox00 one-manifest managed recovery. Both were closed as
+records local and test-host-a one-manifest managed recovery. Both were closed as
 completed after UAT, and GitHub reported zero remaining open issues. STB-004 is
 accepted.
 
@@ -349,35 +354,35 @@ component paths, then force cleanup removed its units, directory, and durable
 manifest. A final manager restart removed its expected in-memory stopped
 record and re-adopted the original two runtimes without PID churn. Exact
 evidence is
-[`stable-0.2.0-formal-publication-local.json`](../tests/go-live-validation/results/stable-0.2.0-formal-publication-local.json).
-The operator then separately approved sandbox00 production alignment. With no
+[`stable-0.2.0-formal-publication-local.json`](private-history.md).
+The operator then separately approved test-host-a production alignment. With no
 attached client, the same-version immutable-tree procedure stopped and
-recreated only `sandbox-desktop`, retained the candidate as
+recreated only `primary-desktop`, retained the candidate as
 `0.2.0-candidate-ca1d0b26bf8f`, and selected the downloaded formal bytes. The
-new runtime `xfce-user-desktop-c9c926c84d0f` is server-ready with one manifest;
+new runtime `xfce-user-desktop-EXAMPLE` is server-ready with one manifest;
 its on-attach session correctly remains stopped until a viewer establishes an
 RFB connection. A second manager restart recovered the same runtime and
 creation identity. The running manager and gateway hashes, all four installed
 binary hashes, six App selectors, fixed Desktop policy, routes, configuration,
 child units, and zero-warning journal passed. Exact evidence is
-[`stable-0.2.0-formal-sandbox00-production.json`](../tests/go-live-validation/results/stable-0.2.0-formal-sandbox00-production.json).
+[`stable-0.2.0-formal-test-host-a-production.json`](private-history.md).
 
 Validation used container loopback. The build host's direct private HTTP path
-remains blocked by sandbox00's existing UFW allowlist; no firewall rule was
+remains blocked by test-host-a's existing UFW allowlist; no firewall rule was
 changed and the production gateway was not used. STB-009 is accepted.
 
 ## Completion
 
 The train completed on 2026-09-01: STB-001 through STB-009 are accepted, the
 formal artifact is independently verified and aligned locally and on the
-approved sandbox00 production target, and the handover records the exact
+approved test-host-a production target, and the handover records the exact
 commit, tag, archive digest, deployment selectors, rollback target, and human
 approvals.
 
 ## Post-train follower alignment — 2026-09-01
 
 This was not a stable-train gate. Under a later separate production approval,
-sandbox02, sandbox03, sandbox07, and sandbox10 moved from formal rc.5 to the
+test-host-c, test-host-d, test-host-h, and test-host-k moved from formal rc.5 to the
 checksum-verified `v0.2.0` artifact. Every zero-client managed Desktop retained
 its runtime ID, creation identity, generation, state, and child PIDs across two
 manager restarts. All four ended with formal running manager bytes, stable
@@ -385,4 +390,4 @@ selectors, one runtime and manifest, six unchanged App selectors,
 `NRestarts=0`, and no warning. Rc.5 remains available for rollback, while
 adopted runtime components remain pinned to rc.5 until normal recreation.
 Exact evidence is
-[`stable-0.2.0-formal-followers-production.json`](../tests/go-live-validation/results/stable-0.2.0-formal-followers-production.json).
+[`stable-0.2.0-formal-followers-production.json`](private-history.md).

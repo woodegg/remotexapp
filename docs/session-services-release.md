@@ -1,15 +1,20 @@
 # Core-owned Session Services — Requirements and Design
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Status: **Closed — stable 0.12.0 published as GitHub Latest** (2026-09-14).
 Tag `v0.12.0` points to `3037ca136f58914e6b51262cc377c346ccd259dd`;
 SDK `0.28.0` and the accepted seven App Packages are unchanged. Hosted and
 independent local builds match byte-for-byte. All seven exact-archive E2E
 suites and the separate stopped-cutover rehearsal passed; downloaded published
 bytes match the tested candidate. See
-[publication evidence](../tests/evidence/v1/core-session-services-0.12.0-publication.json).
+[publication evidence](private-history.md).
 Human acceptance was on local `0.12.0-rc.2`; release/build identity and docs-only
 promotion does not imply a second human test of stable bytes. See
-[UAT provenance](../tests/evidence/v1/core-session-services-0.12.0-uat.json).
+[UAT provenance](private-history.md).
 No local endpoint, sandbox or existing runtime was redeployed for publication.
 Persistent data/configuration must survive any separately approved cutover;
 a blocked graceful stop still requires separate force approval.
@@ -19,7 +24,7 @@ cutover and P16 gates passed on 2026-09-14. Both loopback endpoints run the same
 frozen installable working-tree archive, not a formal GitHub release. The
 desktop's same runtime ID was upgraded gracefully to generation 3; user HOME,
 default Xauthority and borrowed account bus remain. See
-[current verification/deployment evidence](../tests/evidence/v1/core-session-services-0.12.0-rc.2-local.json).
+[current verification/deployment evidence](private-history.md).
 The original failed rc.1 expanded gate remains documented below and in the
 [repaired validation report](session-services-dynamic-validation.md).
 
@@ -302,7 +307,7 @@ verify no competing IBus/autostart takeover. `ibus-daemon --single` is not a
 singleton lock. Do not use broad process-killing or fallback bus creation.
 
 Test Xfconf, Thunar, activation services, logout and saved-session behavior.
-The [2026-09-14 saved-session gate](../tests/evidence/v1/core-session-services-0.12.0-rc.2-xfce-saved-session.json)
+The [2026-09-14 saved-session gate](private-history.md)
 now proves actual XSMP command/window restoration, document content, current
 input environment, no duplicate IBus/Unicode, borrowed-bus continuity and
 served-Viewer input across subsequent Manager adoption. Fast logout alone was
@@ -367,7 +372,7 @@ fault injection. Do not count a healthy Manager as proof of Viewer continuity.
 The supervisor requires Linux pidfd support, already present on the target
 Ubuntu hosts. Core preflight requires dbus-daemon/dbus-send, ibus/ibus-daemon,
 Python GI/IBus and the existing engine dependencies. The Python engine has not
-been rewritten. No SDK rebuild or downstream WAOS code change is required;
+been rewritten. No SDK rebuild or downstream host application code change is required;
 old bound instance IDs must be resolved anew after the one-time clean cutover.
 
 ## Verification and local UAT handoff — 2026-09-13

@@ -1,14 +1,19 @@
 # App Actions and Browser Open URL — Locked Release Train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Status: **closed; stable `0.9.0` published on 2026-09-10**, ACT-001–008.
 Target: Core `0.9.0`, SDK `0.26.0`, Firefox ESR App `2.2.0`,
 Edge App `1.1.0`. Promote the accepted candidate without functional changes.
 GitHub publication is authorized; no additional deployment is authorized.
 Publication completed with full exact-archive E2E and independently verified
-downloaded bytes. See [publication evidence](../tests/evidence/v1/app-actions-0.9.0-publication.json).
+downloaded bytes. See [publication evidence](private-history.md).
 The subsequent explicit "deploy to all" approval aligned all eight environments
 to stable `0.9.0`, preserving existing runtime pins and configuration.
-See [alignment evidence and network limitation](../tests/evidence/v1/app-actions-0.9.0-alignment.json).
+See [alignment evidence and network limitation](private-history.md).
 Existing runtime pins are preserved; invoking an action never upgrades them.
 App Package V1 gains an optional `actions` field: old packages remain valid;
 older Managers reject new action-bearing manifests through strict decoding.
@@ -17,11 +22,11 @@ older Managers reject new action-bearing manifests through strict decoding.
 
 Candidate commit `fc2d94e6b764` passed hosted gates and complete exact-archive
 E2E and is deployed to `127.0.0.1:1991` and `127.0.0.1:2992`.
-See [verification evidence](../tests/evidence/v1/app-actions-0.9.0-rc.1-local.json).
+See [verification evidence](private-history.md).
 Human UAT passed after the separately approved force upgrade of local XFCE and
 Edge. Both report ready, generation 3 and Core `0.9.0-rc.1`; connection reads
 passed and Edge `1.1.0` advertises ready `openUrl`. Test 2992 has no active
-runtimes. See [human acceptance](../tests/evidence/v1/app-actions-0.9.0-human-uat.json).
+runtimes. See [human acceptance](private-history.md).
 
 On the production Console (`/sdk/console.html` on 1991), launch/connect Firefox,
 wait for ready, choose **Actions**, enter an HTTP/HTTPS URL and click **Invoke**.
@@ -42,7 +47,7 @@ shared singleton Firefox ESR and Edge templates, defaulting to a new tab.
 Client SDK -> generic Manager action dispatcher -> pinned App Package handler
 -> browser's loopback control endpoint. Firefox owns the BiDi implementation;
 Edge owns the CDP implementation. Manager and SDK contain no browser-specific
-dispatch branches. Drivers do not start an HTTP service. WAOS need not build a
+dispatch branches. Drivers do not start an HTTP service. The host application need not build a
 new CDP/BiDi backend service for this operation.
 
 ## Requirements
@@ -61,7 +66,7 @@ Canonical IDs ACT-001 through ACT-008 are in [requirements.md](requirements.md#l
   with lifecycle operations, cancellation and ambiguous outcomes.
 - ACT-006: least-privilege execution, package/control ownership, URL restrictions,
   no generic shell or raw control proxy, and no takeover of another BiDi session.
-- ACT-007: comprehensive tests and WAOS integration guidance before acceptance.
+- ACT-007: comprehensive tests and host application integration guidance before acceptance.
 - ACT-008: a generic Console action panel using the public SDK to discover,
   enter parameters, explicitly invoke, and inspect results/errors for one runtime.
 
@@ -148,7 +153,7 @@ authorization. With auth-mode=none, reachable callers can invoke declared
 actions. All viewers of a shared runtime can see the newly activated tab.
 Raw CDP/BiDi remain loopback-only; getConnections stays a read-only descriptor.
 
-## WAOS flow and scope boundaries
+## host application flow and scope boundaries
 
 Ensure/create the singleton -> open/connect its Viewer -> wait for application
 ready -> invoke `openUrl`. Use a neutral initial page for creation, then invoke
@@ -191,7 +196,7 @@ Console browser tests must cover successful Firefox/Edge new-tab invocation,
 schema validation, unsupported/legacy actions, non-ready/busy/stale targets,
 duplicate clicks, concurrent windows, restart/upgrade, cancel/timeout ambiguity,
 hostile result text, base paths, and Console-disabled behavior. The panel is
-the human UAT surface for this train and a reference for WAOS SDK integration.
+the human UAT surface for this train and a reference for host application SDK integration.
 
 ## Required verification
 
@@ -206,7 +211,7 @@ runtimes, sequential/multiple URLs, Unicode/encoded URLs, invalid protocols,
 new tab activation without losing the old page/profile, concurrent viewers,
 shared control contention, restart/upgrade/Manager adoption and refreshed
 capabilities. Validate SDK under root and reverse-proxy prefixes, and document
-the minimal WAOS change. Demonstrate a synthetic new package action installed
+the minimal host application change. Demonstrate a synthetic new package action installed
 and invoked without rebuilding Manager/SDK. Require local tests, release gates,
 exact-artifact E2E and human UAT; deployment/publication approvals are separate.
 

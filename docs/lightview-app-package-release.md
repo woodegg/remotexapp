@@ -1,5 +1,10 @@
 # LightView Shared Browser App Package
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 ## Formal target 1.0.13: Viewer attach wakeup
 
 LightView's native one-hour idle hibernation can suspend WebKit while its
@@ -19,7 +24,7 @@ continuity, App upgrade/rollback and vacancy cleanup. Candidate Core
 endpoints, 1991 and 2992. Both passed real native suspension/reattachment,
 policy restoration, and served Chrome Viewer resize/reconnect. Existing 1991
 XFCE generation 11 and component PIDs were preserved. See the
-[local deployment evidence](../tests/evidence/v1/lightview-1.0.12-local-deployment.json).
+[local deployment evidence](private-history.md).
 Human UAT of the deployed RC.1 / App 1.0.12 was accepted on 2026-10-02 and
 formal GitHub publication was authorized. That local App archive included
 ignored Python bytecode and cannot share a version with the clean published
@@ -35,7 +40,7 @@ Formal [lightview-v1.0.11](private-history.md)
 was published 2026-09-29 after local exact-package qualification and hosted
 Verify. Its downloaded archive matches the local UAT archive. Core, SDK and
 host Lightview remain unchanged; sandbox deployment is separately owned.
-See [publication evidence](../tests/evidence/v1/lightview-1.0.11-publication.json).
+See [publication evidence](private-history.md).
 
 ## Hibernation wakeup (LTV-012)
 
@@ -43,7 +48,7 @@ Recorded 2026-09-29 for App Package 1.0.11. Lightview 0.1.10 hibernates its
 WebKit engine after idle time without closing the main process, window or owned
 Unix control socket. Native `open` wakes and navigates. App 1.0.10 instead
 checked `engine_state:ready` before sending `open`, so a healthy suspended
-browser could not be navigated through the Manager action. Sandbox10 reproduced
+browser could not be navigated through the Manager action. test-host-k reproduced
 the failure and verified a sealed experimental App through the real HTTP action
 with memory protection enabled and disabled.
 
@@ -63,7 +68,7 @@ publication or sandbox deployment.
 Published and closed 2026-09-24 as formal
 [lightview-v1.0.10](private-history.md).
 Hosted Verify passed; downloaded archive and checksum match the exact local
-candidate. Core/SDK are unchanged. See [publication evidence](../tests/evidence/v1/lightview-1.0.10-publication.json).
+candidate. Core/SDK are unchanged. See [publication evidence](private-history.md).
 The following records the scope and qualification history.
 
 Recorded 2026-09-24 for [Issue #8](private-history.md),
@@ -147,8 +152,8 @@ All 15 isolated exact-package scenarios passed on verified formal Lightview
 The formal [release](private-history.md)
 contains only the deterministic archive and checksum; fresh downloads match
 the tested bytes. Core 0.13.0 / SDK 0.29.1 and all endpoints are unchanged.
-See [qualification](../tests/evidence/v1/lightview-1.0.9-candidate.json)
-and [publication evidence](../tests/evidence/v1/lightview-1.0.9-publication.json).
+See [qualification](private-history.md)
+and [publication evidence](private-history.md).
 
 Follow-up accepted 2026-09-18: LTV-009 creates immutable `lightview@1.0.8`,
 pinned to formal Lightview 0.1.8 and its verified public artifact. It preserves
@@ -171,8 +176,8 @@ formally publishes only the accepted deterministic archive (SHA-256
 `8af626a664bf335481ad8b7094b0d3f98e18dd6acfa948b17abcc89f5aedbcb7`)
 and checksum. Fresh downloads match the candidate and its App content seal is
 `deb929ce4ed3a2c333827dba268543aa2c3863e27c0b55f3ddb5fad0d02f42e2`.
-Core `v0.12.2` remains Latest and no endpoint was deployed. See the
-[publication evidence](../tests/evidence/v1/lightview-1.0.8-publication.json).
+Core `v0.12.2` was Latest at that historical gate and no endpoint was deployed. See the
+[publication evidence](private-history.md).
 
 Follow-up formally published 2026-09-17: LTV-008 creates immutable
 `lightview@1.0.7`, pinned to formal Lightview 0.1.7. The version gate remains
@@ -188,7 +193,7 @@ publishes only the deterministic archive (SHA-256
 `512eeed017ae52f994e2911d8f203a480a6c9c43a26e54b828298f18ef00ad61`)
 and checksum. Fresh downloads match the tested bytes. No endpoint deployment
 is authorized; sandbox deployment belongs to the sandbox project. See the
-[publication evidence](../tests/evidence/v1/lightview-1.0.7-publication.json).
+[publication evidence](private-history.md).
 
 Follow-up accepted 2026-09-17: LTV-007 advances the independent package to
 `lightview@1.0.6`, pinned to the verified formal Lightview 0.1.6 release. It is
@@ -212,12 +217,12 @@ The immutable `lightview-1.0.0.tar.gz` candidate is active on loopback 1991 and
 container cannot run WebKitGTK's bubblewrap sandbox, so only these local UAT
 runtimes inherit WebKit's explicit unsafe sandbox override. The package does not
 contain that override, and a production host must support the normal WebKit
-sandbox. See the [evidence record](../tests/evidence/v1/lightview-1.0.0-local-uat.json).
+sandbox. See the [evidence record](private-history.md).
 
 Annotated tag [`lightview-v1.0.0`](private-history.md)
 publishes only the accepted deterministic App archive and checksum. Downloaded
 assets match the UAT bytes, while RemoteXApp Latest remains Core `v0.12.2`.
-See the [publication evidence](../tests/evidence/v1/lightview-1.0.0-publication.json).
+See the [publication evidence](private-history.md).
 
 ## Purpose and user-visible policy
 

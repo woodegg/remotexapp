@@ -22,10 +22,10 @@ The same live fixture starts with a missing root and a non-directory root,
 checks explicit journal errors plus HTTP readiness, launches a local document,
 then simulates storage arrival/loss/recovery using only its private directories.
 It proves real document launch after recovery without Manager restart and
-rejects outside/symlink-escape paths. It never accesses real CloudDrive/MyDrive
+rejects outside/symlink-escape paths. It never accesses real remote storage/remote storage
 mounts; directory renames simulate storage outages, not a FUSE integration test.
 
-The actual sandbox00 acceptance must separately record real boot-ID changes,
+The actual test-host-a acceptance must separately record real boot-ID changes,
 active managed XFCE before reboot, server-ready/stopped before postboot attach,
 same post-cutover runtime ID and newer generations, then actual Viewer/input/
 clipboard/connections. Include repeated Manager restarts and container reboots,

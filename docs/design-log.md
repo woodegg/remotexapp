@@ -1,5 +1,29 @@
 # Design decision log
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
+## 2026-10-04 — Separate public engineering guidance from operational records
+
+Public guides describe current contracts and reproducible examples rather than
+captured fleet identity, incident state, private workflow paths or downstream
+project approvals. Anonymize operational identifiers in historical summaries
+while preserving stable requirement IDs, dated technical decisions, failures
+and unexecuted acceptance limits. Replace deployment diaries with handover,
+release-policy and validation guidance; retain complete operational records in
+the private historical archive. This changes presentation and release
+qualification, not any accepted runtime or trust-boundary behavior.
+
+REL-014 adds a current-source documentation disclosure and local-link gate.
+Bundled release guides are checked separately, preserving local links to files
+included in the archive and resolving omitted source guides to the full build
+commit. Publication remains immutable: this cleanup does not rewrite past Git
+history, tags or previously published assets. Existing copies require a
+separate exposure assessment. Generic host-application integration guides
+replace downstream-specific instructions, with redirects at the older paths.
+
 ## 2026-10-02 — Bound recovery of a failed managed desktop session
 
 Core 0.14.2 observes both the pinned readiness-process identity and the
@@ -34,7 +58,7 @@ confidentiality scan or reuse a changed immutable version.
 
 ## 2026-10-02 — Recover a hibernated LightView on Viewer attach
 
-Sandbox10 evidence showed that LightView's process, visible window and private
+test-host-k evidence showed that LightView's process, visible window and private
 socket survived while its WebKit engine became `suspended`. Manager's previous
 `applicationStatus.ready` is a last-reported Driver state, not a live native
 engine probe; changing `openUrl` alone cannot make a newly attached Viewer
@@ -64,11 +88,11 @@ The stable source commit must pass a new same-commit hosted candidate gate
 before its annotated tag is pushed. RC.6 host E2E and Ubuntu 26.04 regression
 are evidence for unchanged behavior, not a claim of byte-identical stable
 binaries. No host reboot was approved, so boot persistence is not certified.
-Publishing does not authorize grok-bot service restart or sandbox alignment.
+Publishing does not authorize standalone test host service restart or sandbox alignment.
 
 ## 2026-10-01 — Canonicalize App Package extraction across installer umasks
 
-Grok-bot's RC.3 version-switch gate installed the same checksum-verified QA
+standalone test host's RC.3 version-switch gate installed the same checksum-verified QA
 archive under umask 077 and later 022. File bytes were identical, but extracted
 permissions differed (`600/700` versus `644/755`), so the permission-inclusive
 content seals differed and an idempotent reinstall was rejected as changed
@@ -77,11 +101,11 @@ executable modes, but `OpenFile` and implicit `MkdirAll` creation had allowed
 the process umask to filter those modes. RC.4 explicitly normalizes every
 extracted file and implicit directory before computing its seal. Changed
 archive content under the same App version remains forbidden. RC.3 was not
-published; grok-bot rolled back activation and retained the fault evidence.
+published; standalone test host rolled back activation and retained the fault evidence.
 
 ## 2026-10-01 — Reclaim standalone component cgroups after stop
 
-Grok-bot's exact RC.2 host E2E found that stopped Apps had no surviving
+standalone test host's exact RC.2 host E2E found that stopped Apps had no surviving
 processes, but their empty component cgroup directories remained. Thirty-two
 empty leaves accumulated after eight App tests; the host's delegated subtree
 allows only 128 descendants. This is a bounded-resource leak and rejects RC.2
@@ -89,7 +113,7 @@ for production, despite its clean process tree. RC.3 removes each exact owned
 leaf only after `cgroup.events` reports unpopulated, rechecking UID and inode;
 the operation is non-recursive and refuses populated or replaced cgroups.
 Manager startup also reclaims empty leaves retained by older builds before
-runtime adoption, without touching live component cgroups. The grok-bot
+runtime adoption, without touching live component cgroups. The standalone test host
 project owns the host rollback and the repeated-launch quota regression.
 
 ## 2026-09-30 — Bound XFCE cold first-start without a false failure
@@ -120,8 +144,8 @@ uutils hosts before qualifying the new App version.
 ## 2026-09-30 — Reject cross-user systemd manager environment
 
 An isolated Ubuntu 26.04 QA clone inherited `/etc/environment` values for
-UID 1001. Installing for UID 1002 passed the former preflight, but its user
-manager exposed UID 1001's XDG runtime, D-Bus and PulseAudio paths and XFCE
+selected non-root UID. Installing for UID 1002 passed the former preflight, but its user
+manager exposed selected non-root UID's XDG runtime, D-Bus and PulseAudio paths and XFCE
 session startup failed. The central-user and user-install preflights now
 inspect the actual user-manager environment, not merely whether the correct
 bus can be contacted. They reject foreign paths with an actionable error.
@@ -144,10 +168,10 @@ Canonical process checks for X11 ownership, environment and connection
 metadata additionally require the exact delegated component cgroup path in
 standalone mode; a matching unit basename in another subtree is insufficient.
 
-## 2026-09-30 — Delegate grok-bot runit installation to its host project
+## 2026-09-30 — Delegate standalone test host runit installation to its host project
 
-The operator assigned grok-bot installation, runit service activation, runtime
-restart, rollback and host-side E2E to the grok-bot project so it can preserve
+The operator assigned standalone test host installation, runit service activation, runtime
+restart, rollback and host-side E2E to the standalone test host project so it can preserve
 an auditable reusable deployment playbook. This supersedes the train's earlier
 assumption that RemoteXApp would write the host-specific runit installer.
 RemoteXApp retains the immutable artifact/staging, explicit selected-UID and
@@ -170,7 +194,7 @@ resources, then retain only a private, bounded, non-sensitive tombstone; do
 not retain raw Driver logs in the tombstone. Managed instances and healthy
 six-hour Edge sessions keep their former policy. Edge 2.0.3 reports a
 window/CDP-specific Driver error before the Core deadline so the original
-failure can be diagnosed if it recurs. The sandbox00 incident's removed logs
+failure can be diagnosed if it recurs. The test-host-a incident's removed logs
 do not justify attributing it to memory pressure. No sandbox deployment is
 part of this implementation decision.
 
@@ -181,7 +205,7 @@ Annotated `lightview-v1.0.11` peels to accepted source commit
 the freshly downloaded archive is byte-identical to the one qualified on
 local 1991/2992. It is a formal App-only release, not Core Latest. No
 additional runtime or sandbox operation was performed. See
-[publication evidence](../tests/evidence/v1/lightview-1.0.11-publication.json).
+[publication evidence](private-history.md).
 
 ## 2026-09-29 — Authorize formal LightView 1.0.11 publication
 
@@ -194,7 +218,7 @@ are outside the publication action.
 
 ## 2026-09-29 — Wake Lightview through the App action (LTV-012)
 
-On sandbox10, App 1.0.10 blocked `openUrl` before sending native `open` because
+On test-host-k, App 1.0.10 blocked `openUrl` before sending native `open` because
 Lightview 0.1.10 reported `engine_state:suspended`. The main PID and private
 socket remained available. An experimental sealed App version verified the
 same Manager action could wake WebKit and complete navigation; the first test
@@ -209,9 +233,9 @@ local 1991/2992 deployment for UAT; formal publication is not included.
 
 Annotated `lightview-v1.0.10` peels to `51c1d46b6a73a59267d8f2233cc71e73cfdd2037`.
 Hosted Verify passed. Public downloads match the exact locally qualified App
-archive; Core 0.13.0 remains Latest. LTV-011 is accepted and the App-only train
+archive; Core 0.13.0 was Latest at that historical gate. LTV-011 is accepted and the App-only train
 is closed. No deployment or runtime restart occurred during publication.
-See [publication evidence](../tests/evidence/v1/lightview-1.0.10-publication.json)
+See [publication evidence](private-history.md)
 for clean-source checks, archive identity and acceptance limitations.
 
 ## 2026-09-24 — Authorize formal LightView 1.0.10 publication
@@ -226,7 +250,7 @@ promotion decision without inventing a separate interactive human-UAT result.
 ## 2026-09-24 — Lock and implement LTV-011 for local UAT
 
 The operator authorized development and local 1991/2992 deployment, then
-explicitly approved upgrading/restarting local LightView `lightview-1693a7110d9d`.
+explicitly approved upgrading/restarting local LightView `lightview-EXAMPLE`.
 Do not restart XFCE or operate sandboxes. Use unpublished immutable App 1.0.10
 under the repository's stable-format shipped-App version convention; no Core/SDK
 release or GitHub publication. Split target identity from navigation readiness;
@@ -272,7 +296,7 @@ needs a ready engine; quit needs a verified control target, not page readiness.
 Status must not misrepresent a configured default as a live enforced policy.
 This supersedes only the mandatory termination-threshold acceptance decision in
 LTV-009/010 on implementation, preserving those historical release records.
-No generic action-error ABI redesign, Manager polling, WAOS change or upstream
+No generic action-error ABI redesign, Manager polling, host application change or upstream
 upgrade requirement is added. This turn records scope only; no code, deployment,
 publication or issue-state change is authorized by adding the requirement.
 
@@ -281,7 +305,7 @@ publication or issue-state change is authorized by adding the requirement.
 Annotated tag `lightview-v1.0.9` peels to qualified source
 `b85984431c6d28c32b1aa1deeb7e12d282ff1a37`. Hosted Verify passed. The formal
 release publishes only the deterministic App archive and checksum; fresh
-downloads match the isolated-test bytes. Core `v0.13.0` remains Latest.
+downloads match the isolated-test bytes. Core `v0.13.0` was Latest at that historical gate.
 LTV-010 is accepted and closed under the operator's direct implementation and
 publication request; no separate interactive UAT or deployment is claimed.
 The version-lock removal does not change package immutability or existing
@@ -385,19 +409,19 @@ pending. See [the locked design](runtime-coordinator-release.md) and
 ## 2026-09-14 — Publish 0.12.2 and retain a separate reboot approval gate
 
 Publish the exact `c1cecabe076e` candidate after hosted/local release gates,
-eight exact-archive suites and sandbox00 seven-App Manager/runtime-only tests.
+eight exact-archive suites and test-host-a seven-App Manager/runtime-only tests.
 Verify downloaded assets match the candidate and deployed binaries; SDK 0.28.0
-and Apps remain unchanged. The observed CloudDrive ENOTCONN now logs an error
+and Apps remain unchanged. The observed remote storage ENOTCONN now logs an error
 without blocking production 1991. Configuration and paired 2991 remain unchanged.
 
 The operator's latest instruction supersedes earlier inferred permission for
-sandbox00 whole-container reboot: require new explicit human approval. No reboot
+test-host-a whole-container reboot: require new explicit human approval. No reboot
 after this restriction; final-byte container acceptance stays open. Historical
-candidate reboots and local boot simulations do not close it. CloudDrive file
+candidate reboots and local boot simulations do not close it. remote storage file
 tests are skipped during maintenance, and native 26.04/physical power loss is
 unverified. No new human UAT, other deployment or gateway mutation is implied.
 Retain failed-attempt dispositions and the host logout-wrapper qualification in
-[publication evidence](../tests/evidence/v1/boot-recovery-0.12.2-publication.json).
+[publication evidence](private-history.md).
 
 ## 2026-09-14 — Decouple document-storage availability from Manager startup
 
@@ -419,7 +443,7 @@ This is a path allowlist, not filesystem isolation or mount-health detection.
 Loading private managed intent validates schema/parameter syntax without live
 document access. Registration, launch and upgrade retain full file checks;
 an unavailable file affects that App operation, not registry loading. Local
-fixtures cover outages/recovery and security boundaries. Real CloudDrive tests
+fixtures cover outages/recovery and security boundaries. Real remote storage tests
 are excluded during maintenance; production mount/configuration changes are not
 part of this fix. Include the change in the still-unpublished 0.12.2 candidate.
 
@@ -435,7 +459,7 @@ and repeat candidate qualification before publication.
 
 ## 2026-09-14 — Separate cross-boot recovery from same-boot session failure
 
-The sandbox01 report and retained postboot records confirm that a healthy
+The test-host-b report and retained postboot records confirm that a healthy
 pre-reboot XFCE is classified as an offline App failure and then blocked by
 both managed reconciliation and Viewer attach. Implement the narrowly scoped
 [boot-aware recovery design](boot-recovery-release.md): private runtime boot
@@ -443,7 +467,7 @@ identity, durable restarting intent, preserved pins and increasing generations.
 No automatic revival of pre-existing failures/refusals, no public API/manifest
 schema change and no claim to recover lost process memory. This supersedes
 the blanket offline-exit rule only for eligible proven boot transitions.
-User authorized new release and sandbox00 production reboot tests; sandbox00
+User authorized new release and test-host-a production reboot tests; test-host-a
 requires the existing 0.11-to-0.12 stopped cutover first. No force-discard or
 other environment deployment is inferred.
 ## 2026-09-14 — Publish stable U26 repair without changing deployment state
@@ -456,7 +480,7 @@ timing corrections do not change production deadlines or accepted behavior.
 Retain native clean 26.04/Qt6/full-host tests as explicit unverified platform
 qualifications. No deployment, existing runtime restart/upgrade or downstream
 workaround retirement. The immutable tag is not moved for this docs-only
-closure record. See [publication evidence](../tests/evidence/v1/ubuntu-host-compatibility-0.12.1-publication.json).
+closure record. See [publication evidence](private-history.md).
 
 ## 2026-09-14 — Accept U26 and promote to stable 0.12.1 without deployment
 
@@ -467,8 +491,8 @@ publication. Acceptance carries over only for this metadata-only promotion;
 no new human test or native Ubuntu 26.04 certification is claimed. Keep the
 unexecuted platform gates explicit. Existing environments/runtime pins and
 downstream workarounds remain outside publication authority. Unrelated sandbox
-TODO edits and the local release-tray are excluded from the commit.
-See [UAT record](../tests/evidence/v1/ubuntu-host-compatibility-0.12.1-uat.json).
+TODO edits and the private review material are excluded from the commit.
+See [UAT record](private-history.md).
 
 ## 2026-09-14 — Preserve paired status revisions during Core startup diagnostics
 
@@ -478,7 +502,7 @@ by getConnections. The supervisor now advances both records before starting
 the Driver, then yields publication ownership. It never writes late progress
 over a Driver's ready/error status. No connection schema or endpoint semantics
 changed. Full main/interaction reruns and a direct paired-revision regression
-passed; failed attempts remain in the [development evidence](../tests/evidence/v1/ubuntu-host-compatibility-0.12.1-rc.1-development.json).
+passed; failed attempts remain in the [development evidence](private-history.md).
 
 ## 2026-09-14 — Lock bounded Ubuntu host compatibility repairs
 
@@ -499,7 +523,7 @@ Stable `v0.12.0` publishes the exact clean candidate from commit `3037ca136f58`.
 Hosted and independent local builds are byte-identical; seven exact-archive
 E2E suites and the old-stack stopped-cutover rehearsal passed before tagging.
 The release workflow did not rebuild, and downloaded publication bytes match.
-See [publication evidence](../tests/evidence/v1/core-session-services-0.12.0-publication.json).
+See [publication evidence](private-history.md).
 The earlier rc.2 UAT/matrix evidence retains its original artifact identity;
 stable acceptance follows the metadata-only promotion decision below.
 No deployment alignment or runtime upgrade is implied by closing the train.
@@ -517,7 +541,7 @@ then tag its exact commit and publish those unchanged bytes. This carries the
 operator's behavior acceptance through metadata-only promotion; it is not a
 claim of a second human test on the stable archive. Any functional change
 requires renewed testing/UAT. No deployment or runtime upgrade is implied.
-See [acceptance evidence](../tests/evidence/v1/core-session-services-0.12.0-uat.json).
+See [acceptance evidence](private-history.md).
 
 ## 2026-09-14 — Close the saved-session evidence gap without changing policy
 
@@ -526,7 +550,7 @@ explicit saved-session behavior. A fresh-UID test now requires actual XSMP
 command/window/document restoration, current-generation environment, single
 owned input services and real Viewer readback across Manager adoption. No
 restore policy, activation environment, API or product binary changes. See
-[evidence, repeats and retained preparation failures](../tests/evidence/v1/core-session-services-0.12.0-rc.2-xfce-saved-session.json).
+[evidence, repeats and retained preparation failures](private-history.md).
 
 Identity validation may fail closed with 409 while an injected IBus process
 is exiting. The test records that transition and requires bounded stable
@@ -542,7 +566,7 @@ Viewer/API/document/control suites, stopped cutover, P16, release-ci and nightly
 gates. The final matrix has 361 checkpoints and 2,235 recorded HTTP assertions;
 20 shuffled Go/Node runs and three fuzz targets passed. These are bounded
 executed invariants, not proof of every possible interleaving or human UAT.
-See [current evidence](../tests/evidence/v1/core-session-services-0.12.0-rc.2-local.json).
+See [current evidence](private-history.md).
 
 Both local loopback Managers select rc.2 while initially adopting the old pinned
 desktop unchanged. Explicit graceful upgrade then moves the same runtime ID
@@ -620,7 +644,7 @@ Live suites must run serially because distinct HTTP ports do not prevent
 dynamic X display collisions. Preserve failed-attempt dispositions; do not
 infer that an early Firefox 100 ms readback failure was a product fix.
 Human UAT is still pending, including native IME and desktop usability.
-See [candidate evidence](../tests/evidence/v1/core-session-services-0.12.0-rc.1-local.json).
+See [candidate evidence](private-history.md).
 
 ## 2026-09-13 — Lock Core-owned services and one stopped-system cutover
 
@@ -1212,7 +1236,7 @@ The Mousepad and Edge session drivers execute `matchbox-window-manager`, so a
 host without that binary cannot run every shipped template even when the
 manager itself starts successfully. Deployment preflight now requires the
 binary and names the Ubuntu `matchbox-window-manager` package as remediation.
-The sandbox00 user deployment installed and verified version
+The test-host-a user deployment installed and verified version
 `1.2.2+git20200512-1build1` without changing its default XFCE window manager.
 
 ## 2026-08-28 — Primary-pointer position is the pre-caret IME fallback
@@ -1299,19 +1323,19 @@ combination means graceful shutdown blocked before destructive intent was
 authorized. If the runtime manifest already says `desiredState: stopped`, a
 force was durably committed and restart must finish cleanup instead.
 
-## 2026-08-29 — Proposed sandbox00-only experimental status commands
+## 2026-08-29 — Proposed test-host-a-only experimental status commands
 
 Status GET remains a durable, side-effect-free snapshot. A proposed, separately
 flagged POST under the status namespace would accept structured argv and execute
 it with the exact active application session environment, returning one bounded
-transient result without changing the durable status revision. The initial WAOS
+transient result without changing the durable status revision. The initial host application
 consumer would run only `/usr/bin/env -0` to discover graphical environment
 values before composing an Agent task.
 
 This is intentionally characterized as same-UID remote execution. Direct argv
 avoids implicit shell parsing but does not prevent a caller from choosing a
 mutating executable. The experiment therefore defaults off, is limited to
-sandbox00, binds every execution to a live session generation, caps time and
+test-host-a, binds every execution to a live session generation, caps time and
 output, kills the complete transient scope, and forbids command/output logging
 or persistence. Broader deployment requires a new security checkpoint and a
 decision to remove it, isolate it as operator tooling, or replace it with named
@@ -1389,7 +1413,7 @@ bumped because the readiness/shutdown bundle contract changed.
 
 ## 2026-08-29 — Explicit insecure-public opt-in applies to EXP-007
 
-The rc.23 sandbox00 deployment exposed a configuration contradiction:
+The rc.23 test-host-a deployment exposed a configuration contradiction:
 `auth-mode=none` on `0.0.0.0:1991` already required the administrator to set
 `allow-insecure-public`, but EXP-007 ignored that explicit opt-in and always
 returned `403`. The manager and SDK versions were correct and the route was
@@ -1411,7 +1435,7 @@ no-persistence checks remain unchanged.
 
 Status: accepted and scope-locked; version not assigned. This
 decision refines the initial proposal after primary-source extension-system
-research and a direct review of WAOS Browser, File Editor, Desktop, and its
+research and a direct review of host application Browser, File Editor, Desktop, and its
 RemoteXApp release lock.
 
 The original template/driver goal is stronger than keeping application names
@@ -1450,23 +1474,23 @@ also outside V1.
 Manager restart remains the catalog activation boundary. Microsoft Edge is the
 reference package and must prove dynamic loopback CDP plus visible-window/
 protocol readiness without a core protocol branch. Firefox, LibreOffice,
-Mousepad, and both XFCE templates then migrate. WAOS receives one coordinated
+Mousepad, and both XFCE templates then migrate. The host application receives one coordinated
 breaking envelope migration but keeps its application-specific BiDi, CDP, and
-UNO adapters; Desktop remains generic. Future packages affect WAOS only when it
+UNO adapters; Desktop remains generic. Future packages affect host application only when it
 intentionally adds application-specific behavior. The build-once synthetic-
 package test is the defining release acceptance criterion. See APP-001 through
 APP-013 and
 [`app-package-major-release.md`](app-package-major-release.md).
 
 The user accepted and locked APP-001 through APP-013 on 2026-08-29. APP-008
-remains explicitly deferred. The WAOS migration guide is a required APP-006 and
+remains explicitly deferred. The host application migration guide is a required APP-006 and
 APP-013 deliverable, not a new duplicate requirement. Any material scope change
 requires explicit unlock approval and a new dated decision.
 
 ## 2026-08-29 — Implement App Package ABI v1 as an immutable local extension boundary
 
 Status: implementation candidate for `0.2.0-rc.1`; final local deployment,
-coordinated WAOS acceptance, and human UAT remain pending.
+coordinated host application acceptance, and human UAT remain pending.
 
 The implementation keeps one in-process catalog but moves all six shipped Apps
 under `apps/<id>`. Installation verifies the deterministic archive checksum,
@@ -1524,33 +1548,33 @@ restart. In contrast, an ordinary App Package resource may use a driver that
 does not enable address reuse; named resource allocation therefore retains its
 stricter plain-bind test and skips `TIME_WAIT` ports.
 
-## 2026-08-30 — Manage RemoteXApp and WAOS as a frozen provider/consumer pair
+## 2026-08-30 — Manage RemoteXApp and host application as a frozen provider/consumer pair
 
 Status: accepted for the App Package ABI V1 release train.
 
 RemoteXApp owns the generic ABI, SDK, immutable provider artifact, fixtures,
-and the complete handoff tuple. WAOS owns protocol adapters, user-facing
+and the complete handoff tuple. The host application owns protocol adapters, user-facing
 behavior, its integration branch, and the exact consumer lock. Ordinary App
-Package changes that preserve V1 and add no WAOS-specific behavior remain
+Package changes that preserve V1 and add no host application-specific behavior remain
 independently deployable; new specialized protocols require a coordinated
 adapter task, while breaking ABI/SDK changes require a paired-major release.
 
 The provider tuple is frozen before downstream evidence begins and includes
 all source, artifact, SDK graph, API, template, protocol, and fixture
-identities. Any tuple drift invalidates affected WAOS evidence even if the
+identities. Any tuple drift invalidates affected host application evidence even if the
 version label is unchanged. Floating branches, `latest` artifacts, runtime
 downloads, and copied provider source are prohibited dependency mechanisms.
 
-For a breaking pair, both artifacts are installed side by side first. WAOS is
-stopped or quiesced while RemoteXApp is selected and verified, then WAOS is
+For a breaking pair, both artifacts are installed side by side first. The host application is
+stopped or quiesced while RemoteXApp is selected and verified, then host application is
 selected and started. Rollback uses the same stopped-consumer boundary,
-restores both old selectors, and starts RemoteXApp before WAOS. Local
+restores both old selectors, and starts RemoteXApp before host application. Local
 acceptance must prove rollback and restoration in both directions before any
-explicitly approved sandbox00 action. This prevents a public mixed-ABI window
+explicitly approved test-host-a action. This prevents a public mixed-ABI window
 without adding a permanent compatibility layer or a third coordination
-repository. WAOS classifies this breaking dependency transition as
+repository. The host application classifies this breaking dependency transition as
 `staging-required`, allocates its immutable managed tag before the first live
-activation, and treats sandbox00 staging and production as separately approved
+activation, and treats test-host-a staging and production as separately approved
 checkpoints.
 
 ## 2026-08-30 — Separate system release staging from paired activation
@@ -1616,7 +1640,7 @@ uses the same budget to verify restoration.
 ## 2026-08-30 — Supersede the Edge template identity without changing core
 
 Status: EDGE-001 through EDGE-004 scope-locked as `edge@1.0.0` on 2026-08-30;
-implementation, local verification, and sandbox00 production are authorized,
+implementation, local verification, and test-host-a production are authorized,
 while every other sandbox remains excluded.
 
 The public Microsoft Edge App Package and template identity will be exactly
@@ -1632,13 +1656,13 @@ runtime before activating `edge`, preserves the profile, restarts only the
 manager, and proves old runtime/port cleanup. Since the core derives the
 profile root from the template ID, the stopped profile directory is atomically
 renamed from `edge-browser/default` to `edge/default`; the migration fails
-closed when both exist instead of merging mutable browser state. WAOS owns the
+closed when both exist instead of merging mutable browser state. The host application owns the
 small consumer-side adapter-key migration if it adopts the new ID. This is
 coordinated application delivery, not a breaking RemoteXApp ABI pair.
 
-## 2026-08-30 — Deploy Edge identity independently on sandbox00
+## 2026-08-30 — Deploy Edge identity independently on test-host-a
 
-Status: EDGE-001 through EDGE-004 implemented; sandbox00 production automated
+Status: EDGE-001 through EDGE-004 implemented; test-host-a production automated
 acceptance passed. No other sandbox was changed.
 
 The deployment installed the checksummed package without activating it, proved
@@ -1649,7 +1673,7 @@ and deliberately retained the unrelated historical `temporary` profile. Both
 pre-existing runtimes were adopted with unchanged unit PIDs. Real viewer/CDP
 acceptance and a second manager restart left no active or durable Edge test
 runtime. This validates independent App delivery: the core remained rc.4 and
-no core, gateway, status-helper, SDK, WAOS, staging, or other sandbox artifact
+no core, gateway, status-helper, SDK, host application, staging, or other sandbox artifact
 was replaced.
 
 ## 2026-08-30 — Separate release-runner inventory from dependency contracts
@@ -1690,16 +1714,16 @@ never published a Release or assets; only the final tag is immutable.
 
 ## 2026-08-30 — Promote the formal core and Edge release to follower sandboxes
 
-Status: accepted on sandbox02, sandbox03, sandbox07, and sandbox10 after
-explicit operator authorization; sandbox00 was not changed.
+Status: accepted on test-host-c, test-host-d, test-host-h, and test-host-k after
+explicit operator authorization; test-host-a was not changed.
 
 Each follower had the same `0.2.0-rc.4` version directory from the earlier
 unpublished candidate, so immutable publication could not overwrite it. With
 zero clients, deployment stopped every active runtime, retained both candidate
 core trees under a commit-qualified name, installed the published core
 artifact, replaced `edge-browser` with the byte-identical `edge@1.0.0` release,
-and recreated the managed Desktop. Existing WAOS deployments, user files, and
-persistent profiles were not replaced. Sandbox10's detached Firefox runtime
+and recreated the managed Desktop. Existing host application deployments, user files, and
+persistent profiles were not replaced. test-host-k's detached Firefox runtime
 was stopped through the API and its persistent profile retained for later
 on-demand creation.
 
@@ -1715,7 +1739,7 @@ changes.
 ## 2026-08-31 — Keep managed recovery on one durable runtime identity
 
 Status: RTM-010 scope-locked and implemented for `0.2.0-rc.5`; local and
-sandbox00 automated production acceptance passed. Human UAT and formal GitHub
+test-host-a automated production acceptance passed. Human UAT and formal GitHub
 publication remain pending. Supersedes the runtime-ID-change allowance in the
 2026-08-27 driver lifecycle decision without changing explicit stopped-to-
 running update behavior.
@@ -1743,23 +1767,23 @@ preserved.
 ## 2026-08-31 — Promote rc.5 to the four authorized follower sandboxes
 
 Status: automated deployment and runtime-restart acceptance passed on
-sandbox02, sandbox03, sandbox07, and sandbox10. Human UAT and formal GitHub
+test-host-c, test-host-d, test-host-h, and test-host-k. Human UAT and formal GitHub
 publication remain pending.
 
 The operator separately authorized the exact rc.5 artifact and restart of all
-RemoteXApp application runtimes on the four followers. Sandbox02 and sandbox03
-were healthy controls. Sandbox07 and sandbox10 were real pre-rc.5 failure
+RemoteXApp application runtimes on the four followers. test-host-c and test-host-d
+were healthy controls. test-host-h and test-host-k were real pre-rc.5 failure
 cases: their managers had entered restart loops with three and two Desktop
 manifests respectively. Activation was allowed to run RTM-010 repair without
 manual manifest deletion; each durable managed pointer won, stale exact state
-was retired, and sandbox10's anonymous Firefox and Edge records survived.
+was retired, and test-host-k's anonymous Firefox and Edge records survived.
 
 Every runtime was then intentionally recreated so its locked core components
 use rc.5 while its template, profile, parameters, and overrides remain. A
 second manager restart adopted the new records. Acceptance requires one
 manifest per API runtime, all runtimes server-ready with stopped sessions and
 zero clients, `NRestarts=0`, no warning after the final restart, and unchanged
-App selectors and network policy. Sandbox07 remains always-on and its LXD
+App selectors and network policy. test-host-h remains always-on and its LXD
 container was not restarted. The unavailable build-host private-IP path is an
 external network dependency, not a reason to broaden UFW or use the production
 gateway for batch validation.
@@ -1767,8 +1791,8 @@ gateway for batch validation.
 ## 2026-08-31 — Publish rc.5 and align the five sandboxes to formal bytes
 
 Status: GitHub prerelease `v0.2.0-rc.5` published and checksum-verified formal
-alignment accepted automatically on sandbox00, sandbox02, sandbox03,
-sandbox07, and sandbox10. Human UAT remains pending. This supersedes only the
+alignment accepted automatically on test-host-a, test-host-c, test-host-d,
+test-host-h, and test-host-k. Human UAT remains pending. This supersedes only the
 pending-publication status of the two preceding rc.5 entries.
 
 The tag points to accepted source commit `8c03c485adc5`. GitHub's clean
@@ -1781,7 +1805,7 @@ overwriting an existing release remained forbidden.
 
 Each host stopped zero-client runtimes, retained both old core trees as
 `0.2.0-rc.5-candidate-8c03c485adc5`, installed the downloaded formal archive,
-and recreated launch intent before a final adoption restart. Sandbox00's XFCE
+and recreated launch intent before a final adoption restart. test-host-a's XFCE
 session exercised the host policy: graceful logout returned
 `shutdown-blocked`, then the explicitly authorized deployment enforced that
 Desktop stop; both browser runtimes stopped normally. Fleet acceptance matched
@@ -1948,7 +1972,7 @@ The final local deployment remains the explicitly requested
 restart is not advertised, and its helper is disabled and inactive. The two
 pre-existing XFCE runtimes are server-ready with stopped sessions and zero
 clients; all test runtimes were removed. No sandbox was changed. Evidence is
-[`unified-console-rc9-local-1991.json`](../tests/go-live-validation/results/unified-console-rc9-local-1991.json).
+[`unified-console-rc9-local-1991.json`](private-history.md).
 
 ## 2026-09-01 — Reject rc.9 flat navigation and lock CON-010
 
@@ -1991,7 +2015,7 @@ disconnect, and `Reconnect` succeeded. The fixture and Chrome profile were
 removed. Final health reports two active runtimes, zero clients, no warning
 journal entries, and no service restarts. The helper remains disabled under
 the requested unauthenticated listener, and no sandbox changed. Evidence is
-[`unified-console-rc10-navigation-local-1991.json`](../tests/go-live-validation/results/unified-console-rc10-navigation-local-1991.json).
+[`unified-console-rc10-navigation-local-1991.json`](private-history.md).
 
 ## 2026-09-01 — Accept Unified Console Human UAT
 
@@ -2015,15 +2039,15 @@ not become stable merely because their code or documentation is present.
 
 Stable publication requires explicit Firefox and LibreOffice Human UAT,
 candidate recovery evidence and closure for GitHub Issues #4 and #5, accurate
-stable support/trust-boundary documents, WAOS contract compatibility without a
+stable support/trust-boundary documents, host application contract compatibility without a
 forced downstream release, clean release and confidentiality gates, immutable
 local upgrade/rollback acceptance, and separately approved production-like
-sandbox00 acceptance. Tagging and publication follow only afterward, and the
+test-host-a acceptance. Tagging and publication follow only afterward, and the
 downloaded formal artifact must be verified and aligned as a new immutable
 release. Follower sandboxes and new functionality are outside this train.
 
 The scope lock authorizes preparation and testing only. It does not authorize
-sandbox00 staging or production mutation, a Git tag, GitHub publication, or
+test-host-a staging or production mutation, a Git tag, GitHub publication, or
 formal deployment. Those steps retain their explicit approvals and ordering.
 The full contract is
 [`stable-0.2.0-release.md`](stable-0.2.0-release.md).
@@ -2053,12 +2077,12 @@ proposed EXP-001 through EXP-006 and IME-004; and implemented but experimental
 EXP-007 remain outside the stable compatibility promise. Firefox and
 LibreOffice remain implemented but await explicit Human UAT.
 
-## 2026-09-01 — Accept provider compatibility without a WAOS release
+## 2026-09-01 — Accept provider compatibility without a host application release
 
-Status: STB-005 implemented; WAOS remains independently releasable.
+Status: STB-005 implemented; host application remains independently releasable.
 
 The accepted downstream baseline is RemoteXApp `v0.2.0-rc.4`, SDK `0.17.0`,
-App Package ABI `remotexapp/v1`, and WAOS v2.0.91. Comparison to the stable
+App Package ABI `remotexapp/v1`, and host application v2.0.91. Comparison to the stable
 source found no App Package parser/test change and no source change in any of
 the six frozen Apps. SDK 0.18 preserves SDK 0.17 exports and the viewer/input
 client bytes while adding manager-only version, health, runtime-restart, and
@@ -2068,8 +2092,8 @@ The isolated port-21991 build-once E2E installed and launched a neutral V1 App,
 adopted it across manager restart, activated a new App version without changing
 core binaries, retained the old runtime pin, selected the new version for a new
 runtime, then disabled and rolled back the App. This is sufficient provider
-evidence because neither the V1 envelope nor an existing WAOS-consumed method
-changed. It deliberately did not build, modify, or release WAOS. WAOS updates
+evidence because neither the V1 envelope nor an existing host application-consumed method
+changed. It deliberately did not build, modify, or release host application. The host application updates
 its exact provider lock and reruns affected flows only when it independently
 chooses to adopt `0.2.0`.
 
@@ -2121,14 +2145,14 @@ kept one manifest and the same manager PID, and left `NRestarts=0`.
 
 Final local state remains the requested unauthenticated wide-test listener with
 two expected runtimes, zero clients, zero warnings, and no test residue. This
-configuration is not a production-security claim. Sandbox00 was not changed,
+configuration is not a production-security claim. test-host-a was not changed,
 and its separate approval gate remains authoritative.
 
 ## 2026-09-01 — Make release content requirements version-aware
 
 Status: DEP-015 implemented; replacement stable candidate required.
 
-The first approved sandbox00 stable staging attempt exposed a rollback defect:
+The first approved test-host-a stable staging attempt exposed a rollback defect:
 the new selector required `remotexapp-operator-helper` in every target release,
 but retained rc.5 correctly predates that optional binary. The selector failed
 before changing rc.5 selectors; the already-running candidate was restored to
@@ -2155,7 +2179,7 @@ must restart.
 
 ## 2026-09-01 — Accept the replacement candidate locally
 
-Status: STB-007 implemented again; sandbox00 replacement staging not approved.
+Status: STB-007 implemented again; test-host-a replacement staging not approved.
 
 Clean commit `ca1d0b26bf8f` passed both release gates and produced reproducible
 archive SHA-256
@@ -2169,12 +2193,12 @@ authenticated environment-owned service-restart policy, malformed-policy
 rejection, fixed framebuffer, finite/unlimited/automatic reconnect, and the
 Issue #4/#5 abnormal recovery paths. Final port 1991 state is healthy with two
 runtimes, zero clients, zero warning entries, and no temporary listener, unit,
-or browser residue. The old sandbox00 staging tree remains inactive and rc.5
+or browser residue. The old test-host-a staging tree remains inactive and rc.5
 remains selected; a new explicit staging approval is required.
 
 ## 2026-09-01 — Publish stable 0.2.0 and align the local formal artifact
 
-Status: GitHub publication and local formal alignment accepted; sandbox00
+Status: GitHub publication and local formal alignment accepted; test-host-a
 formal alignment remains pending separate approval.
 
 Annotated tag `v0.2.0` points to `9ef470c01399`. Both the main Verify workflow
@@ -2198,17 +2222,17 @@ generation, state, and every child PID remained exact; Apps and listener policy
 were unchanged. A disposable Mousepad proved the new formal component paths
 and complete cleanup. A final adoption restart removed its in-memory stopped
 record, retained the original runtimes without PID churn, and left no warning.
-This gate does not authorize or perform sandbox00 formal alignment.
+This gate does not authorize or perform test-host-a formal alignment.
 
-## 2026-09-01 — Complete stable 0.2.0 on sandbox00 formal production bytes
+## 2026-09-01 — Complete stable 0.2.0 on test-host-a formal production bytes
 
 Status: STB-009 accepted; stable 0.2.0 release train complete.
 
-Under a separate explicit production approval, sandbox00 retained candidate
+Under a separate explicit production approval, test-host-a retained candidate
 `ca1d0b26bf8f` under a commit-qualified immutable directory and selected the
 checksum-verified GitHub `v0.2.0` artifact at `9ef470c01399`. Because the
 candidate and formal artifact share version `0.2.0`, the documented collision
-procedure required a zero-client stop and recreation of `sandbox-desktop`; it
+procedure required a zero-client stop and recreation of `primary-desktop`; it
 did not overwrite either immutable tree. The final runtime is server-ready,
 has one durable manifest, and survives manager restart under the same identity.
 
@@ -2221,17 +2245,17 @@ hashes, App selectors, fixed display policy, routes, configuration, child-unit
 states, `NRestarts=0`, and an empty warning journal.
 
 Validation stayed on container loopback. The build host remains outside
-sandbox00's existing UFW allowlist, so direct private HTTP timed out; the
+test-host-a's existing UFW allowlist, so direct private HTTP timed out; the
 firewall and production gateway were deliberately unchanged. Exact evidence is
-[`stable-0.2.0-formal-sandbox00-production.json`](../tests/go-live-validation/results/stable-0.2.0-formal-sandbox00-production.json).
+[`stable-0.2.0-formal-test-host-a-production.json`](private-history.md).
 
 ## 2026-09-01 — Align follower sandboxes after the stable train
 
 Status: separately approved post-train production rollout accepted.
 
 The stable train explicitly excluded follower deployment. After it completed,
-the operator separately authorized sandbox02, sandbox03, sandbox07, and
-sandbox10 to select the same checksum-verified `v0.2.0` GitHub artifact. This
+the operator separately authorized test-host-c, test-host-d, test-host-h, and
+test-host-k to select the same checksum-verified `v0.2.0` GitHub artifact. This
 did not reopen STB-001 through STB-009 or change release scope.
 
 Each target started from formal rc.5 with zero attached clients and no stable
@@ -2244,12 +2268,12 @@ change. Rc.5 remains an immutable rollback target, and adopted runtime
 components deliberately remain rc.5-pinned until natural recreation.
 
 All four targets ended with one runtime and manifest, zero clients,
-`NRestarts=0`, and no warning. Sandbox10 retained its running Desktop session
-while its manifestless stopped history was cleared normally. Sandbox07's
+`NRestarts=0`, and no warning. test-host-k retained its running Desktop session
+while its manifestless stopped history was cleared normally. test-host-h's
 always-on configuration was untouched. Existing UFW allowlists still block
 build-host private HTTP; no firewall or production-gateway action was taken.
 Exact evidence is
-[`stable-0.2.0-formal-followers-production.json`](../tests/go-live-validation/results/stable-0.2.0-formal-followers-production.json).
+[`stable-0.2.0-formal-followers-production.json`](private-history.md).
 
 ## 2026-09-02 — Propose a breaking catalog simplification as 0.3.0
 
@@ -2300,7 +2324,7 @@ depth-16 VNC process, live BiDi, resize, reconnect, Unicode input
 acknowledgement, and cleanup. Human UAT is now the sole remaining local
 acceptance action; sandboxes, tagging, and publication remain unauthorized.
 Exact evidence is
-[`template-catalog-0.3.0-rc.1-local-1991.json`](../tests/go-live-validation/results/template-catalog-0.3.0-rc.1-local-1991.json).
+[`template-catalog-0.3.0-rc.1-local-1991.json`](private-history.md).
 
 ## 2026-09-02 — Accept 0.3.0 Human UAT and authorize formal publication
 
@@ -2314,7 +2338,7 @@ input change would invalidate this acceptance and require the candidate gate
 again. The formal tag must pass the complete portable release workflow and its
 downloaded archive/checksum must be independently verified. Exact Human UAT
 evidence is
-[`template-catalog-0.3.0-rc.1-human-uat.json`](../tests/go-live-validation/results/template-catalog-0.3.0-rc.1-human-uat.json).
+[`template-catalog-0.3.0-rc.1-human-uat.json`](private-history.md).
 
 ## 2026-09-02 — Publish stable RemoteXApp 0.3.0
 
@@ -2331,7 +2355,7 @@ The formal Go 1.22.12 archive differs from the same-source local Go 1.22.2
 artifact, so the attached GitHub `SHA256SUMS` is authoritative. Publication
 does not imply deployment: local port 1991 remains on the accepted rc.1 bytes,
 and no sandbox was changed. Exact evidence is
-[`template-catalog-0.3.0-formal-publication.json`](../tests/go-live-validation/results/template-catalog-0.3.0-formal-publication.json).
+[`template-catalog-0.3.0-formal-publication.json`](private-history.md).
 
 ## 2026-09-02 — Propose one bidirectional rich clipboard train
 
@@ -2417,7 +2441,7 @@ Mousepad, and full two-Viewer XFCE testing on local `0.0.0.0:1991`. The local
 generation transition rejected stale requests and replayed no offers; the
 owner-only socket, installed licenses, zero payload-pattern journal matches,
 and test cleanup were verified. Exact payload-free evidence is
-[`rich-clipboard-0.4.0-rc.1-local-1991.json`](../tests/go-live-validation/results/rich-clipboard-0.4.0-rc.1-local-1991.json).
+[`rich-clipboard-0.4.0-rc.1-local-1991.json`](private-history.md).
 No sandbox, tag, or GitHub Release was created.
 
 ## 2026-09-02 — Supersede clipboard expiry ownership for rc.2
@@ -2463,7 +2487,7 @@ only the empty tombstone, test Viewers were removed, the Manager had zero
 restarts and warnings, and clipboard payload patterns were absent from its
 journal. Existing rc.1 evidence remains as the rejected-candidate audit record.
 Exact payload-free evidence is
-[`rich-clipboard-0.4.0-rc.2-local-1991.json`](../tests/go-live-validation/results/rich-clipboard-0.4.0-rc.2-local-1991.json).
+[`rich-clipboard-0.4.0-rc.2-local-1991.json`](private-history.md).
 No sandbox, tag, or GitHub Release was created.
 
 ## 2026-09-02 — Extend the clipboard train with explicit browser authorization
@@ -2515,7 +2539,7 @@ multi-Viewer, expiry, Clipman, and port-1991 evidence for the unchanged data
 plane and the exact rc.3 browser check for CLP-017. It does not claim that rc.3
 was installed on port 1991: that service remains rc.2. The publication approval
 does not authorize local replacement or any sandbox deployment. Evidence is
-[`rich-clipboard-0.4.0-rc.3-human-uat.json`](../tests/go-live-validation/results/rich-clipboard-0.4.0-rc.3-human-uat.json).
+[`rich-clipboard-0.4.0-rc.3-human-uat.json`](private-history.md).
 
 ## 2026-09-02 — Publish RemoteXApp 0.4.0-rc.3
 
@@ -2535,7 +2559,7 @@ is authoritative.
 
 Publication did not install or activate the release. Local port 1991 remains
 on rc.2 and no sandbox changed. Exact evidence is
-[`rich-clipboard-0.4.0-rc.3-formal-publication.json`](../tests/go-live-validation/results/rich-clipboard-0.4.0-rc.3-formal-publication.json).
+[`rich-clipboard-0.4.0-rc.3-formal-publication.json`](private-history.md).
 
 ## 2026-09-02 — Promote accepted clipboard rc.3 to stable 0.4.0
 
@@ -2554,7 +2578,7 @@ The stable commit must repeat local and hosted release gates; the downloaded
 GitHub archive and checksum must be independently verified. Promotion itself
 does not authorize local port-1991 replacement or any sandbox deployment.
 Acceptance evidence is
-[`rich-clipboard-0.4.0-stable-acceptance.json`](../tests/go-live-validation/results/rich-clipboard-0.4.0-stable-acceptance.json).
+[`rich-clipboard-0.4.0-stable-acceptance.json`](private-history.md).
 
 ## 2026-09-02 — Publish stable RemoteXApp 0.4.0
 
@@ -2576,7 +2600,7 @@ five App Package checksums passed. The formal Go 1.22.12 archive differs from
 the same-source local Go 1.22.2 gate archive, so the attached formal checksum
 is authoritative. Local port 1991 remains on rc.2 and no sandbox changed.
 Exact evidence is
-[`rich-clipboard-0.4.0-formal-publication.json`](../tests/go-live-validation/results/rich-clipboard-0.4.0-formal-publication.json).
+[`rich-clipboard-0.4.0-formal-publication.json`](private-history.md).
 
 ## 2026-09-02 — Deploy stable RemoteXApp 0.4.0 to the approved fleet
 
@@ -2584,8 +2608,8 @@ Status: complete; eight endpoints aligned to the formal stable manager and
 catalog without restarting existing production runtimes.
 
 The operator authorized the post-publication rollout to local ports 1991 and
-2991, sandbox00 production 1991 and isolated test 2991, then sandbox02,
-sandbox03, sandbox07, and sandbox10 production 1991. Every target used the
+2991, test-host-a production 1991 and isolated test 2991, then test-host-c,
+test-host-d, test-host-h, and test-host-k production 1991. Every target used the
 independently downloaded GitHub archive whose SHA-256 is
 `c12ccf4db75ee693ef27142786439086f22b6209ad63f8be0e21c5a7d114d871`.
 All endpoints report stable `0.4.0` commit `292a20ba5d7e`; installed and running
@@ -2595,7 +2619,7 @@ is entirely 16-bit, and post-activation warning journals are empty.
 The isolated 2991 managers are loopback-only, disable console, retain kiosk,
 and contain no runtime. Production sandbox configuration remains public
 no-auth only under the existing controlled boundary, with document roots
-`/home/sandbox`, `/mnt/CloudDrive`, and `/mnt/MyDrive`. Sandbox07's always-on
+`/home/appuser`, `/srv/example-documents`, and `/srv/example-storage`. test-host-h's always-on
 configuration and durable managed registration were checksum-identical before
 and after activation.
 
@@ -2604,7 +2628,7 @@ the same identity and remains component-locked to its creation release until
 its next explicit stop/start. This preserves the accepted live-upgrade
 contract and means manager/catalog activation must not be interpreted as an
 implicit runtime component replacement. Exact evidence is
-[`rich-clipboard-0.4.0-fleet-deployment.json`](../tests/go-live-validation/results/rich-clipboard-0.4.0-fleet-deployment.json).
+[`rich-clipboard-0.4.0-fleet-deployment.json`](private-history.md).
 
 ## Related specifications
 
@@ -2628,7 +2652,7 @@ Each `RemoteXAppClient` keeps its prompt configuration but reads and
 fingerprints local content only while its own input host is active. Activation
 performs one immediate reconciliation; inactive signals do not mutate that
 Client's fingerprints. Browser focus provides mutual exclusion, so a second
-WAOS-level clipboard coordinator or shared active-Viewer registry is rejected.
+The host application-level clipboard coordinator or shared active-Viewer registry is rejected.
 An embedding window manager only performs its normal focus handoff through
 `client.focus()` when activation happens outside the remote canvas. The SDK
 must prevent automatic RFB connection focus from claiming clipboard activity.
@@ -2685,7 +2709,7 @@ safety, A-only rebound suppression followed by B forwarding, remote fanout,
 move/minimize/switch, scoped disconnect, and Viewer-only close. Both local
 environments run the candidate and passed their configured Console/kiosk
 boundaries. Exact evidence is
-[`client-active-clipboard-0.5.0-rc.1-local.json`](../tests/go-live-validation/results/client-active-clipboard-0.5.0-rc.1-local.json).
+[`client-active-clipboard-0.5.0-rc.1-local.json`](private-history.md).
 
 ## 2026-09-03 — Accept client-active clipboard UAT and authorize publication
 
@@ -2698,7 +2722,7 @@ remain immutable, the hosted workflow must repeat the release gate, and the
 downloaded archive must be checked against the published checksum and its
 embedded release, SDK, App Package, and source identities. This approval does
 not authorize any sandbox deployment. Exact acceptance evidence is
-[`client-active-clipboard-0.5.0-rc.1-human-uat.json`](../tests/go-live-validation/results/client-active-clipboard-0.5.0-rc.1-human-uat.json).
+[`client-active-clipboard-0.5.0-rc.1-human-uat.json`](private-history.md).
 
 ## 2026-09-03 — Publish and independently verify 0.5.0-rc.1
 
@@ -2714,7 +2738,7 @@ expected generated assets, and validated all five embedded App Package
 archives, seals, ABI identities, and 16-bit templates. Stable `v0.4.0` remains
 Latest. No local formal-artifact deployment or sandbox change was made. Exact
 evidence is
-[`client-active-clipboard-0.5.0-rc.1-formal-publication.json`](../tests/go-live-validation/results/client-active-clipboard-0.5.0-rc.1-formal-publication.json).
+[`client-active-clipboard-0.5.0-rc.1-formal-publication.json`](private-history.md).
 
 ## 2026-09-03 — Promote the accepted rc.1 behavior to stable 0.5.0
 
@@ -2727,9 +2751,9 @@ not a prerelease, and approved promoting the accepted `v0.5.0-rc.1` behavior to
 support/release documentation may change; SDK `0.21.0`, App Package ABI V1,
 all five App versions, generated assets, and runtime behavior remain exact.
 After hosted publication and independent download verification, the same
-formal bytes are authorized for local 1991/2991, sandbox00 1991/2991, and
-sandbox02/03/07/10 production 1991. No other host is in scope. Evidence is
-[`client-active-clipboard-0.5.0-stable-acceptance.json`](../tests/go-live-validation/results/client-active-clipboard-0.5.0-stable-acceptance.json).
+formal bytes are authorized for local 1991/2991, test-host-a 1991/2991, and
+test-host-c/03/07/10 production 1991. No other host is in scope. Evidence is
+[`client-active-clipboard-0.5.0-stable-acceptance.json`](private-history.md).
 
 ## 2026-09-03 — Publish and deploy stable RemoteXApp 0.5.0
 
@@ -2742,42 +2766,42 @@ a fresh download matched SHA-256
 the embedded source identity, SDK `0.21.0`, five App archives, seals, and
 16-bit catalog. The release is neither draft nor prerelease and is GitHub
 Latest. Exact publication evidence is
-[`client-active-clipboard-0.5.0-formal-publication.json`](../tests/go-live-validation/results/client-active-clipboard-0.5.0-formal-publication.json).
+[`client-active-clipboard-0.5.0-formal-publication.json`](private-history.md).
 
-The same formal bytes now run on local 1991/2991, sandbox00 1991/2991, and
-sandbox02/03/07/10 production 1991. Production managers passed two restart and
+The same formal bytes now run on local 1991/2991, test-host-a 1991/2991, and
+test-host-c/03/07/10 production 1991. Production managers passed two restart and
 adoption checks without replacing active runtimes; runtime IDs and creation
-times remained stable, active manifest counts matched, and sandbox07's
+times remained stable, active manifest counts matched, and test-host-h's
 environment and durable managed record checksums were unchanged. Both 2991
 managers remain loopback-only with Console disabled, SDK enabled, four Apps,
 and zero runtime. All warning journals were empty. Build-host HTTP to the LXD
 private addresses remained blocked by the existing network boundary, so no
 firewall or production gateway change was made. Exact rollout evidence is
-[`client-active-clipboard-0.5.0-fleet-deployment.json`](../tests/go-live-validation/results/client-active-clipboard-0.5.0-fleet-deployment.json).
+[`client-active-clipboard-0.5.0-fleet-deployment.json`](private-history.md).
 
-## 2026-09-03 — Recreate the legacy sandbox00 desktop for clipboard support
+## 2026-09-03 — Recreate the legacy test-host-a desktop for clipboard support
 
-Status: sandbox00 remediation complete; follower runtime replacement remains
+Status: test-host-a remediation complete; follower runtime replacement remains
 outside the approval scope.
 
 Post-deployment use proved that manager/catalog alignment does not imply a
 live adopted runtime has newly introduced gateway capabilities. The existing
-`sandbox-desktop` was correctly pinned to the 0.2.0 gateway and had no rich
+`primary-desktop` was correctly pinned to the 0.2.0 gateway and had no rich
 clipboard socket. Its capabilities endpoint therefore returned HTTP 409.
 Restarting that runtime preserved the pin by design and could not repair it.
 
 The operator approved ending the zero-client XFCE session and recreating only
-sandbox00's managed desktop. Graceful logout was attempted first and reported
+test-host-a's managed desktop. Graceful logout was attempted first and reported
 `shutdown-blocked`; the already disclosed session-loss boundary was then
 enforced with scoped `force:true`. The old manifest and socket directory were
 removed before desired state returned to running. New runtime
-`xfce-user-desktop-2e7b598b6a5a` pins all core components to 0.5.0 and exposes
+`xfce-user-desktop-EXAMPLE` pins all core components to 0.5.0 and exposes
 the clipboard socket. A temporary loopback Edge Viewer passed SDK capabilities,
 plain/HTML/RTF/PNG browser-to-X11 transfer, and XFixes remote-to-browser
 delivery, then detached cleanly. No other runtime lifecycle API was called.
 The remaining follower desktops still pin pre-clipboard gateways and require
 separate destructive-recreation approval. Exact evidence is
-[`client-active-clipboard-0.5.0-sandbox00-runtime-remediation.json`](../tests/go-live-validation/results/client-active-clipboard-0.5.0-sandbox00-runtime-remediation.json).
+[`client-active-clipboard-0.5.0-test-host-a-runtime-remediation.json`](private-history.md).
 
 ## 2026-09-03 — Propose clipboard prompt host-safety hardening
 
@@ -2865,7 +2889,7 @@ Candidate commit `b6e6b2fb19e4` subsequently passed `make release-ci`, the
 isolated four-App real-browser harness, and the full two-Viewer clipboard path
 inside both Mousepad and LibreOffice. Both local managers were then activated
 on the exact candidate. Port 1991 retained `0.0.0.0:1991`, Console and kiosk;
-its existing `xfce-user-desktop-2c5cf858536f` remained generation 1. Port 2991
+its existing `xfce-user-desktop-EXAMPLE` remained generation 1. Port 2991
 retained loopback-only, Console-disabled, kiosk-enabled policy. Each deployed
 environment independently passed rich transfer, omitted-RTF no-rebound,
 genuine-change prompting, XFixes fanout, view-only, reconnect, permission,
@@ -2885,7 +2909,7 @@ downloaded archive must be verified against its attached checksum plus its
 embedded release, SDK, App Package, generated-asset, and source identities.
 This approval does not authorize any sandbox deployment. Exact acceptance is
 recorded in
-[`clipboard-prompt-reliability-0.5.1-rc.1-human-uat.json`](../tests/go-live-validation/results/clipboard-prompt-reliability-0.5.1-rc.1-human-uat.json).
+[`clipboard-prompt-reliability-0.5.1-rc.1-human-uat.json`](private-history.md).
 
 ## 2026-09-03 — Publish RemoteXApp 0.5.1-rc.1 prerelease
 
@@ -2901,7 +2925,7 @@ sensitive-data scan, validated all five App Package checksums and seals, and
 started with five expected templates plus healthy `/healthz` and `/readyz`.
 The served SDK and Console assets matched the committed generated bytes. Exact
 evidence is
-[`clipboard-prompt-reliability-0.5.1-rc.1-formal-publication.json`](../tests/go-live-validation/results/clipboard-prompt-reliability-0.5.1-rc.1-formal-publication.json).
+[`clipboard-prompt-reliability-0.5.1-rc.1-formal-publication.json`](private-history.md).
 
 ## 2026-09-03 — Promote 0.5.1 and define the formal alignment process
 
@@ -2909,11 +2933,11 @@ Status: stable `v0.5.1` publication and the enumerated eight-endpoint rollout
 authorized; no functional change permitted.
 
 The operator accepted the published `v0.5.1-rc.1` behavior as the stable
-release and authorized local 1991/2991, sandbox00 1991/2991, and
-sandbox02/03/07/10 production 1991 only. SDK `0.21.1`, App Package ABI V1,
+release and authorized local 1991/2991, test-host-a 1991/2991, and
+test-host-c/03/07/10 production 1991 only. SDK `0.21.1`, App Package ABI V1,
 package versions, dependencies, templates, drivers, and generated assets must
 remain identical to the accepted candidate. Exact acceptance is
-[`clipboard-prompt-reliability-0.5.1-stable-acceptance.json`](../tests/go-live-validation/results/clipboard-prompt-reliability-0.5.1-stable-acceptance.json).
+[`clipboard-prompt-reliability-0.5.1-stable-acceptance.json`](private-history.md).
 
 This rollout and future explicitly approved fleet rollouts use the documented
 [对齐流程](release-alignment-process.md): independently verify one GitHub
@@ -2934,10 +2958,10 @@ downloaded linux/amd64 archive matched its attached checksum at
 passed the sensitive-data and isolated startup checks, and retained the exact
 accepted SDK `0.21.1` plus five App Package identities and seals. Exact
 publication evidence is
-[`clipboard-prompt-reliability-0.5.1-formal-publication.json`](../tests/go-live-validation/results/clipboard-prompt-reliability-0.5.1-formal-publication.json).
+[`clipboard-prompt-reliability-0.5.1-formal-publication.json`](private-history.md).
 
-The same formal bytes now run on local 1991/2991, sandbox00 1991/2991, and
-sandbox02/03/07/10 production 1991. Production Managers adopted all existing
+The same formal bytes now run on local 1991/2991, test-host-a 1991/2991, and
+test-host-c/03/07/10 production 1991. Production Managers adopted all existing
 runtimes with unchanged ID, creation time, and session generation; runtime
 components stayed locked to their creation releases. All endpoints passed
 repeat health/readiness, exact running-binary, SDK, catalog, route, listener,
@@ -2946,7 +2970,7 @@ also passed a temporary on-attach kiosk smoke and were cleaned afterward.
 Existing LXD network policy continued to block build-host private HTTP, so
 container loopback was used; no firewall or production-gateway state changed.
 Exact evidence is
-[`clipboard-prompt-reliability-0.5.1-alignment.json`](../tests/go-live-validation/results/clipboard-prompt-reliability-0.5.1-alignment.json).
+[`clipboard-prompt-reliability-0.5.1-alignment.json`](private-history.md).
 
 ## 2026-09-04 — Adopt measured test tiers and build-once release promotion
 
@@ -3066,7 +3090,7 @@ that exact behavior and authorized stable promotion. The promotion changes
 version/release records and release automation only; Manager, gateway, SDK,
 App Package ABI, Apps, templates, drivers, and generated browser assets remain
 unchanged. Exact UAT and promotion authorization is recorded in
-[`development-quality-0.5.2-stable-acceptance.json`](../tests/evidence/v1/development-quality-0.5.2-stable-acceptance.json).
+[`development-quality-0.5.2-stable-acceptance.json`](private-history.md).
 
 ## 2026-09-04 — Make the release verifier's native dependency explicit
 
@@ -3080,9 +3104,9 @@ publication because `scripts/check-sensitive-data.sh` correctly requires
 jobs already installed the dependency. The accepted candidate was published
 unchanged only after the same fail-closed check passed locally and the
 published assets were downloaded and reverified. The failure is preserved in
-[`release-ripgrep-dependency-gap.json`](../tests/evidence/v1/release-ripgrep-dependency-gap.json)
+[`release-ripgrep-dependency-gap.json`](private-history.md)
 and the recovery publication in
-[`development-quality-0.5.2-rc.1-publication.json`](../tests/evidence/v1/development-quality-0.5.2-rc.1-publication.json).
+[`development-quality-0.5.2-rc.1-publication.json`](private-history.md).
 
 Stable release automation now installs `ripgrep` explicitly, and the workflow
 source test prevents its accidental removal. The release metadata gate accepts
@@ -3111,7 +3135,7 @@ manager resource-lifecycle defect rather than increasing the test deadline.
 The replacement passed 500 same-process repetitions and 100 race-enabled
 repetitions without a lost event.
 Exact failure and reproduction evidence is
-[`hosted-cgroup-observer-shutdown-gap.json`](../tests/evidence/v1/hosted-cgroup-observer-shutdown-gap.json).
+[`hosted-cgroup-observer-shutdown-gap.json`](private-history.md).
 
 ## 2026-09-04 — Align the approved eight-endpoint fleet to 0.5.2
 
@@ -3120,8 +3144,8 @@ deployment approval.
 
 The deployment used archive SHA-256
 `0f8ce1756a89b6e32a855bc6b557722d21c9e4dfe52b385c8867827353210a83`
-and commit `815eae926ef7`. Local 1991/2991, sandbox00 1991/2991, and
-sandbox02/03/07/10 production 1991 were selected transactionally, one endpoint
+and commit `815eae926ef7`. Local 1991/2991, test-host-a 1991/2991, and
+test-host-c/03/07/10 production 1991 were selected transactionally, one endpoint
 at a time. Every endpoint passed two version, health, and readiness checks;
 running Manager hashes, SDK assets, App catalogs, selectors, routes, and
 per-endpoint policy matched their expected values.
@@ -3132,7 +3156,7 @@ at activation, all production manifest counts remained one, and the
 post-activation RemoteXApp warning count was zero. The deployment used direct
 LXD private connectivity only; `zerotrust-gw` was not exercised. Exact evidence
 is
-[`development-quality-0.5.2-alignment.json`](../tests/evidence/v1/development-quality-0.5.2-alignment.json).
+[`development-quality-0.5.2-alignment.json`](private-history.md).
 
 ## 2026-09-07 — Plan Firefox interactive focus compatibility with BiDi
 
@@ -3198,7 +3222,7 @@ bytes. The prior desktop identity/generation/profile and configuration remain
 unchanged; only the dedicated Firefox UAT runtime was created and restarted.
 The restart retained its control endpoint and incremented generation, with
 actual input readback in both sessions. Neither local 2991 nor any sandbox
-was deployed. See [acceptance evidence](../tests/evidence/v1/firefox-ime-0.5.3-rc.1-local-1991.json).
+was deployed. See [acceptance evidence](private-history.md).
 
 Candidate provenance verification rejected the linked-worktree build because
 this Go toolchain recognizes a `.git` directory, not that worktree's `.git`
@@ -3214,7 +3238,7 @@ formal publication. Promote the accepted runtime behavior using stable version
 metadata only; retain SDK 0.21.1 and Firefox App 2.1.1. A hosted stable candidate
 must pass exact-artifact acceptance and then be published without rebuilding.
 This authorization does not align local or sandbox deployments. See
-[Human UAT](../tests/evidence/v1/firefox-ime-0.5.3-human-uat.json).
+[Human UAT](private-history.md).
 
 ## 2026-09-08 — Publish immutable stable 0.5.3
 
@@ -3226,7 +3250,7 @@ passed portable validation and exact downloaded-archive local E2E. Release
 VCS and checksum validation passed. Runtime source is unchanged from accepted
 rc.1, Firefox App 2.1.1 bytes match UAT, and SDK remains 0.21.1. Local 1991
 stays on rc.1; other environments were not accessed. See
-[publication evidence](../tests/evidence/v1/firefox-ime-0.5.3-publication.json).
+[publication evidence](private-history.md).
 
 ## 2026-09-09 — Local deployments remain IPv4 loopback-only
 
@@ -3286,7 +3310,7 @@ The exact hosted `0.5.4-rc.1` artifact passed four-App E2E and was selected
 at both local endpoints. New Mousepad/LibreOffice runtimes passed two-Viewer
 clipboard and actual application paste/readback. The live desktop retains
 its generation and old gateway pin; no forced logout or sandbox change occurred.
-See [evidence](../tests/evidence/v1/clipboard-empty-0.5.4-rc.1-local.json).
+See [evidence](private-history.md).
 
 Short-vacancy tests now prewarm the same-origin browser renderer and SDK
 before allocating the runtime. A listening CDP port alone proved insufficient;
@@ -3303,7 +3327,7 @@ tagging. Publication does not authorize further deployment or runtime recreation
 Stable `v0.5.4` was subsequently published from the exact tested same-commit
 candidate. Independent download matched its checksum and bytes, embedded
 identity verified, and the archive passed the sensitive-data gate. It is the
-normal Latest release. See [publication evidence](../tests/evidence/v1/clipboard-empty-0.5.4-publication.json).
+normal Latest release. See [publication evidence](private-history.md).
 
 ## 2026-09-10 — Proposed Mousepad document-launch train
 
@@ -3444,7 +3468,7 @@ identity without invoking either destructive action. Existing desktop pins,
 loopback-only listeners, page policy and token files remain unchanged.
 Live XFCE upgrade and native browser UX are not claimed as tested; Human UAT
 is pending. No sandbox deployment or publication occurred. See
-[evidence](../tests/evidence/v1/runtime-upgrade-0.7.0-rc.1-local.json).
+[evidence](private-history.md).
 
 ## 2026-09-10 — Proposed trusted Console connection inspector
 
@@ -3499,7 +3523,7 @@ token files or existing runtime pins. Both endpoints passed six real App IBus
 queries and original SDK 0.24.0 compatibility. The existing desktop correctly
 reports legacy IBus metadata absence; inspection does not retrofit or restart it.
 No sandbox or publication occurred. Native permission UX and Human UAT remain
-pending. See [evidence](../tests/evidence/v1/console-connections-0.8.0-rc.1-local.json).
+pending. See [evidence](private-history.md).
 
 ## 2026-09-10 — CONN-004 uses Manager authentication for connection reads
 
@@ -3522,7 +3546,7 @@ SDK compatibility. Console DOM passed on the candidate and deployed 1991.
 Existing desktop ID/generation/pins and service/App configuration were retained.
 Legacy token configuration remains on disk but is ignored. No sandbox or GitHub
 publication; Human UAT pending. See
-[evidence](../tests/evidence/v1/tokenless-connections-0.8.0-rc.2-local.json).
+[evidence](private-history.md).
 
 ## 2026-09-10 — CONN-005 binds Console to its build-matched SDK
 
@@ -3550,14 +3574,14 @@ editor fixture onto an independent six-hour browser fixture; shipped code did
 not change. Manager deployment preserved both existing runtime IDs/generations.
 
 The subsequent 1991 smoke script incorrectly treated a singleton create response
-as a new test-owned runtime. It stopped existing edge-721897a6883d at 09:32:17 UTC.
+as a new test-owned runtime. It stopped existing edge-EXAMPLE at 09:32:17 UTC.
 The operator was notified immediately after identifying this. The persistent
 default profile directory remains, but no runtime recreation is authorized or
 performed yet; unsaved browser state is not guaranteed recoverable. XFCE remains
 running unchanged. Runtime-preservation acceptance is failed, not passed.
 Future smoke tests must skip pre-existing singleton templates and independently
 exclude every pre-existing ID from cleanup ownership. See the alignment runbook
-and [failed alignment evidence](../tests/evidence/v1/console-sdk-binding-0.8.0-rc.3-local.json).
+and [failed alignment evidence](private-history.md).
 
 ## 2026-09-10 — Accept UAT and authorize stable 0.8.0 publication
 
@@ -3579,21 +3603,21 @@ including isolated cached SDK root/subpath tests and disposable-user XFCE.
 Release 34473201571 uploaded that same artifact without rebuilding. Independent
 download, checksum/VCS/secret checks and byte comparison passed. GitHub reports
 Latest, non-draft, non-prerelease. No local/sandbox deployment, gateway change or
-Edge recovery occurred. See [publication evidence](../tests/evidence/v1/connections-0.8.0-publication.json).
+Edge recovery occurred. See [publication evidence](private-history.md).
 
 ## 2026-09-10 — Align eight endpoints to formal 0.8.0
 
 The operator subsequently authorized deployment to all environments. Local
-1991/2992, sandbox00 1991/2991 and sandbox02/03/07/10 1991 now use the published
+1991/2992, test-host-a 1991/2991 and test-host-c/03/07/10 1991 now use the published
 0.8.0 artifact and SDK 0.25.1. Two Manager starts per endpoint preserved all
 active runtime identities, generations, session states and component/App pins.
 Only Managers and enabled catalogs changed; no application was recreated.
 Stopped in-memory history entries disappear normally on Manager restart;
-they are not active runtime losses. Existing sandbox02 stopped and sandbox03
+they are not active runtime losses. Existing test-host-c stopped and test-host-d
 shutdown-blocked sessions remain unchanged. Read-only running-session
 connection checks succeeded. Direct private HTTP access remains blocked from
 the build host; container-loopback checks passed. No gateway/firewall mutation.
-See [alignment evidence](../tests/evidence/v1/connections-0.8.0-alignment.json).
+See [alignment evidence](private-history.md).
 
 ## 2026-09-10 — Release stopped allocations during explicit upgrade (UPG-002)
 
@@ -3601,7 +3625,7 @@ The authorized sandbox runtime upgrade exposed a self-collision on fixed
 display :1. PreserveRuntime leaves the record restarting after process cleanup;
 ordinary restart excludes its own record via pinned allocation, but upgrade
 allocates the new template without that exclusion. The old restarting record
-therefore falsely reserves the display. Sandbox02/03 stopped successfully but
+therefore falsely reserves the display. test-host-c/03 stopped successfully but
 failed to relaunch; the remaining sandbox upgrades were paused.
 
 After successful cleanup only, mark the old runtime stopped and durably record
@@ -3630,20 +3654,20 @@ passed for 7c252209b250. Complete exact-archive local E2E passed, including
 fixed-display managed upgrades and disposable-user XFCE. Published Latest
 v0.8.1 was independently verified byte-identical to that candidate. All eight
 Managers were aligned without configuration changes. The guarded upgrade API
-then recovered sandbox02/03 to 0.8.1; real desktop/RFB/IBus/connection checks
-passed. Sandbox00 XFCE refused graceful shutdown, so the remaining runtime
+then recovered test-host-c/03 to 0.8.1; real desktop/RFB/IBus/connection checks
+passed. test-host-a XFCE refused graceful shutdown, so the remaining runtime
 batch was paused without force. This is a shutdown-policy blocker, not another
-allocation failure. See [evidence](../tests/evidence/v1/upgrade-0.8.1-alignment.json).
+allocation failure. See [evidence](private-history.md).
 
 ## 2026-09-10 — Complete sandbox runtime upgrade with explicit force approval
 
-The operator authorized force after sandbox00's graceful shutdown blocked.
-Guarded upgrade requests with force=true upgraded sandbox00 XFCE/Firefox and
-sandbox07/10 XFCE to 0.8.1. Already-current sandbox02/03 were skipped. All six
+The operator authorized force after test-host-a's graceful shutdown blocked.
+Guarded upgrade requests with force=true upgraded test-host-a XFCE/Firefox and
+test-host-h/10 XFCE to 0.8.1. Already-current test-host-c/03 were skipped. All six
 runtimes are running/ready with completed upgrades and no remaining errors;
 the four restarted applications passed actual RFB/IBus/connection verification.
 Profiles and IDs remain unchanged. Host forceAfter policy and local runtimes
-were not changed. See [completion evidence](../tests/evidence/v1/upgrade-0.8.1-force-completion.json).
+were not changed. See [completion evidence](private-history.md).
 
 ## 2026-09-10 — Propose package-owned actions and browser openUrl
 
@@ -3719,11 +3743,11 @@ Stable metadata requires a new exact candidate and archive E2E before tagging;
 publish those same verified bytes. Acceptance does not authorize deployment
 or sandbox/runtime changes. The earlier pin-preservation evidence remains
 historical, not a claim that the later approved upgrades preserved old pins.
-See [human acceptance](../tests/evidence/v1/app-actions-0.9.0-human-uat.json).
+See [human acceptance](private-history.md).
 
 ## 2026-09-12 — Keep idle RFB transport alive independently of input
 
-Sandbox10 observations measured two RFB WebSocket closures after approximately
+test-host-k observations measured two RFB WebSocket closures after approximately
 125 seconds without RFB data while the separate input connection remained
 active. A later passive capture showed cloudflared closing its nginx connection
 before nginx closed the origin connection. Cloudflare's internal terminating
@@ -3796,7 +3820,7 @@ the user manager supplies WebKit's explicit unsafe sandbox override plus
 software rendering. This is an environment qualification, not App policy: no
 override is present in the package, and production deployment requires a host
 where the normal WebKit sandbox works. Publication and sandbox deployment remain
-unauthorized. See [the durable evidence](../tests/evidence/v1/lightview-1.0.0-local-uat.json).
+unauthorized. See [the durable evidence](private-history.md).
 
 The operator accepted UAT and authorized formal release. Follow the existing
 independent-App path: annotated `lightview-v1.0.0` on the accepted source commit,
@@ -3811,7 +3835,7 @@ archive and checksum; independent download, checksum, byte comparison and
 manifest identity checks passed. The App Release is neither draft nor
 prerelease, and the repository's Latest Core release remains `v0.12.2`. No
 sandbox deployment occurred. See
-[publication evidence](../tests/evidence/v1/lightview-1.0.0-publication.json).
+[publication evidence](private-history.md).
 
 ## 2026-09-12 — Accept heartbeat UAT and align every live runtime
 
@@ -3823,7 +3847,7 @@ alignment remains distinct from runtime pin replacement. All seven live
 runtimes were subsequently force-upgraded, attached and verified ready with
 formal gateway bytes and periodic Ping/Pong; no stopped history was relaunched.
 The two test endpoints had no live runtime. Existing network restrictions were
-preserved. See [evidence](../tests/evidence/v1/rfb-heartbeat-0.9.1-alignment.json)
+preserved. See [evidence](private-history.md)
 for the temporary-account cleanup retry and resize-aware verifier correction.
 
 ## 2026-09-12 — Lock Viewer-local clipboard consistency (CLP-035–038)
@@ -3845,7 +3869,7 @@ These are observed-state checks, not atomic OS compare-and-swap. Explicit
 write-only manual transfer can replace an unknown local clipboard; automatic
 transfer cannot infer authority from unreadable or unknown state. Required
 read failures preserve the clipboard. See the [locked contract](clipboard-prompt-consistency-release.md)
-for consent, race bounds and WAOS compatibility. Only local loopback 1991/2992
+for consent, race bounds and host application compatibility. Only local loopback 1991/2992
 deployment is authorized; development/verification are in progress, with no
 GitHub publication or sandbox rollout.
 
@@ -3864,7 +3888,7 @@ and unchanged config/App selectors/runtime pins. Existing XFCE generation 7
 remains on 0.9.1 because restart/upgrade approval was not granted. Test-created
 runtimes were stopped; new instances use 0.10.0-rc.1. Human UAT remains pending,
 with no GitHub push/publication or sandbox mutation. See
-[evidence](../tests/evidence/v1/clipboard-consistency-0.10.0-rc.1-local.json).
+[evidence](private-history.md).
 
 ## 2026-09-12 — Clipboard success receipts (CLP-039)
 
@@ -3912,10 +3936,10 @@ metadata for larger images without decoding them. Permit blob images in the
 shipped CSP for ephemeral object URLs; do not add blob script permission.
 Embedding hosts must allow data/blob image sources to use the standard UI.
 
-## 2026-09-16 — Formally align LightView 1.0.0 on local and sandbox00/01
+## 2026-09-16 — Formally align LightView 1.0.0 on local and test-host-a/01
 
 Deploy the immutable public `lightview@1.0.0` App archive to local loopback
-1991/2992 and sandbox00/01 production 1991. The initially installed Lightview
+1991/2992 and test-host-a/01 production 1991. The initially installed Lightview
 0.1.1 dependency was rejected before selector activation because it changes
 the locked `--low-memory` media policy. Install the formal Lightview 0.1.0 host
 release instead; do not weaken the Driver's version gate or silently broaden
@@ -3925,9 +3949,9 @@ Stage the App without activation, switch each production selector under a
 Manager-only restart and retain rollback state. Real Viewer startup, visible
 ready status, same-UID Unix control, `openUrl`, cleanup and final Manager
 adoption passed on every endpoint. Existing XFCE runtime identity, generation
-and process IDs survived. Local listeners remain loopback-only. Sandbox00 2991
+and process IDs survived. Local listeners remain loopback-only. test-host-a 2991
 was not authorized, its selector remains absent, and the container was not
-rebooted. See the [deployment evidence](../tests/evidence/v1/lightview-1.0.0-local-sandbox00-sandbox01-alignment.json).
+rebooted. See the [deployment evidence](private-history.md).
 
 ## 2026-09-16 — Supersede the LightView host dependency pin with 0.1.1
 
@@ -4073,9 +4097,9 @@ runtime-upgrade claim.
 
 The operator authorized fleet alignment and required affected RemoteXApp
 runtimes to restart after upgrade. The exact formal Edge 2.0.2 archive was
-staged and transactionally selected on both local endpoints, sandbox00
-production/test and sandbox01/02/03/07/10 production. LightView 1.0.6 was
-verified only on its existing local and sandbox00/01 footprint; no new
+staged and transactionally selected on both local endpoints, test-host-a
+production/test and test-host-b/02/03/07/10 production. LightView 1.0.6 was
+verified only on its existing local and test-host-a/01 footprint; no new
 LightView footprint was created.
 
 Every changed Manager passed two starts and durable adoption. Selector
@@ -4084,8 +4108,8 @@ Edge runtime was explicitly upgraded and restarted without force. Its real
 RFB attachment reached ready state and returned valid CDP metadata; `openUrl`
 also passed. Unrelated runtimes were not restarted. Local listeners stayed on
 loopback, sandbox policy stayed unchanged, no container reboot occurred and
-CloudDrive functional tests remained skipped during maintenance. See the
-[alignment evidence](../tests/evidence/v1/edge-2.0.2-lightview-1.0.6-alignment.json).
+remote storage functional tests remained skipped during maintenance. See the
+[alignment evidence](private-history.md).
 
 ## 2026-09-17 — Transfer sandbox deployment ownership
 
@@ -4140,7 +4164,7 @@ archive and checksum. An independent fresh download passed its checksum, was
 byte-identical to the tested archive, and reported `lightview@1.0.7` with App
 Package ABI V1. The release is neither draft nor prerelease; Core `v0.12.2`
 remains GitHub Latest. Publication did not deploy or upgrade any endpoint. See
-the [publication evidence](../tests/evidence/v1/lightview-1.0.7-publication.json).
+the [publication evidence](private-history.md).
 
 ## 2026-09-18 — Lock exact Lightview 0.1.8 compatibility
 
@@ -4209,7 +4233,7 @@ explicit interest. Release/destroy affects owned interests only. Keep current
 Manager/Client standalone behavior and CLP-018 Viewer-local clipboard logic.
 Namespace records by server/base-path/login identity for future growth.
 
-WAOS currently needs one server. Multiple concurrent servers (RTC-005), reliable
+The host application currently needs one server. Multiple concurrent servers (RTC-005), reliable
 external background ownership (RTC-006) and server/user-scoped shared audio
 (AUD-001) remain pending. Audio eventually shares one bidirectional connection
 per server/client scope rather than following runtime generation. Do not
@@ -4237,18 +4261,18 @@ App exit, stop-session and crash. Preserve Manager-crash adoption, process
 identity, shutdown refusal/enforcement and pinned upgrade semantics behind a
 backend interface; keep systemd as the default and API/SDK unchanged.
 
-On grok-bot, `sandbox` (UID 1001) is non-sudo, and the runit-supervised account
+On standalone test host, `sandbox` (selected non-root UID) is non-sudo, and the runit-supervised account
 D-Bus answered a same-UID protocol request on 2026-09-30. The platform's X
 display `:1` is occupied; do not stop it or remove its lock. A fixed alternate
 allocation must be controlled by the administrator, not the instance caller.
-The grok-bot project owns packages, account-bus/platform supervision and host
+The standalone test host project owns packages, account-bus/platform supervision and host
 preparation; this repository owns the release and exact-artifact qualification.
 See [locked design](standalone-runit-release.md). No implementation, package
 installation, service change or deployment is claimed by this entry.
 
 ## 2026-10-01 — Retire session leaf before terminal state
 
-Grok-bot RC.4 qualification showed that a natural Mousepad exit published
+standalone test host RC.4 qualification showed that a natural Mousepad exit published
 `sessionState=stopped` and App status `exited`, but left an empty standalone
 session cgroup for more than 20 seconds. It held a descendant-quota slot until
 the whole runtime was forced to stop. RC.4 was rejected and host activation
@@ -4264,7 +4288,7 @@ standalone decision; API, App ABI and systemd defaults remain unchanged.
 
 ## 2026-10-01 — Reconcile managed state after standalone server loss
 
-RC.5 grok-bot fault injection killed the exact owned server-Driver cgroup.
+RC.5 standalone test host fault injection killed the exact owned server-Driver cgroup.
 The standalone component monitor stopped the runtime and removed every
 component leaf within about 2.4 seconds, but the managed registration kept
 `observedState=running` and exposed a stopped runtime for over 25 seconds.

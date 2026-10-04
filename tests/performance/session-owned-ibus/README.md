@@ -59,6 +59,11 @@ failure.
 
 ## Reproduction
 
+The resource table records the original experiment. The commands below use
+loopback for current reproduction; do not copy historical wildcard test
+listeners into production.
+
+
 Build experimental binaries outside `bin/`, then run an isolated manager:
 
 ```bash
@@ -69,7 +74,7 @@ go build -o .runtime/experiments/session-owned-ibus/bin/remotexapp-status ./cmd/
 systemd-run --user --unit=remotexapp-session-owned-ibus --collect \
   --property=WorkingDirectory="$PWD" \
   "$PWD/.runtime/experiments/session-owned-ibus/bin/remotexappd" \
-  -listen 0.0.0.0:1992 \
+  -listen 127.0.0.1:1992 \
   -state-dir "$PWD/.runtime/experiments/session-owned-ibus/state" \
   -class-config "$PWD/tests/performance/session-owned-ibus/class.json" \
   -gateway-bin "$PWD/.runtime/experiments/session-owned-ibus/bin/novnc-input" \
@@ -89,7 +94,7 @@ journalctl --user-unit remotexapp-INSTANCE-gateway.service
 
 The isolated viewer was stopped after acceptance; port 1992 is no longer
 running. The live managed XFCE viewer is
-`http://test-host:1991/remotexapps/xfce-desktop-688676b680f5/kiosk.html`.
+`http://test-host:1991/remotexapps/xfce-desktop-EXAMPLE/kiosk.html`.
 
 ## Decision and deployment state
 

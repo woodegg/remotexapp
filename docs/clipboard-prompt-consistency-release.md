@@ -1,11 +1,16 @@
 # Locked release — Clipboard prompt consistency
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 ## Current approval — 2026-09-12
 
 Completed: formal [v0.10.0](private-history.md)
 published and all eight approved Managers aligned. Human UAT is accepted.
-See [publication verification and retained test failure](../tests/evidence/v1/clipboard-0.10.0-publication.json)
-and [per-endpoint alignment](../tests/evidence/v1/clipboard-0.10.0-alignment.json).
+See [publication verification and retained test failure](private-history.md)
+and [per-endpoint alignment](private-history.md).
 Existing runtime pins are deliberately preserved; old gateways still need a
 separately approved upgrade/restart for guarded clipboard approvals.
 
@@ -36,7 +41,7 @@ checks on both endpoints. Configurations, App selectors and existing runtime
 pins were preserved. The existing local XFCE remains on 0.9.1, generation 7;
 use a newly launched instance or an explicitly approved runtime upgrade for
 candidate UAT. No sandbox deployment or GitHub push/publication occurred.
-See [the retained evidence](../tests/evidence/v1/clipboard-consistency-0.10.0-rc.1-local.json),
+See [the retained evidence](private-history.md),
 including intermediate validation failures and their corrections.
 
 ## Three governing principles — retained by operator, 2026-09-12
@@ -137,7 +142,7 @@ offer or an implicit browser clear.
 The SDK's prompt approvals require consistency-capable runtime gateways. Updating
 Manager/SDK alone does not upgrade pinned runtimes. Old SDK direct uploads remain
 compatible but do not acquire the new precondition protection. Apps/drivers are
-unchanged. WAOS only needs the matching SDK and upgraded runtimes; it retains one
+unchanged. The host application only needs the matching SDK and upgraded runtimes; it retains one
 Client and optional prompt controller per Viewer, with no shared coordinator.
 
 On first attachment the remote snapshot is a manual baseline, not a prompt.
@@ -163,7 +168,7 @@ atomic compare-and-swap or cancellation after a write starts. Revalidation
 narrows those windows but cannot eliminate them. Offer timestamps determine
 expiry only, never which machine wins. Clipboard contents are not logged.
 
-Canonical IDs: [requirements.md](requirements.md#clipboard-prompt-consistency--pending-release).
+Canonical IDs: [requirements.md](requirements.md#clipboard-prompt-consistency--0100-accepted-release).
 
 ## Human UAT checklist
 

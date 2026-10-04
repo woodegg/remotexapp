@@ -13,13 +13,13 @@ Manager client, authentication scope, runtime registry, observation and leases.
 Isolate failure/reconnection and identical runtime IDs across servers. Preserve
 base-path and login boundaries; do not equate a hostname with a server/account.
 
-Current WAOS needs one server. Reserve identity boundaries in the current
-design, but defer multi-server orchestration, UI and migration. Acceptance needs
+The shipped Coordinator manages one server. Reserve identity boundaries in the
+current design, but defer multi-server orchestration, UI and migration. Acceptance needs
 two actual servers, independent outages, auth changes and cross-target tests.
 
 ## RTC-006 — reliable external keepalive ownership
 
-Permit a WAOS/native host or backend service to own keepalive interests when
+Permit a host application/native host or backend service to own keepalive interests when
 all browser Tabs may be frozen or closed. Reuse the same server lease API;
 define identity, authorization, explicit release, bounded stale ownership and
 recovery. Do not retain Apps indefinitely because an owner disappeared.
@@ -48,8 +48,6 @@ runtime operation. A future integration must establish permission/gesture,
 owner-transfer, reconnection, shared-user trust and resource-cleanup contracts
 and test them with actual playback/microphone and multiple Tabs.
 
-The existing local review input is
-`release-tray/audio-core-integration/IMPLEMENTATION-PLAN.md` (untracked review
-material, not a published dependency or approved implementation). Reconcile it
-with these requirements when this item is promoted; audio code and transport
-are not part of the current idle-lease/Coordinator train.
+Any future implementation plan must be reviewed against AUD-001 before
+promotion. Audio transport and controls are outside the shipped Coordinator
+contract; no unpublished plan is a public dependency.

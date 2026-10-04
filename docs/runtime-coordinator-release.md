@@ -1,19 +1,24 @@
 # Runtime idle lease and SDK Coordinator
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Status: human UAT accepted 2026-09-18 for Core **0.13.0-rc.3 / SDK 0.29.1**;
 formal **0.13.0 / SDK 0.29.1** published, with no functional
 changes. Local 1991/2992 subsequently selected stable; see the separate
-[deployment evidence and exceptions](../tests/evidence/v1/runtime-coordinator-0.13.0-local-deployment.json).
+[deployment evidence and exceptions](private-history.md).
 App versions unchanged. RC.3 added the panel without overwriting RC.2.
 RC.2 supersedes the local RC.1 candidate with fresh Driver-status validation;
 already staged RC.1 artifacts are not overwritten.
 Publication verification passed; the train is closed. See
-[publication evidence](../tests/evidence/v1/runtime-coordinator-0.13.0-publication.json).
+[publication evidence](private-history.md).
 Requirements: IDL-001–004,
 RTC-001–004 and RTC-007 in
 [the register](requirements.md#runtime-idle-lease-and-sdk-coordinator--planned-2026-09-18).
 Future work: [release pending](release-pending.md).
-Downstream handoff: [WAOS migration guide](waos-runtime-coordinator-migration.md).
+Downstream handoff: [host application migration guide](host-runtime-coordinator-migration.md).
 
 ## Purpose and scope
 
@@ -46,7 +51,7 @@ for rollback without the panel.
 Keep an existing runtime/App running when its Viewer disconnects or moves to a
 background Tab but a caller still explicitly needs it. Add an optional
 RemoteXAppCoordinator to share status monitoring and idle-lease renewal across
-multiple Viewers and same-origin Tabs. Current WAOS scope is one server.
+multiple Viewers and same-origin Tabs. Current host application scope is one server.
 
 Keep the existing RemoteXAppManager as the HTTP client and RemoteXAppClient as
 the individual Viewer. Coordinator owns runtime observation and keepalive
@@ -189,9 +194,9 @@ Required before acceptance, with results recorded against exact artifacts:
 5. Recovery: Manager restart adoption, App restart and upgrade with generation
    change, service failure, existing Viewer input/IME/clipboard behavior and
    bounded timer/claim/request resource use.
-6. Document single-server WAOS integration and rollback to existing SDK use.
+6. Document single-server host application integration and rollback to existing SDK use.
    Removing Coordinator stops renewal without changing profiles or explicitly
-   stopping Apps. WAOS repository changes are a separate integration task.
+   stopping Apps. The host application repository changes are a separate integration task.
 
 Run normal repository and exact-release gates after implementation. Any local
 UAT deployment uses loopback; sandbox deployment belongs to the sandbox

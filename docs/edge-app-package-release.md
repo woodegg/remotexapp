@@ -1,5 +1,10 @@
 # Microsoft Edge App Package release train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Follow-up accepted 2026-09-17: EDGE-005 advances the independent package to
 `edge@2.0.2` with fail-closed stale Chromium singleton-link recovery. It changes
 only the Edge package. Complete local validation and loopback 1991/2992 UAT
@@ -15,7 +20,7 @@ bytes match local UAT SHA-256
 Status: EDGE-001 through EDGE-004 were scope-locked on 2026-08-30, implemented
 as App Package `edge@1.0.0`, and formally released as GitHub tag
 `edge-v1.0.0`. The exact package was deployed and accepted by automated
-production checks on sandbox00, sandbox02, sandbox03, sandbox07, and sandbox10.
+production checks on test-host-a, test-host-c, test-host-d, test-host-h, and test-host-k.
 No other sandbox deployment is authorized.
 
 ## Outcome
@@ -53,7 +58,7 @@ reverse-proxied.
 
 Implementation is limited to the `edge` package manifest, server/session/
 shutdown drivers, CDP probe, package tests, and documentation. No Go binary,
-browser SDK, global preflight, or unrelated App is changed or rebuilt. WAOS
+browser SDK, global preflight, or unrelated App is changed or rebuilt. The host application
 already owns a CDP adapter; when it adopts `edge`, it changes the adapter key,
 fixtures, and deployment expectation from `edge-browser` to `edge` without a
 RemoteXApp ABI change.
@@ -80,12 +85,12 @@ policy and proved terminal state, manifest/runtime removal, inactive units,
 closed CDP, and retained profile. The deterministic `edge-1.0.0.tar.gz` digest
 is `0ab9d97f549fe24657f4d45ffe04d6c6f4cf82338cce0ca48a04f3d025235a37`.
 
-Sandbox00 was the initial authorized production target. The operator later
-authorized ordered promotion to sandbox02, sandbox03, sandbox07, and sandbox10;
+test-host-a was the initial authorized production target. The operator later
+authorized ordered promotion to test-host-c, test-host-d, test-host-h, and test-host-k;
 all five deployments passed the read-only preflight and fail-closed profile
 migration above.
 
-## Sandbox00 production evidence
+## test-host-a production evidence
 
 Production activated `/usr/local/share/remotexapp/apps/edge/1.0.0` from source
 commit `4d9f27a49998` with archive SHA-256
@@ -127,7 +132,7 @@ checksum files, and the downloaded Edge manifest reports exactly
 
 ## Follower deployment evidence
 
-Sandbox02, sandbox03, sandbox07, and sandbox10 replaced their unpublished
+test-host-c, test-host-d, test-host-h, and test-host-k replaced their unpublished
 rc.4 candidate with the formal core artifact and activated the embedded Edge
 archive, which is byte-identical to `edge-v1.0.0`. All had zero clients, no old
 Edge runtime, and neither `edge-browser/default` nor `edge/default` before the
@@ -139,8 +144,8 @@ digests.
 Each follower passed a real headless viewer over noVNC/RFB, dynamic framebuffer
 resize from 1280x720 to 900x640, SDK reconnect, visible Edge readiness, and a
 live loopback CDP result reporting `Edg/150.0.4078.83` and protocol 1.3.
-Allocated control ports were 21000 on sandbox02, sandbox03, and sandbox07 and
-21001 on sandbox10, proving the port is not fixed. Every test runtime, viewer,
+Allocated control ports were 21000 on test-host-c, test-host-d, and test-host-h and
+21001 on test-host-k, proving the port is not fixed. Every test runtime, viewer,
 and control listener was then stopped; a final manager restart removed the
 test runtime and adopted the same Desktop runtime ID. Final fleet verification
 found zero clients, zero active Edge runtimes, zero open App control ports, and

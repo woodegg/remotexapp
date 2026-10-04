@@ -16,7 +16,7 @@ through the API.
 Register it as a managed instance, for example:
 
 ```json
-{"id":"sandbox-desktop","templateId":"xfce-user-desktop","desiredState":"running","profileRef":"default"}
+{"id":"primary-desktop","templateId":"xfce-user-desktop","desiredState":"running","profileRef":"default"}
 ```
 
 Use one dedicated Linux account per mutually untrusted tenant.

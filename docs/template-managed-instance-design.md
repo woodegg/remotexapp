@@ -21,9 +21,10 @@ operator-owned template JSON
 
 ## Remote app templates
 
-Templates are trusted JSON files in `configs/remotexapp-classes/`. They define
-drivers, commands, input focus policy, readiness checks and default runtime
-policy. **Template** is the preferred API terminology; the class-oriented
+Templates are defined by trusted versioned App Package manifests under
+`apps/<app-id>/manifest.json` and loaded through installed enabled selectors.
+`configs/remotexapp-classes/` is an empty compatibility catalog. Packages define
+drivers, input focus policy, readiness checks and default runtime policy. **Template** is the preferred API terminology; the class-oriented
 fields remain part of the current template schema.
 
 Templates are loaded at manager startup. There is deliberately no remote API
@@ -204,9 +205,9 @@ The response reports both identities and both states:
   "templateId": "mousepad",
   "desiredState": "running",
   "observedState": "running",
-  "runtimeInstanceId": "mousepad-0123456789ab",
+  "runtimeInstanceId": "mousepad-EXAMPLE",
   "runtime": {
-    "id": "mousepad-0123456789ab",
+    "id": "mousepad-EXAMPLE",
     "managedInstanceId": "resident-mousepad"
   }
 }
@@ -304,7 +305,7 @@ deployment still requires its existing access gateway.
 
 ## Fixed desktop deployment
 
-The historical port-1991 fixed desktop used managed ID `test-host-xfce`, template
+The historical port-1991 fixed desktop used managed ID `example-managed-desktop`, template
 `xfce-desktop`, desired state `running` and profile `xfce-driver-test`. This is
 deliberate even though the template retains `server.activation=auto`: managed
 reconciliation runs before template autostart, and any managed registration

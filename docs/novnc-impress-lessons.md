@@ -614,7 +614,7 @@ P09b experiment described below.
 
 The 2026-08-27 integrated deployment applies these accepted paths to port
 1991. The manager is an enabled user-systemd unit, and fixed display `:2` is
-durable managed registration `test-host-xfce`. The live switch and matched
+durable managed registration `example-managed-desktop`. The live switch and matched
 system comparison are documented in
 [`go-live-report-2026-08-27.md`](go-live-report-2026-08-27.md).
 

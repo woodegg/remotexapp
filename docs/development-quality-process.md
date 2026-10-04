@@ -86,11 +86,10 @@ results, compatibility/deployment impact, and any skipped live dependency.
 Keep feature changes separate from acceptance and rollout records where
 practical.
 
-## Repository-Control Limitation
+## Repository administration
 
-The repository is private on GitHub Free, whose API does not permit branch
-protection or rulesets for this repository. Workflow gates fail closed, but
-they cannot technically prevent a privileged direct push. Upgrading the
-repository to GitHub Pro/Team and requiring `Verify` plus one reviewed pull
-request remains an external administrative action; recheck this control after
-the plan changes.
+Workflow checks verify a candidate when they run. Configure branch protection
+or repository rulesets separately to require the relevant checks and review
+before merging. Audit those settings after changing repository visibility,
+ownership or plan; a successful workflow does not establish that direct pushes
+are restricted.

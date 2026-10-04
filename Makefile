@@ -8,7 +8,7 @@ SOAK_COUNT ?= 20
 FUZZ_TIME ?= 10s
 GO_TOOLCHAIN := go1.26.8
 
-.PHONY: novnc-check web-assets build app-catalog check test test-race vet coverage-check soak-check fuzz-check integration-check live-e2e nightly-portable toolchain-check module-check vuln-check binary-vuln-check performance-docs-check sensitive-data-check evidence-check current-state-check workflow-check release-metadata-check release-check release-ci package-release install-user install-system deployment-check system-stage-test backend-build backend-test backend-test-race
+.PHONY: novnc-check web-assets build app-catalog check test test-race vet coverage-check soak-check fuzz-check integration-check live-e2e nightly-portable toolchain-check module-check vuln-check binary-vuln-check performance-docs-check sensitive-data-check public-docs-check evidence-check current-state-check workflow-check release-metadata-check release-check release-ci package-release install-user install-system deployment-check system-stage-test backend-build backend-test backend-test-race
 
 toolchain-check:
 	@test "$$(go env GOVERSION)" = "$(GO_TOOLCHAIN)" || { \
@@ -51,6 +51,9 @@ release-metadata-check:
 
 sensitive-data-check:
 	./scripts/check-sensitive-data.sh
+
+public-docs-check:
+	node scripts/check-public-docs.mjs
 
 evidence-check:
 	node scripts/check-evidence.mjs
@@ -114,7 +117,7 @@ binary-vuln-check: build toolchain-check
 		go tool govulncheck -mode binary "bin/$$binary" || exit 1; \
 	done
 
-check: toolchain-check module-check sensitive-data-check evidence-check current-state-check workflow-check test vet deployment-check
+check: toolchain-check module-check sensitive-data-check public-docs-check evidence-check current-state-check workflow-check test vet deployment-check
 
 test-race:
 	go test -race ./...

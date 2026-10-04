@@ -1,5 +1,10 @@
 # RemoteXApp naming cutover — 2026-08-27
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 ## Outcome
 
 The host now uses the formal product name `RemoteXApp` and machine identifier
@@ -29,7 +34,7 @@ current tree and deployment are the supported product surface.
 The previous manager was stopped with zero attached clients. Its managed
 registration and persistent XFCE profile were copied into the new state root;
 the runtime directory itself was not reused. `remotexapp.service` then created
-managed runtime `xfce-desktop-34cd0356c80a` on fixed display `:2` with:
+managed runtime `xfce-desktop-EXAMPLE` on fixed display `:2` with:
 
 - framebuffer `1280x720`, depth 16, 5 FPS, client resize disabled;
 - loopback RFB `127.0.0.1:5902`;
@@ -75,8 +80,8 @@ The failure was initially hidden by a stale `_NET_SUPPORTING_WM_CHECK` root
 property on the persistent TigerVNC display. The driver now requires the EWMH
 supporting-WM window to be live and to point back to itself before publishing
 readiness. The seven saved XFCE session paths were migrated to the actual
-profile root, and managed registration `test-host-xfce` was stopped and
-started through its API. It rebuilt runtime `xfce-desktop-eafccb412376` on the
+profile root, and managed registration `example-managed-desktop` was stopped and
+started through its API. It rebuilt runtime `xfce-desktop-EXAMPLE` on the
 same fixed display `:2`.
 
 A real Edge/noVNC client then verified the full desktop visually and confirmed

@@ -1,5 +1,10 @@
 # Firefox interactive IME fix release train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Status: implemented, exact-candidate automated acceptance passed, and deployed
 to local 1991; Human UAT accepted and stable publication authorized on
 2026-09-08. Stable `0.5.3` is published and independently verified. Subsequent
@@ -89,9 +94,9 @@ only completed experiment temporary data to volatile memory-backed retention,
 `make check`, coverage (Go 56.9%; SDK lines 83.66%, branches 69.87%, functions
 77.04%) and `make release-ci` passed. This was a development-worktree run,
 not a clean immutable UAT candidate. See the
-[portable recheck](../tests/evidence/v1/firefox-ime-0.5.3-rc.1-portable-recheck.json).
+[portable recheck](private-history.md).
 The live restart blocker remains unresolved and requires scope approval.
-See [development evidence](../tests/evidence/v1/firefox-ime-0.5.3-rc.1-development-gate.json).
+See [development evidence](private-history.md).
 No local deployment has occurred; 1991 and 2991 remain healthy on 0.5.2.
 At this historical gate, implementation was locally committed and publication
 had not occurred; subsequent publication is recorded below.
@@ -117,19 +122,19 @@ profile. Local 2991 remains `0.5.2`; no sandbox was touched.
 
 Exact-candidate fresh, reused and restarted profiles passed 108 actual
 ASCII/Chinese readbacks. Deployed startup and immediate restart added 72:
-runtime `firefox-esr-432ed9e74fd9` retained control port `127.0.0.1:21000`
+runtime `firefox-esr-EXAMPLE` retained control port `127.0.0.1:21000`
 and advanced generation 1→2. Native keyboard, tabs/windows, focus return,
 Viewer reconnect and BiDi lifecycle passed. Test Viewer was closed; this
 dedicated `ffx007-uat` profile/runtime remains ready for the operator.
 
 Open the local 1991 Console or
-`/remotexapps/firefox-esr-432ed9e74fd9/kiosk.html`. Test English/Chinese input
+`/remotexapps/firefox-esr-EXAMPLE/kiosk.html`. Test English/Chinese input
 and `sendText()` in the synthetic editable fields, switch windows, reconnect,
 then use Console runtime restart and confirm input still works. Password
 fields continue to require direct keyboard input, not `sendText()`.
 
-Evidence: [candidate](../tests/evidence/v1/firefox-ime-0.5.3-rc.1-candidate.json)
-and [exact acceptance/deployment](../tests/evidence/v1/firefox-ime-0.5.3-rc.1-local-1991.json).
+Evidence: [candidate](private-history.md)
+and [exact acceptance/deployment](private-history.md).
 Human UAT was pending at this handoff and was subsequently accepted. The local
 deployment remains the rc.1 artifact, not a formal stable fleet alignment.
 
@@ -147,8 +152,8 @@ Release workflow 34183810815 published candidate run 34183500632 without
 rebuilding. Independent download matched the tested archive byte-for-byte:
 SHA-256 `09d9108fe0c4f7cd7c3ce9f641e596222e7d6723910311a319ad672d1f4047a2`.
 Firefox App 2.1.1's archive is unchanged from UAT; SDK remains 0.21.1.
-See [exact validation](../tests/evidence/v1/firefox-ime-0.5.3-exact-validation.json)
-and [publication evidence](../tests/evidence/v1/firefox-ime-0.5.3-publication.json).
+See [exact validation](private-history.md)
+and [publication evidence](private-history.md).
 No deployment occurred during publication: local 1991 remains rc.1, and other
 environments remain unchanged pending a separately approved alignment.
 
@@ -163,18 +168,18 @@ per endpoint before any runtime replacement; configurations and test/production
 separation were preserved. All four installed executable files and the running
 Manager match the formal artifact; SDK hashes match everywhere.
 
-Normal stop/recreate completed for the local desktop, sandbox02/07 desktop
-servers, and sandbox00 Firefox, preserving persistent profiles. The local
-desktop and sandbox00 Firefox passed real RFB negotiation, 16-bit framebuffer,
+Normal stop/recreate completed for the local desktop, test-host-c/07 desktop
+servers, and test-host-a Firefox, preserving persistent profiles. The local
+desktop and test-host-a Firefox passed real RFB negotiation, 16-bit framebuffer,
 and application-ready checks; Firefox reports working BiDi readiness and App
-`2.1.1`. Previously dormant sandbox02/07 sessions remain on-attach.
+`2.1.1`. Previously dormant test-host-c/07 sessions remain on-attach.
 
-Sandbox00/03/10 desktops block graceful shutdown. They remain on old pinned
+test-host-a/03/10 desktops block graceful shutdown. They remain on old pinned
 components with desired state restored to running, pending explicit permission
 for forced exit. No unsaved state was forcibly discarded. Direct private HTTP
 connectivity from the build host timed out; container-loopback verification
 passed. Neither gateway nor firewall was changed. See
-[evidence](../tests/evidence/v1/firefox-ime-0.5.3-alignment.json).
+[evidence](private-history.md).
 
 ### 2026-09-08 approved runtime completion
 
@@ -187,7 +192,7 @@ and pass real RFB negotiation, fixed 1280x720/16-bit policy, XFCE ready, and
 four-format bidirectional clipboard capability checks. No Manager restart,
 firewall change, or gateway testing was needed. This supersedes the runtime
 blocker above, not the unresolved external-network acceptance limitation.
-See [completion evidence](../tests/evidence/v1/firefox-ime-0.5.3-runtime-completion.json).
+See [completion evidence](private-history.md).
 
 The changed driver requires a new immutable App Package version; never mutate
 installed `firefox-esr@2.1.0` or a runtime pinned to it. Installing the package
@@ -199,6 +204,6 @@ version and preference after adoption. Retain the old package for rollback.
 The original candidate authorization covered implementation, local tests and deployment only to
 local 1991 for UAT, followed by separate stable tagging/publication approval.
 Local 2991 deployment and sandbox deployments required the subsequent explicit
-alignment approval recorded above. Sandbox00 staging and production always
+alignment approval recorded above. test-host-a staging and production always
 require explicit human approval. Driver sandboxing and IME-004 stale
 cross-application context protection remain separate work, not implicit scope.

@@ -1,5 +1,10 @@
 # Connection readiness mask — 0.11.0
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Scope locked 2026-09-13. Target: `0.11.0-rc.1`, SDK `0.28.0`.
 
 ## Stable promotion authorized
@@ -8,14 +13,14 @@ Scope locked 2026-09-13. Target: `0.11.0-rc.1`, SDK `0.28.0`.
 endpoints are aligned. SDK `0.28.0`; App Packages unchanged. Hosted/local
 gates and all six formal exact-archive suites passed first attempt, followed
 by eight served live-App mask tests and the clipboard browser matrix.
-See [formal evidence](../tests/evidence/v1/connection-mask-0.11.0-alignment.json).
+See [formal evidence](private-history.md).
 UAT requirements SDK-005/006 and CON-011 are accepted. Local Viewer continuity
 was not fully preserved during Manager switching: see the evidence caveat;
 runtime adoption success does not prove client reconnection success.
 
 2026-09-13: Human UAT passed. Operator approved stable `0.11.0` GitHub
-publication and alignment of local 1991/2992, sandbox00 1991/2991 and
-sandbox02/03/07/10 1991. SDK `0.28.0` and accepted behavior remain unchanged.
+publication and alignment of local 1991/2992, test-host-a 1991/2991 and
+test-host-c/03/07/10 1991. SDK `0.28.0` and accepted behavior remain unchanged.
 Run exact formal-candidate gates before publishing; preserve existing runtime
 pins and configuration. This approval supersedes the original local-only
 authorization retained below. The first-run lifecycle-contention caveat remains

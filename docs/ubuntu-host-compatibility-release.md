@@ -1,13 +1,18 @@
 # Ubuntu host compatibility repair — 0.12.1
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 ## Closed — formal stable release published
 
 2026-09-14: [`v0.12.1`](private-history.md)
-is GitHub Latest, not an RC/prerelease; commit `0300acdfd003`, SDK `0.28.0`,
+was published at that historical gate, not an RC/prerelease; commit `0300acdfd003`, SDK `0.28.0`,
 Mousepad `4.0.1`. Hosted and independent clean-clone release gates produced
 identical archives. Seven exact-archive local E2E suites and eight additional
 Mousepad upgrade/class/input checks passed; downloaded release assets match
-the tested candidate. [Publication evidence](../tests/evidence/v1/ubuntu-host-compatibility-0.12.1-publication.json)
+the tested candidate. [Publication evidence](private-history.md)
 retains failed attempts and test instrumentation limits.
 
 The accepted repair scope is released, with native clean Ubuntu 26.04,
@@ -22,7 +27,7 @@ Operator instruction: "uat accept do a formal release (formal version not rc ver
 Core target is now **0.12.1**, not an RC; SDK `0.28.0` and Mousepad `4.0.1`
 are unchanged. Accepted behavior is frozen. Publication requires a clean
 committed/hosted candidate and exact-archive local E2E; only then publish those
-unchanged bytes. [Acceptance provenance](../tests/evidence/v1/ubuntu-host-compatibility-0.12.1-uat.json)
+unchanged bytes. [Acceptance provenance](private-history.md)
 records the operator's acceptance, not an invented second human test.
 
 The operator accepted publication after the pending native Ubuntu 26.04 gates
@@ -55,7 +60,7 @@ UAT acceptance, commits/publication and workaround retirement are separate.
 
 ## Evidence and scope
 
-Incoming sandbox01 Ubuntu 26.04 report identifies formatted IBus queries taking
+Incoming test-host-b Ubuntu 26.04 report identifies formatted IBus queries taking
 565.7–617.1ms against a 500ms probe deadline, versus 64.2–116.7ms for name-only.
 Its Mousepad input failed first from missing toolkit modules and then from
 `Org.xfce.mousepad` missing in the App allowlist. These are downstream samples,
@@ -65,8 +70,8 @@ their individual necessity was not established by that experiment.
 Sources: [IBus command implementation](https://github.com/ibus/ibus/blob/1.5.29/tools/main.vala),
 [Ubuntu Mousepad GTK3 dependency](https://packages.ubuntu.com/resolute/mousepad),
 [Ubuntu IBus toolkit packages](https://packages.ubuntu.com/en/source/resolute/ibus).
-Original packet remains local in `release-tray/sandbox01-ubuntu2604-012-feedback-20260914/`;
-do not import its installer, UID, exposure policy or fleet naming into Core.
+The original downstream report is private review material. Its installer,
+UID, exposure policy and host naming are not Core configuration examples.
 Its absent checksum manifest and split/missing original test reports are known
 provenance limitations, not grounds to reconstruct passing evidence.
 
@@ -114,7 +119,7 @@ from Manager-only restart and retain existing explicit failure recovery.
 Record exact artifact/OS/application versions and failed attempts. Prior 24.04
 developer-host passes do not certify clean 26.04 deployment.
 
-Existing sandbox01/00/10 sessions and production gateways are not test targets.
+Existing test-host-b/00/10 sessions and production gateways are not test targets.
 Destructive reproduction requires disposable resources and verified paired
 root/home checkpoints where applicable. No existing default user bus or desktop
 may be killed by tests. Pending live infrastructure gates must be reported, not
@@ -137,7 +142,7 @@ silently skipped or marked accepted.
 
 2026-09-14: the locked implementation is present; local automated validation
 passed. This is **not** clean Ubuntu 26.04 acceptance, UAT or a publishable
-clean candidate. [Machine-readable development evidence](../tests/evidence/v1/ubuntu-host-compatibility-0.12.1-rc.1-development.json)
+clean candidate. [Machine-readable development evidence](private-history.md)
 binds the tested binaries, source base plus dirty-worktree qualification,
 host versions, actual outcomes and retained failed attempts.
 

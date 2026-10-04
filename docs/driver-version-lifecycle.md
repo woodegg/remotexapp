@@ -229,10 +229,10 @@ make release-check
 ```
 
 The accepted production evidence is
-[`tests/go-live-validation/results/driver-version-lifecycle-production.json`](../tests/go-live-validation/results/driver-version-lifecycle-production.json).
+[`tests/go-live-validation/results/driver-version-lifecycle-production.json`](private-history.md).
 That file is historical managed-runtime evidence. The current unified
 managed/anonymous adoption and locked-recovery evidence is recorded in
-[`tests/go-live-validation/results/runtime-manifest-adoption.json`](../tests/go-live-validation/results/runtime-manifest-adoption.json)
+[`tests/go-live-validation/results/runtime-manifest-adoption.json`](private-history.md)
 and RTM-007 through RTM-009; production deployment and UAT remain separate.
 
 ## Known limitations

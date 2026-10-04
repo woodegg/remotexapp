@@ -1,5 +1,10 @@
 # RemoteXApp 0.1.0-rc.1 commercial release report
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 > Historical evidence: this report describes rc.1 and is superseded for
 > current release status by `CHANGELOG.md`, `docs/requirements.md`, and
 > `docs/production-handover.md`.
@@ -80,8 +85,8 @@ session cgroup. This preserves the intended lightweight server-only state.
 - Internal URL: `http://test-host:1991/`
 - Console: `http://test-host:1991/sdk/console.html`
 - Version endpoint: `0.1.0-rc.1`, source commit `208d4f4140c7`
-- Current runtime: `xfce-desktop-48ba769445cd` on display `:2`
-- Managed registration: `test-host-xfce`
+- Current runtime: `xfce-desktop-EXAMPLE` on display `:2`
+- Managed registration: `example-managed-desktop`
 - Installed unit: `remotexapp.service`
 - Unit source: `deploy/systemd/remotexapp.service`
 - Live rollback backup:

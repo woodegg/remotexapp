@@ -34,13 +34,13 @@
 
 ### 分阶段范围
 
-第一阶段是**本地 PoC**，不依赖 WAOS、Cloudflare Access、外部认证或跨 host 调度：
+第一阶段是**本地 PoC**，不依赖 host application、Cloudflare Access、外部认证或跨 host 调度：
 
 ```text
 local browser client ↔ local RemoteXApp Manager ↔ local per-instance runtimes
 ```
 
-它的目的不是先解决公开访问，而是证明一个服务可以以同一套 API、class 和 lifecycle 同时创建 XFCE desktop 与单应用 Matchbox session。第二阶段才把 WAOS 作为外部认证和 reverse-proxy adapter 接入，不能反过来让 WAOS 阻塞第一阶段。
+它的目的不是先解决公开访问，而是证明一个服务可以以同一套 API、class 和 lifecycle 同时创建 XFCE desktop 与单应用 Matchbox session。第二阶段才把 host application 作为外部认证和 reverse-proxy adapter 接入，不能反过来让 host application 阻塞第一阶段。
 
 ## 证据基础与范围
 
@@ -74,11 +74,11 @@ local browser client ↔ local RemoteXApp Manager ↔ local per-instance runtime
 - Full XFCE 现在通过 generation-safe driver status 区分正常 Logout 与 crash：零退出码先原子报告 `exited`，manager 映射为 `sessionState: stopped`；非零退出仍为 `failed`。旧 persistent runtime 会在下一次 session start 自动获得最新 status schema；
 - 停止 per-instance systemd cgroup 可以可靠清理该实例的 VNC、窗口管理器、IBus 和应用进程。
 - 2026-08-27 已把 `test-host:1991` 切换为 enabled user-systemd manager，
-  固定 display `:2` 由 managed registration `test-host-xfce` 持久托管；
+  固定 display `:2` 由 managed registration `example-managed-desktop` 持久托管；
   manager 重启保持 runtime ID、registry inode 与 unit PID，不再生成匿名重复实例。
 
 当前 Go PoC 已实现本地多实例路由、managed registry 和本文第一阶段的
-lifecycle manager，但仍未实现外部 API 鉴权、跨 host 调度或 WAOS adapter。
+lifecycle manager，但仍未实现外部 API 鉴权、跨 host 调度或 host application adapter。
 
 ## 架构
 
@@ -107,7 +107,7 @@ Per-instance runtime
 |---|---|---|
 | Local RemoteXApp Manager | API、class 校验、display/资源分配、状态机、idle policy、启动/停止 cgroup、日志与本地 client 路由 | 直接把浏览器请求转为任意 shell 命令 |
 | Per-instance runtime | 一个 X11 display、VNC、session、app 和其输入路径 | 为其他实例提供 X11/IBus 状态 |
-| Phase 2 WAOS adapter | TLS、认证入口、WebSocket reverse proxy、把 identity/ticket 交给 manager | 改变 session class 或暴露 VNC TCP、D-Bus、IBus socket |
+| Phase 2 host application adapter | TLS、认证入口、WebSocket reverse proxy、把 identity/ticket 交给 manager | 改变 session class 或暴露 VNC TCP、D-Bus、IBus socket |
 
 ## 输入与传输模型
 
@@ -368,7 +368,7 @@ manager 对每个 registered instance 反向代理同源 WebSocket 路径到其 
 
 第一阶段不做认证或 ticket，只能用于受控内部网络。manager 仍必须仅代理已注册且 `ready` 的 instance，且不得把内部 VNC TCP、D-Bus、IBus socket、UNO 或其他 app socket 放进 API response。POC 当前的 same-origin 检查不构成生产鉴权。
 
-第二阶段加入 WAOS 后，attach 会获得短期、仅限特定 instance 和权限范围的 ticket；WAOS 负责认证与外部 TLS/WebSocket reverse proxy，内部 instance URL 模型保持不变。
+第二阶段加入 host application 后，attach 会获得短期、仅限特定 instance 和权限范围的 ticket；host application 负责认证与外部 TLS/WebSocket reverse proxy，内部 instance URL 模型保持不变。
 
 ## Example classes
 
@@ -470,13 +470,13 @@ parameters:
 停止一个实例不影响另一个实例或 manager。
 ```
 
-## 第二阶段：WAOS integration
+## 第二阶段：host application integration
 
-第一阶段稳定后，再加入 WAOS adapter：TLS、用户认证、instance-scoped ticket、权限策略和外部 WebSocket reverse proxy。WAOS 不改变 class、instance、session driver 或 per-instance runtime 的生命周期。
+第一阶段稳定后，再加入 host application adapter：TLS、用户认证、instance-scoped ticket、权限策略和外部 WebSocket reverse proxy。host application 不改变 class、instance、session driver 或 per-instance runtime 的生命周期。
 
 ## 尚待确认的产品决策
 
 1. shared instance 是否允许多人同时控制，还是使用 controller lease？
 2. 临时 instance idle 后是否保留 HOME/profile，还是同时销毁？
 3. agent 操作 WeChat 时，agent 与人是否共享同一控制权，还是需要明确 handover/lease？
-4. 第二阶段是否需要跨 sandbox/host 调度？若需要，instance-to-host routing 和 profile storage 需在接入 WAOS 前扩展。
+4. 第二阶段是否需要跨 sandbox/host 调度？若需要，instance-to-host routing 和 profile storage 需在接入 host application 前扩展。

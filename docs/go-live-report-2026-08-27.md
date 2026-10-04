@@ -1,5 +1,10 @@
 # Go-live and system performance report — 2026-08-27
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 ## Outcome
 
 The P01/P03/P03b driver integrations and P02/P05-P14 compiled features are live
@@ -9,7 +14,7 @@ on `0.0.0.0:1991`. The stable console is:
 
 The manager is an enabled user service named
 `remotexapp.service`. Fixed display `:2` is no longer an anonymous
-in-memory autostart runtime: persistent registration `test-host-xfce` owns
+in-memory autostart runtime: persistent registration `example-managed-desktop` owns
 it. Its server layer stays running, XFCE starts on the first RFB attachment,
 and ten seconds after the last detachment only the session layer stops.
 
@@ -136,11 +141,11 @@ authorized no-auth `0.0.0.0:1991` policy; new installations use loopback
 listening, trusted-proxy identity authentication and redacted API responses by
 default.
 
-The manager first adopted `xfce-desktop-688676b680f5`, proving state
+The manager first adopted `xfce-desktop-EXAMPLE`, proving state
 compatibility. With zero clients, desired state was changed to stopped and back
 to running so every per-instance process used the installed release. The first
-RC runtime was `xfce-desktop-fa8b782d5f1d`; final route hardening rebuilt it as
-`xfce-desktop-48ba769445cd`. A live headless browser then passed
+RC runtime was `xfce-desktop-EXAMPLE`; final route hardening rebuilt it as
+`xfce-desktop-EXAMPLE`. A live headless browser then passed
 fixed framebuffer policy, Chinese and English committed text, and reconnect.
 The rollback snapshot is
 `~/.local/state/remotexapp-install-backups/20260827T162800Z-live/`.

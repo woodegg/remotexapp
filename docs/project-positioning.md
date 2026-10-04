@@ -85,8 +85,8 @@ and [runtime upgrade API](runtime-upgrade-api.md).
 
 ## Text identity
 
-The README uses three playful ASCII scenes: an X-shaped teleport between local
-and remote screens, an App delivery truck, and a human/agent pair. Keep them
+The README uses two playful ASCII scenes: an X-shaped teleport between local
+and remote screens and an App delivery truck. Keep them
 monospaced, selectable and image-free. The delivery slogan refers to interactive
 applications, not a different transport or a bundled agent. Audio remains
 explicitly labeled WIP. The short tagline is **Remote apps. Local interaction.**

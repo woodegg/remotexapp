@@ -1,10 +1,15 @@
 # Console Connection Information — Locked Release Train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 ## Stable publication — 2026-09-10
 
 Published as normal Latest `v0.8.0` at `c097bbcdb032`. Full hosted candidate and
 exact-archive acceptance passed; independently downloaded bytes match the tested
-candidate. See [evidence](../tests/evidence/v1/connections-0.8.0-publication.json).
+candidate. See [evidence](private-history.md).
 Local services remain rc.3; no additional deployment or runtime recreation.
 
 Human UAT accepted for rc.3; publish stable `0.8.0` with SDK `0.25.1` after
@@ -207,7 +212,7 @@ endpoints passed candidate and post-deployment checks. Open 1991 Console,
 select Connection info and Refresh: no token is required. SDK callers can use
 `manager.getConnections(id)` directly. Manager authentication still applies.
 2992 Console remains disabled; use its SDK/API. Existing XFCE pins remain
-unchanged. [Evidence](../tests/evidence/v1/tokenless-connections-0.8.0-rc.2-local.json).
+unchanged. [Evidence](private-history.md).
 
 The following rc.1 deployment and token-entry checklist is historical and
 superseded by CONN-004 above.
@@ -215,7 +220,7 @@ superseded by CONN-004 above.
 Exact candidate `c64d1857da26`, Core `0.8.0-rc.1` / SDK `0.25.0`, completed
 automated acceptance and both local loopback deployments on 2026-09-10 at
 08:17 UTC. App versions and selectors are unchanged. See
-[verification evidence](../tests/evidence/v1/console-connections-0.8.0-rc.1-local.json).
+[verification evidence](private-history.md).
 No sandbox or publication was performed; Human UAT remains pending.
 
 1. On the deployment host, open `http://127.0.0.1:1991/sdk/console.html` and

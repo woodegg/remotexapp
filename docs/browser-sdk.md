@@ -2,7 +2,7 @@
 
 ## Optional runtime keepalive (SDK 0.29)
 
-For a windowed host application, see the [WAOS migration guide](waos-runtime-coordinator-migration.md)
+For a windowed host application, see the [host application migration guide](host-runtime-coordinator-migration.md)
 before deciding whether to retain existing Viewers or bind new ones to handles.
 
 Keepalive defaults **off**. It delays the template's idle action without a

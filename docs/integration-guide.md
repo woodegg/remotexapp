@@ -1,12 +1,16 @@
 # Downstream integration guide
 
-## Single-server runtime coordination (Core 0.13 / SDK 0.29)
+Use the [current release-matched SDK](current-state.md) served by your Manager.
+Version labels in feature sections describe when their contracts were introduced;
+they are not instructions to install older releases.
 
-WAOS implementers: start with the [Coordinator migration guide](waos-runtime-coordinator-migration.md)
+## Single-server runtime coordination
+
+For a windowed host application, start with the [Coordinator migration guide](host-runtime-coordinator-migration.md)
 for ownership, incremental adapter code, cold XFCE activation, logout,
 restart/upgrade, dependency locks and the downstream acceptance checklist.
 
-This candidate is opt-in; existing standalone Viewers need no migration.
+Coordination is opt-in; existing standalone Viewers need no migration.
 Create one `RemoteXAppCoordinator({manager, scope})` per application/login in
 each Tab, using the same non-secret login epoch across cooperating Tabs.
 It manages one RemoteXApp server; do not combine multiple servers or audio
@@ -32,15 +36,15 @@ a distributed lock.
 Rollback: release handles/destroy coordinators and use the existing standalone
 Client construction. Existing grants expire under the template policy; no
 profile migration, App stop or Driver change is required. Do not centralize
-Viewer IME, clipboard focus/prompts or fingerprints. WAOS adoption is a separate
-repository task; this release changes no WAOS code.
+Viewer IME, clipboard focus/prompts or fingerprints. Host-application adoption is a separate
+repository task; this release changes no host application code.
 
 ## Declared App actions (Core 0.9 / SDK 0.26)
 
-The candidate adds `manager.getActions(id)` and
+Use `manager.getActions(id)` and
 `manager.invokeAction(id, action, parameters, {sessionGeneration, signal})`.
 An already-connected writable `client.invokeAction(action, parameters, {signal})`
-supplies its own runtime identity. See [App Actions contract and WAOS flow](app-actions-release.md).
+supplies its own runtime identity. See [App Actions contract and host application flow](app-actions-release.md).
 
 For Firefox 2.2.0 / Edge 1.1.0, ensure/create the singleton with a neutral start
 page, attach a Viewer, wait until `applicationStatus.state === 'ready'`, then:
@@ -57,12 +61,12 @@ contains `instanceId`, `sessionGeneration`, `action` and `result: {tabId, url}`;
 it means browser acknowledgement, not successful website loading. Existing
 pins without this action need an explicit upgrade; no action starts/restarts
 the app. Firefox returns `control-busy` while another BiDi controller owns it.
-WAOS needs no new raw CDP/BiDi service. Normal Manager authentication applies.
+The host application needs no new raw CDP/BiDi service. Normal Manager authentication applies.
 
 ## Existing clipboard integration
 
-RemoteXApp 0.5 supports browser applications through SDK `0.21.1` served by the
-manager, including opt-in clipboard APIs without changing App Package ABI V1.
+Use the release-matched SDK served by the Manager, including opt-in clipboard
+APIs and the App Package ABI V1 contract.
 Deploy the application and RemoteXApp behind the same authenticated TLS reverse
 proxy, then import the stable entry point:
 
@@ -81,7 +85,7 @@ proxy, then import the stable entry point:
 </script>
 ```
 
-The same-origin deployment is part of the supported 0.4 contract. The server
+The same-origin deployment is part of the supported contract. The server
 does not ship a permissive CORS policy, and the SDK package is deliberately not
 published to npm. Do not copy repository SDK source files or hard-code
 content-hashed `/assets/` URLs. Those are release internals; `/sdk/index.js`
@@ -105,7 +109,7 @@ and does not enable CORS.
 
 Use SDK `0.27.0` with upgraded Core `0.10.0` runtime gateways for guarded
 prompt approval. Updating only the Manager does not upgrade existing runtime
-pins. WAOS keeps one Client and optional prompt controller per Viewer; no
+pins. The host application keeps one Client and optional prompt controller per Viewer; no
 shared coordinator or App-specific changes are needed.
 
 Each direction retains only its latest prompt. Recovered history does not
@@ -154,7 +158,7 @@ LAN HTTP; `localhost` is treated as trustworthy for local testing. Content is
 transient and must not be copied into URLs, logs, diagnostics, application
 status, launch parameters, local storage, or crash reports.
 
-SDK `0.21.1` retains per-Client input activity for multi-window consumers. Keep
+The SDK retains per-Client input activity for multi-window consumers. Keep
 one Client and one prompt controller per Viewer; do not create a shared
 clipboard coordinator. A pointer or keyboard event over the remote canvas
 activates its Client automatically. When application window chrome or keyboard

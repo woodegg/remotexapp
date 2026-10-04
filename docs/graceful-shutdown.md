@@ -126,7 +126,7 @@ action, unexpected crash classification, browser terminal behavior, and real
 unsaved-document UAT.
 
 The `0.1.0-rc.5` isolated gate covers this matrix in
-[`graceful-shutdown-rc5.json`](../tests/go-live-validation/results/graceful-shutdown-rc5.json).
+[`graceful-shutdown-rc5.json`](private-history.md).
 It also verifies that persistent/mounted document paths survive teardown;
 ephemeral workspace HOME content is intentionally removed by `stop-instance`.
 
@@ -135,7 +135,7 @@ session bus used `/tmp`, which is not shared with a manager using
 `PrivateTmp=yes`. Driver 1.2 in rc.6 places the private bus at
 `REMOTEXAPP_SOCKET_RUNTIME/session-bus.sock`. The exact hardened-service
 regression is recorded in
-[`graceful-shutdown-rc6-private-tmp.json`](../tests/go-live-validation/results/graceful-shutdown-rc6-private-tmp.json).
+[`graceful-shutdown-rc6-private-tmp.json`](private-history.md).
 
 As of rc.23 the manager intentionally shares the host mount namespace so it can
 perform EXP-007's validated same-UID procfs read. Session IPC remains under the

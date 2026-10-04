@@ -6,14 +6,14 @@ remain below. Initial seven-App E2E passes did not prove every App/state/API
 combination; do not promote `0.12.0-rc.1` on that basis.
 
 Operator acceptance supersedes the historical pending-UAT statements below;
-see [acceptance and stable promotion provenance](../tests/evidence/v1/core-session-services-0.12.0-uat.json).
+see [acceptance and stable promotion provenance](private-history.md).
 No deployment alignment was requested with publication.
 
 Stable commit `3037ca136f58` subsequently passed all seven exact-archive E2E
 suites on the first run plus the stopped-cutover rehearsal; hosted, independent
 local and published archives are identical. This does not relabel the rc.2
 dynamic matrix as a stable-archive run. See
-[stable publication evidence](../tests/evidence/v1/core-session-services-0.12.0-publication.json).
+[stable publication evidence](private-history.md).
 
 ## Repair follow-up — 2026-09-14 (automated validation and local deployment complete)
 
@@ -25,7 +25,7 @@ real Viewer, performance and final repeatability gates passed.
 The original failures below remain historical evidence, not accepted behavior.
 Both local endpoints now run the verified rc.2 archive; the desktop was upgraded
 gracefully. No sandbox/GitHub release changed. See
-[current local evidence](../tests/evidence/v1/core-session-services-0.12.0-rc.2-local.json).
+[current local evidence](private-history.md).
 
 Additional SVC-F08: repeated SIGTERM could kill the supervisor during deferred
 cleanup because its signal handler was removed before cleanup ran. Disposable
@@ -69,7 +69,7 @@ and Viewer gates subsequently passed as recorded below.
 | Seven-App timeout/failed shutdown hooks and crash-persistent enforcement | 28 | 140 |
 
 These counts are assertions/checkpoints, not independent exhaustive scenarios.
-See the [machine-readable repaired gate](../tests/evidence/v1/core-session-services-0.12.0-rc.2-state-matrix.json).
+See the [machine-readable repaired gate](private-history.md).
 Firefox's interrupted graceful upgrade also exercised the conditional blocked
 response followed by explicit force recovery of the disposable test App. That
 does not authorize forcing a real user's blocked shutdown.
@@ -112,7 +112,7 @@ IBus and Unicode engine with recorded PID/start/cgroup identities, and an
 unchanged borrowed account bus. Actual served-Viewer Unicode and clipboard
 readback then pass in that restored editor before/after Manager restart.
 Ordinary runtime restart and subsequent IBus loss also pass without silently
-replacing the App. See [saved-session evidence and raw hashes](../tests/evidence/v1/core-session-services-0.12.0-rc.2-xfce-saved-session.json).
+replacing the App. See [saved-session evidence and raw hashes](private-history.md).
 
 Three consecutive full runs passed; the final two use the identical final
 harness with an explicit five-second degradation bound. The last observed
@@ -297,7 +297,7 @@ Human UAT cannot substitute for fixing these reproduced lifecycle findings.
 
 ## Completed runs and acceptance decision
 
-See [machine-readable evidence](../tests/evidence/v1/core-session-services-0.12.0-rc.1-state-matrix.json)
+See [machine-readable evidence](private-history.md)
 for exact artifact identity, raw evidence locations and earlier-attempt
 dispositions. The main matrix uses the later complete browser runs instead
 of double-counting their earlier aborted partial runs.
@@ -331,6 +331,6 @@ Keep each as a reproducible regression. Rerun the whole matrix and served-Viewer
 E2E after fixing; do not promote based on partial retests or human UAT alone.
 
 Existing local 1991/2992 listeners/binaries were not changed. The actual user
-XFCE remained `xfce-user-desktop-8cdcaa0b5159`, generation 1. All temporary test
+XFCE remained `xfce-user-desktop-EXAMPLE`, generation 1. All temporary test
 accounts were terminated/removed, evidence retained, and port 21996 was clear.
 No sandbox/gateway mutation, commit, push, deployment or publication occurred.

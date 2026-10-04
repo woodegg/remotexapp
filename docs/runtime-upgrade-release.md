@@ -1,5 +1,10 @@
 # Runtime Upgrade and KDE Editors — Locked Release Train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Status: locked by the operator on 2026-09-10. Target Core `0.7.0-rc.1`, SDK
 `0.24.0`, Kate `1.0.0` and KWrite `1.0.0`; other App versions remain unchanged.
 UPG-001–004, KTE-001 and KWR-001 are authorized for implementation, full tests
@@ -84,7 +89,7 @@ generation/connection/clipboard state, and reconnect to the resulting runtime
 without duplicate launch requests. Trusted Agents explicitly refetch protected
 `getConnections()` data; never copy their capability token into a Viewer.
 Unchanged restart APIs and consumers remain compatible. Document usage and
-errors for downstream integrations such as WAOS; no WAOS code changes belong
+errors for downstream integrations such as host application; no host application code changes belong
 to this train.
 
 ## UPG-004 — Console version visibility and distinct actions
@@ -167,7 +172,7 @@ Automated acceptance and deployment completed on 2026-09-10 at 07:16 UTC.
 Both loopback endpoints run exact hosted candidate commit `a3f4a2569d4f`,
 Core `0.7.0-rc.1` / SDK `0.24.0`. Hosted Verify and Release candidate gates,
 exact-archive E2E, and post-deployment editor/connection/browser checks passed.
-See [machine-readable evidence](../tests/evidence/v1/runtime-upgrade-0.7.0-rc.1-local.json).
+See [machine-readable evidence](private-history.md).
 
 The 1991 catalog has seven templates; 2992 has six (its existing catalog did
 not include XFCE). Kate and KWrite are separate new selectors, both `1.0.0`.

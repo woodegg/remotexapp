@@ -1,9 +1,14 @@
 # Clipboard Empty Content Release Train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Status: Human UAT accepted and train closed on 2026-09-10 UTC. Stable `0.5.4`
 is published as normal Latest with SDK `0.22.0` and unchanged App Packages.
 Independent download, checksum, identity and byte comparison passed; see
-[publication evidence](../tests/evidence/v1/clipboard-empty-0.5.4-publication.json).
+[publication evidence](private-history.md).
 No further deployment is authorized by this publication approval.
 
 Historical lock: scope locked by the operator on 2026-09-09; implementation and local
@@ -101,9 +106,9 @@ On 2026-09-10 UTC, the exact hosted candidate at commit `4f55e629cdef` passed
 checksum/identity, synthetic ABI, and four-App live E2E. Both local Managers
 now serve that archive. Each endpoint passed newly created Mousepad and
 LibreOffice two-Viewer clipboard tests and actual application paste/copy
-readback. See [machine evidence](../tests/evidence/v1/clipboard-empty-0.5.4-rc.1-local.json).
+readback. See [machine evidence](private-history.md).
 Human UAT was subsequently explicitly accepted by the operator. See
-[acceptance](../tests/evidence/v1/clipboard-empty-0.5.4-human-uat.json).
+[acceptance](private-history.md).
 
 ## Stable promotion
 

@@ -11,9 +11,9 @@ validated in 0.1.0-rc.24
 **Target release train:** 0.1.0-rc.23 (EXP-007), 0.1.0-rc.24 (sandbox access
 correction)
 
-**Initial downstream:** Web Agentic OS (WAOS)
+**Initial downstream:** Web Agentic OS (host application)
 
-**Initial command-execution target:** sandbox00 only; EXP-007 is the separate
+**Initial command-execution target:** test-host-a only; EXP-007 is the separate
 named operation validated on local port 1991
 
 ## Request
@@ -23,8 +23,8 @@ which an authorized same-origin client can submit a custom command. RemoteXApp
 executes that command with the active application's resolved session environment
 and returns its bounded result.
 
-The first WAOS use case runs `/usr/bin/env -0` when the user asks an Agent to
-work with the user-home `xfce-user-desktop`. WAOS extracts the current graphical
+The first host application use case runs `/usr/bin/env -0` when the user asks an Agent to
+work with the user-home `xfce-user-desktop`. The host application extracts the current graphical
 environment—such as DISPLAY, Xauthority, user runtime, D-Bus and audio
 settings—and includes only the useful values in an Agent task.
 
@@ -39,7 +39,7 @@ A downstream viewer can currently read public lifecycle and display fields, but
 production redaction intentionally removes HOME, Xauthority and private runtime
 paths, and the API has no generic audio-environment description.
 
-Inferring those values in WAOS would duplicate RemoteXApp policy and become
+Inferring those values in host application would duplicate RemoteXApp policy and become
 incorrect as templates, run modes or host audio stacks evolve. A flexible
 status command lets the integration observe real environments first, identify
 which values and probes are useful, and later replace this experiment with
@@ -125,17 +125,17 @@ A successful response is exactly:
 
 ```json
 {
-  "instanceId": "sandbox-desktop",
+  "instanceId": "primary-desktop",
   "sessionGeneration": 3,
   "applicationState": "ready",
   "environment": {
     "DISPLAY": ":1",
-    "XAUTHORITY": "/home/sandbox/.Xauthority",
-    "HOME": "/home/sandbox",
-    "XDG_RUNTIME_DIR": "/run/user/1001",
-    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/1001/bus"
+    "XAUTHORITY": "/home/appuser/.Xauthority",
+    "HOME": "/home/appuser",
+    "XDG_RUNTIME_DIR": "/run/user/<uid>",
+    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/run/user/<uid>/bus"
   },
-  "workingDirectory": "/home/sandbox"
+  "workingDirectory": "/home/appuser"
 }
 ```
 
@@ -251,7 +251,7 @@ REMOTEXAPP_EXPERIMENTAL_STATUS_COMMAND=true
 ```
 
 The default is disabled and the disabled route returns 404. Initial deployment
-is limited to sandbox00. It must not be enabled on WAOS follower sandboxes or a
+is limited to test-host-a. It must not be enabled on host application follower sandboxes or a
 general RemoteXApp installation merely because the code exists.
 
 The route retains the existing same-origin and RemoteXApp authentication
@@ -274,7 +274,7 @@ RemoteXApp therefore must not log argv, stdout or stderr. It may audit only:
 The SDK must not copy command results into diagnostics, events, local storage or
 durable instance state.
 
-For the initial WAOS experiment, application code submits only the built-in
+For the initial host application experiment, application code submits only the built-in
 `['/usr/bin/env', '-0']` request. It parses NUL-separated entries, retains only
 the variables needed to describe graphical access, and immediately discards
 the complete result. It never records or forwards unrelated variables.
@@ -286,7 +286,7 @@ execution read-only. A caller could select a mutating executable. OS account and
 container separation remain the actual security boundary; the words “status”
 and “experimental” provide no isolation.
 
-This risk is accepted only for the bounded sandbox00 discovery phase. Promotion
+This risk is accepted only for the bounded test-host-a discovery phase. Promotion
 requires a separate security review with retained abuse-case testing. No
 production acceptance may silently reclassify the free-form operation as safe.
 
@@ -308,7 +308,7 @@ production acceptance may silently reclassify the free-form operation as safe.
    SDK diagnostics and browser persistence.
 6. A generation rollover during execution cannot return a result as current or
    change the replacement session's durable status.
-7. WAOS sandbox00 E2E proves only `/usr/bin/env -0` is submitted, only its
+7. The host application test-host-a E2E proves only `/usr/bin/env -0` is submitted, only its
    explicit environment allowlist reaches the Agent task, and no full result is
    persisted or logged.
 8. Documentation and operator UI label the feature experimental remote command

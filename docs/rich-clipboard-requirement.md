@@ -169,7 +169,7 @@ client.clipboard.dismiss(offerId);
 ```
 
 The SDK also exposes explicit-item `send`, pending-offer listing, and `offer`,
-`statechange`, `permissionrequired`, and `error` events so WAOS and other
+`statechange`, `permissionrequired`, and `error` events so host application and other
 integrators can provide their own policy and UI. Both directions are
 configured independently:
 
@@ -254,7 +254,7 @@ An explicit “Authorize local clipboard read” action exercises
 `checkAccess()` and therefore cannot raise a permission prompt.
 
 The Console imports and exercises the same public `client.clipboard` API as
-WAOS and other consumers; it must not call private bridge functions or add a
+The host application and other consumers; it must not call private bridge functions or add a
 test-only backend route. Enabling prompt or automatic behavior requires an
 explicit user action after the Viewer connects. The selection applies only to
 that browser-side client and is reset by page reload, disconnect, or client

@@ -1,12 +1,17 @@
 # Unified operator console release train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Status: scope-locked 2026-08-31 and extended by accepted UAT correction
 CON-010 on 2026-09-01; target `0.2.0-rc.10` with SDK `0.18.0`.
 Implementation, complete local validation, and deployment only to local port
 1991 are authorized. No sandbox deployment is authorized.
 
 Rc.9 automated local acceptance completed. Evidence is in
-[`unified-console-rc9-local-1991.json`](../tests/go-live-validation/results/unified-console-rc9-local-1991.json).
+[`unified-console-rc9-local-1991.json`](private-history.md).
 Human UAT rejected its flat managed-registration/runtime navigation. Rc.10
 adds the locked ownership hierarchy and repeats affected acceptance before UAT.
 
@@ -32,7 +37,7 @@ reconnects.
 Rc.10 implementation and automated local acceptance are complete. The exact
 artifact passed the repository, race, package, immutable staging, and real
 Chrome gates. Evidence is in
-[`unified-console-rc10-navigation-local-1991.json`](../tests/go-live-validation/results/unified-console-rc10-navigation-local-1991.json).
+[`unified-console-rc10-navigation-local-1991.json`](private-history.md).
 Human UAT was accepted on 2026-09-01. The Unified Operator Console train is
 complete.
 

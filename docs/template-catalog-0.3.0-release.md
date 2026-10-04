@@ -1,5 +1,10 @@
 # RemoteXApp 0.3.0 template catalog simplification train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Status: complete on 2026-09-02. Candidate `0.3.0-rc.1` at `cfddd717e14d`
 completed implementation, automated gates, real upgrade and rollback, full
 local E2E, deployment to local `0.0.0.0:1991`, and Human UAT. Annotated
@@ -67,7 +72,7 @@ Before this train can be accepted:
 4. `make release-check`, `make release-ci`, confidentiality checks, and the
    complete local port-1991 E2E gate pass on one immutable candidate.
 5. Human UAT, sandbox deployment, version tagging, and GitHub publication each
-   require later explicit approval. Sandbox00 staging and production remain
+   require later explicit approval. test-host-a staging and production remain
    separate approval gates.
 
 Items 1 through 4 passed on `0.3.0-rc.1`. The real local transition exercised
@@ -76,9 +81,9 @@ PIDs, and proved automatic recovery from an injected target-commit health
 failure. Final Firefox validation proved the actual depth-16 VNC command,
 BiDi, input, dynamic resize, reconnect, and cleanup; the retained user-home
 Desktop proved fixed-size browser scaling and reconnect. Exact evidence is
-[`template-catalog-0.3.0-rc.1-local-1991.json`](../tests/go-live-validation/results/template-catalog-0.3.0-rc.1-local-1991.json).
+[`template-catalog-0.3.0-rc.1-local-1991.json`](private-history.md).
 Human UAT was accepted on 2026-09-02. Exact acceptance is recorded in
-[`template-catalog-0.3.0-rc.1-human-uat.json`](../tests/go-live-validation/results/template-catalog-0.3.0-rc.1-human-uat.json).
+[`template-catalog-0.3.0-rc.1-human-uat.json`](private-history.md).
 All acceptance items and formal publication are complete.
 
 Formal publication passed. The downloaded linux/amd64 archive and its attached
@@ -86,7 +91,7 @@ Formal publication passed. The downloaded linux/amd64 archive and its attached
 `3b4c49afc8fec2aec6121822d573170f022a09bd0667de0ed93fd58001c3de69`.
 The embedded commit, sensitive-data scan, and exact five-App catalog also
 passed. Exact evidence is
-[`template-catalog-0.3.0-formal-publication.json`](../tests/go-live-validation/results/template-catalog-0.3.0-formal-publication.json).
+[`template-catalog-0.3.0-formal-publication.json`](private-history.md).
 
 ## Exclusions
 

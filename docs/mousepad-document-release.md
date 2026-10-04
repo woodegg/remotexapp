@@ -1,5 +1,10 @@
 # Optional Document Launch and Agent Connection Information — Next Release Train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Status: scope locked by the operator on 2026-09-10. MPD-001 records the operator's request to make
 Mousepad closer to the LibreOffice document template, with optional `filePath`.
 LOF-001 adds optional `filePath` to LibreOffice in the same train.
@@ -13,10 +18,10 @@ The accepted 0.5.4 train remains closed.
 
 Implementation and exact-candidate automated acceptance completed; the candidate
 is deployed to both authorized local endpoints. Human UAT is pending. See
-[deployment evidence](../tests/evidence/v1/document-connections-0.6.0-rc.1-local.json)
+[deployment evidence](private-history.md)
 for checks. The separately approved local desktop replacement subsequently
 closed the fresh user-home connection coverage gap; see
-[XFCE follow-up evidence](../tests/evidence/v1/document-connections-xfce-0.6.0-rc.1-local.json).
+[XFCE follow-up evidence](private-history.md).
 
 ## Locked configuration (pre-train baseline versus target)
 

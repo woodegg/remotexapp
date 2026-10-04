@@ -991,8 +991,8 @@ During the isolated phase, production remained PID 2881468, HTTP 200 and on
 its original three binary hashes. After user acceptance, the experiment was
 stopped and the common lifecycle was applied to XFCE, Mousepad and Edge.
 
-The live managed runtime changed from `xfce-desktop-3a4e151e1d2b` to
-`xfce-desktop-688676b680f5` while retaining managed ID `test-host-xfce`,
+The live managed runtime changed from `xfce-desktop-EXAMPLE` to
+`xfce-desktop-EXAMPLE` while retaining managed ID `example-managed-desktop`,
 profile `xfce-driver-test`, HOME and display `:2`. Live server-only state was
 212,992 B/1 task with no D-Bus/IBus/engine process or socket, versus the
 pre-deploy 16,887,808 B/18-task snapshot: 16,674,816 B (98.74%) lower.
@@ -1050,7 +1050,7 @@ P01/P03/P03b drivers and the compiled P02/P05-P14 candidates were validated on
 isolated port-1992 managers, then deployed to port 1991. Build, race, SDK,
 documentation, Mousepad, Edge, clean/configured XFCE, lifecycle, managed
 gateway/VNC/session fault and manager-restart tests all passed. Fixed XFCE was
-migrated to managed ID `test-host-xfce` after testing proved that an
+migrated to managed ID `example-managed-desktop` after testing proved that an
 anonymous fixed-display autostart cannot be adopted across manager restart.
 
 The actual live binaries are `188afc12…`, `304f77f9…` and `3ee10fb2…`; the

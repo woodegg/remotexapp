@@ -1,10 +1,25 @@
 # Changelog
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](docs/current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 All notable user-visible, operator-visible, and compatibility changes are
 recorded here. Add changes under `Unreleased` in the same pull request as the
 implementation; move them to a version section when publishing a release.
 
 ## Unreleased
+
+- Make public documentation independent of private deployment histories:
+  replace operational diaries with current guidance, anonymize historical
+  examples, and generalize host-application integration guides.
+- Clarify Citrix-style Linux app delivery and SDK embedding in the README;
+  correct App README versions and historical repository-status wording.
+- Add a public-documentation disclosure/link gate to `make check`. Release
+  packaging checks bundled guides and links omitted source material to the
+  exact source commit, without copying operational diaries into the archive.
+
 
 ## 0.14.3 — 2026-10-03
 
@@ -119,7 +134,7 @@ Target: `0.13.1`. SDK `0.29.1` unchanged; Edge App Package `2.0.3`.
 Target: `0.13.0`. SDK `0.29.1`; App Packages unchanged. Human UAT accepted
 for local RC.3; formal publication authorized without functional changes.
 
-- Add the WAOS Coordinator migration handoff: per-Tab service/per-window
+- Add the host application Coordinator migration handoff: per-Tab service/per-window
   ownership, incremental integration, on-attach generation handling,
   restart/upgrade/logout cleanup, diagnostics, acceptance and rollback.
 
@@ -204,9 +219,9 @@ SDK `0.28.0` and App versions are unchanged. Published as formal GitHub Latest
   files and path escapes remain rejected; no Driver runs for a rejected launch.
 
 Hosted/local release gates produced identical bytes; all eight final-archive
-E2E suites passed. Sandbox00 production 1991 runs those bytes and passed seven-App
+E2E suites passed. test-host-a production 1991 runs those bytes and passed seven-App
 Viewer/input/control checks across two Manager restarts plus an explicit XFCE
-logout/stopped-session restart. CloudDrive still reports a storage error without
+logout/stopped-session restart. remote storage still reports a storage error without
 blocking Manager; its functional tests were skipped during maintenance.
 Final-candidate container reboot acceptance remains pending new human approval:
 no container reboot occurred after that restriction. Paired 2991 remains 0.11.0;
@@ -418,7 +433,7 @@ The following entries retain the local candidate validation history.
 - Clipboard capabilities add `consistencyVersion:1` and `sequence`; guarded
   uploads accept `X-RemoteXApp-Clipboard-Sequence`. Stale accepts/writes return
   HTTP 409. New guarded SDK approvals require an upgraded runtime, not merely
-  a new Manager. No App/WAOS-specific branch or shared Viewer coordinator.
+  a new Manager. No App/host application-specific branch or shared Viewer coordinator.
 - Clean-clone release-ci, exact-archive six-suite E2E and deployed two-Viewer
   Mousepad/LibreOffice checks passed on local 127.0.0.1:1991/2992. Human UAT
   is pending; existing XFCE retains its 0.9.1 pin. No formal publication or
@@ -442,7 +457,7 @@ Target: `0.9.0`. SDK `0.26.0`; human UAT accepted.
 
 Verified candidate `fc2d94e6b764` is deployed to local loopback 1991/2992;
 subsequently authorized XFCE/Edge force upgrades passed readiness and connection
-checks. [Validation record](tests/evidence/v1/app-actions-0.9.0-rc.1-local.json).
+checks. [Validation record](docs/private-history.md).
 
 - Add optional App Package actions with generic pinned capability discovery,
   strict input/result schemas, session-generation guards, bounded execution,
@@ -636,7 +651,7 @@ Target: `0.5.1`.
   SDK, App Package, template, driver, dependency, or generated-asset changes.
   Stable `v0.5.1` passed both hosted workflows and independent artifact
   verification. Its exact formal bytes were aligned to local 1991/2991,
-  sandbox00 1991/2991, and sandbox02/03/07/10 production 1991 with unchanged
+  test-host-a 1991/2991, and test-host-c/03/07/10 production 1991 with unchanged
   policy, App selectors, and runtime identities and with clear warning logs.
 
 ## 0.5.1-rc.1 — 2026-09-03
@@ -721,8 +736,8 @@ Target: `0.5.0`.
   generated assets remain unchanged; deployment follows formal publication.
 - Published `v0.5.0` as the normal Latest GitHub release after both hosted
   workflows and independent artifact verification passed. The exact formal
-  archive was deployed to local 1991/2991, sandbox00 1991/2991, and
-  sandbox02/03/07/10 production 1991; all eight endpoints passed version,
+  archive was deployed to local 1991/2991, test-host-a 1991/2991, and
+  test-host-c/03/07/10 production 1991; all eight endpoints passed version,
   binary, catalog, policy, runtime-adoption, and warning-log checks.
 
 ## 0.4.0 — 2026-09-02
@@ -776,7 +791,7 @@ Target: `0.4.0`.
   application Apps, and full two-Viewer XFCE validation on local port 1991.
   Human UAT was accepted on 2026-09-02 and formal GitHub publication was
   explicitly authorized. The subsequent operator-authorized rollout aligned
-  local 1991/2991, both sandbox00 environments, and sandbox02/03/07/10.
+  local 1991/2991, both test-host-a environments, and test-host-c/03/07/10.
 - Passed dedicated no-Clipman repeat-paste and generation cleanup tests, three
   consecutive real Clipman stale-replay tests including gateway exit, and a
   live XFCE/Clipman check past the complete 60-second offer lifetime. The
@@ -909,7 +924,7 @@ Target: `0.2.0`.
   No sandbox deployment is authorized. Human UAT was accepted on 2026-09-01.
 - Scope-locked the stability-only `0.2.0` train with SDK `0.18.0` and App
   Package ABI V1 unchanged. Its remaining UAT, issue-closure, documentation,
-  compatibility, release, local, separately approved sandbox00, publication,
+  compatibility, release, local, separately approved test-host-a, publication,
   and formal-artifact gates are explicit; no sandbox deployment or publication
   is authorized by the lock itself.
 - Completed the stable-positioning audit across README, security, commercial,
@@ -919,11 +934,11 @@ Target: `0.2.0`.
   blockers and were closed after exact stable-candidate evidence was attached;
   all experimental and deferred requirements remain outside the stable
   compatibility promise.
-- Confirmed provider-side WAOS compatibility: App Package ABI V1, its parser,
+- Confirmed provider-side host application compatibility: App Package ABI V1, its parser,
   and all six App sources are unchanged from accepted rc.4; SDK 0.18 is an
   additive manager API over the unchanged viewer/input client. The isolated
   build-once package install, update, adoption, disable, and rollback gate
-  passed without a WAOS build or core rebuild.
+  passed without a host application build or core rebuild.
 - Passed the first clean stable candidate gate on Ubuntu 24.04 linux/amd64:
   `make release-check`, `make release-ci`, race, preflight, immutable staging,
   archive inspection, and all six embedded App checksums. Repeated packaging
@@ -934,12 +949,12 @@ Target: `0.2.0`.
   scaling, reconnect, logout/relaunch, graceful/forced shutdown, and cleanup
   paths. Exact Issue #4 and #5 abnormal recovery retained their required
   profile or runtime identity without a restart loop; no sandbox was changed.
-- Completed the separately approved replacement sandbox00 automated staging
+- Completed the separately approved replacement test-host-a automated staging
   gate: rc.5 upgrade/rollback, runtime adoption, EXP-007 policy, four App
   control/lifecycle probes, and managed logout/gateway recovery passed. The
   original rc.5 selectors and unit were restored before the separately
   approved production activation.
-- Activated the same checksum-verified candidate on sandbox00 after separate
+- Activated the same checksum-verified candidate on test-host-a after separate
   production approval. The managed Desktop identity, generation, and child
   processes were adopted without restart; health and production surface smoke
   checks passed.
@@ -967,18 +982,18 @@ Target: `0.2.0-rc.5`.
 ### Documentation
 
 - Scope-locked the Issue #5 recovery train to RTM-010, core manager lifecycle
-  behavior, abnormal-restart regression coverage, and sandbox00 production
+  behavior, abnormal-restart regression coverage, and test-host-a production
   validation before separately approved follower promotion. It does not change
-  the SDK, App Package ABI, templates, drivers, WAOS, or network policy.
-- Recorded exact local and sandbox00 production evidence: real cgroup gateway
+  the SDK, App Package ABI, templates, drivers, host application, or network policy.
+- Recorded exact local and test-host-a production evidence: real cgroup gateway
   failure recovered under one ID/manifest with no manager restart, followed by
   successful restart adoption.
 - Recorded the separately approved follower deployment and all-runtime
-  restart. Rc.5 repaired real duplicate-manifest restart loops on sandbox07
-  and sandbox10, all four followers converged to one manifest per runtime, and
+  restart. Rc.5 repaired real duplicate-manifest restart loops on test-host-h
+  and test-host-k, all four followers converged to one manifest per runtime, and
   final services reported zero restarts and warning-level entries.
-- Published `v0.2.0-rc.5` as a GitHub prerelease and aligned sandbox00,
-  sandbox02, sandbox03, sandbox07, and sandbox10 to the checksum-verified formal
+- Published `v0.2.0-rc.5` as a GitHub prerelease and aligned test-host-a,
+  test-host-c, test-host-d, test-host-h, and test-host-k to the checksum-verified formal
   archive. The prior same-commit candidate trees remain available for audit;
   Human UAT remains pending.
 - Aligned local port 1991 to the same formal archive, gracefully recreated its
@@ -1063,31 +1078,31 @@ Target: `0.2.0-rc.4`.
   `edge`, preserves the existing shared singleton/profile/six-hour/CDP
   behavior, supersedes `edge-browser` without concurrent selectors, and keeps
   the implementation outside RemoteXApp core and SDK. Implementation, local
-  verification, and deployment on sandbox00/02/03/07/10 are authorized; other
+  verification, and deployment on test-host-a/02/03/07/10 are authorized; other
   sandboxes are excluded.
-- Recorded sandbox00 production activation of the exact `edge@1.0.0` archive,
+- Recorded test-host-a production activation of the exact `edge@1.0.0` archive,
   including independent selector migration, unchanged core/runtime identity,
   real viewer/CDP acceptance, cleanup, and the exclusion of every other
   sandbox.
 - Published GitHub prerelease `v0.2.0-rc.4` and the independent stable App
   Package release `edge-v1.0.0` from the same accepted commit. The core archive
   embeds the exact independently checksummed Edge archive.
-- Promoted the formal core archive and embedded Edge release to sandbox02,
-  sandbox03, sandbox07, and sandbox10. All four passed real viewer/CDP,
+- Promoted the formal core archive and embedded Edge release to test-host-c,
+  test-host-d, test-host-h, and test-host-k. All four passed real viewer/CDP,
   resize/reconnect, cleanup, restart-adoption, selector/seal, and fleet hygiene
-  checks without changing sandbox00, WAOS, existing user profiles, or network
+  checks without changing test-host-a, host application, existing user profiles, or network
   policy.
 
-- Scope, ABI ownership, downstream WAOS migration, release gates, and the
+- Scope, ABI ownership, downstream host application migration, release gates, and the
   explicitly deferred lifecycle redesign are recorded in the App Package major
   release design. APP-008 remains deferred.
-- The TASK-018 cross-repository plan now assigns RemoteXApp provider and WAOS
+- The downstream integration task cross-repository plan now assigns RemoteXApp provider and host application
   consumer ownership, classifies independent versus paired changes, freezes a
   checksummed handoff tuple, invalidates downstream evidence on tuple drift,
   and requires stopped-consumer activation plus two-direction paired rollback
-  so no mixed ABI pair is served. WAOS classifies the breaking migration as
+  so no mixed ABI pair is served. The host application classifies the breaking migration as
   `staging-required`, tags its immutable candidate before its first live
-  activation, and keeps sandbox00 staging and production separately
+  activation, and keeps test-host-a staging and production separately
   approval-gated.
 - Breaking-major rollback now restores the pre-upgrade root/Home state snapshot
   before selecting the old pair. Older managers are never started on
@@ -1096,21 +1111,21 @@ Target: `0.2.0-rc.4`.
 - After separate operator approval, the exact `0.2.0-rc.4` artifact from
   `b21524c08d6e` (release SHA-256
   `9466197d170b9aa9c75a39711c6b5847e3764a5a6c0bc39c375071d3d8234a99`)
-  was activated on sandbox00 production with WAOS v2.0.91. All six V1 App
+  was activated on test-host-a production with host application v2.0.91. All six V1 App
   Package selectors/templates, exact version/commit and SDK graph, managed
   Desktop adoption, service health, and read-only direct access checks pass.
   The stopped-consumer rollback pair is
   `webagenticos-v2.0.91-paired-20260830T190100Z-{root,home}` and preserves the
-  prior rc.24/WAOS v1.0.88 pair. The operator accepted Human UAT on
+  prior rc.24/host application v1.0.88 pair. The operator accepted Human UAT on
   2026-08-30 and then explicitly approved ordered follower deployment. The
-  byte-identical rc.4/WAOS v2.0.91 pair was activated on sandbox02,
-  sandbox03, sandbox07, and sandbox10, in that order, after matched root/Home
+  byte-identical rc.4/host application v2.0.91 pair was activated on test-host-c,
+  test-host-d, test-host-h, and test-host-k, in that order, after matched root/Home
   snapshots with base `webagenticos-v2.0.91-preprod-20260830T191230Z`. Their
   managed Desktop runtimes were intentionally stopped and recreated at the
   package-major boundary; all are server-ready on driver 2.0.0. Exact core/SDK
   provenance, all six package selectors, service health, configured roots,
-  hygiene, and unchanged WAOS tmux identities pass. Sandbox10's first
-  CloudDrive root read transiently returned 503 while the mount reported
+  hygiene, and unchanged host application session identities pass. test-host-k's first
+  remote storage root read transiently returned 503 while the mount reported
   `reading`; it recovered without service or mount changes and the complete
   repeated gate passed. No production-gateway or mutating application E2E was
   run.
@@ -1141,8 +1156,8 @@ Target: `0.1.0-rc.23`.
 
 ### Documentation
 
-- Proposed EXP-001 through EXP-006 and documented a sandbox00-only,
-  default-disabled experimental status-command request for WAOS environment
+- Proposed EXP-001 through EXP-006 and documented a test-host-a-only,
+  default-disabled experimental status-command request for host application environment
   discovery. The design explicitly treats structured custom argv as same-UID
   remote execution, binds it to an active session generation, bounds and
   contains execution, prohibits command/output persistence and requires a
@@ -1322,7 +1337,7 @@ Target: `0.1.0-rc.21`.
   and both detached and never-attached whole-instance idle cleanup.
 - The rc.17 sandbox central real-user deployment exposes port 1991 on all
   interfaces with intentional no-auth test policy. It adopted the running
-  `sandbox-desktop` user-home runtime across manager restarts, and real
+  `primary-desktop` user-home runtime across manager restarts, and real
   Edge/noVNC sessions connected to both XFCE and `libreoffice`. The LibreOffice
   test reached exact-document UNO readiness and released its dynamic control
   port after graceful stop.

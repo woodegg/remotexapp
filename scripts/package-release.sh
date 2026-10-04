@@ -41,11 +41,15 @@ install -m 0644 docs/connection-mask-release.md docs/browser-sdk.md docs/depende
 install -m 0644 docs/runtime-coordinator-release.md docs/release-pending.md "$root/docs/"
 install -m 0644 docs/standalone-runit-release.md "$root/docs/"
 install -m 0644 docs/waos-runtime-coordinator-migration.md "$root/docs/"
+install -m 0644 docs/host-app-package-migration.md docs/host-runtime-coordinator-migration.md docs/private-history.md "$root/docs/"
 cp -a third_party/novnc "$root/third_party/"
 install -m 0644 third_party/licenses/gorilla-websocket-LICENSE.txt "$root/third_party/licenses/"
 install -m 0644 third_party/licenses/jezek-xgb-LICENSE.txt "$root/third_party/licenses/"
 install -m 0644 third_party/licenses/golang-x-mod-LICENSE.txt "$root/third_party/licenses/"
 install -m 0644 third_party/licenses/golang-x-sys-LICENSE.txt "$root/third_party/licenses/"
+
+# Keep bundled guides usable without copying development/operational diaries.
+node scripts/prepare-release-docs.mjs "$root" "$(git rev-parse HEAD)"
 
 mkdir -p "$dist_dir"
 archive="$dist_dir/$artifact.tar.gz"

@@ -1,6 +1,6 @@
 # LightView App Package
 
-LightView 1.0.11 is a shared singleton browser package with persistent profile
+LightView 1.0.13 is a shared singleton browser package with persistent profile
 `default`. It starts on first Viewer attach, uses a dynamic 1280×720, depth-16,
 5 FPS display with client resize, and stops the complete runtime after six
 detached hours while preserving website data.
@@ -22,6 +22,12 @@ wakes an idle-hibernated WebKit engine: it verifies the main process and private
 socket, dispatches native `open`, then waits for `ready` and a completed load.
 Other unready states still fail closed. Quit verifies its target without
 requiring page readiness.
+
+Since 1.0.13, Viewer transition hooks wake the engine before the first Viewer
+connects and inhibit native idle hibernation while a Viewer is attached. The
+last detach restores the previous idle interval; Manager adoption reconciles
+that policy. These hooks require Core 0.14.1 or later.
+
 Public status reports `launchLowMemory:true` only as a launch setting. It no
 longer advertises fixed live `lowMemory`, `memoryLimitMiB` or
 `memoryKillThresholdMiB` fields. Trusted local Agents can query current policy

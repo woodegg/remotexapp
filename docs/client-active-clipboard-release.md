@@ -1,12 +1,17 @@
 # Client-Active Clipboard Release Train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 **Status:** CLP-018 through CLP-024 are accepted for stable `0.5.0`. The exact
 `0.5.0-rc.1` behavior passed complete automated and local real-browser/runtime
 validation, was deployed to both local environments on ports 1991 and 2991,
 and received Human UAT acceptance on 2026-09-03. The prerelease and subsequent
 stable `v0.5.0` GitHub release were independently verified on 2026-09-03. The
-exact stable artifact is deployed to both local environments, both sandbox00
-environments, and sandbox02/03/07/10 production.
+exact stable artifact is deployed to both local environments, both test-host-a
+environments, and test-host-c/03/07/10 production.
 
 **Target release:** RemoteXApp `0.5.0`, SDK `0.21.0`. RemoteXApp Manager
 and gateway protocol behavior, App Package ABI V1, application packages,
@@ -136,17 +141,17 @@ browser E2E proving:
 
 The candidate passed `make check`, browser permission tests, the multi-Viewer
 clipboard matrix, and local real-X11/browser E2E. Machine evidence is
-[`client-active-clipboard-0.5.0-rc.1-local.json`](../tests/go-live-validation/results/client-active-clipboard-0.5.0-rc.1-local.json),
+[`client-active-clipboard-0.5.0-rc.1-local.json`](private-history.md),
 and explicit acceptance is recorded in
-[`client-active-clipboard-0.5.0-rc.1-human-uat.json`](../tests/go-live-validation/results/client-active-clipboard-0.5.0-rc.1-human-uat.json).
+[`client-active-clipboard-0.5.0-rc.1-human-uat.json`](private-history.md).
 Human UAT is accepted. Annotated
 [`v0.5.0-rc.1`](private-history.md)
 is published as a GitHub prerelease, and its independently downloaded archive
 and checksum are verified in
-[`client-active-clipboard-0.5.0-rc.1-formal-publication.json`](../tests/go-live-validation/results/client-active-clipboard-0.5.0-rc.1-formal-publication.json).
+[`client-active-clipboard-0.5.0-rc.1-formal-publication.json`](private-history.md).
 The exact behavior is published as the normal Latest
 [`v0.5.0`](private-history.md), with
-independent [formal publication](../tests/go-live-validation/results/client-active-clipboard-0.5.0-formal-publication.json)
-and [fleet deployment](../tests/go-live-validation/results/client-active-clipboard-0.5.0-fleet-deployment.json)
-evidence. Only local 1991/2991, sandbox00 1991/2991, and sandbox02/03/07/10
+independent [formal publication](private-history.md)
+and [fleet deployment](private-history.md)
+evidence. Only local 1991/2991, test-host-a 1991/2991, and test-host-c/03/07/10
 production 1991 were changed.

@@ -1,9 +1,12 @@
 # RemoteXApp
 
-This public repository begins with a reviewed source snapshot. Earlier
-operational issues and release artifacts remain in a private archive; see the
-[historical-record note](docs/private-history.md). Public releases from this
-repository will appear on its Releases page.
+**Remote apps. Local interaction.** A Linux application service and browser
+client SDK for bringing desktops, browsers, editors and office apps into your
+own product.
+
+[Get a release](https://github.com/woodegg/remotexapp/releases) ·
+[Embed an app](#embed-an-app) · [Try it locally](#development-launch) ·
+[Integration guide](docs/integration-guide.md)
 
 ```text
        LOCAL                               REMOTE
@@ -17,39 +20,55 @@ repository will appear on its Releases page.
              Your apps are far. Your IME isn't.
 ```
 
-## Citrix-style app delivery, built for developers and AI agents
+## Citrix-style remote Linux apps, ready to embed
 
-The familiar starting point is a [Citrix-style browser session](https://docs.citrix.com/en-us/citrix-workspace-app-for-html5.html):
-a person opens a remote desktop or an individual application. RemoteXApp brings
-that experience to **Linux X11 apps on a VPS, container, or physical machine**,
-then makes the running application a programmable part of your product. It is
-not a Citrix/ICA/HDX client or a feature-by-feature Citrix replacement.
+Give your users a real Linux app inside your web application. An editor in a
+support portal. LibreOffice in a document workflow. A browser or full XFCE
+desktop shared by a person and an AI agent. The app runs on your Linux host;
+your user opens it in the browser, types with their local IME, and exchanges
+rich clipboard content.
 
-The Manager launches and supervises the display and App session. Versioned
-App Packages define how each application starts, reports readiness, exposes
-control, and shuts down. The browser SDK embeds a Viewer with local IME and
-rich, bidirectional clipboard workflows. APIs let a trusted local agent inspect
-the same runtime and use declared application actions or control connections.
-The human gets a live UI; the agent gets structured local control over the
-same running app. **Audio integration is work in progress, not a shipped
-feature.**
+RemoteXApp packages the service and client SDK together: the **Go Manager**
+launches and supervises application runtimes, **versioned App Packages** define
+how each app starts and stops, and the **JavaScript SDK** embeds the interactive
+Viewer in your page. The included multi-window **Console** lets you explore the
+same APIs before building your own interface.
 
-Use RemoteXApp as an interactive building block for developer products and
-**AI-agent sandbox fabrics**, not as the whole platform. Bring your own host
-provisioning, tenant isolation, identity, and agent orchestration.
-For example, embed LibreOffice in a document workflow, offer a browser-based
-XFCE workspace, or let an agent and a person share a managed browser session.
+Start with a shipped App Package, connect a Viewer with a few lines of
+JavaScript, then add the lifecycle and application actions your solution needs.
+You can also package another X11 app without rebuilding the Manager.
 
-```text
-       .----------.              .----------.
-       |  o    o  |              |  []  []  |
-       |    __    |   RemoteXApp  |   ====   |
-       '----||----'  <========>  '----||----'
-         ___||___                  ___||___
-           HUMAN                     AGENT
+The experience is Citrix-style desktop and application delivery, with a
+programmable integration surface for developers. RemoteXApp uses TigerVNC and
+noVNC; it is not compatible with Citrix ICA/HDX. Bring your own Linux host,
+authentication and tenant isolation. Audio integration is still work in progress.
 
-             Same app. Different life goals.
+## Embed an app
+
+With a configured Manager and the Mousepad App installed, serve your page behind
+the same authenticated origin and import the SDK that the Manager serves:
+
+```html
+<div id="app" style="height: 720px"></div>
+<script type="module">
+  import { RemoteXAppManager, RemoteXAppClient } from '/sdk/index.js';
+
+  const manager = new RemoteXAppManager();
+  const instance = await manager.createInstance({ templateId: 'mousepad' });
+  const client = new RemoteXAppClient({ manager, instance, container: '#app' });
+  await client.connect();
+</script>
 ```
+
+That is the Viewer connection. Your host supplies the application and X11
+services; the [dependency guide](docs/dependencies.md) lists what to install.
+For a first local experiment, follow [Development launch](#development-launch)
+and open `http://127.0.0.1:1991/sdk/console.html`.
+
+Use the [integration guide](docs/integration-guide.md) for proxy subpaths and
+embedding, and the [SDK reference](docs/browser-sdk.md) for lifecycle, actions
+and opt-in clipboard synchronization. The SDK ships with the service at
+`/sdk/index.js`; it does not require a separate npm package.
 
 ## Why developers use RemoteXApp
 
@@ -146,62 +165,20 @@ are **not an OS security sandbox**: mutually untrusted tenants need separate
 Linux UIDs or containers. Publish through authenticated TLS; keep internal
 display and control endpoints private.
 
-## Embed an app
+## Explore the project
 
-With a configured Manager and the Mousepad App installed, serve your page behind
-the same authenticated origin and import the release-matched SDK:
+| You want to… | Start here |
+|---|---|
+| Provision a host and install the service | [Dependencies](docs/dependencies.md) and [Operations](docs/operations.md) |
+| Embed a Viewer in your own product | [Integration guide](docs/integration-guide.md) and [SDK reference](docs/browser-sdk.md) |
+| Let an agent work with the same running app | [Connection descriptors](docs/agent-connections.md) and [App actions](docs/app-actions-release.md) |
+| Add another Linux application | [Driver guide](drivers/README.md) and [Example App Package](examples/app-package/README.md) |
+| Understand lifecycle and explicit upgrades | [Backend structure](docs/backend-structure.md) and [Runtime upgrade API](docs/runtime-upgrade-api.md) |
+| Check versions, changes and security boundaries | [Current source identity](docs/current-state.md), [Changelog](CHANGELOG.md) and [Security policy](SECURITY.md) |
+| Contribute or qualify a release | [Contributing](CONTRIBUTING.md), [Test process](docs/development-quality-process.md) and [Release process](docs/release-process.md) |
 
-```html
-<div id="app" style="height: 720px"></div>
-<script type="module">
-  import { RemoteXAppManager, RemoteXAppClient } from '/sdk/index.js';
-
-  const manager = new RemoteXAppManager();
-  const instance = await manager.createInstance({ templateId: 'mousepad' });
-  const client = new RemoteXAppClient({ manager, instance, container: '#app' });
-  await client.connect();
-</script>
-```
-
-See the [integration guide](docs/integration-guide.md) for reverse-proxy subpaths
-and the [SDK reference](docs/browser-sdk.md) for lifecycle and clipboard APIs.
-Clipboard synchronization is opt-in; this example only connects the viewer.
-
-## Start here
-
-- [Dependencies: must-have, per-App requirements and optional tools](docs/dependencies.md)
-- [Production handover](docs/production-handover.md)
-- [Downstream integration](docs/integration-guide.md)
-- [Release policy and process](docs/release-policy.md)
-- [Development and test quality process](docs/development-quality-process.md)
-- [Generated current repository state](docs/current-state.md)
-- [0.2.0 stable release train](docs/stable-0.2.0-release.md)
-- [0.3.0 stable template catalog release](docs/template-catalog-0.3.0-release.md)
-- [0.4.0 stable rich clipboard release](docs/rich-clipboard-requirement.md)
-- [0.5.0 stable client-active clipboard release](docs/client-active-clipboard-release.md)
-- [0.5.1 stable clipboard prompt reliability release](docs/clipboard-prompt-reliability-release.md)
-- [Formal release alignment process](docs/release-alignment-process.md)
-- [Commercial readiness and trust boundary](docs/commercial-readiness.md)
-- [Operations runbook](docs/operations.md)
-- [Driver version and immutable release design](docs/driver-version-lifecycle.md)
-- [App Package ABI v1 release train](docs/app-package-major-release.md)
-- [WAOS migration for App Package ABI v1](docs/waos-app-package-migration.md)
-- [WAOS runtime Coordinator migration](docs/waos-runtime-coordinator-migration.md)
-- [Unified operator console release train](docs/unified-operator-console-release.md)
-- [Graceful application shutdown](docs/graceful-shutdown.md)
-- [Product requirements](docs/requirements.md)
-- [Design decision log](docs/design-log.md)
-- [Changelog](CHANGELOG.md)
-- [RemoteXApp naming cutover](docs/remotexapp-cutover-2026-08-27.md)
-- [Backend structure](docs/backend-structure.md)
-- [Browser SDK](docs/browser-sdk.md)
-- [noVNC upstream dependency](docs/novnc-upstream.md)
-- [Driver development](drivers/README.md)
-- [Security policy](SECURITY.md)
-
-Obsolete WebRTC, FFmpeg, raw WebSocket, and browser A/B prototypes were removed
-from the release branch in rc.13. They remain recoverable from Git history and
-are not built, installed, or served by the current product.
+Earlier release and operational records describe historical validation, rather
+than the state of your installation. See the [historical-record note](docs/private-history.md).
 
 ## Product identifiers
 
@@ -247,7 +224,7 @@ Shipped Apps are independently packaged and activated with:
 ```bash
 make app-catalog
 scripts/package-app.sh apps/mousepad dist/apps
-archive=dist/apps/mousepad-3.0.0.tar.gz
+archive=dist/apps/mousepad-4.0.1.tar.gz
 digest=$(sha256sum "$archive" | awk '{print $1}')
 scripts/install-app.sh --archive "$archive" --sha256 "$digest" \
   --package-root "$HOME/.local/share/remotexapp/apps" \

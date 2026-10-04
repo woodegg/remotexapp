@@ -134,7 +134,7 @@ runs one manager in an approved real user's service manager. Both consume the
 same immutable `/usr/local/{libexec,share}/remotexapp` installation and neither
 can change Unix identity. The older `deploy/systemd/remotexapp.service` and
 `~/.local` paths remain the source-checkout development installation. The
-fixed display-2 desktop is managed registration `test-host-xfce`. Current
+fixed display-2 desktop is managed registration `example-managed-desktop`. Current
 managed and anonymous runtimes both have durable active manifests. On restart,
 complete healthy units are adopted before class autostart; an unhealthy runtime
 without a live application is recreated from its locked manifest, not the

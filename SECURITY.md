@@ -39,8 +39,10 @@ operators must verify its artifact and authorize deployment separately.
   mechanism rather than an `EnvironmentFile`.
 - Do not commit real document names, user HOME paths, deployment hostnames, or
   captured user content. `make sensitive-data-check` scans tracked files, and
-  release packaging scans the final archive; GitHub CI separately scans full
-  history with Gitleaks.
+  release packaging scans the final archive; `make public-docs-check` also
+  rejects operational disclosures and broken local links in readable guides.
+  GitHub CI separately scans full history with Gitleaks. Current-file cleanup
+  does not remove historical copies or previously published release assets.
 
 ## Reporting
 

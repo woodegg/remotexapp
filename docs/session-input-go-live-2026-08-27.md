@@ -1,5 +1,10 @@
 # Session-owned input go-live — 2026-08-27
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 ## Outcome
 
 P14 is live on `0.0.0.0:1991`. Every repository production class
@@ -16,9 +21,9 @@ new explicit production policy and rejects server drivers containing
 Live endpoints:
 
 - console: `http://test-host:1991/sdk/console.html`
-- Full XFCE: `http://test-host:1991/remotexapps/xfce-desktop-688676b680f5/kiosk.html`
+- Full XFCE: `http://test-host:1991/remotexapps/xfce-desktop-EXAMPLE/kiosk.html`
 - X display: `:2`
-- managed registration: `test-host-xfce`
+- managed registration: `example-managed-desktop`
 - retained profile: `xfce-driver-test`
 
 Port 1992, display `:31`, RFB 5931 and gateway 39031 were stopped after the
@@ -33,7 +38,7 @@ candidate tests.
 | `remotexapp-status` | `3ee10fb239c7f201d773d2d422b6bac96d90e7fb9ef9b442c2714ce028d46a91` |
 
 The managed ID, HOME and profile were preserved. Runtime identity changed from
-`xfce-desktop-3a4e151e1d2b` to `xfce-desktop-688676b680f5` so no old
+`xfce-desktop-EXAMPLE` to `xfce-desktop-EXAMPLE` so no old
 server-owned input process could survive the manager binary replacement.
 
 ## Verification
@@ -113,35 +118,12 @@ unavailable message per outage and reconnects when the next session creates
 the socket. The gateway owns the public caret sequence because an engine's
 counter restarts across both session recreation and input-method switching.
 
-## Rollback
+## Historical rollback boundary
 
-The recoverable snapshot is:
-
-`/home/tester/dev/remotexapp/.runtime/deploy-backups/20260827-session-owned-input`
-
-It contains the old three binaries, managed registry/API snapshots, service
-definition, old `HEAD` source archive and the P14 patch. A rollback must stop
-the manager and all four current XFCE units before restoring anything; live
-driver scripts are read directly from the repository.
-
-```bash
-backup=/home/tester/dev/remotexapp/.runtime/deploy-backups/20260827-session-owned-input
-repo=/home/tester/dev/remotexapp
-
-systemctl --user stop remotexapp.service
-systemctl --user stop \
-  remotexapp-xfce-desktop-688676b680f5-session.service \
-  remotexapp-xfce-desktop-688676b680f5-gateway.service \
-  remotexapp-xfce-desktop-688676b680f5-server.service \
-  remotexapp-xfce-desktop-688676b680f5-vnc.service
-
-tar -xf "$backup/source-head.tar" -C "$repo" configs drivers
-install -m 0755 "$backup/binaries/remotexappd-bin" "$repo/.runtime/remotexappd-bin"
-install -m 0755 "$backup/binaries/novnc-input-bin" "$repo/.runtime/novnc-input-bin"
-install -m 0755 "$backup/binaries/remotexapp-status-bin" "$repo/.runtime/remotexapp-status-bin"
-systemctl --user start remotexapp.service
-```
-
-Do not restore the old managed JSON over a running manager. Its registration
-already remains desired-running and preserves the same profile; after the old
-runtime is stopped, reconciliation creates a compatible replacement.
+The original qualification retained a private source/binary/state snapshot.
+Its captured account paths and service names are not portable instructions.
+Current installations use immutable release selection and pinned runtime
+upgrade rules; follow [Operations](operations.md#roll-back) and
+[release selection](release-alignment-process.md). Never restore old state over
+a running Manager or point an older Manager at incompatible forward-written
+records. Resolve owned runtime identities before any stop.

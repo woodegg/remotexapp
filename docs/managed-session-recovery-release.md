@@ -1,8 +1,13 @@
 # Managed session recovery — Core 0.14.2
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 ## Failure and safety boundary
 
-On grok-bot-sandbox, managed `sandbox-desktop` kept TigerVNC `:1` and the
+On standalone test host, managed `primary-desktop` kept TigerVNC `:1` and the
 gateway after the XFCE session leader disappeared. Helper processes retained
 the session cgroup, so its empty-cgroup observer could not notify Core. The
 managed safety sweep eventually marked generation 3 failed. The root cause of
@@ -35,7 +40,7 @@ available to an authorized operator. Manager restart must retain the counter.
 - Repeat normal logout, on-attach relaunch, unsaved document, Manager adoption,
   explicit restart/upgrade, gateway/VNC faults and both lifecycle backends.
 - Qualify a clean exact candidate on a disposable systemd UID, then local UAT.
-  Grok-bot and other sandbox deployment belong to their owning project.
+  standalone test host and other sandbox deployment belong to their owning project.
 
 Resource runaway is intentionally separate. CPU load alone is not proof of
 failure or permission to discard user data. Any later cgroup pressure policy

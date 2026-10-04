@@ -91,7 +91,7 @@ the evidence for the observed rejection.
 ## Follow-up: reversible automation-focus experiment
 
 On the same local 2991 service, created runtime
-`firefox-esr-af9376d8c1b0`, display :10. A diagnostic Firefox ESR 140.15.0
+`firefox-esr-EXAMPLE`, display :10. A diagnostic Firefox ESR 140.15.0
 inherited its session environment, gateway, IBus and Matchbox, with a separate
 temporary profile and BiDi on loopback port 21004. Across three Firefox
 launches, only the explicit `focusmanager.testmode` preference was changed in

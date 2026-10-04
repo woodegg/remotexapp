@@ -1,24 +1,29 @@
 # App Package ABI v1 major release train
 
+> Historical technical record. Dated status and validation statements describe
+> their original scope; they do not identify a current deployment. See
+> [current source versions](current-state.md). Host labels and runtime IDs in
+> historical examples are anonymized.
+
 Status: release scope was accepted and locked on 2026-08-29 after
-primary-source research, scope narrowing, and WAOS integration review. Exact
+primary-source research, scope narrowing, and host application integration review. Exact
 candidate `0.2.0-rc.4` source `b21524c08d6e`, release archive SHA-256
 `9466197d170b9aa9c75a39711c6b5847e3764a5a6c0bc39c375071d3d8234a99`, and
 SDK 0.17 passed core, race, release-CI, build-once, all-six-App real-X11, local
-paired activation/rollback, and exact WAOS integration gates. After separate
-approvals, the pair passed sandbox00 isolated staging, rollback/forward
+paired activation/rollback, and exact host application integration gates. After separate
+approvals, the pair passed test-host-a isolated staging, rollback/forward
 restoration, production activation, read-only acceptance, and Human UAT. The
 operator accepted UAT on 2026-08-30, separately approved ordered follower
 deployment, and the byte-identical pair passed deployment and acceptance on
-sandbox02, sandbox03, sandbox07, and sandbox10. Their managed Desktop runtimes
+test-host-c, test-host-d, test-host-h, and test-host-k. Their managed Desktop runtimes
 were explicitly restarted at the package-major boundary and are server-ready
 on driver 2.0.0; exact core/SDK/package, service, root, hygiene, snapshot, and
-unchanged-WAOS-tmux gates pass.
+unchanged host-application session gates pass.
 
 ## Required outcome
 
 An ordinary X11 application must be addable or upgradable without rebuilding
-the RemoteXApp manager, gateway, status helper, browser SDK, or WAOS. The
+the RemoteXApp manager, gateway, status helper, browser SDK, or host application. The
 operator installs one trusted, versioned App Package, validates and activates
 it, then restarts the manager. Existing healthy runtimes remain on their
 immutable package snapshots; only new runtimes select the newly active package.
@@ -167,12 +172,12 @@ interpreting application meaning. A ready App may report:
 ```
 
 The SDK exposes `resources` and status details as generic JSON values and drops
-protocol-specific top-level control fields in this major API. WAOS retains its
+protocol-specific top-level control fields in this major API. The host application retains its
 application adapters: Browser interprets Firefox BiDi or Edge CDP, File Editor
 interprets LibreOffice UNO, and Desktop remains a generic viewer. Those
 adapters may share a small reader for `resources.control` and
 `applicationStatus.details.control`; RemoteXApp must not pretend the protocols
-have one common behavior. A later App changes WAOS only when WAOS deliberately
+have one common behavior. A later App changes host application only when host application deliberately
 adds App-specific UI, control, or Agent behavior.
 
 ## Policy, readiness, and dependencies
@@ -224,7 +229,7 @@ The major release is not ready until all of the following pass:
    readiness, status, control probes, exit, shutdown, restart adoption, profile
    persistence, and cleanup.
 6. Complete the required
-   [WAOS migration](waos-app-package-migration.md), update its exact
+   [host application migration](host-app-package-migration.md), update its exact
    RemoteXApp/SDK lock, and pass rendered downstream E2E against the same
    immutable candidate. Follow that guide's provider freeze, downstream
    invalidation, stopped-consumer activation, and pre-upgrade state-snapshot

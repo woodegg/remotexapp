@@ -1,5 +1,10 @@
 # Operations runbook
 
+Source versions are listed in [current-state.md](current-state.md). The
+commands below use example accounts and loopback ports, not a captured
+deployment. For a non-systemd host, use the [standalone/runit contract](standalone-runit-release.md)
+and provision its delegated cgroup and account services before launch.
+
 ## Choose the runtime identity
 
 Root installs immutable code, but no RemoteXApp process runs as root or changes
@@ -67,7 +72,7 @@ First use the [dependency guide](dependencies.md) to distinguish core must-haves
 per-App requirements and optional operational tools. The default full installer
 checks all bundled App archives, not only Apps an operator plans to launch;
 missing OS packages must be installed separately. The abbreviated list below
-is not the complete dependency list for the seven-App catalog.
+is not the complete dependency list for the shipped App catalog.
 
 These are **installed component requirements**, not a requirement to prestart
 a standalone desktop. RemoteXApp starts TigerVNC and the App driver starts its
@@ -75,7 +80,7 @@ session; a conflicting standalone VNC service should remain stopped/disabled.
 Keep the systemd user manager and, for `user-home`, the existing user D-Bus
 available. See [component versus service readiness](dependencies.md#installed-components-are-not-pre-running-desktop-services).
 
-Prerequisites are systemd user managers, TigerVNC (`Xtigervnc`), Xauth, Python
+Prerequisites are the chosen lifecycle backend (systemd by default), TigerVNC (`Xtigervnc`), Xauth, Python
 3, D-Bus, IBus, Matchbox (`matchbox-window-manager`), `jq`, `fuser`, X11/XTest
 libraries, and the applications referenced by enabled drivers. On Ubuntu,
 install `matchbox-window-manager`, `jq`, `libreoffice`, `python3-uno`, `psmisc`, and
@@ -107,14 +112,14 @@ enables lingering for the selected account so its user manager and transient
 instance units remain available without an interactive login.
 
 Core releases and App Packages have independent selectors. The system
-installer packages and installs the five shipped Apps below
+installer packages and installs the shipped Apps below
 `/usr/local/share/remotexapp/apps/<id>/<driverVersion>` and activates them from
 `/etc/remotexapp/apps-enabled`. A user install uses the equivalent `~/.local`
 and `~/.config` paths. To add an ordinary trusted App after the core build:
 
 ```bash
-scripts/package-app.sh apps/example-app dist/apps
-app_archive=dist/apps/example-app-1.0.0.tar.gz
+scripts/package-app.sh apps/mousepad dist/apps
+app_archive=dist/apps/mousepad-4.0.1.tar.gz
 app_digest=$(sha256sum "$app_archive" | awk '{print $1}')
 scripts/install-app.sh --archive "$app_archive" --sha256 "$app_digest" \
   --package-root "$HOME/.local/share/remotexapp/apps" \
@@ -212,7 +217,7 @@ runtime account can traverse and read them:
 REMOTEXAPP_DOCUMENT_ROOTS=/srv/remotexapp-documents:/mnt/approved-documents
 ```
 
-Unavailable directories (including disconnected MyDrive/CloudDrive mounts) do
+Unavailable directories (including disconnected remote storage/remote storage mounts) do
 not prevent Manager startup. The journal records `ERROR document root unavailable`
 or a check timeout, and the configured allowlist stays intact. Actual file
 requests still fail if the file/root is unavailable or outside that allowlist;
@@ -316,7 +321,9 @@ host, use only dynamic-display classes or set
 `REMOTEXAPP_CLASS_CONFIG=/etc/remotexapp/users/<user>/classes` in each override
 and assign non-overlapping fixed displays, RFB ports, and gateway ports. The
 shipped fixed `xfce-user-desktop` App can be active in only one manager on a
-host as-is because its display and internal ports are fixed.
+host with the default allocation because its display and internal ports are fixed.
+For a separate approved Manager, configure a coherent nonconflicting
+administrator-owned site allocation before creating the runtime.
 
 For a checkout-local development installation, retain the existing workflow:
 
@@ -333,7 +340,7 @@ When the same formal release must reach several approved endpoints, use the
 per-host selector procedure.
 
 For a centrally installed dedicated or real-user manager, preinstall both
-immutable releases, stop every paired consumer such as WAOS, and select the
+immutable releases, stop every paired host application, and select the
 retained core with the repository-owned selector. It stops the manager before
 changing both `current` links and automatically restores the previous links and
 service state when startup or the optional version/commit check fails:
@@ -343,8 +350,9 @@ service state when startup or the optional version/commit check fails:
 sudo scripts/stage-system-release.sh
 
 # Run this selection only inside the stopped-consumer paired transition.
-release_commit="$(git rev-parse --short=12 'v0.5.0^{commit}')"
-sudo scripts/select-system-release.sh --user ubuntu 0.5.0 --start \
+release_version="$(cat VERSION)"
+release_commit=FULL_COMMIT_FROM_VERIFIED_RELEASE
+sudo scripts/select-system-release.sh --user alice "$release_version" --start \
   --health-url http://127.0.0.1:1991 --expected-commit "$release_commit"
 ```
 
@@ -503,5 +511,5 @@ The checkout-local development installer retains its separate backup workflow.
 - Fixed display conflict: stop the stale owning unit after resolving its exact
   identity; never kill all X/VNC processes indiscriminately.
 
-Current backend target: `http://127.0.0.1:1991/`. Direct non-health requests
+Example backend target: `http://127.0.0.1:1991/`. Direct non-health requests
 return 401; publish it only through the authenticated identity proxy.

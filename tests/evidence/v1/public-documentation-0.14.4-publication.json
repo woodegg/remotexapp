@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "public-documentation-0.14.4-publication",
+  "commit": "a67be470abf094c46e2e69f37d8724ae15913641",
+  "startedAt": "2026-10-04T18:13:57Z",
+  "completedAt": "2026-10-04T18:33:28Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.26.8",
+    "nodeHosted": "v22.23.3"
+  },
+  "environment": {
+    "kind": "github-hosted-and-disposable-local-X11",
+    "name": "public-documentation-release-no-deployment"
+  },
+  "artifact": {
+    "name": "remotexapp-0.14.4-linux-amd64.tar.gz",
+    "sha256": "94e5e1cca394dd98be6e0b4bfe2245d65e43a59354d432830082bb3b8cfe4469"
+  },
+  "scenarios": [
+    {
+      "id": "operator-formal-documentation-release-request",
+      "result": "passed"
+    },
+    {
+      "id": "hosted-Verify",
+      "result": "passed"
+    },
+    {
+      "id": "hosted-same-commit-Release-candidate",
+      "result": "passed"
+    },
+    {
+      "id": "exact-candidate-synthetic-App-ABI",
+      "result": "passed"
+    },
+    {
+      "id": "exact-candidate-shipped-Viewer-input-rich-clipboard-reconnect",
+      "result": "passed"
+    },
+    {
+      "id": "exact-candidate-document-destructive-stop-and-explicit-save",
+      "result": "passed"
+    },
+    {
+      "id": "exact-candidate-editor-control-upgrade-rollback-adoption",
+      "result": "passed"
+    },
+    {
+      "id": "exact-candidate-declared-actions-and-BiDi-ownership",
+      "result": "passed"
+    },
+    {
+      "id": "exact-candidate-disposable-UID-XFCE-Viewer-logout-saved-session",
+      "result": "passed"
+    },
+    {
+      "id": "exact-candidate-session-service-faults-and-Manager-crash",
+      "result": "passed"
+    },
+    {
+      "id": "exact-candidate-simulated-boot-and-storage-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "eight-App-archives-byte-identical-to-0.14.3",
+      "result": "passed"
+    },
+    {
+      "id": "48-readable-archive-documents-disclosure-links-and-source-pin",
+      "result": "passed"
+    },
+    {
+      "id": "hosted-Release-publishes-unchanged-candidate",
+      "result": "passed"
+    },
+    {
+      "id": "fresh-download-checksum-binary-identity-and-byte-comparison",
+      "result": "passed"
+    },
+    {
+      "id": "new-interactive-App-human-UAT",
+      "result": "skipped"
+    },
+    {
+      "id": "real-host-reboot",
+      "result": "skipped"
+    }
+  ],
+  "details": {
+    "coreVersion": "0.14.4",
+    "sdkVersion": "0.29.1",
+    "appPackageAbi": "remotexapp/v1",
+    "appVersionsUnchanged": true,
+    "runtimeBehaviorUnchanged": true,
+    "verifyRun": 37223585455,
+    "candidateRun": 37223584899,
+    "releaseRun": 37224760800,
+    "releaseUrl": "https://github.com/woodegg/remotexapp/releases/tag/v0.14.4",
+    "latestStable": true,
+    "humanAcceptanceScope": "Operator requested formal publication after the documentation cleanup; no new interactive App UAT is claimed.",
+    "bootScope": "Boot markers and storage faults were simulated on disposable fixtures; no real host reboot.",
+    "deploymentPerformed": false,
+    "runtimeUpgradePerformed": false,
+    "historicalAssetsRewritten": false
+  }
+}

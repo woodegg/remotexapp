@@ -11,6 +11,11 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+## 0.14.4 — 2026-10-04
+
+Target: `0.14.4`. Public documentation and release-packaging checks. SDK
+`0.29.1`, App Package versions, APIs and runtime behavior are unchanged.
+
 - Make public documentation independent of private deployment histories:
   replace operational diaries with current guidance, anonymize historical
   examples, and generalize host-application integration guides.

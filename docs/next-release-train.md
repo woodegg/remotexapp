@@ -1,7 +1,7 @@
 # Release trains and future work
 
 Source identity is maintained in [current-state.md](current-state.md). The
-public source includes Core 0.14.3 / SDK 0.29.1. Earlier candidate labels and
+public source includes Core 0.14.4 / SDK 0.29.1. Earlier candidate labels and
 local acceptance states are historical, not a list of work still awaiting
 publication. Deployment is owned by each target's operator.
 

@@ -17,18 +17,28 @@ repository will appear on its Releases page.
              Your apps are far. Your IME isn't.
 ```
 
-## Remote Linux desktops and apps, built for humans and AI agents
+## Citrix-style app delivery, built for developers and AI agents
 
-Connect from your browser to a full Linux desktop or just one application
-running on a **VPS, a container, or a physical machine**. RemoteXApp manages the
-X11 runtime and gives your product an embeddable viewer, local IME integration,
-rich bidirectional clipboard, and application lifecycle and control APIs.
-**Audio integration is work in progress, not a shipped feature.**
+The familiar starting point is a [Citrix-style browser session](https://docs.citrix.com/en-us/citrix-workspace-app-for-html5.html):
+a person opens a remote desktop or an individual application. RemoteXApp brings
+that experience to **Linux X11 apps on a VPS, container, or physical machine**,
+then makes the running application a programmable part of your product. It is
+not a Citrix/ICA/HDX client or a feature-by-feature Citrix replacement.
 
-Use it as a foundational building block for an **AI-agent sandbox fabric**:
-agents can launch and inspect applications, while people can see and interact
-with those same runtimes through a browser. Bring your own sandbox provisioning,
-tenant isolation, identity, and agent orchestration.
+The Manager launches and supervises the display and App session. Versioned
+App Packages define how each application starts, reports readiness, exposes
+control, and shuts down. The browser SDK embeds a Viewer with local IME and
+rich, bidirectional clipboard workflows. APIs let a trusted local agent inspect
+the same runtime and use declared application actions or control connections.
+The human gets a live UI; the agent gets structured local control over the
+same running app. **Audio integration is work in progress, not a shipped
+feature.**
+
+Use RemoteXApp as an interactive building block for developer products and
+**AI-agent sandbox fabrics**, not as the whole platform. Bring your own host
+provisioning, tenant isolation, identity, and agent orchestration.
+For example, embed LibreOffice in a document workflow, offer a browser-based
+XFCE workspace, or let an agent and a person share a managed browser session.
 
 ```text
        .----------.              .----------.

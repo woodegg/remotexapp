@@ -111,7 +111,7 @@ template even though other templates do not need a clipboard manager.
 
 ## Build/test only—not required on release runtime hosts
 
-Source builds require pinned Go 1.26.8, Node 22, esbuild 0.20.1 and native build
+Source builds require pinned Go 1.27.1, Node 22, esbuild 0.20.1 and native build
 headers/toolchain. Go modules are recorded in `go.mod` / `go.sum`.
 Live validation additionally uses tools such as Xvfb, `xclip`, a test browser,
 and Playwright for the dedicated prompt UI check. These become required when

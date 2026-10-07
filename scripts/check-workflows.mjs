@@ -42,8 +42,8 @@ for (const required of [
 
 for (const name of ['ci.yml', 'candidate.yml', 'nightly.yml', 'release.yml']) {
   const source = readFileSync(`${workflowDir}/${name}`, 'utf8');
-  if (!source.includes('go-version: "1.26.8"')) {
-    throw new Error(`${name} does not pin Go 1.26.8`);
+  if (!source.includes('go-version: "1.27.1"')) {
+    throw new Error(`${name} does not pin Go 1.27.1`);
   }
 }
 

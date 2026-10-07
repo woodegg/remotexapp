@@ -87,7 +87,7 @@ install `matchbox-window-manager`, `jq`, `libreoffice`, `python3-uno`, `psmisc`,
 `firefox-esr`; the shipped single-application templates use these packages.
 Firefox ESR may require an administrator-approved package source that is not
 enabled by a base Ubuntu installation. The build host also needs exact Go
-1.26.8, Node 22, and `esbuild`; runtime hosts do not need Node, Go, or a system
+1.27.1, Node 22, and `esbuild`; runtime hosts do not need Node, Go, or a system
 noVNC package.
 
 Build as an ordinary user. Then choose exactly one installation command:

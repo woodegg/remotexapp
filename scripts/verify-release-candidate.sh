@@ -64,8 +64,8 @@ for binary in remotexappd novnc-input remotexapp-status remotexapp-operator-help
   path="$release_root/bin/$binary"
   [[ -x "$path" ]] || { echo "candidate binary missing: $binary" >&2; exit 1; }
   build_info="$(go version -m "$path")"
-  grep -Eq ': go1\.26\.8$' <<<"$(head -n 1 <<<"$build_info")" || {
-    echo "$binary was not built with go1.26.8" >&2
+  grep -Eq ': go1\.27\.1$' <<<"$(head -n 1 <<<"$build_info")" || {
+    echo "$binary was not built with go1.27.1" >&2
     exit 1
   }
   grep -Fq $'\tbuild\tvcs.revision='"$expected_commit" <<<"$build_info" || {

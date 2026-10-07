@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 
 const commit = 'b'.repeat(40);
 
-function fixture() {
+function fixture(toolchain = 'go1.27.1') {
   const root = mkdtempSync(join(tmpdir(), 'remotexapp-evidence-test-'));
   const archive = join(root, 'remotexapp-test-linux-amd64.tar.gz');
   const evidence = join(root, 'candidate-evidence.json');
@@ -22,7 +22,7 @@ function fixture() {
     startedAt: '2026-09-04T12:00:00Z',
     completedAt: '2026-09-04T12:00:01Z',
     result: 'passed',
-    toolchain: { go: 'go1.26.8' },
+    toolchain: { go: toolchain },
     environment: { kind: 'fixture', name: 'candidate-verifier' },
     artifact: { name: 'remotexapp-test-linux-amd64.tar.gz', sha256 },
     scenarios: [{ id: 'release-ci', result: 'passed' }],
@@ -41,6 +41,14 @@ test('candidate verifier binds evidence to exact bytes and commit', (t) => {
     'scripts/verify-candidate-evidence.mjs', value.evidence, value.archive, 'c'.repeat(40),
   ], { stdio: 'ignore' }));
   writeFileSync(value.archive, 'tampered bytes');
+  assert.throws(() => execFileSync(process.execPath, [
+    'scripts/verify-candidate-evidence.mjs', value.evidence, value.archive, commit,
+  ], { stdio: 'ignore' }));
+});
+
+test('candidate verifier rejects the previous release toolchain', (t) => {
+  const value = fixture('go1.26.8');
+  t.after(() => rmSync(value.root, { recursive: true, force: true }));
   assert.throws(() => execFileSync(process.execPath, [
     'scripts/verify-candidate-evidence.mjs', value.evidence, value.archive, commit,
   ], { stdio: 'ignore' }));

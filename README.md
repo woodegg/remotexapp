@@ -207,7 +207,7 @@ make release-check
 
 `make check` runs confidentiality, metadata/evidence, Go and JavaScript,
 generated-asset, vendored noVNC, tracked-shell, workflow, and `go vet` checks.
-The build host needs exact Go 1.26.8, Node 22, and `esbuild`; no system noVNC
+The build host needs exact Go 1.27.1, Node 22, and `esbuild`; no system noVNC
 package is required. Pull-request CI adds coverage and vulnerability gates.
 `make release-check` also runs race, immutable staging, synthetic ABI, and real
 shipped-App E2E. Live X11 verification requires user systemd, TigerVNC, X11,

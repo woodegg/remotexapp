@@ -11,6 +11,13 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+Target: `0.14.5`. Go toolchain release. SDK `0.29.1`, App Package versions,
+APIs and lifecycle contracts are unchanged. Candidate qualification and human
+UAT are required before publication.
+
+- Build all four Core binaries with exact Go `1.27.1`; synchronize CI and
+  candidate verification pins while retaining the Go `1.26.0` minimum.
+
 ## 0.14.4 — 2026-10-04
 
 Target: `0.14.4`. Public documentation and release-packaging checks. SDK

@@ -15,8 +15,8 @@ const evidence = validateEvidence(JSON.parse(readFileSync(evidencePath, 'utf8'))
 if (evidence.kind !== 'candidate' || evidence.result !== 'passed') {
   throw new Error('evidence must describe a passed candidate');
 }
-if (evidence.toolchain.go !== 'go1.26.8') {
-  throw new Error(`candidate toolchain ${evidence.toolchain.go} is not go1.26.8`);
+if (evidence.toolchain.go !== 'go1.27.1') {
+  throw new Error(`candidate toolchain ${evidence.toolchain.go} is not go1.27.1`);
 }
 if (evidence.commit !== expectedCommit) {
   throw new Error(`candidate commit ${evidence.commit} does not match ${expectedCommit}`);

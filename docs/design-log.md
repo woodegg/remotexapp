@@ -4300,3 +4300,14 @@ holding the existing lifecycle lock. A desired-running registration can
 recover its pinned runtime promptly; failed teardown durably reports a failed
 managed state instead of false health. Anonymous runtime behavior is
 unchanged. This extends RUN-005 without changing the public API or App ABI.
+
+## 2026-10-07 — Pin Go 1.27.1 for the Core 0.14.5 train
+
+The locked [Go toolchain train](go-toolchain-0.14.5-release.md) supersedes only
+the exact Go 1.26.8 build invariant in the 2026-09-04 development-quality
+decision. Source, CI and all four candidate binaries must use Go 1.27.1.
+Retain the Go 1.26.0 minimum directive and unchanged SDK/App versions.
+Source and binary vulnerability gates, build-once candidate identity and
+exact-artifact E2E remain mandatory. Human UAT is pending; this decision
+authorizes development and project-owned local UAT preparation, with formal
+publication and downstream deployment separately recorded.

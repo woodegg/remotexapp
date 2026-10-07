@@ -18,7 +18,7 @@ copies of that header before inserting its authenticated value.
 `-auth-mode none -allow-insecure-public` exists solely for explicit internal
 testing. It is not a production configuration.
 
-Production candidates are built with exact Go `1.26.8`. The repository checks
+Production candidates are built with exact Go `1.27.1`. The repository checks
 reachable source call paths and all four packaged binaries with the pinned Go
 vulnerability scanner, and verifies the toolchain plus embedded clean VCS
 identity before publication. A published release is not automatically deployed;

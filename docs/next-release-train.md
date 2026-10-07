@@ -18,7 +18,8 @@ The [Go toolchain release plan](go-toolchain-0.14.5-release.md) defines the
 implementation scope, acceptance matrix and rollback. REL-009 defines the
 new exact build pin; REL-002–004 and REL-010–014
 continue to govern qualification and immutable publication. Publication remains
-pending exact-candidate qualification and human UAT.
+pending human UAT. Hosted candidate and exact-artifact automated qualification
+passed; the candidate is installed in the project-owned local UAT environment.
 
 ## Included technical trains
 

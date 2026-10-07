@@ -1,8 +1,9 @@
 # Core 0.14.5: Go 1.27.1 release train
 
 Locked 2026-10-07 for development, testing and project-owned local UAT.
-Status: toolchain pins implemented; candidate qualification, human UAT and
-publication are pending. The released baseline is Core `0.14.4`, SDK
+Status: implemented; hosted candidate and exact-artifact automated qualification
+passed. The candidate is installed in the project-owned local UAT environment.
+Human UAT and formal publication are pending. The released baseline is Core `0.14.4`, SDK
 `0.29.1`, built with Go `1.26.8`.
 
 ## Problem and ownership
@@ -79,3 +80,33 @@ compiled binaries and do not need the Go toolchain installed.
 SDK features, App upgrades, new lifecycle behavior, performance claims and
 deployment/restarts are outside this train. Expand scope only through a
 reviewed requirement and revised acceptance matrix.
+
+## 2026-10-07 qualification and local UAT preparation
+
+Candidate source: `b5599d71cbcb33cfd9d62f5b92414921ed4a51d4`. Hosted
+[candidate run](https://github.com/woodegg/remotexapp/actions/runs/37664663178)
+passed `make release-ci`. Artifact: `remotexapp-0.14.5-linux-amd64.tar.gz`;
+SHA-256: `a7cb2f6e3730a2be4eefc11a12a3a72448728a3d11a9c404949c6a79a20f7d63`.
+All four binaries embed the exact commit, clean VCS state and Go `1.27.1`.
+
+Local `make check`, coverage, race and source vulnerability gates passed.
+Go statement coverage is 63.2%; SDK line/branch/function coverage is
+87.99% / 79.84% / 83.78%. All eight exact-candidate integration suites passed;
+all eight App archives match verified Core `0.14.4` bytes. The archive
+contains 48 readable documents, all passing the disclosure/link gate.
+
+The exact candidate is active on the loopback local test endpoint
+`127.0.0.1:2992`, with its existing service configuration retained. Binary
+hashes, readiness, listener and a served Firefox Viewer connection/resize/
+reconnect were verified. A fresh isolated Firefox instance is available for
+human UAT; the operator receives its runtime-specific Viewer URL privately.
+The previous test release and a private state snapshot are retained for
+rollback. Console remains disabled and kiosk enabled, matching the existing
+test configuration.
+
+The separate [Verify workflow](https://github.com/woodegg/remotexapp/actions/runs/37664664140)
+timed out during Ubuntu dependency installation before tests; its retry was
+still installing dependencies when this record was written. The full hosted
+release candidate gate passed. This infrastructure result remains explicit.
+Human acceptance, actual host reboot and formal publication are pending.
+See [qualification evidence](../tests/evidence/v1/go-toolchain-0.14.5-local-uat-preparation.json).

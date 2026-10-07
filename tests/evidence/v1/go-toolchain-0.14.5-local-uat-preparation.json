@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "go-toolchain-0.14.5-local-uat-preparation",
+  "commit": "b5599d71cbcb33cfd9d62f5b92414921ed4a51d4",
+  "startedAt": "2026-10-07T18:15:33Z",
+  "completedAt": "2026-10-07T18:35:17Z",
+  "result": "completed",
+  "toolchain": {
+    "go": "go1.27.1",
+    "nodeLocal": "v22.22.3",
+    "nodeHosted": "v22.23.3"
+  },
+  "environment": {
+    "kind": "github-hosted-and-project-owned-local-X11",
+    "name": "go-toolchain-candidate-local-UAT"
+  },
+  "artifact": {
+    "name": "remotexapp-0.14.5-linux-amd64.tar.gz",
+    "sha256": "a7cb2f6e3730a2be4eefc11a12a3a72448728a3d11a9c404949c6a79a20f7d63"
+  },
+  "scenarios": [
+    {
+      "id": "local-make-check-and-vet",
+      "result": "passed"
+    },
+    {
+      "id": "local-coverage-floors",
+      "result": "passed"
+    },
+    {
+      "id": "local-race-tests",
+      "result": "passed"
+    },
+    {
+      "id": "source-vulnerability-scan",
+      "result": "passed"
+    },
+    {
+      "id": "hosted-release-ci-and-all-four-binary-vulnerability-scans",
+      "result": "passed"
+    },
+    {
+      "id": "exact-candidate-checksum-commit-clean-vcs-and-Go-1.27.1",
+      "result": "passed"
+    },
+    {
+      "id": "synthetic-App-ABI",
+      "result": "passed"
+    },
+    {
+      "id": "shipped-Viewer-input-IME-clipboard-and-reconnect",
+      "result": "passed"
+    },
+    {
+      "id": "document-lifecycle-and-save",
+      "result": "passed"
+    },
+    {
+      "id": "editor-upgrade-rollback-and-Manager-adoption",
+      "result": "passed"
+    },
+    {
+      "id": "declared-browser-actions-and-BiDi-ownership",
+      "result": "passed"
+    },
+    {
+      "id": "disposable-UID-XFCE-Viewer-logout-and-session-restore",
+      "result": "passed"
+    },
+    {
+      "id": "session-service-faults-and-Manager-crash",
+      "result": "passed"
+    },
+    {
+      "id": "simulated-boot-and-storage-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "eight-App-archives-byte-identical-to-0.14.4",
+      "result": "passed"
+    },
+    {
+      "id": "48-readable-archive-documents",
+      "result": "passed"
+    },
+    {
+      "id": "local-UAT-activation-binary-hashes-readiness-and-loopback-listener",
+      "result": "passed"
+    },
+    {
+      "id": "local-UAT-served-Firefox-Viewer-resize-and-reconnect",
+      "result": "passed"
+    },
+    {
+      "id": "production-Manager-version-preserved",
+      "result": "passed"
+    },
+    {
+      "id": "separate-hosted-Verify-workflow",
+      "result": "skipped"
+    },
+    {
+      "id": "human-UAT",
+      "result": "skipped"
+    },
+    {
+      "id": "real-host-reboot",
+      "result": "skipped"
+    },
+    {
+      "id": "formal-publication",
+      "result": "skipped"
+    }
+  ],
+  "details": {
+    "coreVersion": "0.14.5",
+    "sdkVersion": "0.29.1",
+    "appVersionsUnchanged": true,
+    "goMinimum": "1.26.0",
+    "candidateRun": 37664663178,
+    "verifyRun": 37664664140,
+    "verifyStatusAtRecording": "First attempt timed out during Ubuntu package metadata installation, before tests; retry remains in dependency installation. Local equivalent gates and hosted release-ci passed.",
+    "goCoverageStatements": 63.2,
+    "sdkCoverageLines": 87.99,
+    "sdkCoverageBranches": 79.84,
+    "sdkCoverageFunctions": 83.78,
+    "localUAT": {
+      "listen": "127.0.0.1:2992",
+      "humanAcceptance": "pending",
+      "consoleEnabled": false,
+      "kioskEnabled": true,
+      "freshIsolatedFirefoxAvailable": true,
+      "runningBinaryMatchesCandidate": true,
+      "previousReleaseRetained": true,
+      "stateSnapshotRetainedPrivately": true
+    },
+    "bootScope": "Boot marker and storage faults were simulated; no real host reboot.",
+    "publicationPerformed": false,
+    "downstreamDeploymentPerformed": false
+  }
+}

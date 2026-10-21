@@ -180,3 +180,20 @@ func TestManagedBootRecoveryHealthProbeCannotShortenCooldown(t *testing.T) {
 		t.Fatal("health timer shortened boot cooldown")
 	}
 }
+
+func TestManagedBootRecoveryPreviouslyRecoveringRunningSessionKeepsCooldown(t *testing.T) {
+	m, item, now, calls := managedBootFixture(t)
+	item.State = "server-ready"
+	item.SessionState = "running"
+	item.Recovery = &managedSessionRecovery{RuntimeID: item.ID, Generation: item.SessionGeneration, Phase: recoveryWatching, Reason: "checking-health", Attempts: 3, UpdatedAt: *now, NextAttemptAt: now.Add(recoveryProbeInterval)}
+	record := runtimeManifestRecord{Runtime: *item, DesiredState: "running", ResolvedSpec: item.Spec, Components: item.Components}
+	m.restoreRuntimeManifests([]runtimeManifestRecord{record})
+	got := m.get(item.ID)
+	if *calls != 0 || got.Recovery.SourceBootID != oldTestBoot || got.Recovery.NextAttemptAt.Before(now.Add(10*time.Minute)) {
+		t.Fatal("boot restore bypassed the existing recovery budget")
+	}
+	m.reconcileSessionRecovery(now.Add(time.Minute))
+	if *calls != 0 {
+		t.Fatal("healthy projection or health timer bypassed boot cooldown")
+	}
+}

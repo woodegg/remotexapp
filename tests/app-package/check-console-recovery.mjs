@@ -4,7 +4,9 @@ import {spawn} from 'node:child_process';
 import {mkdtemp,readFile,writeFile} from 'node:fs/promises';
 const [base,id,output]=process.argv.slice(2);assert.equal(new URL(base).hostname,'127.0.0.1');
 const profile=await mkdtemp('/tmp/remotexapp-recovery-console-'),delay=ms=>new Promise(r=>setTimeout(r,ms));
-const browser=spawn('google-chrome',['--headless=new','--ozone-platform=headless','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{env:{...process.env,DISPLAY:'',XAUTHORITY:''},stdio:['ignore','ignore','pipe']});
+// This browser represents the remote client, not an App in the failed desktop.
+// Avoid portal/session-bus calls into the account whose desktop is being killed.
+const browser=spawn('google-chrome',['--headless=new','--ozone-platform=headless','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{env:{...process.env,DISPLAY:'',XAUTHORITY:'',DBUS_SESSION_BUS_ADDRESS:'unix:path=/dev/null',DBUS_SYSTEM_BUS_ADDRESS:'unix:path=/dev/null'},stdio:['ignore','ignore','pipe']});
 let browserErrors='';browser.stderr.on('data',chunk=>{browserErrors=(browserErrors+chunk).slice(-6000)});
 let socket;
 try{

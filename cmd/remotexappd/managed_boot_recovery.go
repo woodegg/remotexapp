@@ -26,7 +26,7 @@ func (m *manager) isManagedBootRecovery(item *instance) bool {
 	if item.Recovery != nil && item.Recovery.SourceBootID != "" {
 		return true
 	}
-	if item.SessionState != "failed" {
+	if item.SessionState != "failed" && (item.Recovery == nil || item.SessionState != "running" && item.SessionState != "stopped") {
 		return false
 	}
 	boot, err := readRuntimeBoot(item)
@@ -155,7 +155,8 @@ func (m *manager) reconcileManagedBootRecovery(item *instance, desiredRunning bo
 	}
 	// The external recreation may have completed before a result write/Manager
 	// interruption. Adopt a healthy outcome, never repeat its launch.
-	if item.State == "server-ready" && m.checkRuntimeAdoption(item) == nil {
+	boot, bootErr := readRuntimeBoot(item)
+	if item.State == "server-ready" && bootErr == nil && boot == m.bootID && m.checkRuntimeAdoption(item) == nil {
 		return m.finishManagedBootRecovery(item, now)
 	}
 	if r.normalizeClock(now) {

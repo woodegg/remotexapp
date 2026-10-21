@@ -39,11 +39,24 @@ Keep the existing session lifecycle state authoritative while recovery waits.
 
 Persist recovery intent before cleanup or launch. Bind attempts and scheduled
 work to runtime identity and generation; maintain one authoritative recovery
-record rather than an independent managed registration copy. Select the
-compatible manifest/sidecar format during implementation, explicitly verify
-strict decoding, migration and rollback, and never silently reset the budget on
-Manager restart or reboot. Missing/untrusted old boot evidence is not proof
-that replacing old resources is safe.
+record rather than an independent managed registration copy. Extended recovery
+metadata will live in a schema-3 runtime manifest, not a second sidecar ledger.
+The loader must strictly read both schema 2 and 3; migrate an eligible managed
+record only when extended recovery is enabled and its initial intent is
+committed. Other records remain schema 2. Schema 3 adds one root recovery record
+bound to runtime ID/generation, containing phase, reason, attempts, updatedAt,
+nextAttemptAt and healthySince. Legacy sessionRecovery counters are imported
+conservatively and then serve only as a compatibility projection, never as a
+second scheduler budget. Unknown fields/versions still fail closed.
+
+Older Core versions cannot read schema 3. Rollback must stop affected runtimes
+with the current Manager and recreate them from preserved intent/HOME on the
+older release, or restore the pre-upgrade state snapshot. Do not rewrite a live
+schema-3 record to look compatible. The first implementation slice keeps schema
+2 and its existing counter format: it fixes admission classification and
+persist-before-cleanup ordering without introducing the new scheduler format.
+Missing/untrusted old boot evidence is not proof that replacing old resources
+is safe.
 
 ## Scheduling and retry policy
 
@@ -53,13 +66,24 @@ hold the managed registry lock across recursive lifecycle operations.
 Session-exit, Viewer attach, boot restore and manual retry enter the same
 serialized, generation-fenced helper; only one transition may win.
 
-The proposed initial policy is three rapid retries after 5, 15 and 60 seconds,
-then a ten-minute cooldown and a bounded probe before another burst. Reset
-failure history only after ten minutes of verified healthy session operation.
-Persist the deadline and budget. Handle clock rollback/large forward jumps,
-restart storms and simultaneous fleet wakeup with bounded scheduling/jitter.
-A retry blocked by preserved processes must not count as a launch attempt.
-Finalize numeric defaults with fault tests before implementation acceptance.
+The retry defaults are delays of 5, 15 and 60 seconds, each measured from
+completion of the preceding failed attempt (the first from failure detection).
+After the third failed attempt, wait ten minutes and allow one probe. Every
+failed cooldown probe waits another ten minutes; it does not open a new rapid
+burst. Blocked eligibility checks consume no attempt. An admitted attempt is
+charged when its intent is durably committed, before cleanup; cleanup failure
+therefore counts and cannot create an unbounded cleanup loop.
+
+Reset the budget only after ten minutes of continuous observed session health:
+same-generation canonical readiness identity, App readiness, required session
+services and retained display/gateway health. Any observed failure invalidates
+healthySince; after a Manager restart, begin a new health-confirmation interval.
+Keep the attempt budget across Manager restart and reboot. If wall time moves
+backwards, persist one re-anchored delay/cooldown from current time without
+resetting attempts; a large forward jump may release at most one due attempt,
+not replay missed deadlines. On startup, conservatively clamp an implausible
+future deadline to one full delay/cooldown from now and persist that correction
+before action. Bounded positive jitter may delay, never advance, an attempt.
 
 Provide a generation-guarded manual retry for re-evaluation without automatic
 force or budget reset. Existing explicit restart remains the separate path
@@ -67,6 +91,35 @@ for confirmed teardown; a shutdown veto cannot inherit consent from a retry.
 Surface the recovery phase, next attempt and blocked reason in the Console.
 New fields must be additive for existing clients; an SDK version change, if
 needed for a new public method, must be reviewed and recorded separately.
+
+## Transaction, Viewer and lock boundaries
+
+Admission snapshots runtime ID, session generation, desired state and operation
+state under the lifecycle lock. Persist the charged recovery intent before
+stopping components, deleting IPC or starting a new process. A write failure
+must leave old resources untouched. Revalidate identity/generation and protected
+process evidence before cleanup. Persist each subsequent phase before the
+next resource mutation; a schema-3 restart resumes the recorded phase instead
+of charging another attempt. Cleanup and launch are idempotent and generation
+fenced. Never hide a failed cleanup by clearing the failure label.
+
+For the first legacy-format slice, persist the existing attempt counter while
+retaining failed state, then clean, then persist stopped state before normal
+startup. A crash may consume an attempt but cannot authorize an unrecorded
+cleanup or silently refund the budget. Session-only recovery preserves runtime
+ID and Core/App pins. This limited transaction is not background recovery.
+
+Before automatic replacement with attached Viewers is enabled, track connection
+ownership by runtime ID and generation. Close old-generation RFB/input channels
+and invalidate descriptors/offers before activating replacement input. A late
+detach must not decrement the new generation's client count. The first slice
+retains the current attached-client block until those fencing tests exist.
+
+Keep lock order lifecycleMu, then short-lived managedMu/mu snapshots; release
+registry locks before helper calls that can acquire them again or perform host
+I/O. The scheduler never holds its queue lock while entering lifecycle work.
+Preserve existing bounded host-operation timeouts and test stop/attach/recovery
+interleavings. Do not add another global lock or recursive reconciliation path.
 
 ## Implementation slices
 
@@ -105,9 +158,8 @@ plan does not ship Core 0.15.0 or change the existing 0.14.5 qualification scope
 
 ## Compatibility, rollback and ownership
 
-Before introducing durable fields, document whether the previous Core can read
-new records. If it cannot, rollback requires the current Manager's scoped stop
-and the pre-upgrade state snapshot. Preserve immutable prior archives; never
+Schema-3 records require the explicit stop/recreate or state-snapshot rollback
+procedure above; schema-2 first-slice records retain their existing format. Preserve immutable prior archives; never
 claim that runtime replacement restores lost process memory or unsaved data.
 
 This repository develops, tests on disposable/project-owned environments and
@@ -117,3 +169,12 @@ Historical [bounded recovery](managed-session-recovery-release.md), RTM-020–02
 and BR-003 remain the implemented baseline until reviewed implementation lands;
 new MSR requirements describe the selected replacement scope without rewriting
 those accepted historical decisions.
+
+## Incident reproduction dependency
+
+The deployment-owning project must supply a redacted failure classification
+from the affected environment: Manager version, runtime Core/App pins, desired
+and session state, generation, structured failure evidence, session population,
+and display/gateway health. No live incident has been diagnosed by this plan.
+Add a deterministic regression for that observed class when evidence arrives;
+generic matrix coverage must not be presented as proof of that incident's fix.

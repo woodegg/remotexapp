@@ -62,6 +62,18 @@ belongs to [Milestone 0.15.0](https://github.com/woodegg/remotexapp/milestone/1)
 The existing [0.14.5 toolchain train](go-toolchain-0.14.5-release.md) remains
 separate and retains its pending human UAT/publication state.
 
+## Parallel release trains
+
+When an older release still awaits qualification and main is about to take a
+new version's behavior, retain a protected release branch at the reviewed
+pre-change main commit. The current toolchain train uses release/0.14.5; new
+managed recovery implementation uses 0.15.0-dev.1. Keep required PR/check rules
+on the release branch, accept only its scoped fixes there, and qualify the
+exact selected commit through the same candidate workflow. Branch creation
+alone does not create a candidate, approve UAT or publish a release. Merge new
+feature work through its PR to main; avoid copying that work into the older
+release train. Issues and Milestones retain each train's acceptance state.
+
 ## Repository configuration
 
 Main protection requires pull requests and the GitHub Actions `check` context

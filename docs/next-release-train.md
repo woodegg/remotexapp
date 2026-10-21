@@ -6,9 +6,10 @@ Core 0.14.4. Earlier candidate labels and
 local acceptance states are historical, not a list of work still awaiting
 publication. Deployment is owned by each target's operator.
 
-## Locked next train: Core 0.14.5, Go 1.27.3
+## Separate release train: Core 0.14.5, Go 1.27.3
 
-Locked 2026-10-07 for implementation and local UAT. Upgrade the exact Go build
+The protected release/0.14.5 branch retains the reviewed pre-lifecycle-change
+source for this train. Locked 2026-10-07 for implementation and local UAT. Upgrade the exact Go build
 toolchain from
 `1.26.8` to `1.27.3` and qualify newly compiled Core binaries. Core `0.14.5`
 is the release target; SDK `0.29.1` and existing App Package versions remain

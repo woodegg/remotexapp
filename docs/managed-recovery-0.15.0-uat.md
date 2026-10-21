@@ -1,14 +1,14 @@
-# Managed recovery 0.15.0 candidate UAT
+# Managed recovery 0.15.0 UAT
 
-Core 0.15.0 / SDK 0.30.0 is a candidate until the release qualification owner
-records acceptance. [Issue #3](https://github.com/woodegg/remotexapp/issues/3)
-identifies the selected full commit, archive SHA-256, exact-archive checks,
-both-backend faults, actual container reboots and the private test entrypoint.
-The deployment-owning project retains sandbox/production responsibility.
+Core 0.15.0 / SDK 0.30.0 passed owner UAT and was formally released on
+2026-10-21. [Issue #3](https://github.com/woodegg/remotexapp/issues/3) tracks
+qualification and publication. The deployment-owning project retains
+sandbox/production responsibility.
 
-The [automated qualification record](managed-recovery-0.15.0-qualification.md)
-identifies the UAT-ready archive and completed checks. Human acceptance remains
-pending.
+The [qualification record](managed-recovery-0.15.0-qualification.md) identifies
+the exact accepted archive, completed automated checks and publication evidence.
+The procedure below remains available for downstream acceptance on its own
+infrastructure.
 
 ## Preparation
 

@@ -1,8 +1,10 @@
 # Core 0.15.0: managed desktop self-recovery
 
-Scope selected 2026-10-21. Status: implementation merged; candidate qualification in progress. Slices #9/#11/#13/#15 implement recovery scheduling, cross-boot recreation,
-Viewer fencing and operator controls. Candidate qualification, human UAT and
-publication remain pending.
+Scope selected and accepted 2026-10-21. Core 0.15.0 / SDK 0.30.0 is
+[formally released](https://github.com/woodegg/remotexapp/releases/tag/v0.15.0).
+Slices #9/#11/#13/#15 implement scheduling, cross-boot recreation, Viewer
+fencing and operator controls; follow-up fixes #18/#20 passed repeated
+qualification. See [automated, human UAT and publication evidence](managed-recovery-0.15.0-qualification.md).
 [Implementation Issue #2](https://github.com/woodegg/remotexapp/issues/2)
 owns work progress; [release Issue #3](https://github.com/woodegg/remotexapp/issues/3)
 owns candidate/UAT/publication gates under

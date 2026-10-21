@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "publication",
+  "runId": "github-release:39673092618:v0.15.0",
+  "commit": "8c8c1385110bbe37381968340528dc4c0160fe86",
+  "startedAt": "2026-10-21T20:45:45Z",
+  "completedAt": "2026-10-21T20:47:19Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.27.3",
+    "sdk": "0.30.0"
+  },
+  "environment": {
+    "kind": "github-release-and-independent-download",
+    "name": "formal-v0.15.0-verification"
+  },
+  "artifact": {
+    "name": "remotexapp-0.15.0-linux-amd64.tar.gz",
+    "sha256": "f7082814a9f7d797931705a5b8ca56fe7f7e00b2cdf276b7c44a11b53c52d13a"
+  },
+  "scenarios": [
+    {
+      "id": "annotated-tag-points-to-accepted-source",
+      "result": "passed"
+    },
+    {
+      "id": "release-workflow-promotes-original-candidate-without-rebuild",
+      "result": "passed"
+    },
+    {
+      "id": "formal-release-not-draft-or-prerelease",
+      "result": "passed"
+    },
+    {
+      "id": "fresh-download-archive-checksums-evidence-byte-identical",
+      "result": "passed"
+    },
+    {
+      "id": "fresh-download-clean-binary-VCS-toolchain-and-checksum-verification",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "releaseURL": "https://github.com/woodegg/remotexapp/releases/tag/v0.15.0",
+    "releaseRun": "https://github.com/woodegg/remotexapp/actions/runs/39673092618",
+    "candidateRun": "https://github.com/woodegg/remotexapp/actions/runs/39655833914",
+    "publishedAt": "2026-10-21T20:46:10Z",
+    "humanAcceptance": "tests/evidence/v1/managed-recovery-0.15.0-human-uat.json",
+    "automatedQualification": "tests/evidence/v1/managed-recovery-0.15.0-exact-candidate.json",
+    "deployment": "Not performed; target environments remain owned by their deployment project.",
+    "priorTrain": "Protected release/0.14.5 remains unchanged."
+  }
+}

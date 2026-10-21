@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "uat",
+  "runId": "managed-recovery-0.15.0-owner-acceptance:2026-10-21",
+  "commit": "8c8c1385110bbe37381968340528dc4c0160fe86",
+  "startedAt": "2026-10-21T20:46:13Z",
+  "completedAt": "2026-10-21T20:46:13Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.27.3",
+    "sdk": "0.30.0"
+  },
+  "environment": {
+    "kind": "project-owned-local-UAT",
+    "name": "isolated-exact-candidate-desktop",
+    "enabledTemplates": [
+      "xfce-user-desktop",
+      "mousepad"
+    ]
+  },
+  "artifact": {
+    "name": "remotexapp-0.15.0-linux-amd64.tar.gz",
+    "sha256": "f7082814a9f7d797931705a5b8ca56fe7f7e00b2cdf276b7c44a11b53c52d13a"
+  },
+  "scenarios": [
+    {
+      "id": "owner-confirmed-UAT-acceptance-and-authorized-formal-release",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "acceptanceStatement": "uat passed, do a formal release",
+    "acceptedOn": "2026-10-21",
+    "recordedAtMeaning": "Timestamps record the acceptance entry; they do not measure the duration of the owner testing.",
+    "scope": "The owner accepted after the two enabled templates were explained. No per-step human execution log or human coverage of other shipped Apps is claimed.",
+    "automatedEvidence": "tests/evidence/v1/managed-recovery-0.15.0-exact-candidate.json"
+  }
+}

@@ -11,9 +11,17 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.15.0`. Managed desktop self-recovery candidate; not published.
-SDK `0.30.0` adds generation-guarded `manager.retryRecovery()`; App versions
-are unchanged. Exact-candidate qualification and human UAT remain pending.
+No unreleased changes recorded.
+
+## 0.15.0 — 2026-10-21
+
+Target: `0.15.0`. Published.
+
+Managed desktop self-recovery. SDK `0.30.0` adds generation-guarded
+`manager.retryRecovery()`; App versions are unchanged. Exact-archive automated
+qualification and owner UAT passed. The formal release promotes the same bytes
+from source `8c8c1385110bbe37381968340528dc4c0160fe86` without rebuilding.
+See the [qualification and acceptance record](docs/managed-recovery-0.15.0-qualification.md).
 
 - Keep the legacy recovery counter projection present from the first creating
   snapshot, deriving it from the authoritative budget during reconstruction.

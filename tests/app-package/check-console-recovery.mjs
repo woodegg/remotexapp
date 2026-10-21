@@ -17,13 +17,13 @@ try{
  socket.addEventListener('message',event=>{const message=JSON.parse(event.data),request=pending.get(message.id);if(request){pending.delete(message.id);message.error?request.reject(Error(JSON.stringify(message.error))):request.resolve(message.result)}if(message.method==='Network.responseReceived'&&message.params.response.url.endsWith('/recovery-retry'))reply=message.params.response});
  const call=(method,params={})=>new Promise((resolve,reject)=>{const id=++sequence;const timeout=setTimeout(()=>{pending.delete(id);reject(Error('CDP timeout '+method))},5000);pending.set(id,{resolve:value=>{clearTimeout(timeout);resolve(value)},reject:error=>{clearTimeout(timeout);reject(error)}});socket.send(JSON.stringify({id,method,params}))});
  const evaluate=async expression=>{const result=await call('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(result.exceptionDetails)throw Error(JSON.stringify(result.exceptionDetails));return result.result.value};
- await call('Network.enable');await call('Page.navigate',{url:base+'/sdk/console.html'});
+ await call('Network.enable');await call('Emulation.setDeviceMetricsOverride',{width:1280,height:960,deviceScaleFactor:1,mobile:false});await call('Page.navigate',{url:base+'/sdk/console.html'});
  const card=`document.querySelector('[data-managed-id="test-desktop"]')`;
  for(let attempt=0;attempt<100;attempt++){if(await evaluate(`${card}?.querySelector('[data-recovery-retry="${id}"]')!==null && ${card}?.querySelector('[data-recovery-status]')?.textContent.includes('Recovery:')`))break;await delay(100)}
  assert(await evaluate(`${card}?.querySelector('[data-recovery-status]')?.textContent.includes('attempts')`),'Console omitted recovery diagnostic');
  await evaluate(`${card}.querySelector('[data-recovery-retry="${id}"]').click()`);
  for(let attempt=0;attempt<60&&!reply;attempt++)await delay(100);
  assert.equal(reply?.status,202,'Console did not use the guarded recovery SDK method');
- if(output){const screenshot=await call('Page.captureScreenshot',{format:'png'});await writeFile(output,Buffer.from(screenshot.data,'base64'))}
+ if(output){await evaluate(`${card}.scrollIntoView({block:'center'})`);await delay(100);const screenshot=await call('Page.captureScreenshot',{format:'png'});await writeFile(output,Buffer.from(screenshot.data,'base64'))}
  console.log(JSON.stringify({passed:true,check:'served-Console-recovery-diagnostic-and-explicit-generation-guarded-SDK-recheck'}));
 }catch(error){console.error('Recovery Console browser check failed:',error.message,browserErrors);throw error}finally{socket?.close();if(browser.exitCode===null&&browser.signalCode===null)await new Promise(resolve=>{const timeout=setTimeout(()=>{browser.kill('SIGKILL')},2000);browser.once('exit',()=>{clearTimeout(timeout);resolve()});browser.kill('SIGTERM')})}

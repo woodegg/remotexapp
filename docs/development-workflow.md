@@ -54,7 +54,7 @@ Keep one release qualification Issue in the Milestone with candidate identity,
 E2E, human acceptance, publication and handoff checkboxes. Close the Milestone
 after required work and publication complete. Publication and downstream
 deployment are separate states; deployment belongs to the target's project.
-Current qualification trackers are [0.15.0 #3](https://github.com/woodegg/remotexapp/issues/3)
+Historical/current qualification trackers are [0.15.0 #3](https://github.com/woodegg/remotexapp/issues/3)
 and [0.14.5 #4](https://github.com/woodegg/remotexapp/issues/4).
 
 For the selected managed-recovery work, [implementation Issue #2](https://github.com/woodegg/remotexapp/issues/2)
@@ -66,8 +66,8 @@ separate and retains its pending human UAT/publication state.
 
 When an older release still awaits qualification and main is about to take a
 new version's behavior, retain a protected release branch at the reviewed
-pre-change main commit. The current toolchain train uses release/0.14.5; new
-managed recovery implementation uses 0.15.0 development versions. Keep required PR/check rules
+pre-change main commit. The current toolchain train uses release/0.14.5; the managed recovery train completed as 0.15.0. Future transport evaluation
+is tracked separately under the proposed 0.16.0 milestone. Keep required PR/check rules
 on the release branch, accept only its scoped fixes there, and qualify the
 exact selected commit through the same candidate workflow. Branch creation
 alone does not create a candidate, approve UAT or publish a release. Merge new
@@ -88,3 +88,11 @@ Templates and this workflow are introduced through
 [workflow Issue #1](https://github.com/woodegg/remotexapp/issues/1). GitHub
 settings are configured separately from the files; a PR alone does not prove
 that branch protection is active.
+
+## Next selected investigation
+
+[Issue #24](https://github.com/woodegg/remotexapp/issues/24) owns the
+[proposed 0.16.0 KasmVNC evaluation](kasmvnc-0.16.0-evaluation.md).
+Use the evaluation/go-no-go gate before creating implementation slices or
+changing the default transport. Core 0.15.0 is published; its completed
+candidate/UAT history above is not a pending release gate.

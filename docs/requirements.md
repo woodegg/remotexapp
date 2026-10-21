@@ -5,6 +5,15 @@
 > [current source versions](current-state.md). Host labels and runtime IDs in
 > historical examples are anonymized.
 
+## Proposed Core 0.16.0 — KasmVNC evaluation
+
+The owner selected feasibility investigation on 2026-10-21. KVE-001–008 in
+[the evaluation matrix](kasmvnc-0.16.0-evaluation.md#acceptance-matrix) are stable
+evaluation requirements; none is implemented or accepted by this planning PR.
+[Issue #24](https://github.com/woodegg/remotexapp/issues/24) tracks evidence and
+go/no-go. AUD-001 governs audio. Existing display/input/clipboard/lifecycle
+contracts remain in force; accepted 0.15.0 behavior is not superseded here.
+
 ## Selected Core 0.15.0 — managed desktop self-recovery
 
 Accepted and released 2026-10-21 in Core 0.15.0 / SDK 0.30.0.

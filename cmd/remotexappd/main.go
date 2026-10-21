@@ -320,6 +320,7 @@ func main() {
 		cfg:    cfg, instances: make(map[string]*instance), idleTimers: make(map[string]*time.Timer),
 		managed: make(map[string]*managedInstance), managedEvents: make(chan managedRuntimeEvent, 128),
 		sessionEvents: make(chan sessionRuntimeEvent, 128),
+		recoveryWake:  make(chan struct{}, 1),
 	}
 	if cfg.lifecycleBackend == "standalone" {
 		m.standalone, err = openStandaloneCgroupRoot(cfg.standaloneCgroupRoot)
@@ -401,6 +402,9 @@ func main() {
 	} else {
 		go m.reconcileManagedLoop(5*time.Second, false)
 	}
+	recoveryContext, stopRecovery := context.WithCancel(context.Background())
+	defer stopRecovery()
+	go m.runSessionRecoveryLoop(recoveryContext)
 	server := &http.Server{
 		Addr: cfg.listen, Handler: m.handler(),
 		ReadHeaderTimeout: 10 * time.Second, IdleTimeout: 75 * time.Second, MaxHeaderBytes: 1 << 20,
@@ -420,6 +424,7 @@ func main() {
 			log.Fatal(err)
 		}
 	case signal := <-signals:
+		stopRecovery()
 		log.Printf("received %s; draining HTTP connections", signal)
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()

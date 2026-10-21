@@ -45,8 +45,11 @@ before changing browser input or transport.
 - Keep normal text logging at `errors`. Content logging requires a short,
   explicitly authorized diagnostic window and private evidence handling.
 - A dead session leader does not prove its surviving children are disposable.
-  Preserve populated components for review; bounded on-attach recovery applies
-  only to a confirmed inactive component.
+  Preserve populated components for review. Development Core 0.15.0 schedules
+  bounded background recovery only for eligible, confirmed inactive managed
+  user-home components; attached Viewers and unverified resources block it.
+  See [managed recovery](managed-desktop-self-recovery-release.md) for scope
+  and schema-3 rollback constraints.
 - Publisher and deployment owner have separate responsibilities. This project
   develops, tests and publishes immutable artifacts; the target's owner
   installs, activates, restarts and records its own deployment evidence.

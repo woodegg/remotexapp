@@ -1,7 +1,8 @@
 # Core 0.15.0: managed desktop self-recovery
 
-Scope selected 2026-10-21. Status: design and acceptance preparation; runtime
-implementation, qualification, human UAT and publication are pending.
+Scope selected 2026-10-21. Status: implementation in progress. Slices #9/#11 implement durable same-boot
+empty-session recovery; attached-Viewer fencing, cross-boot recreation, operator
+UI, candidate qualification, human UAT and publication remain pending.
 [Implementation Issue #2](https://github.com/woodegg/remotexapp/issues/2)
 owns work progress; [release Issue #3](https://github.com/woodegg/remotexapp/issues/3)
 owns candidate/UAT/publication gates under
@@ -190,3 +191,36 @@ ten-minute limits, process preservation and attached-client guard remain.
 This slice introduces no scheduler, schema-3 migration, boot-policy change or
 new public API. Contract tests cover the persistence/cleanup boundary with
 local service doubles; they are not real-host recovery or UAT evidence.
+
+## Second implementation slice: Issue #11
+
+A single Manager deadline loop schedules failed managed user-home recovery
+without requiring a Viewer. Only statically eligible failed/bound registrations
+migrate from schema 2 to a root schema-3 recovery record. Other records remain
+schema 2. The old sessionRecovery JSON is a capped compatibility projection;
+only the schema-3 root controls attempts/deadlines. Attach cannot bypass it.
+
+The controller checks trusted same-boot identity, recorded component ownership,
+empty session, no attached Viewers, locked package/Core identity and retained
+runtime health before cleanup. Uncertain processes, changed/untrusted boot,
+unresolved operations and unhealthy resources block rather than force teardown.
+Blocked checks use bounded probes without consuming attempts. A charged cleanup
+blocked after a Manager interruption retains its phase/budget until safe resume.
+An ambiguous launch is adopted if running, otherwise accounted as interrupted
+and backed off; it is never blindly replayed. Storage errors have a bounded
+in-memory retry floor and cannot authorize resource mutation.
+
+Health confirmation checks same-generation readiness and required services at
+bounded intervals. A Manager restart or observation gap invalidates continuity;
+only ten minutes of observed health clears the budget. Positive deterministic
+jitter never shortens 5/15/60-second delays or ten-minute cooldown probes.
+Cross-boot reconstruction, generation-qualified Viewer fencing, public recovery
+controls and exact-candidate/human UAT are separate gates. Rollback from schema 3
+requires the explicitly documented stop/recreate or state-snapshot procedure.
+
+Development validation on 2026-10-21 exercised the shipped XFCE driver with a
+disposable locked UID and relocated display: an empty failed session recovered
+without a Viewer, its counter survived Manager restart, and a second leader
+loss recovered with the next charged attempt. Existing desktop services were
+not operated. This used a dirty development build based on commit 3fcb0982e89f,
+not an immutable candidate; it establishes neither cross-boot recovery nor UAT.

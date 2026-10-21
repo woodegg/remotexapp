@@ -11,10 +11,17 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.15.0-dev.1`. First managed recovery implementation slice.
-SDK `0.29.1` and App versions are unchanged. Background recovery, cross-boot
-policy changes, schema-3 records and human UAT remain pending.
+Target: `0.15.0-dev.2`. Durable background managed recovery.
+SDK `0.29.1` and App versions are unchanged. Cross-boot recreation, attached
+Viewer fencing, recovery UI and human UAT remain pending.
 
+- Schedule safe same-boot recovery of empty failed managed user-home sessions
+  without Viewer attachment. Persist schema-3 phases, deadlines and attempts,
+  use bounded delays/cooldown and require observed stable health before reset.
+- Keep schema-2 records readable and unchanged until eligible migration; older
+  Cores reject schema 3, so rollback requires scoped stop/recreation or the
+  pre-upgrade state snapshot. Preserve live/unknown processes, user stop and
+  unresolved shutdown/upgrade intent. Attached Viewers still block replacement.
 - Classify failed managed user-home recovery admission from lifecycle state;
   preserve explicit stop, unresolved shutdown/upgrade, live processes and the
   current attached-Viewer guard.

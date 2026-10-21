@@ -192,6 +192,14 @@ func (m *manager) nextSessionGeneration(id string) (*instance, int64, error) {
 		return nil, 0, errors.New("instance not found")
 	}
 	item.SessionGeneration++
+	if item.Recovery != nil {
+		recovery := *item.Recovery
+		recovery.Generation = item.SessionGeneration
+		recovery.Phase, recovery.UpdatedAt = recoveryLaunching, m.recoveryNow()
+		recovery.Reason = "checking-health"
+		recovery.NextAttemptAt, recovery.HealthySince = time.Time{}, time.Time{}
+		item.Recovery = &recovery
+	}
 	item.StartupFailure = nil
 	copy := *item
 	return &copy, item.SessionGeneration, nil

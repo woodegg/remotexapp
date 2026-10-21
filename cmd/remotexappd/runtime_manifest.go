@@ -23,14 +23,15 @@ const runtimeManifestSchema = 2
 // anonymous runtimes use the same record; ManagedID is only a foreign key to
 // the separate desired-state registration.
 type runtimeManifestRecord struct {
-	SchemaVersion int                  `json:"schemaVersion"`
-	Backend       string               `json:"backend,omitempty"`
-	DesiredState  string               `json:"desiredState"`
-	Runtime       instance             `json:"runtime"`
-	Overrides     instanceOverrides    `json:"overrides,omitempty"`
-	ResolvedSpec  classConfig          `json:"resolvedSpec"`
-	AppPackage    *appPackageReference `json:"appPackage,omitempty"`
-	Components    runtimeComponents    `json:"components"`
+	SchemaVersion int                     `json:"schemaVersion"`
+	Backend       string                  `json:"backend,omitempty"`
+	DesiredState  string                  `json:"desiredState"`
+	Runtime       instance                `json:"runtime"`
+	Overrides     instanceOverrides       `json:"overrides,omitempty"`
+	ResolvedSpec  classConfig             `json:"resolvedSpec"`
+	AppPackage    *appPackageReference    `json:"appPackage,omitempty"`
+	Components    runtimeComponents       `json:"components"`
+	Recovery      *managedSessionRecovery `json:"recovery,omitempty"`
 }
 
 func (m *manager) runtimeManifestDir() string {
@@ -59,6 +60,10 @@ func (m *manager) persistRuntime(item *instance) error {
 		ResolvedSpec:  item.Spec,
 		AppPackage:    item.Spec.Package,
 		Components:    item.Components,
+		Recovery:      item.Recovery,
+	}
+	if record.Recovery != nil {
+		record.SchemaVersion = runtimeRecoverySchema
 	}
 	if record.DesiredState == "" {
 		record.DesiredState = "running"
@@ -188,6 +193,7 @@ func (m *manager) loadRuntimeManifests() ([]runtimeManifestRecord, error) {
 		record.Runtime.Components = record.Components
 		record.Runtime.Overrides = record.Overrides
 		record.Runtime.RuntimeDesired = record.DesiredState
+		record.Runtime.Recovery = record.Recovery
 		record.Runtime.EphemeralHome = record.Runtime.WorkspaceMode == "ephemeral"
 		record.Runtime.VacantTimeout, err = time.ParseDuration(record.ResolvedSpec.Session.VacantTimeout)
 		if err != nil || record.Runtime.VacantTimeout <= 0 {
@@ -199,8 +205,15 @@ func (m *manager) loadRuntimeManifests() ([]runtimeManifestRecord, error) {
 }
 
 func (m *manager) validateRuntimeManifest(path string, record *runtimeManifestRecord) error {
-	if record.SchemaVersion != runtimeManifestSchema {
+	if record.SchemaVersion != runtimeManifestSchema && record.SchemaVersion != runtimeRecoverySchema {
 		return fmt.Errorf("load runtime manifest %s: unsupported schemaVersion %d", path, record.SchemaVersion)
+	}
+	if record.SchemaVersion == runtimeRecoverySchema {
+		if err := validateManagedRecovery(record.Recovery, &record.Runtime, record.ResolvedSpec); err != nil {
+			return fmt.Errorf("load runtime manifest %s: %w", path, err)
+		}
+	} else if record.Recovery != nil {
+		return errors.New("schema 2 cannot contain managed recovery metadata")
 	}
 	backend := record.Backend
 	if backend == "" {

@@ -11,6 +11,19 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+Target: `0.15.0-dev.1`. First managed recovery implementation slice.
+SDK `0.29.1` and App versions are unchanged. Background recovery, cross-boot
+policy changes, schema-3 records and human UAT remain pending.
+
+- Classify failed managed user-home recovery admission from lifecycle state;
+  preserve explicit stop, unresolved shutdown/upgrade, live processes and the
+  current attached-Viewer guard.
+- Persist the charged schema-2 recovery attempt before cleanup, and persist
+  stopped state before launching a replacement. Storage failure prevents
+  cleanup; cleanup failure retains its charged attempt across Manager reload.
+
+## Pending 0.14.5 — separate toolchain train
+
 Target: `0.14.5`. Go toolchain release. SDK `0.29.1`, App Package versions,
 APIs and lifecycle contracts are unchanged. Candidate qualification and human
 UAT are required before publication.

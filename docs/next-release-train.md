@@ -6,11 +6,11 @@ Core 0.14.4. Earlier candidate labels and
 local acceptance states are historical, not a list of work still awaiting
 publication. Deployment is owned by each target's operator.
 
-## Locked next train: Core 0.14.5, Go 1.27.1
+## Locked next train: Core 0.14.5, Go 1.27.3
 
 Locked 2026-10-07 for implementation and local UAT. Upgrade the exact Go build
 toolchain from
-`1.26.8` to `1.27.1` and qualify newly compiled Core binaries. Core `0.14.5`
+`1.26.8` to `1.27.3` and qualify newly compiled Core binaries. Core `0.14.5`
 is the release target; SDK `0.29.1` and existing App Package versions remain
 unchanged unless implementation reveals a separately reviewed change.
 
@@ -18,8 +18,9 @@ The [Go toolchain release plan](go-toolchain-0.14.5-release.md) defines the
 implementation scope, acceptance matrix and rollback. REL-009 defines the
 new exact build pin; REL-002–004 and REL-010–014
 continue to govern qualification and immutable publication. Publication remains
-pending human UAT. Hosted candidate and exact-artifact automated qualification
-passed; the candidate is installed in the project-owned local UAT environment.
+pending fresh candidate qualification and human UAT. The 2026-10-07 Go 1.27.1
+qualification remains historical; the 2026-10-21 security update requires
+Go 1.27.3 and renewed acceptance.
 
 ## Included technical trains
 

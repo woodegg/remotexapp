@@ -4312,6 +4312,17 @@ exact-artifact E2E remain mandatory. Human UAT is pending; this decision
 authorizes development and project-owned local UAT preparation, with formal
 publication and downstream deployment separately recorded.
 
+## 2026-10-21 — Supersede the Go 1.27.1 build pin with Go 1.27.3
+
+The required vulnerability gate found 11 reachable standard-library issues in
+Go 1.27.1. The highest required fix is Go 1.27.3 (GO-2026-6809). Supersede only
+the exact compiler pin in the 2026-10-07 decision: current source, workflows
+and candidate verification use exact Go 1.27.3. Retain the Go 1.26.0 minimum,
+SDK/App versions and fail-closed source/binary scans. Preserve historical
+qualification facts; require a fresh candidate and renewed human UAT before
+Core 0.14.5 publication. This prerequisite changes no deployment or runtime
+restart authorization.
+
 ## 2026-10-21 — Track development through Issues and pull requests
 
 Use [Issues and PRs](development-workflow.md) for work state and review, with

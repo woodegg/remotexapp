@@ -15,6 +15,8 @@ Target: `0.15.0`. Managed desktop self-recovery candidate; not published.
 SDK `0.30.0` adds generation-guarded `manager.retryRecovery()`; App versions
 are unchanged. Exact-candidate qualification and human UAT remain pending.
 
+- Preserve pending boot-recovery intent/deadlines in the standalone component
+  monitor instead of misclassifying absent pre-boot components as a new stop.
 - Fence owned RFB/input channels before failed-session replacement. Old upgrades
   and detaches cannot affect a replacement generation; uncertain ownership and
   live processes still block recovery. Invalidate old clipboard state before

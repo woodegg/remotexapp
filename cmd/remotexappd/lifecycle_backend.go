@@ -153,47 +153,56 @@ func (m *manager) monitorStandaloneComponents() {
 		return
 	}
 	for range time.NewTicker(2 * time.Second).C {
-		if err := m.limitStandaloneComponentLogs(); err != nil {
-			log.Printf("standalone component log maintenance: %v", err)
+		m.reconcileStandaloneComponents()
+	}
+}
+
+// One serialized observation pass. A durable boot transaction owns its missing
+// resources until completion; ordinary component retirement cannot stop it.
+func (m *manager) reconcileStandaloneComponents() {
+	if m.standalone == nil {
+		return
+	}
+	if err := m.limitStandaloneComponentLogs(); err != nil {
+		log.Printf("standalone component log maintenance: %v", err)
+	}
+	m.mu.RLock()
+	ids := make([]string, 0, len(m.instances))
+	for id, item := range m.instances {
+		if item.State == "server-ready" || item.State == "ready" {
+			ids = append(ids, id)
 		}
-		m.mu.RLock()
-		ids := make([]string, 0, len(m.instances))
-		for id, item := range m.instances {
-			if item.State == "server-ready" || item.State == "ready" {
-				ids = append(ids, id)
-			}
-		}
-		m.mu.RUnlock()
-		for _, id := range ids {
-			m.lifecycleMu.Lock()
-			item := m.get(id)
-			if item == nil || (item.State != "server-ready" && item.State != "ready") {
-				m.lifecycleMu.Unlock()
-				continue
-			}
-			failed := ""
-			for _, unit := range []string{item.VNCUnit, item.ServerUnit, item.GatewayUnit} {
-				if unit != "" && !m.componentActive(unit) {
-					failed = unit
-					break
-				}
-			}
-			if failed == "" {
-				m.lifecycleMu.Unlock()
-				continue
-			}
-			err := m.stopInstanceLocked(item, stopOptions{Reason: "standalone-component-exit", Force: true})
-			if item.ManagedID != "" {
-				if reconcileErr := m.reconcileManagedAfterStandaloneComponentLoss(item, err); reconcileErr != nil {
-					log.Printf("managed runtime %s lost component %s; reconciliation failed: %v", item.ManagedID, failed, reconcileErr)
-				}
-			}
+	}
+	m.mu.RUnlock()
+	for _, id := range ids {
+		m.lifecycleMu.Lock()
+		item := m.get(id)
+		if item == nil || (item.State != "server-ready" && item.State != "ready") || item.Recovery != nil && item.Recovery.SourceBootID != "" {
 			m.lifecycleMu.Unlock()
-			if err != nil {
-				log.Printf("runtime %s lost component %s; force cleanup failed: %v", id, failed, err)
-			} else {
-				log.Printf("runtime %s lost component %s; retired dependent components", id, failed)
+			continue
+		}
+		failed := ""
+		for _, unit := range []string{item.VNCUnit, item.ServerUnit, item.GatewayUnit} {
+			if unit != "" && !m.componentActive(unit) {
+				failed = unit
+				break
 			}
+		}
+		if failed == "" {
+			m.lifecycleMu.Unlock()
+			continue
+		}
+		err := m.stopInstanceLocked(item, stopOptions{Reason: "standalone-component-exit", Force: true})
+		if item.ManagedID != "" {
+			if reconcileErr := m.reconcileManagedAfterStandaloneComponentLoss(item, err); reconcileErr != nil {
+				log.Printf("managed runtime %s lost component %s; reconciliation failed: %v", item.ManagedID, failed, reconcileErr)
+			}
+		}
+		m.lifecycleMu.Unlock()
+		if err != nil {
+			log.Printf("runtime %s lost component %s; force cleanup failed: %v", id, failed, err)
+		} else {
+			log.Printf("runtime %s lost component %s; retired dependent components", id, failed)
 		}
 	}
 }

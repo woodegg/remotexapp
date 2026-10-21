@@ -4423,3 +4423,16 @@ generation and desired-running state. Explicit recheck expedites blocked safety
 probes only; waiting/cooldown, charges and shutdown/upgrade boundaries remain.
 Schema-3 lastSuccessAt is private authority; downgrade still requires scoped
 stop/recreate or a compatible pre-upgrade snapshot. UAT/publication are pending.
+
+## 2026-10-21 — Defer standalone observation to pending boot transactions
+
+Issue #18 was found by repeated real isolated-container reboot qualification.
+A previously recovering running record can wait with missing old components
+while its schema-3 sourceBootId transaction preserves a cooldown. The ordinary
+two-second standalone component monitor must skip that recorded transaction,
+rather than force retirement and write stopped intent. The shared recovery
+controller retains sole ownership until successful reconstruction clears the
+source boot field. Ordinary same-boot component-loss retirement is unchanged.
+A single-pass monitor regression covers waiting/cooldown/recreating phases and
+normal component loss. Reject the first candidate; the replacement source must
+receive a fresh immutable build and repeated exact-candidate reboot validation.

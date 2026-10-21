@@ -4311,3 +4311,15 @@ Source and binary vulnerability gates, build-once candidate identity and
 exact-artifact E2E remain mandatory. Human UAT is pending; this decision
 authorizes development and project-owned local UAT preparation, with formal
 publication and downstream deployment separately recorded.
+
+## 2026-10-21 — Track development through Issues and pull requests
+
+Use [Issues and PRs](development-workflow.md) for work state and review, with
+Milestones grouping release scope. Short-lived branches replace direct main
+development pushes. Main requires PRs, an up-to-date GitHub Actions check and
+resolved conversations, without mandatory external approval. Technical
+contracts remain versioned in the repository. Design-only PRs do not close
+implementation Issues. Qualification, human UAT, publication and downstream
+deployment remain distinct outcomes. Preserve build-once promotion and verify
+the exact post-merge candidate identity. This process decision changes no
+runtime or deployment behavior.

@@ -78,6 +78,17 @@ clearly when validation depends on live infrastructure or credentials.
 
 ## Commit & Pull Request Guidelines
 
+Track behavior work in a GitHub Issue with acceptance criteria and an optional
+release Milestone. Work on a short-lived branch and open a linked Draft PR;
+do not push development commits directly to `main`. Small documentation fixes
+may use a PR without a separate Issue. Follow
+`docs/development-workflow.md`. Keep implementation progress in the Issue and
+review/CI evidence in the PR; repository docs retain technical contracts.
+Design-only PRs reference the Issue without closing it. Merge does not mean
+UAT accepted, published or deployed. Qualify the exact post-merge commit and
+publish only its accepted immutable candidate; never tag an unqualified merge
+or substitute a pre-merge PR artifact.
+
 Commits use imperative subjects, for example `fix XFCE profile
 recovery and session shutdown`; prefixes such as `feat:` also appear. Keep
 commits scoped. Pull requests should explain behavior and operational impact,

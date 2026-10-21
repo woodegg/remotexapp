@@ -2,6 +2,9 @@
 
 Releases are immutable, reviewable artifacts promoted from one exact candidate
 build. Publishing is deliberate; a merge to `main` never creates a release.
+Use [Issues, PRs and Milestones](development-workflow.md) to track requirements,
+review and release acceptance. Build candidates from the exact post-merge
+commit; a passing PR test merge is not the publication identity.
 
 ## Prepare
 

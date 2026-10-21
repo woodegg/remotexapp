@@ -3,6 +3,8 @@
 This process keeps the ordinary feedback loop short while reserving expensive
 checks for the risk level they address. The measured 2026-09-04 baseline is
 stored in `tests/evidence/v1/development-process-baseline.json`.
+Use the [Issue and PR workflow](development-workflow.md) for work tracking and
+review. These test tiers also apply to the exact post-merge release candidate.
 
 ## Evidence Behind the Change
 

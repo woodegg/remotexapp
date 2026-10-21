@@ -4322,3 +4322,17 @@ SDK/App versions and fail-closed source/binary scans. Preserve historical
 qualification facts; require a fresh candidate and renewed human UAT before
 Core 0.14.5 publication. This prerequisite changes no deployment or runtime
 restart authorization.
+
+## 2026-10-21 — Select the managed desktop self-recovery design train
+
+Select [MSR-001–007](managed-desktop-self-recovery-release.md) for Core 0.15.0
+design and implementation through Issue #2 and linked PRs. Replace indefinite
+failed-state retention with typed, bounded background recovery only where
+resource ownership and user intent permit it. Preserve live/unknown processes,
+locked components and generation fencing; re-evaluate trusted cross-boot
+failures. Keep durable budget/deadline and human-visible blocked reasons.
+This entry records selected scope, not implemented behavior: RTM-020–022 and
+BR-003 remain effective until superseding implementation lands. Durable-record
+format, retry defaults and rollback must be verified before acceptance. Release
+Issue #3 retains candidate, human UAT and publication gates. No deployment or
+live incident operation is included.

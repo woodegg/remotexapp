@@ -122,3 +122,38 @@ func TestStandaloneComponentPathRejectsTraversal(t *testing.T) {
 		t.Fatalf("safe component path %q: %v", path, err)
 	}
 }
+
+func TestStandaloneMonitorPreservesDurableBootRecovery(t *testing.T) {
+	for _, phase := range []managedRecoveryPhase{recoveryWaiting, recoveryCooldown, recoveryRecreating} {
+		t.Run(string(phase), func(t *testing.T) {
+			m, item, now, _ := managedBootFixture(t)
+			m.standalone = &standaloneCgroupRoot{path: t.TempDir(), uid: os.Getuid()}
+			item.State, item.SessionState = "server-ready", "running"
+			item.Recovery = &managedSessionRecovery{RuntimeID: item.ID, Generation: item.SessionGeneration, SourceBootID: oldTestBoot, Phase: phase, Reason: "boot-recovery", Attempts: 3, UpdatedAt: *now, NextAttemptAt: now.Add(10 * time.Minute)}
+			if phase == recoveryRecreating {
+				item.Recovery.NextAttemptAt = time.Time{}
+			}
+			deadline := item.Recovery.NextAttemptAt
+			for range 3 {
+				m.reconcileStandaloneComponents()
+			}
+			got := m.get(item.ID)
+			if got.State != "server-ready" || got.SessionState != "running" || got.RuntimeDesired != "running" || got.Shutdown != nil || got.Recovery.Attempts != 3 || !got.Recovery.NextAttemptAt.Equal(deadline) || m.managed[item.ManagedID].DesiredState != "running" {
+				t.Fatalf("ordinary monitor consumed the boot transaction: %+v", got)
+			}
+		})
+	}
+}
+
+func TestStandaloneMonitorStillRetiresOrdinaryLostComponents(t *testing.T) {
+	state := t.TempDir()
+	item := testRuntimeManifest(t, state, "fixture-monitor123ab", "")
+	if _, err := os.Lstat(item.SocketRuntime); !errors.Is(err, os.ErrNotExist) {
+		t.Fatal("fixture must not touch existing runtime sockets")
+	}
+	m := &manager{cfg: config{stateDir: state}, standalone: &standaloneCgroupRoot{path: t.TempDir(), uid: os.Getuid()}, instances: map[string]*instance{item.ID: item}}
+	m.reconcileStandaloneComponents()
+	if got := m.get(item.ID); got != nil && got.State != "stopped" {
+		t.Fatalf("ordinary missing component was not retired: %+v", got)
+	}
+}

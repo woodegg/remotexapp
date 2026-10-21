@@ -283,3 +283,14 @@ be described as physical-host power-loss qualification.
 Use the [UAT checklist](managed-recovery-0.15.0-uat.md). A successful CI result
 or source merge is not human acceptance. No tag/publication or downstream
 deployment occurs before explicit acceptance of the selected candidate.
+
+## Qualification correction: Issue #18
+
+Repeated real container reboot exposed a conflict with the standalone component
+monitor: a previously recovering running record waiting on its persisted boot
+deadline was force-retired as ordinary component loss. The monitor now defers
+while sourceBootId records a boot reconstruction transaction. It must not
+change desired state, charge another attempt or bypass the controller deadline.
+Normal same-boot component retirement is retained. The first candidate is
+rejected; [Issue #3](https://github.com/woodegg/remotexapp/issues/3) identifies
+its historical evidence and the replacement candidate's fresh qualification.

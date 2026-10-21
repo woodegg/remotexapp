@@ -6,6 +6,10 @@ identifies the selected full commit, archive SHA-256, exact-archive checks,
 both-backend faults, actual container reboots and the private test entrypoint.
 The deployment-owning project retains sandbox/production responsibility.
 
+The [automated qualification record](managed-recovery-0.15.0-qualification.md)
+identifies the UAT-ready archive and completed checks. Human acceptance remains
+pending.
+
 ## Preparation
 
 Install the unchanged verified candidate into a new immutable directory on a

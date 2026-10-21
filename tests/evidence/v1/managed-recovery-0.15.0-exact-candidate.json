@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "managed-recovery-0.15.0:39655833914:exact-archive",
+  "commit": "8c8c1385110bbe37381968340528dc4c0160fe86",
+  "startedAt": "2026-10-21T18:47:07Z",
+  "completedAt": "2026-10-21T19:15:33Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.27.3",
+    "node": "v22.23.3 (hosted), v22.22.3 (local)"
+  },
+  "environment": {
+    "kind": "project-owned-isolated-test",
+    "name": "linux-amd64-exact-candidate-qualification",
+    "matrix": [
+      "Ubuntu 24.04 systemd",
+      "Ubuntu 24.04 standalone/runit under systemd cgroup delegation",
+      "Ubuntu 26.04.1 systemd"
+    ]
+  },
+  "artifact": {
+    "name": "remotexapp-0.15.0-linux-amd64.tar.gz",
+    "sha256": "f7082814a9f7d797931705a5b8ca56fe7f7e00b2cdf276b7c44a11b53c52d13a"
+  },
+  "scenarios": [
+    {
+      "id": "hosted-release-ci-and-clean-binary-identities",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-app-abi-install-update-rollback",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-all-shipped-apps-browser-ime-clipboard",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-document-connections",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-kde-managed-upgrade",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-console-sdk-actions",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-user-home-managed-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-session-services-fault-matrix",
+      "result": "passed"
+    },
+    {
+      "id": "exact-archive-boot-and-document-root-matrix",
+      "result": "passed"
+    },
+    {
+      "id": "three-environments-Manager-adoption-and-no-Viewer-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "six-actual-container-reboots-preserve-budget-pins-and-document",
+      "result": "passed"
+    },
+    {
+      "id": "three-environments-ten-minute-health-reset",
+      "result": "passed"
+    },
+    {
+      "id": "three-environments-live-editor-protection-and-guarded-recheck",
+      "result": "passed"
+    },
+    {
+      "id": "three-environments-cleared-blocker-background-recovery",
+      "result": "passed"
+    },
+    {
+      "id": "served-UAT-Viewer-SDK-reconnect-and-Console",
+      "result": "passed"
+    }
+  ],
+  "details": {
+    "candidateRun": "https://github.com/woodegg/remotexapp/actions/runs/39655833914",
+    "coreVersion": "0.15.0",
+    "sdkVersion": "0.30.0",
+    "actualContainerReboots": 6,
+    "rebootsPerEnvironment": 2,
+    "rebootSequence": "Failed record: charged attempts 1 to 2; subsequent running recovered record: persisted cooldown and attempts 2 to 3. On-attach activation and saved document verified after each reboot.",
+    "healthReset": "All three environments reached healthy with attempts zero and lastSuccessAt after sustained observation, without a shortened product health window.",
+    "processProtectionScope": "Real live XFCE and visible editor with unavailable/unverified readiness were preserved, including across guarded manual recheck, without charging an attempt. Explicit fixture cleanup then allowed no-Viewer recovery. Dead-leader/surviving-child fencing is covered deterministically; this live fixture did not kill its XFCE leader.",
+    "retryHistory": [
+      "Initial document run timed out in an external LibreOffice UNO call creating a modified untitled document. The complete document suite passed on the same archive without source or artifact changes.",
+      "Standalone health helper used a later external stopwatch than the Manager observation start and asserted elapsed time too early. After the remaining observation interval, the same health/protection checks passed; durable healthy state was retained."
+    ],
+    "rejectedCandidate": "0593b4e6ba741fadba386d688673b567630bcca0 failed the second standalone reboot; issues 18 and 20 were corrected before selecting this archive.",
+    "uatReadiness": "Exact archive installed; actual served Viewer, SDK 0.30.0, reconnect, fixed framebuffer and Console recovery projection passed.",
+    "humanAcceptance": "pending",
+    "publication": "pending",
+    "limits": [
+      "Container reboots are not physical host reboot or power-loss testing.",
+      "Standalone backend used delegated cgroups under a systemd host; a host with non-systemd PID 1 was not tested.",
+      "Existing sandbox and production deployments were not operated."
+    ],
+    "qualificationRecord": "docs/managed-recovery-0.15.0-qualification.md"
+  }
+}

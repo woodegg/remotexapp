@@ -1,6 +1,6 @@
 # Core 0.15.0: managed desktop self-recovery
 
-Scope selected 2026-10-21. Status: implementation in progress. Slices #9/#11/#13/#15 implement recovery scheduling, cross-boot recreation,
+Scope selected 2026-10-21. Status: implementation merged; candidate qualification in progress. Slices #9/#11/#13/#15 implement recovery scheduling, cross-boot recreation,
 Viewer fencing and operator controls. Candidate qualification, human UAT and
 publication remain pending.
 [Implementation Issue #2](https://github.com/woodegg/remotexapp/issues/2)
@@ -138,7 +138,8 @@ interleavings. Do not add another global lock or recursive reconciliation path.
 
 Each slice uses a linked PR. A design-only PR references #2 without closing it.
 Design-only work keeps VERSION unchanged; runtime implementation uses the
-separate 0.15.0-dev.1 development identity. No stable Core 0.15.0 publication or
+0.15.0 development identities until implementation acceptance, then the
+0.15.0 candidate identity. No stable Core 0.15.0 publication or
 renewed 0.14.5 acceptance is implied.
 
 ## Required acceptance matrix
@@ -268,3 +269,17 @@ state before session cleanup. Reboot admission distinguishes failure deadlines
 from prior health probes, so a 30-second health timer cannot shorten a ten-minute
 cooldown. Exact-candidate and real-reboot qualification remain separate from
 development WebSocket/Console tests.
+
+## Candidate freeze and human UAT
+
+Core 0.15.0 / SDK 0.30.0 is the unpublished candidate target. Implementation
+slices are merged; the [release qualification Issue](https://github.com/woodegg/remotexapp/issues/3)
+records the selected exact post-merge commit, archive SHA-256 and test outcomes.
+Run the hosted candidate workflow, exact-archive E2E and both-backend fault
+matrix before installing those same bytes for human UAT. Actual isolated
+container reboot evidence must be separate from marker simulation and must not
+be described as physical-host power-loss qualification.
+
+Use the [UAT checklist](managed-recovery-0.15.0-uat.md). A successful CI result
+or source merge is not human acceptance. No tag/publication or downstream
+deployment occurs before explicit acceptance of the selected candidate.

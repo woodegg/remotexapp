@@ -1,7 +1,7 @@
 # Release trains and future work
 
 Source identity is maintained in [current-state.md](current-state.md). The
-implementation branch targets Core 0.15.0-dev.4 / SDK 0.30.0; the released baseline is
+implementation branch targets Core 0.15.0 / SDK 0.30.0 candidate; the released baseline is
 Core 0.14.4. Earlier candidate labels and
 local acceptance states are historical, not a list of work still awaiting
 publication. Deployment is owned by each target's operator.
@@ -36,7 +36,7 @@ verified cross-boot recreation, Viewer fencing and operator controls. Exact
 candidate qualification remains pending.
 [Release Issue #3](https://github.com/woodegg/remotexapp/issues/3) tracks
 candidate qualification, human UAT and publication separately from merge.
-The 0.14.5 security/toolchain train remains separate. The implementation branch uses VERSION 0.15.0-dev.4 to keep lifecycle work
+The 0.14.5 security/toolchain train remains separate. The implementation branch uses VERSION 0.15.0 for candidate qualification to keep lifecycle work
 separate from the toolchain candidate; it does not authorize deployment or restart.
 
 ## Included technical trains

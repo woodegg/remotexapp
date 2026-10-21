@@ -19,6 +19,8 @@ UAT are required before publication.
   candidate verification pins while retaining the Go `1.26.0` minimum.
   Supersede the earlier 1.27.1 candidate after reachable standard-library
   vulnerability findings; require a fresh candidate and renewed UAT.
+- Track development through public-safe Issues, short-lived branches, PR review
+  and release Milestones, retaining exact-candidate qualification and human UAT.
 
 ## 0.14.4 — 2026-10-04
 

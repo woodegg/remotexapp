@@ -4,7 +4,14 @@ Read [AGENTS.md](AGENTS.md) for repository layout, commands, coding style, and
 change-record rules. Keep changes focused and add tests beside the behavior
 they protect.
 
-Before opening a pull request, run:
+Use [Issues](https://github.com/woodegg/remotexapp/issues) for problems,
+acceptance criteria and implementation progress. Use short-lived branches and
+pull requests for changes; do not push development commits directly to `main`.
+The [development workflow](docs/development-workflow.md) defines ownership,
+release milestones and the distinction between merge, UAT and publication.
+Small documentation fixes may go directly to a PR without a separate Issue.
+
+Before marking a pull request ready for review, run:
 
 ```bash
 make check

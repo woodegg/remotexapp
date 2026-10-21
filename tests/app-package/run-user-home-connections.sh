@@ -12,7 +12,7 @@ cleanup() {
     # Retain bounded fixture diagnostics before deleting this test's HOME, on
     # failure as well as success. Never copy an existing user's environment.
     mkdir -p "$work/evidence"
-    for evidence in served-viewer.json saved-session.json saved-session-viewer.json; do
+    for evidence in served-viewer.json saved-session.json saved-session-viewer.json recovery-console.png; do
       if sudo -n test -f "$work/home/test/$evidence"; then
         sudo -n cp "$work/home/test/$evidence" "$work/evidence/$evidence"
         sudo -n chown "$(id -u):$(id -g)" "$work/evidence/$evidence"
@@ -39,6 +39,7 @@ chmod 755 "$work"
 mkdir "$work/release"
 for part in bin apps scripts drivers components VERSION; do cp -a "$release/$part" "$work/release/"; done
 cp "$project_root/tests/app-package/run-user-home-connections.mjs" "$work/check.mjs"
+cp "$project_root/tests/app-package/check-console-recovery.mjs" "$work/check-console-recovery.mjs"
 cp "$project_root/tests/go-live-validation/check-browser-client.mjs" "$work/"
 cp "$project_root/tests/go-live-validation/check-sdk-lifecycle.mjs" "$work/"
 sudo -n useradd --create-home --home-dir "$work/home" --shell /usr/sbin/nologin "$account"

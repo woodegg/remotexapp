@@ -238,6 +238,10 @@ func (m *manager) serveInstance(w http.ResponseWriter, r *http.Request) {
 		m.serveConnections(w, r, parts[0])
 		return
 	}
+	if len(parts) == 2 && parts[1] == "recovery-retry" {
+		m.serveRecoveryRetry(w, r, parts[0])
+		return
+	}
 	item := m.get(parts[0])
 	if item == nil {
 		writeError(w, http.StatusNotFound, "instance not found")
@@ -371,7 +375,7 @@ func (m *manager) publicInstance(item *instance) *publicInstanceView {
 		copy.ViewerURL = ""
 	}
 	return &publicInstanceView{
-		Versions: m.versionView(item), Upgrade: publicUpgrade(item),
+		Versions: m.versionView(item), Upgrade: publicUpgrade(item), Recovery: recoveryView(item),
 		ID: copy.ID, ClassID: copy.ClassID, TemplateID: copy.TemplateID,
 		DriverVersion: copy.DriverVersion, ManagedID: copy.ManagedID,
 		ProfileRef: copy.ProfileRef, WorkspaceMode: copy.WorkspaceMode,
@@ -423,15 +427,22 @@ func (m *manager) serveInstanceRoute(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	if isRFBWebSocket(parts[1], r) {
-		if err := m.attachRFB(item.ID); err != nil {
-			writeError(w, http.StatusServiceUnavailable, "session start failed: "+err.Error())
+	var channel *viewerChannel
+	if isRFBWebSocket(parts[1], r) || parts[1] == "input" && isWebSocket(r) {
+		var err error
+		channel, r, err = m.openViewerChannel(item.ID, isRFBWebSocket(parts[1], r), r)
+		if err != nil {
+			writeError(w, http.StatusConflict, "Viewer channel unavailable: "+err.Error())
 			return
 		}
-		defer m.detachRFB(item.ID)
+		defer m.closeViewerChannel(channel)
+		item = m.get(item.ID)
 	}
 	targetURL, _ := url.Parse("http://" + item.GatewayAddr)
 	proxy := httputil.NewSingleHostReverseProxy(targetURL)
+	if channel != nil {
+		proxy.ModifyResponse = func(response *http.Response) error { return m.bindViewerChannel(channel, response) }
+	}
 	originalDirector := proxy.Director
 	proxy.Director = func(request *http.Request) {
 		originalDirector(request)
@@ -451,7 +462,7 @@ func isRFBWebSocket(path string, r *http.Request) bool {
 	if path != "rfb" && path != "rfb-compat" && path != "websockify" {
 		return false
 	}
-	return strings.EqualFold(r.Header.Get("Upgrade"), "websocket")
+	return isWebSocket(r)
 }
 
 func writeJSON(w http.ResponseWriter, status int, value any) {

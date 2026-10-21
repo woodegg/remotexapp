@@ -448,9 +448,17 @@ func (m *manager) restoreRuntimeManifests(records []runtimeManifestRecord) {
 			continue
 		}
 		if m.isManagedBootRecovery(item) {
-			// Extended recovery is scheduled after registrations are linked.
-			// Do not let the legacy startup path bypass durable deadlines.
+			// Persist the initial source-boot schedule before managed startup
+			// reconciliation can consider a legacy unhealthy-runtime rebuild.
+			// This branch cannot launch: source-boot intent is not recorded yet.
 			m.storeRuntime(item)
+			if item.Recovery == nil || item.Recovery.SourceBootID == "" {
+				if _, err := m.reconcileManagedBootRecovery(item, record.DesiredState == "running" && m.runtimeShouldRecover(record), m.recoveryNow()); err != nil {
+					m.setState(item.ID, "failed", "", "cannot persist boot recovery schedule")
+					m.setSessionState(item.ID, "failed", "cannot persist boot recovery schedule")
+					log.Printf("runtime %s boot schedule: %v", item.ID, err)
+				}
+			}
 			continue
 		}
 		bootRecovery, bootErr := m.prepareBootRecovery(record)

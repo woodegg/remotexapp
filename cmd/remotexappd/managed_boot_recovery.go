@@ -26,7 +26,7 @@ func (m *manager) isManagedBootRecovery(item *instance) bool {
 	if item.Recovery != nil && item.Recovery.SourceBootID != "" {
 		return true
 	}
-	if item.SessionState != "failed" {
+	if item.SessionState != "failed" && (item.Recovery == nil || item.SessionState != "running" && item.SessionState != "stopped") {
 		return false
 	}
 	boot, err := readRuntimeBoot(item)
@@ -76,7 +76,7 @@ func (m *manager) managedBootRejection(item *instance) string {
 	if m.recordedSessionAlive(item) || m.sessionComponentPopulated(item.SessionUnit) {
 		return string(recoveryProcesses)
 	}
-	if item.AttachedClients != 0 {
+	if item.AttachedClients != 0 && !m.canFenceViewerChannels(item) {
 		return string(recoveryViewers)
 	}
 	// Changed boot never grants permission to stop a newly occupied component.
@@ -148,14 +148,15 @@ func (m *manager) reconcileManagedBootRecovery(item *instance, desiredRunning bo
 			r.Attempts = item.SessionRecovery.Attempts
 		}
 		// Retain a previously scheduled delay/cooldown across another host reboot.
-		if r.NextAttemptAt.IsZero() {
+		if r.NextAttemptAt.IsZero() || r.Phase == recoveryWatching || r.Phase == recoveryHealthy || r.Phase == recoveryDisabled {
 			r.scheduleFailure(now, "boot-recovery")
 		}
 		return r.NextAttemptAt, m.saveManagedRecovery(item, r)
 	}
 	// The external recreation may have completed before a result write/Manager
 	// interruption. Adopt a healthy outcome, never repeat its launch.
-	if item.State == "server-ready" && m.checkRuntimeAdoption(item) == nil {
+	boot, bootErr := readRuntimeBoot(item)
+	if item.State == "server-ready" && bootErr == nil && boot == m.bootID && m.checkRuntimeAdoption(item) == nil {
 		return m.finishManagedBootRecovery(item, now)
 	}
 	if r.normalizeClock(now) {
@@ -204,6 +205,16 @@ func (m *manager) reconcileManagedBootRecovery(item *instance, desiredRunning bo
 			return next, saveErr
 		}
 		return next, err
+	}
+	if err := m.fenceViewerChannels(item); err != nil {
+		return fail(err)
+	}
+	currentSafety := m.get(item.ID)
+	if reason := m.managedBootRejection(currentSafety); reason != "" {
+		r := *currentSafety.Recovery
+		r.block(m.recoveryNow(), reason)
+		r.Phase = recoveryRecreating
+		return r.NextAttemptAt, m.saveManagedRecovery(currentSafety, r)
 	}
 	if err := m.stopUnits(item); err != nil {
 		return fail(err)

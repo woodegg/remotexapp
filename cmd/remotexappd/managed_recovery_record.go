@@ -29,6 +29,7 @@ const maxManagedRecoveryAttempts = 1<<30 - 1
 // Stored once at the manifest root; never in the managed registration or the
 // public instance JSON. Generation fences deferred work and interrupted phases.
 type managedSessionRecovery struct {
+	LastSuccessAt time.Time            `json:"lastSuccessAt,omitempty"`
 	SourceBootID  string               `json:"sourceBootId,omitempty"`
 	RuntimeID     string               `json:"runtimeId"`
 	Generation    int64                `json:"generation"`

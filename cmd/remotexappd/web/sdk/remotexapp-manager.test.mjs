@@ -211,3 +211,15 @@ test('connections validate additive IBus fields and accept legacy absence',async
  for(const unavailable of [undefined,{},[],['sessionBus']]){value={...base,unavailable,unavailableReasons:{ibus:'not-running'}};await assert.rejects(read,e=>e.status===409);}
  value={...base,unavailable:['ibus'],unavailableReasons:{ibus:'invented'}};await assert.rejects(read,e=>e.status===409);
 });
+
+test('recovery retry is generation guarded and never sends force or resets budget', async () => {
+  const {manager,calls}=mockManager();
+  await manager.retryRecovery('mousepad-1',{sessionGeneration:7});
+  const request=calls.at(-1);
+  assert(request.url.endsWith('/api/instances/mousepad-1/recovery-retry'));
+  assert.equal(request.options.method,'POST');
+  assert.deepEqual(JSON.parse(request.options.body),{sessionGeneration:7});
+  for(const generation of [undefined,-1,1.5,Infinity,2**53]) {
+    assert.throws(()=>manager.retryRecovery('mousepad-1',{sessionGeneration:generation}),RangeError);
+  }
+});

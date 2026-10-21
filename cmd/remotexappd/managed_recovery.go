@@ -106,7 +106,7 @@ func (m *manager) recoveryResourceRejection(item *instance) string {
 	if m.sessionComponentPopulated(item.SessionUnit) {
 		return string(recoveryProcesses)
 	}
-	if item.AttachedClients != 0 {
+	if item.AttachedClients != 0 && !m.canFenceViewerChannels(item) {
 		return string(recoveryViewers)
 	}
 	if err := m.checkManagedRecoveryHealth(item, false); err != nil {
@@ -186,6 +186,7 @@ func (m *manager) reconcileOneSessionRecovery(id string, now time.Time) (time.Ti
 			recovery.HealthySince = now
 		} else if now.Sub(recovery.HealthySince) >= recoveryHealthWindow {
 			recovery.Phase, recovery.Reason, recovery.Attempts = recoveryHealthy, "healthy", 0
+			recovery.LastSuccessAt = now
 			recovery.NextAttemptAt = time.Time{}
 		}
 		return recovery.NextAttemptAt, m.saveManagedRecovery(item, recovery)
@@ -236,6 +237,19 @@ func (m *manager) reconcileOneSessionRecovery(id string, now time.Time) (time.Ti
 		if err := m.saveManagedRecovery(item, recovery); err != nil {
 			return time.Time{}, err
 		}
+	}
+	if err := m.fenceViewerChannels(item); err != nil {
+		return m.finishManagedRecoveryFailure(id, m.recoveryNow(), string(recoveryViewers))
+	}
+	currentSafety := m.get(id)
+	if reason := m.recoveryResourceRejection(currentSafety); reason != "" {
+		r := *currentSafety.Recovery
+		r.block(m.recoveryNow(), reason)
+		r.Phase = recoveryCleaning
+		return r.NextAttemptAt, m.saveManagedRecovery(currentSafety, r)
+	}
+	if err := m.setGatewayClipboardSession(item, item.SessionGeneration, false); err != nil {
+		return m.finishManagedRecoveryFailure(id, m.recoveryNow(), "cleanup-failed")
 	}
 	if err := m.cleanupSessionComponent(item); err != nil {
 		log.Printf("runtime %s managed recovery cleanup: %v", id, err)

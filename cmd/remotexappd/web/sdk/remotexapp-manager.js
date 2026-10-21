@@ -257,6 +257,15 @@ export class RemoteXAppManager extends EventTarget {
     });
   }
 
+  retryRecovery(instanceId, { sessionGeneration, signal } = {}) {
+    if (!Number.isSafeInteger(sessionGeneration) || sessionGeneration < 0) {
+      throw new RangeError('sessionGeneration must be a safe non-negative integer');
+    }
+    return this.request(`/api/instances/${encodeURIComponent(instanceId)}/recovery-retry`, {
+      method:'POST', body:{sessionGeneration}, signal,
+    });
+  }
+
   getRuntimeVersions(instanceId, { signal } = {}) {
     return this.request(`/api/instances/${encodeURIComponent(instanceId)}/upgrade-and-restart`, { signal });
   }

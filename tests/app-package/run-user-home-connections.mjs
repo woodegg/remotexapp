@@ -208,6 +208,14 @@ try {
  const adoptedRecovery=await request('/api/instances/'+instance);
  assert.equal(adoptedRecovery.sessionGeneration,recovered.sessionGeneration);
  assert.equal(adoptedRecovery.sessionRecovery?.attempts,1,'Manager restart reset the bounded recovery counter');
+ const staleViewers=[];
+ for(const path of ['rfb-compat','input']) {
+  const socket=new WebSocket(base.replace('http:','ws:')+'/remotexapps/'+instance+'/'+path);
+  const tracked={socket,closed:false};socket.addEventListener('close',()=>{tracked.closed=true});
+  await new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(Error('Viewer open timeout')),10000);socket.addEventListener('open',()=>{clearTimeout(timeout);resolve()},{once:true});socket.addEventListener('error',()=>{clearTimeout(timeout);reject(Error('Viewer open failed'))},{once:true})});
+  staleViewers.push(tracked);
+ }
+ assert.equal((await request('/api/instances/'+instance)).attachedClients,1);
  const readinessPID=Number((await readFile(join(state,'instances',instance,'xfce.pid'),'utf8')).trim());
  process.kill(readinessPID,'SIGKILL');
  const blocked=await wait(async()=>{const current=await request('/api/instances/'+instance);return current.sessionState==='failed'?current:false},'dead XFCE leader was not detected promptly');
@@ -215,6 +223,7 @@ try {
  await wait(async()=> (await request('/api/managed-instances/test-desktop')).observedState==='failed',
   'managed failure was not reconciled after the session exit');
  assert.equal(await busID(),originalBus);
+ await exec(process.execPath,[join(root,'../check-console-recovery.mjs'),base,instance,join(work,'recovery-console.png')],{timeout:25000});
  let leaderExitPath;
  if (/other processes remain/.test(blocked.error)) {
   leaderExitPath='populated-preserved';
@@ -228,7 +237,9 @@ try {
   assert.equal(secondRecovery.sessionRecovery?.attempts,2);
   assert.equal(secondRecovery.attachedClients,0);
   assert.equal(await busID(),originalBus);
+  await wait(()=>staleViewers.every(viewer=>viewer.closed),'old RFB/input channels were not fenced');
  }
+ for(const viewer of staleViewers)viewer.socket.close();
  // Boot simulation owns only this temporary UID and this test's runtime.
  const beforeBoot=await request('/api/instances/'+instance);
  await stopManager();
@@ -250,5 +261,5 @@ try {
  assert.equal(bootRestored.sessionRecovery.attempts,Math.min(3,(beforeBoot.sessionRecovery?.attempts||0)+1));
  assert.equal(bootRestored.id,beforeBoot.id);assert.equal(bootRestored.driverVersion,beforeBoot.driverVersion);
  await activate(instance);await verify(await info());assert.equal(await busID(),originalBus);
- console.log(JSON.stringify({passed:true,uid:process.getuid(),display,checks:['real-shipped-XFCE-driver-disposable-UID-relocated-fixed-display','default-user-dbus-distinct-runtime-ibus-protocol-query','default-Xauthority','Manager-adoption-stable-descriptor','EXP007-final-HOME-and-input-environment','real-served-Viewer-fixed-framebuffer-reconnect-Unicode-clipboard-before-after-Manager-restart','Xfconf-persistence-Thunar-activation-visible-window','natural-XFCE-logout-stop-session-VNC-retained-and-relogin','saved-XFCE-session-restores-real-document-window-without-test-relaunch','restored-App-environment-current-generation-single-IBus-engine-and-Viewer-readback','borrowed-account-bus-identity-preserved-no-owned-bus','ordinary-restart-new-generation-IBus','dead-IBus-explicit-unavailability','empty-session-background-recovery-without-Viewer-and-with-generation-and-attempt-fence','recovery-counter-persists-across-Manager-restart','leader-death-generation-fenced-failure-and-safe-next-step','failed-managed-cross-boot-marker-simulation-pinned-server-restore-and-relogin'],leaderExitPath,faultProbeStatuses,faultElapsedMs,productionDesktopTouched:false}));
+ console.log(JSON.stringify({passed:true,uid:process.getuid(),display,checks:['real-shipped-XFCE-driver-disposable-UID-relocated-fixed-display','default-user-dbus-distinct-runtime-ibus-protocol-query','default-Xauthority','Manager-adoption-stable-descriptor','EXP007-final-HOME-and-input-environment','real-served-Viewer-fixed-framebuffer-reconnect-Unicode-clipboard-before-after-Manager-restart','Xfconf-persistence-Thunar-activation-visible-window','natural-XFCE-logout-stop-session-VNC-retained-and-relogin','saved-XFCE-session-restores-real-document-window-without-test-relaunch','restored-App-environment-current-generation-single-IBus-engine-and-Viewer-readback','borrowed-account-bus-identity-preserved-no-owned-bus','ordinary-restart-new-generation-IBus','dead-IBus-explicit-unavailability','empty-session-background-recovery-without-Viewer-and-with-generation-and-attempt-fence','recovery-counter-persists-across-Manager-restart','served-Console-recovery-diagnostics-and-guarded-SDK-recheck','attached-Viewer-old-RFB-and-input-generation-fenced-before-recovery','leader-death-generation-fenced-failure-and-safe-next-step','failed-managed-cross-boot-marker-simulation-pinned-server-restore-and-relogin'],leaderExitPath,faultProbeStatuses,faultElapsedMs,productionDesktopTouched:false}));
 } finally {if(instance)try{await request('/api/managed-instances/test-desktop',{desiredState:'stopped',force:true},false,'PATCH');}catch{}await stopManager();}

@@ -11,9 +11,18 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.15.0-dev.3`. Boot-aware background managed recovery.
-SDK `0.29.1` and App versions are unchanged. Attached Viewer fencing,
-recovery UI and human UAT remain pending.
+Target: `0.15.0-dev.4`. Managed recovery controls and Viewer fencing.
+SDK `0.30.0` adds generation-guarded `manager.retryRecovery()`; App versions
+are unchanged. Exact-candidate qualification and human UAT remain pending.
+
+- Fence owned RFB/input channels before failed-session replacement. Old upgrades
+  and detaches cannot affect a replacement generation; uncertain ownership and
+  live processes still block recovery. Invalidate old clipboard state before
+  cleanup and preserve generation-qualified descriptor/offer checks.
+- Expose additive recovery phase/reason/message/attempt/deadline/last-success
+  diagnostics in the API and Console, with a guarded recheck that never forces
+  teardown, clears budget or skips waiting/cooldown.
+- Prevent a previous health-probe timer from shortening a cross-boot cooldown.
 
 - Avoid repeated global XFixes decoder writes when opening clipboard
   connections; reject incompatible layouts within one gateway process.

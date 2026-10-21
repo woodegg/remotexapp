@@ -185,6 +185,11 @@ func (m *manager) refreshApplicationStatus(item *instance) {
 }
 
 func (m *manager) nextSessionGeneration(id string) (*instance, int64, error) {
+	if current := m.get(id); current != nil {
+		if err := m.fenceViewerChannels(current); err != nil {
+			return nil, 0, err
+		}
+	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	item := m.instances[id]

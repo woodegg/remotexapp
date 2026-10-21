@@ -11,9 +11,16 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.15.0-dev.2`. Durable background managed recovery.
-SDK `0.29.1` and App versions are unchanged. Cross-boot recreation, attached
-Viewer fencing, recovery UI and human UAT remain pending.
+Target: `0.15.0-dev.3`. Boot-aware background managed recovery.
+SDK `0.29.1` and App versions are unchanged. Attached Viewer fencing,
+recovery UI and human UAT remain pending.
+
+- Avoid repeated global XFixes decoder writes when opening clipboard
+  connections; reject incompatible layouts within one gateway process.
+- Reassess failed managed user-home desktops after a verified boot change,
+  preserving pinned resources, identity and the durable retry budget. Persist
+  source-boot evidence across interrupted runtime cleanup/recreation; block
+  occupied components/listeners and unresolved user operations.
 
 - Schedule safe same-boot recovery of empty failed managed user-home sessions
   without Viewer attachment. Persist schema-3 phases, deadlines and attempts,

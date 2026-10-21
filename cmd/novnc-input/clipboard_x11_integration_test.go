@@ -573,3 +573,42 @@ func findClipboardItem(items []clipboardItem, mediaType string) []byte {
 	}
 	return nil
 }
+
+func TestXClipboardRejectsIncompatibleExtensionLayout(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires Xvfb")
+	}
+	if _, err := exec.LookPath("Xvfb"); err != nil {
+		t.Skip("requires Xvfb")
+	}
+	display := startTestXvfb(t)
+	t.Setenv("XAUTHORITY", "")
+	first, err := newXClipboardBridge(display, func([]clipboardItem, string) {})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer first.Close()
+	clipboardXFixesRegistry.Lock()
+	base := clipboardXFixesRegistry.eventBase
+	clipboardXFixesRegistry.eventBase++
+	clipboardXFixesRegistry.Unlock()
+	restore := func() {
+		clipboardXFixesRegistry.Lock()
+		clipboardXFixesRegistry.eventBase = base
+		clipboardXFixesRegistry.Unlock()
+	}
+	t.Cleanup(restore)
+	second, err := newXClipboardBridge(display, func([]clipboardItem, string) {})
+	if second != nil {
+		second.Close()
+	}
+	if err == nil || !strings.Contains(err.Error(), "incompatible XFIXES event layout") {
+		t.Fatalf("incompatible layout accepted: %v", err)
+	}
+	restore()
+	second, err = newXClipboardBridge(display, func([]clipboardItem, string) {})
+	if err != nil {
+		t.Fatal(err)
+	}
+	second.Close()
+}

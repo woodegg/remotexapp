@@ -4380,3 +4380,28 @@ launches without duplicate external starts. Use 5/15/60-second relative delays,
 then one probe per ten-minute cooldown. Only observed continuous health resets
 the budget; Manager restart, time changes and observation gaps cannot waive it.
 No live deployment, actual reboot, human UAT or publication is claimed.
+
+## 2026-10-21 — Schedule verified failed managed cross-boot recreation
+
+Issue #13 supersedes BR-003 only for desired-running failed managed user-home
+desktops with verified changed boot identity. Use the schema-3 deadline/budget
+and a charged recreating phase; retain sourceBootId in that same private record
+until successful reconstruction. Carry it and the charged budget into the new
+runtime manifest before launching. This avoids losing transaction authority
+when retiring the old directory. Existing interrupted cleanup is not recharged;
+new failed attempts back off, including across repeated restarts. Retain live
+or uncertain components, occupied resources and user stop/shutdown/upgrade
+intent. Restore on-attach servers without imposing immediate App activation.
+Schema-3 rollback restrictions remain; older Core cannot consume these records.
+Actual reboot and human UAT are distinct from boot-marker simulation.
+
+## 2026-10-21 — Register gateway XFixes decoders once per process
+
+The release race gate exposed concurrent reads and repeated writes to xgb's
+global event decoder map during multiple clipboard connections. Register the
+first XFixes layout before selecting any clipboard events. Later connections
+only set their local extension opcode under the existing connection lock;
+reject incompatible event/error bases without mutating the global registry.
+A gateway owns one display, so this preserves production behavior and avoids
+a dependency fork. Repeated real-X11 race tests and a layout-rejection regression
+verify the initialization boundary.

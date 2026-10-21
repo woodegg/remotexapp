@@ -229,5 +229,26 @@ try {
   assert.equal(secondRecovery.attachedClients,0);
   assert.equal(await busID(),originalBus);
  }
- console.log(JSON.stringify({passed:true,uid:process.getuid(),display,checks:['real-shipped-XFCE-driver-disposable-UID-relocated-fixed-display','default-user-dbus-distinct-runtime-ibus-protocol-query','default-Xauthority','Manager-adoption-stable-descriptor','EXP007-final-HOME-and-input-environment','real-served-Viewer-fixed-framebuffer-reconnect-Unicode-clipboard-before-after-Manager-restart','Xfconf-persistence-Thunar-activation-visible-window','natural-XFCE-logout-stop-session-VNC-retained-and-relogin','saved-XFCE-session-restores-real-document-window-without-test-relaunch','restored-App-environment-current-generation-single-IBus-engine-and-Viewer-readback','borrowed-account-bus-identity-preserved-no-owned-bus','ordinary-restart-new-generation-IBus','dead-IBus-explicit-unavailability','empty-session-background-recovery-without-Viewer-and-with-generation-and-attempt-fence','recovery-counter-persists-across-Manager-restart','leader-death-generation-fenced-failure-and-safe-next-step'],leaderExitPath,faultProbeStatuses,faultElapsedMs,productionDesktopTouched:false}));
+ // Boot simulation owns only this temporary UID and this test's runtime.
+ const beforeBoot=await request('/api/instances/'+instance);
+ await stopManager();
+ for(const part of ['session','gateway','server','vnc']) {
+  try{await exec('systemctl',['--user','stop',`remotexapp-${instance}-${part}.service`],{timeout:25000})}
+  catch(error){if(!error.stderr?.includes('not loaded'))throw error}
+ }
+ const manifestPath=join(state,'runtime-manifests',instance+'.json');
+ const bootManifest=JSON.parse(await readFile(manifestPath,'utf8'));
+ bootManifest.runtime.sessionState='failed';bootManifest.runtime.state='failed';
+ await writeFile(manifestPath,JSON.stringify(bootManifest),{mode:0o600});
+ const bootPath=join(state,'instances',instance,'runtime-boot.json');
+ const bootMarker=JSON.parse(await readFile(bootPath,'utf8'));
+ const actualBoot=(await readFile('/proc/sys/kernel/random/boot_id','utf8')).trim();
+ bootMarker.bootId=actualBoot==='11111111-1111-4111-8111-111111111111'?'22222222-2222-4222-8222-222222222222':'11111111-1111-4111-8111-111111111111';
+ await writeFile(bootPath,JSON.stringify(bootMarker),{mode:0o600});
+ await startManager();
+ const bootRestored=await wait(async()=>{const x=await request('/api/instances/'+instance);return x.state==='server-ready'&&x.sessionState==='stopped'&&x.sessionGeneration>beforeBoot.sessionGeneration?x:false},'failed managed cross-boot simulation did not restore its server',90000);
+ assert.equal(bootRestored.sessionRecovery.attempts,Math.min(3,(beforeBoot.sessionRecovery?.attempts||0)+1));
+ assert.equal(bootRestored.id,beforeBoot.id);assert.equal(bootRestored.driverVersion,beforeBoot.driverVersion);
+ await activate(instance);await verify(await info());assert.equal(await busID(),originalBus);
+ console.log(JSON.stringify({passed:true,uid:process.getuid(),display,checks:['real-shipped-XFCE-driver-disposable-UID-relocated-fixed-display','default-user-dbus-distinct-runtime-ibus-protocol-query','default-Xauthority','Manager-adoption-stable-descriptor','EXP007-final-HOME-and-input-environment','real-served-Viewer-fixed-framebuffer-reconnect-Unicode-clipboard-before-after-Manager-restart','Xfconf-persistence-Thunar-activation-visible-window','natural-XFCE-logout-stop-session-VNC-retained-and-relogin','saved-XFCE-session-restores-real-document-window-without-test-relaunch','restored-App-environment-current-generation-single-IBus-engine-and-Viewer-readback','borrowed-account-bus-identity-preserved-no-owned-bus','ordinary-restart-new-generation-IBus','dead-IBus-explicit-unavailability','empty-session-background-recovery-without-Viewer-and-with-generation-and-attempt-fence','recovery-counter-persists-across-Manager-restart','leader-death-generation-fenced-failure-and-safe-next-step','failed-managed-cross-boot-marker-simulation-pinned-server-restore-and-relogin'],leaderExitPath,faultProbeStatuses,faultElapsedMs,productionDesktopTouched:false}));
 } finally {if(instance)try{await request('/api/managed-instances/test-desktop',{desiredState:'stopped',force:true},false,'PATCH');}catch{}await stopManager();}

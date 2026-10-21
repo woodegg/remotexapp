@@ -138,6 +138,9 @@ func (m *manager) reconcileOneSessionRecovery(id string, now time.Time) (time.Ti
 	if !bound {
 		return time.Time{}, nil
 	}
+	if m.isManagedBootRecovery(item) {
+		return m.reconcileManagedBootRecovery(item, running, now)
+	}
 	if item.Recovery == nil {
 		if !running || failedSessionRecoveryRejection(item, m.specFor(item).RunMode) != "" {
 			return time.Time{}, nil

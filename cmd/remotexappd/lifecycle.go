@@ -139,8 +139,8 @@ func (m *manager) createLocked(request createRequest) (*instance, error) {
 		controlAddress = class.Control.Address
 	}
 	item := &instance{
-		Upgrade: request.Upgrade,
-		ID:      id, ClassID: templateID, TemplateID: templateID, DriverVersion: class.DriverVersion, ManagedID: request.ManagedID,
+		Upgrade: request.Upgrade, Recovery: request.Recovery,
+		ID: id, ClassID: templateID, TemplateID: templateID, DriverVersion: class.DriverVersion, ManagedID: request.ManagedID,
 		ProfileRef: request.ProfileRef, WorkspaceMode: workspaceMode, State: "starting", SessionState: "stopped",
 		EffectivePolicy: resolvedPolicy(class, vacantTimeout, workspaceMode),
 		Parameters:      parameters, SessionGeneration: request.SessionGeneration,

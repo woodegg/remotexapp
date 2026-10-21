@@ -1,7 +1,8 @@
 # Managed recovery 0.15.0 qualification
 
-Automated qualification passed on 2026-10-21. The exact candidate is installed
-for human UAT; acceptance and publication remain pending in
+Automated qualification passed on 2026-10-21. The owner accepted the exact candidate and authorized formal publication on
+2026-10-21. [RemoteXApp 0.15.0](https://github.com/woodegg/remotexapp/releases/tag/v0.15.0)
+is published; delivery is tracked in
 [Issue #3](https://github.com/woodegg/remotexapp/issues/3).
 
 ## Selected immutable candidate
@@ -71,7 +72,11 @@ privately alongside the successful results.
 
 ## Human UAT handoff
 
-Follow the [UAT procedure](managed-recovery-0.15.0-uat.md). The private handoff
+The owner confirmed “uat passed, do a formal release” after the two enabled
+UAT templates (XFCE user desktop and Mousepad) were explained. Other shipped
+Apps have automated coverage; additional human App coverage is not claimed.
+See [human acceptance evidence](../tests/evidence/v1/managed-recovery-0.15.0-human-uat.json).
+Follow the [UAT procedure](managed-recovery-0.15.0-uat.md) for downstream checks. The private handoff
 provides a loopback entrypoint and archive location. Existing deployments
 remain with their owning project. Schema-3 state requires the rollback
 procedure in the [release design](managed-desktop-self-recovery-release.md);
@@ -85,3 +90,13 @@ change during normal observation; use the live Console for current state.
 
 [Structured automated evidence](../tests/evidence/v1/managed-recovery-0.15.0-exact-candidate.json)
 records the artifact identity, scope and limitations. It is not human acceptance.
+
+## Formal publication
+
+The annotated tag `v0.15.0` points to the qualified source above.
+[Release workflow](https://github.com/woodegg/remotexapp/actions/runs/39673092618)
+promoted the unchanged candidate. Fresh downloads of the archive, SHA256SUMS
+and candidate-evidence.json are byte-identical to the UAT-accepted files;
+checksum, clean binary VCS identity and toolchain verification passed again.
+See [publication evidence](../tests/evidence/v1/managed-recovery-0.15.0-publication.json).
+Publication does not perform downstream deployment or runtime restart.

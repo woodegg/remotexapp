@@ -45,7 +45,7 @@ before changing browser input or transport.
 - Keep normal text logging at `errors`. Content logging requires a short,
   explicitly authorized diagnostic window and private evidence handling.
 - A dead session leader does not prove its surviving children are disposable.
-  Preserve populated components for review. Development Core 0.15.0 schedules
+  Preserve populated components for review. Core 0.15.0 schedules
   bounded background recovery only for eligible, confirmed inactive managed
   user-home components. Fence registered old-generation Viewer channels before
   replacement; unknown Viewer ownership and unverified resources block it.

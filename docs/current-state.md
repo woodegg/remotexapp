@@ -10,7 +10,7 @@ live deployment state; use the latest approved alignment evidence for that.
 | RemoteXApp core | `0.14.5` |
 | Browser SDK | `0.29.1` |
 | App Package ABI | `remotexapp/v1` |
-| Go language/toolchain | `1.26.0` / `go1.27.1` |
+| Go language/toolchain | `1.26.0` / `go1.27.3` |
 | Vendored noVNC | `v1.7.0` at `63107bd06d9e` |
 
 ## Shipped App Packages

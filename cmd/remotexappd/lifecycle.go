@@ -151,6 +151,16 @@ func (m *manager) createLocked(request createRequest) (*instance, error) {
 		SessionUnit: "remotexapp-" + id + "-session.service",
 		Spec:        class, Components: components, VacantTimeout: vacantTimeout, EphemeralHome: workspaceMode == "ephemeral", Overrides: request.Overrides, RuntimeDesired: "running",
 	}
+	var previousRecovery *sessionRecovery
+	if request.PinnedAllocation != nil {
+		previousRecovery = request.PinnedAllocation.SessionRecovery
+	}
+	item.SessionRecovery = projectManagedRecoveryCounter(previousRecovery, item.Recovery)
+	if item.Recovery == nil && previousRecovery != nil {
+		// Unmigrated schema-2 records still own their legacy budget.
+		previousCopy := *previousRecovery
+		item.SessionRecovery = &previousCopy
+	}
 	if class.RunMode == "user-home" {
 		item.XAuthority = filepath.Join(profileDir, ".Xauthority")
 	}

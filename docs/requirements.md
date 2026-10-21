@@ -5,6 +5,26 @@
 > [current source versions](current-state.md). Host labels and runtime IDs in
 > historical examples are anonymized.
 
+## Selected Core 0.15.0 — managed desktop self-recovery
+
+Selected 2026-10-21 for design and implementation. These requirements are not
+implemented by the design PR. [Implementation Issue #2](https://github.com/woodegg/remotexapp/issues/2)
+owns progress; [release Issue #3](https://github.com/woodegg/remotexapp/issues/3)
+owns exact-candidate qualification, human UAT and publication. See the
+[scope and acceptance matrix](managed-desktop-self-recovery-release.md).
+RTM-020–022 and BR-003 remain the implemented baseline until superseding
+implementation is reviewed and accepted.
+
+| ID | Requirement | Status | Verification required |
+|---|---|---|---|
+| MSR-001 | Classify managed user-home failures from typed lifecycle outcomes and verified ownership. Background recovery must not require Viewer attachment; retain runtime ID, HOME, parameters, component pins and monotonic generation fencing. Normal stopped/vacant sessions retain on-attach policy. | selected; implementation pending | Empty failed session with no Viewer, attached/stale Viewer, clean logout and vacancy regressions |
+| MSR-002 | Persist one authoritative retry budget/deadline and recovery intent before action; use bounded backoff/cooldown and sustained-health reset. Manager restart, reboot, reconnect, concurrent triggers and clock changes cannot create duplicate attempts or an unbounded retry storm. | selected; implementation pending | Scheduling, crash/write-failure, concurrency, persistence and clock tests |
+| MSR-003 | Verified cross-boot recovery may recreate eligible desired-running failed managed desktops on locked resources. Missing/untrusted boot evidence, live applications and foreign ownership do not authorize replay. | selected; implementation pending | Boot-identity and ownership negatives, interrupted recreation, both backends and separately recorded actual reboot |
+| MSR-004 | Preserve populated or uncertain session components; expose their blocked reason and re-evaluate when safety conditions change. Do not kill processes by name or terminate a borrowed account bus. | selected; implementation pending | Surviving editor/helper, unreadable cgroup, empty-after-blocked and bus ownership tests |
+| MSR-005 | Recovery cannot override explicit stop, shutdown veto, unfinished upgrade or stale generation. Background events, attachment and manual retry share one serialized transition path. | selected; implementation pending | Stop/retry/attach races, shutdown-blocked, upgrade and stale-request tests |
+| MSR-006 | Expose additive, non-sensitive recovery phase/reason/attempt/deadline diagnostics and a generation-guarded manual retry. Manual retry must not imply force, automatic budget reset or SDK compatibility breakage. | selected; implementation pending | API/SDK/Console contract, permission, generation and real served Viewer tests |
+| MSR-007 | Document durable-record compatibility and rollback before implementation acceptance. Qualify the exact candidate with both lifecycle backends, disposable real-App faults and human UAT; real reboot evidence is distinct from simulation. | selected; implementation pending | Migration/strict decoding/atomic record tests, candidate evidence, real-host matrix and human acceptance |
+
 ## Core 0.14.2 — bounded managed session recovery
 
 Requested 2026-10-02 after the standalone test host XFCE session leader exited

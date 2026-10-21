@@ -22,6 +22,20 @@ pending fresh candidate qualification and human UAT. The 2026-10-07 Go 1.27.1
 qualification remains historical; the 2026-10-21 security update requires
 Go 1.27.3 and renewed acceptance.
 
+## Selected Core 0.15.0 — managed desktop self-recovery
+
+Selected 2026-10-21. Start with a separate design Draft PR and implementation
+slices under [Issue #2](https://github.com/woodegg/remotexapp/issues/2) and
+[Milestone 0.15.0](https://github.com/woodegg/remotexapp/milestone/1).
+MSR-001–007 define durable background retries, trusted cross-boot recovery,
+protected-process handling and operator diagnostics. See the
+[design and acceptance matrix](managed-desktop-self-recovery-release.md).
+Implementation is pending; existing runtime behavior remains the baseline.
+[Release Issue #3](https://github.com/woodegg/remotexapp/issues/3) tracks
+candidate qualification, human UAT and publication separately from merge.
+The 0.14.5 security/toolchain train remains separate. VERSION is unchanged by
+this design-only work; it does not authorize downstream deployment or restart.
+
 ## Included technical trains
 
 | Train | Stable requirement IDs | Contract and qualification |

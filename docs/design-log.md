@@ -4436,3 +4436,16 @@ source boot field. Ordinary same-boot component-loss retirement is unchanged.
 A single-pass monitor regression covers waiting/cooldown/recreating phases and
 normal component loss. Reject the first candidate; the replacement source must
 receive a fresh immutable build and repeated exact-candidate reboot validation.
+
+## 2026-10-21 — Initialize compatibility recovery projection before creation
+
+Issue #20 was exposed by exact-archive polling of an intermediate server-ready
+recreation snapshot. The schema-3 budget was retained, but its legacy counter
+projection was absent until the final controller result write. Derive that
+projection from the authoritative record before the first creating manifest
+and public state, using the same helper as later controller writes. The old
+projection count cannot supply or reset the schema-3 budget; preserve its window
+label only. Unmigrated schema-2 records retain their legacy counter across
+recreation until eligible migration. Live acceptance must wait for the committed recovery phase, rather than
+treating transient server-ready state as transaction completion. Qualify fresh
+bytes after this correction; intermediate builds are not UAT acceptance.

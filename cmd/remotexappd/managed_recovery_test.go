@@ -414,3 +414,22 @@ func TestManagedRecoverySharedLoopRunsAndCancels(t *testing.T) {
 		t.Fatalf("shared loop launches=%d", starts.Load())
 	}
 }
+
+func TestManagedRecoveryCounterProjectionUsesAuthorityThroughRecreation(t *testing.T) {
+	now := time.Now()
+	previous := &sessionRecovery{WindowStart: now.Add(-time.Hour), Attempts: 99}
+	recovery := &managedSessionRecovery{Phase: recoveryRecreating, UpdatedAt: now, Attempts: 7}
+	projected := projectManagedRecoveryCounter(previous, recovery)
+	if projected == nil || projected.Attempts != 3 || !projected.WindowStart.Equal(previous.WindowStart) || recovery.Attempts != 7 || previous.Attempts != 99 {
+		t.Fatal("legacy projection changed or replaced its budget authority")
+	}
+	recovery.Attempts = 0
+	if projectManagedRecoveryCounter(previous, recovery) != nil || projectManagedRecoveryCounter(previous, nil) != nil {
+		t.Fatal("old projection resurrected a cleared or absent recovery budget")
+	}
+	recovery.Attempts = 2
+	projected = projectManagedRecoveryCounter(nil, recovery)
+	if projected.Attempts != 2 || !projected.WindowStart.Equal(now) {
+		t.Fatal("initial creating snapshot omitted its compatibility projection")
+	}
+}

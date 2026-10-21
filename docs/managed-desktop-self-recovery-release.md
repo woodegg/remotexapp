@@ -294,3 +294,8 @@ change desired state, charge another attempt or bypass the controller deadline.
 Normal same-boot component retirement is retained. The first candidate is
 rejected; [Issue #3](https://github.com/woodegg/remotexapp/issues/3) identifies
 its historical evidence and the replacement candidate's fresh qualification.
+
+Runtime creation also initializes the capped legacy counter projection before
+its first manifest/public snapshot (Issue #20). The root recovery record remains
+the sole budget authority. Exact-archive checks wait for the committed result
+phase, avoiding a server-ready transition being mistaken for completion.

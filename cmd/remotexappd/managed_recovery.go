@@ -30,6 +30,20 @@ func (m *manager) notifySessionRecovery() {
 	}
 }
 
+// The legacy counter is a capped projection, including creating/recreating
+// snapshots. Only the schema-3 authority supplies its budget, never the old
+// projection's count. Keep the old window label for existing clients.
+func projectManagedRecoveryCounter(previous *sessionRecovery, recovery *managedSessionRecovery) *sessionRecovery {
+	if recovery == nil || recovery.Attempts == 0 {
+		return nil
+	}
+	windowStart := recovery.UpdatedAt
+	if previous != nil && !previous.WindowStart.IsZero() {
+		windowStart = previous.WindowStart
+	}
+	return &sessionRecovery{WindowStart: windowStart, Attempts: min(recovery.Attempts, 3)}
+}
+
 // lifecycleMu owns transitions. Registry locks are only used for snapshots;
 // never call this while managedMu is held by managed reconciliation.
 func (m *manager) saveManagedRecovery(item *instance, recovery managedSessionRecovery) error {
@@ -43,14 +57,7 @@ func (m *manager) saveManagedRecovery(item *instance, recovery managedSessionRec
 	copy := *item
 	recovery.RuntimeID, recovery.Generation = item.ID, item.SessionGeneration
 	copy.Recovery = &recovery
-	copy.SessionRecovery = nil
-	if recovery.Attempts > 0 {
-		windowStart := recovery.UpdatedAt
-		if item.SessionRecovery != nil && !item.SessionRecovery.WindowStart.IsZero() {
-			windowStart = item.SessionRecovery.WindowStart
-		}
-		copy.SessionRecovery = &sessionRecovery{WindowStart: windowStart, Attempts: min(recovery.Attempts, 3)}
-	}
+	copy.SessionRecovery = projectManagedRecoveryCounter(item.SessionRecovery, &recovery)
 	if err := m.persistRuntime(&copy); err != nil {
 		return err
 	}

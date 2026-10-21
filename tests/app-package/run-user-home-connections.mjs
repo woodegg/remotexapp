@@ -257,7 +257,7 @@ try {
  bootMarker.bootId=actualBoot==='11111111-1111-4111-8111-111111111111'?'22222222-2222-4222-8222-222222222222':'11111111-1111-4111-8111-111111111111';
  await writeFile(bootPath,JSON.stringify(bootMarker),{mode:0o600});
  await startManager();
- const bootRestored=await wait(async()=>{const x=await request('/api/instances/'+instance);return x.state==='server-ready'&&x.sessionState==='stopped'&&x.sessionGeneration>beforeBoot.sessionGeneration?x:false},'failed managed cross-boot simulation did not restore its server',90000);
+ const bootRestored=await wait(async()=>{const x=await request('/api/instances/'+instance);return x.state==='server-ready'&&x.sessionState==='stopped'&&x.sessionGeneration>beforeBoot.sessionGeneration&&x.recovery?.phase==='disabled'?x:false},'failed managed cross-boot simulation did not restore its server',90000);
  assert.equal(bootRestored.sessionRecovery.attempts,Math.min(3,(beforeBoot.sessionRecovery?.attempts||0)+1));
  assert.equal(bootRestored.id,beforeBoot.id);assert.equal(bootRestored.driverVersion,beforeBoot.driverVersion);
  await activate(instance);await verify(await info());assert.equal(await busID(),originalBus);

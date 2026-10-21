@@ -1,0 +1,27 @@
+name: Feature or behavior change
+description: Propose a problem to solve and observable acceptance criteria.
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: "Keep reports public-safe. A proposal does not authorize deployment or interruption of running applications."
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and intended users
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Expected behavior and acceptance criteria
+      description: Include failure cases and compatibility expectations.
+    validations:
+      required: true
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Scope and operational impact
+      description: Include non-goals, affected components, data preservation and known migration concerns.
+    validations:
+      required: true

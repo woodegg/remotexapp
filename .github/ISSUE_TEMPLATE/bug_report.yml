@@ -1,0 +1,28 @@
+name: Bug report
+description: Report reproducible behavior and its expected result.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "Use generic examples. Do not include credentials, private deployment identifiers, user documents, clipboard contents or unredacted runtime logs. Report vulnerabilities through SECURITY.md."
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and impact
+      description: What happens, and what work does it prevent?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction and version
+      description: Include Core/SDK/App versions, backend, generic platform details and minimal steps.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Expected behavior and acceptance
+      description: What observable outcome would demonstrate the fix?
+    validations:
+      required: true

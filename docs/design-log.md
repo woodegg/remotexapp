@@ -4322,3 +4322,15 @@ SDK/App versions and fail-closed source/binary scans. Preserve historical
 qualification facts; require a fresh candidate and renewed human UAT before
 Core 0.14.5 publication. This prerequisite changes no deployment or runtime
 restart authorization.
+
+## 2026-10-21 — Track development through Issues and pull requests
+
+Use [Issues and PRs](development-workflow.md) for work state and review, with
+Milestones grouping release scope. Short-lived branches replace direct main
+development pushes. Main requires PRs, an up-to-date GitHub Actions check and
+resolved conversations, without mandatory external approval. Technical
+contracts remain versioned in the repository. Design-only PRs do not close
+implementation Issues. Qualification, human UAT, publication and downstream
+deployment remain distinct outcomes. Preserve build-once promotion and verify
+the exact post-merge candidate identity. This process decision changes no
+runtime or deployment behavior.

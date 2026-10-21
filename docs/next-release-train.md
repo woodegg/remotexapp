@@ -1,10 +1,21 @@
 # Release trains and future work
 
-Source identity is maintained in [current-state.md](current-state.md). The
-implementation branch targets Core 0.15.0 / SDK 0.30.0 candidate; the released baseline is
-Core 0.14.4. Earlier candidate labels and
-local acceptance states are historical, not a list of work still awaiting
-publication. Deployment is owned by each target's operator.
+Source identity is maintained in [current-state.md](current-state.md). The released baseline is Core 0.15.0 / SDK 0.30.0,
+[published and verified](managed-recovery-0.15.0-qualification.md) on 2026-10-21.
+Earlier candidate labels are historical. Deployment is owned by each target's
+operator.
+
+## Proposed Core 0.16.0 — KasmVNC integration evaluation
+
+The owner selected evaluating KasmVNC as the replacement for the current
+TigerVNC/noVNC integration, including container audio and clipboard.
+[Issue #24](https://github.com/woodegg/remotexapp/issues/24) and
+[Milestone 0.16.0](https://github.com/woodegg/remotexapp/milestone/3) track the
+[evaluation and acceptance gates](kasmvnc-0.16.0-evaluation.md), KVE-001–008.
+This selects investigation, not a default transport switch. VERSION remains
+0.15.0 until feasibility and implementation scope are accepted. SDK/App version
+changes depend on the resulting contracts. Audio is evaluated against AUD-001;
+KasmVNC and optional container audio services must be assessed separately.
 
 ## Separate release train: Core 0.14.5, Go 1.27.3
 
@@ -23,21 +34,14 @@ pending fresh candidate qualification and human UAT. The 2026-10-07 Go 1.27.1
 qualification remains historical; the 2026-10-21 security update requires
 Go 1.27.3 and renewed acceptance.
 
-## Selected Core 0.15.0 — managed desktop self-recovery
+## Completed Core 0.15.0 — managed desktop self-recovery
 
-Selected 2026-10-21. Start with a separate design Draft PR and implementation
-slices under [Issue #2](https://github.com/woodegg/remotexapp/issues/2) and
-[Milestone 0.15.0](https://github.com/woodegg/remotexapp/milestone/1).
-MSR-001–007 define durable background retries, trusted cross-boot recovery,
-protected-process handling and operator diagnostics. See the
-[design and acceptance matrix](managed-desktop-self-recovery-release.md).
-Slices #9/#11/#13/#15 implement typed admission, durable background deadlines,
-verified cross-boot recreation, Viewer fencing and operator controls. Exact
-candidate qualification remains pending.
-[Release Issue #3](https://github.com/woodegg/remotexapp/issues/3) tracks
-candidate qualification, human UAT and publication separately from merge.
-The 0.14.5 security/toolchain train remains separate. The implementation branch uses VERSION 0.15.0 for candidate qualification to keep lifecycle work
-separate from the toolchain candidate; it does not authorize deployment or restart.
+MSR-001–007 shipped in Core 0.15.0 / SDK 0.30.0. Implementation Issue #2,
+release Issue #3 and Milestone 0.15.0 are complete. Exact-archive qualification,
+six actual container reboots and owner UAT passed; formal release downloads
+match the accepted candidate. See the
+[qualification and publication record](managed-recovery-0.15.0-qualification.md).
+The separate 0.14.5 train remains pending; publication does not deploy it.
 
 ## Included technical trains
 
@@ -57,8 +61,8 @@ remain in force unless a dated replacement explicitly supersedes them.
 
 [Release pending](release-pending.md) records multiple concurrent servers
 (RTC-005), reliable external lease owners (RTC-006) and shared playback/microphone
-integration (AUD-001). These are proposals, not shipped features or selected
-implementation work. Promote a requirement into a reviewed train before coding.
+integration (AUD-001). These are proposals, not shipped features. AUD-001 is included in the
+KasmVNC evaluation above, but implementation is not locked. Promote a requirement into a reviewed train before coding.
 
 ## Selecting a new train
 

@@ -11,7 +11,9 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-No unreleased changes recorded.
+Prepare the proposed Core 0.16.0 KasmVNC replacement evaluation, including
+container audio and clipboard acceptance gates. Documentation only; current
+binaries and runtime behavior remain at the released 0.15.0 baseline.
 
 ## 0.15.0 — 2026-10-21
 

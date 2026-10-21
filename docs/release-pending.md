@@ -1,7 +1,7 @@
 # Release pending
 
-Future requirements recorded 2026-09-18. These items are not selected for the
-[next release train](next-release-train.md), locked or implemented. Promote an
+Future requirements recorded 2026-09-18. RTC-005/006 remain unselected. AUD-001 is selected for feasibility review in
+the [proposed next train](next-release-train.md), not locked implementation. Promote an
 item explicitly into a future train before development and preserve its stable
 ID in [requirements.md](requirements.md). This list does not reclassify other
 historical deferred requirements.
@@ -48,6 +48,7 @@ runtime operation. A future integration must establish permission/gesture,
 owner-transfer, reconnection, shared-user trust and resource-cleanup contracts
 and test them with actual playback/microphone and multiple Tabs.
 
+The [KasmVNC evaluation](kasmvnc-0.16.0-evaluation.md) applies this contract.
 Any future implementation plan must be reviewed against AUD-001 before
 promotion. Audio transport and controls are outside the shipped Coordinator
 contract; no unpublished plan is a public dependency.

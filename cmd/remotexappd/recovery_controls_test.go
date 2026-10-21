@@ -189,3 +189,31 @@ func TestRecoveryRetryRechecksBlockedWithoutForceAndRedactsAuthority(t *testing.
 		}
 	}
 }
+
+func TestViewerInputPreservesInProgressAndBlockedShutdownEpoch(t *testing.T) {
+	for _, state := range []string{"starting", "stopping", "shutdown-blocked"} {
+		t.Run(state, func(t *testing.T) {
+			m, item, _, _ := backgroundRecoveryFixture(t)
+			item.SessionState = state
+			if state == "shutdown-blocked" {
+				item.Shutdown = &shutdownStatus{State: "blocked", Generation: item.SessionGeneration}
+			}
+			channel, _, err := m.openViewerChannel(item.ID, false, httptest.NewRequest("GET", "/input", nil))
+			if state == "shutdown-blocked" {
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer m.closeViewerChannel(channel)
+				if got := m.get(item.ID); got.SessionState != "running" || got.Shutdown.State != "cancelled" {
+					t.Fatal("attachment did not preserve the blocked App")
+				}
+			} else if err == nil {
+				m.closeViewerChannel(channel)
+				t.Fatal("input replaced an in-progress session")
+			}
+			if m.get(item.ID).SessionGeneration != item.SessionGeneration {
+				t.Fatal("input advanced a protected generation")
+			}
+		})
+	}
+}

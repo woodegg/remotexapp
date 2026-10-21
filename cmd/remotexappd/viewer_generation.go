@@ -30,6 +30,9 @@ func (m *manager) openViewerChannel(id string, rfb bool, r *http.Request) (*view
 	if item == nil {
 		return nil, r, errors.New("instance not found")
 	}
+	if item.State != "server-ready" && item.State != "ready" {
+		return nil, r, errors.New("runtime is not ready")
+	}
 	if raw, present := r.URL.Query()["sessionGeneration"]; present {
 		if len(raw) != 1 {
 			return nil, r, errors.New("invalid session generation")
@@ -38,6 +41,11 @@ func (m *manager) openViewerChannel(id string, rfb bool, r *http.Request) (*view
 		if err != nil || generation < 0 || generation != item.SessionGeneration {
 			return nil, r, errors.New("stale session generation")
 		}
+	}
+	m.cancelBlockedShutdown(id)
+	item = m.get(id)
+	if item.SessionState != "running" && item.SessionState != "stopped" && item.SessionState != "failed" {
+		return nil, r, errors.New("session transition is in progress")
 	}
 	if rfb {
 		if err := m.attachRFBLocked(id); err != nil {

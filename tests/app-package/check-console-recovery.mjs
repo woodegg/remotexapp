@@ -4,7 +4,7 @@ import {spawn} from 'node:child_process';
 import {mkdtemp,readFile,writeFile} from 'node:fs/promises';
 const [base,id,output]=process.argv.slice(2);assert.equal(new URL(base).hostname,'127.0.0.1');
 const profile=await mkdtemp('/tmp/remotexapp-recovery-console-'),delay=ms=>new Promise(r=>setTimeout(r,ms));
-const browser=spawn('google-chrome',['--headless=new','--disable-background-networking','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{stdio:['ignore','ignore','pipe']});
+const browser=spawn('google-chrome',['--headless=new','--ozone-platform=headless','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{env:{...process.env,DISPLAY:'',XAUTHORITY:''},stdio:['ignore','ignore','pipe']});
 let browserErrors='';browser.stderr.on('data',chunk=>{browserErrors=(browserErrors+chunk).slice(-6000)});
 let socket;
 try{

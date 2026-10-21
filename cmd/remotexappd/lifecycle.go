@@ -1274,6 +1274,10 @@ func (m *manager) get(id string) *instance {
 		return nil
 	}
 	copy := *item
+	if item.Recovery != nil {
+		recoveryCopy := *item.Recovery
+		copy.Recovery = &recoveryCopy
+	}
 	if item.Shutdown != nil {
 		shutdownCopy := *item.Shutdown
 		copy.Shutdown = &shutdownCopy
@@ -1521,4 +1525,5 @@ func (m *manager) setSessionState(id, state, errorText string) {
 			item.Error = ""
 		}
 	}
+	m.notifySessionRecovery()
 }

@@ -21,6 +21,7 @@ const (
 	recoveryProcesses   sessionRecoveryRejection = "session-populated-or-unknown"
 	recoveryViewers     sessionRecoveryRejection = "viewer-attached"
 	recoveryExhausted   sessionRecoveryRejection = "attempts-exhausted"
+	recoveryScheduled   sessionRecoveryRejection = "background-recovery-scheduled"
 )
 
 func (reason sessionRecoveryRejection) Error() string {
@@ -45,6 +46,8 @@ func (reason sessionRecoveryRejection) Error() string {
 		return "session recovery blocked: viewer is still attached"
 	case recoveryExhausted:
 		return "session recovery exhausted: explicit runtime restart required"
+	case recoveryScheduled:
+		return "managed session recovery is scheduled; reconnect after recovery"
 	default:
 		return "session recovery blocked"
 	}
@@ -95,6 +98,10 @@ func (m *manager) prepareFailedSessionRecovery(id string) (*instance, error) {
 	m.managedMu.Unlock()
 	if stopped {
 		return nil, recoveryStopped
+	}
+	if item.Recovery != nil || m.recoveryWake != nil {
+		m.notifySessionRecovery()
+		return nil, recoveryScheduled
 	}
 	if m.sessionComponentPopulated(item.SessionUnit) {
 		return nil, recoveryProcesses

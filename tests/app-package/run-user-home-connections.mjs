@@ -20,7 +20,7 @@ async function info(){const x=await request('/api/instances/'+instance);return r
 async function verify(x){assert.equal(x.environment.sessionBus.scope,'user');assert.equal(x.environment.sessionBus.address,process.env.DBUS_SESSION_BUS_ADDRESS);assert.equal(x.environment.ibus.scope,'runtime');assert.notEqual(x.environment.ibus.address,x.environment.sessionBus.address);assert.equal(x.environment.xauthorityPath,join(homedir(),'.Xauthority'));assert.equal(x.application,undefined);await exec('gdbus',['call','--address',x.environment.ibus.address,'--dest','org.freedesktop.IBus','--object-path','/org/freedesktop/IBus','--method','org.freedesktop.IBus.ListEngines'],{timeout:5000});await exec('gdbus',['call','--address',x.environment.sessionBus.address,'--dest','org.freedesktop.DBus','--object-path','/org/freedesktop/DBus','--method','org.freedesktop.DBus.ListNames'],{timeout:5000});}
 async function busID(){return (await exec('gdbus',['call','--session','--dest','org.freedesktop.DBus','--object-path','/org/freedesktop/DBus','--method','org.freedesktop.DBus.GetId'],{timeout:5000})).stdout;}
 async function services(){return JSON.parse(await readFile(join(state,'instances',instance,'session-services.json'),'utf8'));}
-async function wait(fn,label){for(let n=0;n<200;n++){const v=await fn();if(v)return v;await delay(100)}throw Error(label);}
+async function wait(fn,label,timeout=20000){const deadline=Date.now()+timeout;while(Date.now()<deadline){const v=await fn();if(v)return v;await delay(100)}throw Error(label);}
 async function verifyServedViewer(xenv,existingWindow,phaseName='initial') {
  const profile=join(work,'viewer-browser-'+phaseName);let browser,editor;
  const stopChild=async child=>{if(child&&child.exitCode===null&&child.signalCode===null)await new Promise(r=>{child.once('exit',r);child.kill('SIGTERM')})};
@@ -198,11 +198,11 @@ try {
  const failed=await request('/api/instances/'+instance);
  assert.equal(failed.state,'server-ready');
  assert.equal(failed.attachedClients,0);
- await activate(instance);
- const recovered=await request('/api/instances/'+instance);
+ const recovered=await wait(async()=>{const current=await request('/api/instances/'+instance);return current.sessionState==='running'&&current.applicationStatus?.state==='ready'?current:false},'empty session did not recover without a Viewer',45000);
  assert(recovered.sessionGeneration>failed.sessionGeneration);
  assert.equal(recovered.sessionState,'running');
  assert.equal(recovered.sessionRecovery?.attempts,1);
+ assert.equal(recovered.attachedClients,0,'background recovery invented a Viewer');
  assert.equal(await busID(),originalBus);
  await stopManager();await startManager();
  const adoptedRecovery=await request('/api/instances/'+instance);
@@ -220,14 +220,14 @@ try {
   leaderExitPath='populated-preserved';
   assert.equal((await exec('systemctl',['--user','is-active',sessionUnit],{timeout:5000})).stdout.trim(),'active');
  } else {
-  leaderExitPath='empty-on-attach-recovered';
+  leaderExitPath='empty-background-recovered';
   assert.match(blocked.error,/application session terminated unexpectedly/);
   await wait(async()=>{try{await exec('systemctl',['--user','is-active','--quiet',sessionUnit],{timeout:5000});return false}catch{return true}},'dead session component remained active');
-  await activate(instance);
-  const secondRecovery=await request('/api/instances/'+instance);
+  const secondRecovery=await wait(async()=>{const current=await request('/api/instances/'+instance);return current.sessionState==='running'&&current.applicationStatus?.state==='ready'?current:false},'leader loss did not recover in the background',45000);
   assert(secondRecovery.sessionGeneration>blocked.sessionGeneration);
   assert.equal(secondRecovery.sessionRecovery?.attempts,2);
+  assert.equal(secondRecovery.attachedClients,0);
   assert.equal(await busID(),originalBus);
  }
- console.log(JSON.stringify({passed:true,uid:process.getuid(),display,checks:['real-shipped-XFCE-driver-disposable-UID-relocated-fixed-display','default-user-dbus-distinct-runtime-ibus-protocol-query','default-Xauthority','Manager-adoption-stable-descriptor','EXP007-final-HOME-and-input-environment','real-served-Viewer-fixed-framebuffer-reconnect-Unicode-clipboard-before-after-Manager-restart','Xfconf-persistence-Thunar-activation-visible-window','natural-XFCE-logout-stop-session-VNC-retained-and-relogin','saved-XFCE-session-restores-real-document-window-without-test-relaunch','restored-App-environment-current-generation-single-IBus-engine-and-Viewer-readback','borrowed-account-bus-identity-preserved-no-owned-bus','ordinary-restart-new-generation-IBus','dead-IBus-explicit-unavailability','empty-session-on-attach-recovery-with-generation-and-attempt-fence','recovery-counter-persists-across-Manager-restart','leader-death-generation-fenced-failure-and-safe-next-step'],leaderExitPath,faultProbeStatuses,faultElapsedMs,productionDesktopTouched:false}));
+ console.log(JSON.stringify({passed:true,uid:process.getuid(),display,checks:['real-shipped-XFCE-driver-disposable-UID-relocated-fixed-display','default-user-dbus-distinct-runtime-ibus-protocol-query','default-Xauthority','Manager-adoption-stable-descriptor','EXP007-final-HOME-and-input-environment','real-served-Viewer-fixed-framebuffer-reconnect-Unicode-clipboard-before-after-Manager-restart','Xfconf-persistence-Thunar-activation-visible-window','natural-XFCE-logout-stop-session-VNC-retained-and-relogin','saved-XFCE-session-restores-real-document-window-without-test-relaunch','restored-App-environment-current-generation-single-IBus-engine-and-Viewer-readback','borrowed-account-bus-identity-preserved-no-owned-bus','ordinary-restart-new-generation-IBus','dead-IBus-explicit-unavailability','empty-session-background-recovery-without-Viewer-and-with-generation-and-attempt-fence','recovery-counter-persists-across-Manager-restart','leader-death-generation-fenced-failure-and-safe-next-step'],leaderExitPath,faultProbeStatuses,faultElapsedMs,productionDesktopTouched:false}));
 } finally {if(instance)try{await request('/api/managed-instances/test-desktop',{desiredState:'stopped',force:true},false,'PATCH');}catch{}await stopManager();}

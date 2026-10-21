@@ -67,7 +67,7 @@ separate and retains its pending human UAT/publication state.
 When an older release still awaits qualification and main is about to take a
 new version's behavior, retain a protected release branch at the reviewed
 pre-change main commit. The current toolchain train uses release/0.14.5; new
-managed recovery implementation uses 0.15.0-dev.1. Keep required PR/check rules
+managed recovery implementation uses 0.15.0 development versions. Keep required PR/check rules
 on the release branch, accept only its scoped fixes there, and qualify the
 exact selected commit through the same candidate workflow. Branch creation
 alone does not create a candidate, approve UAT or publish a release. Merge new

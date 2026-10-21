@@ -4362,3 +4362,21 @@ charged attempt. Schema 2 and the two-field legacy counter remain unchanged.
 No background scheduling, boot eligibility, public API or live deployment
 behavior is enabled. Use 0.15.0-dev.1 on the implementation branch to separate
 this lifecycle work from the uncompleted 0.14.5 toolchain publication.
+
+## 2026-10-21 — Persist schema-3 background managed recovery deadlines
+
+Issue #11 supersedes the on-attach-only part of RTM-021 for statically eligible
+same-boot managed user-home failures. One Manager-owned deadline loop shares
+lifecycle admission with attachment, imports legacy budget conservatively and
+persists root schema-3 recovery metadata before actions. Schema-2 records remain
+readable and unchanged until eligible migration; the old counter is a
+non-authoritative compatibility projection. Unknown formats fail closed and
+older Cores require scoped stop/recreate or a state-snapshot rollback.
+Preserve live/unknown components, attached Viewers, explicit stop and unresolved
+shutdown/upgrade operations. Same-boot resource verification precedes cleanup;
+changed or untrusted boot remains blocked until the separate reconstruction
+slice. Recover charged cleanup without another charge; reconcile ambiguous
+launches without duplicate external starts. Use 5/15/60-second relative delays,
+then one probe per ten-minute cooldown. Only observed continuous health resets
+the budget; Manager restart, time changes and observation gaps cannot waive it.
+No live deployment, actual reboot, human UAT or publication is claimed.

@@ -29,6 +29,7 @@ type instance struct {
 	SessionState        string                       `json:"sessionState"`
 	StartupFailure      *startupFailure              `json:"startupFailure,omitempty"`
 	SessionRecovery     *sessionRecovery             `json:"sessionRecovery,omitempty"`
+	Recovery            *managedSessionRecovery      `json:"-"`
 	AttachedClients     int                          `json:"attachedClients"`
 	Shutdown            *shutdownStatus              `json:"shutdown,omitempty"`
 	Home                string                       `json:"homePath,omitempty"`
@@ -259,6 +260,13 @@ type manager struct {
 	sessionObserver sessionRuntimeObserver
 	managedEvents   chan managedRuntimeEvent
 	sessionEvents   chan sessionRuntimeEvent
+	recoveryWake    chan struct{}
+	// Accessed under lifecycleMu; throttles storage failures without pretending
+	// a failed durable write advanced the persisted recovery deadline.
+	recoveryRetryAfter map[string]recoveryRetryFloor
+	// Test-only launch double; production uses startSession with pinned resources.
+	recoverySessionStart func(string) error
+	recoveryClock        func() time.Time
 	// runtimeAdoptionCheck is overridden only by focused tests. Production
 	// startup uses the full unit/display/gateway/readiness validation.
 	runtimeAdoptionCheck func(*instance) error

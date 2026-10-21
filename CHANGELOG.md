@@ -11,7 +11,7 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.15.0-dev.4`. Managed recovery controls and Viewer fencing.
+Target: `0.15.0`. Managed desktop self-recovery candidate; not published.
 SDK `0.30.0` adds generation-guarded `manager.retryRecovery()`; App versions
 are unchanged. Exact-candidate qualification and human UAT remain pending.
 

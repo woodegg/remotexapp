@@ -75,12 +75,50 @@ type xClipboardBridge struct {
 	closeOnce       sync.Once
 }
 
+// xgb's generated XFixes Init rewrites global decoder maps without locking
+// readers. Each gateway serves one display; reuse its mapping for subsequent
+// connections and fail closed if another server uses a different event layout.
+var clipboardXFixesRegistry struct {
+	sync.Mutex
+	initialized          bool
+	eventBase, errorBase byte
+}
+
+func initializeClipboardXFixes(conn *xgb.Conn) error {
+	clipboardXFixesRegistry.Lock()
+	defer clipboardXFixesRegistry.Unlock()
+	reply, err := xproto.QueryExtension(conn, 6, "XFIXES").Reply()
+	if err != nil {
+		return err
+	}
+	if !reply.Present {
+		return fmt.Errorf("XFIXES extension unavailable")
+	}
+	registry := &clipboardXFixesRegistry
+	if !registry.initialized {
+		// No clipboard connection has selected events yet. This is the only call
+		// permitted to write xgb's process-global event/error decoders.
+		if err := xfixes.Init(conn); err != nil {
+			return err
+		}
+		registry.initialized, registry.eventBase, registry.errorBase = true, reply.FirstEvent, reply.FirstError
+		return nil
+	}
+	if reply.FirstEvent != registry.eventBase || reply.FirstError != registry.errorBase {
+		return fmt.Errorf("incompatible XFIXES event layout in the same gateway process")
+	}
+	conn.ExtLock.Lock()
+	conn.Extensions["XFIXES"] = reply.MajorOpcode
+	conn.ExtLock.Unlock()
+	return nil
+}
+
 func newXClipboardBridge(display string, onRemote func([]clipboardItem, string), onError ...func() func(error)) (clipboardBridge, error) {
 	conn, err := xgb.NewConnDisplay(display)
 	if err != nil {
 		return nil, fmt.Errorf("open pure-Go X11 clipboard connection: %w", err)
 	}
-	if err := xfixes.Init(conn); err != nil {
+	if err := initializeClipboardXFixes(conn); err != nil {
 		conn.Close()
 		return nil, fmt.Errorf("initialize XFixes clipboard monitoring: %w", err)
 	}

@@ -11,14 +11,15 @@ const runtimeRecoverySchema = 3
 type managedRecoveryPhase string
 
 const (
-	recoveryWaiting   managedRecoveryPhase = "waiting"
-	recoveryCooldown  managedRecoveryPhase = "cooldown"
-	recoveryBlocked   managedRecoveryPhase = "blocked"
-	recoveryCleaning  managedRecoveryPhase = "cleaning"
-	recoveryLaunching managedRecoveryPhase = "launching"
-	recoveryWatching  managedRecoveryPhase = "watching"
-	recoveryHealthy   managedRecoveryPhase = "healthy"
-	recoveryDisabled  managedRecoveryPhase = "disabled"
+	recoveryWaiting    managedRecoveryPhase = "waiting"
+	recoveryCooldown   managedRecoveryPhase = "cooldown"
+	recoveryBlocked    managedRecoveryPhase = "blocked"
+	recoveryCleaning   managedRecoveryPhase = "cleaning"
+	recoveryLaunching  managedRecoveryPhase = "launching"
+	recoveryRecreating managedRecoveryPhase = "recreating"
+	recoveryWatching   managedRecoveryPhase = "watching"
+	recoveryHealthy    managedRecoveryPhase = "healthy"
+	recoveryDisabled   managedRecoveryPhase = "disabled"
 )
 
 const recoveryProbeInterval = 30 * time.Second
@@ -28,6 +29,7 @@ const maxManagedRecoveryAttempts = 1<<30 - 1
 // Stored once at the manifest root; never in the managed registration or the
 // public instance JSON. Generation fences deferred work and interrupted phases.
 type managedSessionRecovery struct {
+	SourceBootID  string               `json:"sourceBootId,omitempty"`
 	RuntimeID     string               `json:"runtimeId"`
 	Generation    int64                `json:"generation"`
 	Phase         managedRecoveryPhase `json:"phase"`
@@ -76,7 +78,7 @@ func (r *managedSessionRecovery) block(now time.Time, reason string) {
 
 func (r *managedSessionRecovery) normalizeClock(now time.Time) bool {
 	delay := managedRecoveryDelay(r.Attempts)
-	if r.Phase == recoveryBlocked || r.Phase == recoveryWatching || r.Phase == recoveryCleaning && !r.NextAttemptAt.IsZero() {
+	if r.Phase == recoveryBlocked || r.Phase == recoveryWatching || (r.Phase == recoveryCleaning || r.Phase == recoveryRecreating) && !r.NextAttemptAt.IsZero() {
 		delay = recoveryProbeInterval
 	}
 	backward := now.Before(r.UpdatedAt)
@@ -104,8 +106,14 @@ func validateManagedRecovery(r *managedSessionRecovery, item *instance, spec cla
 		r.Generation < 0 || r.Generation >= 1<<53 || r.Attempts < 0 || r.Attempts > maxManagedRecoveryAttempts || r.UpdatedAt.IsZero() {
 		return errors.New("invalid managed recovery identity or budget")
 	}
+	if r.SourceBootID != "" && !bootIDPattern.MatchString(r.SourceBootID) {
+		return errors.New("invalid recovery source boot")
+	}
+	if r.Phase == recoveryRecreating && (r.SourceBootID == "" || r.Attempts == 0) {
+		return errors.New("recreation requires charged boot evidence")
+	}
 	switch r.Reason {
-	case "session-failed", "cleanup-failed", "launch-failed", "launch-interrupted", "runtime-unhealthy", "boot-unverified", "boot-changed",
+	case "runtime-occupied", "boot-recovery", "runtime-recreation-failed", "session-failed", "cleanup-failed", "launch-failed", "launch-interrupted", "runtime-unhealthy", "boot-unverified", "boot-changed",
 		"session-populated-or-unknown", "viewer-attached", "desired-stopped", "shutdown-unresolved", "upgrade-unresolved", "runtime-not-ready",
 		"generation-exhausted", "attempts-exhausted", "session-stopped", "healthy", "checking-health":
 	default:
@@ -116,7 +124,7 @@ func validateManagedRecovery(r *managedSessionRecovery, item *instance, spec cla
 		if r.NextAttemptAt.IsZero() || !r.NextAttemptAt.After(r.UpdatedAt) {
 			return errors.New("managed recovery deadline must follow its update")
 		}
-	case recoveryCleaning:
+	case recoveryCleaning, recoveryRecreating:
 		if !r.NextAttemptAt.IsZero() && !r.NextAttemptAt.After(r.UpdatedAt) {
 			return errors.New("charged cleanup probe deadline must follow its update")
 		}

@@ -224,3 +224,22 @@ without a Viewer, its counter survived Manager restart, and a second leader
 loss recovered with the next charged attempt. Existing desktop services were
 not operated. This used a dirty development build based on commit 3fcb0982e89f,
 not an immutable candidate; it establishes neither cross-boot recovery nor UAT.
+
+## Third implementation slice: Issue #13
+
+Verified changed-boot failed managed user-home records enter the same deadline
+controller. Source boot identity is retained in the private schema-3 authority
+through interrupted cleanup, so removing a runtime directory cannot erase the
+transaction proof. Deadlines and attempts survive another Manager/host restart.
+Charge and persist a recreating phase before resource mutation; preserve the
+charge across an interrupted phase and advance the generation for recreation.
+Creation carries the recovery authority into every new manifest, including
+failed creation. A healthy completed result is adopted instead of replayed.
+
+Live/unknown session and server components, occupied listeners, unresolved
+shutdown/upgrade, stop intent and unverified frozen content block recreation.
+The existing ownership-checked X11 cleanup and pinned-allocation validation
+remain in force. Successful on-attach recreation restores the server without
+automatically launching the App. Anonymous boot policy is unchanged.
+Simulated boot/crash tests are development evidence; actual reboot qualification
+and both-backend candidate evidence remain separate release gates.

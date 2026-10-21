@@ -431,6 +431,11 @@ func (m *manager) reconcileManagedLocked(id string, requested ...stopOptions) er
 			item.ObservedState = "upgrade-" + current.Upgrade.Status.Phase
 			return nil
 		}
+		if item.Runtime.Recovery != nil && item.Runtime.Recovery.SourceBootID != "" {
+			item.ObservedState = "recovering"
+			m.notifySessionRecovery()
+			return nil
+		}
 		if item.Runtime.SessionState == "running" && !m.recordedSessionAlive(item.Runtime) {
 			// The VNC and session cgroup events can arrive in either order.
 			// Reconcile the terminal session before considering server recovery.

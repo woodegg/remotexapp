@@ -122,7 +122,7 @@ func TestBackgroundRecoveryBackoffCooldownAndReload(t *testing.T) {
 }
 
 func TestBackgroundRecoveryPreservesViewerAndLiveProcessGuards(t *testing.T) {
-	for _, guard := range []string{"viewer", "process", "boot", "untrusted-boot", "health"} {
+	for _, guard := range []string{"viewer", "process", "untrusted-boot", "health"} {
 		t.Run(guard, func(t *testing.T) {
 			m, item, now, starts := backgroundRecoveryFixture(t)
 			next := stepBackgroundRecovery(t, m, item, *now)
@@ -131,12 +131,6 @@ func TestBackgroundRecoveryPreservesViewerAndLiveProcessGuards(t *testing.T) {
 				item.AttachedClients = 1
 			case "process":
 				t.Setenv("REMOTEXAPP_TEST_RECOVERY_FAILURE", "populated")
-			case "boot":
-				m.bootID = "11111111-1111-4111-8111-111111111111"
-				if err := m.writeRuntimeBoot(item); err != nil {
-					t.Fatal(err)
-				}
-				m.bootID = "22222222-2222-4222-8222-222222222222"
 			case "untrusted-boot":
 				m.bootID = "11111111-1111-4111-8111-111111111111"
 			case "health":
@@ -343,7 +337,7 @@ func TestManagedRecoveryManifestStrictSchemaAndSingleAuthority(t *testing.T) {
 	if m.get(item.ID).Recovery.Attempts != 0 {
 		t.Fatal("snapshot mutated live recovery state")
 	}
-	for _, kind := range []string{"schema2-with-recovery", "schema3-without-recovery", "unknown-field", "wrong-generation", "negative-budget", "bad-phase", "unsafe-reason"} {
+	for _, kind := range []string{"schema2-with-recovery", "schema3-without-recovery", "unknown-field", "wrong-generation", "negative-budget", "bad-phase", "unsafe-reason", "invalid-source-boot", "uncharged-recreation"} {
 		t.Run(kind, func(t *testing.T) {
 			var bad map[string]any
 			if err := json.Unmarshal(original, &bad); err != nil {
@@ -365,6 +359,11 @@ func TestManagedRecoveryManifestStrictSchemaAndSingleAuthority(t *testing.T) {
 				r["phase"] = "force-restart"
 			case "unsafe-reason":
 				r["reason"] = "/private/content"
+			case "invalid-source-boot":
+				r["sourceBootId"] = "invalid"
+			case "uncharged-recreation":
+				r["phase"] = "recreating"
+				r["nextAttemptAt"] = time.Time{}
 			}
 			b, err := json.Marshal(bad)
 			if err != nil {

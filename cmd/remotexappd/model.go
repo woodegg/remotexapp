@@ -133,19 +133,20 @@ type effectiveDisplayPolicy struct {
 }
 
 type createRequest struct {
-	Upgrade           *runtimeUpgrade   `json:"-"`
-	ClassID           string            `json:"classId,omitempty"`
-	TemplateID        string            `json:"templateId,omitempty"`
-	ProfileRef        string            `json:"profileRef,omitempty"`
-	Overrides         instanceOverrides `json:"overrides,omitempty"`
-	Parameters        map[string]any    `json:"parameters,omitempty"`
-	ManagedID         string            `json:"-"`
-	PinnedSpec        classConfig       `json:"-"`
-	PinnedComponents  runtimeComponents `json:"-"`
-	RuntimeID         string            `json:"-"`
-	CreatedAt         time.Time         `json:"-"`
-	SessionGeneration int64             `json:"-"`
-	PinnedAllocation  *instance         `json:"-"`
+	Recovery          *managedSessionRecovery `json:"-"`
+	Upgrade           *runtimeUpgrade         `json:"-"`
+	ClassID           string                  `json:"classId,omitempty"`
+	TemplateID        string                  `json:"templateId,omitempty"`
+	ProfileRef        string                  `json:"profileRef,omitempty"`
+	Overrides         instanceOverrides       `json:"overrides,omitempty"`
+	Parameters        map[string]any          `json:"parameters,omitempty"`
+	ManagedID         string                  `json:"-"`
+	PinnedSpec        classConfig             `json:"-"`
+	PinnedComponents  runtimeComponents       `json:"-"`
+	RuntimeID         string                  `json:"-"`
+	CreatedAt         time.Time               `json:"-"`
+	SessionGeneration int64                   `json:"-"`
+	PinnedAllocation  *instance               `json:"-"`
 }
 
 type runtimeComponents struct {

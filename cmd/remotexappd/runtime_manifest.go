@@ -447,6 +447,12 @@ func (m *manager) restoreRuntimeManifests(records []runtimeManifestRecord) {
 		if m.restoreUpgrade(record) {
 			continue
 		}
+		if m.isManagedBootRecovery(item) {
+			// Extended recovery is scheduled after registrations are linked.
+			// Do not let the legacy startup path bypass durable deadlines.
+			m.storeRuntime(item)
+			continue
+		}
 		bootRecovery, bootErr := m.prepareBootRecovery(record)
 		if bootErr != nil {
 			item.State, item.SessionState, item.Error = "failed", "failed", "runtime boot recovery requires explicit intervention"
@@ -586,7 +592,7 @@ func runtimeRecoveryRequest(record *runtimeManifestRecord) createRequest {
 		TemplateID: item.TemplateID, ProfileRef: item.ProfileRef,
 		Overrides: record.Overrides, Parameters: item.Parameters,
 		ManagedID: item.ManagedID, RuntimeID: item.ID, CreatedAt: item.CreatedAt,
-		SessionGeneration: generation, PinnedAllocation: item,
+		SessionGeneration: generation, PinnedAllocation: item, Recovery: recoveryForRecreation(item.Recovery, generation),
 		PinnedSpec: record.ResolvedSpec, PinnedComponents: record.Components,
 	}
 }

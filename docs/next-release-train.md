@@ -1,14 +1,15 @@
 # Release trains and future work
 
 Source identity is maintained in [current-state.md](current-state.md). The
-public source targets Core 0.14.5 / SDK 0.29.1; the released baseline is
+implementation branch targets Core 0.15.0-dev.1 / SDK 0.29.1; the released baseline is
 Core 0.14.4. Earlier candidate labels and
 local acceptance states are historical, not a list of work still awaiting
 publication. Deployment is owned by each target's operator.
 
-## Locked next train: Core 0.14.5, Go 1.27.3
+## Separate release train: Core 0.14.5, Go 1.27.3
 
-Locked 2026-10-07 for implementation and local UAT. Upgrade the exact Go build
+The protected release/0.14.5 branch retains the reviewed pre-lifecycle-change
+source for this train. Locked 2026-10-07 for implementation and local UAT. Upgrade the exact Go build
 toolchain from
 `1.26.8` to `1.27.3` and qualify newly compiled Core binaries. Core `0.14.5`
 is the release target; SDK `0.29.1` and existing App Package versions remain
@@ -30,11 +31,12 @@ slices under [Issue #2](https://github.com/woodegg/remotexapp/issues/2) and
 MSR-001–007 define durable background retries, trusted cross-boot recovery,
 protected-process handling and operator diagnostics. See the
 [design and acceptance matrix](managed-desktop-self-recovery-release.md).
-Implementation is pending; existing runtime behavior remains the baseline.
+Slice #9 implements typed on-attach admission and the legacy intent barrier.
+Background scheduling and cross-boot behavior remain pending.
 [Release Issue #3](https://github.com/woodegg/remotexapp/issues/3) tracks
 candidate qualification, human UAT and publication separately from merge.
-The 0.14.5 security/toolchain train remains separate. VERSION is unchanged by
-this design-only work; it does not authorize downstream deployment or restart.
+The 0.14.5 security/toolchain train remains separate. The implementation branch uses VERSION 0.15.0-dev.1 to keep lifecycle work
+separate from the toolchain candidate; it does not authorize deployment or restart.
 
 ## Included technical trains
 

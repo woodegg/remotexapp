@@ -4348,3 +4348,17 @@ BR-003 remain effective until superseding implementation lands. Durable-record
 format, retry defaults and rollback must be verified before acceptance. Release
 Issue #3 retains candidate, human UAT and publication gates. No deployment or
 live incident operation is included.
+
+## 2026-10-21 — Persist legacy recovery admission before cleanup
+
+Issue #9 implements the first slice of MSR-001/002. Centralize typed admission
+for failed managed user-home sessions and reject explicit stop, unresolved
+shutdown/upgrade and unusable runtime/generation state. Retain the protected
+process and attached-Viewer guards. Supersede only the old cleanup-before-write
+ordering: persist the charged existing recovery counter while still failed,
+then clean, then persist stopped before normal startup. A storage failure must
+not authorize cleanup; a cleanup/stopped-write failure cannot refund the
+charged attempt. Schema 2 and the two-field legacy counter remain unchanged.
+No background scheduling, boot eligibility, public API or live deployment
+behavior is enabled. Use 0.15.0-dev.1 on the implementation branch to separate
+this lifecycle work from the uncompleted 0.14.5 toolchain publication.

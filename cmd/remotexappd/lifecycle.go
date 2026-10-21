@@ -710,40 +710,11 @@ func (m *manager) startSession(id string) (sessionErr error) {
 		return nil
 	}
 	if item.SessionState == "failed" {
-		if item.ManagedID == "" || m.specFor(item).RunMode != "user-home" {
-			return errors.New("session failed; an explicit runtime restart is required")
+		var err error
+		item, err = m.prepareFailedSessionRecovery(id)
+		if err != nil {
+			return err
 		}
-		if m.sessionComponentPopulated(item.SessionUnit) {
-			return errors.New("session recovery blocked: live session processes require operator review")
-		}
-		if item.AttachedClients != 0 {
-			return errors.New("session recovery blocked: viewer is still attached")
-		}
-		window, allowed := nextSessionRecovery(item.SessionRecovery, time.Now())
-		if !allowed {
-			return errors.New("session recovery exhausted: explicit runtime restart required")
-		}
-		if err := m.cleanupSessionComponent(item); err != nil {
-			return fmt.Errorf("session recovery cleanup: %w", err)
-		}
-		m.mu.Lock()
-		if live := m.instances[id]; live != nil && live.SessionGeneration == item.SessionGeneration && live.SessionState == "failed" {
-			live.SessionRecovery = &window
-			live.SessionState = "stopped"
-			live.Error = ""
-		}
-		m.mu.Unlock()
-		if err := m.persistRuntime(m.get(id)); err != nil {
-			m.mu.Lock()
-			if live := m.instances[id]; live != nil && live.SessionGeneration == item.SessionGeneration {
-				live.SessionRecovery = item.SessionRecovery
-				live.SessionState = "failed"
-				live.Error = item.Error
-			}
-			m.mu.Unlock()
-			return fmt.Errorf("persist managed session recovery intent: %w", err)
-		}
-		item = m.get(id)
 	}
 	item, generation, err := m.nextSessionGeneration(id)
 	if err != nil {

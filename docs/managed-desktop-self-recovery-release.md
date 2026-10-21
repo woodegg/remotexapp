@@ -136,8 +136,9 @@ interleavings. Do not add another global lock or recursive reconciliation path.
    UAT, then record immutable publication and downstream handoff separately.
 
 Each slice uses a linked PR. A design-only PR references #2 without closing it.
-Keep VERSION at its current source identity until release preparation; this
-plan does not ship Core 0.15.0 or change the existing 0.14.5 qualification scope.
+Design-only work keeps VERSION unchanged; runtime implementation uses the
+separate 0.15.0-dev.1 development identity. No stable Core 0.15.0 publication or
+renewed 0.14.5 acceptance is implied.
 
 ## Required acceptance matrix
 
@@ -178,3 +179,14 @@ and session state, generation, structured failure evidence, session population,
 and display/gateway health. No live incident has been diagnosed by this plan.
 Add a deterministic regression for that observed class when evidence arrives;
 generic matrix coverage must not be presented as proof of that incident's fix.
+
+## First implementation slice: Issue #9
+
+Typed admission and schema-2 attempt persistence now precede on-attach cleanup.
+A failed intent write preserves old IPC and generation. Failed cleanup retains
+the charged counter and failed state; a failed stopped-state write prevents
+replacement startup and does not refund the attempt. Existing three-attempt /
+ten-minute limits, process preservation and attached-client guard remain.
+This slice introduces no scheduler, schema-3 migration, boot-policy change or
+new public API. Contract tests cover the persistence/cleanup boundary with
+local service doubles; they are not real-host recovery or UAT evidence.

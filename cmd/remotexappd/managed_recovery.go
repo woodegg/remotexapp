@@ -241,6 +241,13 @@ func (m *manager) reconcileOneSessionRecovery(id string, now time.Time) (time.Ti
 	if err := m.fenceViewerChannels(item); err != nil {
 		return m.finishManagedRecoveryFailure(id, m.recoveryNow(), string(recoveryViewers))
 	}
+	currentSafety := m.get(id)
+	if reason := m.recoveryResourceRejection(currentSafety); reason != "" {
+		r := *currentSafety.Recovery
+		r.block(m.recoveryNow(), reason)
+		r.Phase = recoveryCleaning
+		return r.NextAttemptAt, m.saveManagedRecovery(currentSafety, r)
+	}
 	if err := m.setGatewayClipboardSession(item, item.SessionGeneration, false); err != nil {
 		return m.finishManagedRecoveryFailure(id, m.recoveryNow(), "cleanup-failed")
 	}

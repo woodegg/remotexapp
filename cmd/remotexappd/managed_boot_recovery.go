@@ -209,6 +209,13 @@ func (m *manager) reconcileManagedBootRecovery(item *instance, desiredRunning bo
 	if err := m.fenceViewerChannels(item); err != nil {
 		return fail(err)
 	}
+	currentSafety := m.get(item.ID)
+	if reason := m.managedBootRejection(currentSafety); reason != "" {
+		r := *currentSafety.Recovery
+		r.block(m.recoveryNow(), reason)
+		r.Phase = recoveryRecreating
+		return r.NextAttemptAt, m.saveManagedRecovery(currentSafety, r)
+	}
 	if err := m.stopUnits(item); err != nil {
 		return fail(err)
 	}

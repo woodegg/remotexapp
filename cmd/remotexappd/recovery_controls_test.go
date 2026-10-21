@@ -217,3 +217,47 @@ func TestViewerInputPreservesInProgressAndBlockedShutdownEpoch(t *testing.T) {
 		})
 	}
 }
+
+func TestRecoveryRevalidatesSafetyAfterDurableCharge(t *testing.T) {
+	m, item, now, starts := backgroundRecoveryFixture(t)
+	next := stepBackgroundRecovery(t, m, item, *now)
+	checks := 0
+	m.runtimeAdoptionCheck = func(*instance) error {
+		checks++
+		if checks > 1 {
+			return io.ErrUnexpectedEOF
+		}
+		return nil
+	}
+	*now = next
+	stepBackgroundRecovery(t, m, item, *now)
+	got := m.get(item.ID).Recovery
+	if starts.Load() != 0 || got.Attempts != 1 || got.Phase != recoveryCleaning || got.Reason != "runtime-unhealthy" {
+		t.Fatalf("post-intent health guard failed: %+v", got)
+	}
+	m.runtimeAdoptionCheck = func(*instance) error { return nil }
+	*now = got.NextAttemptAt
+	stepBackgroundRecovery(t, m, item, *now)
+	if starts.Load() != 1 || m.get(item.ID).Recovery.Attempts != 1 {
+		t.Fatal("safe resumption charged the interrupted intent again")
+	}
+}
+
+func TestManagedBootRecoveryRevalidatesProcessesAfterCharge(t *testing.T) {
+	m, item, now, calls := managedBootFixture(t)
+	next := stepBackgroundRecovery(t, m, item, *now)
+	checks := 0
+	m.runtimeSessionAliveCheck = func(*instance) bool { checks++; return checks > 1 }
+	*now = next
+	stepBackgroundRecovery(t, m, item, *now)
+	got := m.get(item.ID).Recovery
+	if *calls != 0 || got.Attempts != 1 || got.Phase != recoveryRecreating || got.Reason != string(recoveryProcesses) {
+		t.Fatalf("post-charge process was not protected: %+v", got)
+	}
+	m.runtimeSessionAliveCheck = func(*instance) bool { return false }
+	*now = got.NextAttemptAt
+	stepBackgroundRecovery(t, m, item, *now)
+	if *calls != 1 || m.get(item.ID).Recovery.Attempts != 1 {
+		t.Fatal("interrupted boot intent charged again")
+	}
+}

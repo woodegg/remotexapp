@@ -1,14 +1,15 @@
-# Core 0.14.5: Go 1.27.1 release train
+# Core 0.14.5: Go 1.27.3 release train
 
 Locked 2026-10-07 for development, testing and project-owned local UAT.
-Status: implemented; hosted candidate and exact-artifact automated qualification
-passed. The candidate is installed in the project-owned local UAT environment.
-Human UAT and formal publication are pending. The released baseline is Core `0.14.4`, SDK
-`0.29.1`, built with Go `1.26.8`.
+Status: exact Go 1.27.3 security-pin update selected on 2026-10-21 after
+11 reachable standard-library vulnerability findings on Go 1.27.1.
+Fresh candidate qualification, human UAT and formal publication are pending.
+The 2026-10-07 Go 1.27.1 qualification below is historical and is not renewed
+acceptance. The released baseline remains Core 0.14.4 / SDK 0.29.1.
 
 ## Problem and ownership
 
-Move Core builds to the selected exact Go `1.27.1` toolchain and deliver newly
+Move Core builds to the selected exact Go `1.27.3` toolchain and deliver newly
 qualified binaries in an immutable Core patch release. The Core repository
 owns source changes, qualification and GitHub publication. Each deployment
 owner separately controls installation and runtime upgrades.
@@ -21,7 +22,7 @@ implementation; record any compatibility changes before accepting the train.
 ## Toolchain compatibility review
 
 Reviewed the official [Go 1.27 notes](https://go.dev/doc/go1.27) and
-[Go 1.27.1 history](https://go.dev/doc/devel/release#go1.27.1). Go 1.27
+[Go 1.27.3 history](https://go.dev/doc/devel/release#go1.27.3). Go 1.27
 maintains the Go 1 compatibility promise; its new language features are not
 required by this train. Review points include default `stdversion` vet checks,
 removed legacy asynchronous timer-channel support, runtime/compiler changes,
@@ -49,9 +50,9 @@ No new performance or security guarantee is claimed without measured evidence.
 
 | Gate | Required result |
 |---|---|
-| Source and metadata | Consistent exact Go `1.27.1` pins; clean module metadata; public-documentation, workflow, release and evidence checks pass. |
+| Source and metadata | Consistent exact Go `1.27.3` pins; clean module metadata; public-documentation, workflow, release and evidence checks pass. |
 | Portable qualification | `make check`, `make coverage-check`, `make test-race` and the hosted `make release-ci` pass. Source and all four packaged binaries pass the vulnerability gates. |
-| Artifact identity | All four packaged binaries report Go `1.27.1`, the reviewed full source commit and clean VCS state. Archive checksum and candidate evidence agree. |
+| Artifact identity | All four packaged binaries report Go `1.27.3`, the reviewed full source commit and clean VCS state. Archive checksum and candidate evidence agree. |
 | Target-like integration | Run `scripts/test-release-candidate.sh` against that exact hosted archive, checksum and evidence. Exercise the existing synthetic, shipped-App, document, actions, user-home, service and recovery suites. |
 | Human acceptance | Record scoped human UAT of the exact candidate, including Viewer input/IME, clipboard and Manager adoption/runtime replacement. Record unexecuted scenarios explicitly. |
 | Publication | Publish the unchanged accepted candidate under annotated `v0.14.5`; verify fresh downloads and record publication evidence. |
@@ -110,3 +111,14 @@ still installing dependencies when this record was written. The full hosted
 release candidate gate passed. This infrastructure result remains explicit.
 Human acceptance, actual host reboot and formal publication are pending.
 See [qualification evidence](../tests/evidence/v1/go-toolchain-0.14.5-local-uat-preparation.json).
+
+## 2026-10-21 security prerequisite
+
+The required source scan reported 11 reachable Go standard-library findings
+with Go 1.27.1. GO-2026-6809 requires Go 1.27.3; the remaining findings require
+at least Go 1.27.2. The [official history](https://go.dev/doc/devel/release#go1.27.3)
+records the security fixes. Synchronize current pins and validators to 1.27.3;
+keep the language minimum and SDK/App identities unchanged. Historical evidence
+retains its original compiler identity. A fresh exact candidate, target-like E2E
+and human UAT are required before publication. No host activation is included.
+Track delivery in [release Issue #4](https://github.com/woodegg/remotexapp/issues/4).

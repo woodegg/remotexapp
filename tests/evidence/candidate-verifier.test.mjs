@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 
 const commit = 'b'.repeat(40);
 
-function fixture(toolchain = 'go1.27.1') {
+function fixture(toolchain = 'go1.27.3') {
   const root = mkdtempSync(join(tmpdir(), 'remotexapp-evidence-test-'));
   const archive = join(root, 'remotexapp-test-linux-amd64.tar.gz');
   const evidence = join(root, 'candidate-evidence.json');
@@ -47,7 +47,7 @@ test('candidate verifier binds evidence to exact bytes and commit', (t) => {
 });
 
 test('candidate verifier rejects the previous release toolchain', (t) => {
-  const value = fixture('go1.26.8');
+  const value = fixture('go1.27.1');
   t.after(() => rmSync(value.root, { recursive: true, force: true }));
   assert.throws(() => execFileSync(process.execPath, [
     'scripts/verify-candidate-evidence.mjs', value.evidence, value.archive, commit,

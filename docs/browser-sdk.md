@@ -524,3 +524,21 @@ call the element's `flushResize()` when an embedding UI detects gesture end.
   `applicationStatus` snapshot. It does not currently render a status timeline.
 
 Type declarations are available from `/sdk/index.d.ts`.
+
+## Managed desktop recovery
+
+SDK 0.30.0 adds a safe operator recheck:
+
+```js
+const runtime = await manager.getInstance(instanceId);
+console.log(runtime.recovery); // optional phase/reason/message/attempts/deadline
+await manager.retryRecovery(instanceId, { sessionGeneration: runtime.sessionGeneration });
+```
+
+The Manager returns HTTP 202 with the current instance projection. A stale
+generation or stopped/unresolved operation returns 409. Recheck does not force
+shutdown, reset attempts or skip waiting/cooldown. Blocked safety probes may be
+expedited, but live/unknown processes remain protected. The built-in Console
+displays the same projection and uses this SDK method. Clients should refresh
+instance identity before reconnecting after automatic recovery; old transport
+channels and generation-qualified descriptors/offers are retired.

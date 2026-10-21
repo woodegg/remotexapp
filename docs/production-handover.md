@@ -47,7 +47,8 @@ before changing browser input or transport.
 - A dead session leader does not prove its surviving children are disposable.
   Preserve populated components for review. Development Core 0.15.0 schedules
   bounded background recovery only for eligible, confirmed inactive managed
-  user-home components; attached Viewers and unverified resources block it.
+  user-home components. Fence registered old-generation Viewer channels before
+  replacement; unknown Viewer ownership and unverified resources block it.
   See [managed recovery](managed-desktop-self-recovery-release.md) for scope
   and schema-3 rollback constraints.
 - Publisher and deployment owner have separate responsibilities. This project

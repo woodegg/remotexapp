@@ -76,7 +76,7 @@ func (m *manager) managedBootRejection(item *instance) string {
 	if m.recordedSessionAlive(item) || m.sessionComponentPopulated(item.SessionUnit) {
 		return string(recoveryProcesses)
 	}
-	if item.AttachedClients != 0 {
+	if item.AttachedClients != 0 && !m.canFenceViewerChannels(item) {
 		return string(recoveryViewers)
 	}
 	// Changed boot never grants permission to stop a newly occupied component.
@@ -148,7 +148,7 @@ func (m *manager) reconcileManagedBootRecovery(item *instance, desiredRunning bo
 			r.Attempts = item.SessionRecovery.Attempts
 		}
 		// Retain a previously scheduled delay/cooldown across another host reboot.
-		if r.NextAttemptAt.IsZero() {
+		if r.NextAttemptAt.IsZero() || r.Phase == recoveryWatching || r.Phase == recoveryHealthy || r.Phase == recoveryDisabled {
 			r.scheduleFailure(now, "boot-recovery")
 		}
 		return r.NextAttemptAt, m.saveManagedRecovery(item, r)
@@ -204,6 +204,9 @@ func (m *manager) reconcileManagedBootRecovery(item *instance, desiredRunning bo
 			return next, saveErr
 		}
 		return next, err
+	}
+	if err := m.fenceViewerChannels(item); err != nil {
+		return fail(err)
 	}
 	if err := m.stopUnits(item); err != nil {
 		return fail(err)

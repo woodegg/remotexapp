@@ -1,6 +1,7 @@
 import { managedPrimaryAction, standaloneRuntimes, runtimeVersionLabel, runtimeVersionSummary } from './navigation-model.mjs';
 import {createConnectionsPanel} from './connections-panel.mjs';
 import {createActionsPanel} from './actions-panel.mjs';
+import {recoverySummary} from './recovery-model.mjs';
 import {createCoordinatorPanel} from './coordinator-panel.mjs';
 
 const moduleURL = new URL(import.meta.url);
@@ -599,6 +600,14 @@ async function startConsole(consoleMode) {
         actions.append(element('button', { className:'warn', text:'Restart (current version)', onclick:() => run('Runtime restart', async () => { await restartRuntime(item.runtime); await refresh(); }).catch(() => {}) }));
       }
       if (item.runtime) actions.append(upgradeButton(item.runtime));
+      if (item.desiredState === 'running' && item.runtime?.sessionState === 'failed' && item.runtime?.recovery) {
+        actions.append(element('button', {text:'Recheck recovery', 'data-recovery-retry':item.runtime.id,
+          onclick:() => run('Recovery recheck', async () => {
+            await manager.retryRecovery(item.runtime.id, {sessionGeneration:item.runtime.sessionGeneration});
+            await refresh();
+          }).catch(() => {}),
+        }));
+      }
       if (item.desiredState === 'running') {
         actions.append(element('button', { className:'danger', text:'Stop managed application', onclick:() => run('Managed application stop', async () => { await stopManaged(item); await refresh(); }).catch(() => {}) }));
       } else if (item.observedState === 'shutdown-blocked' && item.runtime) {
@@ -619,6 +628,7 @@ async function startConsole(consoleMode) {
         element('div', { className:'card-title' }, element('span', { text:item.id }), element('span', { className:'chip', text:`${item.desiredState}/${item.observedState}` })),
         element('div', { className:'meta', text:`${item.templateId} · profile ${item.profileRef}\ndriver ${item.appliedDriverVersion || 'not applied'} (available ${item.availableDriverVersion || 'none'}) · ${item.updateStatus}${item.error ? `\nERROR: ${item.error}` : ''}` }),
         element('div', { className:'meta', text:runtimeVersionSummary(runtime, item.availableVersion) }),
+        element('div', {className:'meta', 'data-recovery-status':runtime?.id || '', text:recoverySummary(runtime)}),
         runtimeDetails,
         actions,
       ));

@@ -171,3 +171,12 @@ func TestManagedBootRecoveryPreservesCooldownAcrossAnotherBoot(t *testing.T) {
 		t.Fatal("another reboot reset cooldown")
 	}
 }
+
+func TestManagedBootRecoveryHealthProbeCannotShortenCooldown(t *testing.T) {
+	m, item, now, calls := managedBootFixture(t)
+	item.Recovery = &managedSessionRecovery{RuntimeID: item.ID, Generation: item.SessionGeneration, Phase: recoveryWatching, Reason: "checking-health", Attempts: 3, UpdatedAt: *now, NextAttemptAt: now.Add(recoveryProbeInterval)}
+	next := stepBackgroundRecovery(t, m, item, *now)
+	if *calls != 0 || next.Before(now.Add(10*time.Minute)) || m.get(item.ID).Recovery.Phase != recoveryCooldown {
+		t.Fatal("health timer shortened boot cooldown")
+	}
+}

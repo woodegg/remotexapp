@@ -979,6 +979,10 @@ func (m *manager) cleanupSessionComponent(item *instance) error {
 func (m *manager) attachRFB(id string) error {
 	m.lifecycleMu.Lock()
 	defer m.lifecycleMu.Unlock()
+	return m.attachRFBLocked(id)
+}
+
+func (m *manager) attachRFBLocked(id string) error {
 	m.mu.Lock()
 	if timer := m.idleTimers[id]; timer != nil {
 		timer.Stop()
@@ -1013,6 +1017,10 @@ func (m *manager) attachRFB(id string) error {
 func (m *manager) detachRFB(id string) {
 	m.lifecycleMu.Lock()
 	defer m.lifecycleMu.Unlock()
+	m.detachRFBLocked(id)
+}
+
+func (m *manager) detachRFBLocked(id string) {
 	m.mu.Lock()
 	item := m.instances[id]
 	if item == nil {

@@ -4405,3 +4405,21 @@ reject incompatible event/error bases without mutating the global registry.
 A gateway owns one display, so this preserves production behavior and avoids
 a dependency fork. Repeated real-X11 race tests and a layout-rejection regression
 verify the initialization boundary.
+
+## 2026-10-21 — Fence Viewer epochs and expose guarded recovery controls
+
+Issue #15 supersedes the attached-client blanket veto only for channels whose
+Manager-owned runtime/generation is registered. Cover pending upgrades as well
+as upgraded transports; atomically retire ownership/counts before cancellation
+and resource replacement. Late upgrades fail closed and old detaches cannot
+affect the next generation. Unknown counts and live/uncertain processes remain
+protected. Serialize input/RFB activation because the SDK opens both together.
+Keep old descriptor/offer generation guards and deactivate clipboard state before
+cleanup. A health observation timer is not a failure cooldown across reboot.
+
+Expose only an additive phase/reason/fixed-message/budget/deadline/last-success
+projection. Add SDK 0.30.0 retryRecovery and Console controls, guarded by current
+generation and desired-running state. Explicit recheck expedites blocked safety
+probes only; waiting/cooldown, charges and shutdown/upgrade boundaries remain.
+Schema-3 lastSuccessAt is private authority; downgrade still requires scoped
+stop/recreate or a compatible pre-upgrade snapshot. UAT/publication are pending.

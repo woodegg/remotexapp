@@ -513,3 +513,20 @@ The checkout-local development installer retains its separate backup workflow.
 
 Example backend target: `http://127.0.0.1:1991/`. Direct non-health requests
 return 401; publish it only through the authenticated identity proxy.
+
+## Managed recovery in Core 0.15.0
+
+For desired-running managed user-home desktops, inspect the optional `recovery`
+field from GET `/api/instances/ID` or the Console's recovery status. It reports
+phase, fixed reason/message, charged attempts, next attempt and last confirmed
+healthy success. Internal boot identities and paths are not part of that field.
+Use **Recheck recovery** to reevaluate a blocker after resolving its cause.
+POST `/api/instances/ID/recovery-retry` requires `{ "sessionGeneration": N }`
+and returns 202; stale generations return 409. It does not accept force/reset,
+override stop or unresolved shutdown/upgrade, or skip backoff/cooldown.
+
+Do not clear manifests or kill surviving processes to remove a failure label.
+Unknown/live session components remain protected. See the
+[recovery design and rollback](managed-desktop-self-recovery-release.md) before
+downgrading schema-3 state. Recreated processes cannot restore lost unsaved
+memory; persistent HOME, identity and locked versions are retained.

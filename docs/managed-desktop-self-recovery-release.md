@@ -1,8 +1,8 @@
 # Core 0.15.0: managed desktop self-recovery
 
-Scope selected 2026-10-21. Status: implementation in progress. Slices #9/#11 implement durable same-boot
-empty-session recovery; attached-Viewer fencing, cross-boot recreation, operator
-UI, candidate qualification, human UAT and publication remain pending.
+Scope selected 2026-10-21. Status: implementation in progress. Slices #9/#11/#13/#15 implement recovery scheduling, cross-boot recreation,
+Viewer fencing and operator controls. Candidate qualification, human UAT and
+publication remain pending.
 [Implementation Issue #2](https://github.com/woodegg/remotexapp/issues/2)
 owns work progress; [release Issue #3](https://github.com/woodegg/remotexapp/issues/3)
 owns candidate/UAT/publication gates under
@@ -243,3 +243,28 @@ remain in force. Successful on-attach recreation restores the server without
 automatically launching the App. Anonymous boot policy is unchanged.
 Simulated boot/crash tests are development evidence; actual reboot qualification
 and both-backend candidate evidence remain separate release gates.
+
+## Final implementation slice: Issue #15
+
+Manager-owned RFB and input WebSocket upgrades are registered under the
+lifecycle lock with runtime/generation ownership, including pending upgrades.
+A charged recovery may retire verified old channels before cleanup; unknown
+client counts still veto replacement. Retire ownership/counts before closing
+transport so late upgrade responses and old HTTP detaches cannot affect a new
+generation. The SDK opens input/RFB concurrently; both paths serialize
+activation and bind the winning session epoch. Optional sessionGeneration
+query parameters reject stale callers; older clients remain compatible.
+
+Public recovery diagnostics are an additive allowlisted projection, excluding
+private runtime paths, source boot IDs and raw errors. The Console uses SDK
+0.30.0 retryRecovery(instanceId, {sessionGeneration}) to POST recovery-retry.
+Manual retry rejects stale/stop/unresolved-operation requests, does not accept
+force/reset, and cannot bypass waiting/cooldown or refund an attempt. It may
+expedite a blocked safety probe; host mutation still follows the serialized
+controller and durable admission barrier. Confirmed health persists lastSuccessAt.
+
+Old descriptors/offers retain generation checks; retire old gateway clipboard
+state before session cleanup. Reboot admission distinguishes failure deadlines
+from prior health probes, so a 30-second health timer cannot shorten a ten-minute
+cooldown. Exact-candidate and real-reboot qualification remain separate from
+development WebSocket/Console tests.

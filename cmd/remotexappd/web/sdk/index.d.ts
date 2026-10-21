@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.29.1';
+export const SDK_VERSION: '0.30.0';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -62,7 +62,13 @@ export interface RemoteXAppUpgradeStatus {
 export interface RemoteXAppUpgradeOptions {
   sessionGeneration:number; targetRevision:string; force?:boolean; signal?:AbortSignal;
 }
+export interface RemoteXAppRecovery {
+  phase:'waiting'|'cooldown'|'blocked'|'cleaning'|'launching'|'recreating'|'watching'|'healthy'|'disabled';
+  reason:string; message:string; attempts:number; nextAttemptAt?:string; lastSuccessAt?:string;
+}
+
 export interface RemoteXAppInstance {
+  recovery?:RemoteXAppRecovery;
   versions?:RemoteXAppRuntimeVersions; upgrade?:RemoteXAppUpgradeStatus;
 	id:string; classId:string; templateId:string; driverVersion:string; managedInstanceId?:string; profileRef:string;
 	workspaceMode:'ephemeral'|'persistent'; state:string; display:string;

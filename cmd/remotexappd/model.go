@@ -77,6 +77,7 @@ type sessionRecovery struct {
 // control fields remain on instance only so pre-App-Package runtime manifests
 // can be adopted; they must never leak into the V1 public API.
 type publicInstanceView struct {
+	Recovery          *publicRecovery              `json:"recovery,omitempty"`
 	Versions          *runtimeVersions             `json:"versions,omitempty"`
 	Upgrade           *upgradeStatus               `json:"upgrade,omitempty"`
 	ID                string                       `json:"id"`
@@ -247,6 +248,7 @@ type managedPatchRequest struct {
 }
 
 type manager struct {
+	viewerChannels  map[*viewerChannel]struct{}
 	cfg             config
 	bootID          string
 	mu              sync.RWMutex

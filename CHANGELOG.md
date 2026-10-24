@@ -15,6 +15,12 @@ Prepare the proposed Core 0.16.0 KasmVNC replacement evaluation, including
 container audio and clipboard acceptance gates. Documentation only; current
 binaries and runtime behavior remain at the released 0.15.0 baseline.
 
+- Propose a native Kasm architecture from the frozen research baseline, with
+  explicit keep/adapt/replace decisions, SDK and host integration contracts,
+  optional UDP endpoint/privacy/authorization design, per-session audio and
+  migration gates. KNA-001–010 and AUD-002 await owner review; this documentation
+  neither implements the proposal nor transfers historical UAT to a new release.
+
 ## 0.15.0 — 2026-10-21
 
 Target: `0.15.0`. Published.

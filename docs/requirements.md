@@ -11,8 +11,36 @@ The owner selected feasibility investigation on 2026-10-21. KVE-001–008 in
 [the evaluation matrix](kasmvnc-0.16.0-evaluation.md#acceptance-matrix) are stable
 evaluation requirements; none is implemented or accepted by this planning PR.
 [Issue #24](https://github.com/woodegg/remotexapp/issues/24) tracks evidence and
-go/no-go. AUD-001 governs audio. Existing display/input/clipboard/lifecycle
-contracts remain in force; accepted 0.15.0 behavior is not superseded here.
+go/no-go. The [2026-10-24 interpretation](kasmvnc-0.16.0-evaluation.md#2026-10-24--move-from-research-to-architecture-review)
+distinguishes historical API compatibility constraints from preserved safety
+semantics. Accepted 0.15.0 runtime behavior is not superseded by this proposal.
+
+## Proposed native architecture — owner review pending
+
+[Architecture detail](kasm-native-architecture.md) accepts KNP-BASELINE-20261024
+as research input, not production qualification. All entries below are
+**proposed**, not implemented or accepted. Stable IDs support subsequent
+implementation Issues; KVE-001–008 remain evaluation/qualification gates.
+
+| ID | Proposed requirement | Acceptance boundary |
+| --- | --- | --- |
+| KNA-001 | Pair and pin Kasm server/client behind a distinct display provider. Preserve Manager/App ownership, UID, HOME and App contracts; do not require legacy SDK method shapes. | WSS vertical slice with a single App and managed desktop; dependency/App audit and explicit SDK versioning |
+| KNA-002 | Extend generation/connection fencing to Viewer, UDP, clipboard and audio. Preserve explicit stop, shutdown veto, recovery budgets, populated-process protection and borrowed-bus ownership. | Both lifecycle backends, Manager restart, fault/race tests and actual reboot; no adoption of unknown resources |
+| KNA-003 | Use one native human-input path, OS-local IME shortcut policy and explicit programmatic text outcomes. No uncertain-input automatic replay or silent clipboard fallback. | Physical IME/focus/modifier matrix; target/order/cancel/permission and disconnect tests |
+| KNA-004 | Use native clipboard with honest format capabilities, consent, bounded data and generation/source fencing. | Text/HTML/PNG as qualified; clear versus no-op, multi-Viewer, denial and unsupported RTF/files explicitly tested |
+| KNA-005 | Make WSS complete and UDP optional, with actual transport status and bounded retry/fallback. UDP failure must not restart the App. | Actual frame evidence; loss/MTU/NAT/idle/reconnect tests; no reliable-control data dropped as frames |
+| KNA-006 | Use deployment-owned non-NAT host proxy endpoints plus trusted pre-container metadata filtering for the qualified IPv4 container privacy profile. | Container/host observations, SDP/header leak negatives, concurrent clients and unsupported topology rejection |
+| KNA-007 | Bind all transport permissions to principal/runtime/generation/Viewer/epoch; authenticate UDP independently of Access and revoke on expiry/logout/control loss. | Wrong/missing/retired credentials, replay, cross-account/generation and bounded revocation tests; deployment quotas |
+| KNA-008 | Separate host window/workspace references, Viewer lifetime, audio interests and App keepalive. | Real host hidden/closed/recreated window, multiple Tabs, login change and last-reference tests |
+| KNA-009 | Version provider-specific durable state and lock resources before launch; migrate/rollback only with scoped stop and preserved data. | Old/new format rejection/adoption, write failures, duplicate-port prevention and paired SDK/Core rollback rehearsal |
+| KNA-010 | Qualify exact product artifacts, clean distribution inputs, resource/performance and host integration separately from research/UAT history. | Fixed candidate plus workload/baseline/thresholds, corrected harness, actual cleanup, physical UAT and publication gates |
+| AUD-002 | Propose per-session audio domains and controls over one scoped mux connection, same-session multi-Tab deduplication, explicit multi-target mic with per-target writer ownership; default off. | Owner decisions on connection trigger/shared domains, real playback/readback, permission/owner/worker/outage tests; see [audio model](kasm-native-architecture.md#audio-model) |
+
+AUD-002 proposes replacing only AUD-001's global user-mix and single-mic-target
+scope for the native architecture. Shared connection, explicit permission,
+default-off, cross-Tab ownership and lifecycle safeguards remain. Neither audio
+proposal is shipped; acceptance must be recorded before implementation scope
+is locked.
 
 ## Selected Core 0.15.0 — managed desktop self-recovery
 

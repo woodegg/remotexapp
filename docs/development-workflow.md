@@ -93,6 +93,9 @@ that branch protection is active.
 
 [Issue #24](https://github.com/woodegg/remotexapp/issues/24) owns the
 [proposed 0.16.0 KasmVNC evaluation](kasmvnc-0.16.0-evaluation.md).
-Use the evaluation/go-no-go gate before creating implementation slices or
-changing the default transport. Core 0.15.0 is published; its completed
+The frozen research baseline now feeds the
+[native architecture review](kasm-native-architecture.md). Keep that work in
+a design-only Draft PR referencing #24 without closing it. Record owner choices
+before locking implementation slices; evaluate the new exact product candidate
+before changing the default transport. Core 0.15.0 is published; its completed
 candidate/UAT history above is not a pending release gate.

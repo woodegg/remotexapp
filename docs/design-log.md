@@ -4449,3 +4449,31 @@ label only. Unmigrated schema-2 records retain their legacy counter across
 recreation until eligible migration. Live acceptance must wait for the committed recovery phase, rather than
 treating transient server-ready state as transaction completion. Qualify fresh
 bytes after this correction; intermediate builds are not UAT acceptance.
+
+## 2026-10-24 — Propose native Kasm architecture from frozen research
+
+Status: proposed, owner architecture review pending. Issue #24 receives the
+frozen KNP-BASELINE-20261024 research findings through the detailed
+[architecture proposal](kasm-native-architecture.md). This is design work only;
+it neither implements a provider nor accepts a new production default.
+
+Preserve Manager/App ownership, user data, non-root separation, pinned runtime
+identities, generation fencing, stop/veto and bounded self-recovery. Propose
+native display/input/clipboard and a versioned SDK/host adapter instead of
+requiring legacy IBus acknowledgements and method shapes. The new
+`displayProvider` is distinct from the existing lifecycle `backend` field.
+
+Propose complete WSS with optional per-Viewer UDP through deployment-owned
+non-NAT container proxies; combine trusted pre-container metadata filtering
+with separate session authorization, credential retirement and bounded
+revocation. Audio remains a separate scoped mux connection. AUD-002 proposes
+session domains, same-session multi-Tab controls and explicit multi-target mic,
+superseding AUD-001's mixed-user/single-target scope only after owner review.
+Connection timing and isolation choices are explicit review decisions.
+
+KNA-001–010/AUD-002 record proposed requirements. Historical 0.15.0 decisions
+remain accepted. Natural 8-hour transmission checks support development, but
+overall resource qualification, current combined-candidate UAT, clean
+distribution, real host integration and product lifecycle remain gates.
+No running runtime migration, deployment, version bump or release follows from
+this design PR; record accepted choices before starting scoped implementation.

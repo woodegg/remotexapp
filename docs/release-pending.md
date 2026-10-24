@@ -29,6 +29,13 @@ browser termination, host/service crash, logout, transfer and eventual expiry.
 
 ## AUD-001 — server-scoped shared audio integration
 
+Historical proposal, not shipped. The 2026-10-24
+[AUD-002 native audio proposal](kasm-native-architecture.md#audio-model)
+requests owner review of session audio domains, same-session shared controls,
+multiple explicit mic targets and lazy connection establishment. Its proposed
+replacement scope is recorded in [requirements](requirements.md#proposed-native-architecture--owner-review-pending).
+Until reviewed, neither proposal is a locked implementation requirement.
+
 Integrate shared speaker playback and microphone through one bidirectional
 audio connection per server per client coordination scope. The remote audio
 service belongs to the sandbox/Linux user and is shared across its runtimes
@@ -48,7 +55,7 @@ runtime operation. A future integration must establish permission/gesture,
 owner-transfer, reconnection, shared-user trust and resource-cleanup contracts
 and test them with actual playback/microphone and multiple Tabs.
 
-The [KasmVNC evaluation](kasmvnc-0.16.0-evaluation.md) applies this contract.
-Any future implementation plan must be reviewed against AUD-001 before
-promotion. Audio transport and controls are outside the shipped Coordinator
-contract; no unpublished plan is a public dependency.
+The [KasmVNC evaluation](kasmvnc-0.16.0-evaluation.md) retains this original
+scope for comparison. Review the explicit AUD-002 differences before promotion.
+Audio transport and controls are outside the shipped Coordinator contract;
+no unpublished plan is a public dependency.

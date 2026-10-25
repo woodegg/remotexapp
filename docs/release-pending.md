@@ -31,10 +31,13 @@ browser termination, host/service crash, logout, transfer and eventual expiry.
 
 Historical proposal, not shipped. The 2026-10-24
 [AUD-002 native audio proposal](kasm-native-architecture.md#audio-model)
-requests owner review of session audio domains, same-session shared controls,
-multiple explicit mic targets and lazy connection establishment. Its proposed
+requests owner review of session audio domains, same-session shared controls
+and multiple explicit mic targets. Connection timing (R3) was accepted as a
+design decision on 2026-10-25: connect on the first enabled speaker/mic, reuse
+within the scope and release when all are off; silence does not disconnect.
+Its proposed
 replacement scope is recorded in [requirements](requirements.md#proposed-native-architecture--owner-review-pending).
-Until reviewed, neither proposal is a locked implementation requirement.
+The remaining choices are not locked implementation requirements.
 
 Integrate shared speaker playback and microphone through one bidirectional
 audio connection per server per client coordination scope. The remote audio

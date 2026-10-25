@@ -16,7 +16,9 @@ This selects investigation, not a default transport switch. VERSION remains
 0.15.0 until feasibility and implementation scope are accepted. SDK/App version
 changes depend on the resulting contracts. The frozen research baseline now
 feeds the [native architecture proposal](kasm-native-architecture.md), with
-KNA-001–010 and AUD-002 pending owner review. AUD-002 explicitly proposes changes
+KNA-001–010 and the remaining AUD-002 choices pending owner review. AUD-002's
+connection timing (R3) was accepted as a design decision on 2026-10-25, without
+implementation acceptance. AUD-002 explicitly proposes changes
 to the original AUD-001 audio scope; KasmVNC and optional audio services remain
 separate components. This design stage does not change current runtime behavior.
 

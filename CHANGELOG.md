@@ -18,8 +18,12 @@ binaries and runtime behavior remain at the released 0.15.0 baseline.
 - Propose a native Kasm architecture from the frozen research baseline, with
   explicit keep/adapt/replace decisions, SDK and host integration contracts,
   optional UDP endpoint/privacy/authorization design, per-session audio and
-  migration gates. KNA-001–010 and AUD-002 await owner review; this documentation
+  migration gates. The architecture remains under owner review; this documentation
   neither implements the proposal nor transfers historical UAT to a new release.
+- Record accepted audio connection timing (R3, 2026-10-25): connect when an
+  App's speaker or mic is enabled, share within the server/client scope, and
+  release when all are off. App launch alone and temporary silence do not
+  change the connection. Other architecture choices and implementation remain pending.
 
 ## 0.15.0 — 2026-10-21
 

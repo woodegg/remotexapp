@@ -4477,3 +4477,22 @@ overall resource qualification, current combined-candidate UAT, clean
 distribution, real host integration and product lifecycle remain gates.
 No running runtime migration, deployment, version bump or release follows from
 this design PR; record accepted choices before starting scoped implementation.
+
+## 2026-10-25 — Accept audio connection lifetime only
+
+Status: R3 design accepted by the owner; implementation and qualification
+pending. This supersedes only the connection-timing choice left open in the
+2026-10-24 [native architecture proposal](kasm-native-architecture.md#audio-model).
+
+Within one server/client coordination scope, establish the shared audio
+connection when at least one Remote App's speaker or mic is enabled. Additional
+App audio subscriptions reuse it; disabling one App does not close it while
+another remains enabled. Release the connection and capture devices when all
+speaker/mic controls are off. Merely launching an App does not connect, and an
+enabled but silent App does not cause disconnect/reconnect cycles. Display,
+keyboard and clipboard connections remain independent; device permission and
+authorization requirements still apply.
+
+The owner confirmed this rule after the two-App example. This does not accept
+R1/R2/R4/R5/R6, the entire AUD-002 proposal, implementation, UAT, a default switch
+or deployment. Keep PR #29 in draft for the remaining architecture review.

@@ -1,6 +1,7 @@
 # Kasm 原生 RemoteXApp 架构提案 / Native architecture proposal
 
 状态：**提案（Proposed），等待架构审阅，未实现、未切换默认值。**
+审阅更新：2026-10-25 已确认 R3 音频连接时机；其他决定仍待审阅。
 日期：2026-10-24。跟踪：[Issue #24](https://github.com/woodegg/remotexapp/issues/24)。
 对照源码：`55ac56742c1938de854a177e5664e78d0efdc97d`，Core 0.15.0 / SDK 0.30.0。
 0.16.0 仍为拟议发布列车，具体 SDK、App、状态格式版本在接口审阅后确定。
@@ -354,9 +355,16 @@ base path、origin、profile/存储分区和登录身份；跨浏览器/profile 
 | 最后一个 session/reference 关闭 | 关闭音频通道并释放设备；失联引用由有界 lease 回收 |
 | 浏览器后台冻结/owner 消失 | 暂停/到期可见；speaker 可以有序转移；mic 不在没有用户可见授权的情况下静默重启 |
 
-**待用户选择的连接时机：**建议“至少一个音频功能启用才连接”，与 PoC 一致。
-用户最初的“只要 session 打开就建立通道”也可实现为 idle control connection，
-但不应提前申请 mic 或编码；两者不是同一个需求，审阅时必须明确。
+**已确认的连接时机（R3，2026-10-25）：**同一服务器/客户端协调作用域内，
+至少一个 Remote App 的扬声器（Speaker）或麦克风（Mic）启用时建立共享音频连接；
+其余 App 启用音频时复用该连接。所有 App 的 speaker/mic 都关闭后释放连接与采集设备。
+仅启动 App 不连接；开关已启用但暂时没有声音时仍保持连接，不按声音包是否到达反复重连。
+这个决定取代最初“session 打开即建立 idle 音频连接”的备选语义；显示、键盘和剪贴板
+连接独立运行。这是设计接受，不是实现或运行验收。
+
+例如 A、B 都已启动但音频关闭时不连接；开启 A 的 speaker 后连接，再开启 B 的 mic
+则复用连接；关闭 A 的 speaker 时因 B 的 mic 仍启用而保持连接；最后关闭 B 的 mic
+才释放连接。该连接规则不改变用户权限和设备授权要求。
 
 SharedWorker 是已研究的跨 Tab 实现方向。产品按实际浏览器能力选择；没有可用
 协调器时应明确限制共享功能或限定单 Tab，而不是无声创建多条通道/重复播放。
@@ -443,13 +451,14 @@ encoder/native server、CPU、带宽、交互延迟、画质、实际清理。�
 
 ## 11. 提交用户审阅的决定 / Review decisions
 
-所有建议目前均为 **proposed**，并非通过建分支或提交 PR 就已接受。
+R3 音频连接时机已于 2026-10-25 获用户确认；R1、R2、R4、R5、R6 仍为
+**proposed**。接受一个设计选项不等于整份架构或实现验收通过。
 
 | 决定 | 推荐 | 代价或尚待确认 |
 | --- | --- | --- |
 | R1 兼容策略 | 保留用户/数据/生命周期语义；宿主适配新 native SDK，不强保旧方法/桥接 | 宿主需要配对发布；旧 session 的 adapter 必须明确选择 |
 | R2 UDP | WSS 完整基础路径；合格容器部署可选 prefer-udp，有限静态端口池 + non-NAT proxy | 需要宿主公网入口和运维配置；任意 NAT/IPv6/TURN 不在首期承诺 |
-| R3 音频连接时机 | 至少一项音频启用时连接，全部关闭后释放 | 与“session 一开就连接”不同；若选后者，保持 idle 通道但仍不提前采集 |
+| R3 音频连接时机（已确认） | 至少一个 Remote App 的 speaker 或 mic 启用才连接，同作用域复用，全部关闭后释放 | 2026-10-25 设计接受；仅启动 App 不连接，静音期间保持连接；实现/测试尚未完成 |
 | R4 同 session 多 Tab 与 mic | 共同会话开关、唯一 playback owner；一个 capture 发往显式多个目标，每目标唯一 writer | 必须让所有 Tab 看见开关/owner/冲突，不能偷偷 takeover |
 | R5 音频域 | 新 session 尽量隔离；借用用户桌面只明确声明 user-shared | 同 UID 路由需新增实现/验证；无法隔离时不承诺 per-App 静音 |
 | R6 首期范围 | 先 WSS + 单 App/managed desktop，再输入/音频/UDP；文件复制和未验浏览器单列 | 不用补齐所有 PoC 未决项才开工，但对应发布承诺仍受门禁约束 |

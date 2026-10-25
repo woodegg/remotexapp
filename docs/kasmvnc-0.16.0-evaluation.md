@@ -29,7 +29,7 @@ baseline, not a second requirement to rebuild every legacy bridge.
 | KVE-002 | Native input/display evidence supports development; the current exact candidate and physical platform matrix remain product gates. |
 | KVE-003 | Preserve ordering, authorization, readiness and generation fencing; use explicit new input outcomes instead of requiring the old IBus ACK protocol. |
 | KVE-004 | Preserve consent, limits, clear/no-op semantics and stale-data protection; publish format capabilities instead of forcing every legacy method/mode. Files/RTF are not implicitly supported. |
-| KVE-005 | AUD-001 is the historical proposal; AUD-002 proposes session routing and explicit multiple mic targets while retaining shared-connection, default-off and ownership safeguards. Owner review is pending. |
+| KVE-005 | AUD-001 is the historical proposal; AUD-002 proposes session routing and explicit multiple mic targets while retaining shared-connection, default-off and ownership safeguards. Connection timing (R3) was accepted as a design decision on 2026-10-25; other choices remain pending. |
 | KVE-006 | Manager adoption, both lifecycle backends, data protection, recovery and actual reboot still need product integration evidence. |
 | KVE-007 | The completed natural 8-hour transmission checks do not settle resource qualification or establish a performance improvement; candidate A/B remains open. |
 | KVE-008 | Architecture review may unlock scoped implementation. Default switch, exact-candidate qualification, human UAT and publication remain separate decisions. |

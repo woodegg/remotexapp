@@ -18,8 +18,9 @@ semantics. Accepted 0.15.0 runtime behavior is not superseded by this proposal.
 ## Proposed native architecture — owner review pending
 
 [Architecture detail](kasm-native-architecture.md) accepts KNP-BASELINE-20261024
-as research input, not production qualification. All entries below are
-**proposed**, not implemented or accepted. Stable IDs support subsequent
+as research input, not production qualification. Entries below remain
+**proposed** except AUD-002's connection-lifetime clause, accepted as a design
+decision on 2026-10-25 (R3). None is implemented by this design PR. Stable IDs support subsequent
 implementation Issues; KVE-001–008 remain evaluation/qualification gates.
 
 | ID | Proposed requirement | Acceptance boundary |
@@ -34,7 +35,7 @@ implementation Issues; KVE-001–008 remain evaluation/qualification gates.
 | KNA-008 | Separate host window/workspace references, Viewer lifetime, audio interests and App keepalive. | Real host hidden/closed/recreated window, multiple Tabs, login change and last-reference tests |
 | KNA-009 | Version provider-specific durable state and lock resources before launch; migrate/rollback only with scoped stop and preserved data. | Old/new format rejection/adoption, write failures, duplicate-port prevention and paired SDK/Core rollback rehearsal |
 | KNA-010 | Qualify exact product artifacts, clean distribution inputs, resource/performance and host integration separately from research/UAT history. | Fixed candidate plus workload/baseline/thresholds, corrected harness, actual cleanup, physical UAT and publication gates |
-| AUD-002 | Propose per-session audio domains and controls over one scoped mux connection, same-session multi-Tab deduplication, explicit multi-target mic with per-target writer ownership; default off. | Owner decisions on connection trigger/shared domains, real playback/readback, permission/owner/worker/outage tests; see [audio model](kasm-native-architecture.md#audio-model) |
+| AUD-002 | Propose per-session audio domains and controls over one scoped mux connection, same-session multi-Tab deduplication, explicit multi-target mic with per-target writer ownership; default off. Connection lifetime accepted: connect when at least one App's speaker or mic is enabled, share within the scope, release when all are off; App launch alone does not connect and silence does not disconnect. | R3 design accepted 2026-10-25; remaining choices await review. Verify first enable, additional subscription, partial disable, final disable and enabled-but-silent behavior, plus real playback/readback, permission/owner/worker/outage tests; see [audio model](kasm-native-architecture.md#audio-model) |
 
 AUD-002 proposes replacing only AUD-001's global user-mix and single-mic-target
 scope for the native architecture. Shared connection, explicit permission,

@@ -11,6 +11,8 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+Target: `0.16.0-dev.1`. Development only.
+
 Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
 remains the default; implementation qualification is tracked in Issue #30.
 Development identities are Core `0.16.0-dev.1` and SDK `0.31.0-dev.1`;

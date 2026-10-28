@@ -23,15 +23,16 @@ const runtimeManifestSchema = 2
 // anonymous runtimes use the same record; ManagedID is only a foreign key to
 // the separate desired-state registration.
 type runtimeManifestRecord struct {
-	SchemaVersion int                     `json:"schemaVersion"`
-	Backend       string                  `json:"backend,omitempty"`
-	DesiredState  string                  `json:"desiredState"`
-	Runtime       instance                `json:"runtime"`
-	Overrides     instanceOverrides       `json:"overrides,omitempty"`
-	ResolvedSpec  classConfig             `json:"resolvedSpec"`
-	AppPackage    *appPackageReference    `json:"appPackage,omitempty"`
-	Components    runtimeComponents       `json:"components"`
-	Recovery      *managedSessionRecovery `json:"recovery,omitempty"`
+	SchemaVersion   int                     `json:"schemaVersion"`
+	Backend         string                  `json:"backend,omitempty"`
+	DisplayProvider string                  `json:"displayProvider,omitempty"`
+	DesiredState    string                  `json:"desiredState"`
+	Runtime         instance                `json:"runtime"`
+	Overrides       instanceOverrides       `json:"overrides,omitempty"`
+	ResolvedSpec    classConfig             `json:"resolvedSpec"`
+	AppPackage      *appPackageReference    `json:"appPackage,omitempty"`
+	Components      runtimeComponents       `json:"components"`
+	Recovery        *managedSessionRecovery `json:"recovery,omitempty"`
 }
 
 func (m *manager) runtimeManifestDir() string {
@@ -64,6 +65,9 @@ func (m *manager) persistRuntime(item *instance) error {
 	}
 	if record.Recovery != nil {
 		record.SchemaVersion = runtimeRecoverySchema
+	}
+	if isKasm(item) {
+		record.SchemaVersion, record.DisplayProvider = nativeManifestSchema, "kasm"
 	}
 	if record.DesiredState == "" {
 		record.DesiredState = "running"
@@ -205,10 +209,17 @@ func (m *manager) loadRuntimeManifests() ([]runtimeManifestRecord, error) {
 }
 
 func (m *manager) validateRuntimeManifest(path string, record *runtimeManifestRecord) error {
-	if record.SchemaVersion != runtimeManifestSchema && record.SchemaVersion != runtimeRecoverySchema {
+	if record.SchemaVersion != runtimeManifestSchema && record.SchemaVersion != runtimeRecoverySchema && record.SchemaVersion != nativeManifestSchema {
 		return fmt.Errorf("load runtime manifest %s: unsupported schemaVersion %d", path, record.SchemaVersion)
 	}
-	if record.SchemaVersion == runtimeRecoverySchema {
+	if record.SchemaVersion == nativeManifestSchema {
+		if record.DisplayProvider != "kasm" || displayProvider(record.Components) != "kasm" {
+			return errors.New("schema 4 requires a pinned Kasm display provider")
+		}
+	} else if record.DisplayProvider != "" || displayProvider(record.Components) != "tigervnc" {
+		return errors.New("legacy runtime schema cannot contain a native display provider")
+	}
+	if record.SchemaVersion == runtimeRecoverySchema || record.SchemaVersion == nativeManifestSchema && record.Recovery != nil {
 		if err := validateManagedRecovery(record.Recovery, &record.Runtime, record.ResolvedSpec); err != nil {
 			return fmt.Errorf("load runtime manifest %s: %w", path, err)
 		}
@@ -293,8 +304,11 @@ func (m *manager) validateRuntimeManifest(path string, record *runtimeManifestRe
 			}
 		}
 	}
-	if record.Components.GatewayBinary == "" || record.Components.UnicodeEngine == "" {
+	if record.Components.GatewayBinary == "" {
 		return fmt.Errorf("load runtime manifest %s: incomplete component snapshot", path)
+	}
+	if err := validateDisplayComponents(record.Components, false); err != nil {
+		return err
 	}
 	expectedRuntime := filepath.Join(m.cfg.stateDir, "instances", item.ID)
 	if filepath.Clean(item.Runtime) != expectedRuntime {
@@ -655,9 +669,14 @@ func (m *manager) checkRuntimeAdoption(item *instance) error {
 	}
 	lockedPaths := []string{
 		item.Components.GatewayBinary,
-		item.Components.UnicodeEngine,
 		item.Spec.Server.Driver,
 		item.Spec.Session.Driver,
+	}
+	if err := validateDisplayComponents(item.Components, true); err != nil {
+		return err
+	}
+	if !isKasm(item) {
+		lockedPaths = append(lockedPaths, item.Components.UnicodeEngine)
 	}
 	if item.Spec.Session.Status.Mode == "driver" {
 		lockedPaths = append(lockedPaths, item.Components.StatusBinary)
@@ -717,7 +736,7 @@ func (m *manager) checkRuntimeAdoption(item *instance) error {
 		if err := m.checkSessionServices(item); err != nil {
 			return err
 		}
-		if !socketExists(filepath.Join(item.SocketRuntime, "unicode.sock")) {
+		if !isKasm(item) && !socketExists(filepath.Join(item.SocketRuntime, "unicode.sock")) {
 			return errors.New("session Unicode socket is unavailable")
 		}
 		if item.Spec.Control.Protocol != "" && !portBusy(item.ControlPort) {

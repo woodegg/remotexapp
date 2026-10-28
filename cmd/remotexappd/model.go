@@ -3,6 +3,8 @@ package main
 import (
 	"sync"
 	"time"
+
+	"github.com/woodegg/remotexapp/internal/kasmbundle"
 )
 
 type instance struct {
@@ -77,41 +79,43 @@ type sessionRecovery struct {
 // control fields remain on instance only so pre-App-Package runtime manifests
 // can be adopted; they must never leak into the V1 public API.
 type publicInstanceView struct {
-	Recovery          *publicRecovery              `json:"recovery,omitempty"`
-	Versions          *runtimeVersions             `json:"versions,omitempty"`
-	Upgrade           *upgradeStatus               `json:"upgrade,omitempty"`
-	ID                string                       `json:"id"`
-	ClassID           string                       `json:"classId"`
-	TemplateID        string                       `json:"templateId"`
-	DriverVersion     string                       `json:"driverVersion"`
-	ManagedID         string                       `json:"managedInstanceId,omitempty"`
-	ProfileRef        string                       `json:"profileRef"`
-	WorkspaceMode     string                       `json:"workspaceMode"`
-	EffectivePolicy   effectivePolicy              `json:"effectivePolicy"`
-	Parameters        map[string]any               `json:"parameters,omitempty"`
-	ApplicationStatus *applicationStatus           `json:"applicationStatus,omitempty"`
-	SessionGeneration int64                        `json:"sessionGeneration"`
-	State             string                       `json:"state"`
-	Display           string                       `json:"display"`
-	Resources         map[string]allocatedResource `json:"resources"`
-	ViewerURL         string                       `json:"viewerUrl,omitempty"`
-	CreatedAt         time.Time                    `json:"createdAt"`
-	Error             string                       `json:"error,omitempty"`
-	SessionState      string                       `json:"sessionState"`
-	StartupFailure    *startupFailure              `json:"startupFailure,omitempty"`
-	SessionRecovery   *sessionRecovery             `json:"sessionRecovery,omitempty"`
-	AttachedClients   int                          `json:"attachedClients"`
-	Shutdown          *shutdownStatus              `json:"shutdown,omitempty"`
-	Home              string                       `json:"homePath,omitempty"`
-	XAuthority        string                       `json:"xauthorityPath,omitempty"`
-	Runtime           string                       `json:"runtimePath,omitempty"`
-	SocketRuntime     string                       `json:"socketRuntimePath,omitempty"`
-	RFBAddr           string                       `json:"internalRfbAddress,omitempty"`
-	GatewayAddr       string                       `json:"internalGatewayAddress,omitempty"`
-	VNCUnit           string                       `json:"vncUnit,omitempty"`
-	ServerUnit        string                       `json:"serverUnit,omitempty"`
-	GatewayUnit       string                       `json:"gatewayUnit,omitempty"`
-	SessionUnit       string                       `json:"sessionUnit,omitempty"`
+	DisplayProvider        string                       `json:"displayProvider"`
+	DisplayComponentDigest string                       `json:"displayComponentDigest,omitempty"`
+	Recovery               *publicRecovery              `json:"recovery,omitempty"`
+	Versions               *runtimeVersions             `json:"versions,omitempty"`
+	Upgrade                *upgradeStatus               `json:"upgrade,omitempty"`
+	ID                     string                       `json:"id"`
+	ClassID                string                       `json:"classId"`
+	TemplateID             string                       `json:"templateId"`
+	DriverVersion          string                       `json:"driverVersion"`
+	ManagedID              string                       `json:"managedInstanceId,omitempty"`
+	ProfileRef             string                       `json:"profileRef"`
+	WorkspaceMode          string                       `json:"workspaceMode"`
+	EffectivePolicy        effectivePolicy              `json:"effectivePolicy"`
+	Parameters             map[string]any               `json:"parameters,omitempty"`
+	ApplicationStatus      *applicationStatus           `json:"applicationStatus,omitempty"`
+	SessionGeneration      int64                        `json:"sessionGeneration"`
+	State                  string                       `json:"state"`
+	Display                string                       `json:"display"`
+	Resources              map[string]allocatedResource `json:"resources"`
+	ViewerURL              string                       `json:"viewerUrl,omitempty"`
+	CreatedAt              time.Time                    `json:"createdAt"`
+	Error                  string                       `json:"error,omitempty"`
+	SessionState           string                       `json:"sessionState"`
+	StartupFailure         *startupFailure              `json:"startupFailure,omitempty"`
+	SessionRecovery        *sessionRecovery             `json:"sessionRecovery,omitempty"`
+	AttachedClients        int                          `json:"attachedClients"`
+	Shutdown               *shutdownStatus              `json:"shutdown,omitempty"`
+	Home                   string                       `json:"homePath,omitempty"`
+	XAuthority             string                       `json:"xauthorityPath,omitempty"`
+	Runtime                string                       `json:"runtimePath,omitempty"`
+	SocketRuntime          string                       `json:"socketRuntimePath,omitempty"`
+	RFBAddr                string                       `json:"internalRfbAddress,omitempty"`
+	GatewayAddr            string                       `json:"internalGatewayAddress,omitempty"`
+	VNCUnit                string                       `json:"vncUnit,omitempty"`
+	ServerUnit             string                       `json:"serverUnit,omitempty"`
+	GatewayUnit            string                       `json:"gatewayUnit,omitempty"`
+	SessionUnit            string                       `json:"sessionUnit,omitempty"`
 }
 
 type effectivePolicy struct {
@@ -151,11 +155,13 @@ type createRequest struct {
 }
 
 type runtimeComponents struct {
-	Identity      *coreIdentity `json:"identity,omitempty"`
-	GatewayBinary string        `json:"gatewayBinary"`
-	StatusBinary  string        `json:"statusBinary"`
-	UnicodeEngine string        `json:"unicodeEngine"`
-	CoreDriverDir string        `json:"coreDriverDir,omitempty"`
+	DisplayProvider string          `json:"displayProvider,omitempty"`
+	Kasm            *kasmbundle.Pin `json:"kasm,omitempty"`
+	Identity        *coreIdentity   `json:"identity,omitempty"`
+	GatewayBinary   string          `json:"gatewayBinary"`
+	StatusBinary    string          `json:"statusBinary"`
+	UnicodeEngine   string          `json:"unicodeEngine"`
+	CoreDriverDir   string          `json:"coreDriverDir,omitempty"`
 }
 
 type shutdownStatus struct {

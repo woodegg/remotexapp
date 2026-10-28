@@ -67,6 +67,7 @@ workflow-check:
 test: web-assets performance-docs-check
 	go test ./...
 	node --test cmd/remotexappd/web/sdk/*.test.mjs
+	node --test third_party/kasm/tests/*.test.mjs
 	node --test tests/app-package/*.test.mjs
 	node --test tests/evidence/*.test.mjs
 	node --test apps/*/tests/*.test.mjs

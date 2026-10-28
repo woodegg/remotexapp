@@ -1,0 +1,47 @@
+--- a/common/network/TcpSocket.cxx
++++ b/common/network/TcpSocket.cxx
+@@ -719,12 +719,8 @@
+   pthread_t tid;
+   pthread_create(&tid, NULL, start_server, NULL);
+ 
+-  uint16_t *nport = (uint16_t *) calloc(1, sizeof(uint16_t));
+-  if (rfb::Server::udpPort)
+-    *nport = rfb::Server::udpPort;
+-  else
+-    *nport = ntohs(sa.u.sin.sin_port);
+-  pthread_create(&tid, NULL, udpserver, nport);
++  // RemoteXApp D1 is WSS-only: no UDP listener or discovery worker.
++
+ }
+ 
+ Socket* WebsocketListener::createSocket(int fd) {
+--- a/common/rfb/SMsgReader.cxx
++++ b/common/rfb/SMsgReader.cxx
+@@ -355,26 +355,7 @@
+ 
+ void SMsgReader::readUpgradeToUdp()
+ {
+-  char buf[4096], resp[4096];
+-  rdr::U16 len = is->readU16();
+-
+-  if (len >= sizeof(buf)) {
+-    vlog.error("Ignoring udp upgrade with too large payload");
+-    is->skip(len);
+-    return;
+-  }
+-
+-  if (!len) {
+-    handler->udpDowngrade(false);
+-    return;
+-  }
+-
+-  is->readBytes(buf, len);
+-  buf[len] = '\0';
+-
+-  const uint64_t clientID = wuGotHttp(buf, len, resp);
+-
+-  handler->udpUpgrade(resp, clientID);
++  throw Exception("UDP is unavailable in the WSS-only component");
+ }
+ 
+ void SMsgReader::readSubscribeUnixRelay()

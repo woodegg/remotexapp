@@ -20,7 +20,9 @@ semantics. Accepted 0.15.0 runtime behavior is not superseded by this proposal.
 [Architecture detail](kasm-native-architecture.md) accepts KNP-BASELINE-20261024
 as research input, not production qualification. Entries below remain
 **proposed** except AUD-002's connection-lifetime clause, accepted as a design
-decision on 2026-10-25 (R3). None is implemented by this design PR. Stable IDs support subsequent
+decision on 2026-10-25 (R3). D1 implementation and its bounded automated matrix are recorded in
+[the native qualification results](../tests/kasm-native/README.md); they do not
+qualify the remaining architecture. Stable IDs support subsequent
 implementation Issues; KVE-001–008 remain evaluation/qualification gates.
 
 On 2026-10-28 the owner approved the bounded D1 implementation scope in
@@ -30,13 +32,23 @@ and nine acceptance groups. Applicable provider, generation, persistence and
 recovery requirements are selected for D1; complete host integration, audio,
 UDP and publication are not accepted by that scope approval.
 
+D1 implements the WSS parts of KNA-001/002/005/007/009 with explicit
+`display-provider=kasm`, a separately installed manifest-pinned pair and
+schema 4. Legacy schema 2/3 remain TigerVNC. Native Viewer preparation and
+attach require current generation; readiness requires App ready plus paint.
+The native session retains the Core supervisor and D-Bus, with no mandatory
+IBus/Unicode service. Ordinary upgrade cannot change display provider.
+Real App, both-backend reboot, recovery, cleanup and scoped rollback evidence
+is recorded in the D1 results; Issue #30 and PR #31 own acceptance/merge.
+D2 input/clipboard and later transports remain pending.
+
 | ID | Proposed requirement | Acceptance boundary |
 | --- | --- | --- |
-| KNA-001 | Pair and pin Kasm server/client behind a distinct display provider. Preserve Manager/App ownership, UID, HOME and App contracts; do not require legacy SDK method shapes. | WSS vertical slice with a single App and managed desktop; dependency/App audit and explicit SDK versioning |
-| KNA-002 | Extend generation/connection fencing to Viewer, UDP, clipboard and audio. Preserve explicit stop, shutdown veto, recovery budgets, populated-process protection and borrowed-bus ownership. | Both lifecycle backends, Manager restart, fault/race tests and actual reboot; no adoption of unknown resources |
+| KNA-001 | Pair and pin Kasm server/client behind a distinct display provider. Preserve Manager/App ownership, UID, HOME and App contracts; do not require legacy SDK method shapes. | WSS vertical slice with a single App and managed desktop; dependency/App audit and explicit SDK versioning; server-enforced class rendering/resize policy |
+| KNA-002 | Extend generation/connection fencing to Viewer, UDP, clipboard and audio. Preserve explicit stop, shutdown veto, recovery budgets, populated-process protection and borrowed-bus ownership. Unexpected user-home Driver/supervisor loss must not trigger descendant cleanup; systemd retains populated units with `ExitType=cgroup`, while explicit stop and current-generation clean logout retain cleanup. | Both lifecycle backends, Manager restart, fault/race tests and actual reboot; no adoption of unknown resources |
 | KNA-003 | Use one native human-input path, OS-local IME shortcut policy and explicit programmatic text outcomes. No uncertain-input automatic replay or silent clipboard fallback. | Physical IME/focus/modifier matrix; target/order/cancel/permission and disconnect tests |
 | KNA-004 | Use native clipboard with honest format capabilities, consent, bounded data and generation/source fencing. | Text/HTML/PNG as qualified; clear versus no-op, multi-Viewer, denial and unsupported RTF/files explicitly tested |
-| KNA-005 | Make WSS complete and UDP optional, with actual transport status and bounded retry/fallback. UDP failure must not restart the App. | Actual frame evidence; loss/MTU/NAT/idle/reconnect tests; no reliable-control data dropped as frames |
+| KNA-005 | Make WSS complete and UDP optional, with actual transport status and bounded retry/fallback. UDP failure must not restart the App. | Actual frame evidence, including complete-message draining and transactional split-message parsing; loss/MTU/NAT/idle/reconnect tests; no reliable-control data dropped as frames |
 | KNA-006 | Use deployment-owned non-NAT host proxy endpoints plus trusted pre-container metadata filtering for the qualified IPv4 container privacy profile. | Container/host observations, SDP/header leak negatives, concurrent clients and unsupported topology rejection |
 | KNA-007 | Bind all transport permissions to principal/runtime/generation/Viewer/epoch; authenticate UDP independently of Access and revoke on expiry/logout/control loss. | Wrong/missing/retired credentials, replay, cross-account/generation and bounded revocation tests; deployment quotas |
 | KNA-008 | Separate host window/workspace references, Viewer lifetime, audio interests and App keepalive. | Real host hidden/closed/recreated window, multiple Tabs, login change and last-reference tests |

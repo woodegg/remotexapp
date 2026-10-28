@@ -11,9 +11,31 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Prepare the proposed Core 0.16.0 KasmVNC replacement evaluation, including
-container audio and clipboard acceptance gates. Documentation only; current
-binaries and runtime behavior remain at the released 0.15.0 baseline.
+Target: `0.16.0-dev.1`. Development only.
+
+Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
+remains the default; implementation qualification is tracked in Issue #30.
+Development identities are Core `0.16.0-dev.1` and SDK `0.31.0-dev.1`;
+these are not published or UAT-qualified releases.
+
+- Preserve user-home applications after unexpected Driver/supervisor loss.
+  Systemd uses `ExitType=cgroup` (systemd 250 or newer); supervision does not
+  interpret Driver loss as permission to kill surviving editors. Explicit stop
+  and confirmed clean logout retain owned cleanup. This protection applies to
+  both display providers and both lifecycle backends.
+- Drain completed native control messages without waiting for another network
+  packet; parse variable codec capability payloads transactionally across
+  packet boundaries. Disable unadvertised printer/smartcard subscriptions.
+- Keep Kasm rendering settings under the server/class policy; client encoding
+  hints cannot silently replace the configured frame rate.
+- Add provider-specific component pins and schema-4 native runtime records;
+  schema 2/3 retain their legacy meaning. Provider changes require a scoped
+  stopped migration, and native sessions retain D-Bus without the legacy input
+  bridge. Kasm component installation is separate from the ordinary release.
+- Add authenticated, generation-bound native Viewer routes and a minimal
+  native SDK adapter. Readiness requires App readiness and actual painting;
+  disconnect/dispose release only the owned Viewer. Native clipboard, audio,
+  programmatic text and UDP are not advertised by this slice.
 
 - Propose a native Kasm architecture from the frozen research baseline, with
   explicit keep/adapt/replace decisions, SDK and host integration contracts,

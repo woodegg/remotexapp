@@ -119,7 +119,16 @@ func contentRevision(v any) string {
 }
 func identifyCore(c runtimeComponents) (*coreIdentity, error) {
 	hashes := map[string]string{}
-	for name, path := range map[string]string{"gateway": c.GatewayBinary, "status": c.StatusBinary, "engine": c.UnicodeEngine} {
+	paths := map[string]string{"gateway": c.GatewayBinary, "status": c.StatusBinary}
+	if displayProvider(c) == "kasm" {
+		if err := validateDisplayComponents(c, true); err != nil {
+			return nil, err
+		}
+		hashes["kasm-manifest"] = c.Kasm.SHA256
+	} else {
+		paths["engine"] = c.UnicodeEngine
+	}
+	for name, path := range paths {
 		d, err := componentDigest(path)
 		if err != nil {
 			return nil, err
@@ -198,13 +207,17 @@ func versionFor(spec classConfig, c runtimeComponents) runtimeVersion {
 	return runtimeVersion{Core: identity, App: a}
 }
 func (m *manager) currentComponents() runtimeComponents {
-	return runtimeComponents{GatewayBinary: m.cfg.gatewayBinary, StatusBinary: m.cfg.statusBinary, UnicodeEngine: m.cfg.engine, CoreDriverDir: m.cfg.coreDriverDir}
+	return m.newRuntimeComponents()
 }
 func downgrade(a, b string) bool {
 	return semver.IsValid("v"+a) && semver.IsValid("v"+b) && semver.Compare("v"+b, "v"+a) < 0
 }
 func (m *manager) versionView(item *instance) *runtimeVersions {
 	v := &runtimeVersions{Current: versionFor(item.Spec, item.Components)}
+	if displayProvider(item.Components) != displayProvider(m.currentComponents()) {
+		v.Reason = "display provider changes require a stopped, scoped migration"
+		return v
+	}
 	target, ok := m.cfg.classes[item.TemplateID]
 	if !ok {
 		v.Reason = "template is not enabled"
@@ -276,6 +289,9 @@ func (m *manager) setUpgrade(item *instance, u *runtimeUpgrade, phase, code, mes
 	return nil
 }
 func (m *manager) preflightUpgrade(item *instance, target classConfig) error {
+	if displayProvider(item.Components) != displayProvider(m.currentComponents()) {
+		return errors.New("display provider changes require a stopped, scoped migration")
+	}
 	if target.Package == nil {
 		return errors.New("upgrade requires an immutable App Package")
 	}

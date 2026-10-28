@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.30.0';
+export const SDK_VERSION: '0.31.0-dev.1';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -30,6 +30,7 @@ export interface RemoteXAppLoopbackTCPResource {
 }
 
 export interface RemoteXAppClass {
+  displayProvider?:'tigervnc'|'kasm';
   id: string; name: string; driverVersion:string; singleton: boolean; profileRef: string;
 	apiVersion?:'remotexapp/v1';
   runMode: 'shared' | 'isolated' | 'user-home';
@@ -39,7 +40,7 @@ export interface RemoteXAppClass {
   display: { mode:'fixed'|'dynamic'; number:number; size:string; depth:16|24; frameRate:number; allowClientResize:boolean };
   drivers?: { server:string; session:string; shutdown?:string };
   readiness: { serverPids:string[]; sessionPid:string; serverTimeout?:string; sessionTimeout?:string };
-	input: { backend:string; lifecycle:'server'|'session'; allowedWmClasses:string[] };
+	input: { backend:string; lifecycle:'server'|'session'; allowedWmClasses?:string[] };
 	ports?:Record<string,{kind:'loopback-tcp';port:number}>;
 	overrides?:{allowed:string[]};
 	dependencies?:{executables:string[];pythonModules:string[]};
@@ -68,6 +69,7 @@ export interface RemoteXAppRecovery {
 }
 
 export interface RemoteXAppInstance {
+  displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string;
   recovery?:RemoteXAppRecovery;
   versions?:RemoteXAppRuntimeVersions; upgrade?:RemoteXAppUpgradeStatus;
 	id:string; classId:string; templateId:string; driverVersion:string; managedInstanceId?:string; profileRef:string;
@@ -130,6 +132,19 @@ export interface RemoteXAppClipboardSnapshot {
 }
 
 export class RemoteXAppAPIError extends Error { status:number; body:unknown; }
+
+export class RemoteXAppNativeError extends Error { code:string; }
+export class RemoteXAppNativeClient extends EventTarget {
+  constructor(options:{container:HTMLElement;manager?:RemoteXAppManager;timeout?:number});
+  readonly state:'disconnected'|'connecting'|'ready'|'failed'|'disposed';
+  readonly instance?:RemoteXAppInstance;
+  readonly capabilities:{readonly display:'kasm-wss-v1';readonly pointer:true;readonly keyboard:true;
+    readonly clipboard:false;readonly programmaticText:false;readonly audio:false;readonly udp:false};
+  connect(instance?:string|RemoteXAppInstance):Promise<RemoteXAppInstance>;
+  reconnect():Promise<RemoteXAppInstance>;
+  disconnect():void;
+  dispose():void;
+}
 export interface RemoteXActions { instanceId:string; sessionGeneration:number; driverVersion:string; ready:boolean; actions:Record<string,{parameters:Record<string,unknown>;result:Record<string,unknown>;timeout:string}>; }
 export interface RemoteXActionResult { instanceId:string;sessionGeneration:number;action:string;result:Record<string,unknown>; }
 

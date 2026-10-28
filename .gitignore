@@ -5,3 +5,4 @@ bin/
 *.pptx
 __pycache__/
 *.pyc
+node_modules/

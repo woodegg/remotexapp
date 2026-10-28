@@ -23,6 +23,10 @@ import (
 const managerClipboardRequestLimit = (80 << 20) + (1 << 20)
 
 func (m *manager) serveClipboard(w http.ResponseWriter, r *http.Request, item *instance, parts []string) {
+	if isKasm(item) {
+		writeError(w, http.StatusNotImplemented, "legacy clipboard API is unavailable for the native provider")
+		return
+	}
 	if len(parts) < 3 || parts[1] != "clipboard" {
 		http.NotFound(w, r)
 		return
@@ -330,6 +334,9 @@ func validClipboardOfferID(value string) bool {
 }
 
 func (m *manager) setGatewayClipboardSession(item *instance, generation int64, active bool) error {
+	if isKasm(item) {
+		return nil
+	}
 	if item == nil || item.SocketRuntime == "" {
 		return nil
 	}

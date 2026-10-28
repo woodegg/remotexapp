@@ -334,6 +334,7 @@ export class RemoteXAppClient extends EventTarget {
     try {
       const selected = typeof instance === 'string' ? await this.manager.getInstance(instance) : instance;
       current();
+      if (selected.displayProvider === 'kasm') throw new Error('Kasm instances require RemoteXAppNativeClient');
       this.instance = selected;
       this.instanceId = selected.id;
       if (selected.state !== 'server-ready' && selected.state !== 'ready') {

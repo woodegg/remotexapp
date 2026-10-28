@@ -1,0 +1,1617 @@
+--- a/core/display.js
++++ b/core/display.js
+@@ -33,6 +33,9 @@
+             4 - int, index of current rect (post-processing)
+             5 - int, number of times requestAnimationFrame called _pushAsyncFrame and the frame had all rects, however, the frame was not marked complete
+         */
++        this._disposed = false;
++        this._asyncFrameRequest = null;
++        this._syncFrameRequest = null;
+         this._asyncFrameQueue = [];
+         this._maxAsyncFrameQueue = 3;
+         this._clearAsyncQueue();
+@@ -677,6 +680,11 @@
+     * Cleans up resources, should be called on a disconnect
+     */
+     dispose() {
++        this._disposed = true;
++        for (const name of ['_asyncFrameRequest', '_syncFrameRequest']) {
++            if (this[name] !== null) window.cancelAnimationFrame(this[name]);
++            this[name] = null;
++        }
+         if (this._frameStatsInterval) {
+             clearInterval(this._frameStatsInterval);
+             this._frameStatsInterval = null;
+@@ -1033,9 +1041,7 @@
+                 }
+                 break;
+             case 'frameComplete':
+-                window.requestAnimationFrame(() => {
+-                    this._pushSyncRects();
+-                });
++                this._scheduleSyncFrame();
+                 break;
+             case 'registered':
+                 if (!this._isPrimaryDisplay) {
+@@ -1062,6 +1068,25 @@
+                 break;
+ 
+         }
++    }
++
++    // Background tabs suspend RAF while UDP/secondary-screen messages continue.
++    // Bound callback ownership as well as the frame queues, including forced
++    // renders. Clear the handle before draining so remaining work can reschedule.
++    _scheduleAsyncFrame() {
++        if (this._disposed || this._asyncFrameRequest !== null) return;
++        this._asyncFrameRequest = window.requestAnimationFrame(() => {
++            this._asyncFrameRequest = null;
++            if (!this._disposed) this._pushAsyncFrame();
++        });
++    }
++
++    _scheduleSyncFrame() {
++        if (this._disposed || this._syncFrameRequest !== null) return;
++        this._syncFrameRequest = window.requestAnimationFrame(() => {
++            this._syncFrameRequest = null;
++            if (!this._disposed) this._pushSyncRects();
++        });
+     }
+ 
+     _pushSyncRects() {
+@@ -1120,7 +1145,7 @@
+         }
+ 
+         if (this._syncFrameQueue.length > 0) {
+-            window.requestAnimationFrame( () => { this._pushSyncRects(); });
++            this._scheduleSyncFrame();
+         }
+     }
+ 
+@@ -1293,7 +1318,7 @@
+         if (force && frameIx == 0) {
+             this._pushAsyncFrame(true);
+         } else {
+-            window.requestAnimationFrame( () => { this._pushAsyncFrame(); });
++            this._scheduleAsyncFrame();
+         }
+     }
+ 
+@@ -1550,7 +1575,7 @@
+ 
+             // if there is more data in queue, then keep checking
+             if (this._asyncFrameQueue[0][2].length > 0) {
+-                window.requestAnimationFrame( () => { this._pushAsyncFrame(); });
++                this._scheduleAsyncFrame();
+             }
+         } else if (this._asyncFrameQueue[0][1] > 0 && this._asyncFrameQueue[0][1] === this._asyncFrameQueue[0][2].length) {
+             //how many times has _pushAsyncFrame been called when the frame had all rects but has not been drawn
+@@ -1681,6 +1706,6 @@
+ 
+         this._renderer?.rescale(factor, width, height, vp.serverWidth, vp.serverHeight, vp.width);
+ 
+-        requestAnimationFrame( () => { this._pushAsyncFrame(); });
++        this._scheduleAsyncFrame();
+     }
+ }
+--- a/core/input/keyboard.js
++++ b/core/input/keyboard.js
+@@ -3,6 +3,8 @@
+  * Copyright (C) 2019 The noVNC Authors
+  * Licensed under MPL 2.0 or any later version (see LICENSE.txt)
+  */
++
++import {InputPolicy, detectProfile} from './poc-input-policy.mjs';
+ 
+ import * as Log from '../util/logging.js';
+ import { stopEvent } from '../util/events.js';
+@@ -28,7 +30,19 @@
+ 
+         this._rfbKeyQueue = [];
+         this._lastSendTime = 0;
+-
++        this._keySendScheduled = false;
++        this._compositionSegments = typeof Intl.Segmenter === "function" ? new Intl.Segmenter(undefined, { granularity: "grapheme" }) : null;
++
++        this._submittedKeys = new Map();
++        this._inputEpoch = 0;
++        this.onkeycancel = () => {};
++        this.onpolicychange = () => {};
++        this.inputPolicy = new InputPolicy({
++            profile: detectProfile(navigator.platform),
++            emit: (event, down) => down ? this._handleNativeKeyDown(event) : this._handleNativeKeyUp(event),
++            release: codes => this._releaseInputCodes(codes),
++            changed: config => this.onpolicychange(config),
++        });
+         this._layoutMap = null;
+ 
+         if (keyboardInput?.getLayoutMap) {
+@@ -44,15 +58,18 @@
+         this._eventHandlers = {
+             'keyup': this._handleKeyUp.bind(this),
+             'keydown': this._handleKeyDown.bind(this),
+-            'blur': this._allKeysUp.bind(this),
++            'blur': () => this._allKeysUp(true),
+             'compositionstart': this._handleCompositionStart.bind(this),
+             'compositionend': this._handleCompositionEnd.bind(this),
+             'compositionupdate': this._handleCompositionUpdate.bind(this),
+-            'input': this._handleInput.bind(this)
++            'input': this._handleInput.bind(this),
++            'beforeinput': e => { if (this.inputPolicy.consumeInput(e)) e.preventDefault(); },
++            'visibilitychange': () => { if (document.hidden) this._allKeysUp(true); }
+         };
+ 
+         // ===== EVENT HANDLERS =====
+         this.onkeyevent = () => {}; // Handler for key press/release
++        this.onbeforepaste = () => {};
+ 
+         this._enableIME = false;
+         this._imeStarted = false;
+@@ -74,7 +91,7 @@
+ 
+     // ===== PRIVATE METHODS =====
+ 
+-    clearKeysDown(event) {
++    clearKeysDown(event, immediate = false) {
+         // On some Operating systems, the browser will lose key up events when a shortcut key combination triggers something
+         // on the OS that is outside the scope of the browser. For example, MacOS Cmd+Shift+Ctrl+4 brings up a screen capture
+         // tool and the browser only recieves some of the key down events, but not the key up events. This leaves the server
+@@ -86,28 +103,28 @@
+                     case "ControlRight":
+                         if (!event.ctrlKey) {
+                             Log.Error("A control key is stuck down, sending up.");
+-                            this._sendKeyEvent(value, key, false);
++                            this._sendKeyEvent(value, key, false, immediate);
+                         }
+                         break;
+                     case "MetaLeft":
+                     case "MetaRight":
+                         if (!event.metaKey) {
+                             Log.Error("A meta key is stuck down, sending up.");
+-                            this._sendKeyEvent(value, key, false);
++                            this._sendKeyEvent(value, key, false, immediate);
+                         }
+                         break;
+                     case "AltLeft":
+                     case "AltRight":
+                         if (!event.altKey) {
+                             Log.Error("A alt key is stuck down, sending up. ");
+-                            this._sendKeyEvent(value, key, false);
++                            this._sendKeyEvent(value, key, false, immediate);
+                         }
+                         break;
+                     case "ShiftRight":
+                     case "ShiftLeft":
+                         if (!event.shiftKey) {
+                             Log.Error("A shift key is stuck down, sending up.");
+-                            this._sendKeyEvent(value, key, false);
++                            this._sendKeyEvent(value, key, false, immediate);
+                         }
+                         break;
+                 }
+@@ -116,29 +133,85 @@
+     }
+ 
+     _scheduleRfbKeySend() {
+-        if (this._rfbKeyQueue.length === 0) return;
+-
++        if (this._keySendScheduled || this._rfbKeyQueue.length === 0) return;
++        this._keySendScheduled = true;
++        const epoch = this._inputEpoch;
+         const process = (timestamp) => {
+-            const elapsed = timestamp - this._lastSendTime;
+-            if (elapsed > thresholdTime) {
++            if (epoch !== this._inputEpoch) return;
++            if (timestamp - this._lastSendTime > thresholdTime) {
+                 while (this._rfbKeyQueue.length > 0) {
+                     const event = this._rfbKeyQueue.shift();
+-                    Log.Debug("onkeyevent " + (event.down ? "down" : "up") +
+-                        ", keysym: " + event.keysym, ", code: " + event.code);
+-                    this.onkeyevent(event.keysym, event.code, event.down);
++                    if (event.pointer) { event.pointer(); continue; }
++                    this._deliverInputEvent(event);
++                    // Yield between text strokes so X11 consumers can process
++                    // dynamic keymap notifications before mappings are recycled.
++                    if (event.code === 'Unidentified' && event.down) {
++                        const next = this._rfbKeyQueue[0];
++                        if (next && !next.down && next.code === event.code && next.keysym === event.keysym) {
++                            this._rfbKeyQueue.shift();
++                            this._deliverInputEvent(next);
++                        }
++                        break;
++                    }
+                 }
+                 this._lastSendTime = timestamp;
+             }
+-
+-            if (this._rfbKeyQueue.length > 0) {
+-                requestAnimationFrame(process);
+-            }
++            if (this._rfbKeyQueue.length > 0) requestAnimationFrame(process);
++            else this._keySendScheduled = false;
+         };
+-
+         requestAnimationFrame(process);
+     }
+ 
+-    _sendKeyEvent(keysym, code, down) {
++    recordSubmitted(keysym, code, down) {
++        if (down) this._submittedKeys.set(code, keysym);
++        else this._submittedKeys.delete(code);
++    }
++
++    _deliverInputEvent(event) {
++        if (this.trackDelivery !== false) this.recordSubmitted(event.keysym, event.code, event.down);
++        this.onkeyevent(event.keysym, event.code, event.down);
++    }
++
++    _releaseInputCodes(codes) {
++        this.onkeycancel(codes);
++        const selected = new Set(codes);
++        this._rfbKeyQueue = this._rfbKeyQueue.filter(e => !selected.has(e.code));
++        if (selected.has('ControlLeft')) {
++            clearTimeout(this._altGrTimeout);
++            this._altGrArmed = false;
++        }
++        for (const code of codes) {
++            delete this._keyDownList[code];
++            const keysym = this._submittedKeys.get(code);
++            if (keysym !== undefined) this._deliverInputEvent({keysym, code, down:false});
++        }
++    }
++
++    routePointer(event, intent, action) {
++        const accepted = this.inputPolicy.pointer(event, intent);
++        const run = () => action(accepted);
++        if (this._rfbKeyQueue.length) {
++            // Keep modifier-down ahead of a click, without bypassing paced text.
++            this._rfbKeyQueue.push({pointer:run});
++            this._scheduleRfbKeySend();
++        } else run();
++    }
++
++    _handleKeyDown(event) {
++        this.inputPolicy.down(event, this._getKeyCode(event));
++    }
++
++    _handleKeyUp(event) {
++        this.inputPolicy.up(event, this._getKeyCode(event));
++        // Kasm translates Command shortcuts into a synthetic Ctrl. Pair its release.
++        if ((browser.isMac() || browser.isIOS()) && !event.metaKey && !event.ctrlKey &&
++            this._keyDownList.ControlLeft && !this.inputPolicy.physical.has('ControlLeft') &&
++            !this.inputPolicy.physical.has('ControlRight')) {
++            this._sendKeyEvent(this._keyDownList.ControlLeft, 'ControlLeft', false);
++        }
++    }
++
++    _sendKeyEvent(keysym, code, down, immediate = false) {
+         if (down) {
+             this._keyDownList[code] = keysym;
+         } else {
+@@ -149,6 +222,7 @@
+             delete this._keyDownList[code];
+         }
+ 
++        if (immediate) { this._deliverInputEvent({keysym, code, down}); return; }
+         this._rfbKeyQueue.push({keysym: keysym, code: code, down: down});
+         this._scheduleRfbKeySend();
+     }
+@@ -190,51 +264,38 @@
+     }
+ 
+     _handleCompositionStart(e) {
++        this.inputPolicy.composition(true);
+         Log.Debug("Composition started: " + e.data);
+         this._imeStarted = true;
+         this._lastKeyboardInput = "";
+     }
+ 
+     _handleCompositionUpdate(e) {
+-        Log.Debug("Composition update: " + e.data);
+-        const oldValue = this._lastKeyboardInput;
+-        const newValue = e.data;
+-        let diffStart = 0;
+-
+-        if (this._imeStarted) {
+-            this._sendKeyStroke(keysyms.lookup(newValue.charCodeAt(0)), 'Unidentified');
+-            this._imeStarted = false;
+-        } else {
+-            //find position where difference starts
+-            for (let i = 0; i < Math.min(oldValue.length, newValue.length); i++) {
+-                if (newValue.charAt(i) !== oldValue.charAt(i)) {
+-                    break;
+-                }
+-                diffStart++;
+-            }
+-
+-            //send backspaces if needed
+-            Log.Debug("Backspace diffStart: " + diffStart);
+-            Log.Debug("Old value: " + oldValue + " Old value length: " + oldValue.length + " New value: " + newValue);
+-            for (let bs = oldValue.length - diffStart; bs > 0; bs--) {
+-                this._sendKeyStroke(KeyTable.XK_BackSpace, "Backspace");
+-            }
+-
+-            //send new keys
+-            for (let i = diffStart; i < newValue.length; i++) {
+-                this._sendKeyStroke(keysyms.lookup(newValue.charCodeAt(i)), 'Unidentified');
+-            }
+-        }
+-        this._lastKeyboardInput = newValue;
+-        //this._touchInput.focus();
++        const value = e.data || '';
++        const split = text => this._compositionSegments
++            ? Array.from(this._compositionSegments.segment(text), part => part.segment)
++            : Array.from(text);
++        const before = split(this._lastKeyboardInput || '');
++        const after = split(value);
++        let common = 0;
++        while (common < before.length && common < after.length && before[common] === after[common]) common++;
++        for (let index = common; index < before.length; index++) this._sendKeyStroke(KeyTable.XK_BackSpace, 'Backspace');
++        for (const segment of after.slice(common)) {
++            for (const character of segment) this._sendKeyStroke(keysyms.lookup(character.codePointAt(0)), 'Unidentified');
++        }
++        this._imeStarted = false;
++        this._lastKeyboardInput = value;
+     }
+ 
+     _handleCompositionEnd(e) {
+-        Log.Debug("Composition ended: " + e.data);
++        this._handleCompositionUpdate(e);
+         this._touchInput.value = '';
++        this._lastKeyboardInput = '';
++        this.inputPolicy.composition(false);
+     }
+ 
+     _handleInput(e) {
++        if (this.inputPolicy.consumeInput(e)) { this._touchInput.value = ''; return; }
+         //input event occurs only when keyup keydown events don't prevent default
+         //IME events will make this happen, for example
+         //IME changes can back out old characters and replace, thus send differential if IME
+@@ -244,8 +305,9 @@
+             Log.Debug("Non-IME input change, sending new characters");
+             const newValue = e.data;
+ 
+-            for (let i = 0; i < newValue?.length; i++) {
+-                this._sendKeyStroke(keysyms.lookup(newValue.charCodeAt(i)), 'Unidentified');
++            for (const character of newValue || '') {
++                const point = character.codePointAt(0);
++                this._sendKeyStroke(point === 10 || point === 13 ? KeyTable.XK_Return : point === 9 ? KeyTable.XK_Tab : keysyms.lookup(point), 'Unidentified');
+             }
+ 
+             this._touchInput.value = '';
+@@ -257,7 +319,7 @@
+         this._lastKeyboardInput = this._touchInput.value;
+     }
+ 
+-    _handleKeyDown(e) {
++    _handleNativeKeyDown(e) {
+         Log.Debug("Key Down: " + e.keyCode + " isComposing: " + e.isComposing);
+         if (e.isComposing || e.keyCode === 229) {
+             //skip event if IME related
+@@ -267,6 +329,7 @@
+ 
+         const code = this._getKeyCode(e);
+         let keysym = KeyboardUtil.getKeysym(e);
++        if (code === 'KeyV' && (e.ctrlKey || e.metaKey) && !e.altKey) this.onbeforepaste();
+         this.clearKeysDown(e);
+         Log.Debug("Key Down: " + e.keyCode + " code: " + code + " keysym: " + keysym);
+ 
+@@ -399,7 +462,7 @@
+         this._sendKeyEvent(keysym, code, true);
+     }
+ 
+-    _handleKeyUp(e) {
++    _handleNativeKeyUp(e) {
+         Log.Debug("Key Up: " + e.keyCode + " Buffer: " + this._touchInput.value);
+         if (e.isComposing || e.keyCode === 229) {
+             //skip IME related events
+@@ -447,12 +510,21 @@
+         this._sendKeyEvent(KeyTable.XK_Control_L, "ControlLeft", true);
+     }
+ 
+-    _allKeysUp() {
+-        Log.Debug(">> Keyboard.allKeysUp");
+-        for (let code in this._keyDownList) {
+-            this._sendKeyEvent(this._keyDownList[code], code, false);
+-        }
+-        Log.Debug("<< Keyboard.allKeysUp");
++    _allKeysUp(preserveText = false) {
++        // Committed native text remains paced on this connection when focus moves.
++        // Destruction/disconnect uses false so no text enters a new generation.
++        const text = preserveText ? this._rfbKeyQueue.filter(e => e.code === 'Unidentified') : [];
++        this._inputEpoch++;
++        this._keySendScheduled = false;
++        this._rfbKeyQueue = [];
++        clearTimeout(this._altGrTimeout);
++        this._altGrArmed = false;
++        this.onkeycancel(null);
++        this.inputPolicy.reset();
++        this._releaseInputCodes([...this._submittedKeys.keys()]);
++        this._keyDownList = {};
++        this._rfbKeyQueue = text;
++        this._scheduleRfbKeySend();
+     }
+ 
+     _isIMEInteraction(e) {
+@@ -499,6 +571,8 @@
+ 
+     grab() {
+         //Log.Debug(">> Keyboard.grab");
++        this._screenInput.addEventListener('blur', this._eventHandlers.blur);
++        this._touchInput.addEventListener('blur', this._eventHandlers.blur);
+         this._screenInput.addEventListener('keydown', this._eventHandlers.keydown);
+         this._screenInput.addEventListener('keyup', this._eventHandlers.keyup);
+ 
+@@ -508,6 +582,8 @@
+         this._touchInput.addEventListener('compositionupdate', this._eventHandlers.compositionupdate);
+         this._touchInput.addEventListener('compositionend', this._eventHandlers.compositionend);
+         this._touchInput.addEventListener('input', this._eventHandlers.input);
++        this._touchInput.addEventListener('beforeinput', this._eventHandlers.beforeinput);
++        document.addEventListener('visibilitychange', this._eventHandlers.visibilitychange);
+ 
+         // Release (key up) if window loses focus
+         window.addEventListener('blur', this._eventHandlers.blur);
+@@ -517,6 +593,8 @@
+ 
+     ungrab() {
+         //Log.Debug(">> Keyboard.ungrab");
++        this._screenInput.removeEventListener('blur', this._eventHandlers.blur);
++        this._touchInput.removeEventListener('blur', this._eventHandlers.blur);
+         this._screenInput.removeEventListener('keydown', this._eventHandlers.keydown);
+         this._screenInput.removeEventListener('keyup', this._eventHandlers.keyup);
+ 
+@@ -526,6 +604,8 @@
+         this._touchInput.removeEventListener('compositionupdate', this._eventHandlers.compositionupdate);
+         this._touchInput.removeEventListener('compositionend', this._eventHandlers.compositionend);
+         this._touchInput.removeEventListener('input', this._eventHandlers.input);
++        this._touchInput.removeEventListener('beforeinput', this._eventHandlers.beforeinput);
++        document.removeEventListener('visibilitychange', this._eventHandlers.visibilitychange);
+ 
+         window.removeEventListener('blur', this._eventHandlers.blur);
+ 
+--- /dev/null
++++ b/core/input/poc-input-policy.mjs
+@@ -0,0 +1,182 @@
++// PoC-owned routing before Kasm's native keyboard translation. No text transport.
++export const profiles = Object.freeze({
++  windows: ['Meta+Space', 'Meta+Shift+Space'],
++  mac: ['Control+Space', 'Control+Alt+Space'],
++  gnome: ['Meta+Space', 'Meta+Shift+Space'],
++  fcitx: ['Control+Space'],
++  custom: [],
++  unknown: [],
++});
++const groups = ['Control', 'Alt', 'Shift', 'Meta'];
++const flags = {Control:'ctrlKey',Alt:'altKey',Shift:'shiftKey',Meta:'metaKey'};
++export const modifierGroup = code => groups.find(g => code === g+'Left' || code === g+'Right');
++export function detectProfile(platform = '') {
++  return /win/i.test(platform) ? 'windows' : /mac/i.test(platform) ? 'mac' : 'unknown';
++}
++export function normalizePolicy(value = {}) {
++  const profile = value.profile ?? 'unknown';
++  if (!Object.hasOwn(profiles, profile)) throw Error('Unknown keyboard profile');
++  const mode = value.mode ?? 'local';
++  if (!['local','remote'].includes(mode)) throw Error('Unknown keyboard mode');
++  const bindings = value.bindings ?? profiles[profile];
++  if (!Array.isArray(bindings) || bindings.length > 16) throw Error('At most 16 shortcut bindings');
++  const parsed = bindings.map(binding => {
++    if (typeof binding !== 'string' || binding.length > 80) throw Error('Invalid shortcut');
++    const parts = binding.split('+');
++    if (new Set(parts).size !== parts.length) throw Error('Repeated shortcut key');
++    const modifiers = parts.filter(p=>groups.includes(p));
++    const terminals = parts.filter(p=>!groups.includes(p));
++    if (terminals.length > 1 || !parts.length || parts.some(p=>!p)) throw Error('Invalid shortcut');
++    const terminal = terminals[0] ?? null;
++    if (terminal && !/^(Space|Period|CapsLock|Fn|Lang[1-5]|Key[A-Z]|Digit[0-9]|F([1-9]|1[0-2]))$/.test(terminal)) throw Error('Unsupported shortcut key');
++    if (!terminal && !modifiers.length) throw Error('Empty shortcut');
++    return {modifiers, terminal};
++  });
++  return {version:1, profile, mode, bindings:[...bindings], parsed};
++}
++const isIME = e => e.isComposing || e.keyCode === 229 || ['Process','Dead'].includes(e.key);
++
++export class InputPolicy {
++  constructor({emit = ()=>{}, release = ()=>{}, changed = ()=>{}, ...settings} = {}) {
++    this.emit = emit; this.release = release; this.changed = changed;
++    this.config = normalizePolicy(settings);
++    this.physical = new Map(); this.pending = new Map(); this.forwarded = new Map();
++    this.consumed = new Set(); this.localGroups = new Set();
++    this.composing = false; this.buttons = 0; this.next = null; this.residual = null;
++  }
++  get neutral() { return !this.physical.size && !this.composing && !this.buttons; }
++  get state() { return this.localGroups.size || this.consumed.size ? 'local' : this.pending.size ? 'pending' : this.forwarded.size ? 'remote' : 'neutral'; }
++  configure(value) {
++    const config = normalizePolicy(value);
++    if (!this.neutral) { this.next = config; return false; }
++    this.config = config; this.next = null; this.changed(config); return true;
++  }
++  _apply() { if (this.next && this.neutral) this.configure(this.next); }
++  _snapshot(e, code) {
++    return {code,key:e.key,keyCode:e.keyCode,location:e.location,timeStamp:e.timeStamp,repeat:e.repeat,
++      isComposing:e.isComposing,ctrlKey:!!e.ctrlKey,altKey:!!e.altKey,shiftKey:!!e.shiftKey,metaKey:!!e.metaKey,
++      getModifierState:name=>e.getModifierState?.(name) ?? false,
++      preventDefault:()=>e.preventDefault?.(),stopPropagation:()=>e.stopPropagation?.()};
++  }
++  _stop(e) { e.stopPropagation?.(); } // Preserve the OS default action.
++  _release(codes) {
++    if (codes.length) this.release(codes);
++    for (const code of codes) { this.forwarded.delete(code); this.pending.delete(code); }
++  }
++  _reconcile(e, current = '') {
++    const missing = [];
++    for (const group of groups) {
++      if (e[flags[group]]) continue;
++      this.localGroups.delete(group);
++      for (const code of [...this.physical.keys()]) {
++        if (code === current || modifierGroup(code) !== group) continue;
++        this.physical.delete(code); this.pending.delete(code); this.consumed.delete(code);
++        if (this.forwarded.has(code)) missing.push(code);
++      }
++    }
++    this._release(missing);
++  }
++  _mask(e) {
++    const blocked = new Set([...this.localGroups].map(g=>flags[g]));
++    return new Proxy(e, {get(target,key) {
++      if (blocked.has(key)) return false;
++      const value = Reflect.get(target,key,target);
++      return typeof value==='function' ? value.bind(target) : value;
++    }});
++  }
++  _forward(e, down) {
++    if (down) this.forwarded.set(e.code,e); else this.forwarded.delete(e.code);
++    this.emit(this._mask(e),down);
++  }
++  _flush() {
++    const pending = [...this.pending.values()]; this.pending.clear();
++    for (const e of pending) if (this.physical.has(e.code) && !this.localGroups.has(modifierGroup(e.code))) this._forward(e,true);
++  }
++  _active(e) { return groups.filter(g=>e[flags[g]]); }
++  _match(e, terminal) {
++    const active = this._active(e);
++    return this.config.parsed.find(b=>b.terminal===terminal && b.modifiers.length===active.length && active.every(g=>b.modifiers.includes(g)));
++  }
++  _prefix(e, group) {
++    const active = this._active(e);
++    return this.config.parsed.some(b=>b.modifiers.includes(group) && active.every(g=>b.modifiers.includes(g)));
++  }
++  _consume(e, binding) {
++    for (const group of binding.modifiers) this.localGroups.add(group);
++    const releases = [];
++    for (const code of this.physical.keys()) {
++      if (binding.modifiers.includes(modifierGroup(code)) || code===e.code) {
++        this.pending.delete(code); this.consumed.add(code);
++        if (this.forwarded.has(code)) releases.push(code);
++      }
++    }
++    this.consumed.add(e.code);
++    this._release(releases);
++    this.residual = e.key?.length===1 ? {code:e.code,data:e.key} : null;
++    this._stop(e);
++  }
++  down(event, code) {
++    const e = this._snapshot(event,code);
++    this._reconcile(e,code); this.residual=null;
++    if (this.physical.size >= 64 && !this.physical.has(code)) { this.reset(); return; }
++    if (!this.physical.has(code)) this.physical.set(code,e);
++    if (this.config.mode==='remote') { this._forward(e,true); return; }
++    // A known terminal may be IME-marked; match before the generic composition bypass.
++    const altGraph = e.getModifierState('AltGraph') || e.key==='AltGraph' ||
++      (code==='AltRight' && e.ctrlKey && this.physical.has('ControlLeft'));
++    const binding = !altGraph && this._match(e,code);
++    if (binding) { this._consume(e,binding); return; }
++    if (this.consumed.has(code) || this.localGroups.has(modifierGroup(code))) { this._stop(e); return; }
++    if (this.composing || isIME(e)) { this.composition(this.composing); this.consumed.add(code); return; }
++    const group = modifierGroup(code);
++    if (!altGraph && group && !this.forwarded.has(code) && this._prefix(e,group)) {
++      if (!this.pending.has(code)) this.pending.set(code,e);
++      this._stop(e); return;
++    }
++    this._flush(); this._forward(e,true);
++  }
++  up(event, code) {
++    const e = this._snapshot(event,code);
++    const wasPending = this.pending.delete(code);
++    const consumed = this.consumed.delete(code);
++    const group = modifierGroup(code);
++    this.physical.delete(code);
++    if (this.residual?.code===code) this.residual=null;
++    // IME may mark the release of a key that was already accepted as raw input.
++    // Its accepted down still needs a native up; composition does not own it.
++    if (this.forwarded.has(code)) this._forward({...e,isComposing:false,keyCode:e.keyCode===229?0:e.keyCode},false);
++    else if (this.config.mode==='remote') this._forward(e,false);
++    else if (wasPending || consumed || this.localGroups.has(group)) this._stop(e);
++    this._reconcile(e);
++    if (group && ![...this.physical.keys()].some(c=>modifierGroup(c)===group)) this.localGroups.delete(group);
++    this._apply();
++  }
++  composition(active) {
++    this.composing=active; this.residual=null;
++    for (const code of this.pending.keys()) {
++      this.consumed.add(code); this.localGroups.add(modifierGroup(code));
++    }
++    this.pending.clear();
++    const modifiers=[...this.forwarded.keys()].filter(modifierGroup);
++    for (const code of modifiers) { this.consumed.add(code);this.localGroups.add(modifierGroup(code)); }
++    this._release(modifiers); this._apply();
++  }
++  consumeInput(e) {
++    return !!(this.residual && this.consumed.has(this.residual.code) && !this.composing && !e.isComposing &&
++      e.inputType==='insertText' && e.data===this.residual.data);
++  }
++  pointer(event, intent = false) {
++    this._reconcile(event); this.residual=null;
++    this.buttons=event.buttons ?? this.buttons;
++    if (intent) this._flush();
++    this._apply();
++    return this._mask(event);
++  }
++  reset() {
++    this._release([...this.forwarded.keys()]);
++    this.physical.clear();this.pending.clear();this.consumed.clear();this.localGroups.clear();
++    this.residual=null;this.buttons=0;
++    // Composition is owned by native handlers, not cancelled by a source chooser's blur.
++    this._apply();
++  }
++}
+--- /dev/null
++++ b/core/poc-webrtc-offer.mjs
+@@ -0,0 +1,41 @@
++// PoC transport privacy boundary. Keep the browser's localDescription intact;
++// serialize only the single data-channel offer understood by the pinned server.
++// This module must be delivered by the trusted client/asset host, before SDP
++// crosses into the desktop container. It is not a filter for arbitrary user data.
++export function privateWebRTCOffer(sdp) {
++  const invalid = () => { throw new Error('Unsupported WebRTC offer'); };
++  if (typeof sdp !== 'string' || sdp.length > 32768 || /[^\x20-\x7e\r\n]/.test(sdp)) invalid();
++  const lines = sdp.split(/\r?\n/).filter(Boolean);
++  const one = prefix => {
++    const values = lines.filter(line => line.startsWith(prefix));
++    if (values.length !== 1) invalid();
++    return values[0].slice(prefix.length);
++  };
++  if (one('v=') !== '0') invalid();
++  const media = one('m=');
++  const match = /^application ([0-9]{1,5}) UDP\/DTLS\/SCTP webrtc-datachannel$/.exec(media);
++  if (!match || Number(match[1]) < 1 || Number(match[1]) > 65535) invalid();
++  const ufrag = one('a=ice-ufrag:');
++  const password = one('a=ice-pwd:');
++  const mid = one('a=mid:');
++  const fingerprint = one('a=fingerprint:');
++  const setup = one('a=setup:');
++  const port = one('a=sctp-port:');
++  if (!/^[A-Za-z0-9+/]{4,128}$/.test(ufrag) || !/^[A-Za-z0-9+/]{22,128}$/.test(password) ||
++      !/^[A-Za-z0-9_-]{1,32}$/.test(mid) ||
++      !/^sha-256 (?:[A-Fa-f0-9]{2}:){31}[A-Fa-f0-9]{2}$/.test(fingerprint) ||
++      setup !== 'actpass' || !/^[0-9]{1,5}$/.test(port) || Number(port) < 1 || Number(port) > 65535) invalid();
++  const sizeLines = lines.filter(line => line.startsWith('a=max-message-size:'));
++  if (sizeLines.length > 1) invalid();
++  const size = sizeLines.length ? sizeLines[0].slice(19) : null;
++  if (size !== null && (!/^[0-9]{1,10}$/.test(size) || Number(size) > 4294967295)) invalid();
++  // No origin/session text, c= address, candidates, raddr, remote-candidates,
++  // RTCP endpoint, mDNS name or unknown extension is copied to the wire.
++  return [
++    'v=0', 'o=- 0 0 IN IP4 0.0.0.0', 's=-', 't=0 0', `a=group:BUNDLE ${mid}`,
++    'm=application 9 UDP/DTLS/SCTP webrtc-datachannel', 'c=IN IP4 0.0.0.0',
++    `a=ice-ufrag:${ufrag}`, `a=ice-pwd:${password}`, `a=fingerprint:${fingerprint}`,
++    `a=setup:${setup}`, `a=mid:${mid}`, `a=sctp-port:${port}`,
++    ...(size === null ? [] : [`a=max-message-size:${size}`]), '',
++  ].join('\r\n');
++}
+--- a/core/rfb.js
++++ b/core/rfb.js
+@@ -11,7 +11,6 @@
+ import { toUnsigned32bit, toSigned32bit } from './util/int.js';
+ import * as Log from './util/logging.js';
+ import { encodeUTF8, decodeUTF8, uuidv4 } from './util/strings.js';
+-import { hashUInt8Array } from './util/int.js';
+ import { dragThreshold, supportsCursorURIs, isTouchDevice, isWindows, isMac, isIOS, isDesktop } from './util/browser.js';
+ import { clientToElement } from './util/element.js';
+ import { setCapture } from './util/events.js';
+@@ -29,6 +28,7 @@
+ import KeyTable from "./input/keysym.js";
+ import XtScancode from "./input/xtscancodes.js";
+ import { encodings } from "./encodings.js";
++import { privateWebRTCOffer } from "./poc-webrtc-offer.mjs";
+ import { messages } from "./messages.js";
+ import { MouseButtonMapper, xvncButtonToMask } from "./mousebuttonmapper.js";
+ 
+@@ -187,6 +187,8 @@
+         this._disconnTimer = null;      // disconnection timer
+         this._resizeTimeout = null;     // resize rate limiting
+         this._mouseMoveTimer = null;
++        this._udpUpgradeTimer = null;
++        this._udpHandshakeTimer = null;
+         this._forceFullFrameUpdateTimeout = null;
+ 
+         // Decoder states
+@@ -311,6 +313,12 @@
+ 
+         this._keyboard = new Keyboard(this._canvas, touchInput, navigator.keyboard);
+         this._keyboard.onkeyevent = this._handleKeyEvent.bind(this);
++        this._keyboard.onbeforepaste = this._syncGrantedClipboardBeforePaste.bind(this);
++        this._keyboard.trackDelivery = false;
++        this._keyboard.onkeycancel = codes => {
++            const selected = codes && new Set(codes);
++            this._clipboardInputQueue = selected ? (this._clipboardInputQueue || []).filter(e => !selected.has(e.code)) : [];
++        };
+ 
+         this._gestures = new GestureHandler();
+ 
+@@ -1040,6 +1048,7 @@
+         }
+ 
+         const scancode = XtScancode[code];
++        if (keysym || (this._qemuExtKeyEventSupported && scancode)) this._keyboard.recordSubmitted(keysym, code, down);
+ 
+         if (this._qemuExtKeyEventSupported && scancode) {
+             // 0 is NoSymbol
+@@ -1082,41 +1091,106 @@
+         this._keyboard.blur();
+     }
+ 
+-    checkLocalClipboard() {
+-        if (this.clipboardUp && this.clipboardSeamless && this._resendClipboardNextUserDrivenEvent) {
+-            this._resendClipboardNextUserDrivenEvent = false;
++    async _syncGrantedClipboardBeforePaste() {
++        if (!this.clipboardUp || !this.clipboardSeamless || this._viewOnly ||
++            this._rfbConnectionState !== 'connected' || !document.hasFocus() ||
++            this._clipboardPasteSyncPending || !this._resendClipboardNextUserDrivenEvent) return;
++        this._clipboardPasteSyncPending = true;
++        try {
++            // Never open a permission prompt just to process a remote shortcut.
++            // The explicit lab/native clipboard grant remains the authorization.
++            const permission = await navigator.permissions.query({name: 'clipboard-read'});
++            if (permission.state === 'granted') {
++                this._resendClipboardNextUserDrivenEvent = true;
++                await this.checkLocalClipboard();
++            }
++        } catch (err) {
++            Log.Debug('Clipboard shortcut synchronization unavailable: ' + err);
++        } finally {
++            this._clipboardPasteSyncPending = false;
++            this._flushClipboardInputQueue();
++        }
++    }
++
++    _flushClipboardInputQueue() {
++        if (this._clipboardReadPending || this._clipboardPasteSyncPending) return;
++        const pending = this._clipboardInputQueue || [];
++        this._clipboardInputQueue = [];
++        for (const event of pending) {
++            // Blur must still release modifiers already sent, but must not type
++            // delayed characters into a desktop now controlled elsewhere.
++            if (document.hasFocus() || !event.down)
++                this.sendKey(event.keysym, event.code, event.down);
++        }
++    }
++
++    async checkLocalClipboard() {
++        if (!(this.clipboardUp && this.clipboardSeamless && this._resendClipboardNextUserDrivenEvent)) return;
++        if (this._clipboardReadPending || !document.hasFocus()) return;
++        this._resendClipboardNextUserDrivenEvent = false;
++        this._clipboardReadPending = true;
++        let readSucceeded = false;
++        try {
+             if (this.clipboardBinary) {
+-                navigator.clipboard.read().then((data) => {
+-                    this.clipboardPasteDataFrom(data);
+-                }, (err) => {
+-                    Log.Debug("No data in clipboard: " + err);
+-                });
++                await this.clipboardPasteDataFrom(await navigator.clipboard.read());
++            } else if (navigator.clipboard && navigator.clipboard.readText) {
++                const text = await navigator.clipboard.readText();
++                // An empty passive read is not a request to clear the remote clipboard.
++                if (text.length) await this.clipboardPasteFrom(text);
++            }
++            readSucceeded = true;
++        } catch (err) {
++            Log.Debug("Failed to read system clipboard: " + err);
++        } finally {
++            this._clipboardReadPending = false;
++            const pending = this._pendingRemoteClipboard;
++            if (readSucceeded) {
++                this._pendingRemoteClipboard = null;
++                if (pending) this._write_binary_clipboard(...pending);
+             } else {
+-                if (navigator.clipboard && navigator.clipboard.readText) {
+-                    navigator.clipboard.readText().then(function (text) {
+-                        this.clipboardPasteFrom(text);
+-                    }.bind(this)).catch(function () {
+-                      return Log.Debug("Failed to read system clipboard");
+-                    });
+-                }
+-            }
+-        }
+-    }
+-
+-    clipboardPasteFrom(text) {
+-        if (this._rfbConnectionState !== 'connected' || this._viewOnly) { return; }
+-        if (!(typeof text === 'string' && text.length > 0)) { return; }
++                this._resendClipboardNextUserDrivenEvent = true;
++            }
++            this._flushClipboardInputQueue();
++        }
++    }
++
++    async _clipboardFingerprint(mimes, dataset) {
++        // Include every MIME representation, independently of enumeration order.
++        // The upstream 32-bit rolling hash conflates ordinary strings such as Aa/BB.
++        const digest = async data => Array.from(new Uint8Array(
++            await crypto.subtle.digest('SHA-256', data)), byte => byte.toString(16).padStart(2, '0')).join('');
++        return (await Promise.all(mimes.map(async (mime, i) => {
++            let data = dataset[i];
++            if (mime === 'image/png') {
++                // X11 may re-encode identical PNG pixels; byte hashes cause echo loops.
++                const image = await createImageBitmap(new Blob([data], {type: mime}));
++                try {
++                    const canvas = document.createElement('canvas');
++                    canvas.width = image.width; canvas.height = image.height;
++                    const context = canvas.getContext('2d');
++                    context.drawImage(image, 0, 0);
++                    data = context.getImageData(0, 0, image.width, image.height).data;
++                    return mime + ':' + image.width + 'x' + image.height + ':' + await digest(data);
++                } finally { image.close(); }
++            }
++            if (mime.startsWith('text/') && data.length && data[data.length - 1] === 0)
++                data = data.subarray(0, data.length - 1);
++            return mime + ':' + data.length + ':' + await digest(data);
++        }))).sort().join('|');
++    }
++
++    async clipboardPasteFrom(text) {
++        if (this._rfbConnectionState !== 'connected' || this._viewOnly || !this.clipboardUp) { return; }
++        if (typeof text !== 'string') { return; }
++        // An explicit native-panel send takes precedence until the next focus change.
++        this._resendClipboardNextUserDrivenEvent = false;
+ 
+         let data = new TextEncoder().encode(text);
+ 
+-        let h = hashUInt8Array(data);
+-        // avoid resending the same data if larger than 64k
+-        if (h === this._clipHash) {
+-            Log.Debug('No clipboard changes');
+-            return;
+-        } else {
+-            this._clipHash = h;
+-        }
++        // Explicit panel sends/clears are commands, not passive observations.
++        // A queued hidden-window update must not suppress or later replay over them.
++        this._pendingRemoteClipboard = null;
++        this._clipHash = await this._clipboardFingerprint(['text/plain'], [data]);
+ 
+         let dataset = [];
+         let mimes = [ 'text/plain' ];
+@@ -1131,11 +1205,10 @@
+     }
+ 
+     async clipboardPasteDataFrom(clipdata) {
+-        if (this._rfbConnectionState !== 'connected' || this._viewOnly) { return; }
++        if (this._rfbConnectionState !== 'connected' || this._viewOnly || !this.clipboardUp) { return; }
+ 
+         let dataset = [];
+         let mimes = [];
+-        let h = 0;
+         for (let i = 0; i < clipdata.length; i++) {
+             for (let ti = 0; ti < clipdata[i].types.length; ti++) {
+                 let mime = clipdata[i].types[ti];
+@@ -1151,17 +1224,6 @@
+                         let buff = await blob.arrayBuffer();
+                         let data = new Uint8Array(buff);
+ 
+-                        if (!h) {
+-                            h = hashUInt8Array(data);
+-                            // avoid resending the same data if larger than 64k
+-                            if (h === this._clipHash) {
+-                                Log.Debug('No clipboard changes');
+-                                return;
+-                            } else {
+-                                this._clipHash = h;
+-                            }
+-                        }
+-
+                         if (mimes.includes(mime)) {
+                             continue;
+                         }
+@@ -1190,7 +1252,13 @@
+         }
+ 
+ 
+-        if (dataset.length > 0) {
++        // Passive empty reads preserve remote data. Explicit Clear uses clipboardPasteFrom('').
++        if (dataset.length > 0 && dataset.some(data => data.length > 0)) {
++            const fingerprint = await this._clipboardFingerprint(mimes, dataset);
++            if (fingerprint === this._clipHash) return;
++            this._clipHash = fingerprint;
++            // Local user intent wins over a remote update queued during this read.
++            this._pendingRemoteClipboard = null;
+             if (this._isPrimaryDisplay) {
+                 RFB.messages.sendBinaryClipboard(this._sock, dataset, mimes);
+             } else {
+@@ -1394,120 +1462,15 @@
+         this._resendClipboardNextUserDrivenEvent = true;
+ 
+         // WebRTC UDP datachannel inits
+-        if (typeof RTCPeerConnection !== 'undefined' && this._isPrimaryDisplay) {
+-            this._udpBuffer = new Map();
+-
+-            this._udpPeer = new RTCPeerConnection({
+-                iceServers: [{
+-                    urls: ["stun:stun.l.google.com:19302"]
+-                }]
+-            });
+-            let peer = this._udpPeer;
+-
+-            peer.onicecandidate = function(e) {
+-                if (e.candidate)
+-                    Log.Debug("received ice candidate", e.candidate);
+-                else
+-                    Log.Debug("all candidates received");
+-            }
+-
+-            peer.ondatachannel = function(e) {
+-                Log.Debug("peer connection on data channel", e);
+-            }
+-
+-            this._udpChannel = peer.createDataChannel("webudp", {
+-                ordered: false,
+-                maxRetransmits: 0
+-            });
+-            this._udpChannel.binaryType = "arraybuffer";
+-
+-            this._udpChannel.onerror = function(e) {
+-                Log.Error("data channel error " + e.message);
+-                this._udpTransitFailures+=1;
+-                this._sendUdpDowngrade();
+-            }
+-
+-            let sock = this._sock;
+-            let udpBuffer = this._udpBuffer;
+-            let me = this;
+-            this._udpChannel.onmessage = function(e) {
+-                //Log.Info("got udp msg", e.data);
+-                const u8 = new Uint8Array(e.data);
+-                // Got an UDP packet. Do we need reassembly?
+-                const id = parseInt(u8[0] +
+-                                    (u8[1] << 8) +
+-                                    (u8[2] << 16) +
+-                                    (u8[3] << 24), 10);
+-                const i = parseInt(u8[4] +
+-                                   (u8[5] << 8) +
+-                                   (u8[6] << 16) +
+-                                   (u8[7] << 24), 10);
+-                const pieces = parseInt(u8[8] +
+-                                        (u8[9] << 8) +
+-                                        (u8[10] << 16) +
+-                                        (u8[11] << 24), 10);
+-                const hash = parseInt(u8[12] +
+-                                        (u8[13] << 8) +
+-                                        (u8[14] << 16) +
+-                                        (u8[15] << 24), 10);
+-                // TODO: check the hash. It's the low 32 bits of XXH64, seed 0
+-                const frame_id = parseInt(u8[16] +
+-                                        (u8[17] << 8) +
+-                                        (u8[18] << 16) +
+-                                        (u8[19] << 24), 10);
+-
+-                if (me._transitConnectionState !== me.TransitConnectionStates.Udp) {
+-                    me._display.clear();
+-                    me._changeTransitConnectionState(me.TransitConnectionStates.Udp);
+-                }
+-
+-                if (pieces == 1) { // Handle it immediately
+-                    me._handleUdpRect(u8.slice(20), frame_id);
+-                } else { // Use buffer
+-                    const now = Date.now();
+-
+-                    if (udpBuffer.has(id)) {
+-                        let item = udpBuffer.get(id);
+-                        item.recieved_pieces += 1;
+-                        item.data[i] = u8.slice(20);
+-                        item.total_bytes += item.data[i].length;
+-
+-                        if (item.total_pieces == item.recieved_pieces) {
+-                            // Message is complete, combile data into a single array
+-                            var finaldata = new Uint8Array(item.total_bytes);
+-                            let z = 0;
+-                            for (let x = 0; x < item.data.length; x++) {
+-                                finaldata.set(item.data[x], z);
+-                                z += item.data[x].length;
+-                            }
+-                            udpBuffer.delete(id);
+-                            me._handleUdpRect(finaldata, frame_id);
+-                        }
+-                    } else {
+-                        let item = {
+-                            total_pieces: pieces,   // number of pieces expected
+-                                arrival: now,       //time first piece was recieved
+-                            recieved_pieces: 1,     // current number of pieces in data
+-                            total_bytes: 0,         // total size of all data pieces combined
+-                            data: new Array(pieces)
+-                        }
+-                        item.data[i] = u8.slice(20);
+-                        item.total_bytes = item.data[i].length;
+-                        udpBuffer.set(id, item);
+-                    }
+-                }
+-            }
+-        }
+-
+-	    if (this._useUdp && typeof RTCPeerConnection !== 'undefined' && this._isPrimaryDisplay) {
+-            setTimeout(function() { this._sendUdpUpgrade() }.bind(this), 3000);
+-        }
++        this._setupUdp();
++
+ 
+         Log.Debug("<< RFB.connect");
+     }
+ 
+     _disconnect() {
+         Log.Debug(">> RFB.disconnect");
++        this._closeUdp();
+         this._cursor.detach();
+         this._canvas.removeEventListener("gesturestart", this._eventHandlers.handleGesture);
+         this._canvas.removeEventListener("gesturemove", this._eventHandlers.handleGesture);
+@@ -1618,15 +1581,15 @@
+             this.pointerLock = true;
+         }
+ 
+-        if (this._resendClipboardNextUserDrivenEvent) {
+-            this.checkLocalClipboard();
+-        }
+-
+-        if (!this.focusOnClick) {
+-            return;
+-        }
+-
+-        this.focus();
++        // The Clipboard API requires the document to be focused. Focus first,
++        // otherwise a blur-to-click transition can reject the local read and
++        // then overwrite the local copy with an older queued remote update.
++        // Embedded multi-screen mouse handling permits the browser's default
++        // canvas focus. That default runs after focus(), stealing focus back
++        // from the IME textarea on the first click returning from outside.
++        if (this._keyboard.enableIME && event.type === 'mousedown') event.preventDefault();
++        if (this.focusOnClick) this.focus();
++        if (this._resendClipboardNextUserDrivenEvent) this.checkLocalClipboard();
+ 
+     }
+ 
+@@ -1850,6 +1813,12 @@
+ 
+             case 'connected':
+                 this.dispatchEvent(new CustomEvent("connect", { detail: {} }));
++                if (this._useUdp && this._udpPeer) {
++                    this._udpUpgradeTimer = setTimeout(() => {
++                        this._udpUpgradeTimer = null;
++                        this._sendUdpUpgrade();
++                    }, 3000);
++                }
+                 break;
+ 
+             case 'disconnecting':
+@@ -1928,6 +1897,11 @@
+ 
+     _handleControlMessage(event) {
+         if (this._isPrimaryDisplay) {
++            // Retired viewers and unregistered screens cannot replay input.
++            if (this._rfbConnectionState !== 'connected') return;
++            const inputTypes = ['keyEvent', 'QEMUExtendedKeyEvent', 'mousedown', 'mouseup', 'mousemove', 'scroll'];
++            if (inputTypes.includes(event.data.eventType) && (this._viewOnly ||
++                !this._display.screens.some(screen => screen.screenID === event.data.screenID))) return;
+             // Secondary to Primary screen message
+             let size;
+             let coords;
+@@ -2011,6 +1985,10 @@
+                     break;
+                 case 'keepAlive':
+                     RFB.messages.keepAlive(this._sock);
++                    break;
++                case 'QEMUExtendedKeyEvent':
++                    RFB.messages.QEMUExtendedKeyEvent(this._sock, ...event.data.args);
++                    this._setLastActive();
+                     break;
+                 case 'keyEvent':
+                     RFB.messages.keyEvent(this._sock, ...event.data.args);
+@@ -2081,6 +2059,7 @@
+ 
+     _unregisterSecondaryDisplay() {
+         if (!this._isPrimaryDisplay && this._controlChannel) {
++            this._keyboard.ungrab();
+             let message = {
+                 eventType: 'unregister',
+                 screenID: this._display.screenID
+@@ -2173,6 +2152,11 @@
+     }
+ 
+     _handleKeyEvent(keysym, code, down) {
++        if (this._clipboardReadPending || this._clipboardPasteSyncPending) {
++            if (!this._clipboardInputQueue) this._clipboardInputQueue = [];
++            this._clipboardInputQueue.push({keysym, code, down});
++            return;
++        }
+         this.sendKey(keysym, code, down);
+     }
+ 
+@@ -2193,6 +2177,13 @@
+     }
+ 
+     _handleMouse(ev) {
++        if (this._viewOnly) return this._handleMouseNative(ev);
++        // Cancel browser canvas defaults synchronously, before queued delivery.
++        if (ev.type !== 'click' || ev.target === this._canvas) ev.preventDefault();
++        this._keyboard.routePointer(ev, ev.type === 'mousedown', accepted => this._handleMouseNative(accepted));
++    }
++
++    _handleMouseNative(ev) {
+         /*
+          * We don't check connection status or viewOnly here as the
+          * mouse events might be used to control the viewport
+@@ -2252,19 +2243,19 @@
+                 }
+                 setCapture(this._canvas);
+ 
++                // Reconcile before adding the translated Ctrl for this pointer.
++                this._keyboard.clearKeysDown(ev, true);
++
+                 // Translate CMD+Click into CTRL+click on MacOs
+                 if (
+                     isMac() &&
+                     ev.metaKey &&
+                     (this._keyboard._keyDownList["MetaLeft"] || this._keyboard._keyDownList["MetaRight"])
+                 ) {
+-                    this._keyboard._sendKeyEvent(this._keyboard._keyDownList["MetaLeft"], "MetaLeft", false);
+-                    this._keyboard._sendKeyEvent(this._keyboard._keyDownList["MetaRight"], "MetaRight", false);
+-                    this._keyboard._sendKeyEvent(KeyTable.XK_Control_L, "ControlLeft", true);
+-                }
+-
+-                // Ensure keys down are synced between client and server
+-                this._keyboard.clearKeysDown(ev);
++                    this._keyboard._sendKeyEvent(this._keyboard._keyDownList["MetaLeft"], "MetaLeft", false, true);
++                    this._keyboard._sendKeyEvent(this._keyboard._keyDownList["MetaRight"], "MetaRight", false, true);
++                    this._keyboard._sendKeyEvent(KeyTable.XK_Control_L, "ControlLeft", true, true);
++                }
+ 
+                 if (this._isPrimaryDisplay) {
+                     this._handleMouseButton(pos.x, pos.y, true, xvncButtonToMask(mappedButton));
+@@ -2464,12 +2455,40 @@
+     }
+ 
+     _sendScroll(x, y, dX, dY) {
+-        if (this._rfbConnectionState !== 'connected') { return; }
+-        if (this._viewOnly) { return; } // View only, skip mouse events
+-
++        if (this._rfbConnectionState !== 'connected' || this._viewOnly) return;
++        // Large coalesced browser deltas were lost by the native X11/GTK path
++        // after a window drag. Preserve the total displacement in bounded steps.
++        const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dX), Math.abs(dY)) / 120));
++        if (!this._scrollQueue) this._scrollQueue = [];
++        let sentX = 0, sentY = 0;
++        for (let index = 1; index <= steps; index++) {
++            const nextX = Math.round(dX * index / steps);
++            const nextY = Math.round(dY * index / steps);
++            this._scrollQueue.push({x, y, dX: nextX - sentX, dY: nextY - sentY});
++            sentX = nextX; sentY = nextY;
++        }
++        if (this._scrollScheduled) return;
++        const sendNext = () => {
++            if (this._rfbConnectionState !== 'connected' || this._viewOnly) {
++                this._scrollQueue = [];
++            }
++            const event = this._scrollQueue.shift();
++            if (event) this._sendScrollStep(event.x, event.y, event.dX, event.dY);
++            if (this._scrollQueue.length) {
++                this._scrollScheduled = true;
++                requestAnimationFrame(sendNext);
++            } else this._scrollScheduled = false;
++        };
++        sendNext();
++    }
++
++    _sendScrollStep(x, y, dX, dY) {
+         if (this._pointerLock && this._directMouseEnabled) {
+             this._sendDirectMouse(0, 0, this._mouseButtonMask, dX, dY);
+         } else if (this._isPrimaryDisplay) {
++            // The native server's scroll branch ignores the position fields;
++            // ensure position/button state is transmitted separately first.
++            RFB.messages.pointerEventClamped(this._sock, this._display.absX(x), this._display.absY(y), this._mouseButtonMask);
+             RFB.messages.pointerEventClamped(this._sock, this._display.absX(x), this._display.absY(y), 0, dX, dY);
+         } else {
+             this._proxyRFBMessage('scroll', [ x, y, dX, dY ]);
+@@ -2484,6 +2503,12 @@
+     }
+ 
+     _handleWheel(ev) {
++        if (this._viewOnly || this._rfbConnectionState !== 'connected') return;
++        ev.preventDefault();
++        this._keyboard.routePointer(ev, true, accepted => this._handleWheelNative(accepted));
++    }
++
++    _handleWheelNative(ev) {
+         if (this._rfbConnectionState !== 'connected') { return; }
+         if (this._viewOnly) { return; } // View only, skip mouse events
+ 
+@@ -2491,13 +2516,13 @@
+         ev.preventDefault();
+ 
+         // Ensure keys down are synced between client and server
+-        this._keyboard.clearKeysDown(ev);
++        this._keyboard.clearKeysDown(ev, true);
+ 
+         // On MacOs we need to translate zooming CMD+wheel to CTRL+wheel
+         if (isMac() && (this._keyboard._keyDownList["MetaLeft"] || this._keyboard._keyDownList["MetaRight"])) {
+-            this._keyboard._sendKeyEvent(this._keyboard._keyDownList["MetaLeft"], "MetaLeft", false);
+-            this._keyboard._sendKeyEvent(this._keyboard._keyDownList["MetaRight"], "MetaRight", false);
+-            this._keyboard._sendKeyEvent(KeyTable.XK_Control_L, "ControlLeft", true);
++            this._keyboard._sendKeyEvent(this._keyboard._keyDownList["MetaLeft"], "MetaLeft", false, true);
++            this._keyboard._sendKeyEvent(this._keyboard._keyDownList["MetaRight"], "MetaRight", false, true);
++            this._keyboard._sendKeyEvent(KeyTable.XK_Control_L, "ControlLeft", true, true);
+         }
+ 
+         // In a pinch and zoom gesture we're sending only a wheel event so we need
+@@ -2505,13 +2530,13 @@
+         // Moreover, we don't have a way to know that the gesture has stopped so we
+         // need to check manually every now and then and "unpress" the CTRL key when it ends.
+         if (ev.ctrlKey && !this._keyboard._keyDownList["ControlLeft"]) {
+-            this._keyboard._sendKeyEvent(KeyTable.XK_Control_L, "ControlLeft", true);
++            this._keyboard._sendKeyEvent(KeyTable.XK_Control_L, "ControlLeft", true, true);
+ 
+             this._watchForPinchAndZoom = this._watchForPinchAndZoom || setInterval(() => {
+                 const timeSinceLastPinchAndZoom = +new Date() - this._mouseLastPinchAndZoomTime;
+                 if (timeSinceLastPinchAndZoom > 250) {
+                     clearInterval(this._watchForPinchAndZoom);
+-                    this._keyboard._sendKeyEvent(KeyTable.XK_Control_L, "ControlLeft", false);
++                    this._keyboard._sendKeyEvent(KeyTable.XK_Control_L, "ControlLeft", false, true);
+                     this._watchForPinchAndZoom = null;
+                     this._mouseLastPinchAndZoomTime = 0;
+                 }
+@@ -3635,8 +3660,6 @@
+ 
+         if (Object.keys(clipItemData).length > 0) {
+             if (this.clipboardBinary) {
+-                this._clipHash = 0;
+-
+                 if (this._mouseLastScreenIndex === 0) {
+                     this._write_binary_clipboard(clipItemData, textdata)
+                 } else {
+@@ -3648,28 +3671,39 @@
+         return true;
+     }
+ 
+-    _write_binary_clipboard(clipItemData, textdata) {
+-        navigator.clipboard.write([new ClipboardItem(clipItemData)]).then(
+-            () => {
+-                if (textdata) {
+-                    this._clipHash = hashUInt8Array(textdata);
+-                }
+-            },
+-            (err) => {
+-                Log.Error("Error writing to client clipboard: " + err);
+-                // Lets try writeText
+-                if (textdata.length > 0) {
+-                    navigator.clipboard.writeText(textdata).then(
+-                        () => {
+-                            this._clipHash = hashUInt8Array(textdata);
+-                        },
+-                        (err) => {
+-                            Log.Error("Error writing text to client clipboard: " + err);
+-                        }
+-                    );
+-                }
+-            }
+-        );
++    async _write_binary_clipboard(clipItemData, textdata) {
++        if (!this.clipboardDown || !this.clipboardSeamless) return;
++        const mimes = Object.keys(clipItemData);
++        const dataset = await Promise.all(mimes.map(async mime => new Uint8Array(await clipItemData[mime].arrayBuffer())));
++        const fingerprint = await this._clipboardFingerprint(mimes, dataset);
++        if (fingerprint === this._clipHash) return; // Native server echo of our own upload.
++        // Do not overwrite a fresh local copy while a user-triggered read is pending.
++        if (!document.hasFocus() || this._clipboardReadPending || this._clipboardWritePending) {
++            this._pendingRemoteClipboard = [clipItemData, textdata];
++            return;
++        }
++        this._clipboardWritePending = true;
++        try {
++            await navigator.clipboard.write([new ClipboardItem(clipItemData)]);
++            this._clipHash = fingerprint;
++        } catch (err) {
++            Log.Debug("Error writing to client clipboard: " + err);
++            if (typeof textdata === 'string' && textdata.length > 0) {
++                try {
++                    await navigator.clipboard.writeText(textdata);
++                    this._clipHash = await this._clipboardFingerprint(['text/plain'], [new TextEncoder().encode(textdata)]);
++                } catch (fallbackError) {
++                    Log.Debug("Error writing text to client clipboard: " + fallbackError);
++                }
++            }
++        } finally {
++            this._clipboardWritePending = false;
++            if (this._pendingRemoteClipboard && document.hasFocus() && !this._clipboardReadPending) {
++                const pending = this._pendingRemoteClipboard;
++                this._pendingRemoteClipboard = null;
++                this._write_binary_clipboard(...pending);
++            }
++        }
+     }
+ 
+     _handle_server_stats_msg() {
+@@ -3916,38 +3950,211 @@
+         return true;
+     }
+ 
++    _setupUdp() {
++        this._closeUdp();
++        if (typeof RTCPeerConnection !== 'undefined' && this._isPrimaryDisplay) {
++            this._udpBuffer = new Map();
++
++            this._udpPeer = new RTCPeerConnection({
++                iceServers: [{
++                    urls: ["stun:stun.l.google.com:19302"]
++                }]
++            });
++            let peer = this._udpPeer;
++
++            peer.onicecandidate = function(e) {
++                if (e.candidate)
++                    Log.Debug("received ice candidate", e.candidate);
++                else
++                    Log.Debug("all candidates received");
++            }
++
++            peer.ondatachannel = function(e) {
++                Log.Debug("peer connection on data channel", e);
++            }
++
++            this._udpChannel = peer.createDataChannel("webudp", {
++                ordered: false,
++                maxRetransmits: 0
++            });
++            this._udpChannel.binaryType = "arraybuffer";
++
++            this._udpChannel.onerror = (e) => {
++                if (this._udpPeer !== peer) return;
++                Log.Error("data channel error " + e.message);
++                this._failUdpTransport();
++            };
++            this._udpChannel.onopen = () => {
++                if (this._udpPeer !== peer) return;
++                clearTimeout(this._udpHandshakeTimer);
++                this._udpHandshakeTimer = null;
++                this._udpConnectFailures = 0;
++                this._udpTransitFailures = 0;
++            };
++            peer.onconnectionstatechange = () => {
++                if (this._udpPeer === peer && peer.connectionState === 'failed') {
++                    this._failUdpTransport();
++                }
++            };
++
++            let sock = this._sock;
++            let udpBuffer = this._udpBuffer;
++            let me = this;
++            this._udpChannel.onmessage = function(e) {
++                if (me._udpPeer !== peer || !me.isConnected) return;
++                //Log.Info("got udp msg", e.data);
++                const u8 = new Uint8Array(e.data);
++                // Got an UDP packet. Do we need reassembly?
++                const id = parseInt(u8[0] +
++                                    (u8[1] << 8) +
++                                    (u8[2] << 16) +
++                                    (u8[3] << 24), 10);
++                const i = parseInt(u8[4] +
++                                   (u8[5] << 8) +
++                                   (u8[6] << 16) +
++                                   (u8[7] << 24), 10);
++                const pieces = parseInt(u8[8] +
++                                        (u8[9] << 8) +
++                                        (u8[10] << 16) +
++                                        (u8[11] << 24), 10);
++                const hash = parseInt(u8[12] +
++                                        (u8[13] << 8) +
++                                        (u8[14] << 16) +
++                                        (u8[15] << 24), 10);
++                // TODO: check the hash. It's the low 32 bits of XXH64, seed 0
++                const frame_id = parseInt(u8[16] +
++                                        (u8[17] << 8) +
++                                        (u8[18] << 16) +
++                                        (u8[19] << 24), 10);
++
++                if (me._transitConnectionState !== me.TransitConnectionStates.Udp) {
++                    me._display.clear();
++                    me._changeTransitConnectionState(me.TransitConnectionStates.Udp);
++                }
++
++                if (pieces == 1) { // Handle it immediately
++                    me._handleUdpRect(u8.slice(20), frame_id);
++                } else { // Use buffer
++                    const now = Date.now();
++
++                    if (udpBuffer.has(id)) {
++                        let item = udpBuffer.get(id);
++                        item.recieved_pieces += 1;
++                        item.data[i] = u8.slice(20);
++                        item.total_bytes += item.data[i].length;
++
++                        if (item.total_pieces == item.recieved_pieces) {
++                            // Message is complete, combile data into a single array
++                            var finaldata = new Uint8Array(item.total_bytes);
++                            let z = 0;
++                            for (let x = 0; x < item.data.length; x++) {
++                                finaldata.set(item.data[x], z);
++                                z += item.data[x].length;
++                            }
++                            udpBuffer.delete(id);
++                            me._handleUdpRect(finaldata, frame_id);
++                        }
++                    } else {
++                        let item = {
++                            total_pieces: pieces,   // number of pieces expected
++                                arrival: now,       //time first piece was recieved
++                            recieved_pieces: 1,     // current number of pieces in data
++                            total_bytes: 0,         // total size of all data pieces combined
++                            data: new Array(pieces)
++                        }
++                        item.data[i] = u8.slice(20);
++                        item.total_bytes = item.data[i].length;
++                        udpBuffer.set(id, item);
++                    }
++                }
++            }
++        }
++    }
++
++    _closeUdp() {
++        clearTimeout(this._udpUpgradeTimer);
++        clearTimeout(this._udpHandshakeTimer);
++        this._udpHandshakeTimer = null;
++        this._udpUpgradeTimer = null;
++        if (this._udpChannel) {
++            this._udpChannel.onmessage = null;
++            this._udpChannel.onerror = null;
++            this._udpChannel.onopen = null;
++            this._udpChannel.close();
++            this._udpChannel = null;
++        }
++        if (this._udpPeer) {
++            this._udpPeer.onicecandidate = null;
++            this._udpPeer.ondatachannel = null;
++            this._udpPeer.onconnectionstatechange = null;
++            this._udpPeer.close();
++            this._udpPeer = null;
++        }
++        if (this._udpBuffer) this._udpBuffer.clear();
++    }
++
+     _sendUdpUpgrade() {
+-        if (this._transitConnectionState == this.TransitConnectionStates.Upgrading) {
++        if (!this.isConnected || !this._useUdp ||
++            this._transitConnectionState === this.TransitConnectionStates.Upgrading ||
++            this._transitConnectionState === this.TransitConnectionStates.Udp) {
+             return;
+         }
++        if (!this._udpPeer || this._udpPeer.remoteDescription ||
++            this._udpPeer.connectionState === 'failed' || this._udpPeer.connectionState === 'closed') {
++            this._setupUdp();
++        }
++        if (!this._udpPeer) return;
+         this._changeTransitConnectionState(this.TransitConnectionStates.Upgrading);
+-
+-        let peer = this._udpPeer;
+-        let sock = this._sock;
+-
+-        peer.createOffer().then(function(offer) {
+-            return peer.setLocalDescription(offer);
+-        }).then(function() {
++        const peer = this._udpPeer;
++        const sock = this._sock;
++        const alive = () => this.isConnected && this._useUdp && this._udpPeer === peer;
++        peer.createOffer().then(offer => {
++            if (alive()) return peer.setLocalDescription(offer);
++        }).then(() => {
++            if (!alive() || !peer.localDescription) return;
+             const buff = sock._sQ;
+             const offset = sock._sQlen;
+-            const str = Uint8Array.from(Array.from(peer.localDescription.sdp).map(letter => letter.charCodeAt(0)));
+-
+-            buff[offset] = 181; // msg-type
+-            buff[offset + 1] = str.length >> 8; // u16 len
++            const str = Uint8Array.from(Array.from(privateWebRTCOffer(peer.localDescription.sdp)).map(letter => letter.charCodeAt(0)));
++            buff[offset] = 181;
++            buff[offset + 1] = str.length >> 8;
+             buff[offset + 2] = str.length;
+-
+             buff.set(str, offset + 3);
+-
+             sock._sQlen += 3 + str.length;
+             sock.flush();
+-        }).catch(function(reason) {
++            this._udpHandshakeTimer = setTimeout(() => {
++                this._udpHandshakeTimer = null;
++                if (alive() && this._udpChannel?.readyState !== 'open') this._failUdpTransport();
++            }, 12000);
++        }).catch(reason => {
++            if (!alive()) return;
+             Log.Error("Failed to create offer " + reason);
+             this._changeTransitConnectionState(this.TransitConnectionStates.Tcp);
+             this._udpConnectFailures++;
++            this._scheduleUdpRetry();
+         });
+     }
+ 
++    _scheduleUdpRetry() {
++        if (!this.isConnected || !this._useUdp || this._udpUpgradeTimer !== null) return;
++        // Keep TCP usable during long outages, with one low-rate UDP probe.
++        const exhausted = this._udpConnectFailures >= 3 || this._udpTransitFailures >= 3;
++        this._udpUpgradeTimer = setTimeout(() => {
++            this._udpUpgradeTimer = null;
++            if (this.isConnected && this._useUdp) this.enableWebRTC = true;
++        }, exhausted ? 30000 : 3000);
++    }
++
++    _failUdpTransport() {
++        if (!this.isConnected || !this._useUdp || !this._udpPeer) return;
++        this._udpConnectFailures++;
++        this._sendUdpDowngrade();
++        this._closeUdp();
++        this._changeTransitConnectionState(this.TransitConnectionStates.Failure);
++        this._scheduleUdpRetry();
++    }
++
+     _sendUdpDowngrade() {
++        if (!this.isConnected) return;
+         this._changeTransitConnectionState(this.TransitConnectionStates.Downgrading);
+         const buff = this._sock._sQ;
+         const offset = this._sock._sQlen;
+@@ -3969,9 +4176,23 @@
+ 
+         let peer = this._udpPeer;
+ 
+-        var response = JSON.parse(payload);
+-        Log.Debug("UDP Upgrade recieved from server: " + payload);
++        if (!this.isConnected || !this._useUdp || !peer) return true;
++        let response;
++        try {
++            response = JSON.parse(payload);
++            if (!response || response.error || !response.answer || !response.candidate) {
++                throw new Error('UDP unavailable');
++            }
++        } catch (error) {
++            this._udpUnavailableReason = response?.error === 'udp-unavailable' ? 'address-unavailable' : 'negotiation-failed';
++            // Discovery may still be pending. Keep the RFB connection usable
++            // and reuse the bounded UDP retry path without logging credentials.
++            this._failUdpTransport();
++            return true;
++        }
++        this._udpUnavailableReason = null;
+         peer.setRemoteDescription(new RTCSessionDescription(response.answer)).then(function() {
++            if (!this.isConnected || this._udpPeer !== peer) return;
+             var candidate = new RTCIceCandidate(response.candidate);
+             peer.addIceCandidate(candidate).then(function() {
+                 Log.Debug("success in addicecandidate");
+@@ -4498,14 +4719,7 @@
+                 this._changeTransitConnectionState(this.TransitConnectionStates.Tcp);
+                 this._display.clear();
+                 if (this._useUdp) {
+-                    if (this._udpConnectFailures < 3 && this._udpTransitFailures < 3) {
+-                        setTimeout(function() {
+-                            Log.Warn("Attempting to connect via UDP again after failure.")
+-                            this.enableWebRTC = true;
+-                        }.bind(this), 3000);
+-                    } else {
+-                        Log.Warn("UDP connection failures exceeded limit, remaining on TCP transit.")
+-                    }
++                    this._scheduleUdpRetry();
+                 }
+             } else if (this._transitConnectionState == this.TransitConnectionStates.Downgrading) {
+                 this._display.clear();
+@@ -4907,6 +5121,8 @@
+ 
+             offset = sock._sQlen;
+         }
++        // Header-only payloads (explicit empty text) still need transmission.
++        sock.flush();
+     },
+ 
+     sendSubscribeUnixRelay(sock, name) {

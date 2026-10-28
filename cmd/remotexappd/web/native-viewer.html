@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RemoteXApp native Viewer</title>
+<style>
+html,body{margin:0;height:100%;background:#17202c;color:#edf2fa;font:14px system-ui}body{display:flex;flex-direction:column}header{padding:10px;display:flex;gap:16px;align-items:center}button{padding:6px 12px}#display{flex:1;min-height:0;overflow:hidden;position:relative}
+</style>
+<header><strong>RemoteXApp</strong><span id="status" role="status">Connecting…</span><button id="reconnect">Reconnect</button><button id="disconnect">Disconnect</button></header>
+<main id="display"></main>
+<script type="module">
+const marker = location.pathname.lastIndexOf('/remotexapps/');
+const baseURL = location.pathname.slice(0, marker);
+const id = decodeURIComponent(location.pathname.slice(marker + '/remotexapps/'.length).split('/')[0]);
+const { RemoteXAppManager, RemoteXAppNativeClient } = await import(`${baseURL}/sdk/index.js`);
+const viewer = new RemoteXAppNativeClient({ container:document.querySelector('#display'), manager:new RemoteXAppManager({ baseURL }) });
+viewer.addEventListener('statechange', ({ detail }) => {
+  document.querySelector('#status').textContent = detail.state === 'ready' ? `Ready · ${detail.transport.toUpperCase()}` : `${detail.state}${detail.code ? ` · ${detail.code}` : ''}`;
+});
+const connect = () => viewer.connect(id).catch(() => {});
+document.querySelector('#reconnect').onclick = connect;
+document.querySelector('#disconnect').onclick = () => viewer.disconnect();
+window.addEventListener('pagehide', () => viewer.dispose(), { once:true });
+connect();
+</script>
+</html>

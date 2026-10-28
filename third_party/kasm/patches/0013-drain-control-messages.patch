@@ -1,0 +1,97 @@
+--- a/core/rfb.js
++++ b/core/rfb.js
+@@ -19,8 +19,7 @@
+ import Inflator from "./inflator.js";
+ import Deflator from "./deflator.js";
+ import Keyboard from "./input/keyboard.js";
+-import initializePrinterRelay from "./output/printer.js";
+-import initializeSmartcardRelay from "./output/smartcard.js";
++import { readVideoEncoders } from "./remotexapp-server-messages.mjs";
+ import GestureHandler from "./input/gesturehandler.js";
+ import Cursor from "./util/cursor.js";
+ import Websock from "./websock.js";
+@@ -3264,9 +3263,7 @@
+ 
+         this._updateConnectionState('connected');
+ 
+-        //Register pipe based extensions
+-        initializePrinterRelay(this);
+-        initializeSmartcardRelay(this);
++        // D1 does not subscribe to printer or smartcard Unix relays.
+ 
+         return true;
+     }
+@@ -4214,6 +4211,7 @@
+         } else {
+             Log.Warn("Unix relay subscription failed, " + payload);
+         }
++        return true;
+     }
+ 
+     _handleUnixRelay() {
+@@ -4229,58 +4227,18 @@
+         const payload = this._sock.rQshiftBytes(len);
+         const processRelay = this._unixRelays[name];
+         processRelay && processRelay(payload);
++        return true;
+     }
+ 
+     _handleServerVideoEncoders() {
+-        if (this._sock.rQwait("VideoEncoders header", 1, 1))
+-            return false;
+-
+-        let num = this._sock.rQshift8();
+-
+-        // Each encoder has variable length data:
+-        // codec(4) + minQuality(4) + maxQuality(4) + numPresets(1) + presets(4*n)
+-        // Minimum is 13 bytes per encoder
+-        if (this._sock.rQwait("VideoEncoders data", num * 13, 1))
+-            return false;
+-
+-        let serverSupportedEncoders = [];
+-        let codecConfigurations = {};
+-
+-        for (let i = 0; i < num; i++) {
+-            const codec = this._sock.rQshift32();
+-
+-            const minQuality = this._sock.rQshift32();
+-            const maxQuality = this._sock.rQshift32();
+-
+-            const numPresets = this._sock.rQshift8();
+-            if (numPresets > 0) {
+-                if (this._sock.rQwait("VideoEncoders presets", numPresets * 4)) {
+-                    return false;
+-                }
+-            }
+-
+-            const presets = [];
+-            for (let j = 0; j < numPresets; j++) {
+-                presets.push(this._sock.rQshift32());
+-            }
+-
+-            serverSupportedEncoders.push(codec);
+-            codecConfigurations[codec] = {
+-                minQuality,
+-                maxQuality,
+-                presets
+-            };
+-        }
+-
+-        this.videoCodecs = serverSupportedEncoders;
+-        this.videoCodecConfigurations = codecConfigurations;
+-
++        const result = readVideoEncoders(this._sock);
++        if (!result) return false;
++        this.videoCodecs = result.codecs;
++        this.videoCodecConfigurations = result.configurations;
+         this.dispatchEvent(new CustomEvent("videocodecschange", {
+-            detail: {
+-                codecs: serverSupportedEncoders,
+-                configurations: codecConfigurations
+-            }
++            detail: { codecs: result.codecs, configurations: result.configurations }
+         }));
++        return true;
+     }
+ 
+     _handleForceGameMode() {

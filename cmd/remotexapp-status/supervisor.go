@@ -28,6 +28,7 @@ type serviceIdentity struct {
 }
 
 type serviceRecord struct {
+	InputProvider string                     `json:"inputProvider,omitempty"`
 	DeadlineMS    int64                      `json:"deadlineMs"`
 	SchemaVersion int                        `json:"schemaVersion"`
 	Generation    int64                      `json:"generation"`
@@ -54,6 +55,7 @@ type sessionSupervisor struct {
 	children                                               map[string]*serviceChild
 	endpoints                                              map[string]os.FileInfo
 	stage                                                  string
+	preserveDriver                                         bool
 }
 
 func (s *sessionSupervisor) startupStage(stage string) error {
@@ -219,6 +221,9 @@ func (s *sessionSupervisor) rememberEndpoints() {
 func (s *sessionSupervisor) cleanup() {
 	s.rememberEndpoints()
 	for _, name := range []string{"driver", "engine", "ibus", "dbus"} {
+		if name == "driver" && s.preserveDriver {
+			continue
+		}
 		s.stop(name)
 	}
 	for path, original := range s.endpoints {
@@ -294,8 +299,12 @@ func (s *sessionSupervisor) startServices(ctx context.Context) error {
 			return err
 		}
 	}
-	s.env = append(s.env, "DBUS_SESSION_BUS_ADDRESS="+bus, "IBUS_ADDRESS=unix:path="+filepath.Join(s.socketRuntime, "ibus.sock"),
-		"GTK_IM_MODULE=ibus", "QT_IM_MODULE=ibus", "XMODIFIERS=@im=ibus")
+	s.env = append(s.env, "DBUS_SESSION_BUS_ADDRESS="+bus)
+	if s.record.InputProvider == "native" {
+		s.env = append(s.env, "GTK_IM_MODULE=xim", "QT_IM_MODULE=xim", "XMODIFIERS=@im=none")
+	} else {
+		s.env = append(s.env, "IBUS_ADDRESS=unix:path="+filepath.Join(s.socketRuntime, "ibus.sock"), "GTK_IM_MODULE=ibus", "QT_IM_MODULE=ibus", "XMODIFIERS=@im=ibus")
+	}
 	if err := s.startupStage("D-Bus readiness"); err != nil {
 		return err
 	}
@@ -306,6 +315,9 @@ func (s *sessionSupervisor) startServices(ctx context.Context) error {
 	}
 	if err := writeAtomic(filepath.Join(s.runtime, "session-dbus-address"), []byte(bus+"\n")); err != nil {
 		return err
+	}
+	if s.record.InputProvider == "native" {
+		return nil
 	}
 	if err := s.startupStage("IBus startup"); err != nil {
 		return err
@@ -354,6 +366,10 @@ func superviseSession(driver string) error {
 	if os.Getenv("REMOTEXAPP_SESSION_SERVICES") != "core-v1" {
 		return errors.New("core-v1 session services contract required")
 	}
+	inputProvider := os.Getenv("REMOTEXAPP_INPUT_PROVIDER")
+	if inputProvider != "" && inputProvider != "native" {
+		return errors.New("unsupported session input provider")
+	}
 	generation, err := strconv.ParseInt(os.Getenv("REMOTEXAPP_SESSION_GENERATION"), 10, 64)
 	if err != nil || generation < 1 {
 		return errors.New("invalid session generation")
@@ -363,6 +379,9 @@ func superviseSession(driver string) error {
 		return errors.New("invalid session deadline")
 	}
 	for _, key := range []string{"REMOTEXAPP_RUNTIME", "REMOTEXAPP_SOCKET_RUNTIME", "REMOTEXAPP_STATUS_PATH", "REMOTEXAPP_STATUS_SCHEMA", "REMOTE_UNICODE_ENGINE", "HOME", "XAUTHORITY"} {
+		if key == "REMOTE_UNICODE_ENGINE" && inputProvider == "native" {
+			continue
+		}
 		if !filepath.IsAbs(os.Getenv(key)) {
 			return fmt.Errorf("absolute %s is required", key)
 		}
@@ -383,6 +402,7 @@ func superviseSession(driver string) error {
 	s := &sessionSupervisor{runtime: os.Getenv("REMOTEXAPP_RUNTIME"), socketRuntime: os.Getenv("REMOTEXAPP_SOCKET_RUNTIME"), publicPath: os.Getenv("REMOTEXAPP_STATUS_PATH"), schemaPath: os.Getenv("REMOTEXAPP_STATUS_SCHEMA"), driver: driver, generation: generation,
 		env: supervisorEnvironment(os.Environ()), children: map[string]*serviceChild{}, endpoints: map[string]os.FileInfo{}, record: serviceRecord{SchemaVersion: 1, Generation: generation, Services: map[string]serviceIdentity{}, BorrowedBus: mode == "user-home"}}
 	s.record.DeadlineMS = deadline
+	s.record.InputProvider = inputProvider
 	lock, err := os.OpenFile(filepath.Join(s.runtime, "session-services.lock"), os.O_CREATE|os.O_RDWR|syscall.O_NOFOLLOW, 0600)
 	if err != nil {
 		return err
@@ -463,6 +483,17 @@ func (s *sessionSupervisor) observe(lifetime context.Context) error {
 		case <-lifetime.Done():
 			return s.publish("stopped", "")
 		case <-s.children["driver"].done:
+			// Losing the user-home Driver is not authorization to destroy its
+			// surviving applications. Only an explicit stop or a current-generation
+			// clean logout authorizes normal descendant cleanup. Systemd must also
+			// retain the populated unit (ExitType=cgroup); standalone already does.
+			status, statusErr := readStatus(s.publicPath)
+			cleanLogout := statusErr == nil && status.Generation == s.generation && status.State == "exited"
+			if s.record.BorrowedBus && lifetime.Err() == nil && !cleanLogout {
+				s.preserveDriver = true
+				_ = report(s.publicPath, s.schemaPath, s.generation, "error", "Session Driver exited; surviving applications retained", "driver-exited-unexpectedly", nil, nil, nil, nil)
+				return s.publish("exited", "driver-exited-unexpectedly")
+			}
 			// Driver has already published its canonical App exit status. Returning
 			// tears down services, allowing the existing cgroup observer to run once.
 			failure := s.record.Failure

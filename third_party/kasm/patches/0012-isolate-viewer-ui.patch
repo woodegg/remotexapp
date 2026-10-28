@@ -1,0 +1,54 @@
+--- a/core/display.js
++++ b/core/display.js
+@@ -12,7 +12,7 @@
+ import { toSigned32bit } from './util/int.js';
+ import { isWindows } from './util/browser.js';
+ import { uuidv4 } from './util/strings.js';
+-import UI from '../app/ui.js';
++// RemoteXApp owns the Viewer UI; secondary-window maps are instance-local.
+ import { encodings } from "./encodings.js";
+ import {Canvas2DRenderer} from "./renderers/Canvas2DRenderer";
+ import {WebGLRenderer} from "./renderers/WebGLRenderer";
+@@ -21,6 +21,8 @@
+ export default class Display {
+     constructor(target, rfb, isPrimaryDisplay, videoRenderingMode = 'canvas2d') {
+         Log.Debug(">> Display.constructor");
++        this.registeredWindows = new Map();
++        this.displayWindows = new Map();
+ 
+         /*
+         For performance reasons we use a multi dimensional array
+@@ -474,7 +476,7 @@
+ 
+             this._screens.push(new_screen);
+             if (new_screen.channel) {
+-                UI.registeredWindows.set(screenID, windowId);
++                this.registeredWindows.set(screenID, windowId);
+                 new_screen.channel.postMessage({eventType: "registered", screenIndex: new_screen.screenIndex});
+             } else
+                 Log.Debug(`Channel not found for screenId ${screenID}`);
+@@ -512,10 +514,10 @@
+                 if (this._screens[i].screenID == screenID) {
+                     //flush all rects on target screen
+                     this._flushRectsScreen(i);
+-                    const windowId = UI.registeredWindows.get(screenID);
++                    const windowId = this.registeredWindows.get(screenID);
+                     if (windowId) {
+-                        UI.registeredWindows.delete(screenID);
+-                        UI.displayWindows.delete(windowId);
++                        this.registeredWindows.delete(screenID);
++                        this.displayWindows.delete(windowId);
+                     }
+                     this._screens.splice(i, 1);
+                     removed = true;
+--- a/core/rfb.js
++++ b/core/rfb.js
+@@ -128,7 +128,7 @@
+         this._supportsContinuousUpdates = false;
+         this._enabledContinuousUpdates = false;
+         this._supportsSetDesktopSize = false;
+-        this._connectionID = window.location.href.split('?')[0].match(/^(.+)(\/)/)[0];
++        this._connectionID = crypto.randomUUID();
+         this._screenFlags = 0;
+         this._qemuExtKeyEventSupported = false;
+ 

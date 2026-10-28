@@ -24,6 +24,8 @@ var unoAPIScript []byte
 func main() {
 	cfg := config{}
 	flag.StringVar(&cfg.listen, "listen", "127.0.0.1:1984", "HTTP/WebSocket listen address")
+	flag.StringVar(&cfg.nativeBundle, "native-kasm-bundle", "", "pinned Kasm bundle; disables legacy input/clipboard bridges")
+	flag.StringVar(&cfg.nativeDigest, "native-kasm-digest", "", "expected Kasm manifest SHA-256")
 	flag.StringVar(&cfg.display, "display", ":23", "X11 display to control")
 	flag.StringVar(&cfg.vncAddr, "vnc-addr", "127.0.0.1:5923", "loopback TigerVNC TCP/RFB address")
 	flag.StringVar(&cfg.legacyRFB, "legacy-rfb", "", "optional internal websockify WebSocket URL for A/B testing")
@@ -38,6 +40,21 @@ func main() {
 	flag.Parse()
 	if cfg.maxRFBConnections < 1 || cfg.maxRFBConnections > 128 || cfg.maxInputConnections < 1 || cfg.maxInputConnections > 128 {
 		log.Fatal("connection limits must be between 1 and 128")
+	}
+	if cfg.nativeBundle != "" {
+		if cfg.nativeDigest == "" {
+			log.Fatal("native Kasm requires a manifest digest")
+		}
+		cfg.clipboardSocket = ""
+		handler, err := nativeKasmHandler(cfg)
+		if err != nil {
+			log.Fatal(err)
+		}
+		runGateway(cfg.listen, handler)
+		return
+	}
+	if cfg.nativeDigest != "" {
+		log.Fatal("native digest requires a bundle")
 	}
 
 	if _, _, err := net.SplitHostPort(cfg.vncAddr); err != nil {
@@ -87,7 +104,11 @@ func main() {
 	log.Printf("Unicode text backend: %s", cfg.textBackend)
 	log.Printf("Text request log level: %s", cfg.textLogLevel)
 	log.Printf("remotexapp gateway: http://%s/kiosk.html (X11 %s, RFB TCP %s, UNO enabled=%t)", cfg.listen, cfg.display, cfg.vncAddr, cfg.unoURL != "")
-	server := &http.Server{Addr: cfg.listen, Handler: gatewayHandler(cfg, input), ReadHeaderTimeout: 10 * time.Second, IdleTimeout: 75 * time.Second, MaxHeaderBytes: 1 << 20}
+	runGateway(cfg.listen, gatewayHandler(cfg, input))
+}
+
+func runGateway(listen string, handler http.Handler) {
+	server := &http.Server{Addr: listen, Handler: handler, ReadHeaderTimeout: 10 * time.Second, IdleTimeout: 75 * time.Second, MaxHeaderBytes: 1 << 20}
 	errors := make(chan error, 1)
 	go func() { errors <- server.ListenAndServe() }()
 	signals := make(chan os.Signal, 1)

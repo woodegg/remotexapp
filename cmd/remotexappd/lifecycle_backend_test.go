@@ -58,7 +58,7 @@ func TestStandaloneServerLossCleanupFailureIsVisibleToManaged(t *testing.T) {
 func TestParseComponentLaunch(t *testing.T) {
 	args := []string{
 		"--user", "--unit=remotexapp-example-gateway", "--collect",
-		"--property=WorkingDirectory=/tmp", "--property=BindsTo=remotexapp-example-vnc.service",
+		"--property=WorkingDirectory=/tmp", "--property=ExitType=cgroup", "--property=BindsTo=remotexapp-example-vnc.service",
 		"--property=After=remotexapp-example-vnc.service", "--setenv=HOME=/tmp",
 		"--", "/usr/bin/true", "--argument",
 	}

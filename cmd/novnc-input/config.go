@@ -1,6 +1,8 @@
 package main
 
 type config struct {
+	nativeBundle        string
+	nativeDigest        string
 	listen              string
 	display             string
 	vncAddr             string

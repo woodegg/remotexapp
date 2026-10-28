@@ -28,6 +28,9 @@ var (
 //go:embed web/console.html
 var consoleHTML []byte
 
+//go:embed web/native-viewer.html
+var nativeViewerHTML []byte
+
 //go:embed web/sdk/*
 var sdkFiles embed.FS
 
@@ -64,6 +67,8 @@ func main() {
 	}
 	flag.StringVar(&cfg.coreDriverDir, "core-driver-dir", coreDriverDir, "immutable core driver helper directory for App Package ABI")
 	flag.StringVar(&cfg.vncLauncher, "vnc-launcher", "direct", "VNC launcher: direct or wrapper")
+	flag.StringVar(&cfg.displayProvider, "display-provider", "tigervnc", "display provider for new runtimes: tigervnc or kasm")
+	flag.StringVar(&cfg.kasmBundle, "kasm-bundle", "", "immutable Kasm WSS bundle directory (explicit opt-in)")
 	flag.StringVar(&cfg.lifecycleBackend, "lifecycle-backend", "systemd", "component lifecycle backend: systemd or standalone")
 	flag.StringVar(&cfg.standaloneCgroupRoot, "standalone-cgroup-root", "", "host-delegated cgroup v2 subtree for standalone components")
 	flag.StringVar(&cfg.managedObserver, "managed-observer", "cgroup", "managed runtime observer: cgroup or poll")
@@ -199,6 +204,9 @@ func main() {
 	if cfg.vncLauncher != "wrapper" && cfg.vncLauncher != "direct" {
 		log.Fatalf("unsupported VNC launcher %q", cfg.vncLauncher)
 	}
+	if err := cfg.configureDisplayProvider(); err != nil {
+		log.Fatal(err)
+	}
 	if cfg.lifecycleBackend != "systemd" && cfg.lifecycleBackend != "standalone" {
 		log.Fatalf("unsupported lifecycle backend %q", cfg.lifecycleBackend)
 	}
@@ -287,9 +295,15 @@ func main() {
 	if len(cfg.classes) == 0 {
 		log.Fatal("template catalog is empty")
 	}
-	requiredPaths := []string{cfg.engine, cfg.gatewayBinary}
+	requiredPaths := []string{cfg.gatewayBinary}
+	if cfg.displayProvider != "kasm" {
+		requiredPaths = append(requiredPaths, cfg.engine)
+	}
 	if cfg.vncLauncher == "direct" {
-		requiredPaths = append(requiredPaths, "/usr/bin/Xtigervnc", "/usr/bin/xauth")
+		requiredPaths = append(requiredPaths, "/usr/bin/xauth")
+		if cfg.displayProvider != "kasm" {
+			requiredPaths = append(requiredPaths, "/usr/bin/Xtigervnc")
+		}
 	}
 	for _, class := range cfg.classes {
 		if class.Session.Status.Mode == "driver" {

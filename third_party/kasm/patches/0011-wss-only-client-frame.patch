@@ -1,0 +1,113 @@
+--- a/core/rfb.js
++++ b/core/rfb.js
+@@ -151,7 +151,7 @@
+         this._forcedResolutionY = null;
+         this._clipboardBinary = true;
+         this._resendClipboardNextUserDrivenEvent = true;
+-        this._useUdp = true;
++        this._useUdp = false;
+         this._hiDpi = 'hiDpi' in options ? !!options.hiDpi : false;
+         this._enableQOI = false;
+         this._videoQuality = 2;
+@@ -300,6 +300,7 @@
+             throw exc;
+         }
+         this._display.onflush = this._onFlush.bind(this);
++        this._display.onframe = () => this.dispatchEvent(new CustomEvent("frame"));
+ 
+         // populate decoder array with objects
+         this._decoders[encodings.encodingRaw] = new RawDecoder();
+@@ -747,16 +748,8 @@
+ 
+     get enableWebRTC() { return this._useUdp; }
+     set enableWebRTC(value) {
+-        this._useUdp = value;
+-        if (!value) {
+-            if (this.isConnected && (this._transitConnectionState !== this.TransitConnectionStates.Tcp)) {
+-                this._sendUdpDowngrade();
+-            }
+-        } else {
+-            if (this.isConnected && (this._transitConnectionState !== this.TransitConnectionStates.Udp)) {
+-                this._sendUdpUpgrade();
+-            }
+-        }
++        if (value) throw new Error("UDP is unavailable in the WSS-only component");
++        this._useUdp = false;
+     }
+ 
+     get enableHiDpi() { return this._hiDpi; }
+@@ -1462,7 +1455,7 @@
+         this._resendClipboardNextUserDrivenEvent = true;
+ 
+         // WebRTC UDP datachannel inits
+-        this._setupUdp();
++        // WSS-only component: do not create ICE/STUN/PeerConnection state.
+ 
+ 
+         Log.Debug("<< RFB.connect");
+@@ -4101,7 +4094,7 @@
+         }
+         if (!this._udpPeer || this._udpPeer.remoteDescription ||
+             this._udpPeer.connectionState === 'failed' || this._udpPeer.connectionState === 'closed') {
+-            this._setupUdp();
++            // WSS-only component: do not create ICE/STUN/PeerConnection state.
+         }
+         if (!this._udpPeer) return;
+         this._changeTransitConnectionState(this.TransitConnectionStates.Upgrading);
+--- a/core/display.js
++++ b/core/display.js
+@@ -182,6 +182,7 @@
+ 
+         // ===== EVENT HANDLERS =====
+ 
++        this.onframe = () => {};
+         this.onflush = () => {  }; // A flush request has finished
+ 
+         this._broadcastChannel = new BroadcastChannel(`channel_${this.screenID}`);
+@@ -1144,6 +1145,7 @@
+             this._renderer?.drawTransparentOverlayImg()
+         }
+ 
++        if (drawRectCnt > 0) this.onframe();
+         if (this._syncFrameQueue.length > 0) {
+             this._scheduleSyncFrame();
+         }
+@@ -1564,6 +1566,7 @@
+                 }
+             }
+ 
++            if (primaryScreenRects > 0) this.onframe();
+             this._flipCnt += 1;
+ 
+             if (this._flushing) {
+--- a/core/decoders/tight.js
++++ b/core/decoders/tight.js
+@@ -12,7 +12,8 @@
+ import * as Log from '../util/logging.js';
+ import Inflator from "../inflator.js";
+ import { hashUInt8Array } from '../util/int.js';
+-import qoiWorker from './qoi/decoder.js?worker';
++// QOI workers are outside the initial WSS component contract.
++class qoiWorker { constructor() { throw new Error("QOI is unavailable"); } }
+ 
+ export default class TightDecoder {
+     constructor(display) {
+@@ -37,16 +38,8 @@
+     
+     get enableQOI() { return this._enableQOI; }
+     set enableQOI(enabled) {
+-        if(this._enableQOI === enabled) {
+-            return;
+-        }
+-
+-        if (enabled) {
+-            this._enableQOI = this._enableQOIWorkers();
+-        } else {
+-            this._enableQOI = false;
+-            this._disableQOIWorkers();
+-        }
++        if (enabled) throw new Error("QOI is unavailable in this component");
++        this._enableQOI = false;
+     }
+ 
+     // ===== Public Methods =====

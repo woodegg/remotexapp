@@ -33,6 +33,9 @@ func (m *manager) openViewerChannel(id string, rfb bool, r *http.Request) (*view
 	if item.State != "server-ready" && item.State != "ready" {
 		return nil, r, errors.New("runtime is not ready")
 	}
+	if isKasm(item) && (r.URL.Query().Get("sessionGeneration") == "" || item.SessionGeneration < 1 || item.SessionState != "running") {
+		return nil, r, errors.New("native Viewer requires a prepared current generation")
+	}
 	if raw, present := r.URL.Query()["sessionGeneration"]; present {
 		if len(raw) != 1 {
 			return nil, r, errors.New("invalid session generation")

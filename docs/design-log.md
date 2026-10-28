@@ -4513,3 +4513,96 @@ UDP, audio isolation/ownership, default switching and publication remain their
 own decisions and gates. The design PR can retain these proposed sections as
 future guidance; implementation uses a separate linked Draft PR. No further
 scope confirmation is needed for the already approved D1 work.
+
+## 2026-10-28 — Implement the bounded native WSS provider contract
+
+D1 / Issue #30 selects `display-provider=kasm` explicitly; lifecycle backend
+remains independent. This refines KNA-001/002/005/007/009 from the
+[native proposal](kasm-native-architecture.md). It does not accept the later
+UDP/audio/host gates or qualify a production release.
+
+New Kasm runtime records use schema 4 and pin a manifest containing server,
+client, source and member digests. Schema 2/3 always mean the legacy provider.
+Unknown records, missing or altered components fail closed. Ordinary upgrade
+cannot switch providers. Scoped stop and compatible state/data snapshots are
+required for migration and rollback; no live X-server adoption is implied.
+
+The existing Core supervisor owns native sessions and D-Bus. Native service
+records explicitly name their input provider; they neither launch nor require
+IBus/Unicode. Borrowed account buses and populated application components keep
+their existing protection. Existing class/App shutdown semantics still apply.
+
+Native preparation is an authenticated POST with expected session generation.
+It returns the started generation without fabricating a Viewer attachment.
+Native WSS requires that running generation and uses existing owned-channel
+fencing; arbitrary upstream management paths and legacy input routes are
+unavailable. The minimal native SDK reports ready only after both current App
+readiness and an actual painted update; disposal owns only its Viewer.
+Legacy clients reject Kasm descriptors. Unsupported clipboard/programmatic
+text/audio/UDP capabilities are explicit. D1 keeps the existing authenticated
+single-account trust model; it does not introduce a multi-tenant ACL service.
+
+Native descriptors also expose a non-secret component digest. Preparation and
+asset/Viewer routes check it; the SDK includes it in the module URL to prevent
+the browser's module cache from retaining an old client after a paired upgrade.
+Only WebSocket protocol headers reach the Kasm server; site-specific identity,
+credential and forwarding headers stop at the trusted gateway. Clipboard is
+disabled in both directions in the initial server launch and client adapter.
+
+Focused automated boundary checks are in progress alongside real disposable
+App/lifecycle verification. Neither a passing unit test nor these implementation
+choices complete the nine D1 acceptance groups.
+
+
+## 2026-10-28 — Preserve user-home descendants after leader loss
+
+D1 fault injection exposed a gap beneath the accepted populated-session guard:
+Driver death made the supervisor clean its process group, then systemd's default
+main-process lifetime removed remaining applications before Manager could
+classify the component. This supersedes the D1 assumption above that retaining
+the existing supervisor alone preserved this invariant.
+
+For both display providers, a user-home Driver exit without explicit supervisor
+stop or a current-generation `exited` App report retains its descendant group
+and publishes `driver-exited-unexpectedly`. Owned input helpers may stop; the
+borrowed account bus remains untouched. Systemd user-home session units use
+`ExitType=cgroup` so even supervisor loss cannot imply descendant teardown.
+This requires systemd 250 or newer; unsupported systems fail the launch rather
+than silently weakening protection. Standalone keeps its existing populated
+cgroup ownership. Manager's readiness-process observation reports failure and
+its populated/unknown guard blocks replacement. Normal logout and explicit
+stop retain their cleanup semantics; isolated/shared disposable Apps retain
+their existing policy.
+
+Reference: [systemd service lifetime](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#ExitType=).
+Regression coverage distinguishes unexpected Driver death, clean logout and
+explicit stop with real child processes; actual systemd/standalone fault and
+cleanup results remain part of D1's live qualification.
+
+
+## 2026-10-28 — Drain complete native protocol messages
+
+D1 repeated reconnects exposed a connected-but-blank Viewer. The pinned client
+returned no completion value after consuming codec/Unix-relay control messages,
+so its receive loop stopped with complete coalesced messages still queued.
+Variable codec lists also rewound an incomplete message by an incorrect amount.
+
+The component now returns completion explicitly and parses codec capabilities
+without committing bytes until the entire bounded payload is present. D1 does
+not subscribe to printer/smartcard Unix relays. Tests cover every byte split,
+coalesced messages, maximum count fields and the actual patched upstream methods.
+No input replay, polling refresh, false first-paint signal or protocol-version
+change is introduced. The new component digest requires renewed live evidence;
+prior component results remain historical.
+
+Kasm's client encoding preferences can mutate shared server rendering settings.
+D1 starts the server with `IgnoreClientSettingsKasm=1` to preserve the class's
+frame-rate policy across all Viewers. Resize authorization remains the separate
+class-derived `AcceptSetDesktopSize` setting. Browser preferences are not an
+authority for shared runtime policy.
+
+The completed bounded D1 automation is recorded in
+[the dated native qualification evidence](../tests/kasm-native/README.md):
+real Apps, both lifecycle backends, actual container reboot, generation
+retirement, prior-Core rollback and owned cleanup. PR #31 / Issue #30 retain
+the review and merge boundary; D2–D5 qualification is not implied.

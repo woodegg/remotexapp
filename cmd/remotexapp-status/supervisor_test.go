@@ -33,6 +33,17 @@ func TestSessionServiceProcess(t *testing.T) {
 		os.Exit(0)
 	}
 	if role == "driver" {
+		if os.Getenv("REMOTEXAPP_TEST_DRIVER_CHILD") == "1" {
+			helper := exec.Command("/bin/sleep", "120")
+			if err := helper.Start(); err != nil {
+				os.Exit(8)
+			}
+			identity, err := processIdentity(helper.Process.Pid)
+			if err != nil {
+				os.Exit(9)
+			}
+			_ = os.WriteFile(filepath.Join(os.Getenv("REMOTEXAPP_RUNTIME"), "helper-identity.json"), mustJSON(identity), 0600)
+		}
 		if os.Getenv("REMOTEXAPP_TEST_IGNORE_DRIVER_TERM") == "1" {
 			signal.Ignore(syscall.SIGTERM)
 		}
@@ -215,6 +226,54 @@ func TestSupervisorEnvironmentAndBorrowedBus(t *testing.T) {
 	}
 }
 
+func TestNativeSupervisorKeepsBusWithoutLegacyInput(t *testing.T) {
+	for _, mode := range []string{"isolated", "user-home"} {
+		t.Run(mode, func(t *testing.T) {
+			f := newSupervisorFixture(t, mode)
+			f.env = append(f.env, "REMOTEXAPP_INPUT_PROVIDER=native", "REMOTE_UNICODE_ENGINE=", "IBUS_ADDRESS=untrusted-inherited")
+			c := f.start(t)
+			r := f.record(t, "ready")
+			if r.InputProvider != "native" || r.Driver == nil {
+				t.Fatal("native supervisor did not launch")
+			}
+			if _, ok := r.Services["ibus"]; ok {
+				t.Fatal("native started IBus")
+			}
+			if _, ok := r.Services["engine"]; ok {
+				t.Fatal("native started legacy engine")
+			}
+			_, ownsBus := r.Services["dbus"]
+			if ownsBus == (mode == "user-home") {
+				t.Fatal("wrong bus ownership")
+			}
+			data, err := os.ReadFile(filepath.Join(f.runtime, "driver-environment.json"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			var env []string
+			if err := json.Unmarshal(data, &env); err != nil {
+				t.Fatal(err)
+			}
+			for _, v := range env {
+				if strings.HasPrefix(v, "IBUS_ADDRESS=") || v == "GTK_IM_MODULE=ibus" {
+					t.Fatal("legacy environment leaked")
+				}
+			}
+			if ownsBus {
+				if err := syscall.Kill(r.Services["dbus"].PID, syscall.SIGTERM); err != nil {
+					t.Fatal(err)
+				}
+				f.record(t, "degraded")
+				if actual, err := processIdentity(r.Driver.PID); err != nil || actual != *r.Driver {
+					t.Fatal("bus failure destroyed application")
+				}
+			}
+			_ = c.Process.Signal(syscall.SIGTERM)
+			f.record(t, "stopped")
+		})
+	}
+}
+
 func TestSupervisorServiceFaultPreservesApplication(t *testing.T) {
 	for _, name := range []string{"dbus", "ibus", "engine"} {
 		t.Run(name, func(t *testing.T) {
@@ -261,6 +320,56 @@ func TestSupervisorDriverExitCleansServices(t *testing.T) {
 		time.Sleep(20 * time.Millisecond)
 	}
 	t.Fatal("helpers kept exited Driver alive")
+}
+
+func TestUserHomeDriverLossPreservesChildrenUntilExplicitStop(t *testing.T) {
+	for _, provider := range []string{"", "native"} {
+		for _, action := range []string{"driver-loss", "clean-logout", "explicit-stop"} {
+			t.Run(provider+"/"+action, func(t *testing.T) {
+				f := newSupervisorFixture(t, "user-home")
+				f.env = append(f.env, "REMOTEXAPP_INPUT_PROVIDER="+provider, "REMOTEXAPP_TEST_DRIVER_CHILD=1")
+				c := f.start(t)
+				r := f.record(t, "ready")
+				b, err := os.ReadFile(filepath.Join(f.runtime, "helper-identity.json"))
+				if err != nil {
+					t.Fatal(err)
+				}
+				var helper serviceIdentity
+				if err := json.Unmarshal(b, &helper); err != nil {
+					t.Fatal(err)
+				}
+				t.Cleanup(func() {
+					if got, err := processIdentity(helper.PID); err == nil && got == helper {
+						_ = syscall.Kill(helper.PID, syscall.SIGKILL)
+					}
+				})
+				if action == "clean-logout" {
+					if err := report(filepath.Join(f.runtime, "status.json"), filepath.Join(f.runtime, "schema.json"), r.Generation, "exited", "", "", nil, nil, nil, nil); err != nil {
+						t.Fatal(err)
+					}
+				}
+				if action == "explicit-stop" {
+					_ = c.Process.Signal(syscall.SIGTERM)
+				} else {
+					_ = syscall.Kill(r.Driver.PID, syscall.SIGKILL)
+				}
+				state := "exited"
+				if action == "explicit-stop" {
+					state = "stopped"
+				}
+				final := f.record(t, state)
+				time.Sleep(2200 * time.Millisecond)
+				got, err := processIdentity(helper.PID)
+				alive := err == nil && got == helper
+				if alive != (action == "driver-loss") {
+					t.Fatalf("helper alive=%v after %s", alive, action)
+				}
+				if action == "driver-loss" && final.Failure != "driver-exited-unexpectedly" {
+					t.Fatal("missing actionable failure")
+				}
+			})
+		}
+	}
 }
 
 func TestSupervisorRefusesOccupiedEndpoint(t *testing.T) {

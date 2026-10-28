@@ -15,6 +15,19 @@ Prepare the proposed Core 0.16.0 KasmVNC replacement evaluation, including
 container audio and clipboard acceptance gates. Documentation only; current
 binaries and runtime behavior remain at the released 0.15.0 baseline.
 
+- Propose a native Kasm architecture from the frozen research baseline, with
+  explicit keep/adapt/replace decisions, SDK and host integration contracts,
+  optional UDP endpoint/privacy/authorization design, per-session audio and
+  migration gates. The architecture remains under owner review; this documentation
+  neither implements the proposal nor transfers historical UAT to a new release.
+- Record accepted audio connection timing (R3, 2026-10-25): connect when an
+  App's speaker or mic is enabled, share within the server/client scope, and
+  release when all are off. App launch alone and temporary silence do not
+  change the connection. Other architecture choices and implementation remain pending.
+- Record owner approval of the bounded D1 Kasm WSS/Manager/minimal-SDK
+  implementation scope on 2026-10-28; product implementation and acceptance
+  remain tracked separately in Issue #30.
+
 ## 0.15.0 — 2026-10-21
 
 Target: `0.15.0`. Published.

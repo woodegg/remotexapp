@@ -14,8 +14,13 @@ TigerVNC/noVNC integration, including container audio and clipboard.
 [evaluation and acceptance gates](kasmvnc-0.16.0-evaluation.md), KVE-001–008.
 This selects investigation, not a default transport switch. VERSION remains
 0.15.0 until feasibility and implementation scope are accepted. SDK/App version
-changes depend on the resulting contracts. Audio is evaluated against AUD-001;
-KasmVNC and optional container audio services must be assessed separately.
+changes depend on the resulting contracts. The frozen research baseline now
+feeds the [native architecture proposal](kasm-native-architecture.md), with
+KNA-001–010 and the remaining AUD-002 choices pending owner review. AUD-002's
+connection timing (R3) was accepted as a design decision on 2026-10-25, without
+implementation acceptance. AUD-002 explicitly proposes changes
+to the original AUD-001 audio scope; KasmVNC and optional audio services remain
+separate components. This design stage does not change current runtime behavior.
 
 ## Separate release train: Core 0.14.5, Go 1.27.3
 

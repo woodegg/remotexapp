@@ -6,6 +6,10 @@ Historical measurements below are scoped experiments, not the identity or
 health of a live installation. Private deployment diaries remain outside this
 public guide.
 
+The [Kasm native architecture proposal](kasm-native-architecture.md) describes
+a possible replacement and its migration/UDP/audio gates. It awaits owner
+review; the current architecture and accepted invariants below still apply.
+
 ## Architecture and ownership
 
 RemoteXApp manages Linux X11 applications through four boundaries:

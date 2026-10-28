@@ -7,6 +7,38 @@ and [Milestone 0.16.0](https://github.com/woodegg/remotexapp/milestone/3) track
 this work. This is an evaluation plan; replacement feasibility and the default
 switch are not accepted yet. VERSION remains 0.15.0 / SDK 0.30.0.
 
+## 2026-10-24 — move from research to architecture review
+
+The owner accepted the frozen research baseline KNP-BASELINE-20261024 as
+sufficient to begin product design. The detailed
+[native architecture proposal](kasm-native-architecture.md) now records
+component decisions, SDK/host adaptation, lifecycle, UDP and audio boundaries,
+implementation slices and review choices. It is proposed, not implemented or
+accepted as a new production contract.
+
+The owner's native-first direction supersedes the **evaluation constraint**
+that old SDK method shapes, IBus acknowledgements and clipboard modes must all
+be reproduced. Preserve user intent, data, access control, input targeting and
+recovery semantics; deliberately version changed APIs and report unsupported
+capabilities. The historical plan below remains the original comparison
+baseline, not a second requirement to rebuild every legacy bridge.
+
+| Historical gate | Interpretation for the proposed native design |
+| --- | --- |
+| KVE-001 | Still requires exact component provenance, clean builds and distribution review; research pins alone do not close it. |
+| KVE-002 | Native input/display evidence supports development; the current exact candidate and physical platform matrix remain product gates. |
+| KVE-003 | Preserve ordering, authorization, readiness and generation fencing; use explicit new input outcomes instead of requiring the old IBus ACK protocol. |
+| KVE-004 | Preserve consent, limits, clear/no-op semantics and stale-data protection; publish format capabilities instead of forcing every legacy method/mode. Files/RTF are not implicitly supported. |
+| KVE-005 | AUD-001 is the historical proposal; AUD-002 proposes session routing and explicit multiple mic targets while retaining shared-connection, default-off and ownership safeguards. Connection timing (R3) was accepted as a design decision on 2026-10-25; other choices remain pending. |
+| KVE-006 | Manager adoption, both lifecycle backends, data protection, recovery and actual reboot still need product integration evidence. |
+| KVE-007 | The completed natural 8-hour transmission checks do not settle resource qualification or establish a performance improvement; candidate A/B remains open. |
+| KVE-008 | Architecture review may unlock scoped implementation. Default switch, exact-candidate qualification, human UAT and publication remain separate decisions. |
+
+See [evidence boundaries](kasm-native-architecture.md#evidence-boundary)
+and [delivery gates](kasm-native-architecture.md#delivery-gates).
+The rest of this document records the initial 2026-10-21 evaluation plan;
+its compatibility constraints are interpreted by this update.
+
 ## Inspected upstream baseline
 
 | Component | Inspected identity | Relevance |

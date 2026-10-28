@@ -4449,3 +4449,67 @@ label only. Unmigrated schema-2 records retain their legacy counter across
 recreation until eligible migration. Live acceptance must wait for the committed recovery phase, rather than
 treating transient server-ready state as transaction completion. Qualify fresh
 bytes after this correction; intermediate builds are not UAT acceptance.
+
+## 2026-10-24 — Propose native Kasm architecture from frozen research
+
+Status: proposed, owner architecture review pending. Issue #24 receives the
+frozen KNP-BASELINE-20261024 research findings through the detailed
+[architecture proposal](kasm-native-architecture.md). This is design work only;
+it neither implements a provider nor accepts a new production default.
+
+Preserve Manager/App ownership, user data, non-root separation, pinned runtime
+identities, generation fencing, stop/veto and bounded self-recovery. Propose
+native display/input/clipboard and a versioned SDK/host adapter instead of
+requiring legacy IBus acknowledgements and method shapes. The new
+`displayProvider` is distinct from the existing lifecycle `backend` field.
+
+Propose complete WSS with optional per-Viewer UDP through deployment-owned
+non-NAT container proxies; combine trusted pre-container metadata filtering
+with separate session authorization, credential retirement and bounded
+revocation. Audio remains a separate scoped mux connection. AUD-002 proposes
+session domains, same-session multi-Tab controls and explicit multi-target mic,
+superseding AUD-001's mixed-user/single-target scope only after owner review.
+Connection timing and isolation choices are explicit review decisions.
+
+KNA-001–010/AUD-002 record proposed requirements. Historical 0.15.0 decisions
+remain accepted. Natural 8-hour transmission checks support development, but
+overall resource qualification, current combined-candidate UAT, clean
+distribution, real host integration and product lifecycle remain gates.
+No running runtime migration, deployment, version bump or release follows from
+this design PR; record accepted choices before starting scoped implementation.
+
+## 2026-10-25 — Accept audio connection lifetime only
+
+Status: R3 design accepted by the owner; implementation and qualification
+pending. This supersedes only the connection-timing choice left open in the
+2026-10-24 [native architecture proposal](kasm-native-architecture.md#audio-model).
+
+Within one server/client coordination scope, establish the shared audio
+connection when at least one Remote App's speaker or mic is enabled. Additional
+App audio subscriptions reuse it; disabling one App does not close it while
+another remains enabled. Release the connection and capture devices when all
+speaker/mic controls are off. Merely launching an App does not connect, and an
+enabled but silent App does not cause disconnect/reconnect cycles. Display,
+keyboard and clipboard connections remain independent; device permission and
+authorization requirements still apply.
+
+The owner confirmed this rule after the two-App example. This does not accept
+R1/R2/R4/R5/R6, the entire AUD-002 proposal, implementation, UAT, a default switch
+or deployment. Keep PR #29 in draft for the remaining architecture review.
+
+## 2026-10-28 — Approve the bounded D1 WSS implementation scope
+
+The owner approved Issue #30 after review of its Mousepad and managed XFCE
+scope, nine acceptance groups and isolated test/rollback boundary. D1 may
+implement an opt-in paired Kasm WSS provider, provider-specific durable state,
+authenticated generation-bound Viewer/minimal SDK and existing Manager
+adoption/recovery semantics. Preserve current App shutdown contracts, data,
+live/unknown processes and default provider; qualify both lifecycle backends
+including actual disposable-container reboots.
+
+This accepts the R1 native-provider/minimal-SDK and R6 first-slice scope needed
+for D1, not every later SDK or host integration detail. R3 remains accepted;
+UDP, audio isolation/ownership, default switching and publication remain their
+own decisions and gates. The design PR can retain these proposed sections as
+future guidance; implementation uses a separate linked Draft PR. No further
+scope confirmation is needed for the already approved D1 work.

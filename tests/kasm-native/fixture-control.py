@@ -47,7 +47,7 @@ if action=='snapshot':
  x=desk();r=record(x);(out/'snapshot-private.json').write_text(json.dumps({'runtime':x,'record':r,'services':services(x),'boot':read('/proc/sys/kernel/random/boot_id')}))
  emit({'saved':True,'core':x['versions']['current']['core'],'componentDigest':x['displayComponentDigest']})
 elif action=='start':
- desired('running');x=prepare();emit({'started':x['sessionState']=='running'})
+ desired('running');x=prepare();assert x['sessionState']=='running';emit({'started':True})
 elif action=='adoption':
  x=desk();r=record(x);s=services(x);b=bus()
  if backend=='systemd':asuser(*config['managerRestart'])
@@ -77,7 +77,7 @@ print(p.pid)
  y=wait(lambda: (v:=desk())['sessionState']=='failed' and v) if action=='driver-loss' else wait(lambda: ((v:=desk()).get('recovery',{}).get('reason')=='session-populated-or-unknown' or 'incomplete adoption health' in v.get('error','')) and v);assert alive(h);assert y['sessionGeneration']==x['sessionGeneration'];assert bus()==b
  (wait(lambda: desk().get('recovery',{}).get('reason')=='session-populated-or-unknown') if action=='driver-loss' else None);time.sleep(3);assert alive(h);assert desk()['sessionGeneration']==x['sessionGeneration']
  (out/(action+'-private.json')).write_text(json.dumps({'helper':h,'record':r,'services':s,'bus':b}))
- emit({'liveEditorRetained':True,'replacementBlocked':True,'generationUnchanged':True,'borrowedBusPreserved':True,'unhealthyCheckedAfterManagerRestart':action=='supervisor-loss','reportedHealth':('populated-recovery-blocked' if y.get('recovery',{}).get('reason')=='session-populated-or-unknown' else 'incomplete-adoption-health')})
+ emit({'liveEditorRetained':True,'replacementBlocked':True,'generationUnchanged':True,'borrowedBusPreserved':True,'unhealthyCheckedAfterManagerRestart':action=='supervisor-loss','reportedHealth':('populated-recovery-blocked' if action=='driver-loss' or y.get('recovery',{}).get('reason')=='session-populated-or-unknown' else 'incomplete-adoption-health')})
 elif action=='empty-recovery':
  x=desk();r=record(x);b=bus();unit=r['runtime']['sessionUnit'];cg=read('/proc/'+str(json.loads((out/'driver-loss-private.json').read_text())['helper']['pid'])+'/cgroup').strip().split('::')[1]
  # Explicit fault injection into the already-proven disposable component only.

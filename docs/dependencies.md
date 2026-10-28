@@ -37,7 +37,7 @@ graphical login or application must already be running.
 
 | Component | Required before launching a RemoteXApp runtime |
 |---|---|
-| systemd user manager | Available for the deployment's non-root account; configure lingering for unattended user-service operation |
+| systemd user manager | Available for the deployment's non-root account; configure lingering for unattended user-service operation. Development Core 0.16 user-home sessions require systemd 250+ for `ExitType=cgroup`, which preserves surviving applications after session-leader loss. |
 | User D-Bus in `user-home` mode | Existing account bus available at `/run/user/<uid>/bus`; RemoteXApp reuses it and must not stop it |
 | TigerVNC | Executable installed; RemoteXApp starts its own display server |
 | XFCE / Matchbox / application | Corresponding packages installed; the App driver starts the session when its activation policy requires it |

@@ -8,7 +8,8 @@ public guide.
 
 The [Kasm native architecture proposal](kasm-native-architecture.md) describes
 a replacement and its migration/UDP/audio gates. Its bounded D1 WSS scope is
-approved and under implementation; later gates await review. The default
+implemented with [bounded automated evidence](../tests/kasm-native/README.md);
+later gates await review. The default
 architecture and accepted invariants below still apply.
 
 ## Architecture and ownership

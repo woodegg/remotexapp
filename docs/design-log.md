@@ -4600,3 +4600,9 @@ D1 starts the server with `IgnoreClientSettingsKasm=1` to preserve the class's
 frame-rate policy across all Viewers. Resize authorization remains the separate
 class-derived `AcceptSetDesktopSize` setting. Browser preferences are not an
 authority for shared runtime policy.
+
+The completed bounded D1 automation is recorded in
+[the dated native qualification evidence](../tests/kasm-native/README.md):
+real Apps, both lifecycle backends, actual container reboot, generation
+retirement, prior-Core rollback and owned cleanup. PR #31 / Issue #30 retain
+the review and merge boundary; D2–D5 qualification is not implied.

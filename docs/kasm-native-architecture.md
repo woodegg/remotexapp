@@ -1,6 +1,6 @@
 # Kasm 原生 RemoteXApp 架构提案 / Native architecture proposal
 
-状态：**D1 实施范围已批准，产品实现与验收待完成，默认值未切换。**
+状态：**D1 已实现并完成限定自动化矩阵；Issue #30 / PR #31 跟踪验收与合并，默认值未切换。**
 审阅更新：2026-10-28 用户批准 [D1 / Issue #30](https://github.com/woodegg/remotexapp/issues/30)
 的 Kasm WSS、Manager 生命周期和最小 SDK 实施；R3 音频连接时机已于 2026-10-25 确认。
 后续音频/UDP 和完整宿主接口决定仍按对应阶段审阅。
@@ -467,8 +467,9 @@ R2 的 UDP、R4/R5 的音频方案仍待对应审阅。设计接受不等于实�
 | R5 音频域 | 新 session 尽量隔离；借用用户桌面只明确声明 user-shared | 同 UID 路由需新增实现/验证；无法隔离时不承诺 per-App 静音 |
 | R6 首期范围 | 先 WSS + 单 App/managed desktop，再输入/音频/UDP；文件复制和未验浏览器单列 | 不用补齐所有 PoC 未决项才开工，但对应发布承诺仍受门禁约束 |
 
-D1 范围确认已追加到设计日志，其验收标准由 Issue #30 跟踪。下一步实施限定的
-产品代码；既有部署、默认 provider 和发布状态仍按各自流程处理。
+D1 范围确认已追加到设计日志，其验收标准由 Issue #30 跟踪。
+[限定自动化证据](../tests/kasm-native/README.md)已记录真实 App、重启、恢复与回滚；
+既有部署、默认 provider 和发布状态仍按各自流程处理。
 
 ## 12. 相关合同 / References
 

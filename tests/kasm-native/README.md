@@ -5,6 +5,46 @@ SDK. The default remains TigerVNC. Implementation acceptance is Issue #30;
 publication, host application integration, physical IME/clipboard, audio, UDP
 and performance qualification remain separate gates.
 
+## 2026-10-28 implementation evidence
+
+[Sanitized results](results-20261028.json) bind the live matrix to Core source
+`3bc5aed0eceb5d5b19d1335c57f6d619a886091a` (Core 0.16.0-dev.1 / SDK
+0.31.0-dev.1) and Kasm manifest
+`7045b68a5fad52e9c77afecfc1eb76c6accd90fb98f57314e26a30faf9ace17f`.
+Subsequent documentation/test-helper edits do not change those artifact
+identities. [PR #31](https://github.com/woodegg/remotexapp/pull/31) owns review
+and merge; Issue #30 owns implementation acceptance.
+
+| Gate | Evidence |
+| --- | --- |
+| D1-01 pins/prerequisites | Verified source reconstruction, archive/patch/server/client digests and notices; missing/tampered/extra members and incompatible schema/provider rejected |
+| D1-02 real startup | Mousepad and managed XFCE visible through native WSS; pointer/ASCII/save readback; App readiness plus real paint; bounded SDK startup/cancellation tests |
+| D1-03 Viewer/access | Two Viewers, 30 reconnects, independent detach, final 60-second vacancy; identity/Origin/pin/generation/route negatives; real old-channel closure during recovery |
+| D1-04 persistence/adoption | Both backends retain process identities, pins, HOME and borrowed bus on Manager restart; atomic-write, concurrent recovery and unknown-ownership tests |
+| D1-05 recovery/intent | Both backends recover an empty failed desktop without a Viewer; persisted retry/cooldown tests; explicit stop/veto/upgrade controls; retired descriptor rejected |
+| D1-06 surviving processes | Both backends retain a real editor after Driver/Supervisor loss and report blocked/unhealthy preservation; explicit veto fixture retains its Driver until authorized force |
+| D1-07 reboot/data | Actual container restart, both backends, desired-running and explicit-stop cases; changed boot ID, stable pins/HOME/data, advanced generation and one display owner; real post-boot paint |
+| D1-08 cleanup/rollback | Owned display sockets/processes gone; same-UID unrelated sentinel and borrowed bus preserved; prior immutable Core 0.15.0 / SDK 0.30.0 plus scoped snapshot restored and exercised |
+| D1-09 regression | Default TigerVNC real browser readback/reconnect; focused tests, full check, race, CI coverage/vulnerability gates; sanitized evidence and limits retained |
+
+The final fixture is stopped, its loopback ingress is closed, and private
+raw evidence/disposable data are retained. No existing deployment was changed.
+The screenshot shows the dedicated fixture after the actual reboot:
+
+![Native WSS managed desktop after reboot](native-desktop.png)
+
+Two product defects were found and fixed before this final run: destructive
+user-home descendant cleanup after unexpected Driver loss, and a Kasm receive
+loop that stalled on completed control messages. The result file distinguishes
+those defects from test-harness/fixture errors and records their regressions.
+
+This is automated **D1 implementation** evidence. It does not qualify physical
+IME, clipboard, audio, UDP, host workspaces, non-systemd PID 1, performance,
+other browsers, distribution or a post-merge release. Human UAT remains
+separate. The fresh source build used preinstalled build dependencies; complete
+supply-chain/distribution qualification remains Issue #26. Supervisor-loss
+health was checked after Manager restart, not as an immediate-detection SLA.
+
 ## Portable and component checks
 
 Run `make check` and the relevant Go race tests. Native tests cover schema-4
@@ -33,7 +73,8 @@ to inject faults and reboot that fixture. They must never target an existing
 user, UAT or sandbox deployment. This repository does not own those deployments.
 
 Provision two independent non-root accounts/HOMEs/state roots/listeners and
-nonconflicting fixed display allocations. One uses systemd; the other uses the
+nonconflicting fixed display allocations. Run transient Apps sequentially or
+assign disjoint dynamic display/port pools to each Manager. One uses systemd; the other uses the
 standalone backend in a delegated cgroup v2 subtree, with runit supervising only
 the Manager. The measured standalone fixture uses systemd as the **host's**
 delegation/bootstrap mechanism; it does not qualify a non-systemd PID 1 host.

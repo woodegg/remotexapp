@@ -1,0 +1,441 @@
+{
+  "schemaVersion": 1,
+  "scope": "D1 implementation qualification; not a published or UAT-qualified release",
+  "date": "2026-10-28",
+  "core": {
+    "version": "0.16.0-dev.1",
+    "commit": "3bc5aed0eceb5d5b19d1335c57f6d619a886091a",
+    "sha256": "a99058f87b6d609805f92ccbf10599fa07f349a6561c59fc28b99ddf710d1011"
+  },
+  "sdkVersion": "0.31.0-dev.1",
+  "environment": {
+    "platform": "Ubuntu 24.04.5 LTS",
+    "architecture": "x86_64",
+    "systemd": "systemd 255 (255.4-1ubuntu8.18)",
+    "coreBinaries": {
+      "remotexappd": "0434642c620c369622cb28c11f50cb19e6d94fc1bf0cba2a54ed027c1131dc07",
+      "novnc-input": "a09f6d8ea489c3872fda0ae1cc8ef78a158d83d81e88934d59b919fb53ed2f73",
+      "remotexapp-status": "ac1b3905a3fe5a42420c98843b8910d4d2ff2cf386d3f9cded011e429638ee63",
+      "remotexapp-operator-helper": "5fe99d0e34e2ccbcfb78cdc53366adca4b7504cfa01f88b49a9b7edad14be40f"
+    },
+    "runtimePackages": {
+      "mousepad": "0.6.1-1build2",
+      "xfce4-session": "4.18.3-1build2",
+      "matchbox-window-manager": "1.2.2+git20200512-1build1",
+      "runit": "2.1.2-59ubuntu1",
+      "tigervnc-standalone-server": "1.13.1+dfsg-2build2"
+    }
+  },
+  "browser": {
+    "Browser": "Chrome/149.0.7827.102",
+    "Protocol-Version": "1.3",
+    "V8-Version": "14.9.207.27",
+    "mode": "dedicated Linux headless CDP profile; authenticated loopback TLS fixture"
+  },
+  "component": {
+    "manifestSha256": "7045b68a5fad52e9c77afecfc1eb76c6accd90fb98f57314e26a30faf9ace17f",
+    "serverSha256": "18fb10b9b8c98aacb4d7a7bbc9a6f1fd4d3c6f8618ddd9268103b79c6012a036",
+    "clientSha256": "8fd0ff2fbaf6ab64abdf91d825dee2c038939e19edadfb40692b1b4226f30206",
+    "sourceManifestSha256": "7517fea8606b21e41de07bd06896d96ccc7e84ddab7135171bf772effef7a14d",
+    "provenance": {
+      "status": "experimental-d1-not-a-release",
+      "serverCommit": "17265facc40ab50db5740cdf0d12c61173edafc9",
+      "clientCommit": "475ecfa5356579ef222983c7ce4619a7576a3bce",
+      "archives": {
+        "server.tar.gz": "478f4d6a973fc6f51cc5c711d37ff3ba30007792e481a7074cc5e5ce63f2eca1",
+        "client.tar.gz": "325084abe7af9174812f06933a9f154d044b485254eda9f49ce511552a262420",
+        "xorg.tar.xz": "1e016e2be1b5ccdd65eac3ea08e54bd13ce8f4f6c3fb32ad6fdac4e71729a90f"
+      },
+      "patches": {
+        "0001-bound-dtls-read-errors.patch": "3858472ab7799aae1a3e310c4a674deb6419e6baa05e5283ecff3739f3f9b874",
+        "0004-private-authenticated-udp.patch": "244fe114ddbdf720734865a75d66b53a38f9eee598a40d4797ea5ccaf0cbc67b",
+        "0005-bind-udp-negotiation.patch": "6312c444c6e93817cc9d3b4343508d0f2aa3725783c82a6a5ee717c4c1d32bf0",
+        "0006-wss-only-server.patch": "1aff64606b0ea6549c6a7c611fef18dfdc964e66d960b432dee836d9f74c8a38",
+        "0007-static-link-order.patch": "80aab63ab55a358834b7c2bdf7802f231c7c9b88ef6546e3e9f0b48a8340353e",
+        "0010-client-research-baseline.patch": "dec9b27d4481c12eb5f3b207e1750d5ed0472d9fcfc0ef2bcc7316ef1fca8420",
+        "0011-wss-only-client-frame.patch": "211e44262b069f0937c777784eaab98e85d308ef6fc2b8bf0396cbfde1e1bc78",
+        "0012-isolate-viewer-ui.patch": "7377978d0190cd10fec3590a6711d0618be03ac0edc260e5ae3deac2dff91eea",
+        "0013-drain-control-messages.patch": "bcfe84829a9ae4193f0a44665341f16181a749489c139412ca663c802d83c16c"
+      },
+      "runtimeLibraryPackages": {
+        "libtbb12": "2021.11.0-2ubuntu2",
+        "libyuv0": "0.0~git202401110.af6ac82-1",
+        "libcpuid16": "0.6.4+repack1-1",
+        "libfmt9": "9.1.0+ds1-2",
+        "libjpeg-turbo8": "2.1.5-2ubuntu2"
+      },
+      "clientDependencies": {
+        "pako": "2.1.0"
+      },
+      "clientBuilder": {
+        "esbuild": "0.20.1"
+      },
+      "scope": "WSS only; no UDP, QOI workers, audio or clipboard qualification",
+      "tools": {
+        "c++": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+        "cmake": "cmake version 3.28.3",
+        "node": "v22.22.3",
+        "npm": "10.9.8"
+      }
+    }
+  },
+  "apps": [
+    {
+      "id": "mousepad",
+      "version": "4.0.1",
+      "sha256": "a42c90f2313bb4e487fb07fdde1c12357c646a58bf100eaa38a127a44ce9a7d2"
+    },
+    {
+      "id": "xfce-user-desktop",
+      "version": "3.0.1",
+      "sha256": "d270ff4d18e637e06e3d8c1af6b9492612cd8973d1813a243808591467f51028"
+    }
+  ],
+  "backends": {
+    "systemd": {
+      "snapshot": {
+        "backend": "systemd",
+        "saved": true,
+        "core": {
+          "version": "0.16.0-dev.1",
+          "commit": "3bc5aed0eceb5d5b19d1335c57f6d619a886091a",
+          "sha256": "a99058f87b6d609805f92ccbf10599fa07f349a6561c59fc28b99ddf710d1011"
+        },
+        "componentDigest": "7045b68a5fad52e9c77afecfc1eb76c6accd90fb98f57314e26a30faf9ace17f"
+      },
+      "adoption": {
+        "backend": "systemd",
+        "adopted": true,
+        "pinsGenerationHomeAndProcessIdentitiesUnchanged": true,
+        "borrowedBusPreserved": true
+      },
+      "driver-loss": {
+        "backend": "systemd",
+        "liveEditorRetained": true,
+        "replacementBlocked": true,
+        "generationUnchanged": true,
+        "borrowedBusPreserved": true,
+        "unhealthyCheckedAfterManagerRestart": false
+      },
+      "empty-recovery": {
+        "backend": "systemd",
+        "eligibleEmptySessionRecoveredWithoutNewViewer": true,
+        "generationAdvanced": true,
+        "pinsAndBorrowedBusPreserved": true,
+        "oldViewerCount": 0
+      },
+      "supervisor-loss": {
+        "backend": "systemd",
+        "liveEditorRetained": true,
+        "replacementBlocked": true,
+        "generationUnchanged": true,
+        "borrowedBusPreserved": true,
+        "unhealthyCheckedAfterManagerRestart": true,
+        "reportedHealth": "incomplete-adoption-health"
+      },
+      "stop": {
+        "backend": "systemd",
+        "explicitStop": true,
+        "allOwnedComponentsEmpty": true,
+        "borrowedBusPreserved": true
+      },
+      "access": {
+        "backend": "systemd",
+        "checks": [
+          "missing-identity-rejected",
+          "invalid-identity-rejected",
+          "cross-origin-rejected",
+          "mismatched-component-rejected",
+          "pinned-asset-served",
+          "stale-generation-rejected",
+          "upstream-management-unavailable",
+          "legacy-input-unavailable"
+        ],
+        "singleAccountTrustedIngressBoundary": true
+      },
+      "veto": {
+        "backend": "systemd",
+        "fixture": "separate-real-Mousepad-App-with-explicit-veto-hook",
+        "vetoHonored": true,
+        "driverPreservedUntilForce": true,
+        "forceStopCleansOwnedProcesses": true,
+        "borrowedBusPreserved": true,
+        "shippedMousepadPolicyUnchanged": true
+      },
+      "reboot": {
+        "backend": "systemd",
+        "actualContainerReboot": true,
+        "bootIdentityChanged": true,
+        "runningRuntimeRestored": true,
+        "onAttachSessionRemainedStopped": true,
+        "generationAdvanced": true,
+        "componentPinsHomeAndSavedDataPreserved": true,
+        "explicitStoppedRegistrationStayedStopped": true,
+        "singleDisplayOwner": true,
+        "core": {
+          "version": "0.16.0-dev.1",
+          "commit": "3bc5aed0eceb5d5b19d1335c57f6d619a886091a",
+          "sha256": "a99058f87b6d609805f92ccbf10599fa07f349a6561c59fc28b99ddf710d1011"
+        },
+        "componentDigest": "7045b68a5fad52e9c77afecfc1eb76c6accd90fb98f57314e26a30faf9ace17f"
+      },
+      "reboot-viewer": {
+        "backend": "systemd",
+        "firstPaintAfterRealReboot": true,
+        "transport": "wss",
+        "currentApplicationReady": true
+      }
+    },
+    "standalone": {
+      "snapshot": {
+        "backend": "standalone",
+        "saved": true,
+        "core": {
+          "version": "0.16.0-dev.1",
+          "commit": "3bc5aed0eceb5d5b19d1335c57f6d619a886091a",
+          "sha256": "a99058f87b6d609805f92ccbf10599fa07f349a6561c59fc28b99ddf710d1011"
+        },
+        "componentDigest": "7045b68a5fad52e9c77afecfc1eb76c6accd90fb98f57314e26a30faf9ace17f"
+      },
+      "adoption": {
+        "backend": "standalone",
+        "adopted": true,
+        "pinsGenerationHomeAndProcessIdentitiesUnchanged": true,
+        "borrowedBusPreserved": true
+      },
+      "driver-loss": {
+        "backend": "standalone",
+        "liveEditorRetained": true,
+        "replacementBlocked": true,
+        "generationUnchanged": true,
+        "borrowedBusPreserved": true,
+        "unhealthyCheckedAfterManagerRestart": false
+      },
+      "empty-recovery": {
+        "backend": "standalone",
+        "eligibleEmptySessionRecoveredWithoutNewViewer": true,
+        "generationAdvanced": true,
+        "pinsAndBorrowedBusPreserved": true,
+        "oldViewerCount": 0
+      },
+      "supervisor-loss": {
+        "backend": "standalone",
+        "liveEditorRetained": true,
+        "replacementBlocked": true,
+        "generationUnchanged": true,
+        "borrowedBusPreserved": true,
+        "unhealthyCheckedAfterManagerRestart": true,
+        "reportedHealth": "populated-recovery-blocked"
+      },
+      "stop": {
+        "backend": "standalone",
+        "explicitStop": true,
+        "allOwnedComponentsEmpty": true,
+        "borrowedBusPreserved": true
+      },
+      "access": {
+        "backend": "standalone",
+        "checks": [
+          "missing-identity-rejected",
+          "invalid-identity-rejected",
+          "cross-origin-rejected",
+          "mismatched-component-rejected",
+          "pinned-asset-served",
+          "stale-generation-rejected",
+          "upstream-management-unavailable",
+          "legacy-input-unavailable"
+        ],
+        "singleAccountTrustedIngressBoundary": true
+      },
+      "veto": {
+        "backend": "standalone",
+        "fixture": "separate-real-Mousepad-App-with-explicit-veto-hook",
+        "vetoHonored": true,
+        "driverPreservedUntilForce": true,
+        "forceStopCleansOwnedProcesses": true,
+        "borrowedBusPreserved": true,
+        "shippedMousepadPolicyUnchanged": true
+      },
+      "reboot": {
+        "backend": "standalone",
+        "actualContainerReboot": true,
+        "bootIdentityChanged": true,
+        "runningRuntimeRestored": true,
+        "onAttachSessionRemainedStopped": true,
+        "generationAdvanced": true,
+        "componentPinsHomeAndSavedDataPreserved": true,
+        "explicitStoppedRegistrationStayedStopped": true,
+        "singleDisplayOwner": true,
+        "core": {
+          "version": "0.16.0-dev.1",
+          "commit": "3bc5aed0eceb5d5b19d1335c57f6d619a886091a",
+          "sha256": "a99058f87b6d609805f92ccbf10599fa07f349a6561c59fc28b99ddf710d1011"
+        },
+        "componentDigest": "7045b68a5fad52e9c77afecfc1eb76c6accd90fb98f57314e26a30faf9ace17f"
+      },
+      "reboot-viewer": {
+        "backend": "standalone",
+        "firstPaintAfterRealReboot": true,
+        "transport": "wss",
+        "currentApplicationReady": true
+      }
+    }
+  },
+  "browserCases": {
+    "default-final": {
+      "phase": "default-final",
+      "provider": "tigervnc",
+      "sdk": "0.31.0-dev.1",
+      "realFirstPaint": true,
+      "browserPointerKeyboardSaveReadback": true,
+      "reconnect": true
+    },
+    "native-final": {
+      "phase": "native-final",
+      "provider": "kasm",
+      "sdk": "0.31.0-dev.1",
+      "realFirstPaint": true,
+      "browserPointerKeyboardSaveReadback": true,
+      "reconnect": true
+    },
+    "restore": {
+      "phase": "restore",
+      "provider": "tigervnc",
+      "sdk": "0.30.0",
+      "realFirstPaint": true,
+      "browserPointerKeyboardSaveReadback": true,
+      "reconnect": true
+    },
+    "standaloneMousepad": {
+      "phase": "final",
+      "provider": "kasm",
+      "sdk": "0.31.0-dev.1",
+      "realFirstPaint": true,
+      "browserPointerKeyboardSaveReadback": true,
+      "reconnect": true
+    },
+    "twoViewerReconnectAndVacancy": {
+      "componentDigest": "7045b68a5fad52e9c77afecfc1eb76c6accd90fb98f57314e26a30faf9ace17f",
+      "cycles": 30,
+      "allFirstPaintReady": true,
+      "secondViewerPreserved": true,
+      "noViewerCountGrowth": true,
+      "maxReadyMs": 320,
+      "finalDetachObeys60SecondVacancy": true,
+      "stopObservedMs": 60372
+    },
+    "connectedViewerGenerationRetirement": {
+      "core": {
+        "version": "0.16.0-dev.1",
+        "commit": "3bc5aed0eceb5d5b19d1335c57f6d619a886091a",
+        "sha256": "a99058f87b6d609805f92ccbf10599fa07f349a6561c59fc28b99ddf710d1011"
+      },
+      "componentDigest": "7045b68a5fad52e9c77afecfc1eb76c6accd90fb98f57314e26a30faf9ace17f",
+      "actualRecoveryWithTwoConnectedViewers": true,
+      "oldViewerChannelsClosed": true,
+      "oldDescriptorRejected": true,
+      "replacementFirstPaintReady": true,
+      "oldTabsCannotReattachOrDetachReplacement": true
+    }
+  },
+  "verification": {
+    "makeCheck": "passed",
+    "relevantGoRace": "passed",
+    "componentAppliedSourceProtocolTests": {
+      "passed": 3,
+      "skipped": 0
+    },
+    "pullRequestCIGate": {
+      "commit": "3bc5aed0eceb5d5b19d1335c57f6d619a886091a",
+      "result": "SUCCESS",
+      "url": "https://github.com/woodegg/remotexapp/actions/runs/40669679871",
+      "includes": [
+        "make check",
+        "make coverage-check",
+        "make vuln-check",
+        "make release-metadata-check",
+        "generated asset consistency",
+        "secret scan"
+      ]
+    }
+  },
+  "rollback": {
+    "priorCoreVersion": "0.15.0",
+    "priorSdkVersion": "0.30.0",
+    "priorArtifactSha256": "f7082814a9f7d797931705a5b8ca56fe7f7e00b2cdf276b7c44a11b53c52d13a",
+    "restoredScopedStateSnapshot": true,
+    "retainedProfileBytes": true,
+    "nativePhaseDocumentPreserved": true,
+    "downtimeRequired": true,
+    "liveXServerProviderAdoption": false
+  },
+  "cleanup": [
+    {
+      "backend": "systemd",
+      "instancesStopped": 2,
+      "actualServersWithClassAndClipboardPolicy": 2,
+      "allOwnedDisplaySocketsRemoved": true,
+      "noOwnedDisplayGatewayOrSupervisorProcesses": true,
+      "borrowedAccountBusPreserved": true,
+      "unrelatedSameUidSentinelPreserved": true
+    },
+    {
+      "backend": "standalone",
+      "instancesStopped": 2,
+      "actualServersWithClassAndClipboardPolicy": 2,
+      "allOwnedDisplaySocketsRemoved": true,
+      "noOwnedDisplayGatewayOrSupervisorProcesses": true,
+      "borrowedAccountBusPreserved": true,
+      "unrelatedSameUidSentinelPreserved": true
+    }
+  ],
+  "fixtureCleanup": {
+    "ownedContainerStopped": true,
+    "ownedIngressListenersClosed": true,
+    "fixtureDataRetained": true,
+    "existingDeploymentsUntouched": true
+  },
+  "limitations": [
+    "Functional automated evidence for the exact pre-merge Core commit and separately pinned component. Post-merge release qualification and human UAT remain D5.",
+    "Standalone uses runit with a systemd host bootstrap/delegation unit; a non-systemd PID 1 host is not qualified.",
+    "Native physical IME, rich clipboard, programmatic text, host workspace integration, audio, UDP, files and other browsers are not qualified by D1.",
+    "No resource/performance improvement or long-soak claim; reconnect timing is a local observation only.",
+    "The component was rebuilt from fresh verified source archives on a host with build dependencies already installed. Fresh apt-only bootstrap, publication supply chain and complete distribution qualification remain Issue #26.",
+    "Missing/malformed identity and Origin were tested at the existing single-account trusted ingress boundary. D1 does not add a per-user ACL inside one selected UID.",
+    "Supervisor-loss health was checked after Manager restart. This does not establish immediate supervisor-loss detection.",
+    "User-home systemd sessions now require systemd 250+ for ExitType=cgroup; standalone retains its delegated cgroup contract.",
+    "Prior-Core rollback requires stopping writers and restoring compatible state; it is not live X-server adoption across providers."
+  ],
+  "investigatedFailures": [
+    {
+      "kind": "product",
+      "finding": "Unexpected user-home Driver loss previously cleaned surviving application descendants; systemd main-process lifetime could also kill the cgroup.",
+      "resolution": "Preserve descendants unless explicit stop/current-generation clean logout authorizes cleanup; ExitType=cgroup for user-home systemd. Real child-process tests and both-backend live fault tests passed."
+    },
+    {
+      "kind": "product",
+      "finding": "Completed Kasm codec/Unix-relay messages returned no completion value, leaving coalesced ServerFence/frame messages queued. Variable codec lists also rewound split messages incorrectly.",
+      "diagnosticObservation": {
+        "queuedBytes": 119,
+        "nextMessage": "ServerFence",
+        "manualQueueDrainRestoredPaint": true
+      },
+      "resolution": "Explicit completion and transactional bounded codec parsing. Actual patched-source regressions and 30 real reconnects passed on the new digest."
+    },
+    {
+      "kind": "test-harness",
+      "finding": "Supervisor-loss assertion accepted only incomplete-adoption-health text; standalone can report populated-session recovery blocked after its leader exits.",
+      "resolution": "Accept either reported unhealthy state while independently requiring the editor, generation and borrowed bus to survive; both backend runs passed."
+    },
+    {
+      "kind": "fixture",
+      "finding": "Concurrent transient fixtures initially contended for a shared dynamic display/port pool. A veto-fixture startup timed out.",
+      "resolution": "Run transient Apps sequentially; final veto and rollback evidence is from the successful sequential runs. Explicitly stopped the failed fixture intent during final cleanup."
+    },
+    {
+      "kind": "test-timing",
+      "finding": "An earlier full test run hit an existing resize debounce assertion under load.",
+      "resolution": "Subsequent full make check and the exact Core CI gate passed; no test was disabled."
+    }
+  ]
+}

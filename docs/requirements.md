@@ -20,7 +20,8 @@ semantics. Accepted 0.15.0 runtime behavior is not superseded by this proposal.
 [Architecture detail](kasm-native-architecture.md) accepts KNP-BASELINE-20261024
 as research input, not production qualification. Entries below remain
 **proposed** except AUD-002's connection-lifetime clause, accepted as a design
-decision on 2026-10-25 (R3). D1 implementation is in progress; its tests do not
+decision on 2026-10-25 (R3). D1 implementation and its bounded automated matrix are recorded in
+[the native qualification results](../tests/kasm-native/README.md); they do not
 qualify the remaining architecture. Stable IDs support subsequent
 implementation Issues; KVE-001–008 remain evaluation/qualification gates.
 
@@ -37,8 +38,9 @@ schema 4. Legacy schema 2/3 remain TigerVNC. Native Viewer preparation and
 attach require current generation; readiness requires App ready plus paint.
 The native session retains the Core supervisor and D-Bus, with no mandatory
 IBus/Unicode service. Ordinary upgrade cannot change display provider.
-Acceptance remains open until Issue #30's real App, reboot and rollback
-evidence is complete. D2 input/clipboard and later transports remain pending.
+Real App, both-backend reboot, recovery, cleanup and scoped rollback evidence
+is recorded in the D1 results; Issue #30 and PR #31 own acceptance/merge.
+D2 input/clipboard and later transports remain pending.
 
 | ID | Proposed requirement | Acceptance boundary |
 | --- | --- | --- |

@@ -13,6 +13,8 @@ implementation; move them to a version section when publishing a release.
 
 Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
 remains the default; implementation qualification is tracked in Issue #30.
+Development identities are Core `0.16.0-dev.1` and SDK `0.31.0-dev.1`;
+these are not published or UAT-qualified releases.
 
 - Add provider-specific component pins and schema-4 native runtime records;
   schema 2/3 retain their legacy meaning. Provider changes require a scoped

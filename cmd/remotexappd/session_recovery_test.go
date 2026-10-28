@@ -85,6 +85,15 @@ func TestManagedUserHomeLeaderExitPreservesPopulatedSession(t *testing.T) {
 	if got.SessionState != "failed" || !strings.Contains(got.Error, "other processes remain") {
 		t.Fatalf("populated user-home session was not safely blocked: %+v", got)
 	}
+	// A readiness leader dying after a veto does not prove all applications
+	// accepted logout. Preserve both the surviving component and the veto.
+	item.SessionState = "shutdown-blocked"
+	item.Shutdown = &shutdownStatus{State: "blocked", RequestID: "veto", Generation: 3}
+	m.handleSessionExit(item.ID, 3, "readiness process exited")
+	got = m.get(item.ID)
+	if got.SessionState != "failed" || got.Shutdown.State != "blocked" {
+		t.Fatal("leader death resolved an outstanding shutdown veto")
+	}
 	logBytes, err := os.ReadFile(unitLog)
 	if err != nil {
 		t.Fatal(err)

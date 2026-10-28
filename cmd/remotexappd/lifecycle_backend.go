@@ -85,7 +85,7 @@ func parseComponentLaunch(args []string) (unit, directory string, env, argv []st
 		case strings.HasPrefix(arg, "--property=WorkingDirectory="):
 			directory = strings.TrimPrefix(arg, "--property=WorkingDirectory=")
 		case strings.HasPrefix(arg, "--property=BindsTo="), strings.HasPrefix(arg, "--property=After="),
-			arg == "--property=KillMode=mixed", arg == "--property=TimeoutStopSec=10s":
+			arg == "--property=KillMode=mixed", arg == "--property=TimeoutStopSec=10s", arg == "--property=ExitType=cgroup":
 			// These systemd dependencies are enforced by Manager launch order and
 			// cgroup/observer reconciliation in standalone mode.
 		default:

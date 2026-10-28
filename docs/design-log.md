@@ -4552,3 +4552,29 @@ disabled in both directions in the initial server launch and client adapter.
 Focused automated boundary checks are in progress alongside real disposable
 App/lifecycle verification. Neither a passing unit test nor these implementation
 choices complete the nine D1 acceptance groups.
+
+
+## 2026-10-28 — Preserve user-home descendants after leader loss
+
+D1 fault injection exposed a gap beneath the accepted populated-session guard:
+Driver death made the supervisor clean its process group, then systemd's default
+main-process lifetime removed remaining applications before Manager could
+classify the component. This supersedes the D1 assumption above that retaining
+the existing supervisor alone preserved this invariant.
+
+For both display providers, a user-home Driver exit without explicit supervisor
+stop or a current-generation `exited` App report retains its descendant group
+and publishes `driver-exited-unexpectedly`. Owned input helpers may stop; the
+borrowed account bus remains untouched. Systemd user-home session units use
+`ExitType=cgroup` so even supervisor loss cannot imply descendant teardown.
+This requires systemd 250 or newer; unsupported systems fail the launch rather
+than silently weakening protection. Standalone keeps its existing populated
+cgroup ownership. Manager's readiness-process observation reports failure and
+its populated/unknown guard blocks replacement. Normal logout and explicit
+stop retain their cleanup semantics; isolated/shared disposable Apps retain
+their existing policy.
+
+Reference: [systemd service lifetime](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#ExitType=).
+Regression coverage distinguishes unexpected Driver death, clean logout and
+explicit stop with real child processes; actual systemd/standalone fault and
+cleanup results remain part of D1's live qualification.

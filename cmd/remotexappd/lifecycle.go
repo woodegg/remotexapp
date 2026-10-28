@@ -829,6 +829,11 @@ func (m *manager) startSession(id string) (sessionErr error) {
 	if isKasm(item) {
 		args = append(args, "--setenv=REMOTEXAPP_INPUT_PROVIDER=native")
 	}
+	if class.RunMode == "user-home" {
+		// Main-process loss must not make systemd kill surviving editors before
+		// Manager's populated-session recovery guard can inspect them.
+		args = append(args, "--property=ExitType=cgroup")
+	}
 	if class.Control.Protocol != "" {
 		args = append(args,
 			"--setenv=REMOTEXAPP_CONTROL_PROTOCOL="+class.Control.Protocol,
@@ -1371,6 +1376,17 @@ func (m *manager) handleSessionExit(id string, generation int64, reason string) 
 	m.unobserveSession(id, generation)
 	_ = m.setGatewayClipboardSession(&copy, generation, false)
 	status, _ := readApplicationStatus(copy.Runtime)
+	if copy.ManagedID != "" && m.specFor(&copy).RunMode == "user-home" &&
+		m.sessionComponentPopulated(copy.SessionUnit) && (status == nil || status.State != "exited") {
+		// The readiness process is gone, but the session cgroup still contains
+		// processes. Those may include unsaved user applications. Do not treat
+		// their presence as permission to kill the cgroup for auto-recovery.
+		const blocked = "session leader exited while other processes remain; recovery requires operator review"
+		_ = m.writeApplicationStatus(&copy, generation, "error", "Session recovery blocked", blocked, true)
+		m.setSessionState(id, "failed", blocked)
+		m.persistRuntimeTransition(m.get(id), "session-recovery-blocked")
+		return
+	}
 	if wasShutdownBlocked && copy.Shutdown != nil {
 		if status == nil || status.State != "exited" {
 			_ = m.writeApplicationStatus(&copy, generation, "exited", "Application exited after the graceful shutdown request", "", true)
@@ -1387,17 +1403,6 @@ func (m *manager) handleSessionExit(id string, generation int64, reason string) 
 		m.mu.Unlock()
 		m.persistRuntimeTransition(m.get(id), "blocked-shutdown-exited")
 		go m.completeBlockedShutdown(id, generation, copy.Shutdown.RequestID, copy.Shutdown.Scope, copy.Shutdown.Reason)
-		return
-	}
-	if copy.ManagedID != "" && m.specFor(&copy).RunMode == "user-home" &&
-		m.sessionComponentPopulated(copy.SessionUnit) && (status == nil || status.State != "exited") {
-		// The readiness process is gone, but the session cgroup still contains
-		// processes. Those may include unsaved user applications. Do not treat
-		// their presence as permission to kill the cgroup for auto-recovery.
-		const blocked = "session leader exited while other processes remain; recovery requires operator review"
-		_ = m.writeApplicationStatus(&copy, generation, "error", "Session recovery blocked", blocked, true)
-		m.setSessionState(id, "failed", blocked)
-		m.persistRuntimeTransition(m.get(id), "session-recovery-blocked")
 		return
 	}
 	if err := m.cleanupSessionComponent(&copy); err != nil {

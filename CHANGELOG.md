@@ -18,6 +18,11 @@ remains the default; implementation qualification is tracked in Issue #30.
 Development identities are Core `0.16.0-dev.1` and SDK `0.31.0-dev.1`;
 these are not published or UAT-qualified releases.
 
+- Preserve user-home applications after unexpected Driver/supervisor loss.
+  Systemd uses `ExitType=cgroup` (systemd 250 or newer); supervision does not
+  interpret Driver loss as permission to kill surviving editors. Explicit stop
+  and confirmed clean logout retain owned cleanup. This protection applies to
+  both display providers and both lifecycle backends.
 - Add provider-specific component pins and schema-4 native runtime records;
   schema 2/3 retain their legacy meaning. Provider changes require a scoped
   stopped migration, and native sessions retain D-Bus without the legacy input

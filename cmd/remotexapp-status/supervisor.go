@@ -55,6 +55,7 @@ type sessionSupervisor struct {
 	children                                               map[string]*serviceChild
 	endpoints                                              map[string]os.FileInfo
 	stage                                                  string
+	preserveDriver                                         bool
 }
 
 func (s *sessionSupervisor) startupStage(stage string) error {
@@ -220,6 +221,9 @@ func (s *sessionSupervisor) rememberEndpoints() {
 func (s *sessionSupervisor) cleanup() {
 	s.rememberEndpoints()
 	for _, name := range []string{"driver", "engine", "ibus", "dbus"} {
+		if name == "driver" && s.preserveDriver {
+			continue
+		}
 		s.stop(name)
 	}
 	for path, original := range s.endpoints {
@@ -479,6 +483,17 @@ func (s *sessionSupervisor) observe(lifetime context.Context) error {
 		case <-lifetime.Done():
 			return s.publish("stopped", "")
 		case <-s.children["driver"].done:
+			// Losing the user-home Driver is not authorization to destroy its
+			// surviving applications. Only an explicit stop or a current-generation
+			// clean logout authorizes normal descendant cleanup. Systemd must also
+			// retain the populated unit (ExitType=cgroup); standalone already does.
+			status, statusErr := readStatus(s.publicPath)
+			cleanLogout := statusErr == nil && status.Generation == s.generation && status.State == "exited"
+			if s.record.BorrowedBus && lifetime.Err() == nil && !cleanLogout {
+				s.preserveDriver = true
+				_ = report(s.publicPath, s.schemaPath, s.generation, "error", "Session Driver exited; surviving applications retained", "driver-exited-unexpectedly", nil, nil, nil, nil)
+				return s.publish("exited", "driver-exited-unexpectedly")
+			}
 			// Driver has already published its canonical App exit status. Returning
 			// tears down services, allowing the existing cgroup observer to run once.
 			failure := s.record.Failure

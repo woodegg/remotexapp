@@ -19,6 +19,9 @@ D2 physical-input UAT checkpoint.
 Development identities are Core `0.16.0-dev.2` and SDK `0.31.0-dev.2`;
 these are not published or UAT-qualified releases.
 
+- Avoid logging typed Unicode mappings in ordinary native server logs.
+- Allow concurrent ID-based Viewer startup to follow one stopped-session
+  activation with unchanged pins; explicit descriptors and upgrades remain fenced.
 - Add supported native keyboard profiles and opt-in explicit text clipboard.
   The paired text component bounds/validates data before allocation/mutation.
   Per-Viewer consent revisions and generation fencing reject late reads after

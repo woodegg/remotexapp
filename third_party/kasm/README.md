@@ -85,6 +85,7 @@ point an older Core at native runtime records or share a live profile writer.
 
 ## D2 input and text checkpoint
 
+Patch 0009 removes ordinary content-bearing keyboard mapping logs.
 The recipe now emits protocol `kasm-wss-text-v1`. Patch 0008 bounds incoming
 UTF-8 text before allocation/mutation and filters outgoing formats/sizes.
 Patch 0014 uses the bounded transactional browser parser. The adapter exposes

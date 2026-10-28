@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RemoteXApp · 原生输入验证</title>
+<style>
+:root{color-scheme:dark;font:15px system-ui;background:#101823;color:#e7edf5}body{max-width:1500px;margin:24px auto;padding:0 20px}h1{font-size:24px}button,textarea{font:inherit;border:1px solid #516581;border-radius:6px;background:#243249;color:inherit;padding:8px 12px}button{cursor:pointer;margin:4px}textarea{width:min(95%,700px);height:65px}#views{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}iframe{width:100%;height:620px;border:1px solid #516581;border-radius:8px;background:#17202c}small,#identity{color:#acbed5}pre{white-space:pre-wrap;font-size:12px}#status{padding:10px 0;color:#9ee6d7}@media(max-width:1000px){#views{grid-template-columns:1fr}}
+</style>
+<h1>RemoteXApp 原生输入验证 · D2</h1>
+<p>这是独立测试环境。先打开应用，再按测试清单验证输入法、剪贴板和两个 Viewer。此页验证 SDK 嵌入行为，不代表业务宿主已经验收。</p>
+<div><button id="launch-mousepad">打开 Mousepad</button><button id="launch-desktop">打开测试桌面</button><button id="toggle-a">隐藏 / 显示 A</button><button id="dispose-a">关闭 Viewer A</button><button id="recreate-a">重新打开 A</button></div>
+<div id="status" role="status">加载测试配置…</div>
+<label for="local-text">本机文本区：用于测试中文输入、切换输入法和复制粘贴</label><br>
+<textarea id="local-text" placeholder="在这里输入，再切换到远程应用"></textarea>
+<div><button id="local-copy">复制本机文本</button><button id="local-read">读取本机剪贴板到文本区</button></div>
+<small>远程 Viewer 内展开 Keyboard and clipboard。先选浏览器所在系统的输入法快捷键，再开启文本剪贴板。Local → Remote 是发送到远程剪贴板；随后在远程应用按 Ctrl+V。Remote → Local 之前先在远程复制文本。</small>
+<pre id="identity"></pre>
+<div id="views"><section><strong>Viewer A</strong><div id="slot-a"></div></section><section><strong>Viewer B · 同一个 App</strong><div id="slot-b"></div></section></div>
+<script type="module">
+let current,config;
+const status=text=>{document.querySelector('#status').textContent=text;};
+try{config=await fetch('/fixture-config').then(r=>{if(!r.ok)throw Error('fixture unavailable');return r.json();});status('请选择测试应用。');}catch{status('测试配置不可用。');}
+const api=async(path,body,method)=>{const r=await fetch(config.baseURL+path,{method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const x=await r.json();if(!r.ok)throw Error(x.error||'API request failed');return x;};
+const frame=slot=>{const el=document.createElement('iframe');el.title='Native remote App '+slot;el.allow='clipboard-read; clipboard-write';el.src=config.baseURL+current.viewerUrl;const node=document.querySelector('#slot-'+slot);node.replaceChildren(el);node.hidden=false;};
+const show=x=>{current=x;document.querySelector('#identity').textContent=JSON.stringify({core:x.versions.current.core,component:x.displayComponentDigest,generation:x.sessionGeneration,clipboard:x.nativeClipboard||'off'},null,2);frame('a');frame('b');status('应用已创建；等两个 Viewer 显示 Ready，再开始操作。');};
+document.querySelector('#launch-mousepad').onclick=()=>api('/api/instances',{templateId:'mousepad',parameters:{filePath:config.documentFile}}).then(show).catch(e=>status(e.message));
+document.querySelector('#launch-desktop').onclick=()=>api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH').then(x=>show(x.runtime)).catch(e=>status(e.message));
+document.querySelector('#toggle-a').onclick=()=>{const slot=document.querySelector('#slot-a');slot.hidden=!slot.hidden;};
+document.querySelector('#dispose-a').onclick=()=>document.querySelector('#slot-a').replaceChildren();
+document.querySelector('#recreate-a').onclick=()=>{if(current)frame('a');};
+document.querySelector('#local-copy').onclick=()=>navigator.clipboard.writeText(document.querySelector('#local-text').value).then(()=>status('本机剪贴板已更新。')).catch(()=>status('浏览器拒绝剪贴板写入。'));
+document.querySelector('#local-read').onclick=()=>navigator.clipboard.readText().then(text=>{document.querySelector('#local-text').value=text;status('已读到本机文本区。');}).catch(()=>status('浏览器拒绝剪贴板读取。'));
+</script>
+</html>

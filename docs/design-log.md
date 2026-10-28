@@ -4640,3 +4640,17 @@ HTML/PNG/RTF/files, passive synchronization, read-only role grants and
 programmatic text with target/ack semantics remain unsupported. The existing
 selected-UID/trusted-ingress model applies; browser consent is not server
 authorization. Real host application business acceptance remains distinct from a host harness.
+
+Live D2 inspection found upstream INFO logging of dynamically mapped Unicode
+keysyms. Patch 0009 removes that content-bearing success log and makes ordinary
+mapping errors content-free; explicit debug diagnostics remain a private,
+authorized activity. The new component has its own digest.
+
+Simultaneous Viewers selecting a stopped on-attach session exposed a benign
+prepare conflict after the first Viewer advanced its generation. ID-based
+initial connect may re-read and retry exactly once only when the same runtime
+is now running at generation +1, with unchanged provider, component, clipboard
+policy and Core digest. Explicit descriptors, already-running recovery, changed
+pins/policy and second conflicts remain rejected. No user input or pending
+clipboard action is replayed. This narrows initial connection behavior without
+weakening the Manager's generation checks.

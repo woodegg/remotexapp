@@ -56,7 +56,7 @@ export class RemoteXAppNativeClient extends EventTarget {
     const timer = setTimeout(() => controller.abort(new RemoteXAppNativeError('timeout', 'Native Viewer readiness timed out')), this.timeout);
     this._state('connecting');
     try {
-      const selected = typeof instance === 'string' ? await this.manager.getInstance(instance, { signal }) : instance;
+      let selected = typeof instance === 'string' ? await this.manager.getInstance(instance, { signal }) : instance;
       current();
       if (selected.displayProvider !== 'kasm') throw new RemoteXAppNativeError('provider-mismatch', 'Native Viewer requires a Kasm runtime');
       if (!Number.isSafeInteger(selected.sessionGeneration) || selected.sessionGeneration < 0) throw new RemoteXAppNativeError('invalid-descriptor', 'Invalid session generation');
@@ -65,7 +65,23 @@ export class RemoteXAppNativeClient extends EventTarget {
       const base = `/remotexapps/${encodeURIComponent(selected.id)}/native`;
       const moduleURL = new URL(this.manager.url(`${base}/client.js`), globalThis.location.href);
       if (moduleURL.origin !== globalThis.location.origin) throw new RemoteXAppNativeError('origin', 'Native Viewer requires a same-origin Manager');
-      const prepared = await this.manager.request(`${base}/prepare`, { method:'POST', body:{ sessionGeneration:selected.sessionGeneration, componentDigest:selected.displayComponentDigest }, signal });
+      const prepare = () => this.manager.request(`${base}/prepare`, { method:'POST', body:{ sessionGeneration:selected.sessionGeneration, componentDigest:selected.displayComponentDigest }, signal });
+      let prepared;
+      try { prepared = await prepare(); }
+      catch (error) {
+        current();
+        // Two Viewers can select the same stopped on-attach session. Only an
+        // ID-based initial connect may follow its one unchanged-pin activation.
+        // Explicit descriptors, recovery/upgrade and repeated conflicts stay fenced.
+        if (typeof instance !== 'string' || selected.sessionState !== 'stopped' || error.status !== 409) throw error;
+        const fresh = await this.manager.getInstance(selected.id, {signal});
+        current();
+        if (fresh.id !== selected.id || fresh.displayProvider !== 'kasm' || fresh.sessionState !== 'running' ||
+            fresh.sessionGeneration !== selected.sessionGeneration + 1 || fresh.displayComponentDigest !== selected.displayComponentDigest ||
+            fresh.nativeClipboard !== selected.nativeClipboard || fresh.versions?.current?.core?.sha256 !== selected.versions?.current?.core?.sha256) throw error;
+        selected = fresh;
+        prepared = await prepare();
+      }
       current();
       if (prepared.id !== selected.id || prepared.displayProvider !== 'kasm' || prepared.displayComponentDigest !== selected.displayComponentDigest || !Number.isSafeInteger(prepared.sessionGeneration) || prepared.sessionGeneration < 1) throw new RemoteXAppNativeError('invalid-descriptor', 'Invalid prepared session');
       this.instance = prepared;

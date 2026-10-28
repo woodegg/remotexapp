@@ -626,3 +626,8 @@ Rich formats/files, read-only role authorization and programmatic text remain
 unsupported. host application's legacy prompt/offer and text-ACK consumers must adapt to
 these capabilities/results; the native client is not the legacy client with a
 new renderer. Real host application window/business validation remains a separate gate.
+
+For concurrent native Viewers, ID-based initial connect may retry one prepare
+conflict if another Viewer just activated the same stopped session at the next
+generation with unchanged component/Core/clipboard policy. Explicit descriptor
+connections and upgrades/recovery remain fenced; no input is replayed.

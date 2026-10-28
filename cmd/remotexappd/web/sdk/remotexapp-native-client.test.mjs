@@ -147,3 +147,30 @@ test('a local write racing retirement reports uncertainty and is never replayed'
   const pending=f.viewer.copyClipboardToLocal();f.viewer.disconnect();resolve();
   await assert.rejects(pending,{code:'clipboard-uncertain'});assert.equal(writes,1);f.viewer.dispose();
 });
+
+test('concurrent ID connects may follow one stopped-session activation with unchanged pins', async () => {
+  const f=fixture();f.state.sessionState='stopped';f.state.sessionGeneration=2;
+  let calls=0;
+  f.viewer.manager.request=async (_path,{body})=>{
+    calls++;
+    if(calls===1){assert.equal(body.sessionGeneration,2);f.state.sessionState='running';f.state.sessionGeneration=3;throw Object.assign(new Error('stale descriptor'),{status:409});}
+    assert.equal(body.sessionGeneration,3);return structuredClone(f.state);
+  };
+  await f.viewer.connect('app');assert.equal(calls,2);assert.equal(f.viewer.state,'ready');f.viewer.dispose();
+});
+test('activation retry cannot follow explicit descriptors, upgrades, recovery or repeated conflicts', async () => {
+  for(const scenario of ['descriptor','pin','core','policy','generation','running','repeat','cancel']){
+    const f=fixture();f.state.sessionState=scenario==='running'?'running':'stopped';f.state.sessionGeneration=2;
+    const descriptor=structuredClone(f.state);let calls=0;
+    f.viewer.manager.request=async()=>{
+      calls++;f.state.sessionState='running';f.state.sessionGeneration=scenario==='generation'?4:3;
+      if(scenario==='pin')f.state.displayComponentDigest='b'.repeat(64);
+      if(scenario==='core')f.state.versions={current:{core:{sha256:'changed'}}};
+      if(scenario==='policy')f.state.nativeClipboard='text';
+      if(scenario==='cancel')f.viewer.disconnect();
+      throw Object.assign(new Error('conflict'),{status:409});
+    };
+    await assert.rejects(f.viewer.connect(scenario==='descriptor'?descriptor:'app'));
+    assert.equal(calls,scenario==='repeat'?2:1,scenario);assert.equal(f.display,undefined);f.viewer.dispose();
+  }
+});

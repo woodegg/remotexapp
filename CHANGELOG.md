@@ -11,9 +11,17 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Prepare the proposed Core 0.16.0 KasmVNC replacement evaluation, including
-container audio and clipboard acceptance gates. Documentation only; current
-binaries and runtime behavior remain at the released 0.15.0 baseline.
+Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
+remains the default; implementation qualification is tracked in Issue #30.
+
+- Add provider-specific component pins and schema-4 native runtime records;
+  schema 2/3 retain their legacy meaning. Provider changes require a scoped
+  stopped migration, and native sessions retain D-Bus without the legacy input
+  bridge. Kasm component installation is separate from the ordinary release.
+- Add authenticated, generation-bound native Viewer routes and a minimal
+  native SDK adapter. Readiness requires App readiness and actual painting;
+  disconnect/dispose release only the owned Viewer. Native clipboard, audio,
+  programmatic text and UDP are not advertised by this slice.
 
 - Propose a native Kasm architecture from the frozen research baseline, with
   explicit keep/adapt/replace decisions, SDK and host integration contracts,

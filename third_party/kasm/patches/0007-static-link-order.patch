@@ -1,0 +1,11 @@
+--- a/unix/xserver/hw/vnc/Makefile.am
++++ b/unix/xserver/hw/vnc/Makefile.am
+@@ -7,7 +7,7 @@
+ NETWORK_LIB=$(KASMVNC_BUILDDIR)/common/network/libnetwork.la
+ XREGION_LIB=$(KASMVNC_BUILDDIR)/common/Xregion/libXregion.la
+ UNIXCOMMON_LIB=$(KASMVNC_BUILDDIR)/unix/common/libunixcommon.la
+-COMMON_LIBS=$(NETWORK_LIB) $(RFB_LIB) $(RDR_LIB) $(XREGION_LIB) $(OS_LIB) $(UNIXCOMMON_LIB)
++COMMON_LIBS=$(RFB_LIB) $(NETWORK_LIB) $(RDR_LIB) $(XREGION_LIB) $(OS_LIB) $(UNIXCOMMON_LIB)
+ 
+ noinst_LTLIBRARIES = libvnccommon.la
+ 

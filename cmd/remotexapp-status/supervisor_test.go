@@ -215,6 +215,54 @@ func TestSupervisorEnvironmentAndBorrowedBus(t *testing.T) {
 	}
 }
 
+func TestNativeSupervisorKeepsBusWithoutLegacyInput(t *testing.T) {
+	for _, mode := range []string{"isolated", "user-home"} {
+		t.Run(mode, func(t *testing.T) {
+			f := newSupervisorFixture(t, mode)
+			f.env = append(f.env, "REMOTEXAPP_INPUT_PROVIDER=native", "REMOTEXAPP_UNICODE_ENGINE=", "IBUS_ADDRESS=untrusted-inherited")
+			c := f.start(t)
+			r := f.record(t, "ready")
+			if r.InputProvider != "native" || r.Driver == nil {
+				t.Fatal("native supervisor did not launch")
+			}
+			if _, ok := r.Services["ibus"]; ok {
+				t.Fatal("native started IBus")
+			}
+			if _, ok := r.Services["engine"]; ok {
+				t.Fatal("native started legacy engine")
+			}
+			_, ownsBus := r.Services["dbus"]
+			if ownsBus == (mode == "user-home") {
+				t.Fatal("wrong bus ownership")
+			}
+			data, err := os.ReadFile(filepath.Join(f.runtime, "driver-environment.json"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			var env []string
+			if err := json.Unmarshal(data, &env); err != nil {
+				t.Fatal(err)
+			}
+			for _, v := range env {
+				if strings.HasPrefix(v, "IBUS_ADDRESS=") || v == "GTK_IM_MODULE=ibus" {
+					t.Fatal("legacy environment leaked")
+				}
+			}
+			if ownsBus {
+				if err := syscall.Kill(r.Services["dbus"].PID, syscall.SIGTERM); err != nil {
+					t.Fatal(err)
+				}
+				f.record(t, "degraded")
+				if actual, err := processIdentity(r.Driver.PID); err != nil || actual != *r.Driver {
+					t.Fatal("bus failure destroyed application")
+				}
+			}
+			_ = c.Process.Signal(syscall.SIGTERM)
+			f.record(t, "stopped")
+		})
+	}
+}
+
 func TestSupervisorServiceFaultPreservesApplication(t *testing.T) {
 	for _, name := range []string{"dbus", "ibus", "engine"} {
 		t.Run(name, func(t *testing.T) {

@@ -20,7 +20,8 @@ semantics. Accepted 0.15.0 runtime behavior is not superseded by this proposal.
 [Architecture detail](kasm-native-architecture.md) accepts KNP-BASELINE-20261024
 as research input, not production qualification. Entries below remain
 **proposed** except AUD-002's connection-lifetime clause, accepted as a design
-decision on 2026-10-25 (R3). None is implemented by this design PR. Stable IDs support subsequent
+decision on 2026-10-25 (R3). D1 implementation is in progress; its tests do not
+qualify the remaining architecture. Stable IDs support subsequent
 implementation Issues; KVE-001–008 remain evaluation/qualification gates.
 
 On 2026-10-28 the owner approved the bounded D1 implementation scope in
@@ -29,6 +30,15 @@ Manager lifecycle and a minimal native SDK, with Mousepad/managed XFCE fixtures
 and nine acceptance groups. Applicable provider, generation, persistence and
 recovery requirements are selected for D1; complete host integration, audio,
 UDP and publication are not accepted by that scope approval.
+
+D1 implements the WSS parts of KNA-001/002/005/007/009 with explicit
+`display-provider=kasm`, a separately installed manifest-pinned pair and
+schema 4. Legacy schema 2/3 remain TigerVNC. Native Viewer preparation and
+attach require current generation; readiness requires App ready plus paint.
+The native session retains the Core supervisor and D-Bus, with no mandatory
+IBus/Unicode service. Ordinary upgrade cannot change display provider.
+Acceptance remains open until Issue #30's real App, reboot and rollback
+evidence is complete. D2 input/clipboard and later transports remain pending.
 
 | ID | Proposed requirement | Acceptance boundary |
 | --- | --- | --- |

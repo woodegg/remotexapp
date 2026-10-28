@@ -1,0 +1,254 @@
+--- a/common/network/webudp/Wu.cpp
++++ b/common/network/webudp/Wu.cpp
+@@ -39,6 +39,7 @@
+ };
+ 
+ const double kMaxClientTtl = 9.0;
++const double kHandshakeTtl = 30.0;
+ const double heartbeatInterval = 4.0;
+ const int kDefaultMTU = 1400;
+ 
+@@ -129,7 +130,7 @@
+   client->sctpVerificationTag = 0;
+   client->remoteTsn = 0;
+   client->tsn = 1;
+-  client->ttl = kMaxClientTtl;
++  client->ttl = kHandshakeTtl;
+   client->nextHeartbeat = heartbeatInterval;
+   client->user = NULL;
+ 
+@@ -426,6 +427,7 @@
+   BIO_write(client->inBio, data, length);
+ 
+   if (!SSL_is_init_finished(client->ssl)) {
++    ERR_clear_error();
+     int r = SSL_do_handshake(client->ssl);
+ 
+     if (r <= 0) {
+@@ -439,17 +441,31 @@
+         }
+       }
+     }
++    // Flush the final server flight as well as intermediate handshake output.
++    WuClientSendPendingDTLS(wu, client);
+   } else {
+     WuClientSendPendingDTLS(wu, client);
+ 
+     while (BIO_ctrl_pending(client->inBio) > 0) {
+       uint8_t receiveBuffer[8092];
++      ERR_clear_error();
+       int bytes = SSL_read(client->ssl, receiveBuffer, sizeof(receiveBuffer));
+ 
+       if (bytes > 0) {
+         uint8_t* buf = (uint8_t*)WuArenaAcquire(wu->arena, bytes);
+         memcpy(buf, receiveBuffer, bytes);
+         WuHandleSctp(wu, client, buf, bytes);
++      } else {
++        // A memory BIO can retain encrypted bytes after a close alert or
++        // an incomplete DTLS record. Retrying SSL_read without new input
++        // spins while holding the host mutex and starves every UDP client.
++        const int error = SSL_get_error(client->ssl, bytes);
++        if (error != SSL_ERROR_WANT_READ && error != SSL_ERROR_WANT_WRITE) {
++          client->state = WuClient_WaitingRemoval;
++          WuReportDebug(wu, "DTLS read closed or failed; retiring client");
++        }
++        WuClientSendPendingDTLS(wu, client);
++        break;
+       }
+     }
+   }
+@@ -480,10 +496,14 @@
+       SerializeStunPacket(&outPacket, client->serverPassword.identifier,
+                           client->serverPassword.length, stunResponse, 512);
+ 
++  // Connectivity checks can arrive from several browser interfaces. Reply to
++  // each source, but only let the nominated pair select the DTLS destination.
++  // Otherwise a late alternate check diverts the handshake to another socket.
++  const WuAddress selected = client->address;
+   client->localSctpPort = remote->port;
+   client->address = *remote;
+-
+   wu->writeUdpData(stunResponse, serializedSize, client, wu->userData);
++  if (!packet->useCandidate) client->address = selected;
+ }
+ 
+ static void WuPurgeDeadClients(Wu* wu) {
+@@ -616,6 +636,19 @@
+     WuClient* client = wu->clients[i];
+     client->ttl -= wu->dt;
+     client->nextHeartbeat -= wu->dt;
++
++    // OpenSSL memory BIOs do not retransmit a lost DTLS handshake flight
++    // themselves. Drive its timer even when no new UDP packet arrives.
++    if (client->state == WuClient_DTLSHandshake) {
++      ERR_clear_error();
++      const int retransmitted = DTLSv1_handle_timeout(client->ssl);
++      if (retransmitted < 0) {
++        WuReportError(wu, "DTLS handshake retransmission failed");
++        client->state = WuClient_WaitingRemoval;
++      } else if (retransmitted > 0) {
++        WuReportDebug(wu, "DTLS handshake flight retransmitted");
++      }
++    }
+ 
+     if (client->nextHeartbeat <= 0.0) {
+       client->nextHeartbeat = heartbeatInterval;
+--- a/common/network/webudp/WuStun.cpp
++++ b/common/network/webudp/WuStun.cpp
+@@ -8,83 +8,43 @@
+ const int32_t kStunAlignment = 4;
+ 
+ bool ParseStun(const uint8_t* src, int32_t len, StunPacket* packet) {
+-  if (len < kStunHeaderLength || src[0] != 0 || src[1] != 1) {
+-    return false;
++  if (len < kStunHeaderLength || src[0] != 0 || src[1] != 1) return false;
++  memset(packet, 0, sizeof(*packet));
++  ReadScalarSwapped(src, &packet->type);
++  ReadScalarSwapped(src + 2, &packet->length);
++  ReadScalarSwapped(src + 4, &packet->cookie);
++  if (packet->cookie != kStunCookie || packet->length < 4 ||
++      packet->length > len - kStunHeaderLength || packet->length % 4) return false;
++  memcpy(packet->transactionId, src + 8, kStunTransactionIdLength);
++  const int32_t end = kStunHeaderLength + packet->length;
++  bool foundUser = false;
++  for (int32_t pos = kStunHeaderLength; pos < end;) {
++    if (end - pos < 4) return false;
++    uint16_t type, length;
++    ReadScalarSwapped(src + pos, &type);
++    ReadScalarSwapped(src + pos + 2, &length);
++    pos += 4;
++    const int32_t padded = length + PadSize(length, kStunAlignment);
++    if (padded > end - pos) return false;
++    if (type == StunAttrib_User) {
++      if (foundUser || length < 9) return false;
++      const char* user = reinterpret_cast<const char*>(src + pos);
++      const int32_t colon = FindTokenIndex(user, length, ':');
++      const int32_t remoteLength = length - colon - 1;
++      if (colon < 4 || colon > kMaxStunIdentifierLength ||
++          remoteLength < 4 || remoteLength > kMaxStunIdentifierLength) return false;
++      packet->serverUser.length = colon;
++      packet->remoteUser.length = remoteLength;
++      memcpy(packet->serverUser.identifier, user, colon);
++      memcpy(packet->remoteUser.identifier, user + colon + 1, remoteLength);
++      foundUser = true;
++    } else if (type == 0x0025) { // ICE USE-CANDIDATE
++      if (length != 0) return false;
++      packet->useCandidate = true;
++    }
++    pos += padded;
+   }
+-
+-  src += ReadScalarSwapped(src, &packet->type);
+-
+-  if (packet->type != Stun_BindingRequest) {
+-    return false;
+-  }
+-
+-  src += ReadScalarSwapped(src, &packet->length);
+-
+-  if (packet->length < 4 || packet->length > len - kStunHeaderLength) {
+-    // Need at least 1 attribute
+-    return false;
+-  }
+-
+-  src += ReadScalarSwapped(src, &packet->cookie);
+-
+-  for (int32_t i = 0; i < kStunTransactionIdLength; i++) {
+-    packet->transactionId[i] = src[i];
+-  }
+-
+-  src += kStunTransactionIdLength;
+-
+-  int32_t maxOffset = int32_t(packet->length) - 1;
+-  int32_t payloadOffset = 0;
+-  while (payloadOffset < maxOffset) {
+-    int32_t remain = len - kStunHeaderLength - payloadOffset;
+-    if (remain >= 4) {
+-      uint16_t payloadType = 0;
+-      uint16_t payloadLength = 0;
+-
+-      payloadOffset += ReadScalarSwapped(src + payloadOffset, &payloadType);
+-      payloadOffset += ReadScalarSwapped(src + payloadOffset, &payloadLength);
+-      remain -= 4;
+-
+-      int32_t paddedLength =
+-          payloadLength + PadSize(payloadLength, kStunAlignment);
+-
+-      if (payloadType == StunAttrib_User) {
+-        // fragment = min 4 chars
+-        // username = fragment:fragment (at least 9 characters)
+-        if (paddedLength <= remain && payloadLength >= 9) {
+-          const char* uname = (const char*)src + payloadOffset;
+-          int32_t colonIndex = FindTokenIndex(uname, payloadLength, ':');
+-          if (colonIndex >= 4) {
+-            int32_t serverUserLength = colonIndex;
+-            int32_t remoteUserLength = payloadLength - colonIndex - 1;
+-            if (serverUserLength > kMaxStunIdentifierLength ||
+-                remoteUserLength > kMaxStunIdentifierLength) {
+-              return false;
+-            } else {
+-              packet->serverUser.length = serverUserLength;
+-              packet->remoteUser.length = remoteUserLength;
+-              memcpy(packet->serverUser.identifier, uname, serverUserLength);
+-              memcpy(packet->remoteUser.identifier, uname + colonIndex + 1,
+-                     remoteUserLength);
+-              return true;
+-            }
+-
+-          } else {
+-            return false;
+-          }
+-        } else {
+-          // Actual length > reported length
+-          return false;
+-        }
+-      }
+-
+-      payloadOffset += paddedLength;
+-    } else {
+-      return false;
+-    }
+-  }
+-
+-  return true;
++  return foundUser;
+ }
+ 
+ int32_t SerializeStunPacket(const StunPacket* packet, const uint8_t* password,
+--- a/common/network/webudp/WuStun.h
++++ b/common/network/webudp/WuStun.h
+@@ -42,6 +42,7 @@
+ struct StunPacket {
+   uint16_t type;
+   uint16_t length;
++  bool useCandidate;
+   uint32_t cookie;
+   uint8_t transactionId[kStunTransactionIdLength];
+ 
+--- a/common/network/webudp/WuHostEpoll.cpp
++++ b/common/network/webudp/WuHostEpoll.cpp
+@@ -191,7 +191,9 @@
+ }
+ 
+ void WuHostRemoveClient(WuHost* host, WuClient* client) {
++  if (pthread_mutex_lock(&wumutex)) abort();
+   WuRemoveClient(host->wu, client);
++  pthread_mutex_unlock(&wumutex);
+ }
+ 
+ int32_t WuHostSendText(WuHost* host, WuClient* client, const char* text,
+@@ -248,6 +250,7 @@
+ void WuGotHttp(WuHost *host, const char msg[], const uint32_t msglen,
+                char resp[]) {
+ 
++  if (pthread_mutex_lock(&wumutex)) abort();
+   const SDPResult sdp = WuExchangeSDP(
+       host->wu, msg, msglen);
+ 
+@@ -265,4 +268,5 @@
+     WuReportError(host->wu, "Other error");
+     strcpy(resp, HTTP_SERVER_ERROR);
+   }
+-}
++  pthread_mutex_unlock(&wumutex);
++}

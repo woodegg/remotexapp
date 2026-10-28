@@ -1,0 +1,463 @@
+--- a/common/network/GetAPI.h
++++ b/common/network/GetAPI.h
+@@ -67,7 +67,7 @@
+     void netGetFrameStats(char *buf, uint32_t len);
+     void netResetFrameStatsCall();
+     uint8_t netServerFrameStatsReady();
+-    void netUdpUpgrade(void *client, uint32_t ip);
++    void netUdpUpgrade(uint64_t clientID);
+     void netClearClipboard();
+ 
+     enum USER_ACTION {
+@@ -90,8 +90,7 @@
+       union {
+         kasmpasswd_entry_t data;
+         struct {
+-          void *client;
+-          uint32_t ip;
++          uint64_t clientID;
+         } udp;
+       };
+     };
+--- a/common/network/GetAPIMessager.cxx
++++ b/common/network/GetAPIMessager.cxx
+@@ -817,12 +817,11 @@
+ 	return ret;
+ }
+ 
+-void GetAPIMessager::netUdpUpgrade(void *client, uint32_t ip) {
++void GetAPIMessager::netUdpUpgrade(uint64_t clientID) {
+ 	// Return 1 for success
+ 	action_data act;
+ 	act.action = UDP_UPGRADE;
+-	act.udp.client = client;
+-	act.udp.ip = ip;
++	act.udp.clientID = clientID;
+ 
+ 	// Send it in
+ 	if (pthread_mutex_lock(&userMutex))
+--- a/common/network/Udp.cxx
++++ b/common/network/Udp.cxx
+@@ -80,7 +80,6 @@
+ 	host.store(myhost, std::memory_order_release);
+ 
+ 	while (1) {
+-		WuAddress addr;
+ 		WuEvent e;
+ 		if (!WuHostServe(myhost, &e, 2000))
+ 			continue;
+@@ -88,12 +87,11 @@
+ 		switch (e.type) {
+ 			case WuEvent_ClientJoin:
+ 				vlog.info("client join");
+-				addr = WuClientGetAddress(e.client);
+-				msgr->netUdpUpgrade(e.client, htonl(addr.host));
++				msgr->netUdpUpgrade(e.clientID);
+ 			break;
+ 			case WuEvent_ClientLeave:
+ 				vlog.info("client leave");
+-				WuHostRemoveClient(myhost, e.client);
++				WuHostRemoveClientID(myhost, e.clientID);
+ 			break;
+ 			default:
+ 				vlog.error("client sent data, this is unexpected");
+@@ -105,7 +103,7 @@
+ }
+ 
+ // Send one packet, split into N UDP-sized pieces
+-static uint8_t udpsend(WuClient *client, const uint8_t *data, unsigned len, uint32_t *id,
++static uint8_t udpsend(uint64_t clientID, const uint8_t *data, unsigned len, uint32_t *id,
+ 			const uint32_t *frame) {
+ 	const uint32_t DATA_MAX = udpSize;
+ 
+@@ -128,7 +126,7 @@
+ 		data += curlen;
+ 		len -= curlen;
+ 
+-		if (WuHostSendBinary(host, client, buf, curlen + sizeof(uint32_t) * 5) < 0)
++		if (WuHostSendBinaryID(host.load(std::memory_order_acquire), clientID, buf, curlen + sizeof(uint32_t) * 5) < 0)
+ 			return 1;
+ 	}
+ 
+@@ -137,7 +135,7 @@
+ 	return 0;
+ }
+ 
+-UdpStream::UdpStream(): OutStream(), client(NULL), total_len(0), id(0), failed(false),
++UdpStream::UdpStream(): OutStream(), clientID(0), total_len(0), id(0), failed(false),
+ 	                frame(0) {
+ 	ptr = data;
+ 	end = data + UDPSTREAM_BUFSIZE;
+@@ -149,8 +147,8 @@
+ 	const unsigned len = ptr - data;
+ 	total_len += len;
+ 
+-	if (client) {
+-		if (udpsend(client, data, len, &id, &frame)) {
++	if (clientID) {
++		if (udpsend(clientID, data, len, &id, &frame)) {
+ 			vlog.error("Error sending udp, client gone?");
+ 			failed = true;
+ 		}
+@@ -174,11 +172,16 @@
+ 	failed = false;
+ }
+ 
+-void wuGotHttp(const char msg[], const uint32_t msglen, char resp[]) {
++void wuRetireClient(uint64_t clientID) {
++	WuHost *current = host.load(std::memory_order_acquire);
++	if (current && clientID) WuHostRemoveClientID(current, clientID);
++}
++
++uint64_t wuGotHttp(const char msg[], const uint32_t msglen, char resp[]) {
+ 	WuHost *current = host.load(std::memory_order_acquire);
+ 	if (!current) {
+ 		strcpy(resp, "{\"error\":\"udp-unavailable\"}");
+-		return;
++		return 0;
+ 	}
+-	WuGotHttp(current, msg, msglen, resp);
++	return WuGotHttp(current, msg, msglen, resp);
+ }
+--- a/common/network/Udp.h
++++ b/common/network/Udp.h
+@@ -36,9 +36,12 @@
+ 			virtual size_t length() { return total_len; }
+ 			virtual void overrun(size_t needed);
+ 
+-			void setClient(WuClient *cli) {
+-				client = cli;
++			void setClientID(uint64_t value) {
++				clientID = value;
++				failed = false;
+ 			}
++
++			uint64_t getClientID() const { return clientID; }
+ 
+ 			void setFrameNumber(const unsigned in) {
+ 				frame = in;
+@@ -48,7 +51,7 @@
+ 			void clearFailed();
+ 		private:
+ 			uint8_t data[UDPSTREAM_BUFSIZE];
+-			WuClient *client;
++			uint64_t clientID;
+ 			size_t total_len;
+ 			uint32_t id;
+ 			bool failed;
+@@ -56,7 +59,9 @@
+ 	};
+ }
+ 
+-extern "C" void wuGotHttp(const char msg[], const uint32_t msglen, char resp[]);
++void wuRetireClient(uint64_t clientID);
++
++extern "C" uint64_t wuGotHttp(const char msg[], const uint32_t msglen, char resp[]);
+ 
+ 
+ #endif // __NETWORK_UDP_H__
+--- a/common/network/webudp/Wu.cpp
++++ b/common/network/webudp/Wu.cpp
+@@ -25,6 +25,7 @@
+   WuQueue* pendingEvents;
+   int32_t maxClients;
+   int32_t numClients;
++  uint64_t nextClientID;
+ 
+   WuPool* clientPool;
+   WuClient** clients;
+@@ -92,6 +93,7 @@
+ }
+ 
+ struct WuClient {
++  uint64_t id;
+   StunUserIdentifier serverUser;
+   StunUserIdentifier serverPassword;
+   StunUserIdentifier remoteUser;
+@@ -153,10 +155,12 @@
+                        const SctpChunk* chunks, int32_t numChunks);
+ 
+ static WuClient* WuNewClient(Wu* wu) {
++  if (wu->nextClientID == UINT64_MAX) return NULL;
+   WuClient* client = (WuClient*)WuPoolAcquire(wu->clientPool);
+ 
+   if (client) {
+     memset(client, 0, sizeof(WuClient));
++    client->id = ++wu->nextClientID;
+     WuClientStart(wu, client);
+     wu->clients[wu->numClients++] = client;
+     return client;
+@@ -166,6 +170,8 @@
+ }
+ 
+ static void WuPushEvent(Wu* wu, WuEvent evt) {
++  // Snapshot before queueing; a recycled pool pointer is not an identity.
++  evt.clientID = evt.client->id;
+   WuQueuePush(wu->pendingEvents, &evt);
+ }
+ 
+@@ -206,6 +212,13 @@
+     }
+   }
+ 
++  return NULL;
++}
++
++WuClient* WuFindClientByID(const Wu* wu, uint64_t id) {
++  if (!id) return NULL;
++  for (int32_t i = 0; i < wu->numClients; ++i)
++    if (wu->clients[i]->id == id) return wu->clients[i];
+   return NULL;
+ }
+ 
+@@ -761,7 +774,7 @@
+     return {WuSDPStatus_Error, NULL, NULL, 0};
+   }
+ 
+-  return {WuSDPStatus_Success, client, responseSdp, sdpLength};
++  return {WuSDPStatus_Success, client, responseSdp, sdpLength, client->id};
+ }
+ 
+ void WuSetUserData(Wu* wu, void* userData) { wu->userData = userData; }
+--- a/common/network/webudp/Wu.h
++++ b/common/network/webudp/Wu.h
+@@ -34,6 +34,7 @@
+ typedef struct {
+   WuEventType type;
+   WuClient* client;
++  uint64_t clientID;
+   const uint8_t* data;
+   int32_t length;
+ } WuEvent;
+@@ -43,6 +44,7 @@
+   WuClient* client;
+   const char* sdp;
+   int32_t sdpLength;
++  uint64_t clientID;
+ } SDPResult;
+ 
+ typedef struct {
+@@ -70,6 +72,7 @@
+ void WuSetDebugCallback(Wu* wu, WuErrorFn callback);
+ WuAddress WuClientGetAddress(const WuClient* client);
+ WuClient* WuFindClient(const Wu* wu, WuAddress address);
++WuClient* WuFindClientByID(const Wu* wu, uint64_t id);
+ 
+ #ifdef __cplusplus
+ }
+--- a/common/network/webudp/WuHost.h
++++ b/common/network/webudp/WuHost.h
+@@ -20,6 +20,8 @@
+  */
+ int32_t WuHostServe(WuHost* host, WuEvent* evt, int timeout);
+ void WuHostRemoveClient(WuHost* wu, WuClient* client);
++void WuHostRemoveClientID(WuHost* host, uint64_t id);
++int32_t WuHostSendBinaryID(WuHost* host, uint64_t id, const uint8_t* data, int32_t length);
+ int32_t WuHostSendText(WuHost* host, WuClient* client, const char* text,
+                        int32_t length);
+ int32_t WuHostSendBinary(WuHost* host, WuClient* client, const uint8_t* data,
+@@ -28,7 +30,7 @@
+ void WuHostSetDebugCallback(WuHost* host, WuErrorFn callback);
+ WuClient* WuHostFindClient(const WuHost* host, WuAddress address);
+ 
+-void WuGotHttp(WuHost *host, const char msg[], const uint32_t msglen,
++uint64_t WuGotHttp(WuHost *host, const char msg[], const uint32_t msglen,
+                char resp[]);
+ 
+ #ifdef __cplusplus
+--- a/common/network/webudp/WuHostEpoll.cpp
++++ b/common/network/webudp/WuHostEpoll.cpp
+@@ -196,6 +196,21 @@
+   pthread_mutex_unlock(&wumutex);
+ }
+ 
++void WuHostRemoveClientID(WuHost* host, uint64_t id) {
++  if (pthread_mutex_lock(&wumutex)) abort();
++  WuClient* client = WuFindClientByID(host->wu, id);
++  if (client) WuRemoveClient(host->wu, client);
++  pthread_mutex_unlock(&wumutex);
++}
++
++int32_t WuHostSendBinaryID(WuHost* host, uint64_t id, const uint8_t* data, int32_t length) {
++  if (pthread_mutex_lock(&wumutex)) abort();
++  WuClient* client = WuFindClientByID(host->wu, id);
++  const int32_t ret = client ? WuSendBinary(host->wu, client, data, length) : -1;
++  pthread_mutex_unlock(&wumutex);
++  return ret;
++}
++
+ int32_t WuHostSendText(WuHost* host, WuClient* client, const char* text,
+                        int32_t length) {
+   return WuSendText(host->wu, client, text, length);
+@@ -247,7 +262,7 @@
+   return WuFindClient(host->wu, address);
+ }
+ 
+-void WuGotHttp(WuHost *host, const char msg[], const uint32_t msglen,
++uint64_t WuGotHttp(WuHost *host, const char msg[], const uint32_t msglen,
+                char resp[]) {
+ 
+   if (pthread_mutex_lock(&wumutex)) abort();
+@@ -269,4 +284,5 @@
+     strcpy(resp, HTTP_SERVER_ERROR);
+   }
+   pthread_mutex_unlock(&wumutex);
+-}
++  return sdp.status == WuSDPStatus_Success ? sdp.clientID : 0;
++}
+--- a/common/rfb/SMsgHandler.h
++++ b/common/rfb/SMsgHandler.h
+@@ -103,7 +103,7 @@
+     // client supports the direct mouse extension
+     virtual void supportsDirectMouse();
+ 
+-    virtual void udpUpgrade(const char *resp) = 0;
++    virtual void udpUpgrade(const char *resp, uint64_t clientID) = 0;
+     virtual void udpDowngrade(const bool) = 0;
+ 
+     virtual void subscribeUnixRelay(const char *name) = 0;
+--- a/common/rfb/SMsgReader.cxx
++++ b/common/rfb/SMsgReader.cxx
+@@ -372,9 +372,9 @@
+   is->readBytes(buf, len);
+   buf[len] = '\0';
+ 
+-  wuGotHttp(buf, len, resp);
+-
+-  handler->udpUpgrade(resp);
++  const uint64_t clientID = wuGotHttp(buf, len, resp);
++
++  handler->udpUpgrade(resp, clientID);
+ }
+ 
+ void SMsgReader::readSubscribeUnixRelay()
+--- a/common/rfb/VNCSConnectionST.cxx
++++ b/common/rfb/VNCSConnectionST.cxx
+@@ -60,7 +60,7 @@
+ 
+ VNCSConnectionST::VNCSConnectionST(VNCServerST* server_, network::Socket *s, const video_encoders::EncoderProbe &encoder_probe,
+                                    bool reverse)
+-  : upgradingToUdp(false), sock(s), reverseConnection(reverse),
++  : pendingUdpID(0), sock(s), reverseConnection(reverse),
+     inProcessMessages(false),
+     pendingSyncFence(false), syncFence(false), fenceFlags(0),
+     fenceDataLen(0), fenceData(nullptr), congestionTimer(this),
+@@ -127,6 +127,7 @@
+ 
+ VNCSConnectionST::~VNCSConnectionST()
+ {
++  retireUdp();
+   // If we reach here then VNCServerST is deleting us!
+   VNCServerST::connectionsLog.write(1,"closed: %s (%s)",
+                                     peerEndpoint.buf,
+@@ -175,6 +176,7 @@
+ 
+ void VNCSConnectionST::close(const char* reason)
+ {
++  retireUdp();
+   // Log the reason for the close
+   if (!closeReason.buf)
+     closeReason.buf = strDup(reason);
+@@ -1843,19 +1845,33 @@
+   return false;
+ }
+ 
+-void VNCSConnectionST::udpUpgrade(const char *resp)
+-{
+-  if (resp[0] == 'H') {
++void VNCSConnectionST::retireUdp()
++{
++  network::UdpStream *stream = (network::UdpStream *)getOutStream(true);
++  const uint64_t pending = pendingUdpID;
++  const uint64_t active = stream->getClientID();
++  pendingUdpID = 0;
++  stream->setClientID(0);
++  cp.supportsUdp = false;
++  wuRetireClient(pending);
++  if (active != pending) wuRetireClient(active);
++}
++
++void VNCSConnectionST::udpUpgrade(const char *resp, uint64_t clientID)
++{
++  retireUdp();
++  pendingUdpID = clientID;
++  if (!clientID) {
+     vlog.info("Client %s requested upgrade to udp, but WebUdp refused", sock->getPeerAddress());
+   } else {
+     vlog.info("Client %s requesting upgrade to udp", sock->getPeerAddress());
+-    upgradingToUdp = true;
+   }
+   writer()->writeUdpUpgrade(resp);
+ }
+ 
+ void VNCSConnectionST::udpDowngrade(const bool byServer)
+ {
++  retireUdp();
+   cp.supportsUdp = false;
+   cp.useCopyRect = true;
+   encodeManager.resetZlib();
+--- a/common/rfb/VNCSConnectionST.h
++++ b/common/rfb/VNCSConnectionST.h
+@@ -203,7 +203,8 @@
+ 
+     virtual void udpDowngrade(const bool byServer);
+ 
+-    bool upgradingToUdp;
++    uint64_t pendingUdpID;
++    void retireUdp();
+ 
+     bool isSubscribedToUnixRelay(const char *name) const {
+       unsigned i;
+@@ -257,7 +258,7 @@
+                                          int x, int y, int w, int h);
+     virtual void handleClipboardAnnounce(bool available);
+     virtual void handleClipboardAnnounceBinary(const unsigned num, const char mimes[][32]);
+-    virtual void udpUpgrade(const char *resp);
++    virtual void udpUpgrade(const char *resp, uint64_t clientID);
+     virtual void subscribeUnixRelay(const char *name);
+     virtual void unixRelay(const char *name, const rdr::U8 *buf, const unsigned len);
+       void videoEncodersRequest(std::vector<int32_t> const &encoders) override;
+--- a/common/rfb/VNCServerST.cxx
++++ b/common/rfb/VNCServerST.cxx
+@@ -890,25 +890,15 @@
+   for (ci = clients.begin(); ci != clients.end(); ci = ci_next) {
+     ci_next = ci; ci_next++;
+ 
+-    if (!(*ci)->upgradingToUdp)
++    // All viewers may share one proxy address. Bind only the exact SDP
++    // negotiation; late/duplicate events cannot select another viewer.
++    if (!act.udp.clientID || (*ci)->pendingUdpID != act.udp.clientID)
+       continue;
+ 
+-    char buf[32];
+-    inet_ntop(AF_INET, &act.udp.ip, buf, 32);
+-
+     const char * const who = (*ci)->getPeerEndpoint();
+-    const char *start = strrchr(who, '@');
+-    if (!start)
+-      continue;
+-    start++;
+-
+-    // Slightly inaccurate, if several clients on the same IP try to upgrade at the same time
+-    if (strncmp(start, buf, strlen(buf)))
+-      continue;
+-
+-    (*ci)->upgradingToUdp = false;
++    (*ci)->pendingUdpID = 0;
+     (*ci)->cp.useCopyRect = false;
+-    ((network::UdpStream *)(*ci)->getOutStream(true))->setClient((WuClient *) act.udp.client);
++    ((network::UdpStream *)(*ci)->getOutStream(true))->setClientID(act.udp.clientID);
+     (*ci)->cp.supportsUdp = true;
+ 
+     slog.info("%s upgraded to UDP", who);
+--- a/common/rfb/benchmark/benchmark.cxx
++++ b/common/rfb/benchmark/benchmark.cxx
+@@ -110,7 +110,7 @@
+             return true;
+         }
+ 
+-        void udpUpgrade(const char *resp) override {}
++        void udpUpgrade(const char *resp, uint64_t clientID) override {}
+ 
+         void udpDowngrade(const bool) override {}
+ 

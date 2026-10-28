@@ -4513,3 +4513,35 @@ UDP, audio isolation/ownership, default switching and publication remain their
 own decisions and gates. The design PR can retain these proposed sections as
 future guidance; implementation uses a separate linked Draft PR. No further
 scope confirmation is needed for the already approved D1 work.
+
+## 2026-10-28 — Implement the bounded native WSS provider contract
+
+D1 / Issue #30 selects `display-provider=kasm` explicitly; lifecycle backend
+remains independent. This refines KNA-001/002/005/007/009 from the
+[native proposal](kasm-native-architecture.md). It does not accept the later
+UDP/audio/host gates or qualify a production release.
+
+New Kasm runtime records use schema 4 and pin a manifest containing server,
+client, source and member digests. Schema 2/3 always mean the legacy provider.
+Unknown records, missing or altered components fail closed. Ordinary upgrade
+cannot switch providers. Scoped stop and compatible state/data snapshots are
+required for migration and rollback; no live X-server adoption is implied.
+
+The existing Core supervisor owns native sessions and D-Bus. Native service
+records explicitly name their input provider; they neither launch nor require
+IBus/Unicode. Borrowed account buses and populated application components keep
+their existing protection. Existing class/App shutdown semantics still apply.
+
+Native preparation is an authenticated POST with expected session generation.
+It returns the started generation without fabricating a Viewer attachment.
+Native WSS requires that running generation and uses existing owned-channel
+fencing; arbitrary upstream management paths and legacy input routes are
+unavailable. The minimal native SDK reports ready only after both current App
+readiness and an actual painted update; disposal owns only its Viewer.
+Legacy clients reject Kasm descriptors. Unsupported clipboard/programmatic
+text/audio/UDP capabilities are explicit. D1 keeps the existing authenticated
+single-account trust model; it does not introduce a multi-tenant ACL service.
+
+Focused automated boundary checks are in progress alongside real disposable
+App/lifecycle verification. Neither a passing unit test nor these implementation
+choices complete the nine D1 acceptance groups.

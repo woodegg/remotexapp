@@ -15,6 +15,7 @@ type sessionServiceIdentity struct {
 	StartTime string `json:"startTime"`
 }
 type sessionServicesRecord struct {
+	InputProvider string                            `json:"inputProvider,omitempty"`
 	SchemaVersion int                               `json:"schemaVersion"`
 	DeadlineMS    int64                             `json:"deadlineMs"`
 	Generation    int64                             `json:"generation"`
@@ -48,6 +49,9 @@ func (m *manager) readSessionServices(item *instance) (*sessionServicesRecord, e
 	if d.Decode(&v) != nil || v.SchemaVersion != 1 || v.Generation != item.SessionGeneration || v.BorrowedBus != (item.Spec.RunMode == "user-home") {
 		return nil, errors.New("invalid session services generation or contract")
 	}
+	if isKasm(item) && v.InputProvider != "native" || !isKasm(item) && v.InputProvider != "" {
+		return nil, errors.New("session input provider differs from pinned runtime")
+	}
 	var extra any
 	if d.Decode(&extra) != io.EOF {
 		return nil, errors.New("invalid session services trailing data")
@@ -65,6 +69,9 @@ func (m *manager) readSessionServices(item *instance) (*sessionServicesRecord, e
 		seen[v.Driver.PID] = true
 	}
 	for name, id := range v.Services {
+		if isKasm(item) && name != "dbus" {
+			return nil, errors.New("unexpected bridge in native session")
+		}
 		if (name != "dbus" && name != "ibus" && name != "engine") || (name == "dbus" && v.BorrowedBus) || seen[id.PID] {
 			return nil, errors.New("invalid session service ownership")
 		}
@@ -99,6 +106,9 @@ func (m *manager) checkSessionServices(item *instance) error {
 		return errors.New("session input services are degraded")
 	}
 	for _, name := range []string{"ibus", "engine", "dbus"} {
+		if isKasm(item) && name != "dbus" {
+			continue
+		}
 		if name == "dbus" && v.BorrowedBus {
 			continue
 		}

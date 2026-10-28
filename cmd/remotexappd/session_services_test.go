@@ -87,6 +87,23 @@ func TestSessionServicesAdoptionIdentity(t *testing.T) {
 	}
 }
 
+func TestNativeSessionServicesAdoption(t *testing.T) {
+	m, item, r, write := sessionServicesFixture(t)
+	item.Components.DisplayProvider = "kasm"
+	r.InputProvider = "native"
+	delete(r.Services, "ibus")
+	delete(r.Services, "engine")
+	write(r)
+	if err := m.checkSessionServices(item); err != nil {
+		t.Fatal(err)
+	}
+	r.InputProvider = ""
+	write(r)
+	if err := m.checkSessionServices(item); err == nil {
+		t.Fatal("legacy services adopted as native")
+	}
+}
+
 func TestSessionServicesRejectsUnsafeRecords(t *testing.T) {
 	for _, name := range []string{"missing", "symlink", "world-readable", "oversized", "unknown-field", "trailing"} {
 		t.Run(name, func(t *testing.T) {

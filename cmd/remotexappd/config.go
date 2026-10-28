@@ -11,6 +11,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/woodegg/remotexapp/internal/kasmbundle"
 )
 
 type config struct {
@@ -29,6 +31,9 @@ type config struct {
 	statusBinary         string
 	coreDriverDir        string
 	vncLauncher          string
+	displayProvider      string
+	kasmBundle           string
+	kasmPin              *kasmbundle.Pin
 	lifecycleBackend     string
 	standaloneCgroupRoot string
 	managedObserver      string

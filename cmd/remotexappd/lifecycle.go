@@ -44,9 +44,18 @@ func (m *manager) createLocked(request createRequest) (*instance, error) {
 	if err != nil {
 		return nil, err
 	}
-	components := runtimeComponents{GatewayBinary: m.cfg.gatewayBinary, StatusBinary: m.cfg.statusBinary, UnicodeEngine: m.cfg.engine, CoreDriverDir: m.cfg.coreDriverDir}
+	components := m.newRuntimeComponents()
 	if request.PinnedComponents.GatewayBinary != "" {
 		components = request.PinnedComponents
+	}
+	if displayProvider(components) == "kasm" {
+		if m.cfg.vncLauncher != "direct" {
+			return nil, errors.New("Kasm requires the direct launcher")
+		}
+		if err := validateDisplayComponents(components, true); err != nil {
+			return nil, err
+		}
+		class.Server.Depth = 24
 	}
 	if components.Identity == nil {
 		components.Identity, _ = identifyCore(components)
@@ -580,6 +589,9 @@ func (m *manager) startServer(item *instance) error {
 		// Single-app classes should instead pass only their application's class.
 		"-ibus-focus-class", strings.Join(class.Input.AllowedWMClasses, ","),
 	)
+	if isKasm(item) {
+		gatewayArgs = append(gatewayArgs, "-native-kasm-bundle", item.Components.Kasm.Directory, "-native-kasm-digest", item.Components.Kasm.SHA256)
+	}
 	if output, err := m.launchComponent(gatewayArgs); err != nil {
 		return fmt.Errorf("start gateway unit: %w: %s", err, output)
 	}
@@ -631,6 +643,11 @@ func (m *manager) startWrappedVNC(item *instance, class classConfig, rfbPort int
 }
 
 func (m *manager) startDirectVNC(item *instance, class classConfig, rfbPort int) error {
+	if isKasm(item) {
+		if err := validateDisplayComponents(item.Components, true); err != nil {
+			return err
+		}
+	}
 	authority := authorityPath(item)
 	if err := prepareXAuthority(item.Display, authority); err != nil {
 		return fmt.Errorf("prepare Xauthority: %w", err)
@@ -643,6 +660,9 @@ func (m *manager) startDirectVNC(item *instance, class classConfig, rfbPort int)
 		"-geometry", class.Server.Geometry, "-depth", strconv.Itoa(class.Server.Depth), "-FrameRate", strconv.Itoa(class.Server.FrameRate),
 		"-localhost=1", "-rfbport", strconv.Itoa(rfbPort), "-SecurityTypes", "None",
 		"-AcceptSetDesktopSize=" + boolDigit(class.Server.AllowClientResize), "-auth", authority,
+	}
+	if isKasm(item) {
+		vncArgs = kasmLaunchArgs(item, class, rfbPort, authority)
 	}
 	if output, err := m.launchComponent(vncArgs); err != nil {
 		return fmt.Errorf("start direct VNC unit: %w: %s", err, output)
@@ -806,6 +826,9 @@ func (m *manager) startSession(id string) (sessionErr error) {
 		"--setenv=REMOTEXAPP_SESSION_DEADLINE_MS="+strconv.FormatInt(startupDeadline.UnixMilli(), 10),
 	)
 	args = append(args, appSystemdEnvironmentArgs(item, class)...)
+	if isKasm(item) {
+		args = append(args, "--setenv=REMOTEXAPP_INPUT_PROVIDER=native")
+	}
 	if class.Control.Protocol != "" {
 		args = append(args,
 			"--setenv=REMOTEXAPP_CONTROL_PROTOCOL="+class.Control.Protocol,

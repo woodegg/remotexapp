@@ -1,0 +1,432 @@
+--- a/common/network/Udp.cxx
++++ b/common/network/Udp.cxx
+@@ -28,6 +28,9 @@
+ 
+ #include <network/GetAPI.h>
+ #include <network/Udp.h>
++#include <network/iceip.h>
++#include <network/webudp/WuHttp.h>
++#include <atomic>
+ #include <network/webudp/WuHost.h>
+ #include <network/webudp/Wu.h>
+ #include <network/websocket.h>
+@@ -38,7 +41,7 @@
+ using namespace network;
+ 
+ static rfb::LogWriter vlog("WebUdp");
+-static WuHost *host = NULL;
++static std::atomic<WuHost *> host{nullptr};
+ 
+ rfb::IntParameter udpSize("udpSize", "UDP packet data size", 1296, 500, 1400);
+ 
+@@ -54,25 +57,32 @@
+ 
+ void *udpserver(void *nport) {
+ 
++	const uint16_t port = *(uint16_t *) nport;
++	free(nport);
++	// Discovery runs only on this UDP worker. HTTP/WS startup is independent.
++	while (!getPublicIP()) {
++		vlog.error("UDP unavailable; retrying address discovery in 30 seconds");
++		sleep(30);
++	}
+ 	WuHost *myhost = NULL;
+-	int ret = WuHostCreate(rfb::Server::publicIP, *(uint16_t *) nport, 16, &myhost);
++	int ret = WuHostCreate(rfb::Server::publicIP, port, 16, &myhost);
+ 	if (ret != WU_OK) {
+ 		vlog.error("Failed to create WebUDP host");
+ 		return NULL;
+ 	}
+-	vlog.debug("UDP listening on port %u", *(uint16_t *) nport);
++	vlog.debug("UDP listening on port %u", port);
+ 
+-	__sync_bool_compare_and_swap(&host, host, myhost);
+ 
+ 	GetAPIMessager *msgr = (GetAPIMessager *) settings.messager;
+ 
+-	WuHostSetErrorCallback(host, udperr);
+-	WuHostSetDebugCallback(host, udpdebug);
++	WuHostSetErrorCallback(myhost, udperr);
++	WuHostSetDebugCallback(myhost, udpdebug);
++	host.store(myhost, std::memory_order_release);
+ 
+ 	while (1) {
+ 		WuAddress addr;
+ 		WuEvent e;
+-		if (!WuHostServe(host, &e, 2000))
++		if (!WuHostServe(myhost, &e, 2000))
+ 			continue;
+ 
+ 		switch (e.type) {
+@@ -83,7 +93,7 @@
+ 			break;
+ 			case WuEvent_ClientLeave:
+ 				vlog.info("client leave");
+-				WuHostRemoveClient(host, e.client);
++				WuHostRemoveClient(myhost, e.client);
+ 			break;
+ 			default:
+ 				vlog.error("client sent data, this is unexpected");
+@@ -165,5 +175,10 @@
+ }
+ 
+ void wuGotHttp(const char msg[], const uint32_t msglen, char resp[]) {
+-	WuGotHttp(host, msg, msglen, resp);
++	WuHost *current = host.load(std::memory_order_acquire);
++	if (!current) {
++		strcpy(resp, "{\"error\":\"udp-unavailable\"}");
++		return;
++	}
++	WuGotHttp(current, msg, msglen, resp);
+ }
+--- a/common/network/iceip.cxx
++++ b/common/network/iceip.cxx
+@@ -110,55 +110,44 @@
+ 	socklen_t socklen = sizeof(struct sockaddr_in);
+ 	int len = recvfrom(sock, buf, PATH_MAX, 0, (struct sockaddr *) &from,
+ 				&socklen);
+-	if (len < 20)
++	if (len < 20 || from.sin_port != dst.sin_port ||
++	    memcmp(&from.sin_addr, &dst.sin_addr, sizeof(struct in_addr)) ||
++	    memcmp(buf + 4, tid, sizeof(tid)) || buf[0] != 1 || buf[1] != 1)
+ 		return false;
+-	if (memcmp(&from.sin_addr, &dst.sin_addr, sizeof(struct in_addr)))
+-		return false;
+-
+-	int i;
+-/*	vlog.info("Got %u bytes", len);
+-	for (i = 0; i < len; i++)
+-		vlog.info("0x%02x,", buf[i]);*/
+-
+-	if (buf[0] != 1 || buf[1] != 1)
+-		return false; // type not binding response
+-
+-	// Parse attrs
+-	for (i = 20; i < len;) {
++	uint16_t bodyLength;
++	memcpy(&bodyLength, buf + 2, 2);
++	if (ntohs(bodyLength) != len - 20) return false;
++	for (int i = 20; i < len;) {
++		if (len - i < 4) return false;
+ 		uint16_t type, attrlen;
+-		memcpy(&type, &buf[i], 2);
+-		i += 2;
+-		memcpy(&attrlen, &buf[i], 2);
+-		i += 2;
+-
+-		type = ntohs(type);
+-		attrlen = ntohs(attrlen);
+-		if (type != 1) {
+-			// Not mapped-address
+-			i += attrlen;
+-			continue;
++		memcpy(&type, buf + i, 2);
++		memcpy(&attrlen, buf + i + 2, 2);
++		type = ntohs(type); attrlen = ntohs(attrlen); i += 4;
++		const int padded = (attrlen + 3) & ~3;
++		if (padded > len - i) return false;
++		if (type == 1 && attrlen == 8 && buf[i + 1] == 1) {
++			struct in_addr address;
++			memcpy(&address.s_addr, buf + i + 4, 4);
++			if (address.s_addr == INADDR_ANY || address.s_addr == INADDR_BROADCAST ||
++			    IN_MULTICAST(ntohl(address.s_addr))) return false;
++			rfb::Server::publicIP.setParam(inet_ntoa(address));
++			vlog.info("UDP public address discovery succeeded");
++			return true;
+ 		}
+-
+-		// Yay, we got a response
+-		i += 4;
+-		struct in_addr in;
+-		memcpy(&in.s_addr, &buf[i], 4);
+-
+-		rfb::Server::publicIP.setParam(inet_ntoa(in));
+-
+-		vlog.info("My public IP is %s", (const char *) rfb::Server::publicIP);
+-
+-		return true;
++		i += padded;
+ 	}
+ 
+ 	return false;
+ }
+ 
+-void getPublicIP() {
++bool getPublicIP() {
+ 	if (rfb::Server::publicIP[0]) {
+ 		vlog.info("Using public IP %s from args",
+ 				(const char *) rfb::Server::publicIP);
+-		return;
++		struct in_addr address;
++		return inet_pton(AF_INET, rfb::Server::publicIP, &address) == 1 &&
++		       address.s_addr != INADDR_ANY && address.s_addr != INADDR_BROADCAST &&
++		       !IN_MULTICAST(ntohl(address.s_addr));
+ 	}
+ 
+ 	srand(time(NULL));
+@@ -166,8 +155,10 @@
+ 	vlog.info("Querying public IP...");
+ 
+ 	const int sock = socket(AF_INET, SOCK_DGRAM, 0);
+-	if (sock < 0)
+-		abort();
++	if (sock < 0) {
++		vlog.error("UDP discovery socket unavailable; WS remains available");
++		return false;
++	}
+ 
+ 	unsigned i;
+ 	if (rfb::Server::stunServer[0]) {
+@@ -184,7 +175,8 @@
+ 	close(sock);
+ 
+ 	if (!rfb::Server::publicIP[0]) {
+-		vlog.error("Failed to get public IP, please specify it with -publicIP");
+-		exit(1);
++		vlog.error("UDP unavailable: public IP discovery failed; WS remains available");
++		return false;
+ 	}
++	return true;
+ }
+--- a/common/network/iceip.h
++++ b/common/network/iceip.h
+@@ -18,6 +18,6 @@
+ #ifndef __ICEIP_H__
+ #define __ICEIP_H__
+ 
+-void getPublicIP();
++bool getPublicIP();
+ 
+ #endif
+--- a/common/network/webudp/Wu.cpp
++++ b/common/network/webudp/Wu.cpp
+@@ -3,6 +3,7 @@
+ #include <openssl/ec.h>
+ #include <openssl/err.h>
+ #include <openssl/ssl.h>
++#include <openssl/rand.h>
+ #include <string.h>
+ #include "WuArena.h"
+ #include "WuClock.h"
+@@ -482,6 +483,12 @@
+     return;
+   }
+ 
++  if (!VerifyStunIntegrity(packet, client->serverPassword.identifier,
++                           client->serverPassword.length)) {
++    WuReportDebug(wu, "Stun: Invalid integrity");
++    return;
++  }
++
+   StunPacket outPacket;
+   outPacket.type = Stun_SuccessResponse;
+   memcpy(outPacket.transactionId, packet->transactionId,
+@@ -500,7 +507,7 @@
+   // each source, but only let the nominated pair select the DTLS destination.
+   // Otherwise a late alternate check diverts the handshake to another socket.
+   const WuAddress selected = client->address;
+-  client->localSctpPort = remote->port;
++  // SCTP ports belong to the negotiated association, not the UDP/NAT tuple.
+   client->address = *remote;
+   wu->writeUdpData(stunResponse, serializedSize, client, wu->userData);
+   if (!packet->useCandidate) client->address = selected;
+@@ -711,22 +718,32 @@
+ 
+ SDPResult WuExchangeSDP(Wu* wu, const char* sdp, int32_t length) {
+   ICESdpFields iceFields;
+-  if (!ParseSdp(sdp, length, &iceFields)) {
++  if (!sdp || length < 1 || length > 32768 || !ParseSdp(sdp, length, &iceFields) ||
++      iceFields.ufrag.length < 4 || iceFields.ufrag.length > kMaxStunIdentifierLength ||
++      iceFields.password.length < 22 || iceFields.password.length > kMaxStunIdentifierLength ||
++      iceFields.mid.length < 1 || iceFields.mid.length > 32) {
+     return {WuSDPStatus_InvalidSDP, NULL, NULL, 0};
+   }
+ 
++  // Credentials must not depend on rand()/time or SCTP's non-secret RNG.
++  uint8_t entropy[40];
++  if (RAND_bytes(entropy, sizeof(entropy)) != 1) {
++    return {WuSDPStatus_Error, NULL, NULL, 0};
++  }
+   WuClient* client = WuNewClient(wu);
+ 
+   if (!client) {
+     return {WuSDPStatus_MaxClients, NULL, NULL, 0};
+   }
+ 
+-  client->serverUser.length = 4;
+-  WuRandomString((char*)client->serverUser.identifier,
+-                 client->serverUser.length);
+-  client->serverPassword.length = 24;
+-  WuRandomString((char*)client->serverPassword.identifier,
+-                 client->serverPassword.length);
++  static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
++  client->localSctpPort = wu->port;
++  client->serverUser.length = 8;
++  client->serverPassword.length = 32;
++  for (int i = 0; i < client->serverUser.length; ++i)
++    client->serverUser.identifier[i] = alphabet[entropy[i] & 63];
++  for (int i = 0; i < client->serverPassword.length; ++i)
++    client->serverPassword.identifier[i] = alphabet[entropy[i + 8] & 63];
+   memcpy(client->remoteUser.identifier, iceFields.ufrag.value,
+          Min(iceFields.ufrag.length, kMaxStunIdentifierLength));
+   client->remoteUser.length = iceFields.ufrag.length;
+@@ -752,9 +769,10 @@
+ void WuHandleUDP(Wu* wu, const WuAddress* remote, const uint8_t* data,
+                  int32_t length) {
+   StunPacket stunPacket;
+-  if (ParseStun(data, length, &stunPacket)) {
+-    //WuReportDebug(wu, "Received stun packet");
+-    WuHandleStun(wu, &stunPacket, remote);
++  if (length > 0 && data[0] < 4) {
++    // Malformed STUN is never fed into an existing DTLS association.
++    if (ParseStun(data, length, &stunPacket))
++      WuHandleStun(wu, &stunPacket, remote);
+   } else {
+     //WuReportDebug(wu, "Received DTLS packet");
+     WuReceiveDTLSPacket(wu, data, length, remote);
+--- a/common/network/webudp/WuPool.cpp
++++ b/common/network/webudp/WuPool.cpp
+@@ -1,8 +1,9 @@
+ #include "WuPool.h"
+ #include <assert.h>
+ #include <stdlib.h>
++#include <cstddef>
+ 
+-struct BlockHeader {
++struct alignas(std::max_align_t) BlockHeader {
+   int32_t index;
+ };
+ 
+@@ -18,7 +19,8 @@
+ WuPool* WuPoolCreate(int32_t blockSize, int32_t numBlocks) {
+   WuPool* pool = (WuPool*)calloc(1, sizeof(WuPool));
+ 
+-  pool->slotSize = blockSize + sizeof(BlockHeader);
++  const int32_t alignment = alignof(std::max_align_t);
++  pool->slotSize = (blockSize + sizeof(BlockHeader) + alignment - 1) / alignment * alignment;
+   pool->numBytes = pool->slotSize * numBlocks;
+   pool->numBlocks = numBlocks;
+   pool->memory = (uint8_t*)calloc(pool->numBytes, 1);
+--- a/common/network/webudp/WuStun.cpp
++++ b/common/network/webudp/WuStun.cpp
+@@ -1,6 +1,9 @@
+ #include "WuStun.h"
+ #include <arpa/inet.h>
+ #include <string.h>
++#include <vector>
++#include <openssl/hmac.h>
++#include <openssl/crypto.h>
+ #include "CRC32.h"
+ #include "WuCrypto.h"
+ 
+@@ -8,25 +11,38 @@
+ const int32_t kStunAlignment = 4;
+ 
+ bool ParseStun(const uint8_t* src, int32_t len, StunPacket* packet) {
+-  if (len < kStunHeaderLength || src[0] != 0 || src[1] != 1) return false;
++  if (!src || len < kStunHeaderLength || src[0] != 0 || src[1] != 1) return false;
+   memset(packet, 0, sizeof(*packet));
+   ReadScalarSwapped(src, &packet->type);
+   ReadScalarSwapped(src + 2, &packet->length);
+   ReadScalarSwapped(src + 4, &packet->cookie);
+   if (packet->cookie != kStunCookie || packet->length < 4 ||
+-      packet->length > len - kStunHeaderLength || packet->length % 4) return false;
++      packet->length != len - kStunHeaderLength || packet->length % 4) return false;
+   memcpy(packet->transactionId, src + 8, kStunTransactionIdLength);
+-  const int32_t end = kStunHeaderLength + packet->length;
+-  bool foundUser = false;
+-  for (int32_t pos = kStunHeaderLength; pos < end;) {
+-    if (end - pos < 4) return false;
++  packet->wire = src;
++  packet->wireLength = len;
++  bool foundUser = false, foundNomination = false;
++  for (int32_t pos = kStunHeaderLength; pos < len;) {
++    const int32_t attributeOffset = pos;
++    if (len - pos < 4) return false;
+     uint16_t type, length;
+     ReadScalarSwapped(src + pos, &type);
+     ReadScalarSwapped(src + pos + 2, &length);
+     pos += 4;
+     const int32_t padded = length + PadSize(length, kStunAlignment);
+-    if (padded > end - pos) return false;
+-    if (type == StunAttrib_User) {
++    if (padded > len - pos) return false;
++    if (type == StunAttrib_MessageIntegrity) {
++      if (packet->integrityOffset || length != 20) return false;
++      packet->integrityOffset = attributeOffset;
++    } else if (type == StunAttrib_Fingerprint) {
++      if (length != 4 || pos + padded != len) return false;
++      uint32_t fingerprint;
++      ReadScalarSwapped(src + pos, &fingerprint);
++      if (fingerprint != (StunCRC32(src, attributeOffset) ^ 0x5354554e)) return false;
++    } else if (packet->integrityOffset) {
++      // RFC 8489: unauthenticated attributes after integrity cannot change
++      // the username or nomination. Unknown extensions are ignored here.
++    } else if (type == StunAttrib_User) {
+       if (foundUser || length < 9) return false;
+       const char* user = reinterpret_cast<const char*>(src + pos);
+       const int32_t colon = FindTokenIndex(user, length, ':');
+@@ -38,13 +54,30 @@
+       memcpy(packet->serverUser.identifier, user, colon);
+       memcpy(packet->remoteUser.identifier, user + colon + 1, remoteLength);
+       foundUser = true;
+-    } else if (type == 0x0025) { // ICE USE-CANDIDATE
+-      if (length != 0) return false;
++    } else if (type == 0x0025) {
++      if (length != 0 || foundNomination) return false;
+       packet->useCandidate = true;
++      foundNomination = true;
+     }
+     pos += padded;
+   }
+   return foundUser;
++}
++
++bool VerifyStunIntegrity(const StunPacket* packet, const uint8_t* password,
++                         int32_t passwordLen) {
++  const int32_t offset = packet->integrityOffset;
++  if (!packet->wire || offset < 20 || offset + 24 > packet->wireLength ||
++      !password || passwordLen < 1 || passwordLen > kMaxStunIdentifierLength) return false;
++  std::vector<uint8_t> input(packet->wire, packet->wire + offset);
++  const uint16_t length = offset + 24 - kStunHeaderLength;
++  input[2] = length >> 8;
++  input[3] = length & 0xff;
++  uint8_t digest[EVP_MAX_MD_SIZE];
++  unsigned digestLen = 0;
++  if (!HMAC(EVP_sha1(), password, passwordLen, input.data(), input.size(), digest, &digestLen) ||
++      digestLen != 20) return false;
++  return CRYPTO_memcmp(digest, packet->wire + offset + 4, 20) == 0;
+ }
+ 
+ int32_t SerializeStunPacket(const StunPacket* packet, const uint8_t* password,
+--- a/common/network/webudp/WuStun.h
++++ b/common/network/webudp/WuStun.h
+@@ -43,6 +43,9 @@
+   uint16_t type;
+   uint16_t length;
+   bool useCandidate;
++  const uint8_t* wire;
++  int32_t wireLength;
++  int32_t integrityOffset;
+   uint32_t cookie;
+   uint8_t transactionId[kStunTransactionIdLength];
+ 
+@@ -54,5 +57,7 @@
+ 
+ bool ParseStun(const uint8_t* src, int32_t len, StunPacket* packet);
+ 
++bool VerifyStunIntegrity(const StunPacket* packet, const uint8_t* password, int32_t passwordLen);
++
+ int32_t SerializeStunPacket(const StunPacket* packet, const uint8_t* password,
+                             int32_t passwordLen, uint8_t* dest, int32_t len);
+--- a/unix/xserver/hw/vnc/vncExtInit.cc
++++ b/unix/xserver/hw/vnc/vncExtInit.cc
+@@ -207,7 +207,7 @@
+ 
+   if (!initialised) {
+     parseClipTypes();
+-    getPublicIP();
++    // UDP discovery runs on its worker; WS must start independently.
+   }
+   vncSelectionInit();
+ 

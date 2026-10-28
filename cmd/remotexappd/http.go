@@ -375,7 +375,8 @@ func (m *manager) publicInstance(item *instance) *publicInstanceView {
 		copy.ViewerURL = ""
 	}
 	return &publicInstanceView{
-		Versions: m.versionView(item), Upgrade: publicUpgrade(item), Recovery: recoveryView(item),
+		DisplayProvider: displayProvider(item.Components),
+		Versions:        m.versionView(item), Upgrade: publicUpgrade(item), Recovery: recoveryView(item),
 		ID: copy.ID, ClassID: copy.ClassID, TemplateID: copy.TemplateID,
 		DriverVersion: copy.DriverVersion, ManagedID: copy.ManagedID,
 		ProfileRef: copy.ProfileRef, WorkspaceMode: copy.WorkspaceMode,
@@ -413,6 +414,10 @@ func (m *manager) serveInstanceRoute(w http.ResponseWriter, r *http.Request) {
 	item := m.get(parts[0])
 	if item == nil || (item.State != "server-ready" && item.State != "ready") {
 		writeError(w, http.StatusServiceUnavailable, "instance is not ready")
+		return
+	}
+	if isKasm(item) {
+		m.serveNativeInstance(w, r, item, parts[1])
 		return
 	}
 	if parts[1] == "kiosk.html" {

@@ -3,6 +3,8 @@ package main
 import (
 	"sync"
 	"time"
+
+	"github.com/woodegg/remotexapp/internal/kasmbundle"
 )
 
 type instance struct {
@@ -77,6 +79,7 @@ type sessionRecovery struct {
 // control fields remain on instance only so pre-App-Package runtime manifests
 // can be adopted; they must never leak into the V1 public API.
 type publicInstanceView struct {
+	DisplayProvider   string                       `json:"displayProvider"`
 	Recovery          *publicRecovery              `json:"recovery,omitempty"`
 	Versions          *runtimeVersions             `json:"versions,omitempty"`
 	Upgrade           *upgradeStatus               `json:"upgrade,omitempty"`
@@ -151,11 +154,13 @@ type createRequest struct {
 }
 
 type runtimeComponents struct {
-	Identity      *coreIdentity `json:"identity,omitempty"`
-	GatewayBinary string        `json:"gatewayBinary"`
-	StatusBinary  string        `json:"statusBinary"`
-	UnicodeEngine string        `json:"unicodeEngine"`
-	CoreDriverDir string        `json:"coreDriverDir,omitempty"`
+	DisplayProvider string          `json:"displayProvider,omitempty"`
+	Kasm            *kasmbundle.Pin `json:"kasm,omitempty"`
+	Identity        *coreIdentity   `json:"identity,omitempty"`
+	GatewayBinary   string          `json:"gatewayBinary"`
+	StatusBinary    string          `json:"statusBinary"`
+	UnicodeEngine   string          `json:"unicodeEngine"`
+	CoreDriverDir   string          `json:"coreDriverDir,omitempty"`
 }
 
 type shutdownStatus struct {

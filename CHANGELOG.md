@@ -24,6 +24,9 @@ binaries and runtime behavior remain at the released 0.15.0 baseline.
   App's speaker or mic is enabled, share within the server/client scope, and
   release when all are off. App launch alone and temporary silence do not
   change the connection. Other architecture choices and implementation remain pending.
+- Record owner approval of the bounded D1 Kasm WSS/Manager/minimal-SDK
+  implementation scope on 2026-10-28; product implementation and acceptance
+  remain tracked separately in Issue #30.
 
 ## 0.15.0 — 2026-10-21
 

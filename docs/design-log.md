@@ -4496,3 +4496,20 @@ authorization requirements still apply.
 The owner confirmed this rule after the two-App example. This does not accept
 R1/R2/R4/R5/R6, the entire AUD-002 proposal, implementation, UAT, a default switch
 or deployment. Keep PR #29 in draft for the remaining architecture review.
+
+## 2026-10-28 — Approve the bounded D1 WSS implementation scope
+
+The owner approved Issue #30 after review of its Mousepad and managed XFCE
+scope, nine acceptance groups and isolated test/rollback boundary. D1 may
+implement an opt-in paired Kasm WSS provider, provider-specific durable state,
+authenticated generation-bound Viewer/minimal SDK and existing Manager
+adoption/recovery semantics. Preserve current App shutdown contracts, data,
+live/unknown processes and default provider; qualify both lifecycle backends
+including actual disposable-container reboots.
+
+This accepts the R1 native-provider/minimal-SDK and R6 first-slice scope needed
+for D1, not every later SDK or host integration detail. R3 remains accepted;
+UDP, audio isolation/ownership, default switching and publication remain their
+own decisions and gates. The design PR can retain these proposed sections as
+future guidance; implementation uses a separate linked Draft PR. No further
+scope confirmation is needed for the already approved D1 work.

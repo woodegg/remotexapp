@@ -23,6 +23,13 @@ as research input, not production qualification. Entries below remain
 decision on 2026-10-25 (R3). None is implemented by this design PR. Stable IDs support subsequent
 implementation Issues; KVE-001–008 remain evaluation/qualification gates.
 
+On 2026-10-28 the owner approved the bounded D1 implementation scope in
+[Issue #30](https://github.com/woodegg/remotexapp/issues/30): opt-in Kasm WSS,
+Manager lifecycle and a minimal native SDK, with Mousepad/managed XFCE fixtures
+and nine acceptance groups. Applicable provider, generation, persistence and
+recovery requirements are selected for D1; complete host integration, audio,
+UDP and publication are not accepted by that scope approval.
+
 | ID | Proposed requirement | Acceptance boundary |
 | --- | --- | --- |
 | KNA-001 | Pair and pin Kasm server/client behind a distinct display provider. Preserve Manager/App ownership, UID, HOME and App contracts; do not require legacy SDK method shapes. | WSS vertical slice with a single App and managed desktop; dependency/App audit and explicit SDK versioning |

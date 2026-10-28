@@ -9,6 +9,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/woodegg/remotexapp/internal/testfixture"
 )
 
 func backgroundRecoveryFixture(t *testing.T) (*manager, *instance, *time.Time, *atomic.Int32) {
@@ -93,7 +95,16 @@ func TestBackgroundRecoveryWithoutViewerAndSharedAttachBudget(t *testing.T) {
 }
 
 func TestBackgroundRecoveryBackoffCooldownAndReload(t *testing.T) {
+	t.Run("legacy", func(t *testing.T) { checkBackgroundRecoveryBackoff(t, false) })
+	t.Run("native-schema-4", func(t *testing.T) { checkBackgroundRecoveryBackoff(t, true) })
+}
+
+func checkBackgroundRecoveryBackoff(t *testing.T, native bool) {
 	m, item, now, starts := backgroundRecoveryFixture(t)
+	if native {
+		pin := testfixture.Kasm(t)
+		item.Components.DisplayProvider, item.Components.Kasm, item.Components.UnicodeEngine = "kasm", &pin, ""
+	}
 	launch := m.recoverySessionStart
 	m.recoverySessionStart = func(id string) error {
 		if err := launch(id); err != nil {

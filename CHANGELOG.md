@@ -23,6 +23,11 @@ these are not published or UAT-qualified releases.
   interpret Driver loss as permission to kill surviving editors. Explicit stop
   and confirmed clean logout retain owned cleanup. This protection applies to
   both display providers and both lifecycle backends.
+- Drain completed native control messages without waiting for another network
+  packet; parse variable codec capability payloads transactionally across
+  packet boundaries. Disable unadvertised printer/smartcard subscriptions.
+- Keep Kasm rendering settings under the server/class policy; client encoding
+  hints cannot silently replace the configured frame rate.
 - Add provider-specific component pins and schema-4 native runtime records;
   schema 2/3 retain their legacy meaning. Provider changes require a scoped
   stopped migration, and native sessions retain D-Bus without the legacy input

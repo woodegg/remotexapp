@@ -76,6 +76,9 @@ def build(inputs, work):
         shutil.copyfile(COMPONENT / name, deps / name)
     run(['npm', 'ci', '--ignore-scripts', '--no-audit', '--no-fund'], deps)
     shutil.copyfile(COMPONENT / 'client-entry.js', client / 'remotexapp-entry.js')
+    shutil.copyfile(COMPONENT / 'server-messages.mjs', client / 'core/remotexapp-server-messages.mjs')
+    run(['node', '--test', str(COMPONENT / 'tests/server-messages.test.mjs')], client,
+        env=dict(os.environ, KASM_CLIENT_SOURCE=str(client)))
     env = dict(os.environ, NODE_PATH=str(deps / 'node_modules'))
     run([str(deps / 'node_modules/.bin/esbuild'), 'remotexapp-entry.js', '--bundle',
          '--format=esm', '--target=es2022', '--loader:.bin=dataurl',
@@ -93,6 +96,8 @@ def package(inputs, work, output):
     (output / 'bin/Xkasmvnc').chmod(0o755)
     run(['strip', '--strip-debug', str(output / 'bin/Xkasmvnc')], work)
     copy(work / 'client.js', 'web/client.js')
+    copy(COMPONENT / 'server-messages.mjs', 'sources/server-messages.mjs')
+    copy(COMPONENT / 'tests/server-messages.test.mjs', 'sources/tests/server-messages.test.mjs')
     copy(work / 'server/LICENSE.TXT', 'LICENSE.server.txt')
     copy(work / 'client/LICENSE.txt', 'LICENSE.client.txt')
     packages = {}

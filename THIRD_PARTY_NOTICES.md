@@ -41,3 +41,12 @@ TigerVNC, X11, D-Bus, IBus, Python/PyGObject, XFCE, Matchbox, Mousepad, and any
 configured browser are host-installed runtime dependencies and are not copied
 into RemoteXApp release artifacts. Operators remain responsible for their
 package and application license obligations.
+
+## Optional experimental Kasm component
+
+The opt-in Kasm server/client pair is built and installed separately; it is not
+included in the ordinary Core archive. Source pins, ordered modifications,
+source reconstruction and dependency notices are described in
+[`third_party/kasm/README.md`](third_party/kasm/README.md). Each component includes
+its source archives, patches, integration sources and upstream/bundled-library
+notices. Distribution qualification is tracked separately in Issue #26.

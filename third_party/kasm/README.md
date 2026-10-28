@@ -53,6 +53,9 @@ Audit unbundled runtime libraries on the actual target before use.
 - 0011 disables browser WebRTC setup and QOI workers and emits an actual-paint
   event from the display; 0012 removes the full menu UI dependency and gives
   each Viewer its own window-channel identity.
+- 0013 makes completed control handlers continue the receive loop, uses the
+  bounded transactional codec parser in `server-messages.mjs`, and removes
+  printer/smartcard subscriptions. Applied-source tests run during the build.
 - `client-entry.js` is the only adapter that uses pinned upstream internals.
   It exposes connect/frame/disconnect to the native SDK, with clipboard off.
 

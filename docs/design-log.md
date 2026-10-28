@@ -4578,3 +4578,25 @@ Reference: [systemd service lifetime](https://www.freedesktop.org/software/syste
 Regression coverage distinguishes unexpected Driver death, clean logout and
 explicit stop with real child processes; actual systemd/standalone fault and
 cleanup results remain part of D1's live qualification.
+
+
+## 2026-10-28 — Drain complete native protocol messages
+
+D1 repeated reconnects exposed a connected-but-blank Viewer. The pinned client
+returned no completion value after consuming codec/Unix-relay control messages,
+so its receive loop stopped with complete coalesced messages still queued.
+Variable codec lists also rewound an incomplete message by an incorrect amount.
+
+The component now returns completion explicitly and parses codec capabilities
+without committing bytes until the entire bounded payload is present. D1 does
+not subscribe to printer/smartcard Unix relays. Tests cover every byte split,
+coalesced messages, maximum count fields and the actual patched upstream methods.
+No input replay, polling refresh, false first-paint signal or protocol-version
+change is introduced. The new component digest requires renewed live evidence;
+prior component results remain historical.
+
+Kasm's client encoding preferences can mutate shared server rendering settings.
+D1 starts the server with `IgnoreClientSettingsKasm=1` to preserve the class's
+frame-rate policy across all Viewers. Resize authorization remains the separate
+class-derived `AcceptSetDesktopSize` setting. Browser preferences are not an
+authority for shared runtime policy.

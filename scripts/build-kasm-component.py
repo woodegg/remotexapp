@@ -77,7 +77,7 @@ def build(inputs, work):
     run(['npm', 'ci', '--ignore-scripts', '--no-audit', '--no-fund'], deps)
     shutil.copyfile(COMPONENT / 'client-entry.js', client / 'remotexapp-entry.js')
     shutil.copyfile(COMPONENT / 'server-messages.mjs', client / 'core/remotexapp-server-messages.mjs')
-    run(['node', '--test', str(COMPONENT / 'tests/server-messages.test.mjs')], client,
+    run(['node', '--test', *[str(p) for p in sorted((COMPONENT / 'tests').glob('*.test.mjs'))]], client,
         env=dict(os.environ, KASM_CLIENT_SOURCE=str(client)))
     env = dict(os.environ, NODE_PATH=str(deps / 'node_modules'))
     run([str(deps / 'node_modules/.bin/esbuild'), 'remotexapp-entry.js', '--bundle',
@@ -97,7 +97,8 @@ def package(inputs, work, output):
     run(['strip', '--strip-debug', str(output / 'bin/Xkasmvnc')], work)
     copy(work / 'client.js', 'web/client.js')
     copy(COMPONENT / 'server-messages.mjs', 'sources/server-messages.mjs')
-    copy(COMPONENT / 'tests/server-messages.test.mjs', 'sources/tests/server-messages.test.mjs')
+    for test in sorted((COMPONENT / 'tests').glob('*.test.mjs')):
+        copy(test, 'sources/tests/' + test.name)
     copy(work / 'server/LICENSE.TXT', 'LICENSE.server.txt')
     copy(work / 'client/LICENSE.txt', 'LICENSE.client.txt')
     packages = {}
@@ -115,15 +116,15 @@ def package(inputs, work, output):
     for patch in sorted((COMPONENT / 'patches').glob('*.patch')):
         copy(patch, 'sources/patches/' + patch.name)
         patches[patch.name] = digest(patch)
-    source = {'status':'experimental-d1-not-a-release', 'serverCommit':SERVER, 'clientCommit':CLIENT,
+    source = {'status':'experimental-d2-not-a-release', 'serverCommit':SERVER, 'clientCommit':CLIENT,
               'archives':INPUTS, 'patches':patches, 'runtimeLibraryPackages':packages,
               'clientDependencies':{'pako':'2.1.0'}, 'clientBuilder':{'esbuild':'0.20.1'},
-              'scope':'WSS only; no UDP, QOI workers, audio or clipboard qualification',
+              'scope':'WSS only; bounded explicit text clipboard; no UDP, QOI workers, audio or rich clipboard qualification',
               'tools':{name:subprocess.check_output([name,'--version'],text=True).splitlines()[0]
                        for name in ['c++','cmake','node','npm']}}
     (output / 'SOURCE.json').write_text(json.dumps(source, indent=2)+'\n')
     files = {str(p.relative_to(output)):digest(p) for p in sorted(output.rglob('*')) if p.is_file()}
-    manifest = {'schemaVersion':1, 'protocol':'kasm-wss-v1', 'serverCommit':SERVER,
+    manifest = {'schemaVersion':1, 'protocol':'kasm-wss-text-v1', 'serverCommit':SERVER,
                 'clientCommit':CLIENT, 'binary':'bin/Xkasmvnc', 'client':'web/client.js', 'files':files}
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
     print('Kasm component manifest SHA256:', digest(output / 'manifest.json'))

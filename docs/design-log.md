@@ -4606,3 +4606,37 @@ The completed bounded D1 automation is recorded in
 real Apps, both lifecycle backends, actual container reboot, generation
 retirement, prior-Core rollback and owned cleanup. PR #31 / Issue #30 retain
 the review and merge boundary; D2–D5 qualification is not implied.
+
+## 2026-10-28 — Native input and explicit text clipboard checkpoint
+
+The owner requested continuing until human testing is required after D1 merge.
+Issue #32 selects keyboard policy and bounded text/plain clipboard for the next
+D2 UAT. Remaining rich formats, programmatic text and actual host application workflows
+retain their separate qualification gates; this is not full D2 acceptance.
+
+Browser-OS routing remains inside the pinned component. SDK configuration,
+focus and blur are supported adapter methods. Linux starts unknown and requires
+an explicit profile/custom binding. Physical OS IME/shortcut acceptance cannot
+be inferred from synthetic CDP events or historical PoC UAT.
+
+The separately pinned `kasm-wss-text-v1` component supports text clipboard.
+Manager `-native-clipboard` defaults off; enabled policy is snapshotted with the
+runtime and included in its identity. Old components cannot adopt text policy;
+old schema-4 records with no policy keep clipboard off. The server validates
+one text/plain representation, UTF-8 and 64 KiB before allocation/mutation,
+and filters outgoing formats/sizes. The browser parser is transactional and
+bounded. Malformed wire data closes that Viewer. This corrects the upstream
+size check, which happened only after allocating the payload.
+
+Per-Viewer browser consent defaults off on reconnect. Every OS clipboard action
+requires a focused user gesture. No focus polling, background overwrite or
+legacy clipboard bridge runs. Empty reads are no-op; Clear is explicit. Both
+Viewer epoch and a separate consent revision fence pending reads, including
+disable/re-enable in one generation. An already-started browser write cannot be
+cancelled; retirement/timeout reports uncertainty and never replays it. Native
+submission is not an App readback acknowledgement. Status contains no text.
+
+HTML/PNG/RTF/files, passive synchronization, read-only role grants and
+programmatic text with target/ack semantics remain unsupported. The existing
+selected-UID/trusted-ingress model applies; browser consent is not server
+authorization. Real host application business acceptance remains distinct from a host harness.

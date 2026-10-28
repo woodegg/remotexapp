@@ -594,3 +594,35 @@ expedited, but live/unknown processes remain protected. The built-in Console
 displays the same projection and uses this SDK method. Clients should refresh
 instance identity before reconnecting after automatic recovery; old transport
 channels and generation-qualified descriptors/offers are retired.
+
+### Native input/clipboard checkpoint (development SDK 0.31.0-dev.2)
+
+Issue #32 adds `configureKeyboard({profile, mode, bindings})`, `keyboardPolicy`,
+`focus()` and `blur()`. Profiles: `windows`, `mac`, `gnome`, `fcitx`, `unknown`,
+`custom`. Detection uses the browser OS; Linux starts unknown. Policy changes
+while keys/composition/buttons are active return `{applied:false}` and take
+effect at neutral state. Observe `keyboardpolicychange`. Hosts must not depend
+on Kasm internals.
+
+With the text component and Manager `-native-clipboard`, capabilities advertise
+`clipboard:true` and `clipboardMaxBytes:65536`. Use `enableClipboard(true)` from
+a consent control, then invoke these methods directly from focused user actions:
+
+- `copyClipboardToRemote()` reads plain text. Empty returns `empty-noop`;
+  otherwise `submitted`. It does not paste or claim App acknowledgement.
+- `copyClipboardToLocal()` writes the latest remote text offer received after
+  enabling. Copy text in the remote App first. Result: `copied-to-local`.
+- `clearRemoteClipboard()` submits empty text without reading locally.
+
+`clipboardchange` contains only enabled/available/byte-count metadata. There
+is no automatic browser clipboard access. Disabling/disconnecting/replacing
+the Viewer invalidates pending reads and clears offers. Reconnect requires
+new consent. An already-started browser write may finish despite retirement;
+`clipboard-uncertain` reports this boundary. Other codes distinguish
+`clipboard-denied`, `-gesture`, `-focus`, `-busy`, `-size`, `-format`, `-empty`,
+`-cancelled` and `-timeout`. Never replay an uncertain action automatically.
+
+Rich formats/files, read-only role authorization and programmatic text remain
+unsupported. host application's legacy prompt/offer and text-ACK consumers must adapt to
+these capabilities/results; the native client is not the legacy client with a
+new renderer. Real host application window/business validation remains a separate gate.

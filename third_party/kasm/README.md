@@ -57,7 +57,8 @@ Audit unbundled runtime libraries on the actual target before use.
   bounded transactional codec parser in `server-messages.mjs`, and removes
   printer/smartcard subscriptions. Applied-source tests run during the build.
 - `client-entry.js` is the only adapter that uses pinned upstream internals.
-  It exposes connect/frame/disconnect to the native SDK, with clipboard off.
+  It exposes connection/input policy and native text actions to the SDK;
+  clipboard requires explicit server selection and per-Viewer consent.
 
 The initial component does not enable UDP, audio, rich clipboard, extra
 windows, QOI workers or video codec qualification. Physical IME and host
@@ -81,3 +82,19 @@ The browser uses `RemoteXAppNativeClient`, not the legacy `RemoteXAppClient`.
 The native kiosk displays actual WSS state (or explicit loopback WS for local
 development). Stop and snapshot state before provider/Core rollback; do not
 point an older Core at native runtime records or share a live profile writer.
+
+## D2 input and text checkpoint
+
+The recipe now emits protocol `kasm-wss-text-v1`. Patch 0008 bounds incoming
+UTF-8 text before allocation/mutation and filters outgoing formats/sizes.
+Patch 0014 uses the bounded transactional browser parser. The adapter exposes
+keyboard policy and explicit native text sends; it never accesses the browser
+clipboard itself. Policy tests exercise the exact patch in portable CI and
+the actual applied file during a component build.
+
+Core also recognizes the older WSS-only component for adoption, but rejects
+text policy on it. Add `-native-clipboard` explicitly for new runtimes; without
+it the server keeps clipboard off. Restarting Manager is not a runtime upgrade.
+Browser clipboard actions require separate per-Viewer consent/user gesture.
+The native kiosk exposes those actions. HTML/PNG/RTF/files are not supported
+by this checkpoint; no passive browser clipboard synchronization is enabled.

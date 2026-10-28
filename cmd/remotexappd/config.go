@@ -16,6 +16,7 @@ import (
 )
 
 type config struct {
+	nativeClipboard      bool
 	listen               string
 	stateDir             string
 	classConfigPath      string

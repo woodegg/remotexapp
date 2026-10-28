@@ -79,6 +79,7 @@ type sessionRecovery struct {
 // control fields remain on instance only so pre-App-Package runtime manifests
 // can be adopted; they must never leak into the V1 public API.
 type publicInstanceView struct {
+	NativeClipboard        string                       `json:"nativeClipboard,omitempty"`
 	DisplayProvider        string                       `json:"displayProvider"`
 	DisplayComponentDigest string                       `json:"displayComponentDigest,omitempty"`
 	Recovery               *publicRecovery              `json:"recovery,omitempty"`
@@ -155,6 +156,7 @@ type createRequest struct {
 }
 
 type runtimeComponents struct {
+	NativeClipboard string          `json:"nativeClipboard,omitempty"`
 	DisplayProvider string          `json:"displayProvider,omitempty"`
 	Kasm            *kasmbundle.Pin `json:"kasm,omitempty"`
 	Identity        *coreIdentity   `json:"identity,omitempty"`

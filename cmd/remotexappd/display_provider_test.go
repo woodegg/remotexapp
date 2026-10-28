@@ -181,3 +181,41 @@ func TestKasmLaunchKeepsClassDisplayPolicy(t *testing.T) {
 		}
 	}
 }
+
+func TestNativeClipboardIsPinnedAndServerEnforced(t *testing.T) {
+	old := testfixture.Kasm(t)
+	cfg := config{displayProvider: "kasm", vncLauncher: "direct", kasmBundle: old.Directory, nativeClipboard: true}
+	if cfg.configureDisplayProvider() == nil {
+		t.Fatal("old component accepted clipboard")
+	}
+	pin := testfixture.KasmProtocol(t, "kasm-wss-text-v1")
+	cfg.kasmBundle = pin.Directory
+	if err := cfg.configureDisplayProvider(); err != nil {
+		t.Fatal(err)
+	}
+	m := manager{cfg: cfg}
+	c := m.newRuntimeComponents()
+	if c.NativeClipboard != "text" {
+		t.Fatal("policy was not snapshotted")
+	}
+	if err := validateDisplayComponents(c, true); err != nil {
+		t.Fatal(err)
+	}
+	c.Kasm = &old
+	if validateDisplayComponents(c, true) == nil {
+		t.Fatal("old pair adopted text policy")
+	}
+	c.Kasm = &pin
+	c.NativeClipboard = "rich"
+	if validateDisplayComponents(c, false) == nil {
+		t.Fatal("unknown policy accepted")
+	}
+	c.NativeClipboard = "text"
+	item := &instance{Components: c}
+	args := strings.Join(kasmLaunchArgs(item, classConfig{}, 5903, "/tmp/fixture-authority"), " ")
+	for _, value := range []string{"-AcceptCutText=1", "-SendCutText=1", "-DLP_ClipAcceptMax=65536", "-DLP_ClipSendMax=65537", "-DLP_ClipTypes=text/plain", "-DLP_Log=off"} {
+		if !strings.Contains(args, value) {
+			t.Fatalf("missing server policy %s", value)
+		}
+	}
+}

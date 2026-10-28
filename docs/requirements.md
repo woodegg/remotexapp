@@ -40,14 +40,17 @@ The native session retains the Core supervisor and D-Bus, with no mandatory
 IBus/Unicode service. Ordinary upgrade cannot change display provider.
 Real App, both-backend reboot, recovery, cleanup and scoped rollback evidence
 is recorded in the D1 results; Issue #30 and PR #31 own acceptance/merge.
-D2 input/clipboard and later transports remain pending.
+Issue #32 develops the first D2 physical-input checkpoint: native keyboard
+policy and explicit text/plain clipboard, opt-in in Manager and Viewer. Rich
+formats, programmatic input, real host application workflows and later transports remain
+unqualified.
 
 | ID | Proposed requirement | Acceptance boundary |
 | --- | --- | --- |
 | KNA-001 | Pair and pin Kasm server/client behind a distinct display provider. Preserve Manager/App ownership, UID, HOME and App contracts; do not require legacy SDK method shapes. | WSS vertical slice with a single App and managed desktop; dependency/App audit and explicit SDK versioning; server-enforced class rendering/resize policy |
 | KNA-002 | Extend generation/connection fencing to Viewer, UDP, clipboard and audio. Preserve explicit stop, shutdown veto, recovery budgets, populated-process protection and borrowed-bus ownership. Unexpected user-home Driver/supervisor loss must not trigger descendant cleanup; systemd retains populated units with `ExitType=cgroup`, while explicit stop and current-generation clean logout retain cleanup. | Both lifecycle backends, Manager restart, fault/race tests and actual reboot; no adoption of unknown resources |
 | KNA-003 | Use one native human-input path, OS-local IME shortcut policy and explicit programmatic text outcomes. No uncertain-input automatic replay or silent clipboard fallback. | Physical IME/focus/modifier matrix; target/order/cancel/permission and disconnect tests |
-| KNA-004 | Use native clipboard with honest format capabilities, consent, bounded data and generation/source fencing. | Text/HTML/PNG as qualified; clear versus no-op, multi-Viewer, denial and unsupported RTF/files explicitly tested |
+| KNA-004 | The initial D2 text checkpoint requires explicit browser actions/consent, 64 KiB UTF-8 text, server bounds before allocation/mutation, no passive OS clipboard access and generation/consent fencing. Use native clipboard with honest format capabilities, consent, bounded data and generation/source fencing. | Text/HTML/PNG as qualified; clear versus no-op, multi-Viewer, denial and unsupported RTF/files explicitly tested |
 | KNA-005 | Make WSS complete and UDP optional, with actual transport status and bounded retry/fallback. UDP failure must not restart the App. | Actual frame evidence, including complete-message draining and transactional split-message parsing; loss/MTU/NAT/idle/reconnect tests; no reliable-control data dropped as frames |
 | KNA-006 | Use deployment-owned non-NAT host proxy endpoints plus trusted pre-container metadata filtering for the qualified IPv4 container privacy profile. | Container/host observations, SDP/header leak negatives, concurrent clients and unsupported topology rejection |
 | KNA-007 | Bind all transport permissions to principal/runtime/generation/Viewer/epoch; authenticate UDP independently of Access and revoke on expiry/logout/control loss. | Wrong/missing/retired credentials, replay, cross-account/generation and bounded revocation tests; deployment quotas |

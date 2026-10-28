@@ -15,6 +15,8 @@ import (
 	"strings"
 )
 
+const TextProtocol = "kasm-wss-text-v1"
+
 const ServerCommit = "17265facc40ab50db5740cdf0d12c61173edafc9"
 const ClientCommit = "475ecfa5356579ef222983c7ce4619a7576a3bce"
 
@@ -112,7 +114,7 @@ func Load(root, expected string) (*Bundle, error) {
 	if d.Decode(&extra) != io.EOF {
 		return nil, errors.New("Kasm manifest has trailing data")
 	}
-	if manifest.SchemaVersion != 1 || manifest.Protocol != "kasm-wss-v1" || manifest.ServerCommit != ServerCommit || manifest.ClientCommit != ClientCommit {
+	if manifest.SchemaVersion != 1 || (manifest.Protocol != "kasm-wss-v1" && manifest.Protocol != TextProtocol) || manifest.ServerCommit != ServerCommit || manifest.ClientCommit != ClientCommit {
 		return nil, errors.New("unsupported Kasm server/client contract")
 	}
 	if manifest.Binary != "bin/Xkasmvnc" || manifest.Client != "web/client.js" || len(manifest.Files) < 5 || len(manifest.Files) > 4096 {

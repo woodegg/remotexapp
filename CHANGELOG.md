@@ -11,13 +11,18 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.16.0-dev.1`. Development only.
+Target: `0.16.0-dev.2`. Development only.
 
 Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
-remains the default; implementation qualification is tracked in Issue #30.
-Development identities are Core `0.16.0-dev.1` and SDK `0.31.0-dev.1`;
+remains the default. D1 is recorded in Issue #30; Issue #32 tracks the first
+D2 physical-input UAT checkpoint.
+Development identities are Core `0.16.0-dev.2` and SDK `0.31.0-dev.2`;
 these are not published or UAT-qualified releases.
 
+- Add supported native keyboard profiles and opt-in explicit text clipboard.
+  The paired text component bounds/validates data before allocation/mutation.
+  Per-Viewer consent revisions and generation fencing reject late reads after
+  revocation/reconnect. Empty reads are no-op; clear is explicit.
 - Preserve user-home applications after unexpected Driver/supervisor loss.
   Systemd uses `ExitType=cgroup` (systemd 250 or newer); supervision does not
   interpret Driver loss as permission to kill surviving editors. Explicit stop
@@ -34,8 +39,8 @@ these are not published or UAT-qualified releases.
   bridge. Kasm component installation is separate from the ordinary release.
 - Add authenticated, generation-bound native Viewer routes and a minimal
   native SDK adapter. Readiness requires App readiness and actual painting;
-  disconnect/dispose release only the owned Viewer. Native clipboard, audio,
-  programmatic text and UDP are not advertised by this slice.
+  disconnect/dispose release only the owned Viewer. The initial D1 component keeps clipboard off; D2 text requires its separate
+  pin and explicit selection. Audio, programmatic text and UDP stay unsupported.
 
 - Propose a native Kasm architecture from the frozen research baseline, with
   explicit keep/adapt/replace decisions, SDK and host integration contracts,

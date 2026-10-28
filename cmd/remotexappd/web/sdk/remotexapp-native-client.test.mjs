@@ -6,7 +6,7 @@ globalThis.CustomEvent ||= class extends Event { constructor(type,options) { sup
 globalThis.location = new URL('https://viewer.example.test/remotexapps/app/kiosk.html');
 
 function fixture({ ready = true, frame = true, timeout = 200 } = {}) {
-  const state = { id:'app', displayProvider:'kasm', sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
+  const state = { id:'app', displayProvider:'kasm', displayComponentDigest:'a'.repeat(64), sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
   let display, reads = 0;
   class Display extends EventTarget {
     constructor(container,url) {
@@ -33,7 +33,7 @@ test('native ready needs current App and painted frame; dispose owns only one at
   const f = fixture();
   await f.viewer.connect('app');
   assert.equal(f.viewer.state,'ready');
-  assert.equal(f.display.url,'wss://viewer.example.test/remotexapps/app/native/websockify?sessionGeneration=3');
+  assert.equal(f.display.url,'wss://viewer.example.test/remotexapps/app/native/websockify?sessionGeneration=3&componentDigest='+'a'.repeat(64));
   assert.equal(f.viewer.capabilities.udp,false);
   const old = f.display;
   await f.viewer.reconnect();
@@ -76,4 +76,15 @@ test('stale generation, wrong provider and foreign origin fail before unsafe att
   f.viewer._loadDisplay = (...args) => { f.state.sessionGeneration++; return load(...args); };
   await assert.rejects(f.viewer.connect('app'),{code:'stale-generation'});
   assert.equal(f.display.closed,1);
+});
+
+test('reconnect imports the exact new component instead of reusing a cached old module', async () => {
+  const f = fixture(), urls = [], load = f.viewer._loadDisplay;
+  f.viewer._loadDisplay = url => { urls.push(url); return load(url); };
+  await f.viewer.connect('app');
+  f.state.displayComponentDigest = 'b'.repeat(64);
+  await f.viewer.reconnect();
+  assert.notEqual(urls[0],urls[1]);
+  assert.equal(new URL(urls[1]).searchParams.get('componentDigest'),f.state.displayComponentDigest);
+  f.viewer.dispose();
 });

@@ -59,7 +59,7 @@ func TestNativeGatewayAssetsOriginAndPrivateUpstream(t *testing.T) {
 			t.Fatalf("unsafe Origin accepted: %s", origin)
 		}
 	}
-	headers := http.Header{"Origin": {server.URL}, "Authorization": {"secret"}, "Cookie": {"secret"}, "X-Forwarded-For": {"192.0.2.1"}, "CF-Connecting-IP": {"192.0.2.1"}, "Forwarded": {"for=192.0.2.1"}}
+	headers := http.Header{"Origin": {server.URL}, "Authorization": {"secret"}, "Cookie": {"secret"}, "X-Site-Identity": {"fixture"}, "X-Forwarded-For": {"192.0.2.1"}, "CF-Connecting-IP": {"192.0.2.1"}, "Forwarded": {"for=192.0.2.1"}}
 	c, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
 		t.Fatal(err)
@@ -73,7 +73,7 @@ func TestNativeGatewayAssetsOriginAndPrivateUpstream(t *testing.T) {
 		t.Fatalf("relay: %v", err)
 	}
 	got := <-seen
-	for _, key := range []string{"Authorization", "Cookie", "X-Forwarded-For", "CF-Connecting-IP", "Forwarded"} {
+	for _, key := range []string{"Authorization", "Cookie", "X-Site-Identity", "X-Forwarded-For", "CF-Connecting-IP", "Forwarded"} {
 		if got.Get(key) != "" {
 			t.Fatalf("private header forwarded: %s", key)
 		}

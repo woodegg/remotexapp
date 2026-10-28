@@ -182,6 +182,11 @@ func (m *manager) serveClasses(w http.ResponseWriter, r *http.Request) {
 				"serverTimeout": class.Server.ReadinessTimeout, "sessionTimeout": class.Session.ReadinessTimeout,
 			}
 		}
+		if m.cfg.displayProvider == "kasm" {
+			item["displayProvider"] = "kasm"
+			item["input"] = map[string]any{"backend": "native", "lifecycle": "session"}
+			item["display"].(map[string]any)["depth"] = 24
+		}
 		if m.cfg.exposeInternals {
 			item["drivers"] = map[string]any{"server": class.Server.Driver, "session": class.Session.Driver, "shutdown": class.Session.ShutdownDriver}
 		}
@@ -374,9 +379,14 @@ func (m *manager) publicInstance(item *instance) *publicInstanceView {
 	if m.cfg.disableKiosk {
 		copy.ViewerURL = ""
 	}
+	componentDigest := ""
+	if isKasm(item) && item.Components.Kasm != nil {
+		componentDigest = item.Components.Kasm.SHA256
+	}
 	return &publicInstanceView{
-		DisplayProvider: displayProvider(item.Components),
-		Versions:        m.versionView(item), Upgrade: publicUpgrade(item), Recovery: recoveryView(item),
+		DisplayProvider:        displayProvider(item.Components),
+		DisplayComponentDigest: componentDigest,
+		Versions:               m.versionView(item), Upgrade: publicUpgrade(item), Recovery: recoveryView(item),
 		ID: copy.ID, ClassID: copy.ClassID, TemplateID: copy.TemplateID,
 		DriverVersion: copy.DriverVersion, ManagedID: copy.ManagedID,
 		ProfileRef: copy.ProfileRef, WorkspaceMode: copy.WorkspaceMode,

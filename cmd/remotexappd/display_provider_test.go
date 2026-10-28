@@ -75,3 +75,19 @@ func TestNativeViewerRejectsStaleAndLegacyRoutesBeforeAttach(t *testing.T) {
 		t.Fatal("rejected request attached a Viewer")
 	}
 }
+
+func TestNativeAssetRejectsOldComponentBeforeProxy(t *testing.T) {
+	m, item, _, _ := backgroundRecoveryFixture(t)
+	pin := testfixture.Kasm(t)
+	item.Components.DisplayProvider, item.Components.Kasm = "kasm", &pin
+	if bus, reason, err := m.ibusConnection(item, nil); err != nil || bus != nil || reason != "unsupported-provider" {
+		t.Fatal("native descriptor invents an IBus service")
+	}
+	for _, query := range []string{"", "?componentDigest=" + strings.Repeat("0", 64), "?componentDigest=" + pin.SHA256 + "&componentDigest=" + pin.SHA256} {
+		w := httptest.NewRecorder()
+		m.serveInstanceRoute(w, httptest.NewRequest("GET", "/remotexapps/"+item.ID+"/native/client.js"+query, nil))
+		if w.Code != 409 {
+			t.Fatalf("accepted unpinned/stale component: %d", w.Code)
+		}
+	}
+}

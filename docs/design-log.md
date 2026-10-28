@@ -4542,6 +4542,13 @@ Legacy clients reject Kasm descriptors. Unsupported clipboard/programmatic
 text/audio/UDP capabilities are explicit. D1 keeps the existing authenticated
 single-account trust model; it does not introduce a multi-tenant ACL service.
 
+Native descriptors also expose a non-secret component digest. Preparation and
+asset/Viewer routes check it; the SDK includes it in the module URL to prevent
+the browser's module cache from retaining an old client after a paired upgrade.
+Only WebSocket protocol headers reach the Kasm server; site-specific identity,
+credential and forwarding headers stop at the trusted gateway. Clipboard is
+disabled in both directions in the initial server launch and client adapter.
+
 Focused automated boundary checks are in progress alongside real disposable
 App/lifecycle verification. Neither a passing unit test nor these implementation
 choices complete the nine D1 acceptance groups.

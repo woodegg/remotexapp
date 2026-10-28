@@ -33,6 +33,15 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 		return
 	}
 	member := strings.TrimPrefix(route, "native/")
+	if member != "websockify" && member != "client.js" && !strings.HasSuffix(member, ".wasm") {
+		http.NotFound(w, r)
+		return
+	}
+	digests := r.URL.Query()["componentDigest"]
+	if item.Components.Kasm == nil || len(digests) != 1 || digests[0] != item.Components.Kasm.SHA256 {
+		writeError(w, http.StatusConflict, "stale native component descriptor")
+		return
+	}
 	var channel *viewerChannel
 	if member == "websockify" {
 		if r.Method != http.MethodGet || !isWebSocket(r) {
@@ -76,6 +85,7 @@ func (m *manager) prepareNativeViewer(w http.ResponseWriter, r *http.Request, id
 	}
 	var request struct {
 		SessionGeneration *int64 `json:"sessionGeneration"`
+		ComponentDigest   string `json:"componentDigest"`
 	}
 	if err := decodeStrictJSON(r.Body, &request); err != nil || request.SessionGeneration == nil || *request.SessionGeneration < 0 {
 		writeError(w, http.StatusBadRequest, "sessionGeneration is required")
@@ -84,7 +94,7 @@ func (m *manager) prepareNativeViewer(w http.ResponseWriter, r *http.Request, id
 	m.lifecycleMu.Lock()
 	defer m.lifecycleMu.Unlock()
 	item := m.get(id)
-	if !isKasm(item) || (item.State != "server-ready" && item.State != "ready") || item.SessionGeneration != *request.SessionGeneration {
+	if !isKasm(item) || item.Components.Kasm == nil || request.ComponentDigest != item.Components.Kasm.SHA256 || (item.State != "server-ready" && item.State != "ready") || item.SessionGeneration != *request.SessionGeneration {
 		writeError(w, http.StatusConflict, "stale native Viewer descriptor")
 		return
 	}

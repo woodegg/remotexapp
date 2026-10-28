@@ -89,6 +89,7 @@ func kasmLaunchArgs(item *instance, class classConfig, port int, authority strin
 		"-interface", "127.0.0.1", "-websocketPort", strconv.Itoa(port),
 		"-DisableBasicAuth", "-sslOnly", "0", "-SecurityTypes", "None",
 		"-publicIP", "127.0.0.1", "-httpd", "", "-nolisten", "tcp",
+		"-AcceptCutText=0", "-SendCutText=0",
 		"-geometry", class.Server.Geometry, "-depth", "24", "-FrameRate", strconv.Itoa(class.Server.FrameRate),
 		"-AcceptSetDesktopSize=" + boolDigit(class.Server.AllowClientResize), "-FreeKeyMappings", "-auth", authority,
 	}

@@ -219,7 +219,7 @@ func TestNativeSupervisorKeepsBusWithoutLegacyInput(t *testing.T) {
 	for _, mode := range []string{"isolated", "user-home"} {
 		t.Run(mode, func(t *testing.T) {
 			f := newSupervisorFixture(t, mode)
-			f.env = append(f.env, "REMOTEXAPP_INPUT_PROVIDER=native", "REMOTEXAPP_UNICODE_ENGINE=", "IBUS_ADDRESS=untrusted-inherited")
+			f.env = append(f.env, "REMOTEXAPP_INPUT_PROVIDER=native", "REMOTE_UNICODE_ENGINE=", "IBUS_ADDRESS=untrusted-inherited")
 			c := f.start(t)
 			r := f.record(t, "ready")
 			if r.InputProvider != "native" || r.Driver == nil {

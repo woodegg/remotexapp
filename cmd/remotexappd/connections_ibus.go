@@ -15,6 +15,9 @@ import (
 // The recorded launch and the live peer must describe the same runtime process.
 // A conventional filename by itself is not evidence of a usable IBus service.
 func (m *manager) ibusConnection(item *instance, raw any) (*sessionBusConnection, string, error) {
+	if isKasm(item) {
+		return nil, "unsupported-provider", nil
+	}
 	bad := errors.New("invalid private IBus metadata")
 	if raw == nil {
 		return nil, "metadata-missing", nil

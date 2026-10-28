@@ -19,7 +19,7 @@ function abortable(promise, signal) {
 
 /** Minimal opt-in Kasm Viewer. Each object owns one display attachment only. */
 export class RemoteXAppNativeClient extends EventTarget {
-  constructor({ container, manager = new RemoteXAppManager(), timeout = 30000 } = {}) {
+  constructor({ container, manager = new RemoteXAppManager(), timeout = 90000 } = {}) {
     super();
     if (!container?.replaceChildren) throw new TypeError('container is required');
     if (!Number.isFinite(timeout) || timeout < 1 || timeout > 120000) throw new RangeError('invalid connection timeout');
@@ -57,19 +57,22 @@ export class RemoteXAppNativeClient extends EventTarget {
       current();
       if (selected.displayProvider !== 'kasm') throw new RemoteXAppNativeError('provider-mismatch', 'Native Viewer requires a Kasm runtime');
       if (!Number.isSafeInteger(selected.sessionGeneration) || selected.sessionGeneration < 0) throw new RemoteXAppNativeError('invalid-descriptor', 'Invalid session generation');
+      if (!/^[a-f0-9]{64}$/.test(selected.displayComponentDigest || '')) throw new RemoteXAppNativeError('invalid-descriptor', 'Missing paired component identity');
       this.instance = selected;
       const base = `/remotexapps/${encodeURIComponent(selected.id)}/native`;
       const moduleURL = new URL(this.manager.url(`${base}/client.js`), globalThis.location.href);
       if (moduleURL.origin !== globalThis.location.origin) throw new RemoteXAppNativeError('origin', 'Native Viewer requires a same-origin Manager');
-      const prepared = await this.manager.request(`${base}/prepare`, { method:'POST', body:{ sessionGeneration:selected.sessionGeneration }, signal });
+      const prepared = await this.manager.request(`${base}/prepare`, { method:'POST', body:{ sessionGeneration:selected.sessionGeneration, componentDigest:selected.displayComponentDigest }, signal });
       current();
-      if (prepared.id !== selected.id || prepared.displayProvider !== 'kasm' || !Number.isSafeInteger(prepared.sessionGeneration) || prepared.sessionGeneration < 1) throw new RemoteXAppNativeError('invalid-descriptor', 'Invalid prepared session');
+      if (prepared.id !== selected.id || prepared.displayProvider !== 'kasm' || prepared.displayComponentDigest !== selected.displayComponentDigest || !Number.isSafeInteger(prepared.sessionGeneration) || prepared.sessionGeneration < 1) throw new RemoteXAppNativeError('invalid-descriptor', 'Invalid prepared session');
       this.instance = prepared;
+      moduleURL.searchParams.set('componentDigest', prepared.displayComponentDigest);
       const { default:NativeDisplay } = await abortable(this._loadDisplay(moduleURL.href), signal);
       current();
       const socketURL = new URL(this.manager.url(`${base}/websockify`), globalThis.location.href);
       socketURL.protocol = socketURL.protocol === 'https:' ? 'wss:' : 'ws:';
       socketURL.searchParams.set('sessionGeneration', String(prepared.sessionGeneration));
+      socketURL.searchParams.set('componentDigest', prepared.displayComponentDigest);
       const display = this._display = new NativeDisplay(this.container, socketURL.href, { resize:prepared.effectivePolicy?.display?.allowClientResize === true });
       await new Promise((resolve, reject) => {
         let painted = false, connected = false, checking = false, poll;
@@ -83,7 +86,7 @@ export class RemoteXAppNativeClient extends EventTarget {
             current();
             const actual = await this.manager.getInstance(prepared.id, { signal });
             current();
-            if (actual.sessionGeneration !== prepared.sessionGeneration || actual.sessionState !== 'running') throw new RemoteXAppNativeError('stale-generation', 'Session changed during connection');
+            if (actual.sessionGeneration !== prepared.sessionGeneration || actual.displayComponentDigest !== prepared.displayComponentDigest || actual.sessionState !== 'running') throw new RemoteXAppNativeError('stale-generation', 'Session changed during connection');
             const status = actual.applicationStatus;
             if (status?.generation === prepared.sessionGeneration && status.state === 'ready') {
               this.instance = actual;

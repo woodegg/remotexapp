@@ -1,5 +1,57 @@
 # RemoteXApp browser SDK
 
+## Experimental native Viewer (D1)
+
+The opt-in Kasm provider uses `RemoteXAppNativeClient`. It is a separate minimal
+adapter; the legacy `RemoteXAppClient` rejects Kasm descriptors. The default
+provider and existing SDK interfaces remain unchanged. D1 qualification is
+tracked in [Issue #30](https://github.com/woodegg/remotexapp/issues/30).
+
+```js
+import { RemoteXAppManager, RemoteXAppNativeClient } from '/sdk/index.js';
+const manager = new RemoteXAppManager();
+const viewer = new RemoteXAppNativeClient({
+  manager, container:document.querySelector('#remote-app'), timeout:90000,
+});
+viewer.addEventListener('statechange', event => console.log(event.detail.state));
+await viewer.connect(instanceId);
+// Later: await viewer.reconnect(); or viewer.disconnect();
+// On final host view removal:
+viewer.dispose();
+```
+
+`connect()` resolves only after an actual painted update and current-generation
+App readiness. A protocol handshake alone is insufficient. A background tab
+which has not painted is not ready; the bounded timeout still applies. The
+host must arrange a visible first attachment or retry on activation. Full host
+workspace/visibility coordination remains outside this initial adapter.
+
+Each object owns one Viewer. Disconnect/dispose cancels pending work and
+releases that attachment, without stopping the remote application or another
+Viewer. Final detach still follows the App's existing vacancy policy. There is
+no automatic replay of keyboard input or automatic retry loop. `reconnect()`
+fetches a fresh descriptor. Late callbacks cannot revive a disposed Viewer.
+
+Native descriptors include `displayProvider: 'kasm'` and the non-secret
+`displayComponentDigest`. Preparation requires the descriptor's generation
+and component digest. Assets use a digest-qualified URL so the browser cannot
+reuse a previous component module after an upgrade; stale asset/attach requests
+are rejected. The native kiosk uses authenticated same-origin WSS. Loopback
+development explicitly reports WS rather than pretending TLS is in use.
+
+The adapter reports pointer and basic keyboard support. Its frozen
+`capabilities` reports clipboard, programmatic text, audio and UDP as false;
+this is not the legacy IBus `sendText()` interface. Physical IME and rich
+clipboard qualification remain separate. Error instances expose a `code`,
+including timeout, provider mismatch and stale generation, plus a cause for
+an underlying Manager/network failure. Native IBus connection metadata reports
+`unsupported-provider`, not a broken input service.
+
+See the [component recipe](../third_party/kasm/README.md) for installation,
+source pins and rollback restrictions. No Kasm credentials are delivered to
+the host SDK. The existing Manager/trusted-ingress single-account authorization
+model applies; this adapter does not add a separate multi-tenant ACL system.
+
 ## Optional runtime keepalive (SDK 0.29)
 
 For a windowed host application, see the [host application migration guide](host-runtime-coordinator-migration.md)

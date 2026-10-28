@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -13,6 +14,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/woodegg/remotexapp/internal/testfixture"
 )
 
 type recoveryCloseCounter struct{ closed atomic.Int32 }
@@ -83,6 +85,62 @@ func TestRecoveryFencesRealRFBAndInputChannels(t *testing.T) {
 	m.serveInstanceRoute(response, request)
 	if response.Code != 409 {
 		t.Fatalf("stale generation accepted: %d", response.Code)
+	}
+}
+
+func TestNativeRecoveryFencesBothViewers(t *testing.T) {
+	m, item, now, starts := backgroundRecoveryFixture(t)
+	pin := testfixture.Kasm(t)
+	item.Components.DisplayProvider, item.Components.Kasm, item.Components.UnicodeEngine = "kasm", &pin, ""
+	item.SessionState = "running"
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		c, err := (&websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return true }}).Upgrade(w, r, nil)
+		if err != nil {
+			return
+		}
+		defer c.Close()
+		for {
+			kind, data, err := c.ReadMessage()
+			if err != nil {
+				return
+			}
+			if c.WriteMessage(kind, data) != nil {
+				return
+			}
+		}
+	}))
+	defer upstream.Close()
+	item.GatewayAddr = strings.TrimPrefix(upstream.URL, "http://")
+	server := httptest.NewServer(http.HandlerFunc(m.serveInstanceRoute))
+	defer server.Close()
+	var sockets []*websocket.Conn
+	for i := 0; i < 2; i++ {
+		u := "ws" + strings.TrimPrefix(server.URL, "http") + "/remotexapps/" + item.ID + "/native/websockify?sessionGeneration=" + strconv.FormatInt(item.SessionGeneration, 10) + "&componentDigest=" + pin.SHA256
+		c, _, err := websocket.DefaultDialer.Dial(u, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer c.Close()
+		sockets = append(sockets, c)
+	}
+	if got := m.get(item.ID); got.AttachedClients != 2 || !m.canFenceViewerChannels(got) {
+		t.Fatal("native channels are not owned")
+	}
+	m.setSessionState(item.ID, "failed", "injected loss")
+	*now = stepBackgroundRecovery(t, m, item, *now)
+	stepBackgroundRecovery(t, m, item, *now)
+	if starts.Load() != 1 || m.get(item.ID).AttachedClients != 0 {
+		t.Fatal("native channel ownership blocked safe recovery")
+	}
+	for _, c := range sockets {
+		c.SetReadDeadline(time.Now().Add(time.Second))
+		if _, _, err := c.ReadMessage(); err == nil {
+			t.Fatal("native old-generation channel survived")
+		}
+	}
+	records, err := m.loadRuntimeManifests()
+	if err != nil || len(records) != 1 || records[0].SchemaVersion != 4 || records[0].Recovery == nil {
+		t.Fatalf("native recovery record lost: %v", err)
 	}
 }
 

@@ -45,11 +45,15 @@ func nativeKasmHandler(cfg config) (http.Handler, error) {
 	proxy.Director = func(r *http.Request) {
 		director(r)
 		r.URL.Path, r.URL.RawPath, r.URL.RawQuery = "/websockify", "", ""
-		r.Header.Del("Authorization")
-		r.Header.Del("Cookie")
-		r.Header.Del("Forwarded")
-		r.Header.Del("CF-Connecting-IP")
-		r.Header.Del("X-Real-IP")
+		// Authentication ends at the Manager. Forward only protocol headers,
+		// including no site-specific identity/token or proxy metadata headers.
+		incoming := r.Header
+		r.Header = make(http.Header)
+		for _, name := range []string{"Origin", "Connection", "Upgrade", "Sec-WebSocket-Key", "Sec-WebSocket-Version", "Sec-WebSocket-Protocol", "Sec-WebSocket-Extensions"} {
+			if values, ok := incoming[http.CanonicalHeaderKey(name)]; ok {
+				r.Header[http.CanonicalHeaderKey(name)] = append([]string(nil), values...)
+			}
+		}
 		// A nil slice suppresses ReverseProxy's automatic source-IP header.
 		r.Header["X-Forwarded-For"] = nil
 	}

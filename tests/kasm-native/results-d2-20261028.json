@@ -1,0 +1,203 @@
+{
+  "date": "2026-10-28",
+  "status": "automated-checkpoint-passed-physical-uat-pending",
+  "issue": 32,
+  "pullRequest": 33,
+  "scope": "D2 native keyboard policy and explicit plain-text clipboard; not full D2 or a release",
+  "core": {
+    "version": "0.16.0-dev.2",
+    "commit": "71e5fbeadcf1507cce9f29172400f0ab66ebef41",
+    "sha256": "36618fd1e7d0162801c4583f00d415a19262ebddcccc26296d54740a4140c3e5"
+  },
+  "sdkVersion": "0.31.0-dev.2",
+  "binaries": {
+    "remotexappd": "21e7eab4419888b8f8400691e6d123d2c6cb9ccf8831564ad5a084b6ab646ef4",
+    "novnc-input": "ad6918065520017a32017d0eae4b812bd2a2550c77017d59452e2f686a1b35ad",
+    "remotexapp-status": "1ab70510aa2db04450266cc9d21eeb6a97c01501fb042b3dc590cfdf2f19634c"
+  },
+  "component": {
+    "manifestSHA256": "d9373b47ecf5d230deecdc2be0bbcbe028f50d3ed2bf582138d3a065ad234798",
+    "protocol": "kasm-wss-text-v1",
+    "serverCommit": "17265facc40ab50db5740cdf0d12c61173edafc9",
+    "clientCommit": "475ecfa5356579ef222983c7ce4619a7576a3bce",
+    "binarySHA256": "a6cb222bfc8095e349aee49ab2446945e15a3dfcfc3d408974fd0711236787c1",
+    "clientSHA256": "c71587a60d8b4eaf50ff9bbbc0348a7cbe1ef92440de5c1cc565628d4d7221f4"
+  },
+  "environment": {
+    "os": "Ubuntu 24.04 amd64 disposable container",
+    "browser": "Chrome 149.0.7827.102, dedicated Linux headless profile",
+    "apps": [
+      "Mousepad 4.0.1",
+      "XFCE user-home desktop 3.0.1"
+    ],
+    "displayTransport": "WSS through authenticated loopback test ingress; localhost WS also checked for SSH-forwarded UAT",
+    "backends": [
+      "systemd",
+      "standalone in host-systemd delegated cgroup"
+    ]
+  },
+  "textBrowserAssertions": [
+    {
+      "name": "local text -> native clipboard -> real App paste/save",
+      "status": "passed"
+    },
+    {
+      "name": "remote offer does not change local OS clipboard",
+      "status": "passed"
+    },
+    {
+      "name": "real App copy -> native offer -> explicit local readback",
+      "status": "passed"
+    },
+    {
+      "name": "empty local read preserves remote clipboard",
+      "status": "passed"
+    },
+    {
+      "name": "explicit clear prevents old text from pasting",
+      "status": "passed"
+    },
+    {
+      "name": "64 KiB UTF-8 boundary real server readback",
+      "status": "passed"
+    },
+    {
+      "name": "64 KiB real App copy -> local boundary readback",
+      "status": "passed"
+    },
+    {
+      "name": "64 KiB+1 rejected before remote mutation",
+      "status": "passed"
+    },
+    {
+      "name": "browser permission denied gives explicit failure",
+      "status": "passed"
+    },
+    {
+      "name": "disabled-period offer is not cached on re-enable",
+      "status": "passed"
+    },
+    {
+      "name": "four OS shortcut profiles suppress terminal Space, ordinary Ctrl+A/S preserved",
+      "status": "passed"
+    },
+    {
+      "name": "ten outside/inside focus cycles with synthetic composition and file readback",
+      "status": "passed"
+    },
+    {
+      "name": "two Viewers have independent consent and disconnect",
+      "status": "passed"
+    },
+    {
+      "name": "reconnect resets consent",
+      "status": "passed"
+    }
+  ],
+  "malformedWireAssertions": [
+    {
+      "name": "oversize header before payload",
+      "status": "passed"
+    },
+    {
+      "name": "invalid UTF-8",
+      "status": "passed"
+    },
+    {
+      "name": "embedded NUL",
+      "status": "passed"
+    },
+    {
+      "name": "HTML representation",
+      "status": "passed"
+    },
+    {
+      "name": "multiple representations",
+      "status": "passed"
+    }
+  ],
+  "otherEvidence": {
+    "systemdAdoption": {
+      "backend": "systemd",
+      "policyPinsGenerationAndProcessesRetained": true
+    },
+    "standaloneAdoption": {
+      "backend": "standalone",
+      "policyPinsGenerationAndProcessesRetained": true
+    },
+    "systemdPaint": {
+      "status": "Ready · WSS",
+      "colors": 6974,
+      "clipboardAvailable": true
+    },
+    "standalonePaint": {
+      "status": "Ready · WSS",
+      "colors": 6975,
+      "clipboardAvailable": true
+    },
+    "hostHarness": {
+      "concurrentActivation": true,
+      "basePath": "/rx",
+      "twoIframes": true,
+      "hideShow": true,
+      "disposeRecreate": true,
+      "businessHostAcceptance": false
+    },
+    "defaultOff": {
+      "serverRejectsValidClipboardWithoutPolicy": true,
+      "uiUnavailable": true,
+      "compositionCancelAndCommitReadback": true
+    },
+    "ordinaryLogPrivacy": {
+      "activeFinalServers": 2,
+      "ordinaryUnicodeMappingLogs": 0,
+      "clipboardFlagsPinned": true
+    },
+    "handoffBrowser": {
+      "loopbackHTTPBrowserSecureContext": true,
+      "twoViewersReady": true,
+      "explicitBrowserClipboardReadWrite": true,
+      "manualEntryAvailable": true
+    }
+  },
+  "legacyRegression": {
+    "phase": "default",
+    "provider": "tigervnc",
+    "sdk": "0.31.0-dev.2",
+    "realFirstPaint": true,
+    "browserPointerKeyboardSaveReadback": true,
+    "reconnect": true
+  },
+  "portableChecks": {
+    "makeCheck": "passed",
+    "nativeSDKTests": 11,
+    "pairedAppliedSourceTests": 33,
+    "focusedGoRace": "passed; Go implementation unchanged after that check",
+    "ci": "https://github.com/woodegg/remotexapp/actions/runs/40687207943"
+  },
+  "defectsFoundAndFixed": [
+    "Upstream Unicode mapping success logs exposed codepoints; patch 0009 removes ordinary content-bearing logs.",
+    "Concurrent first Viewers could race on stopped-session activation; a single unchanged-pin ID-connect retry handles only that transition."
+  ],
+  "fixtureCorrections": [
+    "CJK and emoji fonts installed after visual inspection showed missing glyphs.",
+    "App paste/save checks wait for asynchronous X11 selection delivery. Explicit clear is verified by App paste readback, since xclip reports an unavailable text target for an empty selection.",
+    "Transient Apps created without a Viewer expire under their normal 60-second vacancy policy; tests attach immediately."
+  ],
+  "handoff": {
+    "status": "prepared for owner physical UAT",
+    "secondaryManagersAndApps": "stopped",
+    "primaryFixture": "kept available with fixed Core and component; creates synthetic Apps on request",
+    "deploymentOwnership": "project-owned new fixture only; existing user/sandbox deployments untouched",
+    "dedicatedAutomationBrowser": "stopped after final checks; UAT creates Viewers on demand"
+  },
+  "notQualified": [
+    "Physical OS IME and candidate windows; Windows/macOS/Linux shortcut behavior",
+    "Actual host application business workflows",
+    "Rich clipboard and file transfer",
+    "Read-only per-Viewer server role grants",
+    "Programmatic text with target/application acknowledgement",
+    "Audio and UDP",
+    "Other browsers, performance/resource soak, non-systemd PID 1, distribution and post-merge release"
+  ]
+}

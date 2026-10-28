@@ -13,15 +13,18 @@
 <textarea id="local-text" placeholder="在这里输入，再切换到远程应用"></textarea>
 <div><button id="local-copy">复制本机文本</button><button id="local-read">读取本机剪贴板到文本区</button></div>
 <small>远程 Viewer 内展开 Keyboard and clipboard。先选浏览器所在系统的输入法快捷键，再开启文本剪贴板。Local → Remote 是发送到远程剪贴板；随后在远程应用按 Ctrl+V。Remote → Local 之前先在远程复制文本。</small>
-<pre id="identity"></pre>
+<details><summary>测试版本与会话信息</summary><pre id="identity"></pre></details>
 <div id="views"><section><strong>Viewer A</strong><div id="slot-a"></div></section><section><strong>Viewer B · 同一个 App</strong><div id="slot-b"></div></section></div>
 <script type="module">
 let current,config;
 const status=text=>{document.querySelector('#status').textContent=text;};
 try{config=await fetch('/fixture-config').then(r=>{if(!r.ok)throw Error('fixture unavailable');return r.json();});status('请选择测试应用。');}catch{status('测试配置不可用。');}
 const api=async(path,body,method)=>{const r=await fetch(config.baseURL+path,{method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const x=await r.json();if(!r.ok)throw Error(x.error||'API request failed');return x;};
-const frame=slot=>{const el=document.createElement('iframe');el.title='Native remote App '+slot;el.allow='clipboard-read; clipboard-write';el.src=config.baseURL+current.viewerUrl;const node=document.querySelector('#slot-'+slot);node.replaceChildren(el);node.hidden=false;};
-const show=x=>{current=x;document.querySelector('#identity').textContent=JSON.stringify({core:x.versions.current.core,component:x.displayComponentDigest,generation:x.sessionGeneration,clipboard:x.nativeClipboard||'off'},null,2);frame('a');frame('b');status('应用已创建；等两个 Viewer 显示 Ready，再开始操作。');};
+const frame=slot=>{const el=document.createElement('iframe');el.title='Native remote App '+slot;el.allow='clipboard-read; clipboard-write';el.src=config.baseURL+current.viewerUrl;const node=document.querySelector('#slot-'+slot);const link=document.createElement('a');link.href=el.src;link.target='_blank';link.rel='noopener';link.textContent='单独打开此 Viewer（更大画面）';link.style.cssText='display:block;color:#9ee6d7;margin:6px 0';node.replaceChildren(link,el);node.hidden=false;};
+const identity=x=>{document.querySelector('#identity').textContent=JSON.stringify({core:x.versions.current.core,component:x.displayComponentDigest,generation:x.sessionGeneration,clipboard:x.nativeClipboard||'off'},null,2);};
+const show=x=>{current=x;identity(x);frame('a');frame('b');status('应用已创建；等两个 Viewer 显示 Ready，再开始操作。');
+  (async()=>{for(let i=0;i<60&&current===x;i++){await new Promise(r=>setTimeout(r,1000));try{const actual=await api('/api/instances/'+encodeURIComponent(x.id));if(current!==x)return;identity(actual);if(actual.applicationStatus?.state==='ready')return;}catch{return;}}})();
+};
 document.querySelector('#launch-mousepad').onclick=()=>api('/api/instances',{templateId:'mousepad',parameters:{filePath:config.documentFile}}).then(show).catch(e=>status(e.message));
 document.querySelector('#launch-desktop').onclick=()=>api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH').then(x=>show(x.runtime)).catch(e=>status(e.message));
 document.querySelector('#toggle-a').onclick=()=>{const slot=document.querySelector('#slot-a');slot.hidden=!slot.hidden;};

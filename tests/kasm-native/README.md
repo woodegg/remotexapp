@@ -1,4 +1,10 @@
-# D1 native WSS qualification
+# Native Kasm qualification
+
+The next bounded input/clipboard checkpoint is recorded in
+[D2 automated evidence and physical UAT instructions](D2-UAT.md). It does not
+change the D1 scope or imply full D2 acceptance.
+
+## D1 native WSS qualification
 
 D1 exercises an opt-in paired Kasm component through the Manager and native
 SDK. The default remains TigerVNC. Implementation acceptance is Issue #30;

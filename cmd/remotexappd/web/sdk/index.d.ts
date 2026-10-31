@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.31.0-dev.2';
+export const SDK_VERSION: '0.31.0-dev.3';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -135,14 +135,23 @@ export class RemoteXAppAPIError extends Error { status:number; body:unknown; }
 
 export class RemoteXAppNativeError extends Error { code:string; }
 export interface NativeKeyboardPolicy {profile:'unknown'|'windows'|'mac'|'gnome'|'fcitx'|'custom';mode?:'local'|'remote';bindings?:string[];}
+export type RemoteXAppNativeStats = {
+  schemaVersion:1; state:'disconnected'|'connecting'|'ready'|'failed'|'disposed';
+  code:string|null; connectionEpoch:number; observedAt:number;
+  transport:'wss'|'ws-loopback'|null; connectedForMs:number|null;
+} & ({available:false} | {
+  available:true; receivedBytes:number; sentBytes:number; bufferedBytes:number;
+  renderedFrames:number; width:number; height:number;
+});
 export class RemoteXAppNativeClient extends EventTarget {
   constructor(options:{container:HTMLElement;manager?:RemoteXAppManager;timeout?:number;keyboardPolicy?:NativeKeyboardPolicy});
   readonly state:'disconnected'|'connecting'|'ready'|'failed'|'disposed';
   readonly instance?:RemoteXAppInstance;
   readonly capabilities:{readonly display:'kasm-wss-v1';readonly pointer:true;readonly keyboard:true;
-    readonly clipboard:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly programmaticText:false;readonly audio:false;readonly udp:false};
+    readonly clipboard:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly statistics:boolean;readonly programmaticText:false;readonly audio:false;readonly udp:false};
   readonly keyboardPolicy:NativeKeyboardPolicy|null;
   readonly clipboardEnabled:boolean;
+  getStats():RemoteXAppNativeStats;
   configureKeyboard(settings:NativeKeyboardPolicy):{applied:boolean};
   focus():void;
   blur():void;

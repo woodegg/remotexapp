@@ -44,6 +44,44 @@ The handoff page presents two independent Viewers of one App:
 
 ![Native input UAT host](native-input-uat.png)
 
+## 2026-10-31 connection statistics
+
+Core `0.16.0-dev.3` / SDK `0.31.0-dev.3` adds a per-Viewer statistics snapshot.
+The [stats results](results-d2-stats-20261031.json) identify the new Core and
+paired component, installed artifact checks and 21 real-browser assertions.
+Both Mousepad and a managed desktop expose counters in two separate Viewers.
+Chrome's independent WebSocket events match the reported payload totals.
+Pointer/arrow edits are saved and read back; failures, reconnect, hide/show,
+close/recreate and unknown iframe states are checked. A synthetic visibility
+event checks sampling pause and baseline reset. No HTTP polling is added.
+The isolated stats run uses systemd; earlier backend evidence is not a rerun.
+
+![Per-Viewer connection statistics](native-stats-uat.png)
+
+The cards show actual protocol, receive/send payload rate, painted-update FPS,
+remote framebuffer resolution, connection uptime, cumulative bytes and the
+browser socket's send queue. Rates update once per second. Quiet Apps can show
+zero FPS; this is not a configured target or network-capacity estimate. Hiding
+one panel leaves it connected. A disconnect/failure clears its live metrics;
+an unavailable or older component shows missing values rather than zero.
+The source remains WSS-only. This page does not claim UDP, RTT or packet loss.
+
+Run `node tests/kasm-native/browser-stats.mjs /var/tmp/d2-private/config.json`
+against a newly provisioned stats fixture and dedicated browser. Supply an
+unused synthetic `documentFile`, a matching `/fixture-config`, and an
+`evidenceDirectory`. The fixture helper also expects `instanceFile` (an empty
+JSON object suffices for this homepage test). The test closes its browser tab
+and stops only the Mousepad instance it created; it retains the test desktop
+for UAT. Stop the dedicated browser service afterward. Inspect its cropped
+screenshot before including it in public evidence.
+
+For human UAT, refresh the homepage and open an App. Check both cards show
+**Connected / WSS**, then interact with the App and observe FPS/traffic changes.
+Disconnect A inside its Viewer: A should show disconnected and clear its rates,
+while B remains connected. Reconnect, hide/show and close/reopen A, checking that
+no old connection's rates are carried over. Physical input UAT below remains
+pending against this new component; a stats test does not accept OS IME behavior.
+
 ## Reproduce the browser matrix
 
 Use only a dedicated CDP browser, loopback authenticated ingress and a newly

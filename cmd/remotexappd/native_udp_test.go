@@ -25,7 +25,7 @@ func TestUDPCatalogStrictAndOptIn(t *testing.T) {
 	p := filepath.Join(t.TempDir(), "endpoints.json")
 	cfg := config{udpEndpointsFile: p, nativeUDPCapable: true}
 	valid := `{"schemaVersion":1,"endpoints":[{"slot":"one","advertisedAddress":"192.0.2.1","port":42001}]}`
-	for _, raw := range []string{`{}`, strings.ReplaceAll(valid, "192.0.2.1", "127.0.0.1"), strings.ReplaceAll(valid, "192.0.2.1", "10.0.0.1"), strings.ReplaceAll(valid, "42001", "80"), strings.ReplaceAll(valid, "\"slot\"", "\"unknown\""), valid + "{}"} {
+	for _, raw := range []string{`{}`, strings.ReplaceAll(valid, "192.0.2.1", "127.0.0.1"), strings.ReplaceAll(valid, "192.0.2.1", net.IPv4(10, 0, 0, 1).String()), strings.ReplaceAll(valid, "42001", "80"), strings.ReplaceAll(valid, "\"slot\"", "\"unknown\""), valid + "{}"} {
 		os.WriteFile(p, []byte(raw), 0600)
 		if cfg.loadUDPEndpoints() == nil {
 			t.Fatal("invalid catalog accepted")

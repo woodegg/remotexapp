@@ -95,7 +95,9 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 	proxy.Director = func(request *http.Request) {
 		director(request)
 		if item.Components.NativeUDP {
-			request.Header.Del("Sec-WebSocket-Protocol")
+			// Terminate the Viewer credential here. The pinned Kasm HTTP parser
+			// requires a protocol header even for an ordinary binary stream.
+			request.Header.Set("Sec-WebSocket-Protocol", "binary")
 		}
 		request.URL.Path, request.URL.RawPath = "/"+member, ""
 	}

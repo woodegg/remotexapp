@@ -177,10 +177,10 @@ func TestNativeGrantCapacityAndExpiredPendingReclamation(t *testing.T) {
 func TestNativeGrantRealUpgradeAcknowledgesProtocolAndRevokeClosesWire(t *testing.T) {
 	m, item, request := grantFixture(t)
 	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Sec-WebSocket-Protocol") != "" {
-			t.Error("grant reached native server")
+		if r.Header.Get("Sec-WebSocket-Protocol") != "binary" {
+			t.Error("grant was not replaced by the required native binary protocol")
 		}
-		u := websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return true }}
+		u := websocket.Upgrader{Subprotocols: []string{"binary"}, CheckOrigin: func(*http.Request) bool { return true }}
 		c, err := u.Upgrade(w, r, nil)
 		if err != nil {
 			return

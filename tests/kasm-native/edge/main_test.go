@@ -93,11 +93,15 @@ func TestEdgeBinaryStreamAndDisconnect(t *testing.T) {
 	edge := httptest.NewServer(h)
 	defer edge.Close()
 	head := http.Header{"Host": []string{"uat.example"}, "Origin": []string{"https://uat.example"}, "CF-Connecting-IP": []string{"private"}}
-	c, _, e := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(edge.URL, "http")+"/rx/remotexapps/test/native/websockify?componentDigest="+pin, head)
+	dialer := websocket.Dialer{Subprotocols: []string{"binary"}}
+	c, _, e := dialer.Dial("ws"+strings.TrimPrefix(edge.URL, "http")+"/rx/remotexapps/test/native/websockify?componentDigest="+pin, head)
 	if e != nil {
 		t.Fatal(e)
 	}
 	defer c.Close()
+	if c.Subprotocol() != "binary" {
+		t.Fatal("browser subprotocol was not acknowledged")
+	}
 	for _, p := range [][]byte{[]byte("RFB 003.008\n"), {1, 1, 185}} {
 		if e = c.WriteMessage(websocket.BinaryMessage, p); e != nil {
 			t.Fatal(e)

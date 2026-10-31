@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/woodegg/remotexapp/internal/testfixture"
 )
 
@@ -170,5 +171,57 @@ func TestNativeGrantCapacityAndExpiredPendingReclamation(t *testing.T) {
 		if fresh.nativeGrants[key] != nil {
 			t.Fatal("grants survived Manager restart")
 		}
+	}
+}
+
+func TestNativeGrantRealUpgradeAcknowledgesProtocolAndRevokeClosesWire(t *testing.T) {
+	m, item, request := grantFixture(t)
+	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Sec-WebSocket-Protocol") != "" {
+			t.Error("grant reached native server")
+		}
+		u := websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return true }}
+		c, err := u.Upgrade(w, r, nil)
+		if err != nil {
+			return
+		}
+		defer c.Close()
+		if c.WriteMessage(websocket.BinaryMessage, []byte("RFB 003.008\n")) != nil {
+			return
+		}
+		for {
+			if _, _, err = c.ReadMessage(); err != nil {
+				return
+			}
+		}
+	}))
+	defer backend.Close()
+	item.GatewayAddr = strings.TrimPrefix(backend.URL, "http://")
+	request = issueGrant(t, m, item, request)
+	front := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r = r.WithContext(context.WithValue(r.Context(), requestIdentityKey{}, "alice"))
+		m.serveNativeInstance(w, r, m.get(item.ID), "native/websockify")
+	}))
+	defer front.Close()
+	protocol := nativeGrantProtocol + request.Token
+	d := websocket.Dialer{Subprotocols: []string{protocol}}
+	c, _, err := d.Dial("ws"+strings.TrimPrefix(front.URL, "http")+"/?sessionGeneration=3&componentDigest="+request.ComponentDigest, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+	if c.Subprotocol() != protocol {
+		t.Fatal("browser grant protocol was not acknowledged")
+	}
+	_, payload, err := c.ReadMessage()
+	if err != nil || string(payload) != "RFB 003.008\n" {
+		t.Fatal("native handshake unavailable", err)
+	}
+	if grantCall(m, item, request, "alice", "revoke").Code != 200 {
+		t.Fatal("revoke failed")
+	}
+	c.SetReadDeadline(time.Now().Add(time.Second))
+	if _, _, err = c.ReadMessage(); err == nil {
+		t.Fatal("revoked socket remained readable")
 	}
 }

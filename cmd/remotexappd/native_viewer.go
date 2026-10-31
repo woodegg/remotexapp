@@ -100,7 +100,15 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 		request.URL.Path, request.URL.RawPath = "/"+member, ""
 	}
 	if channel != nil {
-		proxy.ModifyResponse = func(response *http.Response) error { return m.bindViewerChannel(channel, response) }
+		proxy.ModifyResponse = func(response *http.Response) error {
+			if err := m.bindViewerChannel(channel, response); err != nil {
+				return err
+			}
+			if item.Components.NativeUDP && response.StatusCode == http.StatusSwitchingProtocols {
+				response.Header.Set("Sec-WebSocket-Protocol", r.Header.Get("Sec-WebSocket-Protocol"))
+			}
+			return nil
+		}
 	}
 	proxy.ErrorHandler = func(writer http.ResponseWriter, _ *http.Request, _ error) {
 		writeError(writer, http.StatusBadGateway, "native display unavailable")

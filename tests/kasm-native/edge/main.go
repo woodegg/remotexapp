@@ -193,7 +193,9 @@ func bridge(w http.ResponseWriter, r *http.Request, target *url.URL) {
 		return
 	}
 	defer up.Close()
-	upgrade := websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return true }}
+	// The upstream has already accepted the grant (or legacy binary protocol).
+	// Browsers require the offered subprotocol to be acknowledged explicitly.
+	upgrade := websocket.Upgrader{Subprotocols: dialer.Subprotocols, CheckOrigin: func(*http.Request) bool { return true }}
 	client, err := upgrade.Upgrade(w, r, nil)
 	if err != nil {
 		return

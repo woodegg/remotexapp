@@ -4654,3 +4654,34 @@ policy and Core digest. Explicit descriptors, already-running recovery, changed
 pins/policy and second conflicts remain rejected. No user input or pending
 clipboard action is replayed. This narrows initial connection behavior without
 weakening the Manager's generation checks.
+
+## 2026-10-31 — Native pointer initialization and input evidence correction
+
+Physical UAT reported unusable pointer control and arrow keys. A separate
+synthetic document reproduced browser exceptions on pointer events: the native
+adapter omitted the mouse-button mapping normally installed by Kasm's full UI.
+The adapter must initialize DOM-to-X11 left/middle/right/back/forward mappings
+before input starts. This is owned by the pinned component, without importing
+the full upstream UI or changing native input ownership.
+
+Earlier click-then-type checks observed browser focus and saved text, but did
+not prove remote pointer delivery. Those historical assertions are insufficient
+for pointer acceptance. The new gate requires remote coordinates/button events,
+actual caret or desktop focus, navigation-key readback, and no browser exceptions
+in standalone and embedded Viewers. Arrow-key transport passed an isolated
+editor reproduction; desktop focus must also be validated after pointer repair.
+The original UAT candidate remains unaccepted and is superseded by a new
+component digest after verification. Existing populated sessions keep their
+original pins until a controlled replacement; input is never replayed.
+
+The new live pointer matrix also exposed a separate multi-Viewer paint failure:
+captured native payloads contained truncated JPEGs before browser decoding. The
+upstream shared encoding cache had a comparator that violated strict weak
+ordering and replacement kept an old key's length while changing its allocation.
+Patch 0015-server uses lexicographic rectangle/codec keys and atomically replaces
+the stored length/allocation, freeing the previous allocation. Clearing and
+destruction own the remaining allocations. Applied-source tests reject the old
+ordering and stale-length behavior and check permutations, growing/shrinking
+replacement and ownership with sanitizers. This refines KNA-001's actual-paint
+gate; a successful socket or a single painted Viewer is insufficient. The fix
+does not enable new codecs, UDP or automatic input replay.

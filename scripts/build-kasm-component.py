@@ -54,7 +54,7 @@ def build(inputs, work):
     extract(inputs / 'client.tar.gz', client)
     extract(inputs / 'xorg.tar.xz', server / 'unix/xserver')
     for patch in sorted((COMPONENT / 'patches').glob('*.patch')):
-        target = server if patch.name.startswith('000') else client
+        target = server if patch.name.startswith(('000', '0015-server-')) else client
         run(['patch', '--batch', '-p1', '-i', str(patch)], target)
     run(['cmake', '.', '-DBUILD_VIEWER=OFF', '-DENABLE_GNUTLS=OFF',
          '-DCMAKE_BUILD_TYPE=RelWithDebInfo'], server)
@@ -78,7 +78,7 @@ def build(inputs, work):
     shutil.copyfile(COMPONENT / 'client-entry.js', client / 'remotexapp-entry.js')
     shutil.copyfile(COMPONENT / 'server-messages.mjs', client / 'core/remotexapp-server-messages.mjs')
     run(['node', '--test', *[str(p) for p in sorted((COMPONENT / 'tests').glob('*.test.mjs'))]], client,
-        env=dict(os.environ, KASM_CLIENT_SOURCE=str(client)))
+        env=dict(os.environ, KASM_CLIENT_SOURCE=str(client), KASM_SERVER_SOURCE=str(server)))
     env = dict(os.environ, NODE_PATH=str(deps / 'node_modules'))
     run([str(deps / 'node_modules/.bin/esbuild'), 'remotexapp-entry.js', '--bundle',
          '--format=esm', '--target=es2022', '--loader:.bin=dataurl',
@@ -97,7 +97,9 @@ def package(inputs, work, output):
     run(['strip', '--strip-debug', str(output / 'bin/Xkasmvnc')], work)
     copy(work / 'client.js', 'web/client.js')
     copy(COMPONENT / 'server-messages.mjs', 'sources/server-messages.mjs')
-    for test in sorted((COMPONENT / 'tests').glob('*.test.mjs')):
+    for test in sorted((COMPONENT / 'tests').glob('*')):
+        if test.suffix not in ('.mjs', '.cpp'):
+            continue
         copy(test, 'sources/tests/' + test.name)
     copy(work / 'server/LICENSE.TXT', 'LICENSE.server.txt')
     copy(work / 'client/LICENSE.txt', 'LICENSE.client.txt')

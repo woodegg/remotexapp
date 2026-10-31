@@ -11,6 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Fix the native server encoding cache's ordering and replacement ownership so
+  multiple Viewers do not receive JPEG payloads with stale lengths; add applied
+  source cache tests with address, undefined-behavior and leak checks.
+
 Target: `0.16.0-dev.2`. Development only.
 
 Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
@@ -19,6 +23,9 @@ D2 physical-input UAT checkpoint.
 Development identities are Core `0.16.0-dev.2` and SDK `0.31.0-dev.2`;
 these are not published or UAT-qualified releases.
 
+- Initialize the native adapter's mouse button map without the upstream UI.
+  Missing initialization previously threw on pointer events, preventing remote
+  movement, clicks and window focus despite successful keyboard text tests.
 - Avoid logging typed Unicode mappings in ordinary native server logs.
 - Allow concurrent ID-based Viewer startup to follow one stopped-session
   activation with unchanged pins; explicit descriptors and upgrades remain fenced.

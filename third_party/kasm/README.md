@@ -56,8 +56,14 @@ Audit unbundled runtime libraries on the actual target before use.
 - 0013 makes completed control handlers continue the receive loop, uses the
   bounded transactional codec parser in `server-messages.mjs`, and removes
   printer/smartcard subscriptions. Applied-source tests run during the build.
+- 0015-server fixes encoding-cache key ordering and replaces both the stored
+  length and owned allocation for repeated rectangles. The applied C++ test
+  exercises every ordering of conflicting rectangle keys, growing/shrinking
+  replacements, clearing and destruction under ASan/UBSan with leak detection.
+  It requires `KASM_SERVER_SOURCE`; ordinary CI skips it without that build tree.
 - `client-entry.js` is the only adapter that uses pinned upstream internals.
-  It exposes connection/input policy and native text actions to the SDK;
+  It initializes required DOM-to-X11 mouse-button mapping otherwise supplied
+  by the upstream UI. It exposes connection/input policy and native text actions to the SDK;
   clipboard requires explicit server selection and per-Viewer consent.
 
 The initial component does not enable UDP, audio, rich clipboard, extra

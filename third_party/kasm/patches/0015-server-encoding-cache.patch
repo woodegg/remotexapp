@@ -1,0 +1,51 @@
+--- a/common/rfb/EncCache.h
++++ b/common/rfb/EncCache.h
+@@ -22,6 +22,7 @@
+ #define __RFB_ENCCACHE_H__
+ 
+ #include <map>
++#include <tuple>
+ 
+ #include <rdr/types.h>
+ 
+@@ -36,11 +37,8 @@
+     uint32_t len;
+ 
+     bool operator <(const EncId &other) const {
+-      return type < other.type ||
+-             x < other.x ||
+-             y < other.y ||
+-             w < other.w ||
+-             h < other.h;
++      return std::tie(type, x, y, w, h) <
++             std::tie(other.type, other.x, other.y, other.w, other.h);
+     }
+   };
+ 
+--- a/common/rfb/EncCache.cxx
++++ b/common/rfb/EncCache.cxx
+@@ -27,6 +27,7 @@
+ }
+ 
+ EncCache::~EncCache() {
++  clear();
+ }
+ 
+ void EncCache::clear() {
+@@ -49,7 +50,15 @@
+   id.h = h;
+   id.len = len;
+ 
+-  cache[id] = data;
++  // Length is metadata, not part of key equivalence. Replace the stored key
++  // as well as its allocation, so a repeated rectangle cannot retain a stale
++  // length and truncate the next JPEG (or read past a shorter allocation).
++  std::map<EncId, const void *>::iterator it = cache.find(id);
++  if (it != cache.end()) {
++    free((void *) it->second);
++    cache.erase(it);
++  }
++  cache.insert(std::make_pair(id, data));
+ }
+ 
+ const void *EncCache::get(uint8_t type, uint16_t x, uint16_t y, uint16_t w, uint16_t h,

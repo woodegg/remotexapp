@@ -11,6 +11,9 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Defer native resize notification until initial client capability negotiation
+  finishes, so another Viewer's resize cannot disconnect a joining Viewer early.
+
 - Fix the native server encoding cache's ordering and replacement ownership so
   multiple Viewers do not receive JPEG payloads with stale lengths; add applied
   source cache tests with address, undefined-behavior and leak checks.

@@ -4685,3 +4685,14 @@ ordering and stale-length behavior and check permutations, growing/shrinking
 replacement and ownership with sanitizers. This refines KNA-001's actual-paint
 gate; a successful socket or a single painted Viewer is insufficient. The fix
 does not enable new codecs, UDP or automatic input replay.
+
+The same live matrix exposed a separate initial-connection race: one Viewer
+resized while a joining Viewer had received ServerInit but had not sent
+SetEncodings. The server interpreted unknown resize capability as a refusal.
+Patch 0016-server retains the ServerInit dimensions until the first capability
+message, then publishes the current size using the negotiated capability.
+A first framebuffer request also completes this window for clients that omit
+SetEncodings and use RFB defaults. Actual lack of resize support remains a
+refusal; no user input is queued or replayed. A real browser test delays the
+capability packet, resizes through another Viewer, and checks positive and
+unsupported/omitted-capability outcomes. This extends KNA-001's connection gate.

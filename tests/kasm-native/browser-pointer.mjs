@@ -63,5 +63,6 @@ try {
  await h.evaluate('document.querySelectorAll("iframe")[0].contentDocument.querySelector("#reconnect").click()');await wait(()=>h.evaluate('document.querySelectorAll("iframe")[0].contentDocument.querySelector("#status").textContent.startsWith("Ready")'));await exercise(h,0,'iframe-A-after-reconnect');
 } finally {
  writeFileSync(config.evidenceDirectory+'/pointer-results.json',JSON.stringify(reports,null,2));
+ writeFileSync(config.evidenceDirectory+'/pointer-browser-events.json',JSON.stringify(created.flatMap(c=>c.events.filter(e=>['Runtime.exceptionThrown','Runtime.consoleAPICalled','Network.webSocketFrameError'].includes(e.method))),null,2));
  for(const c of created){c.close();await fetch(config.cdpURL+'/json/close/'+c.page.id);}
 }

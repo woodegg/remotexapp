@@ -54,7 +54,7 @@ def build(inputs, work):
     extract(inputs / 'client.tar.gz', client)
     extract(inputs / 'xorg.tar.xz', server / 'unix/xserver')
     for patch in sorted((COMPONENT / 'patches').glob('*.patch')):
-        target = server if patch.name.startswith(('000', '0015-server-')) else client
+        target = server if patch.name.startswith(('000', '0015-server-', '0016-server-')) else client
         run(['patch', '--batch', '-p1', '-i', str(patch)], target)
     run(['cmake', '.', '-DBUILD_VIEWER=OFF', '-DENABLE_GNUTLS=OFF',
          '-DCMAKE_BUILD_TYPE=RelWithDebInfo'], server)

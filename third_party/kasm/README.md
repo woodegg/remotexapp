@@ -61,6 +61,9 @@ Audit unbundled runtime libraries on the actual target before use.
   exercises every ordering of conflicting rectangle keys, growing/shrinking
   replacements, clearing and destruction under ASan/UBSan with leak detection.
   It requires `KASM_SERVER_SOURCE`; ordinary CI skips it without that build tree.
+- 0016-server defers a resize after ServerInit until the first SetEncodings has
+  supplied the client's capabilities. It then publishes the latest dimensions;
+  a client that actually omits resize support still receives the normal refusal.
 - `client-entry.js` is the only adapter that uses pinned upstream internals.
   It initializes required DOM-to-X11 mouse-button mapping otherwise supplied
   by the upstream UI. It exposes connection/input policy and native text actions to the SDK;

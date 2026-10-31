@@ -12,6 +12,7 @@
 <div class="connection-heading"><h2 id="connections-title">本页连接统计 · Connection stats</h2><span id="connection-summary" role="status">已连接 0 / 2</span></div>
 <div class="connection-cards"><article id="connection-a" class="connection-card" data-state="idle"></article><article id="connection-b" class="connection-card" data-state="idle"></article></div>
 <p>每个 Viewer 独立统计，每秒更新。速率为 WSS 与 UDP 应用有效载荷之和，不含 TLS/DTLS/IP 开销；两种通道分别累计；渲染 FPS 是实际画面更新，静止时可为 0。页面隐藏时暂停采样。</p>
+<p>Ping 每 5 秒采样：UDP 为当前 WebRTC 的 ICE/STUN 往返延迟；WebSocket 为浏览器经 Cloudflare、边缘网关到远端 Kasm 的 RFB Fence 回声 RTT。两者均不是 ICMP ping 或画面响应时间；超时、未启用及过期数据会单独显示。</p>
 </section>
 <div><button id="launch-mousepad">打开 Mousepad</button><button id="launch-desktop">打开测试桌面</button><button id="toggle-a">隐藏 / 显示 A</button><button id="dispose-a">关闭 Viewer A</button><button id="recreate-a">重新打开 A</button></div>
 <div id="status" role="status">加载测试配置…</div>
@@ -26,7 +27,7 @@ let current,config;
 const status=text=>{document.querySelector('#status').textContent=text;};
 const views=new Map();
 let statsTimer;
-const fields={protocol:'协议 · Protocol',down:'下行 · Download',up:'上行 · Upload',fps:'渲染 FPS',resolution:'分辨率',uptime:'连接时长',received:'累计接收',sent:'累计发送',buffered:'待发送数据',wss:'WSS 累计接收',udp:'UDP 累计接收'};
+const fields={protocol:'协议 · Protocol',down:'下行 · Download',up:'上行 · Upload',udpPing:'UDP ping · ICE RTT',wssPing:'WebSocket ping · RTT',fps:'渲染 FPS',resolution:'分辨率',uptime:'连接时长',received:'累计接收',sent:'累计发送',buffered:'待发送数据',wss:'WSS 累计接收',udp:'UDP 累计接收'};
 for(const slot of ['a','b']){
   const card=document.querySelector('#connection-'+slot);
   card.innerHTML=`<header><strong>Viewer ${slot.toUpperCase()}</strong><span class="connection-state" role="status">未打开（Not opened）</span></header><dl class="stat-grid">${Object.entries(fields).map(([key,label])=>`<div><dt>${label}</dt><dd data-stat="${key}">—</dd></div>`).join('')}</dl><small class="connection-detail">尚未打开应用</small>`;
@@ -34,6 +35,7 @@ for(const slot of ['a','b']){
 const text=(el,value)=>{if(el.textContent!==value)el.textContent=value;};
 const bytes=n=>n>=1048576?(n/1048576).toFixed(2)+' MiB':n>=1024?(n/1024).toFixed(1)+' KiB':n+' B';
 const rate=n=>n==null?'—':n>=1e6?(n/1e6).toFixed(2)+' Mbit/s':(n/1e3).toFixed(1)+' kbit/s';
+const ping=s=>s?.state==='ready'?s.rttMs.toFixed(1)+' ms':({pending:'测量中',waiting:'等待采样',timeout:'超时',stale:'数据已过期',inactive:'未启用 / 未连接',unavailable:'不可用'}[s?.state]||'—');
 const duration=ms=>{const n=Math.floor(ms/1000);return `${Math.floor(n/3600)}:${String(Math.floor(n/60)%60).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;};
 const labels={idle:'未打开（Not opened）',loading:'加载中（Loading）',connecting:'连接中（Connecting）',ready:'已连接（Connected）',disconnected:'已断开（Disconnected）',failed:'连接失败（Failed）',disposed:'已关闭（Closed）',unknown:'状态未知（Unknown）'};
 function render(slot,item){
@@ -42,6 +44,7 @@ function render(slot,item){
   text(card.querySelector('.connection-state'),labels[item.state]||labels.unknown);
   const s=item.snapshot,active=item.state==='ready',available=active&&s?.available;
   const values={protocol:active?(s?.transport||item.transport||'未知').toUpperCase():'—',down:rate(item.rates?.down),up:rate(item.rates?.up),fps:item.rates==null?'—':item.rates.fps.toFixed(1),resolution:available?`${s.width} × ${s.height}`:'—',uptime:active&&s?.connectedForMs!=null?duration(s.connectedForMs):'—',received:available?bytes(s.receivedBytes+(s.udpReceivedBytes||0)):'—',wss:available?bytes(s.receivedBytes):'—',udp:available?bytes(s.udpReceivedBytes||0):'—',sent:available?bytes(s.sentBytes):'—',buffered:available?bytes(s.bufferedBytes):'—'};
+  values.udpPing=active?ping(s?.latency?.udp):'—';values.wssPing=active?ping(s?.latency?.wss):'—';
   for(const [key,value]of Object.entries(values))text(card.querySelector(`[data-stat="${key}"]`),value);
   const details=[item.detail,active&&!available?'此组件未提供实时统计':available&&!item.rates?'正在采样…':'',item.el&&document.querySelector('#slot-'+slot).hidden?'画面已隐藏；连接状态仍独立更新':''].filter(Boolean);
   text(card.querySelector('.connection-detail'),details.join(' · '));

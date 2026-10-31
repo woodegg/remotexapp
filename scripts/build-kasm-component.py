@@ -86,6 +86,7 @@ def build(inputs, work, platform='ubuntu', transport='wss'):
     shutil.copyfile(COMPONENT / 'client-entry.js', client / 'remotexapp-entry.js')
     shutil.copyfile(COMPONENT / 'server-messages.mjs', client / 'core/remotexapp-server-messages.mjs')
     shutil.copyfile(COMPONENT / 'udp.mjs', client / 'core/remotexapp-udp.mjs')
+    shutil.copyfile(COMPONENT / 'latency.mjs', client / 'core/remotexapp-latency.mjs')
     run(['node', '--test', *[str(p) for p in sorted((COMPONENT / 'tests').glob('*.test.mjs'))]], client,
         env=dict(os.environ, KASM_CLIENT_SOURCE=str(client), KASM_SERVER_SOURCE=str(server), KASM_TRANSPORT=transport))
     env = dict(os.environ, NODE_PATH=str(deps / 'node_modules'))
@@ -108,6 +109,7 @@ def package(inputs, work, output, platform='ubuntu', transport='wss'):
     copy(work / 'client.js', 'web/client.js')
     copy(COMPONENT / 'server-messages.mjs', 'sources/server-messages.mjs')
     copy(COMPONENT / 'udp.mjs', 'sources/udp.mjs')
+    copy(COMPONENT / 'latency.mjs', 'sources/latency.mjs')
     for test in sorted((COMPONENT / 'tests').glob('*')):
         if test.suffix not in ('.mjs', '.cpp'):
             continue

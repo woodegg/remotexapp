@@ -8,6 +8,13 @@ Viewer grant contract plus an outside-container trusted edge. See
 [bounded UDP UAT](../../docs/native-udp-uat.md). Neither profile qualifies audio,
 QOI workers or rich clipboard.
 
+Both profiles include patch 0022 and the latency adapter. Explicit diagnostic
+sampling uses native RFB Fence echo for WebSocket RTT and selected-pair ICE
+statistics for UDP RTT, with bounded timeouts, stale-result rejection and
+connection retirement. Native server binaries and user-activity policy are
+unchanged by this client diagnostic extension. See the
+[SDK statistics contract](../../docs/browser-sdk.md#native-connection-statistics-development-sdk-0310-dev3).
+
 This directory is the D1 integration recipe, not an upstream release or a
 qualified RemoteXApp distribution. The default provider remains TigerVNC.
 Server and browser client form one separately installed, manifest-pinned pair.

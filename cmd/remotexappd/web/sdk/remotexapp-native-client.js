@@ -17,6 +17,15 @@ function abortable(promise, signal) {
   });
 }
 
+function latencySample(raw) {
+  const states = ['waiting','pending','ready','timeout','stale','inactive','unavailable'];
+  if (!raw || !states.includes(raw.state)) return {state:'unavailable'};
+  const age = Number.isFinite(raw.ageMs) && raw.ageMs >= 0;
+  if (raw.state === 'ready') return age && Number.isFinite(raw.rttMs) && raw.rttMs >= 0
+    ? {state:'ready', rttMs:raw.rttMs, ageMs:raw.ageMs} : {state:'unavailable'};
+  return {state:raw.state, ...(raw.state === 'stale' && age ? {ageMs:raw.ageMs} : {})};
+}
+
 /** Minimal opt-in Kasm Viewer. Each object owns one display attachment only. */
 export class RemoteXAppNativeClient extends EventTarget {
   constructor({ container, manager = new RemoteXAppManager(), timeout = 90000, keyboardPolicy, preferUDP = true } = {}) {
@@ -31,7 +40,7 @@ export class RemoteXAppNativeClient extends EventTarget {
     this.clipboardEnabled = false;
     this.state = 'disconnected';
     this.capabilities = Object.freeze({ display:'kasm-wss-v1', pointer:true, keyboard:true,
-      clipboard:false, keyboardPolicy:false, clipboardMaxBytes:0, statistics:false, programmaticText:false, audio:false, udp:false });
+      clipboard:false, keyboardPolicy:false, clipboardMaxBytes:0, statistics:false, latency:false, programmaticText:false, audio:false, udp:false });
     this.preferUDP = !!preferUDP;
     this._viewerId = globalThis.crypto?.randomUUID?.() || `viewer-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     this._epoch = 0;
@@ -109,7 +118,8 @@ export class RemoteXAppNativeClient extends EventTarget {
       const udp = features.udp === true && prepared.nativeTransport?.available === true;
       const clipboard = prepared.nativeClipboard === 'text' && features.clipboardText === true;
       this.capabilities = Object.freeze({...this.capabilities, keyboardPolicy:features.keyboardPolicy === true,
-        clipboard, udp, clipboardMaxBytes:clipboard ? features.clipboardMaxBytes : 0, statistics:features.statistics === true});
+        clipboard, udp, clipboardMaxBytes:clipboard ? features.clipboardMaxBytes : 0, statistics:features.statistics === true,
+        latency:features.latency === true && typeof NativeDisplay.prototype.measureLatency === 'function'});
       const display = this._display = new NativeDisplay(this.container, socketURL.href, {
         resize:prepared.effectivePolicy?.display?.allowClientResize === true, clipboard, keyboardPolicy:this._keyboardPolicy,
         udp:udp && this.preferUDP, protocols:grant ? [`remotexapp-grant.${grant.token}`] : [] });
@@ -209,9 +219,17 @@ export class RemoteXAppNativeClient extends EventTarget {
     const udpKeys = ['udpReceivedBytes','udpPackets','udpRectangles'];
     const udp = this.capabilities.udp && udpKeys.every(key => Number.isSafeInteger(raw[key]) && raw[key] >= 0);
     return {...snapshot, available:true, ...Object.fromEntries(keys.map(key => [key, raw[key]])),
+      ...(this.capabilities.latency ? {latency:{wss:latencySample(raw.latency?.wss),
+        udp:udp ? latencySample(raw.latency?.udp) : {state:'inactive'}}} : {}),
       ...(udp ? {...Object.fromEntries(udpKeys.map(key => [key,raw[key]])),
         transport:raw.screenTransport === 'webrtc-udp' && raw.udpRectangles > 0 ? 'webrtc-udp' : this._transport,
         controlTransport:this._transport, udpState:raw.udpState, udpReason:raw.udpReason} : {})};
+  }
+
+  /** Explicit bounded RTT sampling; getStats() remains passive. */
+  measureLatency() {
+    if (this.state !== 'ready' || !this.capabilities.latency) return false;
+    return this._display.measureLatency();
   }
 
 

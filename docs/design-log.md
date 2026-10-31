@@ -4773,3 +4773,23 @@ write buffer so the WebSocket library does not emit continuation frames. This
 also stays below the native decoder's 65535-byte frame limit. A raw-frame bridge
 regression verifies the complete 64 KiB clipboard and subsequent control bytes,
 rather than relying on a WebSocket receiver that silently rejoins fragments.
+
+
+## 2026-10-31 — Add explicit per-Viewer latency diagnostics
+
+The owner requested UDP and WebSocket ping on UAT (Issue #36). Extend the
+existing passive statistics contract with a separate explicit sampling method.
+WebSocket probes use correlated native RFB Fence echo over the current connection
+to Kasm; UDP samples use the current selected ICE pair's STUN RTT. Do not label
+these ICMP ping or input-to-paint latency, and do not substitute HTTP timing.
+
+Allow at most one sample per five seconds and one outstanding request per
+mechanism. Five-second timeouts, ten-second freshness, peer identity and Viewer
+epoch retirement prevent hung or delayed work from publishing misleading values.
+Known late Fence echoes are ignored without disconnecting a healthy Viewer;
+unrelated Fence responses retain the native parser's rejection behavior.
+Expose numeric RTT/age and bounded status only. The UAT/native page initiates
+sampling only while visible; SDK construction and getStats remain passive.
+Native Fence processing does not update user-activity timestamps or App leases.
+The pinned server binary can be reused, but the changed client belongs in a new
+immutable component manifest; never edit an installed component in place.

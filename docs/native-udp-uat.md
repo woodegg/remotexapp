@@ -37,6 +37,11 @@ UDP-capable component and deployment-owned endpoint catalog.
   bounded retry. Report actual datagram/paint evidence, screen transport and
   separate WSS/UDP counters; do not label configured preference or ICE state alone
   as UDP success. Audio and rich clipboard are outside this slice.
+- Per-Viewer latency diagnostics explicitly sample WebSocket Fence echo through
+  the existing connection to Kasm and read the selected ICE pair's UDP RTT.
+  Bound sampling and pending work; retire it with the connection. Keep the stats
+  getter passive, hide expired samples, and expose neither addresses nor raw
+  ICE reports. Fence probes do not update native user-activity timestamps.
 
 A native UDP manifest schema must fence older Managers and preserve locked
 endpoint identity through restart/recovery. Old WSS manifests remain supported.

@@ -5,16 +5,18 @@ import { RemoteXAppNativeClient } from './remotexapp-native-client.js';
 globalThis.CustomEvent ||= class extends Event { constructor(type,options) { super(type); this.detail = options?.detail; } };
 globalThis.location = new URL('https://viewer.example.test/remotexapps/app/kiosk.html');
 
-function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, statistics = false, udp = false } = {}) {
+function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, statistics = false, udp = false, latency = false } = {}) {
   const state = { id:'app', displayProvider:'kasm', displayComponentDigest:'a'.repeat(64), sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
   if (udp) state.nativeTransport={available:true,grantRequired:true,policy:'prefer-udp'};
   const calls=[];
   state.nativeClipboard = clipboard ? "text" : undefined;
   let display, reads = 0;
   class Display extends EventTarget {
-    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardMaxBytes:65536,statistics,udp};
+    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardMaxBytes:65536,statistics,udp,latency};
     counters = {receivedBytes:100, sentBytes:20, bufferedBytes:0, renderedFrames:2, width:1024, height:768};
     getStats() { return this.counters; }
+    probes = 0;
+    measureLatency() {this.probes++;return true;}
     sent = [];
     sendClipboardText(text) { this.sent.push(text); }
     keyboardPolicy = {profile:"unknown",mode:"local",bindings:[]};
@@ -241,4 +243,21 @@ test('UDP renewal failure retires the display and does not renew a replacement',
   await new Promise(resolve=>queueMicrotask(resolve));await new Promise(resolve=>queueMicrotask(resolve));
   assert.equal(f.viewer.state,'failed');assert.equal(old.closed,1);
   assert.equal(f.viewer.getStats().code,'grant-expired');f.viewer.dispose();
+});
+
+test('RTT sampling is explicit, capability-gated, content-free and reset on reconnect', async () => {
+  const old=fixture({statistics:true});await old.viewer.connect('app');assert.equal(old.viewer.measureLatency(),false);old.viewer.dispose();
+  const f=fixture({statistics:true,udp:true,latency:true});assert.equal(f.viewer.measureLatency(),false);await f.viewer.connect('app');
+  Object.assign(f.display.counters,{udpReceivedBytes:5,udpPackets:1,udpRectangles:1,latency:{
+    wss:{state:'ready',rttMs:0,ageMs:2,token:'must-not-leak'},udp:{state:'stale',ageMs:12000,candidates:['must-not-leak']}}});
+  assert.deepEqual(f.viewer.getStats().latency,{wss:{state:'ready',rttMs:0,ageMs:2},udp:{state:'stale',ageMs:12000}});
+  assert.equal(f.display.probes,0);assert.equal(f.viewer.measureLatency(),true);assert.equal(f.display.probes,1);
+  for (const raw of [null,{state:'bad'},{state:'ready',rttMs:NaN,ageMs:0},{state:'ready',rttMs:1,ageMs:-1}]) {
+    f.display.counters.latency={wss:raw,udp:raw};assert.equal(f.viewer.getStats().latency.wss.state,'unavailable');
+  }
+  for (const state of ['waiting','pending','timeout','inactive','unavailable']) {
+    f.display.counters.latency={wss:{state,extra:'private'}};assert.deepEqual(f.viewer.getStats().latency.wss,{state});
+  }
+  await f.viewer.reconnect();assert.deepEqual(f.viewer.getStats().latency.wss,{state:'unavailable'});
+  f.viewer.disconnect();assert.equal(f.viewer.getStats().latency,undefined);assert.equal(f.viewer.measureLatency(),false);f.viewer.dispose();
 });

@@ -11,6 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Show separate per-Viewer UDP ICE RTT and end-to-end WebSocket Fence RTT on
+  UAT and native Viewer pages. Explicit sampling is bounded to once per five
+  seconds, pauses on hidden pages, and marks timeout/stale/unavailable results.
+
 - Preserve the full 64 KiB native text clipboard through the trusted edge by
   sending validated streams as bounded independent binary WebSocket messages.
 

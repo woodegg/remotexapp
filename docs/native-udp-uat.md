@@ -85,3 +85,5 @@ acceptance and a running experiment is not a test pass.
 The [Alpine UDP qualification record](../tests/kasm-native/UDP.md) records
 independent candidate hashes, actual live checks, integration defects, fixture
 corrections, cleanup and remaining human/long-duration scope.
+The [second-region record](../tests/kasm-native/UDP-CHINA.md) covers deployment
+behind an upstream EIP without rebuilding the qualified development artifacts.

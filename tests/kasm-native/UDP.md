@@ -7,6 +7,10 @@ The [machine-readable record](results-udp-20261031.json) identifies the exact
 independent Core, component and edge artifacts. These are UAT candidates, not a
 release or a production deployment recommendation.
 
+The [second-region qualification](UDP-CHINA.md) repeats the bounded live checks
+on a fresh Alpine fixture behind an upstream cloud EIP, using these same archive
+bytes. Its separate result record retains regional differences and failed attempts.
+
 ## Path and ownership
 
 The browser loads pinned HTML, SDK and component code through authenticated

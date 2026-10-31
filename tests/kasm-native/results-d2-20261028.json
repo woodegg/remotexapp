@@ -126,12 +126,12 @@
       "policyPinsGenerationAndProcessesRetained": true
     },
     "systemdPaint": {
-      "status": "Ready · WSS",
+      "status": "Ready \u00b7 WSS",
       "colors": 6974,
       "clipboardAvailable": true
     },
     "standalonePaint": {
-      "status": "Ready · WSS",
+      "status": "Ready \u00b7 WSS",
       "colors": 6975,
       "clipboardAvailable": true
     },
@@ -199,5 +199,12 @@
     "Programmatic text with target/application acknowledgement",
     "Audio and UDP",
     "Other browsers, performance/resource soak, non-systemd PID 1, distribution and post-merge release"
+  ],
+  "corrections": [
+    {
+      "date": "2026-10-31",
+      "record": "results-d2-input-20261031.json",
+      "scope": "Earlier click-then-type evidence did not prove remote pointer delivery; pointer acceptance is superseded. Original D2 candidate failed physical UAT."
+    }
   ]
 }

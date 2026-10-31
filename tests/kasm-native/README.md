@@ -1,5 +1,11 @@
 # Native Kasm qualification
 
+**2026-10-31 correction:** the earlier D1/D2 click-then-type checks did not prove
+remote pointer delivery. Physical UAT found missing pointer initialization, and
+the expanded matrix also found a multi-Viewer encoding-cache defect. The original
+D2 candidate is UAT-failed. See [the corrective checkpoint](D2-UAT.md#2026-10-31-input-correction)
+for replacement evidence and the remaining physical UAT gate.
+
 The next bounded input/clipboard checkpoint is recorded in
 [D2 automated evidence and physical UAT instructions](D2-UAT.md). It does not
 change the D1 scope or imply full D2 acceptance.

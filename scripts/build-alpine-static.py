@@ -46,6 +46,12 @@ def main():
         parser.error('run in the dedicated Alpine build environment')
     if subprocess.check_output(['go', 'env', 'GOVERSION'], text=True).strip() != 'go1.27.3':
         parser.error('Go 1.27.3 required')
+    revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    epoch = int(subprocess.check_output(['git', 'log', '-1', '--format=%ct'], cwd=ROOT, text=True))
+    if revision != args.source_commit or epoch != args.source_epoch:
+        parser.error('source commit/epoch must match the actual Git checkout')
+    if subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip():
+        parser.error('build from a clean checkout with outputs outside the repository')
     inputs, work, output = (p.resolve() for p in (args.inputs, args.work, args.output))
     if work.exists() or output.exists():
         parser.error('work and output must be new directories')
@@ -78,12 +84,15 @@ def main():
     for name in ['remotexappd', 'novnc-input', 'remotexapp-status', 'remotexapp-operator-helper']:
         cgo = name == 'novnc-input'
         env = dict(os.environ, CGO_ENABLED='1' if cgo else '0', CGO_LDFLAGS='-L' + str(prefix / 'lib'))
-        run(['go', 'build', '-buildvcs=false', '-trimpath', '-tags=x11_static',
+        run(['go', 'build', '-buildvcs=true', '-trimpath', '-tags=x11_static',
              '-ldflags', flags + (' -linkmode external -extldflags -static' if cgo else ''),
              '-o', str(binaries / name), './cmd/' + name], ROOT, env=env)
         elf = subprocess.check_output(['readelf', '-l', '-d', str(binaries / name)], text=True)
         if 'INTERP' in elf or '(NEEDED)' in elf:
             raise RuntimeError(name + ' has a dynamic interpreter or dependency')
+        buildinfo = subprocess.check_output(['go', 'version', '-m', str(binaries / name)], text=True)
+        if 'vcs.revision=' + args.source_commit not in buildinfo or 'vcs.modified=false' not in buildinfo:
+            raise RuntimeError(name + ' does not retain the clean source identity')
         records[name] = {'sha256': sha(binaries / name), 'interpreter': False, 'dynamicDependencies': []}
     shutil.copyfile(Path(__file__), sources / Path(__file__).name)
     manifest = {'status': 'experimental-not-a-release', 'sourceCommit': args.source_commit,

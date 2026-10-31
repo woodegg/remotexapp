@@ -14,6 +14,8 @@ implementation; move them to a version section when publishing a release.
 - Add an experimental Alpine static Core build recipe and lightweight Openbox
   UAT fixtures for the existing standalone lifecycle backend. Keep Kasm as a
   separately pinned Alpine-native component with declared dynamic dependencies.
+  Resolve the persistent server anchor through the system PATH so Alpine's
+  `/bin/sleep` works, and retain verified clean Git identity in static binaries.
 
 - Show per-Viewer connection state, actual transport, payload rates, painted-frame
   rate, resolution, uptime and traffic totals on the UAT page. Add read-only

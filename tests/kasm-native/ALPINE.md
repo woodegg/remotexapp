@@ -39,6 +39,8 @@ The build needs static X11, XCB, XTest, Xext, Xdmcp and xkbcommon libraries;
 Xau, Xinerama and libxdo are built from those checked sources. Preserve source
 archives, dependency versions and notices alongside the candidate. Supply the
 exact source commit and its epoch; regenerate web assets before building.
+Build from a clean Git checkout, not an archive without Git metadata: the
+recipe verifies the commit/epoch and each binary's embedded VCS identity.
 Use new work and output directories. Builds need repository/registry access
 unless all source inputs, Go modules and npm dependencies are cached.
 

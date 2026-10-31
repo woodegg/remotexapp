@@ -20,7 +20,7 @@ export default class NativeDisplay extends EventTarget {
     this.#input.spellcheck = false;
     this.#input.style.cssText = 'position:absolute;left:1px;top:1px;width:1px;height:1px;opacity:0;pointer-events:none';
     container.appendChild(this.#input);
-    const rfb = this.#rfb = new RFB(container, this.#input, url, { shared:true, videoRenderingMode:'canvas2d' }, protocols);
+    const rfb = this.#rfb = new RFB(container, this.#input, url, { shared:true, videoRenderingMode:'canvas2d', wsProtocols:protocols.length ? protocols : ['binary'] }, []);
     // Upstream initializes this in its full UI. The standalone adapter owns
     // the same required DOM-button -> X11-button mapping before input starts.
     rfb.mouseButtonMapper = new MouseButtonMapper();

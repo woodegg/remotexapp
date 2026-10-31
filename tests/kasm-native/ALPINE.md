@@ -89,3 +89,39 @@ audience/required policy into the destination tunnel, change that hostname's
 proxied DNS record, and test authenticated and anonymous requests. Then remove
 only its old rule. Preserve shared tunnels and unrelated routes. Save private
 configuration snapshots and rollback instructions outside this public repo.
+
+## 2026-10-31 qualification
+
+[Recorded results](results-alpine-20261031.json) identify the static Core at
+`49727b761da1`, the separately pinned native Kasm component, and both sealed
+App Packages. The editor layout update is App version `1.0.1` from
+`e7cdd6db8739`; it does not replace the tested Core binaries. The clean build
+environment reported Alpine 3.24.2; the deployment target reported 3.24.3.
+
+The live standalone target passed 21 connection-statistics assertions,
+14 text/clipboard assertions, five malformed-wire cases, three resize
+negotiation cases, and five complete pointer/keyboard scenarios. Two real
+desktop editors also passed focus, four-arrow navigation and saved-file
+readback. The static input Go tests and 35 applied-component tests passed.
+
+After a Manager SIGKILL, runit restarted it and Core adopted the exact existing
+component identities, generation and account bus. Three App start/stop cycles
+removed their owned cgroups without disturbing the desktop. An actual container
+restart recreated supervision, runtime permissions and cgroup delegation;
+saved files survived and two Viewers painted the on-attach desktop again.
+
+An authenticated public Chrome connected two Viewers to both the editor and
+desktop through the destination edge tunnel. Anonymous root, API, forged
+identity and WebSocket requests remained behind Access. The same checks passed
+after retiring the old hostname route and local ingress. Shared connectors and
+unrelated routes were preserved. Raw fleet configuration and rollback snapshots
+remain in private operational evidence.
+
+WAN testing also corrected two test assumptions: desktop checks now wait for
+the new runtime instead of accepting the previous editor, and the disabled
+clipboard test observes actual event delivery instead of assuming a fixed
+delay. These corrections do not change application behavior.
+
+Physical keyboard/IME UAT is still required on the new target. This run does
+not qualify UDP, audio, host-application integration, a long soak, systemd on Alpine or a
+formal release. The historical D2 evidence remains scoped to its own artifacts.

@@ -16,6 +16,9 @@ import (
 )
 
 type config struct {
+	udpEndpointsFile     string
+	udpEndpoints         []udpEndpoint
+	nativeUDPCapable     bool
 	nativeClipboard      bool
 	listen               string
 	stateDir             string

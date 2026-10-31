@@ -1,5 +1,13 @@
 # Experimental Kasm WSS component
 
+The default recipe remains WSS. The explicitly selected `--transport udp`
+development profile adds patches 0020/0021, authenticated native UDP negotiation,
+loopback-only UDP sockets, bounded client reassembly and measured transport
+counters. It emits `kasm-udp-text-v1`; it requires Core's bounded endpoint and
+Viewer grant contract plus an outside-container trusted edge. See
+[bounded UDP UAT](../../docs/native-udp-uat.md). Neither profile qualifies audio,
+QOI workers or rich clipboard.
+
 This directory is the D1 integration recipe, not an upstream release or a
 qualified RemoteXApp distribution. The default provider remains TigerVNC.
 Server and browser client form one separately installed, manifest-pinned pair.

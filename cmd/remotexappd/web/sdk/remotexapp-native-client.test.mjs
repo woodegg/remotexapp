@@ -5,20 +5,23 @@ import { RemoteXAppNativeClient } from './remotexapp-native-client.js';
 globalThis.CustomEvent ||= class extends Event { constructor(type,options) { super(type); this.detail = options?.detail; } };
 globalThis.location = new URL('https://viewer.example.test/remotexapps/app/kiosk.html');
 
-function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, statistics = false } = {}) {
+function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, statistics = false, udp = false } = {}) {
   const state = { id:'app', displayProvider:'kasm', displayComponentDigest:'a'.repeat(64), sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
+  if (udp) state.nativeTransport={available:true,grantRequired:true,policy:'prefer-udp'};
+  const calls=[];
   state.nativeClipboard = clipboard ? "text" : undefined;
   let display, reads = 0;
   class Display extends EventTarget {
-    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardMaxBytes:65536,statistics};
+    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardMaxBytes:65536,statistics,udp};
     counters = {receivedBytes:100, sentBytes:20, bufferedBytes:0, renderedFrames:2, width:1024, height:768};
     getStats() { return this.counters; }
     sent = [];
     sendClipboardText(text) { this.sent.push(text); }
     keyboardPolicy = {profile:"unknown",mode:"local",bindings:[]};
     configureKeyboard(settings) { this.keyboardPolicy = settings;return true; }
-    constructor(container,url) {
-      super(); display = this; this.url = url; this.closed = 0;
+    configureTransport(value) {this.preferUDP=value;}
+    constructor(container,url,options) {
+      super(); display = this; this.url = url; this.options=options; this.closed = 0;
       queueMicrotask(() => { this.dispatchEvent(new Event('connect')); if (frame) this.dispatchEvent(new Event('frame')); });
     }
     disconnect() { this.closed++; this.dispatchEvent(new Event('disconnect')); }
@@ -28,13 +31,16 @@ function fixture({ ready = true, frame = true, timeout = 200, clipboard = false,
     getInstance:async () => { reads++; return structuredClone(state); },
     request:async (path,options) => {
       assert.equal(options.body.sessionGeneration,3);
+      calls.push({path,options});
+      if(path.endsWith('/grant')) return {token:'b'.repeat(64),expiresInMs:90000,renewAfterMs:20000};
+      if(path.endsWith('/lease') || path.endsWith('/revoke')) return {status:'ok'};
       assert.equal(path,'/remotexapps/app/native/prepare');
       return structuredClone(state);
     },
   };
   const viewer = new RemoteXAppNativeClient({ container:{ replaceChildren(){} }, manager, timeout });
   viewer._loadDisplay = async () => ({ default:Display });
-  return { viewer,state,get display(){return display;},get reads(){return reads;} };
+  return { viewer,state,calls,get display(){return display;},get reads(){return reads;} };
 }
 
 test('native ready needs current App and painted frame; dispose owns only one attachment', async () => {
@@ -209,4 +215,30 @@ test('old components and malformed statistics report unavailable instead of fabr
     f.display.counters=value;assert.equal(f.viewer.getStats().available,false);
   }
   f.viewer.dispose();
+});
+
+
+test('UDP uses a header grant, actual bytes/paint status, and per-Viewer preference',async()=>{
+  const f=fixture({udp:true,statistics:true});await f.viewer.connect('app');
+  assert.equal(f.viewer.capabilities.udp,true);
+  assert.equal(f.display.options.udp,true);
+  assert.deepEqual(f.display.options.protocols,['remotexapp-grant.'+'b'.repeat(64)]);
+  assert.equal(f.display.url.includes('b'.repeat(64)),false);
+  Object.assign(f.display.counters,{udpReceivedBytes:300,udpPackets:3,udpRectangles:0,screenTransport:'webrtc-udp',udpState:'udp'});
+  assert.equal(f.viewer.getStats().transport,'wss');
+  f.display.counters.udpRectangles=1;
+  assert.equal(f.viewer.getStats().transport,'webrtc-udp');
+  f.viewer.configureTransport(false);assert.equal(f.display.preferUDP,false);
+  f.viewer.dispose();assert.equal(f.calls.at(-1).path,'/remotexapps/app/native/revoke');
+});
+test('UDP renewal failure retires the display and does not renew a replacement',async t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const f=fixture({udp:true});await f.viewer.connect('app');
+  const old=f.display;
+  const request=f.viewer.manager.request;
+  f.viewer.manager.request=async(path,options)=>{if(path.endsWith('/lease'))throw Error('authorization lost');return request(path,options);};
+  t.mock.timers.tick(20000);
+  await new Promise(resolve=>queueMicrotask(resolve));await new Promise(resolve=>queueMicrotask(resolve));
+  assert.equal(f.viewer.state,'failed');assert.equal(old.closed,1);
+  assert.equal(f.viewer.getStats().code,'grant-expired');f.viewer.dispose();
 });

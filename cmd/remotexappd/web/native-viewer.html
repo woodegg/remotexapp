@@ -6,7 +6,7 @@
 <style>
 html,body{margin:0;height:100%;background:#17202c;color:#edf2fa;font:14px system-ui}body{display:flex;flex-direction:column}header{padding:10px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}button,select{padding:6px 12px}details{padding:0 10px 10px}label{margin-right:12px}#display{flex:1;min-height:0;overflow:hidden;position:relative}#clipboard-status{margin-left:12px}small{display:block;margin-top:8px;color:#b9c7db}
 </style>
-<header><strong>RemoteXApp</strong><span id="status" role="status">Connecting…</span><button id="reconnect">Reconnect</button><button id="disconnect">Disconnect</button></header>
+<header><strong>RemoteXApp</strong><span id="status" role="status">Connecting…</span><label><input type="checkbox" id="prefer-udp" checked disabled>Prefer WebRTC UDP</label><span id="transport-detail"></span><button id="reconnect">Reconnect</button><button id="disconnect">Disconnect</button></header>
 <details><summary>Keyboard and clipboard</summary>
 <label>Local input shortcuts <select id="keyboard-profile"><option value="unknown">No preset / unknown Linux</option><option value="windows">Windows · Win+Space</option><option value="mac">macOS · Control+Space</option><option value="gnome">Linux GNOME · Super+Space</option><option value="fcitx">Linux Fcitx · Control+Space</option></select></label>
 <span id="keyboard-status" role="status"></span>
@@ -27,6 +27,7 @@ const profile = document.querySelector('#keyboard-profile'), enable = document.q
 const message = text => { document.querySelector('#clipboard-status').textContent = text; };
 const controls = () => {
   const ready = viewer.state === 'ready';
+  document.querySelector('#prefer-udp').disabled = !ready || !viewer.capabilities.udp;
   profile.disabled = !ready || !viewer.capabilities.keyboardPolicy;
   enable.disabled = !ready || !viewer.capabilities.clipboard;
   enable.checked = viewer.clipboardEnabled;
@@ -56,6 +57,19 @@ const connect = () => viewer.connect(id).catch(() => {});
 document.querySelector('#reconnect').onclick = connect;
 document.querySelector('#disconnect').onclick = () => viewer.disconnect();
 window.addEventListener('pagehide', () => viewer.dispose(), { once:true });
+const udp = document.querySelector('#prefer-udp');
+udp.onchange = () => { try {viewer.configureTransport(udp.checked);} catch {udp.checked=viewer.preferUDP;} };
+function transport() {
+  const s=viewer.getStats();
+  if (s.state !== 'ready') return;
+  document.querySelector('#status').textContent=`Ready · ${(s.transport || 'wss').toUpperCase()}`;
+  document.querySelector('#transport-detail').textContent=viewer.capabilities.udp
+    ? `Control: ${(s.controlTransport || 'wss').toUpperCase()} · UDP: ${s.udpState || 'waiting'} · ${s.udpReceivedBytes || 0} bytes`
+    : viewer.instance?.nativeTransport?.reason || 'WSS component';
+}
+const transportTimer=setInterval(transport,1000);
+viewer.addEventListener('transportchange',transport);
+window.addEventListener('pagehide',()=>clearInterval(transportTimer),{once:true});
 controls();connect();
 </script>
 </html>

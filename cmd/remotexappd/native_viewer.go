@@ -12,6 +12,10 @@ import (
 // handler. This allowlist prevents the upstream server's management API from
 // becoming part of the public Viewer surface.
 func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, item *instance, route string) {
+	if route == "native/grant" || route == "native/lease" || route == "native/revoke" {
+		m.serveNativeGrant(w, r, item, strings.TrimPrefix(route, "native/"))
+		return
+	}
 	if route == "native/prepare" {
 		m.prepareNativeViewer(w, r, item.ID)
 		return
@@ -48,13 +52,36 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 			writeError(w, http.StatusBadRequest, "WebSocket upgrade required")
 			return
 		}
+		var grant [32]byte
 		var err error
+		if item.Components.NativeUDP {
+			grant, err = m.claimNativeGrant(r, item)
+			if err != nil {
+				writeError(w, http.StatusForbidden, "native Viewer grant rejected")
+				return
+			}
+		}
+		if item.Components.NativeUDP {
+			defer func() {
+				m.mu.Lock()
+				defer m.mu.Unlock()
+				if g := m.nativeGrants[grant]; g != nil && g.channel == nil {
+					delete(m.nativeGrants, grant)
+				}
+			}()
+		}
 		channel, r, err = m.openViewerChannel(item.ID, true, r)
 		if err != nil {
 			writeError(w, http.StatusConflict, "Viewer channel unavailable: "+err.Error())
 			return
 		}
 		defer m.closeViewerChannel(channel)
+		if item.Components.NativeUDP {
+			if err := m.attachNativeGrant(grant, channel); err != nil {
+				writeError(w, http.StatusForbidden, "native Viewer grant retired")
+				return
+			}
+		}
 	} else if r.Method != http.MethodGet && r.Method != http.MethodHead {
 		methodNotAllowed(w, "GET, HEAD")
 		return
@@ -67,6 +94,9 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 	director := proxy.Director
 	proxy.Director = func(request *http.Request) {
 		director(request)
+		if item.Components.NativeUDP {
+			request.Header.Del("Sec-WebSocket-Protocol")
+		}
 		request.URL.Path, request.URL.RawPath = "/"+member, ""
 	}
 	if channel != nil {

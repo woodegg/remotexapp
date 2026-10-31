@@ -37,6 +37,10 @@ UDP-capable component and deployment-owned endpoint catalog.
 
 A native UDP manifest schema must fence older Managers and preserve locked
 endpoint identity through restart/recovery. Old WSS manifests remain supported.
+Schema 5 records UDP capability, the slot and its epoch; schema 4 remains WSS.
+Changing between these transport profiles requires a stopped, scoped migration.
+An ordinary same-profile Core upgrade preserves the runtime's locked endpoint;
+it cannot silently acquire another slot or widen the deployment's network policy.
 Normal stop must verify old owned component termination before its slot can be
 reassigned; stale credentials and delayed datagrams must fail against the new
 negotiation. Proxy routing state is not authorization; test reuse with old packets
@@ -53,6 +57,21 @@ MTU/NAT changes, proxy/Manager restart and actual container reboot. Keep public
 UDP restricted to measured test sources until this candidate's negative and
 resource checks pass. Inspect both host and container evidence without publishing
 raw SDP, credentials, client addresses or private fleet configuration.
+
+The development recipe accepts `--transport udp`; its default remains `wss`.
+Only the UDP build applies patches 0020/0021 and declares `kasm-udp-text-v1`.
+Configure `remotexappd -udp-endpoints /path/to/endpoints.json` with a schema-1
+object containing an `endpoints` array. Each entry has `slot`,
+`advertisedAddress` (public IPv4), and `port` (1024–65535). Matching loopback
+listeners and deployment-owned proxy devices must use the same port.
+
+`tests/kasm-native/edge` is the dedicated UAT trusted edge. Its pinned asset
+configuration is deployment-owned and includes the exact Core SDK, UAT HTML,
+native Viewer HTML and permitted component clients. It serves those bytes from
+verified memory, restricts workload responses to JSON, and terminates/rebuilds
+the native binary client stream before it crosses the workload namespace.
+It listens only on loopback behind an Access-verifying connector; it does not
+replace connector authentication or establish production tenant isolation.
 
 Retain the preceding immutable WSS candidate and private route/configuration
 snapshots. Upgrade/restart only owned test runtimes and preserve their documents.

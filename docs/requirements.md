@@ -49,6 +49,9 @@ On 2026-10-31 the owner approved implementation and testing of the bounded
 IPv4 UDP slice in [Issue #36](https://github.com/woodegg/remotexapp/issues/36).
 [Its contract](native-udp-uat.md) selects KNA-002/005/006/007/009 for this
 standalone UAT; it does not accept production UDP, audio or remaining D4 gates.
+The [bounded live evidence](../tests/kasm-native/UDP.md) records its exact
+artifacts, functional checks, short resource observations and remaining human
+UAT/long-duration scope.
 
 | ID | Proposed requirement | Acceptance boundary |
 | --- | --- | --- |

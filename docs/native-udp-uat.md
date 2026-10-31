@@ -81,3 +81,7 @@ snapshots. Upgrade/restart only owned test runtimes and preserve their documents
 Record exact hashes, failed attempts, cleanup and unverified physical/network/
 long-duration scope in the final evidence. Research passes are not new-product
 acceptance and a running experiment is not a test pass.
+
+The [Alpine UDP qualification record](../tests/kasm-native/UDP.md) records
+independent candidate hashes, actual live checks, integration defects, fixture
+corrections, cleanup and remaining human/long-duration scope.

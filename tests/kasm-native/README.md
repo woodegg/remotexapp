@@ -180,3 +180,9 @@ state to the prior Core or permit concurrent document/profile writers.
 Keep raw protocol data, input/document contents, profiles, credentials, full
 process records and private addresses out of public evidence. Summaries should
 contain identities/digests, assertions, failures and explicit limitations.
+
+## Optional UDP standalone experiment
+
+The later [bounded UDP UAT record](UDP.md) identifies separate artifacts and
+live fault/lifecycle evidence for Issue #36. It does not expand the acceptance
+scope of the earlier WSS checkpoints above.

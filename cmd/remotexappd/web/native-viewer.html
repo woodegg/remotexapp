@@ -21,6 +21,8 @@ const baseURL = location.pathname.slice(0, marker);
 const id = decodeURIComponent(location.pathname.slice(marker + '/remotexapps/'.length).split('/')[0]);
 const { RemoteXAppManager, RemoteXAppNativeClient } = await import(`${baseURL}/sdk/index.js`);
 const viewer = new RemoteXAppNativeClient({ container:document.querySelector('#display'), manager:new RemoteXAppManager({ baseURL }) });
+// Same-origin hosts may read this snapshot; it exposes no controls or payloads.
+Object.defineProperty(window, 'remoteXAppViewerStats', {value:() => viewer.getStats()});
 const profile = document.querySelector('#keyboard-profile'), enable = document.querySelector('#clipboard-enable');
 const message = text => { document.querySelector('#clipboard-status').textContent = text; };
 const controls = () => {

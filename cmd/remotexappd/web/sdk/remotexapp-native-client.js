@@ -31,13 +31,14 @@ export class RemoteXAppNativeClient extends EventTarget {
     this.clipboardEnabled = false;
     this.state = 'disconnected';
     this.capabilities = Object.freeze({ display:'kasm-wss-v1', pointer:true, keyboard:true,
-      clipboard:false, keyboardPolicy:false, clipboardMaxBytes:0, programmaticText:false, audio:false, udp:false });
+      clipboard:false, keyboardPolicy:false, clipboardMaxBytes:0, statistics:false, programmaticText:false, audio:false, udp:false });
     this._epoch = 0;
     this._disposed = false;
   }
 
   _state(state, detail = {}) {
     this.state = state;
+    this._stateCode = detail.code || null;
     this.dispatchEvent(new CustomEvent('statechange', { detail:{ state, ...detail } }));
   }
 
@@ -95,7 +96,7 @@ export class RemoteXAppNativeClient extends EventTarget {
       const features = NativeDisplay.capabilities || {};
       const clipboard = prepared.nativeClipboard === 'text' && features.clipboardText === true;
       this.capabilities = Object.freeze({...this.capabilities, keyboardPolicy:features.keyboardPolicy === true,
-        clipboard, clipboardMaxBytes:clipboard ? features.clipboardMaxBytes : 0});
+        clipboard, clipboardMaxBytes:clipboard ? features.clipboardMaxBytes : 0, statistics:features.statistics === true});
       const display = this._display = new NativeDisplay(this.container, socketURL.href, {
         resize:prepared.effectivePolicy?.display?.allowClientResize === true, clipboard, keyboardPolicy:this._keyboardPolicy });
       display.addEventListener('clipboard', event => {
@@ -146,7 +147,9 @@ export class RemoteXAppNativeClient extends EventTarget {
         this.disconnect();
         this._state('disconnected', { code:'display-disconnected' });
       }, { once:true });
-      this._state('ready', { generation:prepared.sessionGeneration, transport:socketURL.protocol === 'wss:' ? 'wss' : 'ws-loopback' });
+      this._transport = socketURL.protocol === 'wss:' ? 'wss' : 'ws-loopback';
+      this._connectedAt = performance.now();
+      this._state('ready', { generation:prepared.sessionGeneration, transport:this._transport });
       this.dispatchEvent(new CustomEvent('ready', { detail:{ instance:this.instance } }));
       return this.instance;
     } catch (cause) {
@@ -158,6 +161,20 @@ export class RemoteXAppNativeClient extends EventTarget {
       }
       throw cause;
     } finally { clearTimeout(timer); }
+  }
+
+  /** Read-only, per-connection counters. No timer, traffic or content logging. */
+  getStats() {
+    const now = performance.now();
+    const snapshot = {schemaVersion:1, state:this.state, code:this._stateCode || null,
+      connectionEpoch:this._epoch, observedAt:now, available:false,
+      transport:this._transport || null,
+      connectedForMs:this._connectedAt == null ? null : Math.max(0, now - this._connectedAt)};
+    if (this.state !== 'ready' || !this.capabilities.statistics) return snapshot;
+    const raw = this._display?.getStats?.();
+    const keys = ['receivedBytes','sentBytes','bufferedBytes','renderedFrames','width','height'];
+    if (!raw || keys.some(key => !Number.isSafeInteger(raw[key]) || raw[key] < 0)) return snapshot;
+    return {...snapshot, available:true, ...Object.fromEntries(keys.map(key => [key, raw[key]]))};
   }
 
 
@@ -232,6 +249,8 @@ export class RemoteXAppNativeClient extends EventTarget {
 
   disconnect() {
     ++this._epoch;
+    this._transport = null;
+    this._connectedAt = null;
     ++this._clipboardRevision;
     this.clipboardEnabled = false;
     this._clipboardText = undefined;

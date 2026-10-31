@@ -4696,3 +4696,20 @@ SetEncodings and use RFB defaults. Actual lack of resize support remains a
 refusal; no user input is queued or replayed. A real browser test delays the
 capability packet, resizes through another Viewer, and checks positive and
 unsupported/omitted-capability outcomes. This extends KNA-001's connection gate.
+
+
+## 2026-10-31 — Read-only native Viewer connection statistics
+
+KNA-005 now includes a local snapshot contract for actual connection evidence.
+The pinned component owns cumulative WebSocket payload counters and existing
+paint callbacks; the SDK whitelists numeric counters and adds connection state,
+actual transport and an epoch. No payload contents, browser clipboard access,
+server polling or perpetual sampling loop are introduced. Unsupported older
+components remain connectable and explicitly report unavailable metrics.
+
+The same-origin native kiosk offers a read-only snapshot function for embedding
+hosts. The UAT page derives rates with one visible-page timer and independent
+Viewer baselines. Disconnect, reload, epoch change and counter rollback invalidate
+old rates. A hidden panel is distinct from a disconnected Viewer. This adds no
+UDP behavior or server-wide traffic claims; source bytes and actual painted
+updates are deliberately distinct from wire bandwidth and configured FPS.

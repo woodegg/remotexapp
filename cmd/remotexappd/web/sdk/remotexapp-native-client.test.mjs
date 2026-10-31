@@ -5,12 +5,14 @@ import { RemoteXAppNativeClient } from './remotexapp-native-client.js';
 globalThis.CustomEvent ||= class extends Event { constructor(type,options) { super(type); this.detail = options?.detail; } };
 globalThis.location = new URL('https://viewer.example.test/remotexapps/app/kiosk.html');
 
-function fixture({ ready = true, frame = true, timeout = 200, clipboard = false } = {}) {
+function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, statistics = false } = {}) {
   const state = { id:'app', displayProvider:'kasm', displayComponentDigest:'a'.repeat(64), sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
   state.nativeClipboard = clipboard ? "text" : undefined;
   let display, reads = 0;
   class Display extends EventTarget {
-    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardMaxBytes:65536};
+    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardMaxBytes:65536,statistics};
+    counters = {receivedBytes:100, sentBytes:20, bufferedBytes:0, renderedFrames:2, width:1024, height:768};
+    getStats() { return this.counters; }
     sent = [];
     sendClipboardText(text) { this.sent.push(text); }
     keyboardPolicy = {profile:"unknown",mode:"local",bindings:[]};
@@ -173,4 +175,38 @@ test('activation retry cannot follow explicit descriptors, upgrades, recovery or
     await assert.rejects(f.viewer.connect(scenario==='descriptor'?descriptor:'app'));
     assert.equal(calls,scenario==='repeat'?2:1,scenario);assert.equal(f.display,undefined);f.viewer.dispose();
   }
+});
+
+
+test('native statistics expose only per-connection counters and never poll the Manager', async () => {
+  const f = fixture({statistics:true});
+  assert.equal(f.viewer.getStats().available,false);
+  await f.viewer.connect('app');
+  const reads=f.reads, first=f.viewer.getStats();
+  assert.equal(first.available,true);assert.equal(first.transport,'wss');
+  assert.equal(first.receivedBytes,100);assert.equal(first.renderedFrames,2);
+  f.display.counters.receivedBytes=120;f.display.counters.clipboard='private';
+  const next=f.viewer.getStats();assert.equal(next.receivedBytes,120);
+  assert.equal(first.receivedBytes,100);assert.equal(next.clipboard,undefined);
+  assert(next.observedAt>=first.observedAt);assert(next.connectedForMs>=first.connectedForMs);
+  assert.equal(f.reads,reads);
+  const old=f.display;await f.viewer.reconnect();
+  const fresh=f.viewer.getStats();assert(fresh.connectionEpoch>first.connectionEpoch);
+  assert.equal(fresh.receivedBytes,100);
+  old.counters.receivedBytes=999;old.dispatchEvent(new Event('disconnect'));
+  assert.equal(f.viewer.getStats().state,'ready');assert.equal(f.viewer.getStats().receivedBytes,100);
+  f.display.dispatchEvent(new Event('disconnect'));
+  assert.equal(f.viewer.getStats().available,false);assert.equal(f.viewer.getStats().transport,null);
+  assert.equal(f.viewer.getStats().code,'display-disconnected');
+  f.viewer.dispose();assert.equal(f.viewer.getStats().state,'disposed');
+});
+
+test('old components and malformed statistics report unavailable instead of fabricated zeroes', async () => {
+  const old=fixture();await old.viewer.connect('app');
+  assert.equal(old.viewer.getStats().available,false);assert.equal(old.viewer.getStats().receivedBytes,undefined);old.viewer.dispose();
+  const f=fixture({statistics:true});await f.viewer.connect('app');
+  for(const value of [null,{}, {...f.display.counters,sentBytes:-1}, {...f.display.counters,width:NaN}, {...f.display.counters,receivedBytes:Infinity}]){
+    f.display.counters=value;assert.equal(f.viewer.getStats().available,false);
+  }
+  f.viewer.dispose();
 });

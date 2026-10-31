@@ -5,9 +5,10 @@ import {normalizePolicy} from './core/input/poc-input-policy.mjs';
 import { clipboardBytes } from './core/remotexapp-server-messages.mjs';
 
 export default class NativeDisplay extends EventTarget {
-  static capabilities = Object.freeze({keyboardPolicy:true, clipboardText:true, clipboardMaxBytes:65536});
+  static capabilities = Object.freeze({keyboardPolicy:true, clipboardText:true, clipboardMaxBytes:65536, statistics:true});
   #rfb;
   #input;
+  #renderedFrames = 0;
   constructor(container, url, { resize = false, keyboardPolicy, clipboard = false } = {}) {
     super();
     if (keyboardPolicy) normalizePolicy(keyboardPolicy);
@@ -42,8 +43,19 @@ export default class NativeDisplay extends EventTarget {
       this.dispatchEvent(new CustomEvent('clipboard', {detail:{text:event.detail.text}}));
     });
     for (const event of ['connect', 'frame', 'disconnect']) {
-      rfb.addEventListener(event, () => this.dispatchEvent(new Event(event)));
+      rfb.addEventListener(event, () => {
+        if (this.#rfb !== rfb) return;
+        if (event === 'frame') this.#renderedFrames++;
+        this.dispatchEvent(new Event(event));
+      });
     }
+  }
+
+  getStats() {
+    const rfb = this.#rfb;
+    if (!rfb?.isConnected) return null;
+    return {...rfb._sock.trafficStats, renderedFrames:this.#renderedFrames,
+      width:rfb._display.width, height:rfb._display.height};
   }
 
   get keyboardPolicy() {

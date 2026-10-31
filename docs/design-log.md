@@ -4713,3 +4713,21 @@ Viewer baselines. Disconnect, reload, epoch change and counter rollback invalida
 old rates. A hidden panel is distinct from a disconnected Viewer. This adds no
 UDP behavior or server-wide traffic claims; source bytes and actual painted
 updates are deliberately distinct from wire bandwidth and configured FPS.
+
+## 2026-10-31 — Separate static Core portability from native graphical dependencies
+
+Issue [#34](https://github.com/woodegg/remotexapp/issues/34) extends RUN-007 with
+an experimental Alpine candidate. Static Core binaries and standalone process
+ownership are separate claims: verify ELF dependencies for the former and
+actual cgroup placement, adoption and cleanup for the latter. Keep the existing
+non-root UID, immutable component/App pins and lifecycle invariants unchanged.
+Kasm is rebuilt for musl as a separate component; system graphical libraries
+remain explicit target dependencies. The default Ubuntu build stays intact.
+
+Use distinct Openbox test App Packages and an edge-restricted disposable UAT
+proxy. This does not replace shipped App definitions or add production ingress
+authentication. A tunnel move preserves the existing Access policy and changes
+only the requested hostname; shared connectors and unrelated apps are retained.
+See the [Alpine experiment](../tests/kasm-native/ALPINE.md) for build boundaries
+and qualification gates. No deployment or release acceptance follows from
+this design entry alone.

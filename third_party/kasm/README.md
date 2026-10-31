@@ -43,6 +43,11 @@ The server is a GPL derivative and the browser client retains MPL notices;
 preserve corresponding source and all notices when sharing a component.
 Audit unbundled runtime libraries on the actual target before use.
 
+An experimental `--platform alpine` recipe uses native musl libraries rather
+than bundling Ubuntu shared objects. See the [Alpine UAT build boundary](../../tests/kasm-native/ALPINE.md).
+Patch 0018 selects CMake's supported transitive-link policy for newer build
+tools; it does not enable a transport or change the wire protocol.
+
 ## Patch boundary
 
 - 0001/0004/0005 retain the frozen research server hardening changes.

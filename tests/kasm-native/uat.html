@@ -100,7 +100,7 @@ const identity=x=>{document.querySelector('#identity').textContent=JSON.stringif
 const show=x=>{current=x;identity(x);frame('a');frame('b');status('应用已打开，当前连接状态和统计见上方。');
   (async()=>{for(let i=0;i<60&&current===x;i++){await new Promise(r=>setTimeout(r,1000));try{const actual=await api('/api/instances/'+encodeURIComponent(x.id));if(current!==x)return;identity(actual);if(actual.applicationStatus?.state==='ready')return;}catch{return;}}})();
 };
-document.querySelector('#launch-mousepad').onclick=()=>api('/api/instances',{templateId:'mousepad',parameters:{filePath:config.documentFile}}).then(show).catch(e=>status(e.message));
+document.querySelector('#launch-mousepad').onclick=()=>api('/api/instances',{templateId:config.templateId||'mousepad',parameters:{filePath:config.documentFile}}).then(show).catch(e=>status(e.message));
 document.querySelector('#launch-desktop').onclick=()=>api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH').then(x=>show(x.runtime)).catch(e=>status(e.message));
 document.querySelector('#toggle-a').onclick=()=>{const slot=document.querySelector('#slot-a');slot.hidden=!slot.hidden;const item=views.get('a');if(item)render('a',item);};
 document.querySelector('#dispose-a').onclick=()=>closeFrame('a');

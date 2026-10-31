@@ -11,6 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Add an experimental Alpine static Core build recipe and lightweight Openbox
+  UAT fixtures for the existing standalone lifecycle backend. Keep Kasm as a
+  separately pinned Alpine-native component with declared dynamic dependencies.
+
 - Show per-Viewer connection state, actual transport, payload rates, painted-frame
   rate, resolution, uptime and traffic totals on the UAT page. Add read-only
   native SDK statistics with epoch fencing and no background network polling.

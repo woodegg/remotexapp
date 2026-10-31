@@ -4,7 +4,12 @@ import {readFileSync,writeFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 export const config=JSON.parse(readFileSync(process.argv[2],'utf8'));
 assert.equal(config.purpose,'remotexapp-d2-disposable');
-assert.match(config.container,/^remotexapp-d2-/);
+if(config.remoteExec){
+ assert.equal(config.projectOwnedDisposable,true);
+ assert.match(config.container,/^[a-z0-9-]+-remotexapp-uat$/);
+ assert.ok(Array.isArray(config.remoteExec)&&config.remoteExec.length>0&&config.remoteExec.every(v=>typeof v==='string'));
+ assert.ok(config.remoteExec[0].startsWith('/'));
+}else assert.match(config.container,/^remotexapp-d2-/);
 for(const url of [config.cdpURL,config.managerURL,config.ingressURL]) assert.equal(new URL(url).hostname,'127.0.0.1');
 assert.ok(config.documentFile.startsWith('/home/'+config.user+'/documents/'));
 export const delay=ms=>new Promise(r=>setTimeout(r,ms));
@@ -25,8 +30,11 @@ export async function api(path,options={}){const r=await fetch(config.managerURL
 
 export const instance=JSON.parse(readFileSync(config.instanceFile));
 export async function current(){const p=(await fetch(config.cdpURL+'/json/list').then(r=>r.json())).find(p=>p.type==='page'&&p.url.includes(instance.id));return connect(p);}
-export function remote(args,input=''){return execFileSync('python3',['-c',`import subprocess,sys,json\np=subprocess.run(['/snap/bin/lxc','exec',json.loads(sys.argv[2]),'--']+json.loads(sys.argv[1]),input=sys.stdin.read(),capture_output=True,text=True,timeout=12)\nif p.returncode:raise RuntimeError(p.stderr)\nprint(p.stdout,end='')`,JSON.stringify(args),JSON.stringify(config.container)],{input,encoding:'utf8',timeout:16000});}
-export function x(args,input=''){return remote(['runuser','-u',config.user,'--','env','DISPLAY='+instance.display,'XAUTHORITY='+config.xauthority,...args],input);}
+export function remote(args,input=''){
+ if(config.remoteExec)return execFileSync(config.remoteExec[0],[...config.remoteExec.slice(1),...args],{input,encoding:'utf8',timeout:45000});
+ return execFileSync('python3',['-c',`import subprocess,sys,json\np=subprocess.run(['/snap/bin/lxc','exec',json.loads(sys.argv[2]),'--']+json.loads(sys.argv[1]),input=sys.stdin.read(),capture_output=True,text=True,timeout=12)\nif p.returncode:raise RuntimeError(p.stderr)\nprint(p.stdout,end='')`,JSON.stringify(args),JSON.stringify(config.container)],{input,encoding:'utf8',timeout:16000});
+}
+export function x(args,input=''){return remote([...(config.remoteExec?['chpst','-u',config.user+':'+config.user]:['runuser','-u',config.user,'--']),'env','DISPLAY='+instance.display,'XAUTHORITY='+config.xauthority,...args],input);}
 export async function click(c,selector){const r=await c.evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});e.scrollIntoView();const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);await c.call('Input.dispatchMouseEvent',{type:'mousePressed',...r,button:'left',clickCount:1});await c.call('Input.dispatchMouseEvent',{type:'mouseReleased',...r,button:'left',clickCount:1});}
 export async function focus(c){await c.call('Page.bringToFront');const r=await c.evaluate(`(()=>{const r=document.querySelector('canvas').getBoundingClientRect();return {x:r.x+150,y:r.y+180};})()`);await c.call('Input.dispatchMouseEvent',{type:'mousePressed',...r,button:'left',clickCount:1});await c.call('Input.dispatchMouseEvent',{type:'mouseReleased',...r,button:'left',clickCount:1});await delay(80);}
 export async function text(c,s){await c.call('Input.imeSetComposition',{text:'zhongwen',selectionStart:8,selectionEnd:8});await c.call('Input.insertText',{text:s});await delay(150);}

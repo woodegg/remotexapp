@@ -2,7 +2,7 @@
 """Build the experimental WSS component from checked archives in a fresh directory.
 
 This never installs services or changes the running provider. Build dependencies
-must already exist on an Ubuntu 24.04 amd64 build host.
+must already exist on an Ubuntu 24.04 or Alpine 3.24 amd64 build host.
 """
 import argparse
 import hashlib
@@ -47,17 +47,18 @@ def extract(source, destination):
             archive.extract(member, destination, filter='data')
 
 
-def build(inputs, work):
+def build(inputs, work, platform='ubuntu'):
     work.mkdir(parents=True, exist_ok=False)
     server, client = work / 'server', work / 'client'
     extract(inputs / 'server.tar.gz', server)
     extract(inputs / 'client.tar.gz', client)
     extract(inputs / 'xorg.tar.xz', server / 'unix/xserver')
     for patch in sorted((COMPONENT / 'patches').glob('*.patch')):
-        target = server if patch.name.startswith(('000', '0015-server-', '0016-server-')) else client
+        target = server if patch.name.startswith('000') or '-server-' in patch.name else client
         run(['patch', '--batch', '-p1', '-i', str(patch)], target)
+    cmake_options = ['-DCMAKE_POLICY_VERSION_MINIMUM=3.5', '-DENABLE_PAM=OFF'] if platform == 'alpine' else []
     run(['cmake', '.', '-DBUILD_VIEWER=OFF', '-DENABLE_GNUTLS=OFF',
-         '-DCMAKE_BUILD_TYPE=RelWithDebInfo'], server)
+         '-DCMAKE_BUILD_TYPE=RelWithDebInfo', *cmake_options], server)
     run(['make', '-j4'], server)
     xorg = server / 'unix/xserver'
     run(['patch', '--batch', '-p1', '-i', str(server / 'unix/xserver21.patch')], xorg)
@@ -69,7 +70,10 @@ def build(inputs, work):
          '--with-default-font-path=/usr/share/fonts/X11/misc,built-ins',
          '--without-dtrace', '--with-sha1=libcrypto', '--with-xkb-bin-directory=/usr/bin',
          '--with-xkb-output=/var/lib/xkb', '--with-xkb-path=/usr/share/X11/xkb'], xorg)
-    run(['make', '-j4'], xorg)
+    # Only the standalone Xvnc binary is shipped. Alpine's static codec
+    # archives are not PIC and cannot build the unused Xorg loadable module.
+    module_options = ['libvnc_la_LTLIBRARIES='] if platform == 'alpine' else []
+    run(['make', '-j4', *module_options], xorg)
     deps = work / 'dependencies'
     deps.mkdir()
     for name in ['package.json', 'package-lock.json']:
@@ -85,7 +89,7 @@ def build(inputs, work):
          '--outfile=' + str(work / 'client.js')], client, env=env)
 
 
-def package(inputs, work, output):
+def package(inputs, work, output, platform='ubuntu'):
     output.mkdir(parents=True, exist_ok=False)
     def copy(source, name):
         target = output / name
@@ -104,7 +108,7 @@ def package(inputs, work, output):
     copy(work / 'server/LICENSE.TXT', 'LICENSE.server.txt')
     copy(work / 'client/LICENSE.txt', 'LICENSE.client.txt')
     packages = {}
-    for name, pkg in LIBRARIES.items():
+    for name, pkg in (LIBRARIES.items() if platform == 'ubuntu' else []):
         copy(Path('/usr/lib/x86_64-linux-gnu') / name, 'lib/' + name)
         copy(Path('/usr/share/doc') / pkg / 'copyright', 'notices/' + pkg + '.txt')
         packages[pkg] = subprocess.check_output(['dpkg-query', '-W', '-f=${Version}', pkg], text=True)
@@ -118,7 +122,10 @@ def package(inputs, work, output):
     for patch in sorted((COMPONENT / 'patches').glob('*.patch')):
         copy(patch, 'sources/patches/' + patch.name)
         patches[patch.name] = digest(patch)
+    if platform == 'alpine':
+        packages = subprocess.check_output(['apk', 'info', '-v'], text=True).splitlines()
     source = {'status':'experimental-d2-not-a-release', 'serverCommit':SERVER, 'clientCommit':CLIENT,
+              'platform':platform, 'linkage':'dynamic; target runtime libraries required',
               'archives':INPUTS, 'patches':patches, 'runtimeLibraryPackages':packages,
               'clientDependencies':{'pako':'2.1.0'}, 'clientBuilder':{'esbuild':'0.20.1'},
               'scope':'WSS only; bounded explicit text clipboard; no UDP, QOI workers, audio or rich clipboard qualification',
@@ -137,6 +144,7 @@ def main():
     parser.add_argument('--inputs', required=True, type=Path)
     parser.add_argument('--work', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--platform', choices=['ubuntu', 'alpine'], default='ubuntu')
     args = parser.parse_args()
     inputs, work, output = (p.resolve() for p in [args.inputs,args.work,args.output])
     for name, expected in INPUTS.items():
@@ -144,8 +152,8 @@ def main():
             raise SystemExit('Source archive checksum mismatch: ' + name)
     if output.exists() or work.exists():
         raise SystemExit('Work and output directories must be new')
-    build(inputs,work)
-    package(inputs,work,output)
+    build(inputs,work,args.platform)
+    package(inputs,work,output,args.platform)
 
 
 if __name__ == '__main__':

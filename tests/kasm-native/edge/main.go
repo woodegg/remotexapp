@@ -205,6 +205,8 @@ func bridge(w http.ResponseWriter, r *http.Request, target *url.URL) {
 	up.SetReadLimit(8 * 1024 * 1024)
 	ctx, cancel := context.WithCancel(r.Context())
 	defer cancel()
+	heartbeatDone := browserHeartbeat(ctx, client, 20*time.Second, 60*time.Second)
+	defer func() { cancel(); <-heartbeatDone }()
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
@@ -249,6 +251,34 @@ func bridge(w http.ResponseWriter, r *http.Request, target *url.URL) {
 	client.Close()
 	up.Close()
 	<-done
+}
+
+// HTTP grant renewals do not keep an idle WebSocket alive through an edge.
+// Browser-native pong replies are independent of background JavaScript timers.
+// Control frames terminate here and never count as application activity.
+func browserHeartbeat(ctx context.Context, client *websocket.Conn, interval, timeout time.Duration) <-chan struct{} {
+	done := make(chan struct{})
+	client.SetReadDeadline(time.Now().Add(timeout))
+	client.SetPongHandler(func(string) error {
+		return client.SetReadDeadline(time.Now().Add(timeout))
+	})
+	go func() {
+		defer close(done)
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				if err := client.WriteControl(websocket.PingMessage, nil, time.Now().Add(interval)); err != nil {
+					client.Close()
+					return
+				}
+			}
+		}
+	}()
+	return done
 }
 
 func main() {

@@ -11,6 +11,9 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Keep idle UAT WebSockets alive through the trusted edge with native Ping/Pong;
+  retire unresponsive peers without treating heartbeats as App activity.
+
 - Develop optional native IPv4 screen UDP with deployment-owned proxy slots,
   Viewer authorization/expiry, trusted address filtering and WSS fallback;
   qualify the bounded standalone UAT slice separately from publication.

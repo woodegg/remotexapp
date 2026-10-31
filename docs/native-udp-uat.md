@@ -30,6 +30,9 @@ UDP-capable component and deployment-owned endpoint catalog.
   authenticated HTTP. Control loss, explicit revoke, generation retirement or
   expiry closes the owned WSS and retires its UDP negotiation. Manager restart
   drops grants and clients reattach; it does not restart healthy Apps.
+  The trusted UAT edge separately sends browser-native WebSocket pings every
+  20 seconds and retires peers without a pong for 60 seconds. These control
+  frames terminate at the edge and do not reset App activity/vacancy policy.
 - SDK transport preference is per Viewer. UDP failure keeps the same WSS and
   bounded retry. Report actual datagram/paint evidence, screen transport and
   separate WSS/UDP counters; do not label configured preference or ICE state alone

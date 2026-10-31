@@ -1,15 +1,64 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
+
+func TestBrowserHeartbeatKeepsIdleReaderAndRetiresSilentPeer(t *testing.T) {
+	for _, read := range []bool{true, false} {
+		t.Run(map[bool]string{true: "responding", false: "silent"}[read], func(t *testing.T) {
+			ended := make(chan struct{})
+			s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				u := websocket.Upgrader{}
+				c, err := u.Upgrade(w, r, nil)
+				if err != nil {
+					return
+				}
+				defer c.Close()
+				ctx, cancel := context.WithCancel(r.Context())
+				done := browserHeartbeat(ctx, c, 50*time.Millisecond, 500*time.Millisecond)
+				defer func() { cancel(); <-done; close(ended) }()
+				timer := time.AfterFunc(1200*time.Millisecond, func() {
+					c.WriteMessage(websocket.BinaryMessage, []byte("still alive"))
+				})
+				defer timer.Stop()
+				for {
+					if _, _, err := c.ReadMessage(); err != nil {
+						return
+					}
+				}
+			}))
+			defer s.Close()
+			c, _, err := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(s.URL, "http"), nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer c.Close()
+			if read {
+				c.SetReadDeadline(time.Now().Add(3 * time.Second))
+				_, payload, err := c.ReadMessage() // Native handler automatically replies to pings.
+				if err != nil || string(payload) != "still alive" {
+					t.Fatal("idle reader lost", err)
+				}
+				c.Close()
+			}
+			select {
+			case <-ended:
+			case <-time.After(3 * time.Second):
+				t.Fatal("heartbeat owner did not retire")
+			}
+		})
+	}
+}
 
 func TestEdgeHeadersAndStaticTrustBoundary(t *testing.T) {
 	calls := 0

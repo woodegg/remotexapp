@@ -4749,3 +4749,15 @@ retain reservations when termination/ownership is unknown. This refines the
 architecture's proxy-mapping cleanup prerequisite for static infrastructure proxies
 without giving Manager a privileged host-control API. It requires explicit live
 reuse/replay evidence; no production or unrestricted-public-UDP acceptance follows.
+
+
+## 2026-10-31 — Keep idle UAT control channels alive
+
+Live testing of Issue #36 observed idle WebSocket disconnects while App processes
+remained healthy. Authenticated HTTP grant renewals do not exercise that socket.
+Add a separate trusted-edge Ping/Pong owner (20-second ping, 60-second pong
+deadline), retired with the bridge. Browser-native replies remain independent
+of JavaScript background scheduling. Do not forward these control frames to
+the App or count them as user activity. Record the initial disconnects and the
+subsequent idle/fault observations separately; this mitigation does not assert
+a proven root cause for every upstream network closure.

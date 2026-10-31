@@ -11,13 +11,31 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.16.0-dev.1`. Development only.
+- Defer native resize notification until initial client capability negotiation
+  finishes, so another Viewer's resize cannot disconnect a joining Viewer early.
+
+- Fix the native server encoding cache's ordering and replacement ownership so
+  multiple Viewers do not receive JPEG payloads with stale lengths; add applied
+  source cache tests with address, undefined-behavior and leak checks.
+
+Target: `0.16.0-dev.2`. Development only.
 
 Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
-remains the default; implementation qualification is tracked in Issue #30.
-Development identities are Core `0.16.0-dev.1` and SDK `0.31.0-dev.1`;
+remains the default. D1 is recorded in Issue #30; Issue #32 tracks the first
+D2 physical-input UAT checkpoint.
+Development identities are Core `0.16.0-dev.2` and SDK `0.31.0-dev.2`;
 these are not published or UAT-qualified releases.
 
+- Initialize the native adapter's mouse button map without the upstream UI.
+  Missing initialization previously threw on pointer events, preventing remote
+  movement, clicks and window focus despite successful keyboard text tests.
+- Avoid logging typed Unicode mappings in ordinary native server logs.
+- Allow concurrent ID-based Viewer startup to follow one stopped-session
+  activation with unchanged pins; explicit descriptors and upgrades remain fenced.
+- Add supported native keyboard profiles and opt-in explicit text clipboard.
+  The paired text component bounds/validates data before allocation/mutation.
+  Per-Viewer consent revisions and generation fencing reject late reads after
+  revocation/reconnect. Empty reads are no-op; clear is explicit.
 - Preserve user-home applications after unexpected Driver/supervisor loss.
   Systemd uses `ExitType=cgroup` (systemd 250 or newer); supervision does not
   interpret Driver loss as permission to kill surviving editors. Explicit stop
@@ -34,8 +52,8 @@ these are not published or UAT-qualified releases.
   bridge. Kasm component installation is separate from the ordinary release.
 - Add authenticated, generation-bound native Viewer routes and a minimal
   native SDK adapter. Readiness requires App readiness and actual painting;
-  disconnect/dispose release only the owned Viewer. Native clipboard, audio,
-  programmatic text and UDP are not advertised by this slice.
+  disconnect/dispose release only the owned Viewer. The initial D1 component keeps clipboard off; D2 text requires its separate
+  pin and explicit selection. Audio, programmatic text and UDP stay unsupported.
 
 - Propose a native Kasm architecture from the frozen research baseline, with
   explicit keep/adapt/replace decisions, SDK and host integration contracts,

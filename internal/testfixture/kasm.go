@@ -10,10 +10,12 @@ import (
 	"github.com/woodegg/remotexapp/internal/kasmbundle"
 )
 
-func Kasm(t testing.TB) kasmbundle.Pin {
+func Kasm(t testing.TB) kasmbundle.Pin { return KasmProtocol(t, "kasm-wss-v1") }
+
+func KasmProtocol(t testing.TB, protocol string) kasmbundle.Pin {
 	t.Helper()
 	root := t.TempDir()
-	m := kasmbundle.Manifest{SchemaVersion: 1, Protocol: "kasm-wss-v1", ServerCommit: kasmbundle.ServerCommit, ClientCommit: kasmbundle.ClientCommit, Binary: "bin/Xkasmvnc", Client: "web/client.js", Files: map[string]string{}}
+	m := kasmbundle.Manifest{SchemaVersion: 1, Protocol: protocol, ServerCommit: kasmbundle.ServerCommit, ClientCommit: kasmbundle.ClientCommit, Binary: "bin/Xkasmvnc", Client: "web/client.js", Files: map[string]string{}}
 	for _, name := range []string{m.Binary, m.Client, "LICENSE.server.txt", "LICENSE.client.txt", "SOURCE.json", "lib/libfixture.so"} {
 		file := filepath.Join(root, name)
 		if err := os.MkdirAll(filepath.Dir(file), 0700); err != nil {

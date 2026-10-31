@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.31.0-dev.1';
+export const SDK_VERSION: '0.31.0-dev.2';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -69,7 +69,7 @@ export interface RemoteXAppRecovery {
 }
 
 export interface RemoteXAppInstance {
-  displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string;
+  displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string; nativeClipboard?:'text';
   recovery?:RemoteXAppRecovery;
   versions?:RemoteXAppRuntimeVersions; upgrade?:RemoteXAppUpgradeStatus;
 	id:string; classId:string; templateId:string; driverVersion:string; managedInstanceId?:string; profileRef:string;
@@ -134,12 +134,22 @@ export interface RemoteXAppClipboardSnapshot {
 export class RemoteXAppAPIError extends Error { status:number; body:unknown; }
 
 export class RemoteXAppNativeError extends Error { code:string; }
+export interface NativeKeyboardPolicy {profile:'unknown'|'windows'|'mac'|'gnome'|'fcitx'|'custom';mode?:'local'|'remote';bindings?:string[];}
 export class RemoteXAppNativeClient extends EventTarget {
-  constructor(options:{container:HTMLElement;manager?:RemoteXAppManager;timeout?:number});
+  constructor(options:{container:HTMLElement;manager?:RemoteXAppManager;timeout?:number;keyboardPolicy?:NativeKeyboardPolicy});
   readonly state:'disconnected'|'connecting'|'ready'|'failed'|'disposed';
   readonly instance?:RemoteXAppInstance;
   readonly capabilities:{readonly display:'kasm-wss-v1';readonly pointer:true;readonly keyboard:true;
-    readonly clipboard:false;readonly programmaticText:false;readonly audio:false;readonly udp:false};
+    readonly clipboard:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly programmaticText:false;readonly audio:false;readonly udp:false};
+  readonly keyboardPolicy:NativeKeyboardPolicy|null;
+  readonly clipboardEnabled:boolean;
+  configureKeyboard(settings:NativeKeyboardPolicy):{applied:boolean};
+  focus():void;
+  blur():void;
+  enableClipboard(enabled?:boolean):void;
+  copyClipboardToRemote():Promise<{status:'submitted'|'empty-noop'}>;
+  copyClipboardToLocal():Promise<{status:'copied-to-local'}>;
+  clearRemoteClipboard():Promise<{status:'submitted'}>;
   connect(instance?:string|RemoteXAppInstance):Promise<RemoteXAppInstance>;
   reconnect():Promise<RemoteXAppInstance>;
   disconnect():void;

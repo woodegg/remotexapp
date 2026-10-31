@@ -1,0 +1,94 @@
+--- a/common/rfb/SMsgReader.cxx
++++ b/common/rfb/SMsgReader.cxx
+@@ -264,42 +264,49 @@
+   vlog.error("Client sent old cuttext msg, ignoring");
+ }
+ 
++// Native text clipboard is bounded before allocation or clipboard mutation.
++// Reject invalid UTF-8 and embedded NUL instead of publishing ambiguous text.
++static bool nativeClipboardUTF8(const unsigned char *p, unsigned n)
++{
++  for (unsigned i = 0; i < n;) {
++    unsigned c = p[i++], need = 0, min = 0;
++    if (c == 0) return false;
++    if (c < 0x80) continue;
++    if (c >= 0xc2 && c <= 0xdf) { need = 1; min = 0x80; c &= 0x1f; }
++    else if (c >= 0xe0 && c <= 0xef) { need = 2; min = 0x800; c &= 0xf; }
++    else if (c >= 0xf0 && c <= 0xf4) { need = 3; min = 0x10000; c &= 7; }
++    else return false;
++    if (need > n - i) return false;
++    while (need--) {
++      unsigned b = p[i++];
++      if ((b & 0xc0) != 0x80) return false;
++      c = (c << 6) | (b & 0x3f);
++    }
++    if (c < min || c > 0x10ffff || (c >= 0xd800 && c <= 0xdfff)) return false;
++  }
++  return true;
++}
++
+ void SMsgReader::readBinaryClipboard()
+ {
+   const rdr::U8 num = is->readU8();
+-  rdr::U8 i, valid = 0;
+-  char tmpmimes[num][32];
+-
++  if (num != 1) throw Exception("Native clipboard requires one text/plain item");
++  const rdr::U8 mimelen = is->readU8();
++  if (mimelen != 10) throw Exception("Native clipboard requires text/plain");
++  char mime[11];
++  is->readBytes(mime, 10); mime[10] = '\0';
++  if (strcmp(mime, "text/plain")) throw Exception("Native clipboard requires text/plain");
++  const rdr::U32 len = is->readU32();
++  if (len > 65536 || (rfb::Server::DLP_ClipAcceptMax && len > (unsigned)rfb::Server::DLP_ClipAcceptMax))
++    throw Exception("Native clipboard exceeds byte limit");
++  CharArray data(len);
++  is->readBytes(data.buf, len);
++  if (!nativeClipboardUTF8((unsigned char*)data.buf, len))
++    throw Exception("Native clipboard is not valid UTF-8 text");
++  char mimes[1][32] = {"text/plain"};
+   handler->clearBinaryClipboard();
+-  for (i = 0; i < num; i++) {
+-    const rdr::U8 mimelen = is->readU8();
+-    if (mimelen > 32 - 1) {
+-      vlog.error("Mime too long (%u)", mimelen);
+-    }
+-
+-    char mime[mimelen + 1];
+-    mime[mimelen] = '\0';
+-    is->readBytes(mime, mimelen);
+-
+-    strncpy(tmpmimes[valid], mime, 32);
+-    tmpmimes[valid][31] = '\0';
+-
+-    const rdr::U32 len = is->readU32();
+-    CharArray ca(len);
+-    is->readBytes(ca.buf, len);
+-
+-    if (rfb::Server::DLP_ClipAcceptMax && len > (unsigned) rfb::Server::DLP_ClipAcceptMax) {
+-      vlog.info("DLP: refused to receive binary clipboard, too large");
+-      continue;
+-    }
+-
+-    vlog.debug("Received binary clipboard, type %s, %u bytes", mime, len);
+-
+-    handler->addBinaryClipboard(mime, (rdr::U8 *) ca.buf, len, 0);
+-    valid++;
+-  }
+-
+-  handler->handleClipboardAnnounceBinary(valid, tmpmimes);
++  handler->addBinaryClipboard("text/plain", (rdr::U8*)data.buf, len, 0);
++  handler->handleClipboardAnnounceBinary(1, mimes);
+ }
+ 
+ void SMsgReader::readExtendedClipboard(rdr::S32 len)
+--- a/common/rfb/VNCSConnectionST.cxx
++++ b/common/rfb/VNCSConnectionST.cxx
+@@ -475,6 +475,7 @@
+   try {
+     if (!(accessRights & AccessCutText)) return;
+     if (!rfb::Server::sendCutText) return;
++    if (strcmp(mime, "text/plain") || len > 65537) return;
+     if (rfb::Server::DLP_ClipSendMax && len > (unsigned) rfb::Server::DLP_ClipSendMax) {
+       vlog.info("DLP: client %s: refused to send binary clipboard, too large",
+                 sock->getPeerAddress());

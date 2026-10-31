@@ -4606,3 +4606,93 @@ The completed bounded D1 automation is recorded in
 real Apps, both lifecycle backends, actual container reboot, generation
 retirement, prior-Core rollback and owned cleanup. PR #31 / Issue #30 retain
 the review and merge boundary; D2–D5 qualification is not implied.
+
+## 2026-10-28 — Native input and explicit text clipboard checkpoint
+
+The owner requested continuing until human testing is required after D1 merge.
+Issue #32 selects keyboard policy and bounded text/plain clipboard for the next
+D2 UAT. Remaining rich formats, programmatic text and actual host application workflows
+retain their separate qualification gates; this is not full D2 acceptance.
+
+Browser-OS routing remains inside the pinned component. SDK configuration,
+focus and blur are supported adapter methods. Linux starts unknown and requires
+an explicit profile/custom binding. Physical OS IME/shortcut acceptance cannot
+be inferred from synthetic CDP events or historical PoC UAT.
+
+The separately pinned `kasm-wss-text-v1` component supports text clipboard.
+Manager `-native-clipboard` defaults off; enabled policy is snapshotted with the
+runtime and included in its identity. Old components cannot adopt text policy;
+old schema-4 records with no policy keep clipboard off. The server validates
+one text/plain representation, UTF-8 and 64 KiB before allocation/mutation,
+and filters outgoing formats/sizes. The browser parser is transactional and
+bounded. Malformed wire data closes that Viewer. This corrects the upstream
+size check, which happened only after allocating the payload.
+
+Per-Viewer browser consent defaults off on reconnect. Every OS clipboard action
+requires a focused user gesture. No focus polling, background overwrite or
+legacy clipboard bridge runs. Empty reads are no-op; Clear is explicit. Both
+Viewer epoch and a separate consent revision fence pending reads, including
+disable/re-enable in one generation. An already-started browser write cannot be
+cancelled; retirement/timeout reports uncertainty and never replays it. Native
+submission is not an App readback acknowledgement. Status contains no text.
+
+HTML/PNG/RTF/files, passive synchronization, read-only role grants and
+programmatic text with target/ack semantics remain unsupported. The existing
+selected-UID/trusted-ingress model applies; browser consent is not server
+authorization. Real host application business acceptance remains distinct from a host harness.
+
+Live D2 inspection found upstream INFO logging of dynamically mapped Unicode
+keysyms. Patch 0009 removes that content-bearing success log and makes ordinary
+mapping errors content-free; explicit debug diagnostics remain a private,
+authorized activity. The new component has its own digest.
+
+Simultaneous Viewers selecting a stopped on-attach session exposed a benign
+prepare conflict after the first Viewer advanced its generation. ID-based
+initial connect may re-read and retry exactly once only when the same runtime
+is now running at generation +1, with unchanged provider, component, clipboard
+policy and Core digest. Explicit descriptors, already-running recovery, changed
+pins/policy and second conflicts remain rejected. No user input or pending
+clipboard action is replayed. This narrows initial connection behavior without
+weakening the Manager's generation checks.
+
+## 2026-10-31 — Native pointer initialization and input evidence correction
+
+Physical UAT reported unusable pointer control and arrow keys. A separate
+synthetic document reproduced browser exceptions on pointer events: the native
+adapter omitted the mouse-button mapping normally installed by Kasm's full UI.
+The adapter must initialize DOM-to-X11 left/middle/right/back/forward mappings
+before input starts. This is owned by the pinned component, without importing
+the full upstream UI or changing native input ownership.
+
+Earlier click-then-type checks observed browser focus and saved text, but did
+not prove remote pointer delivery. Those historical assertions are insufficient
+for pointer acceptance. The new gate requires remote coordinates/button events,
+actual caret or desktop focus, navigation-key readback, and no browser exceptions
+in standalone and embedded Viewers. Arrow-key transport passed an isolated
+editor reproduction; desktop focus must also be validated after pointer repair.
+The original UAT candidate remains unaccepted and is superseded by a new
+component digest after verification. Existing populated sessions keep their
+original pins until a controlled replacement; input is never replayed.
+
+The new live pointer matrix also exposed a separate multi-Viewer paint failure:
+captured native payloads contained truncated JPEGs before browser decoding. The
+upstream shared encoding cache had a comparator that violated strict weak
+ordering and replacement kept an old key's length while changing its allocation.
+Patch 0015-server uses lexicographic rectangle/codec keys and atomically replaces
+the stored length/allocation, freeing the previous allocation. Clearing and
+destruction own the remaining allocations. Applied-source tests reject the old
+ordering and stale-length behavior and check permutations, growing/shrinking
+replacement and ownership with sanitizers. This refines KNA-001's actual-paint
+gate; a successful socket or a single painted Viewer is insufficient. The fix
+does not enable new codecs, UDP or automatic input replay.
+
+The same live matrix exposed a separate initial-connection race: one Viewer
+resized while a joining Viewer had received ServerInit but had not sent
+SetEncodings. The server interpreted unknown resize capability as a refusal.
+Patch 0016-server retains the ServerInit dimensions until the first capability
+message, then publishes the current size using the negotiated capability.
+A first framebuffer request also completes this window for clients that omit
+SetEncodings and use RFB defaults. Actual lack of resize support remains a
+refusal; no user input is queued or replayed. A real browser test delays the
+capability packet, resizes through another Viewer, and checks positive and
+unsupported/omitted-capability outcomes. This extends KNA-001's connection gate.

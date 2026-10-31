@@ -7,8 +7,8 @@ live deployment state; use the latest approved alignment evidence for that.
 
 | Component | Current identity |
 |---|---|
-| RemoteXApp core | `0.16.0-dev.1` |
-| Browser SDK | `0.31.0-dev.1` |
+| RemoteXApp core | `0.16.0-dev.2` |
+| Browser SDK | `0.31.0-dev.2` |
 | App Package ABI | `remotexapp/v1` |
 | Go language/toolchain | `1.26.0` / `go1.27.3` |
 | Vendored noVNC | `v1.7.0` at `63107bd06d9e` |

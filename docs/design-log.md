@@ -4731,3 +4731,21 @@ only the requested hostname; shared connectors and unrelated apps are retained.
 See the [Alpine experiment](../tests/kasm-native/ALPINE.md) for build boundaries
 and qualification gates. No deployment or release acceptance follows from
 this design entry alone.
+
+
+## 2026-10-31 — Select bounded native IPv4 UDP UAT
+
+The owner approved implementation and live tests of [Issue #36](https://github.com/woodegg/remotexapp/issues/36).
+The [bounded contract](native-udp-uat.md) supplements the earlier D1 WSS boundary:
+keep WSS complete, add deployment-owned non-NAT endpoint slots, a separately
+pinned UDP component, trusted pre-container filtering, and one-use Viewer grants
+with 90-second expiry and 20-second authenticated renewals. Retire both channels
+on control loss or generation change. Preserve old WSS artifacts and App data.
+
+For slot reuse, the authenticated negotiation and old component termination are
+the authority boundary: residual host proxy tuple routing grants no access.
+Verify late old credentials/datagrams cannot reach a new display identity and
+retain reservations when termination/ownership is unknown. This refines the
+architecture's proxy-mapping cleanup prerequisite for static infrastructure proxies
+without giving Manager a privileged host-control API. It requires explicit live
+reuse/replay evidence; no production or unrestricted-public-UDP acceptance follows.

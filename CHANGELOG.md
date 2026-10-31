@@ -11,6 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Develop optional native IPv4 screen UDP with deployment-owned proxy slots,
+  Viewer authorization/expiry, trusted address filtering and WSS fallback;
+  qualify the bounded standalone UAT slice separately from publication.
+
 - Add an experimental Alpine static Core build recipe and lightweight Openbox
   UAT fixtures for the existing standalone lifecycle backend. Keep Kasm as a
   separately pinned Alpine-native component with declared dynamic dependencies.

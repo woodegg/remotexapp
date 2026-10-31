@@ -45,6 +45,11 @@ policy and explicit text/plain clipboard, opt-in in Manager and Viewer. Rich
 formats, programmatic input, real host application workflows and later transports remain
 unqualified.
 
+On 2026-10-31 the owner approved implementation and testing of the bounded
+IPv4 UDP slice in [Issue #36](https://github.com/woodegg/remotexapp/issues/36).
+[Its contract](native-udp-uat.md) selects KNA-002/005/006/007/009 for this
+standalone UAT; it does not accept production UDP, audio or remaining D4 gates.
+
 | ID | Proposed requirement | Acceptance boundary |
 | --- | --- | --- |
 | KNA-001 | Pair and pin Kasm server/client behind a distinct display provider. Preserve Manager/App ownership, UID, HOME and App contracts; do not require legacy SDK method shapes. | WSS vertical slice with a single App and managed desktop; dependency/App audit and explicit SDK versioning; server-enforced class rendering/resize policy; multiple Viewers paint valid frames across resize and reconnect, with matching cache payload lengths |

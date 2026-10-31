@@ -16,6 +16,8 @@ implementation; move them to a version section when publishing a release.
   separately pinned Alpine-native component with declared dynamic dependencies.
   Resolve the persistent server anchor through the system PATH so Alpine's
   `/bin/sleep` works, and retain verified clean Git identity in static binaries.
+  The isolated Openbox editor fixture fills its remote desktop so embedded
+  Viewers open on the document rather than unused desktop space.
 
 - Show per-Viewer connection state, actual transport, payload rates, painted-frame
   rate, resolution, uptime and traffic totals on the UAT page. Add read-only

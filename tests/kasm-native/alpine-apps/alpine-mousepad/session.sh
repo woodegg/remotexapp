@@ -40,7 +40,7 @@ session_status_report --state loading --summary "Preparing Mousepad session" \
   --detail-string application=mousepad
 
 
-openbox --sm-disable >"$REMOTEXAPP_RUNTIME/openbox.log" 2>&1 &
+openbox --sm-disable --config "$script_dir/openbox.xml" >"$REMOTEXAPP_RUNTIME/openbox.log" 2>&1 &
 wm_pid=$!
 
 document_path=$(/usr/bin/jq -er 'if has("filePath") then .filePath | strings | select(length > 0) else "" end' "$REMOTEXAPP_PARAMETERS")

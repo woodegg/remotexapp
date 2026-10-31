@@ -137,7 +137,7 @@ func (m *manager) serveNativeGrant(w http.ResponseWriter, r *http.Request, item 
 }
 
 // The grant travels in an upgrade header, never a URL. The downstream native
-// endpoint does not receive the header or the authenticated principal.
+// endpoint does not receive the grant credential or authenticated principal.
 func (m *manager) claimNativeGrant(r *http.Request, item *instance) ([32]byte, error) {
 	var empty [32]byte
 	protocol := r.Header.Get("Sec-WebSocket-Protocol")

@@ -164,6 +164,10 @@ func edgeHandler(c configuration) (http.Handler, error) {
 	}), nil
 }
 
+// The pinned native decoder ignores continuation frames and rejects frames over
+// 65535 bytes. Match the write buffer to each independent binary message.
+const nativeFrameBytes = 16 * 1024
+
 func bridge(w http.ResponseWriter, r *http.Request, target *url.URL) {
 	if !websocket.IsWebSocketUpgrade(r) || r.Method != "GET" {
 		http.Error(w, "WebSocket required", 400)
@@ -176,7 +180,7 @@ func bridge(w http.ResponseWriter, r *http.Request, target *url.URL) {
 	protocol := headers.Get("Sec-WebSocket-Protocol")
 	headers.Del("Sec-WebSocket-Protocol")
 	headers.Set("Host", r.Host)
-	dialer := websocket.Dialer{HandshakeTimeout: 10 * time.Second}
+	dialer := websocket.Dialer{HandshakeTimeout: 10 * time.Second, WriteBufferSize: nativeFrameBytes}
 	if protocol != "" {
 		dialer.Subprotocols = []string{protocol}
 	}
@@ -230,8 +234,12 @@ func bridge(w http.ResponseWriter, r *http.Request, target *url.URL) {
 				continue
 			}
 			up.SetWriteDeadline(time.Now().Add(15 * time.Second))
-			if up.WriteMessage(websocket.BinaryMessage, payload) != nil {
-				return
+			for len(payload) > 0 {
+				n := min(len(payload), nativeFrameBytes)
+				if up.WriteMessage(websocket.BinaryMessage, payload[:n]) != nil {
+					return
+				}
+				payload = payload[n:]
 			}
 		}
 	}()

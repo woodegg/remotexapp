@@ -4761,3 +4761,15 @@ of JavaScript background scheduling. Do not forward these control frames to
 the App or count them as user activity. Record the initial disconnects and the
 subsequent idle/fault observations separately; this mitigation does not assert
 a proven root cause for every upstream network closure.
+
+
+## 2026-10-31 — Preserve native stream framing after edge validation
+
+Issue #36 live clipboard qualification exposed the pinned native decoder's
+continuation-frame incompatibility. Complete-message validation remains mandatory
+before forwarding any input message. The trusted edge now sends the validated
+stream in independent binary messages of at most 16 KiB, with a matching upstream
+write buffer so the WebSocket library does not emit continuation frames. This
+also stays below the native decoder's 65535-byte frame limit. A raw-frame bridge
+regression verifies the complete 64 KiB clipboard and subsequent control bytes,
+rather than relying on a WebSocket receiver that silently rejoins fragments.

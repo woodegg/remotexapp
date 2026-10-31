@@ -1,8 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"crypto/sha1"
+	"encoding/base64"
+	"encoding/binary"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -163,5 +168,104 @@ func TestEdgeBinaryStreamAndDisconnect(t *testing.T) {
 	c.WriteMessage(websocket.BinaryMessage, []byte{182})
 	if _, _, e = c.ReadMessage(); e == nil {
 		t.Fatal("unsupported stream not closed")
+	}
+}
+
+// Read physical frames: a normal WebSocket library would rejoin continuation
+// frames and conceal the pinned native decoder's incompatibility.
+func TestEdgeFullClipboardUsesIndependentNativeFrames(t *testing.T) {
+	text := []byte(strings.Repeat("界", 21845) + "A")
+	clipboard := append([]byte{180, 1, 10}, []byte("text/plain")...)
+	clipboard = binary.BigEndian.AppendUint32(clipboard, uint32(len(text)))
+	clipboard = append(clipboard, text...)
+	want := append([]byte("RFB 003.008\n\x01\x01"), clipboard...)
+	want = append(want, 185) // Subsequent reliable control must not disappear.
+	result := make(chan error, 1)
+	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		c, rw, err := w.(http.Hijacker).Hijack()
+		if err != nil {
+			result <- err
+			return
+		}
+		defer c.Close()
+		c.SetDeadline(time.Now().Add(5 * time.Second))
+		sum := sha1.Sum([]byte(r.Header.Get("Sec-WebSocket-Key") + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"))
+		fmt.Fprintf(rw, "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: %s\r\n\r\n", base64.StdEncoding.EncodeToString(sum[:]))
+		if err := rw.Flush(); err != nil {
+			result <- err
+			return
+		}
+		var got []byte
+		for len(got) < len(want) {
+			var h [2]byte
+			if _, err := io.ReadFull(rw, h[:]); err != nil {
+				result <- err
+				return
+			}
+			if h[0] != 0x82 || h[1]&0x80 == 0 || h[1]&127 == 127 {
+				result <- fmt.Errorf("unsupported native frame header %x", h)
+				return
+			}
+			size := int(h[1] & 127)
+			if size == 126 {
+				var b [2]byte
+				if _, err := io.ReadFull(rw, b[:]); err != nil {
+					result <- err
+					return
+				}
+				size = int(binary.BigEndian.Uint16(b[:]))
+			}
+			if size == 0 || size > nativeFrameBytes {
+				result <- fmt.Errorf("unexpected frame size %d", size)
+				return
+			}
+			var mask [4]byte
+			if _, err := io.ReadFull(rw, mask[:]); err != nil {
+				result <- err
+				return
+			}
+			body := make([]byte, size)
+			if _, err := io.ReadFull(rw, body); err != nil {
+				result <- err
+				return
+			}
+			for i := range body {
+				body[i] ^= mask[i%4]
+			}
+			got = append(got, body...)
+		}
+		if !bytes.Equal(got, want) {
+			result <- fmt.Errorf("validated byte stream changed: %d != %d", len(got), len(want))
+			return
+		}
+		result <- nil
+	}))
+	defer backend.Close()
+	pin := strings.Repeat("a", 64)
+	h, err := edgeHandler(configuration{Origin: "https://uat.example", Backend: backend.URL, Components: map[string]asset{pin: {}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	edge := httptest.NewServer(h)
+	defer edge.Close()
+	c, _, err := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(edge.URL, "http")+"/rx/remotexapps/test/native/websockify?componentDigest="+pin, http.Header{"Host": []string{"uat.example"}, "Origin": []string{"https://uat.example"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+	// Incoming boundaries deliberately split the RFB clipboard header and text.
+	for start := 0; start < len(want); start += 997 {
+		end := min(start+997, len(want))
+		if err := c.WriteMessage(websocket.BinaryMessage, want[start:end]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	select {
+	case err := <-result:
+		if err != nil {
+			t.Fatal(err)
+		}
+	case <-time.After(6 * time.Second):
+		t.Fatal("native stream did not complete")
 	}
 }

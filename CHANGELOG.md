@@ -11,6 +11,9 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Preserve the full 64 KiB native text clipboard through the trusted edge by
+  sending validated streams as bounded independent binary WebSocket messages.
+
 - Keep idle UAT WebSockets alive through the trusted edge with native Ping/Pong;
   retire unresponsive peers without treating heartbeats as App activity.
 

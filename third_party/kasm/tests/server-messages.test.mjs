@@ -77,3 +77,33 @@ test('completed upstream control handlers drain coalesced messages', {skip:!sour
   assert.equal(received,1);
   assert.equal(data.rQshift8(),2);
 });
+
+const {readClipboardText,clipboardBytes} = await import('../server-messages.mjs');
+const clipboardMessage = text => {
+  const data = [...new TextEncoder().encode(text)];
+  return [180,1,...u32(1),10,...new TextEncoder().encode('text/plain'),...u32(data.length),...data];
+};
+test('native clipboard parses every split, UTF-8 and a coalesced next message', () => {
+  const message=clipboardMessage('中文🙂');
+  for(let split=1;split<message.length;split++) {
+    const queue=new ReceiveQueue(message.slice(0,split));
+    assert.equal(readClipboardText(queue),null);assert.equal(queue.at,0);
+    queue.bytes=Uint8Array.from([...message,2]);queue.rQshift8();
+    assert.deepEqual(readClipboardText(queue),{text:'中文🙂'});assert.equal(queue.rQshift8(),2);
+  }
+  assert.deepEqual(readClipboardText(new ReceiveQueue(clipboardMessage(''))),{text:''});
+  assert.deepEqual(readClipboardText(new ReceiveQueue([180,0])),{text:null});
+});
+test('native clipboard rejects size, format and malformed Unicode before consuming', () => {
+  assert.equal(clipboardBytes('x'.repeat(65536)).length,65536);
+  for(const value of ['x'.repeat(65537),'\ud800','a\0b']) assert.throws(()=>clipboardBytes(value));
+  const huge=clipboardMessage('');huge.splice(17,4,...u32(65538));
+  assert.throws(()=>readClipboardText(new ReceiveQueue(huge)),/limit/);
+  assert.throws(()=>readClipboardText(new ReceiveQueue([180,255])),/representations/);
+  const html=clipboardMessage('x');html[6]=9;
+  assert.throws(()=>readClipboardText(new ReceiveQueue(html)),/MIME/);
+  const invalid=clipboardMessage('x');invalid[21]=255;
+  assert.throws(()=>readClipboardText(new ReceiveQueue(invalid)));
+  assert.deepEqual(readClipboardText(new ReceiveQueue(clipboardMessage('ok\0'))),{text:'ok'});
+  assert.throws(()=>readClipboardText(new ReceiveQueue(clipboardMessage('x\0y'))));
+});

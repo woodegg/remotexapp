@@ -1,0 +1,244 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-31",
+  "issue": 36,
+  "region": "China",
+  "status": "bounded-automated-checks-passed-awaiting-human-uat",
+  "scope": "Second-region deployment qualification of the existing immutable optional IPv4 UDP candidate; no product source rebuild",
+  "artifacts": {
+    "core": {
+      "sourceCommit": "f074cb9c6114539a388b196572d62cca51eda58d",
+      "archiveSHA256": "e878fd22e4a1f3053e51befdeafe113b3970081c162d99f2c199ab805190a2f2"
+    },
+    "edge": {
+      "sourceCommit": "80815e5df839a19a0b253be5417de0aa49eab5bb",
+      "archiveSHA256": "a84159c787065e66b609f36cf5fafceabb80af31f4e7f87a46354f6ed7664432"
+    },
+    "component": {
+      "sourceCommit": "4ea9523d606dbefabc8641d574de03f101174e16",
+      "archiveSHA256": "05e55c785c4a8d548572ef4e751547036944af2f1533a0404af419713cba7fbb",
+      "manifestSHA256": "22273bc7867a9a4e2afc57d5be0974fad6d10ce7e5900b151b40a4923afeefea"
+    }
+  },
+  "build": {
+    "staticCoreExecutables": 4,
+    "staticEdge": true,
+    "component": "separately pinned musl-native Kasm; explicit shared graphical dependencies"
+  },
+  "topology": {
+    "alpineVersion": "3.24.2",
+    "cpuLimit": 1,
+    "memoryLimitMiB": 1024,
+    "unprivilegedContainer": true,
+    "runtimeUID": 1000,
+    "displays": 2,
+    "isolatedBrowserViewers": 3,
+    "additionalUserBrowserViewers": 1,
+    "displayUDPPorts": 2,
+    "upstreamEIPMapping": true,
+    "nonNATProxyToLoopback": true,
+    "proxyProtocol": false,
+    "sourceAllowlist": "authenticated measured test egress only",
+    "existingContainersAndRoutesPreserved": true,
+    "browsers": [
+      "Chrome 149.0.7827.102, isolated Linux browser",
+      "Chrome 156.0.8078.47, user-supplied Linux CDP browser"
+    ]
+  },
+  "checks": {
+    "threeViewersTwoDisplaysChangingUDPPixels": true,
+    "independentTransportPreference": true,
+    "UDPBlockFallbackAndReturnSameWSS": true,
+    "configured20PercentBidirectionalLoss": true,
+    "largePacketDropThresholdBytes": 1100,
+    "actualDropCounters": [
+      {
+        "chain": "input",
+        "counters": [
+          {
+            "packets": 112,
+            "bytes": 18104
+          }
+        ]
+      },
+      {
+        "chain": "output",
+        "counters": [
+          {
+            "packets": 6,
+            "bytes": 3240
+          }
+        ]
+      }
+    ],
+    "scopedProxyRecreationAndIsolation": true,
+    "missingUnknownReplayedStaleGrantDenied": true,
+    "perViewerRevocation": true,
+    "STUNPositiveAndNegativeControls": true,
+    "serverExpiry": {
+      "serverExpiredWithoutRenewal": true,
+      "elapsedMs": 92622,
+      "suppressedRenewals": 4
+    },
+    "poolFullWSSDescriptor": true,
+    "slotReuseNewOwnerAndEpoch": true,
+    "capturedOldPacketRejectedAfterReuse": true,
+    "workloadAddressPrivacy": {
+      "workloadUDPPackets": 400,
+      "allUDPPeersLoopback": true,
+      "httpRequestsChecked": 31,
+      "sourceHeadersAbsent": true,
+      "offersChecked": 4,
+      "clientCandidatesAbsent": true,
+      "clientOriginZeroed": true
+    },
+    "pointerNavigationFocusUDPAndWSS": true,
+    "syntheticCompositionAndExplicitTextClipboard": true,
+    "clipboardUTF8BoundaryBytes": 65536,
+    "fourShortcutProfilesAndFocusCycles": true,
+    "managerAdoptionPreservesProcessesPinsGenerationSlotsDocuments": true,
+    "actualContainerReboot": {
+      "passed": true,
+      "actualBootChanged": true,
+      "pinsSlotsDocumentsPreserved": true,
+      "generationAdvanced": true,
+      "threeViewersReady": true,
+      "threeViewersUDP": true,
+      "onDemandSessionActivatedByViewer": true
+    },
+    "fourViewersPostRebootUDP": true,
+    "anonymousHTTPSRequiresAccess": true,
+    "routeConfiguration": {
+      "onlyNewIngressAdded": true,
+      "previousIngressPreserved": true,
+      "accessVerificationRequired": true,
+      "DNSMatchesEdgeTunnel": true
+    },
+    "fileIntegrity": {
+      "core": {
+        "files": 21,
+        "allHashesMatch": true
+      },
+      "component": {
+        "files": 42,
+        "allHashesMatch": true
+      },
+      "componentDependenciesResolved": true,
+      "alpineVersion": "3.24.2",
+      "staticExecutables": {
+        "novnc-input": true,
+        "remotexapp-operator-helper": true,
+        "remotexapp-status": true,
+        "remotexappd": true
+      }
+    },
+    "edgeIntegrity": {
+      "pinnedFiles": 12,
+      "allHashesMatch": true,
+      "edgeAndTunnelRunning": true,
+      "originMatched": true
+    },
+    "idleSeconds": 180.9
+  },
+  "resources": {
+    "seconds": 180.9,
+    "before": {
+      "processes": 25,
+      "pssMiB": 186.84,
+      "anonymousPssMiB": 84.78,
+      "rssMiB": 318.83,
+      "threads": 85,
+      "fileDescriptors": 248
+    },
+    "after": {
+      "processes": 25,
+      "pssMiB": 187.46,
+      "anonymousPssMiB": 85.41,
+      "rssMiB": 319.46,
+      "threads": 85,
+      "fileDescriptors": 241
+    },
+    "sameProcessIDs": true,
+    "terminalProcessesExcluded": [
+      0,
+      0
+    ],
+    "failedReadSamples": 1,
+    "forcedGC": false,
+    "measurement": "aggregate target runtime UID; RSS double-counts shared pages",
+    "claim": "short idle observation only; no eight-hour leak or capacity qualification"
+  },
+  "cleanup": {
+    "ownedAnonymousAppStopped": true,
+    "managedUATRetained": true,
+    "testHelpersRemoved": true,
+    "temporaryTestPackagesRemoved": true,
+    "testDocumentRetained": true,
+    "activeRuntimes": 1,
+    "runtimeManifests": 1,
+    "noFailedRuntime": true,
+    "testProcessesAbsent": true,
+    "managedUATReady": true,
+    "runtimeUID": 1000,
+    "ownedPacketCapturesStopped": true,
+    "temporaryNetworkFaultsRemoved": true,
+    "authenticatedAllowedSources": 1,
+    "isolatedBrowserStopped": true,
+    "isolatedProfileAndScopedCookieRemoved": true,
+    "ownedRemoteTabClosed": true
+  },
+  "qualificationNotes": [
+    "Exact existing Core, component and edge archives were reused; runtime dependencies were installed in the fresh Alpine fixture. Missing native libraries and jq/xprop were resolved before launch. The native component remains dynamically linked to explicit Alpine libraries.",
+    "Initial source capture was read before ICE credentials and packets existed; only the later authenticated STUN capture was accepted for the allowlist.",
+    "One zero-delay synthetic double-click attempt delivered only one remote button pair and failed selection. Four diagnostic repetitions (zero and 80 ms spacing) selected correctly; the full three-Viewer pointer matrix passed with explicit 80 ms spacing. The initial cause is unproven, the failure is retained, and physical double-click UAT is required.",
+    "A port-reuse harness queried the Viewer API before iframe navigation completed. Existing state was inspected; readiness was awaited without repeating the stop/start mutation.",
+    "The first resource sample hit a terminating helper process and was rejected. A repeat excluded only observed terminal processes; successful idle samples reported zero such exclusions.",
+    "Post-reboot managed session activation remains on demand; no App vacancy policy or product code was changed for the regional test."
+  ],
+  "notQualified": [
+    "new-candidate eight-hour soak",
+    "host reboot",
+    "full public NAT/firewall/MTU matrix",
+    "IPv6 or TURN",
+    "production tenant authentication/quotas",
+    "Windows/macOS physical IME",
+    "rich/file clipboard",
+    "speaker/microphone",
+    "embedding-host integration",
+    "formal release",
+    "physical double-click feel in the user browser"
+  ],
+  "evidenceSHA256": {
+    "route-final-results.json": "ac325ebe0ce30956fe5a8831cd14258425fb784ebe583b81028e9ce93415484c",
+    "public-udp-ingress.json": "2b05e2d4aba556878648cfb1f4c14b55008b1c86468978b90652b131e1e7f1f4",
+    "access-results.json": "1f494c4315a22c963f4b0260fe15f9ecfe336feaf92b8f39ad03169baa122c87",
+    "transport-results.json": "be7a2a25fd726588739e515ba648c231b2bf71c3c792ed24544d71e3de553f9f",
+    "grant-results.json": "2c16ec82d47cd60f6e4c3a95adf60104dfce7f4f4f773822084c63c73fe254f7",
+    "stun-active.json": "3a0350da644a78de021d1ea7fa4e61dcc818a15a73b39b2ea5ad0c9ce8c147e4",
+    "stun-retired.json": "abb72435fafb07bee490825bb01564b242697265e7e93da086607af1b7cde83b",
+    "expiry-results.json": "fdb0d95febf1ffc6e3501d7cc747dabe9aae65bb5b61179f7c2832d032d5b35f",
+    "privacy-results.json": "39f39cee844bce4912a33da888e8200a2c9453f790af6b30ac7d4d48aae83351",
+    "proxy-results.json": "09d42cb33c043be2812f332e9d9efc5e211e97c915f5e724b04ef7ccf29a589f",
+    "pool-results.json": "8248862878cf6d6fa081967927c569b474d69ce5181e843ab30e32b6ce3e41a9",
+    "input-results.json": "d00757bf7723ecd2a28c298e8d8b38c373d01ae93160a7ff362be97f5a552e64",
+    "input-initial-attempt.json": "1decc2ed2c24d834d526c813018a20c0039a7dd137d2589b4806035a28cf6e64",
+    "double-click-diagnostic.json": "3f2c9ebbb6a24f9852e6a82f53b1eb9158a1f682738fc9d5d2b5dce5966bf3e0",
+    "text-results.json": "6fb2867ff278afd67626d3f41988e17984afd2448a8a5a0dc1c6c705a9368c02",
+    "manager-results.json": "6425b719f77a6303ba7dc9944187aa78b4faef7b3430308f28983c3883e47abb",
+    "reuse-results.json": "1bb654cac7afb525282110b22e7b2f3beeb7b74b69b2f4369e30dca1ea943ff3",
+    "reuse-replay-results.json": "90e16ef876ab39ca1f6695b5819a5502dbebaaf0d63ed1cab8839241020ff15a",
+    "reboot-results.json": "c3bf99088cc9c4e8afb057d7af8db748188269231ef455838135192e53831a94",
+    "post-reboot-browser-results.json": "c716809a720ef3b7eaad85c4f3445604a82e304b4c92fc7c28c4c6fcabd17b2e",
+    "final-idle-results.json": "7689bc86d2ce7dbd65761b33d8e8b0c2c4e2db48f1872711d77153b8e63a3b31",
+    "resource-initial-attempt.json": "f8cbc700a577e830c53d2b0c1331f1bcf137004da49030273d48904a329d33fc",
+    "resource-review.json": "aa3886fe326ecd7a2afe54815f9a7527fc823dbf487e653b2f4ed94677004dc3",
+    "loss-counters.json": "e1196b0699a6e23963ab533a98ccdb0bb54ffbc76cc7785e4ea2f9b7118bb4f2",
+    "final-file-integrity.json": "7bdf7b9226a7bc915a9da4d17c95f353b0a3a49782ce7bd00e6ff86959481527",
+    "edge-final-integrity.json": "c67191970a96603713fe96debbe8c5c82deb8139ec910196c714c850d9b07252",
+    "platform-results.json": "11348fd6db72696bfe6bc147a9c618e6d19228cd4d4069ada92c02fae3b3da32",
+    "target-cleanup.json": "f6602c86078c1955ae31243cc94f6b2a171dd5675abff1c197b36af6cbd64fdd",
+    "runtime-cleanup-final.json": "08271c7069729624d7ac7f0b1d9c813a9378a7fecc73245f29dd4f58af1da886",
+    "host-cleanup-final.json": "bb9b81b974baa66cf31f995f951e0b0ce880469701cd2d60a55ad9b08098d0c5",
+    "local-cleanup.json": "d3bed142f29e643d23289ffcd0b4e6b9dc8e5f0a18fc7d29e3266d52457fea07"
+  }
+}

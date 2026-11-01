@@ -1,0 +1,72 @@
+{
+  "apiVersion": "remotexapp/v1",
+  "id": "alpine-desktop",
+  "name": "Alpine UAT Openbox desktop",
+  "driverVersion": "1.0.0",
+  "singleton": true,
+  "profileRef": "user",
+  "runMode": "user-home",
+  "ports": {},
+  "parameters": {},
+  "driver": {
+    "config": {}
+  },
+  "overrides": {
+    "allowed": []
+  },
+  "dependencies": {
+    "executables": [
+      "grep",
+      "openbox",
+      "seq",
+      "sleep",
+      "xprop",
+      "xterm"
+    ],
+    "pythonModules": []
+  },
+  "server": {
+    "activation": "on-demand",
+    "driver": "server.sh",
+    "displayMode": "fixed",
+    "display": 1,
+    "rfbPort": 5901,
+    "gatewayPort": 39001,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 10,
+    "allowClientResize": false,
+    "readinessPids": [
+      "server.pid"
+    ],
+    "readinessTimeout": "10s"
+  },
+  "session": {
+    "services": "core-v1",
+    "activation": "on-attach",
+    "driver": "session.sh",
+    "shutdownDriver": "shutdown.sh",
+    "readinessPid": "openbox.pid",
+    "readinessTimeout": "20s",
+    "vacantTimeout": "48h",
+    "vacantAction": "stop-session",
+    "status": {
+      "mode": "driver",
+      "details": {
+        "application": {
+          "type": "enum",
+          "values": [
+            "openbox-desktop"
+          ]
+        }
+      }
+    }
+  },
+  "input": {
+    "backend": "ibus",
+    "lifecycle": "session",
+    "allowedWmClasses": [
+      "*"
+    ]
+  }
+}

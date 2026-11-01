@@ -1,0 +1,177 @@
+--- a/core/rfb.js
++++ b/core/rfb.js
+@@ -1,3 +1,4 @@
++import { UDPAssembler } from "./remotexapp-udp.mjs";
+ /*
+  * KasmVNC: HTML5 VNC client
+  * Copyright (C) 2020 Kasm Technologies
+@@ -151,6 +152,9 @@
+         this._clipboardBinary = true;
+         this._resendClipboardNextUserDrivenEvent = true;
+         this._useUdp = false;
++        this._udpReceivedBytes = 0;
++        this._udpPackets = 0;
++        this._udpRectangles = 0;
+         this._hiDpi = 'hiDpi' in options ? !!options.hiDpi : false;
+         this._enableQOI = false;
+         this._videoQuality = 2;
+@@ -747,8 +751,14 @@
+ 
+     get enableWebRTC() { return this._useUdp; }
+     set enableWebRTC(value) {
+-        if (value) throw new Error("UDP is unavailable in the WSS-only component");
+-        this._useUdp = false;
++        this._useUdp = !!value;
++        if (!value) {
++            if (this.isConnected && this._transitConnectionState !== this.TransitConnectionStates.Tcp) this._sendUdpDowngrade();
++            this._closeUdp();
++            this._changeTransitConnectionState(this.TransitConnectionStates.Tcp);
++        } else if (this.isConnected && this._transitConnectionState !== this.TransitConnectionStates.Udp) {
++            this._sendUdpUpgrade();
++        }
+     }
+ 
+     get enableHiDpi() { return this._hiDpi; }
+@@ -1288,7 +1298,9 @@
+ 
+     _changeTransitConnectionState(value) {
+         Log.Info("Transit state change from " + this._transitConnectionState.toString() + ' to ' + value.toString());
++        const changed = this._transitConnectionState !== value;
+         this._transitConnectionState = value;
++        if (changed) this.dispatchEvent(new CustomEvent("transportchange"));
+     }
+ 
+     _setupWebSocket() {
+@@ -1454,7 +1466,7 @@
+         this._resendClipboardNextUserDrivenEvent = true;
+ 
+         // WebRTC UDP datachannel inits
+-        // WSS-only component: do not create ICE/STUN/PeerConnection state.
++        if (this._useUdp) this._setupUdp();
+ 
+ 
+         Log.Debug("<< RFB.connect");
+@@ -3871,25 +3883,12 @@
+     _setupUdp() {
+         this._closeUdp();
+         if (typeof RTCPeerConnection !== 'undefined' && this._isPrimaryDisplay) {
+-            this._udpBuffer = new Map();
++            this._udpBuffer = new UDPAssembler();
+ 
+             this._udpPeer = new RTCPeerConnection({
+-                iceServers: [{
+-                    urls: ["stun:stun.l.google.com:19302"]
+-                }]
++                iceServers: []
+             });
+             let peer = this._udpPeer;
+-
+-            peer.onicecandidate = function(e) {
+-                if (e.candidate)
+-                    Log.Debug("received ice candidate", e.candidate);
+-                else
+-                    Log.Debug("all candidates received");
+-            }
+-
+-            peer.ondatachannel = function(e) {
+-                Log.Debug("peer connection on data channel", e);
+-            }
+ 
+             this._udpChannel = peer.createDataChannel("webudp", {
+                 ordered: false,
+@@ -3920,70 +3919,15 @@
+             let me = this;
+             this._udpChannel.onmessage = function(e) {
+                 if (me._udpPeer !== peer || !me.isConnected) return;
+-                //Log.Info("got udp msg", e.data);
+-                const u8 = new Uint8Array(e.data);
+-                // Got an UDP packet. Do we need reassembly?
+-                const id = parseInt(u8[0] +
+-                                    (u8[1] << 8) +
+-                                    (u8[2] << 16) +
+-                                    (u8[3] << 24), 10);
+-                const i = parseInt(u8[4] +
+-                                   (u8[5] << 8) +
+-                                   (u8[6] << 16) +
+-                                   (u8[7] << 24), 10);
+-                const pieces = parseInt(u8[8] +
+-                                        (u8[9] << 8) +
+-                                        (u8[10] << 16) +
+-                                        (u8[11] << 24), 10);
+-                const hash = parseInt(u8[12] +
+-                                        (u8[13] << 8) +
+-                                        (u8[14] << 16) +
+-                                        (u8[15] << 24), 10);
+-                // TODO: check the hash. It's the low 32 bits of XXH64, seed 0
+-                const frame_id = parseInt(u8[16] +
+-                                        (u8[17] << 8) +
+-                                        (u8[18] << 16) +
+-                                        (u8[19] << 24), 10);
+-
+-                if (me._transitConnectionState !== me.TransitConnectionStates.Udp) {
+-                    me._display.clear();
++                const packet = new Uint8Array(e.data);
++                me._udpReceivedBytes += packet.length;
++                me._udpPackets++;
++                const result = udpBuffer.push(packet);
++                if (!result) return;
++                if (me._transitConnectionState !== me.TransitConnectionStates.Udp) me._display.clear();
++                if (me._handleUdpRect(result.data, result.frame)) {
++                    me._udpRectangles++;
+                     me._changeTransitConnectionState(me.TransitConnectionStates.Udp);
+-                }
+-
+-                if (pieces == 1) { // Handle it immediately
+-                    me._handleUdpRect(u8.slice(20), frame_id);
+-                } else { // Use buffer
+-                    const now = Date.now();
+-
+-                    if (udpBuffer.has(id)) {
+-                        let item = udpBuffer.get(id);
+-                        item.recieved_pieces += 1;
+-                        item.data[i] = u8.slice(20);
+-                        item.total_bytes += item.data[i].length;
+-
+-                        if (item.total_pieces == item.recieved_pieces) {
+-                            // Message is complete, combile data into a single array
+-                            var finaldata = new Uint8Array(item.total_bytes);
+-                            let z = 0;
+-                            for (let x = 0; x < item.data.length; x++) {
+-                                finaldata.set(item.data[x], z);
+-                                z += item.data[x].length;
+-                            }
+-                            udpBuffer.delete(id);
+-                            me._handleUdpRect(finaldata, frame_id);
+-                        }
+-                    } else {
+-                        let item = {
+-                            total_pieces: pieces,   // number of pieces expected
+-                                arrival: now,       //time first piece was recieved
+-                            recieved_pieces: 1,     // current number of pieces in data
+-                            total_bytes: 0,         // total size of all data pieces combined
+-                            data: new Array(pieces)
+-                        }
+-                        item.data[i] = u8.slice(20);
+-                        item.total_bytes = item.data[i].length;
+-                        udpBuffer.set(id, item);
+-                    }
+                 }
+             }
+         }
+@@ -4019,7 +3963,7 @@
+         }
+         if (!this._udpPeer || this._udpPeer.remoteDescription ||
+             this._udpPeer.connectionState === 'failed' || this._udpPeer.connectionState === 'closed') {
+-            // WSS-only component: do not create ICE/STUN/PeerConnection state.
++            if (this._useUdp) this._setupUdp();
+         }
+         if (!this._udpPeer) return;
+         this._changeTransitConnectionState(this.TransitConnectionStates.Upgrading);
+@@ -4124,6 +4068,7 @@
+             this._changeTransitConnectionState(this.TransitConnectionStates.Failure)
+             this._udpConnectFailures++;
+         }.bind(this));
++        return true;
+     }
+ 
+     _handleSubscribeUnixRelay() {

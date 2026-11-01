@@ -125,6 +125,7 @@ func identifyCore(c runtimeComponents) (*coreIdentity, error) {
 			return nil, err
 		}
 		hashes["kasm-manifest"] = c.Kasm.SHA256
+		hashes["native-clipboard"] = c.NativeClipboard
 	} else {
 		paths["engine"] = c.UnicodeEngine
 	}
@@ -214,8 +215,8 @@ func downgrade(a, b string) bool {
 }
 func (m *manager) versionView(item *instance) *runtimeVersions {
 	v := &runtimeVersions{Current: versionFor(item.Spec, item.Components)}
-	if displayProvider(item.Components) != displayProvider(m.currentComponents()) {
-		v.Reason = "display provider changes require a stopped, scoped migration"
+	if displayProvider(item.Components) != displayProvider(m.currentComponents()) || item.Components.NativeUDP != m.currentComponents().NativeUDP {
+		v.Reason = "display provider or native transport changes require a stopped, scoped migration"
 		return v
 	}
 	target, ok := m.cfg.classes[item.TemplateID]
@@ -289,8 +290,8 @@ func (m *manager) setUpgrade(item *instance, u *runtimeUpgrade, phase, code, mes
 	return nil
 }
 func (m *manager) preflightUpgrade(item *instance, target classConfig) error {
-	if displayProvider(item.Components) != displayProvider(m.currentComponents()) {
-		return errors.New("display provider changes require a stopped, scoped migration")
+	if displayProvider(item.Components) != displayProvider(m.currentComponents()) || item.Components.NativeUDP != m.currentComponents().NativeUDP {
+		return errors.New("display provider or native transport changes require a stopped, scoped migration")
 	}
 	if target.Package == nil {
 		return errors.New("upgrade requires an immutable App Package")
@@ -416,6 +417,7 @@ func (m *manager) upgradeRuntime(id string, r upgradeRequest) (*instance, error)
 	}
 	c := m.currentComponents()
 	c.Identity = v.Available.Core
+	c.UDPEndpoint, c.UDPUnavailableReason = item.Components.UDPEndpoint, item.Components.UDPUnavailableReason
 	operationID, err := randomID("upgrade")
 	if err != nil {
 		return item, err

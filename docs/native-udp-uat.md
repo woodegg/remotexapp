@@ -1,0 +1,108 @@
+# Bounded native UDP UAT
+
+Issue [#36](https://github.com/woodegg/remotexapp/issues/36) implements the owner's
+2026-10-31 approval of the bounded IPv4 D4 slice on the standalone Alpine test
+fixture. It builds on #34/#35 and the [UDP architecture](kasm-native-architecture.md#udp-design).
+This is development UAT; production qualification and a formal release remain
+separate. WSS stays complete and is the default without an explicitly configured
+UDP-capable component and deployment-owned endpoint catalog.
+
+## Implementation contract
+
+- One immutable Kasm server/client pair declares optional UDP capability. Retain
+  the frozen research fixes for authenticated STUN/DTLS, exact negotiation
+  ownership/retirement and bounded retries; bind its UDP socket to loopback.
+- The deployment owner supplies a finite IPv4 endpoint catalog and non-NAT Incus
+  proxy devices with PROXY protocol disabled. Manager never receives Incus or
+  firewall privileges. Each display owns a durable slot/epoch before launch;
+  multiple Viewers share its port but have distinct authenticated negotiations.
+  Missing/full pools fall back to WSS. Unknown/failed ownership blocks reuse.
+- The trusted edge serves immutable browser assets, strips source-bearing HTTP
+  metadata before entering the workload namespace, and checks the bounded native
+  client stream. Rebuild SDP from allowed ICE/DTLS/SCTP fields before forwarding;
+  preserve the browser's actual localDescription. Unknown messages/SDP fail closed.
+  This protects the supported trusted-client path, not arbitrary malicious code
+  controlling the trusted edge or user-supplied application traffic.
+- A one-use Viewer grant binds authenticated principal, runtime, generation,
+  component, Viewer and connection epoch. It is delivered in an authenticated
+  response, used in a WebSocket protocol header, never a URL or ordinary log.
+  Grants expire in 90 seconds and active Viewers renew every 20 seconds through
+  authenticated HTTP. Control loss, explicit revoke, generation retirement or
+  expiry closes the owned WSS and retires its UDP negotiation. Manager restart
+  drops grants and clients reattach; it does not restart healthy Apps.
+  The trusted UAT edge separately sends browser-native WebSocket pings every
+  20 seconds and retires peers without a pong for 60 seconds. These control
+  frames terminate at the edge and do not reset App activity/vacancy policy.
+- SDK transport preference is per Viewer. UDP failure keeps the same WSS and
+  bounded retry. Report actual datagram/paint evidence, screen transport and
+  separate WSS/UDP counters; do not label configured preference or ICE state alone
+  as UDP success. Audio and rich clipboard are outside this slice.
+- Per-Viewer latency diagnostics explicitly sample WebSocket Fence echo through
+  the existing connection to Kasm and read the selected ICE pair's UDP RTT.
+  Bound sampling and pending work; retire it with the connection. Keep the stats
+  getter passive, hide expired samples, and expose neither addresses nor raw
+  ICE reports. Fence probes do not update native user-activity timestamps.
+- UDP loss is a bounded receiver-observed display-block estimate over ten
+  seconds, with two seconds for incomplete/missing blocks. It handles duplicate,
+  out-of-order and wrapped IDs without modifying transport. The UI explicitly
+  distinguishes this from IP packet loss and hides idle or unobservable values.
+
+A native UDP manifest schema must fence older Managers and preserve locked
+endpoint identity through restart/recovery. Old WSS manifests remain supported.
+Schema 5 records UDP capability, the slot and its epoch; schema 4 remains WSS.
+Changing between these transport profiles requires a stopped, scoped migration.
+An ordinary same-profile Core upgrade preserves the runtime's locked endpoint;
+it cannot silently acquire another slot or widen the deployment's network policy.
+Normal stop must verify old owned component termination before its slot can be
+reassigned; stale credentials and delayed datagrams must fail against the new
+negotiation. Proxy routing state is not authorization; test reuse with old packets
+and retain a failed/unknown owner's reservation rather than guessing it is free.
+
+## Qualification
+
+Build immutable static Core and Alpine-native Kasm artifacts off the target.
+Use two displays and three Viewers, including two Viewers sharing one display.
+Require actual changing pixels and UDP bytes, pointer/keyboard/text clipboard
+regression, pool full/reuse, old/missing/wrong credentials, fragmented signaling,
+address stripping, independent disconnect, UDP blockage/fallback/return, loss,
+MTU/NAT changes, proxy/Manager restart and actual container reboot. Keep public
+UDP restricted to measured test sources until this candidate's negative and
+resource checks pass. Inspect both host and container evidence without publishing
+raw SDP, credentials, client addresses or private fleet configuration.
+
+The development recipe accepts `--transport udp`; its default remains `wss`.
+Only the UDP build applies patches 0020/0021 and declares `kasm-udp-text-v1`.
+Configure `remotexappd -udp-endpoints /path/to/endpoints.json` with a schema-1
+object containing an `endpoints` array. Each entry has `slot`,
+`advertisedAddress` (public IPv4), and `port` (1024–65535). Matching loopback
+listeners and deployment-owned proxy devices must use the same port.
+
+`tests/kasm-native/edge` is the dedicated UAT trusted edge. Its pinned asset
+configuration is deployment-owned and includes the exact Core SDK, UAT HTML,
+native Viewer HTML and permitted component clients. It serves those bytes from
+verified memory, restricts workload responses to JSON, and terminates/rebuilds
+the native binary client stream before it crosses the workload namespace.
+It listens only on loopback behind an Access-verifying connector; it does not
+replace connector authentication or establish production tenant isolation.
+
+Retain the preceding immutable WSS candidate and private route/configuration
+snapshots. Upgrade/restart only owned test runtimes and preserve their documents.
+Record exact hashes, failed attempts, cleanup and unverified physical/network/
+long-duration scope in the final evidence. Research passes are not new-product
+acceptance and a running experiment is not a test pass.
+
+The [Alpine UDP qualification record](../tests/kasm-native/UDP.md) records
+independent candidate hashes, actual live checks, integration defects, fixture
+corrections, cleanup and remaining human/long-duration scope.
+The [second-region record](../tests/kasm-native/UDP-CHINA.md) covers deployment
+behind an upstream EIP without rebuilding the qualified development artifacts.
+The [latency checkpoint](../tests/kasm-native/LATENCY.md) records the subsequent
+client/Core/edge pins and focused UDP/WebSocket RTT checks on both fixtures.
+The [UDP loss checkpoint](../tests/kasm-native/UDP-LOSS.md) defines the bounded
+display-block estimate and records controlled receive-side loss checks.
+The [US ARM64 checkpoint](../tests/kasm-native/UDP-US-ARM64.md) records native
+architecture-specific builds, three-Viewer input/authorization/reboot checks,
+diagnostics, failed test attempts and scoped cleanup on the third fixture.
+
+The [UAT workbench](../tests/kasm-native/UAT-WORKBENCH.md) keeps diagnostics
+visible during interaction and records the separate presentation-only rollout.

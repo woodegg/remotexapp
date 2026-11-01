@@ -1,5 +1,24 @@
 # Experimental Kasm WSS component
 
+The default recipe remains WSS. The explicitly selected `--transport udp`
+development profile adds patches 0020/0021, authenticated native UDP negotiation,
+loopback-only UDP sockets, bounded client reassembly and measured transport
+counters. It emits `kasm-udp-text-v1`; it requires Core's bounded endpoint and
+Viewer grant contract plus an outside-container trusted edge. See
+[bounded UDP UAT](../../docs/native-udp-uat.md). Neither profile qualifies audio,
+QOI workers or rich clipboard.
+
+The UDP assembler also exposes bounded, payload-free display-block loss
+observations. These are receiver delivery estimates, not IP packet loss; they
+do not alter the server wire format or the decoder/reassembly policy.
+
+Both profiles include patch 0022 and the latency adapter. Explicit diagnostic
+sampling uses native RFB Fence echo for WebSocket RTT and selected-pair ICE
+statistics for UDP RTT, with bounded timeouts, stale-result rejection and
+connection retirement. Native server binaries and user-activity policy are
+unchanged by this client diagnostic extension. See the
+[SDK statistics contract](../../docs/browser-sdk.md#native-connection-statistics-development-sdk-0310-dev3).
+
 This directory is the D1 integration recipe, not an upstream release or a
 qualified RemoteXApp distribution. The default provider remains TigerVNC.
 Server and browser client form one separately installed, manifest-pinned pair.
@@ -43,6 +62,11 @@ The server is a GPL derivative and the browser client retains MPL notices;
 preserve corresponding source and all notices when sharing a component.
 Audit unbundled runtime libraries on the actual target before use.
 
+An experimental `--platform alpine` recipe uses native musl libraries rather
+than bundling Ubuntu shared objects. See the [Alpine UAT build boundary](../../tests/kasm-native/ALPINE.md).
+Patch 0018 selects CMake's supported transitive-link policy for newer build
+tools; it does not enable a transport or change the wire protocol.
+
 ## Patch boundary
 
 - 0001/0004/0005 retain the frozen research server hardening changes.
@@ -56,8 +80,18 @@ Audit unbundled runtime libraries on the actual target before use.
 - 0013 makes completed control handlers continue the receive loop, uses the
   bounded transactional codec parser in `server-messages.mjs`, and removes
   printer/smartcard subscriptions. Applied-source tests run during the build.
+- 0015-server fixes encoding-cache key ordering and replaces both the stored
+  length and owned allocation for repeated rectangles. The applied C++ test
+  exercises every ordering of conflicting rectangle keys, growing/shrinking
+  replacements, clearing and destruction under ASan/UBSan with leak detection.
+  It requires `KASM_SERVER_SOURCE`; ordinary CI skips it without that build tree.
+- 0016-server defers a resize after ServerInit until the first SetEncodings has
+  supplied the client's capabilities. It then publishes the latest dimensions;
+  a client that actually omits resize support still receives the normal refusal.
 - `client-entry.js` is the only adapter that uses pinned upstream internals.
-  It exposes connect/frame/disconnect to the native SDK, with clipboard off.
+  It initializes required DOM-to-X11 mouse-button mapping otherwise supplied
+  by the upstream UI. It exposes connection/input policy and native text actions to the SDK;
+  clipboard requires explicit server selection and per-Viewer consent.
 
 The initial component does not enable UDP, audio, rich clipboard, extra
 windows, QOI workers or video codec qualification. Physical IME and host
@@ -81,3 +115,20 @@ The browser uses `RemoteXAppNativeClient`, not the legacy `RemoteXAppClient`.
 The native kiosk displays actual WSS state (or explicit loopback WS for local
 development). Stop and snapshot state before provider/Core rollback; do not
 point an older Core at native runtime records or share a live profile writer.
+
+## D2 input and text checkpoint
+
+Patch 0009 removes ordinary content-bearing keyboard mapping logs.
+The recipe now emits protocol `kasm-wss-text-v1`. Patch 0008 bounds incoming
+UTF-8 text before allocation/mutation and filters outgoing formats/sizes.
+Patch 0014 uses the bounded transactional browser parser. The adapter exposes
+keyboard policy and explicit native text sends; it never accesses the browser
+clipboard itself. Policy tests exercise the exact patch in portable CI and
+the actual applied file during a component build.
+
+Core also recognizes the older WSS-only component for adoption, but rejects
+text policy on it. Add `-native-clipboard` explicitly for new runtimes; without
+it the server keeps clipboard off. Restarting Manager is not a runtime upgrade.
+Browser clipboard actions require separate per-Viewer consent/user gesture.
+The native kiosk exposes those actions. HTML/PNG/RTF/files are not supported
+by this checkpoint; no passive browser clipboard synchronization is enabled.

@@ -155,9 +155,45 @@ permission denial, cancellation
 with late synthetic media, real tab hiding, local RMS and manual-result export,
 eight screen sizes, fullscreen and final track/context cleanup. The harness
 clicks the heard button to test export; that is not evidence of human hearing.
-The owned browser/profile was removed. There was no live rollout, remote audio
-readback, physical device acceptance, other-engine or embedding-host UAT.
+The owned browser/profile was removed. That fixture run did not exercise live
+rollout, remote audio readback, physical devices, other engines or an embedding host.
 
 ![Audio drawer with synthetic Viewers and persistent stats](audio-uat-desktop.png)
 
 [Mobile audio drawer and statistics](audio-uat-mobile.png)
+
+
+### 2026-11-01 authorized public UAT rollout
+
+The owner subsequently authorized deployment of the tested page from
+`46fff0b6928633a0bd2c277dce23624b237d3920`, SHA-256
+`22df43a91434284d0bf20c18fe42d903b7083975d51f4bcff0c348bf3213c25b`.
+Australia, China and US now serve those identical HTML bytes. The existing
+Core, SDK, Viewer, Kasm components and UDP configuration were retained; the
+new edge listener uses the existing executable and hash-verified assets.
+Only the protected UAT route destination changed. Access remains required,
+and the previous listener/configuration remains available for rollback.
+There were zero attached Viewers immediately before each route change.
+
+Each authenticated public site passed **91 existing workbench checks and 26
+additional audio-page checks**. The existing checks used real native Viewers
+and a disposable editor with pointer/Unicode/arrow input and saved-file readback.
+The new checks exercised actual same/different-runtime selection, B-only
+close/recreate, preservation of A, browser permission denial, local probe stop,
+JSON export, eight viewport sizes and fullscreen. Observed final transports
+were WSS/WSS in Australia and China, and UDP/WSS in the US; this UI rollout
+was not a new qualification of UDP or its full network fault matrix.
+
+Local media used Chrome's synthetic microphone. The tone was not marked heard
+by the automation. Remote audio cases still remain unexecuted until D3; neither
+physical playback/microphone quality nor embedding-host lifecycle is accepted
+by these tests. The [rollout record](results-audio-uat-rollout-20261101.json)
+binds the page hash, per-region checks, observed transport and cleanup evidence.
+
+Existing App identities, generations/pins, tracked Core/display/application
+processes and saved-document hashes were unchanged. Owned test Apps were
+stopped, their documents removed, and all owned Viewer connections released.
+The temporary browser/profile and its scoped Access cookies were removed.
+These UAT deployments do not merge the PR or publish a release.
+
+![Deployed audio test drawer with a disposable real Mousepad App](audio-uat-live.png)

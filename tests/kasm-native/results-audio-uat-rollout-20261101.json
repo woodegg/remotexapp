@@ -1,0 +1,224 @@
+{
+  "schema": 1,
+  "scope": "native-uat-audio-page-rollout",
+  "verifiedAt": "2026-11-01T05:50:56.025745+00:00",
+  "pageSourceCommit": "46fff0b6928633a0bd2c277dce23624b237d3920",
+  "pageSHA256": "22df43a91434284d0bf20c18fe42d903b7083975d51f4bcff0c348bf3213c25b",
+  "regions": [
+    {
+      "region": "australia",
+      "publicHTMLHashMatched": true,
+      "existingWorkbenchChecks": 91,
+      "audioPageChecks": [
+        "public HTML matches qualified page",
+        "existing 91 workbench checks pass on real Viewers",
+        "audio panel identifies same runtime",
+        "two real runtimes while A remains connected",
+        "A/B runtime IDs differ",
+        "recreated B retains desktop target",
+        "B returns to A without replacing A",
+        "tone ends without claiming human heard it",
+        "synthetic local microphone level observed on public page",
+        "explicit stop releases local tracks and contexts",
+        "browser microphone denial visible on public page",
+        "closing panel stops local capture",
+        "export contains eight unexecuted remote cases",
+        "automated playback has no human confirmation",
+        "export excludes device IDs and grant/endpoint URLs",
+        "audio panel usable with stats 1920x1080",
+        "audio panel usable with stats 1440x900",
+        "audio panel usable with stats 1366x768",
+        "audio panel usable with stats 1024x640",
+        "audio panel usable with stats 900x700",
+        "audio panel usable with stats 800x600",
+        "audio panel usable with stats 768x1024",
+        "audio panel usable with stats 390x844",
+        "fullscreen retains audio panel and stats",
+        "two real Viewers still connected and painted",
+        "no browser exceptions"
+      ],
+      "viewerEvidence": [
+        {
+          "state": "ready",
+          "transport": "wss",
+          "renderedFrames": 7
+        },
+        {
+          "state": "ready",
+          "transport": "wss",
+          "renderedFrames": 1
+        }
+      ],
+      "localMedia": "synthetic-device-only",
+      "humanSpeakerConfirmation": false,
+      "deployedFilesHashVerified": 13,
+      "rolloutInvariants": {
+        "existingAppIDsRetained": true,
+        "existingGenerationAndPinsRetained": true,
+        "existingProcessIdentitiesRetained": true,
+        "existingDocumentsUnchanged": true,
+        "newListenerReady": true,
+        "rollbackListenerRunning": true,
+        "allDeployedHashesMatch": true,
+        "onlyUATRouteDestinationChanged": true,
+        "accessStillRequired": true,
+        "allAttachedViewersReleased": true,
+        "ownedAppAndDocumentCleaned": true
+      },
+      "ownedTestCleanup": {
+        "ownedAppStopped": true,
+        "ownedDocumentRemoved": true,
+        "ownedTabClosed": true
+      }
+    },
+    {
+      "region": "china",
+      "publicHTMLHashMatched": true,
+      "existingWorkbenchChecks": 91,
+      "audioPageChecks": [
+        "public HTML matches qualified page",
+        "existing 91 workbench checks pass on real Viewers",
+        "audio panel identifies same runtime",
+        "two real runtimes while A remains connected",
+        "A/B runtime IDs differ",
+        "recreated B retains desktop target",
+        "B returns to A without replacing A",
+        "tone ends without claiming human heard it",
+        "synthetic local microphone level observed on public page",
+        "explicit stop releases local tracks and contexts",
+        "browser microphone denial visible on public page",
+        "closing panel stops local capture",
+        "export contains eight unexecuted remote cases",
+        "automated playback has no human confirmation",
+        "export excludes device IDs and grant/endpoint URLs",
+        "audio panel usable with stats 1920x1080",
+        "audio panel usable with stats 1440x900",
+        "audio panel usable with stats 1366x768",
+        "audio panel usable with stats 1024x640",
+        "audio panel usable with stats 900x700",
+        "audio panel usable with stats 800x600",
+        "audio panel usable with stats 768x1024",
+        "audio panel usable with stats 390x844",
+        "fullscreen retains audio panel and stats",
+        "two real Viewers still connected and painted",
+        "no browser exceptions"
+      ],
+      "viewerEvidence": [
+        {
+          "state": "ready",
+          "transport": "wss",
+          "renderedFrames": 5
+        },
+        {
+          "state": "ready",
+          "transport": "wss",
+          "renderedFrames": 1
+        }
+      ],
+      "localMedia": "synthetic-device-only",
+      "humanSpeakerConfirmation": false,
+      "deployedFilesHashVerified": 11,
+      "rolloutInvariants": {
+        "existingAppIDsRetained": true,
+        "existingGenerationAndPinsRetained": true,
+        "existingProcessIdentitiesRetained": true,
+        "existingDocumentsUnchanged": true,
+        "newListenerReady": true,
+        "rollbackListenerRunning": true,
+        "allDeployedHashesMatch": true,
+        "onlyUATRouteDestinationChanged": true,
+        "accessStillRequired": true,
+        "allAttachedViewersReleased": true,
+        "ownedAppAndDocumentCleaned": true
+      },
+      "ownedTestCleanup": {
+        "ownedAppStopped": true,
+        "ownedDocumentRemoved": true,
+        "ownedTabClosed": true
+      }
+    },
+    {
+      "region": "us",
+      "publicHTMLHashMatched": true,
+      "existingWorkbenchChecks": 91,
+      "audioPageChecks": [
+        "public HTML matches qualified page",
+        "existing 91 workbench checks pass on real Viewers",
+        "audio panel identifies same runtime",
+        "two real runtimes while A remains connected",
+        "A/B runtime IDs differ",
+        "recreated B retains desktop target",
+        "B returns to A without replacing A",
+        "tone ends without claiming human heard it",
+        "synthetic local microphone level observed on public page",
+        "explicit stop releases local tracks and contexts",
+        "browser microphone denial visible on public page",
+        "closing panel stops local capture",
+        "export contains eight unexecuted remote cases",
+        "automated playback has no human confirmation",
+        "export excludes device IDs and grant/endpoint URLs",
+        "audio panel usable with stats 1920x1080",
+        "audio panel usable with stats 1440x900",
+        "audio panel usable with stats 1366x768",
+        "audio panel usable with stats 1024x640",
+        "audio panel usable with stats 900x700",
+        "audio panel usable with stats 800x600",
+        "audio panel usable with stats 768x1024",
+        "audio panel usable with stats 390x844",
+        "fullscreen retains audio panel and stats",
+        "two real Viewers still connected and painted",
+        "no browser exceptions"
+      ],
+      "viewerEvidence": [
+        {
+          "state": "ready",
+          "transport": "webrtc-udp",
+          "renderedFrames": 15
+        },
+        {
+          "state": "ready",
+          "transport": "wss",
+          "renderedFrames": 1
+        }
+      ],
+      "localMedia": "synthetic-device-only",
+      "humanSpeakerConfirmation": false,
+      "deployedFilesHashVerified": 9,
+      "rolloutInvariants": {
+        "existingAppIDsRetained": true,
+        "existingGenerationAndPinsRetained": true,
+        "existingProcessIdentitiesRetained": true,
+        "existingDocumentsUnchanged": true,
+        "newListenerReady": true,
+        "rollbackListenerRunning": true,
+        "allDeployedHashesMatch": true,
+        "onlyUATRouteDestinationChanged": true,
+        "accessStillRequired": true,
+        "allAttachedViewersReleased": true,
+        "ownedAppAndDocumentCleaned": true
+      },
+      "ownedTestCleanup": {
+        "ownedAppStopped": true,
+        "ownedDocumentRemoved": true,
+        "ownedTabClosed": true
+      }
+    }
+  ],
+  "notQualified": [
+    "remote speaker or microphone integration",
+    "physical playback or microphone devices",
+    "other browser engines",
+    "embedding-host workspace lifecycle",
+    "UDP requalification or new soak"
+  ],
+  "browserProfileCleanup": {
+    "ownedBrowserClosed": true,
+    "ownedProfileRemoved": true,
+    "scopedAccessCookiesRemovedWithProfile": true
+  },
+  "screenshot": {
+    "file": "audio-uat-live.png",
+    "sha256": "100aaa68e5cf216e0ed1d935d72f824a63bc0a7b4ec935ec8f81c6bf188ee286",
+    "scope": "Australia public UAT, owned disposable editor; no physical-device confirmation"
+  }
+}

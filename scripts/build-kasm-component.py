@@ -2,12 +2,14 @@
 """Build the experimental WSS component from checked archives in a fresh directory.
 
 This never installs services or changes the running provider. Build dependencies
-must already exist on an Ubuntu 24.04 or Alpine 3.24 amd64 build host.
+must already exist on an Ubuntu 24.04 amd64 or Alpine 3.24 build host.
+Alpine ARM64 sanitizer tests require KASM_TEST_CXX=clang++ and compiler-rt.
 """
 import argparse
 import hashlib
 import json
 import os
+import platform as host_platform
 from pathlib import Path
 import shutil
 import subprocess
@@ -134,10 +136,14 @@ def package(inputs, work, output, platform='ubuntu', transport='wss'):
     if platform == 'alpine':
         packages = subprocess.check_output(['apk', 'info', '-v'], text=True).splitlines()
     source = {'status':'experimental-d2-not-a-release', 'serverCommit':SERVER, 'clientCommit':CLIENT,
-              'platform':platform, 'linkage':'dynamic; target runtime libraries required',
+              'platform':platform, 'architecture':host_platform.machine(),
+              'linkage':'dynamic; target runtime libraries required',
               'archives':INPUTS, 'patches':patches, 'runtimeLibraryPackages':packages,
               'clientDependencies':{'pako':'2.1.0'}, 'clientBuilder':{'esbuild':'0.20.1'},
               'transport':transport,
+              'nativeTestCompiler':{
+                  'command':os.environ.get('KASM_TEST_CXX', 'c++'),
+                  'version':subprocess.check_output([os.environ.get('KASM_TEST_CXX', 'c++'), '--version'], text=True).splitlines()[0]},
               'scope':'Optional bounded UDP development component' if transport == 'udp' else 'WSS only; bounded explicit text clipboard; no UDP, QOI workers, audio or rich clipboard qualification',
               'tools':{name:subprocess.check_output([name,'--version'],text=True).splitlines()[0]
                        for name in ['c++','cmake','node','npm']}}

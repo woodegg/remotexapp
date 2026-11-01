@@ -9,6 +9,7 @@ import datetime
 import hashlib
 import json
 import os
+import platform
 from pathlib import Path
 import re
 import shutil
@@ -98,6 +99,8 @@ def main():
     manifest = {'status': 'experimental-not-a-release', 'sourceCommit': args.source_commit,
                 'sourceEpoch': args.source_epoch, 'version': version,
                 'alpine': Path('/etc/alpine-release').read_text().strip(),
+                'architecture': platform.machine(),
+                'goArchitecture': subprocess.check_output(['go', 'env', 'GOARCH'], text=True).strip(),
                 'toolchain': 'go1.27.3', 'sources': INPUTS, 'binaries': records,
                 'buildPackages': subprocess.check_output(['apk', 'info', '-v'], text=True).splitlines()}
     (output / 'static-build.json').write_text(json.dumps(manifest, indent=2) + '\n')

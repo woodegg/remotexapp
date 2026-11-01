@@ -10,7 +10,7 @@ test('applied encoding cache preserves ordering, lengths and allocation ownershi
   const work = mkdtempSync(join(tmpdir(), 'kasm-cache-test-'));
   try {
     const binary = join(work, 'cache-test');
-    execFileSync('c++', ['-std=c++11', '-g', '-fsanitize=address,undefined',
+    execFileSync(process.env.KASM_TEST_CXX || 'c++', ['-std=c++11', '-g', '-fsanitize=address,undefined',
       '-fno-omit-frame-pointer', '-I' + join(source, 'common'),
       fileURLToPath(new URL('./encoding-cache.cpp', import.meta.url)),
       join(source, 'common/rfb/EncCache.cxx'), '-o', binary]);

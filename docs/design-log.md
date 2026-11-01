@@ -4817,3 +4817,18 @@ pending blocks; they create no timers and do not renew activity. A new UDP
 assembler/negotiation or explicit close resets the observation. SDK output is
 capability-gated and validates its content-free counters. UAT labels the unit
 and denominator explicitly instead of presenting this as IP packet loss.
+
+## 2026-11-01 — Architecture-specific native build qualification
+
+The owner requested the same development UAT on an ARM64 host. Reuse the
+pinned runtime sources and patches, but build distinct native artifacts and
+verify their ELF machine type. Core/component provenance records the target
+architecture; deployment receipts retain independent artifact hashes.
+
+A fresh Alpine ARM64 build reached the native ownership tests, then failed to
+link GCC's unavailable ASan/UBSan libraries. `KASM_TEST_CXX` now selects only the
+native test compiler, allowing Clang/compiler-rt while preserving the sanitizer
+and leak-detection flags. Record that compiler separately from the server's
+compiler. This extends KNA-010 qualification and the [Alpine build procedure](../tests/kasm-native/ALPINE.md);
+it does not change runtime transport, input or lifecycle behavior. An ARM64
+build alone does not imply target UAT or production acceptance.

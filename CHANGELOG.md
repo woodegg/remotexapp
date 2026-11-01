@@ -11,6 +11,9 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Allow a separate native test compiler for Alpine ARM64 sanitizer checks;
+  record architecture and compiler provenance in development build artifacts.
+
 - Add per-Viewer UDP display-block loss estimates to UAT and the native Viewer.
   Bound duplicate/reorder/sequence tracking, expose stale and unavailable data,
   and distinguish receiver delivery loss from IP packet loss.

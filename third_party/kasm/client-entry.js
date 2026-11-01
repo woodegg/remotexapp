@@ -6,7 +6,7 @@ import { clipboardBytes } from './core/remotexapp-server-messages.mjs';
 import { LatencyProbe } from './core/remotexapp-latency.mjs';
 
 export default class NativeDisplay extends EventTarget {
-  static capabilities = Object.freeze({keyboardPolicy:true, clipboardText:true, clipboardMaxBytes:65536, statistics:true, latency:true, udp:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP});
+  static capabilities = Object.freeze({keyboardPolicy:true, clipboardText:true, clipboardMaxBytes:65536, statistics:true, latency:true, udpLoss:true, udp:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP});
   #rfb;
   #input;
   #renderedFrames = 0;
@@ -76,6 +76,8 @@ export default class NativeDisplay extends EventTarget {
     return {...rfb._sock.trafficStats, renderedFrames:this.#renderedFrames, latency:this.#latency.snapshot(),
       udpReceivedBytes:rfb._udpReceivedBytes || 0, udpPackets:rfb._udpPackets || 0,
       udpRectangles:rfb._udpRectangles || 0,
+      udpLoss:rfb._useUdp && rfb._transitConnectionState === rfb.TransitConnectionStates.Udp
+        ? rfb._udpBuffer?.lossStats() || {state:'waiting'} : {state:'inactive'},
       screenTransport:rfb._transitConnectionState === rfb.TransitConnectionStates.Udp && this.#renderedFrames > this.#udpPaintBaseline ? 'webrtc-udp' : 'wss',
       udpState:rfb._transitConnectionState.description, udpReason:rfb._udpUnavailableReason || null,
       width:rfb._display.width, height:rfb._display.height};

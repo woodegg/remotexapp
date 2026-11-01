@@ -5,14 +5,14 @@ import { RemoteXAppNativeClient } from './remotexapp-native-client.js';
 globalThis.CustomEvent ||= class extends Event { constructor(type,options) { super(type); this.detail = options?.detail; } };
 globalThis.location = new URL('https://viewer.example.test/remotexapps/app/kiosk.html');
 
-function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, statistics = false, udp = false, latency = false } = {}) {
+function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, statistics = false, udp = false, latency = false, udpLoss = false } = {}) {
   const state = { id:'app', displayProvider:'kasm', displayComponentDigest:'a'.repeat(64), sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
   if (udp) state.nativeTransport={available:true,grantRequired:true,policy:'prefer-udp'};
   const calls=[];
   state.nativeClipboard = clipboard ? "text" : undefined;
   let display, reads = 0;
   class Display extends EventTarget {
-    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardMaxBytes:65536,statistics,udp,latency};
+    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardMaxBytes:65536,statistics,udp,latency,udpLoss};
     counters = {receivedBytes:100, sentBytes:20, bufferedBytes:0, renderedFrames:2, width:1024, height:768};
     getStats() { return this.counters; }
     probes = 0;
@@ -260,4 +260,23 @@ test('RTT sampling is explicit, capability-gated, content-free and reset on reco
   }
   await f.viewer.reconnect();assert.deepEqual(f.viewer.getStats().latency.wss,{state:'unavailable'});
   f.viewer.disconnect();assert.equal(f.viewer.getStats().latency,undefined);assert.equal(f.viewer.measureLatency(),false);f.viewer.dispose();
+});
+
+test('UDP block loss validates counts, stays passive, gates old components and clears on reconnect', async () => {
+  const old=fixture({statistics:true,udp:true});await old.viewer.connect('app');
+  assert.equal(old.viewer.capabilities.udpLoss,false);assert.equal(old.viewer.getStats().udpLoss,undefined);old.viewer.dispose();
+  const f=fixture({statistics:true,udp:true,udpLoss:true});await f.viewer.connect('app');
+  const loss={state:'ready',scope:'display-blocks',windowMs:10000,settleMs:2000,
+    receivedBlocks:8,lostBlocks:2,expectedBlocks:10,ratio:999,ageMs:20,privateAddress:'must-not-escape'};
+  Object.assign(f.display.counters,{udpReceivedBytes:10,udpPackets:1,udpRectangles:1,udpLoss:loss});
+  const calls=f.calls.length,s=f.viewer.getStats().udpLoss;
+  assert.equal(s.ratio,.2);assert.equal(s.privateAddress,undefined);assert.equal(f.calls.length,calls);assert.equal(f.display.probes,0);
+  for(const bad of [{expectedBlocks:9},{lostBlocks:-1},{receivedBlocks:NaN},{ageMs:10000},{windowMs:20},{scope:'packets'},{state:'made-up'}]){
+    f.display.counters.udpLoss={...loss,...bad};assert.equal(f.viewer.getStats().udpLoss.state,'unavailable');
+  }
+  for(const state of ['waiting','stale','inactive','unavailable']){
+    f.display.counters.udpLoss={...loss,state};assert.deepEqual(f.viewer.getStats().udpLoss,{state});
+  }
+  f.viewer.disconnect();assert.equal(f.viewer.getStats().udpLoss,undefined);
+  await f.viewer.connect('app');assert.equal(f.viewer.getStats().udpLoss.state,'inactive');f.viewer.dispose();
 });

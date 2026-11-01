@@ -42,6 +42,10 @@ UDP-capable component and deployment-owned endpoint catalog.
   Bound sampling and pending work; retire it with the connection. Keep the stats
   getter passive, hide expired samples, and expose neither addresses nor raw
   ICE reports. Fence probes do not update native user-activity timestamps.
+- UDP loss is a bounded receiver-observed display-block estimate over ten
+  seconds, with two seconds for incomplete/missing blocks. It handles duplicate,
+  out-of-order and wrapped IDs without modifying transport. The UI explicitly
+  distinguishes this from IP packet loss and hides idle or unobservable values.
 
 A native UDP manifest schema must fence older Managers and preserve locked
 endpoint identity through restart/recovery. Old WSS manifests remain supported.

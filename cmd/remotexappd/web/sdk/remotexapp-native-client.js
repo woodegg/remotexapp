@@ -26,6 +26,19 @@ function latencySample(raw) {
   return {state:raw.state, ...(raw.state === 'stale' && age ? {ageMs:raw.ageMs} : {})};
 }
 
+function udpLossSample(raw) {
+  const unavailable = {state:'unavailable'};
+  if (!raw || !['waiting','ready','stale','inactive','unavailable'].includes(raw.state)) return unavailable;
+  if (raw.state !== 'ready') return {state:raw.state};
+  const keys = ['receivedBlocks','lostBlocks','expectedBlocks'];
+  if (raw.scope !== 'display-blocks' || raw.windowMs !== 10000 || raw.settleMs !== 2000 ||
+      keys.some(k => !Number.isSafeInteger(raw[k]) || raw[k] < 0) || raw.expectedBlocks < 1 ||
+      raw.expectedBlocks !== raw.receivedBlocks + raw.lostBlocks ||
+      !Number.isFinite(raw.ageMs) || raw.ageMs < 0 || raw.ageMs >= 10000) return unavailable;
+  return {state:'ready',scope:'display-blocks',windowMs:10000,settleMs:2000,
+    ...Object.fromEntries(keys.map(k => [k,raw[k]])),ratio:raw.lostBlocks/raw.expectedBlocks,ageMs:raw.ageMs};
+}
+
 /** Minimal opt-in Kasm Viewer. Each object owns one display attachment only. */
 export class RemoteXAppNativeClient extends EventTarget {
   constructor({ container, manager = new RemoteXAppManager(), timeout = 90000, keyboardPolicy, preferUDP = true } = {}) {
@@ -40,7 +53,7 @@ export class RemoteXAppNativeClient extends EventTarget {
     this.clipboardEnabled = false;
     this.state = 'disconnected';
     this.capabilities = Object.freeze({ display:'kasm-wss-v1', pointer:true, keyboard:true,
-      clipboard:false, keyboardPolicy:false, clipboardMaxBytes:0, statistics:false, latency:false, programmaticText:false, audio:false, udp:false });
+      clipboard:false, keyboardPolicy:false, clipboardMaxBytes:0, statistics:false, latency:false, udpLoss:false, programmaticText:false, audio:false, udp:false });
     this.preferUDP = !!preferUDP;
     this._viewerId = globalThis.crypto?.randomUUID?.() || `viewer-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     this._epoch = 0;
@@ -119,7 +132,8 @@ export class RemoteXAppNativeClient extends EventTarget {
       const clipboard = prepared.nativeClipboard === 'text' && features.clipboardText === true;
       this.capabilities = Object.freeze({...this.capabilities, keyboardPolicy:features.keyboardPolicy === true,
         clipboard, udp, clipboardMaxBytes:clipboard ? features.clipboardMaxBytes : 0, statistics:features.statistics === true,
-        latency:features.latency === true && typeof NativeDisplay.prototype.measureLatency === 'function'});
+        latency:features.latency === true && typeof NativeDisplay.prototype.measureLatency === 'function',
+        udpLoss:udp && features.udpLoss === true});
       const display = this._display = new NativeDisplay(this.container, socketURL.href, {
         resize:prepared.effectivePolicy?.display?.allowClientResize === true, clipboard, keyboardPolicy:this._keyboardPolicy,
         udp:udp && this.preferUDP, protocols:grant ? [`remotexapp-grant.${grant.token}`] : [] });
@@ -221,6 +235,7 @@ export class RemoteXAppNativeClient extends EventTarget {
     return {...snapshot, available:true, ...Object.fromEntries(keys.map(key => [key, raw[key]])),
       ...(this.capabilities.latency ? {latency:{wss:latencySample(raw.latency?.wss),
         udp:udp ? latencySample(raw.latency?.udp) : {state:'inactive'}}} : {}),
+      ...(this.capabilities.udpLoss ? {udpLoss:udp ? udpLossSample(raw.udpLoss) : {state:'inactive'}} : {}),
       ...(udp ? {...Object.fromEntries(udpKeys.map(key => [key,raw[key]])),
         transport:raw.screenTransport === 'webrtc-udp' && raw.udpRectangles > 0 ? 'webrtc-udp' : this._transport,
         controlTransport:this._transport, udpState:raw.udpState, udpReason:raw.udpReason} : {})};

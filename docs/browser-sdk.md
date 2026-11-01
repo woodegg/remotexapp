@@ -103,6 +103,19 @@ The native Viewer page explicitly samples RTT every five seconds while visible;
 it pauses active sampling when its document is hidden and clears live displays
 on disconnect. SDK construction and passive stats reads do not start sampling.
 
+Components declaring `capabilities.udpLoss` expose `getStats().udpLoss`. Its
+`state` is `waiting`, `ready`, `stale`, `inactive` or `unavailable`. Ready data
+has `scope: 'display-blocks'`, `receivedBlocks`, `lostBlocks`, `expectedBlocks`,
+`ratio` (0–1), `ageMs`, `windowMs: 10000` and `settleMs: 2000`. The ratio is
+`lostBlocks / expectedBlocks`, with ten one-second buckets of finalized blocks.
+A sender block ID identifies an application message; it is not an IP packet
+or necessarily a rendered frame. Unique fragments complete a block. Missing
+IDs and incomplete blocks get two seconds for reordering before counting as
+lost. Leading/trailing wholly unseen loss is unobservable. Tracking overflow,
+large sequence gaps or inconsistent headers suppress the affected window.
+Idle data expires; a new UDP negotiation resets counts. Reading this snapshot
+does not generate probes, change decoder retention or renew App activity.
+
 ## Optional runtime keepalive (SDK 0.29)
 
 For a windowed host application, see the [host application migration guide](host-runtime-coordinator-migration.md)

@@ -4793,3 +4793,27 @@ sampling only while visible; SDK construction and getStats remain passive.
 Native Fence processing does not update user-activity timestamps or App leases.
 The pinned server binary can be reused, but the changed client belongs in a new
 immutable component manifest; never edit an installed component in place.
+
+## 2026-11-01 — Observe UDP display-block loss without changing the transport
+
+KNA-005 gains a passive per-Viewer delivery-loss estimate using the existing
+32-bit block ID and fragment index/count. This extends the latency diagnostics
+accepted on 2026-10-31; it does not change keyboard/audio routing or native wire
+format. A block is one sender UDP application message, not an IP packet or frame.
+
+Count a block received when all unique fragments arrive. A sequence gap or
+incomplete block becomes lost after a two-second reorder allowance; later data
+does not reverse that decision. Handle modular ID wrap and ignore duplicates.
+Project counts over ten one-second buckets; an idle stream becomes stale after
+ten seconds. Initial leading loss and wholly unseen trailing loss are unknown.
+Large sequence jumps, inconsistent metadata or observation capacity overflow
+make the affected ten-second window unavailable. Never infer a zero or 100%
+network-packet loss rate from the absence of samples.
+
+Keep at most 512 incomplete/absent blocks and 8192 fragment bits per block.
+Diagnostics retain no payload, send no traffic and do not alter reassembly,
+paint or fallback policy. Snapshot reads only project state, including expired
+pending blocks; they create no timers and do not renew activity. A new UDP
+assembler/negotiation or explicit close resets the observation. SDK output is
+capability-gated and validates its content-free counters. UAT labels the unit
+and denominator explicitly instead of presenting this as IP packet loss.

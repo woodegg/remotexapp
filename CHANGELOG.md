@@ -11,6 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Add per-Viewer UDP display-block loss estimates to UAT and the native Viewer.
+  Bound duplicate/reorder/sequence tracking, expose stale and unavailable data,
+  and distinguish receiver delivery loss from IP packet loss.
+
 - Show separate per-Viewer UDP ICE RTT and end-to-end WebSocket Fence RTT on
   UAT and native Viewer pages. Explicit sampling is bounded to once per five
   seconds, pauses on hidden pages, and marks timeout/stale/unavailable results.

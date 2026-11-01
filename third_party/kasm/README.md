@@ -8,6 +8,10 @@ Viewer grant contract plus an outside-container trusted edge. See
 [bounded UDP UAT](../../docs/native-udp-uat.md). Neither profile qualifies audio,
 QOI workers or rich clipboard.
 
+The UDP assembler also exposes bounded, payload-free display-block loss
+observations. These are receiver delivery estimates, not IP packet loss; they
+do not alter the server wire format or the decoder/reassembly policy.
+
 Both profiles include patch 0022 and the latency adapter. Explicit diagnostic
 sampling uses native RFB Fence echo for WebSocket RTT and selected-pair ICE
 statistics for UDP RTT, with bounded timeouts, stale-result rejection and

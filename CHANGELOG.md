@@ -11,6 +11,9 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Redesign the native UAT workbench with persistent per-Viewer statistics,
+  focus/comparison layouts, fullscreen diagnostics and collapsible input tools.
+
 - Allow a separate native test compiler for Alpine ARM64 sanitizer checks;
   record architecture and compiler provenance in development build artifacts.
 

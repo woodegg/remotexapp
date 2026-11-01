@@ -103,3 +103,6 @@ display-block estimate and records controlled receive-side loss checks.
 The [US ARM64 checkpoint](../tests/kasm-native/UDP-US-ARM64.md) records native
 architecture-specific builds, three-Viewer input/authorization/reboot checks,
 diagnostics, failed test attempts and scoped cleanup on the third fixture.
+
+The [UAT workbench](../tests/kasm-native/UAT-WORKBENCH.md) keeps diagnostics
+visible during interaction and records the separate presentation-only rollout.

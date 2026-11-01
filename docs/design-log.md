@@ -4832,3 +4832,22 @@ and leak-detection flags. Record that compiler separately from the server's
 compiler. This extends KNA-010 qualification and the [Alpine build procedure](../tests/kasm-native/ALPINE.md);
 it does not change runtime transport, input or lifecycle behavior. An ARM64
 build alone does not imply target UAT or production acceptance.
+
+## 2026-11-01 — UAT workbench presentation and asset rollout
+
+The owner requested a more usable test surface with diagnostics visible during
+App interaction. The viewport now reserves space for the remote surface and a
+separately scrollable stats rail. Focus A/B and comparison modes retain the
+existing iframe nodes and connection epochs. Fullscreen includes the rail;
+local text/clipboard tools expand inside the workbench. No global keyboard
+shortcuts or new remote-input handlers are introduced. Counters, RTT and block
+loss retain the existing measurement and stale/unavailable semantics.
+
+Embedded Viewer styling hides duplicate header statistics only inside this UAT
+page; the standalone Viewer and pinned SDK/component remain unchanged. This
+presentation-only update is deployed as a separately hashed edge asset bundle,
+with the old SDK/component files and executable copied without modification.
+A second loopback edge listener permits the protected route to move while the
+preceding listener retains existing WebSocket clients. Runtime/App pins and
+saved documents are preserved; the prior listener/config remains available
+for rollback and later retirement after its clients disconnect.

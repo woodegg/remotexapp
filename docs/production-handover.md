@@ -12,6 +12,11 @@ implemented with [bounded automated evidence](../tests/kasm-native/README.md);
 later gates await review. The default
 architecture and accepted invariants below still apply.
 
+The opt-in [native audio contract](native-audio.md) and its
+[exact standalone candidate evidence](../tests/native-audio/qualification-7926949.md)
+cover per-session domains, shared speaker/mic transport, recovery and cleanup.
+They leave physical sound quality and actual embedding-host acceptance pending.
+
 ## Architecture and ownership
 
 RemoteXApp manages Linux X11 applications through four boundaries:

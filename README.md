@@ -41,7 +41,9 @@ You can also package another X11 app without rebuilding the Manager.
 The experience is Citrix-style desktop and application delivery, with a
 programmable integration surface for developers. RemoteXApp uses TigerVNC and
 noVNC; it is not compatible with Citrix ICA/HDX. Bring your own Linux host,
-authentication and tenant isolation. Audio integration is still work in progress.
+authentication and tenant isolation. Experimental [Kasm-native speaker and
+microphone integration](docs/native-audio.md) is available for standalone UAT;
+it is not part of the released provider’s accepted behavior.
 
 ## Embed an app
 

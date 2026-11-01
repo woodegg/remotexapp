@@ -52,6 +52,15 @@ source pins and rollback restrictions. No Kasm credentials are delivered to
 the host SDK. The existing Manager/trusted-ingress single-account authorization
 model applies; this adapter does not add a separate multi-tenant ACL system.
 
+## Experimental native audio (D3, SDK 0.31.0-dev.4)
+
+Use the separate `RemoteXAppAudio` export for speaker/microphone interests;
+`RemoteXAppNativeClient` continues to own only the Viewer. See the
+[native audio SDK example and contract](native-audio.md#sdk-use) for explicit
+per-session switches, cross-tab ownership and disposal. Audio interests do not
+attach Viewers or renew App keepalive. The qualified standalone candidate awaits
+one physical audio UAT; embedding host must verify its own workspace and login hooks.
+
 ## Native connection statistics (development SDK 0.31.0-dev.3)
 
 `viewer.getStats()` returns a read-only snapshot with `schemaVersion:1`,

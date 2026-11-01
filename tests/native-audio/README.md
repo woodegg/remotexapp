@@ -4,6 +4,14 @@ Issue [#45](https://github.com/woodegg/remotexapp/issues/45) owns full product
 integration. The owner requests one end-to-end human UAT after the complete
 integration, not separate manual gates for each implementation checkpoint.
 
+## Qualified standalone candidate
+
+[Candidate 7926949 qualification](qualification-7926949.md) records 36 local real
+Pulse/Chrome cases, 56 UAT fixture checks, three-region AMD64/ARM64 playback and
+App lifecycle checks, 27 live fault checks, six logout checks, the natural
+30-minute resource observation and cleanup. Physical audio UAT and actual embedding host
+embedding remain separate; see the report's scope and queue-counter limits.
+
 ## Same-UID routing experiment
 
 Run as a non-root application UID with PulseAudio, pactl, pacat and parec:

@@ -1,0 +1,937 @@
+{
+  "schema": 1,
+  "sourceCommit": "792694956ce1c3fd21160797c6a65be0d09a0d4d",
+  "localBuildFixtureCleanup": {
+    "passed": true,
+    "ownedLocalAudioFixturesRunning": 0,
+    "amd64BuilderReturnedToOriginalStoppedState": true,
+    "arm64BuilderReturnedToOriginalStoppedState": true
+  },
+  "coreVersion": "0.16.0-dev.4",
+  "sdkVersion": "0.31.0-dev.4",
+  "status": "functional-and-resource-qualified-awaiting-one-physical-UAT",
+  "localPulseBrowser": {
+    "schema": 1,
+    "scope": "real-pulse-product-sdk-synthetic-chrome",
+    "passed": true,
+    "checks": [
+      "acquiring three interests opens no audio channel",
+      "no audio device before explicit action",
+      "first speaker creates one WSS",
+      "two sessions and three tabs reuse one WSS",
+      "exactly one playback owner",
+      "remote 440 Hz reaches actual browser playback graph",
+      "second session 660 Hz reaches shared playback graph",
+      "same-session off is shared across tabs",
+      "turning off A preserves B and shared channel",
+      "880 Hz synthetic browser mic is read back in selected remote session",
+      "unselected session mic stays silent",
+      "multi-target mic uses exactly one capture",
+      "multi-target remote readback works",
+      "one unavailable domain preserves the shared connection and other mic target",
+      "unavailable domain does not interrupt the other speaker",
+      "domain recovery leaves its mic off and preserves the existing capture",
+      "disabling A mic preserves B mic",
+      "other browser profile sees explicit writer conflict",
+      "rejected writer releases its capture",
+      "explicit takeover revokes previous target writer",
+      "last lost mic target releases previous capture",
+      "capture owner tab closure releases remote writer",
+      "all audio off releases WSS/readers/writers",
+      "revoking active microphone permission retires writer and preserves speaker",
+      "restoring permission does not silently reopen microphone",
+      "permission denial is explicit and opens no audio WSS",
+      "late permission after cancellation releases tracks",
+      "audio domain replacement fences old mic and restores speaker without recapture",
+      "replacement domain produces real playback",
+      "closing playback owner hands off once to an unlocked tab",
+      "last session reference releases its speaker and channel",
+      "silent SharedWorker exit ends capture, playback and remote relays",
+      "new controller after worker failure starts with audio off",
+      "explicit controller recreation restores real microphone readback",
+      "server retirement of final App closes shared channel and microphone",
+      "browser exceptions absent"
+    ],
+    "cleanup": {
+      "connections": 0,
+      "readers": 0,
+      "writers": 0
+    },
+    "notQualified": [
+      "physical devices",
+      "WAN",
+      "full Manager App lifecycle",
+      "long soak"
+    ]
+  },
+  "CI": {
+    "candidateVerify": "https://github.com/woodegg/remotexapp/actions/runs/41290802284",
+    "status": "success"
+  },
+  "sourceGates": {
+    "makeCheck": "passed",
+    "makeTestRace": "passed",
+    "makeCoverageCheck": "passed",
+    "sdkLineCoveragePercent": 88.3,
+    "vulnerabilityScan": "No vulnerabilities found; dependencies unchanged since scan"
+  },
+  "uatFixture": {
+    "schema": 1,
+    "scope": "synthetic-browser-fixture-only",
+    "pageSHA256": "e1af922c7b0eba6cf852d4820330735f479999fa0d818a982a1d0c6cd9f8a426",
+    "browser": "Chrome/149.0.7827.102",
+    "checks": [
+      "no audio capture/context before explicit click",
+      "initial same runtime shown",
+      "B-only switch preserves A iframe",
+      "recreated B uses its independent target",
+      "return to same runtime preserves A",
+      "failed selection preserves both prior targets",
+      "late session selection cannot reopen an explicitly closed B",
+      "cancelled selection retains previous B target",
+      "tone completion requires human observation",
+      "explicit heard selection exported",
+      "all remote cases remain unexecuted",
+      "export excludes private fields",
+      "synthetic microphone drives local RMS meter",
+      "switching to input tools releases tracks",
+      "contexts close after cancellation",
+      "permission denied visibly without capture",
+      "late permission after UI cancel releases stream",
+      "real tab hiding stops local capture",
+      "audio drawer retains remote surface 1920x1080",
+      "stats remain inside viewport 1920x1080",
+      "audio drawer causes no outer scroll 1920x1080",
+      "audio drawer retains remote surface 1440x900",
+      "stats remain inside viewport 1440x900",
+      "audio drawer causes no outer scroll 1440x900",
+      "audio drawer retains remote surface 1366x768",
+      "stats remain inside viewport 1366x768",
+      "audio drawer causes no outer scroll 1366x768",
+      "audio drawer retains remote surface 1024x640",
+      "stats remain inside viewport 1024x640",
+      "audio drawer causes no outer scroll 1024x640",
+      "audio drawer retains remote surface 900x700",
+      "stats remain inside viewport 900x700",
+      "audio drawer causes no outer scroll 900x700",
+      "audio drawer retains remote surface 800x600",
+      "stats remain inside viewport 800x600",
+      "audio drawer causes no outer scroll 800x600",
+      "audio drawer retains remote surface 768x1024",
+      "stats remain inside viewport 768x1024",
+      "audio drawer causes no outer scroll 768x1024",
+      "audio drawer retains remote surface 390x844",
+      "stats remain inside viewport 390x844",
+      "audio drawer causes no outer scroll 390x844",
+      "fullscreen retains audio and stats",
+      "layout and fullscreen preserve A connection",
+      "desktop already in A is honestly reported as same runtime",
+      "final export still has no remote pass",
+      "page retirement handler stops tracks",
+      "all probe AudioContexts closed",
+      "unavailable backend sends no audio or device payloads",
+      "no browser exceptions",
+      "successful audio App B selection clears earlier failure message",
+      "advancing audio counters produce positive bandwidth",
+      "repeated worklet state preserves measured bandwidth",
+      "new audio connection retires prior rates",
+      "idle audio hides stale rates",
+      "bandwidth fixture has no browser exceptions"
+    ],
+    "errors": [],
+    "notVerified": [
+      "real-Manager/runtime/audio-backend",
+      "physical speaker/microphone",
+      "other browser engines",
+      "embedding-host workspace lifecycle",
+      "live UAT rollout"
+    ]
+  },
+  "remoteRegions": {
+    "australia": {
+      "architecture": "amd64",
+      "pageSHA256": "e1af922c7b0eba6cf852d4820330735f479999fa0d818a982a1d0c6cd9f8a426",
+      "archives": {
+        "core": {
+          "sha256": "3ed7f975ac9a526136fe7b31439cad18edddb45d481f4b929c58b53d023aafb3",
+          "filename": "remotexapp-audio-792694956ce1-amd64.tar.gz"
+        },
+        "edge": {
+          "sha256": "29cad24b09a3cf4ce8e2221f79ac74d9edc04841da192d60c845de3fe141188e",
+          "filename": "remotexapp-audio-edge-792694956ce1-amd64.tar.gz"
+        }
+      },
+      "appPackageSHA256": "38dff3e5a1243eda618161b2b1c817f0082179eb1c9ab1712e2bdbbe70e654e6",
+      "verification": {
+        "public-audio-check": {
+          "passed": true,
+          "checks": [
+            "two real Viewers ready",
+            "App launch alone opens no audio WSS",
+            "remote App 440 Hz reaches browser graph",
+            "second App 660 Hz reaches the shared playback graph",
+            "synthetic browser mic reaches only selected App",
+            "remote App records actual three-second microphone audio",
+            "remote recording replays through speaker path",
+            "two target Apps reuse one browser microphone",
+            "both Apps share one connected audio transport",
+            "all off ends capture and transport",
+            "all off reaps PCM readers and writers",
+            "no browser exceptions"
+          ],
+          "privateRecordSHA256": "8b7c1ff01f542b92441e5e0b28ea23172859b133e1e5a256a46893e1310cddcf",
+          "readback": {
+            "speaker440Peak": 0.1830852685854788,
+            "speaker660Peak": 0.18308561793362754,
+            "replay880Peak": 0.18308494958353733,
+            "selectedMic": {
+              "samples": 95760,
+              "peak880": 5999.331081767731,
+              "windows": 19
+            },
+            "unselectedMic": {
+              "samples": 95040,
+              "peak880": 0,
+              "windows": 19
+            },
+            "multiTargetMic": {
+              "samples": 95520,
+              "peak880": 5999.328081721066,
+              "windows": 19
+            }
+          }
+        },
+        "public-lifecycle": {
+          "passed": true,
+          "checks": [
+            "target microphone is producing real audio before App stop",
+            "normal App stop fences only its own audio route",
+            "other App continues actual microphone readback",
+            "explicit audio interest remains after final Viewer closes",
+            "audio does not renew the sixty-second vacant App policy",
+            "last App stop closes shared audio and capture",
+            "no browser exceptions"
+          ],
+          "privateRecordSHA256": "2877c2d43fbca5bb4d38ae8f051c83bef0c1030f158f8a29ea7307c35190b2ff"
+        },
+        "public-faults": {
+          "passed": true,
+          "checks": [
+            "two Apps and three Viewers share routes with one playback owner",
+            "one capture feeds two remote Apps",
+            "all three Viewers show nonblank real desktop pixels",
+            "closing capture and playback owner hands speaker over without recapture",
+            "handed-over owner receives actual remote speaker",
+            "explicit mic a has real remote readback",
+            "other App microphone is established before domain failure",
+            "private Pulse crash preserves App and fences microphone",
+            "other App private domain survives recovery",
+            "other App keeps real microphone audio without recapture",
+            "explicit mic a has real remote readback",
+            "permission revocation preserves speaker and stops capture",
+            "permission restoration alone does not recapture",
+            "explicit mic a has real remote readback",
+            "lease network failure stops microphone",
+            "same epoch reconnect restores speakers without mic",
+            "explicit mic a has real remote readback",
+            "silent Worker exit closes microphone and playback context",
+            "audio reconnect preserves existing Viewers",
+            "new audio controller starts off",
+            "explicit mic a has real remote readback",
+            "Manager epoch change retires old interests and capture",
+            "Manager adopts existing App and private Pulse unchanged",
+            "existing explicit Viewer reconnect restores both displays after Manager restart",
+            "explicit mic a has real remote readback",
+            "fault sequence all-off reaps audio relay processes",
+            "no unexpected browser exceptions"
+          ],
+          "privateRecordSHA256": "432b4abad9bf49788d87a30e52fb9e8c8c9c1da2ea3a39b392bea58074f55966"
+        },
+        "public-logout": {
+          "passed": true,
+          "checks": [
+            "both tabs observe shared active microphone route",
+            "SDK logout retires audio interests across both tabs",
+            "logout reaps all remote PCM relays",
+            "fresh audio scope starts with both switches off",
+            "explicit post-logout microphone action restores readback",
+            "no browser exceptions"
+          ],
+          "privateRecordSHA256": "63cfb98132fa81eaf2cdefca1f692a23dfbbab0c7f360b0971f36223eda6b9ec"
+        },
+        "owned-cleanup-audit": {
+          "checks": [
+            {
+              "allOwnedAppAndPulseProcessesEnded": true,
+              "privateAudioRootRemoved": true
+            },
+            {
+              "allOwnedAppAndPulseProcessesEnded": true,
+              "privateAudioRootRemoved": true
+            }
+          ],
+          "passed": true
+        },
+        "final-inspection": {
+          "passed": true,
+          "source": "792694956ce1c3fd21160797c6a65be0d09a0d4d",
+          "originalProcessesGenerationsPinsAndDocumentsPreserved": true,
+          "installedCoreAndEdgeHashesVerified": true,
+          "currentPageHashVerified": true,
+          "runningInstances": 1,
+          "attachedViewers": 0
+        },
+        "edge-cleanup": {
+          "passed": true,
+          "immutableArtifactsPreserved": true
+        },
+        "browser-cleanup": {
+          "passed": true,
+          "ownedBrowserExited": true,
+          "ownedProfileRemoved": true
+        },
+        "route-final-check": {
+          "passed": true,
+          "samePublicHostname": true,
+          "qualifiedEdgeSelected": true,
+          "accessRequired": true
+        }
+      }
+    },
+    "china": {
+      "architecture": "amd64",
+      "pageSHA256": "e1af922c7b0eba6cf852d4820330735f479999fa0d818a982a1d0c6cd9f8a426",
+      "archives": {
+        "core": {
+          "sha256": "3ed7f975ac9a526136fe7b31439cad18edddb45d481f4b929c58b53d023aafb3",
+          "filename": "remotexapp-audio-792694956ce1-amd64.tar.gz"
+        },
+        "edge": {
+          "sha256": "29cad24b09a3cf4ce8e2221f79ac74d9edc04841da192d60c845de3fe141188e",
+          "filename": "remotexapp-audio-edge-792694956ce1-amd64.tar.gz"
+        }
+      },
+      "appPackageSHA256": "38dff3e5a1243eda618161b2b1c817f0082179eb1c9ab1712e2bdbbe70e654e6",
+      "verification": {
+        "public-audio-check": {
+          "passed": true,
+          "checks": [
+            "two real Viewers ready",
+            "App launch alone opens no audio WSS",
+            "remote App 440 Hz reaches browser graph",
+            "second App 660 Hz reaches the shared playback graph",
+            "synthetic browser mic reaches only selected App",
+            "remote App records actual three-second microphone audio",
+            "remote recording replays through speaker path",
+            "two target Apps reuse one browser microphone",
+            "both Apps share one connected audio transport",
+            "all off ends capture and transport",
+            "all off reaps PCM readers and writers",
+            "no browser exceptions"
+          ],
+          "privateRecordSHA256": "fa2fa23fb7341eeb09acb3c0ae1a6af71101eda039d444352b7f98997adab013",
+          "readback": {
+            "speaker440Peak": 0.18308526926495478,
+            "speaker660Peak": 0.18308561842230392,
+            "replay880Peak": 0.12315082884185734,
+            "selectedMic": {
+              "samples": 96000,
+              "peak880": 4974.841520672185,
+              "windows": 19
+            },
+            "unselectedMic": {
+              "samples": 96000,
+              "peak880": 0,
+              "windows": 19
+            },
+            "multiTargetMic": {
+              "samples": 95760,
+              "peak880": 4805.850584414973,
+              "windows": 19
+            }
+          }
+        },
+        "public-lifecycle": {
+          "passed": true,
+          "checks": [
+            "target microphone is producing real audio before App stop",
+            "normal App stop fences only its own audio route",
+            "other App continues actual microphone readback",
+            "explicit audio interest remains after final Viewer closes",
+            "audio does not renew the sixty-second vacant App policy",
+            "last App stop closes shared audio and capture",
+            "no browser exceptions"
+          ],
+          "privateRecordSHA256": "2877c2d43fbca5bb4d38ae8f051c83bef0c1030f158f8a29ea7307c35190b2ff"
+        },
+        "owned-cleanup-audit": {
+          "checks": [
+            {
+              "allOwnedAppAndPulseProcessesEnded": true,
+              "privateAudioRootRemoved": true
+            },
+            {
+              "allOwnedAppAndPulseProcessesEnded": true,
+              "privateAudioRootRemoved": true
+            }
+          ],
+          "passed": true
+        },
+        "final-inspection": {
+          "passed": true,
+          "source": "792694956ce1c3fd21160797c6a65be0d09a0d4d",
+          "originalProcessesGenerationsPinsAndDocumentsPreserved": true,
+          "installedCoreAndEdgeHashesVerified": true,
+          "currentPageHashVerified": true,
+          "runningInstances": 1,
+          "attachedViewers": 0
+        },
+        "edge-cleanup": {
+          "passed": true,
+          "immutableArtifactsPreserved": true
+        },
+        "browser-cleanup": {
+          "passed": true,
+          "ownedBrowserExited": true,
+          "ownedProfileRemoved": true
+        },
+        "route-final-check": {
+          "passed": true,
+          "samePublicHostname": true,
+          "qualifiedEdgeSelected": true,
+          "accessRequired": true
+        }
+      }
+    },
+    "us": {
+      "architecture": "arm64",
+      "pageSHA256": "e1af922c7b0eba6cf852d4820330735f479999fa0d818a982a1d0c6cd9f8a426",
+      "archives": {
+        "core": {
+          "sha256": "5b63e73a5be3cab0c7db98e8f371cb71dd5729d6451e2fd55c257afeef7945e5",
+          "filename": "remotexapp-audio-792694956ce1-arm64.tar.gz"
+        },
+        "edge": {
+          "sha256": "c38e4114db4830f0062d705a71f4d6c5bd9bd2867121cf00c39b9d16dfabf3e5",
+          "filename": "remotexapp-audio-edge-792694956ce1-arm64.tar.gz"
+        }
+      },
+      "appPackageSHA256": "8abe41b54dedbdb466434999a2ac41f48d646d95d6e81101cb589db790fff9f0",
+      "verification": {
+        "public-audio-check": {
+          "passed": true,
+          "checks": [
+            "two real Viewers ready",
+            "App launch alone opens no audio WSS",
+            "remote App 440 Hz reaches browser graph",
+            "second App 660 Hz reaches the shared playback graph",
+            "synthetic browser mic reaches only selected App",
+            "remote App records actual three-second microphone audio",
+            "remote recording replays through speaker path",
+            "two target Apps reuse one browser microphone",
+            "both Apps share one connected audio transport",
+            "all off ends capture and transport",
+            "all off reaps PCM readers and writers",
+            "no browser exceptions"
+          ],
+          "privateRecordSHA256": "9ff3f1cb77b647a053c66e66f809db96bbbae6bbf57f9905acd29ee5598c910b",
+          "readback": {
+            "speaker440Peak": 0.18308526761109525,
+            "speaker660Peak": 0.18308561831720935,
+            "replay880Peak": 0.18308490469292496,
+            "selectedMic": {
+              "samples": 96000,
+              "peak880": 5999.33108176773,
+              "windows": 19
+            },
+            "unselectedMic": {
+              "samples": 95040,
+              "peak880": 0,
+              "windows": 19
+            },
+            "multiTargetMic": {
+              "samples": 95760,
+              "peak880": 5999.33108176773,
+              "windows": 19
+            }
+          }
+        },
+        "public-lifecycle": {
+          "passed": true,
+          "checks": [
+            "target microphone is producing real audio before App stop",
+            "normal App stop fences only its own audio route",
+            "other App continues actual microphone readback",
+            "explicit audio interest remains after final Viewer closes",
+            "audio does not renew the sixty-second vacant App policy",
+            "last App stop closes shared audio and capture",
+            "no browser exceptions"
+          ],
+          "privateRecordSHA256": "2877c2d43fbca5bb4d38ae8f051c83bef0c1030f158f8a29ea7307c35190b2ff"
+        },
+        "owned-cleanup-audit": {
+          "checks": [
+            {
+              "allOwnedAppAndPulseProcessesEnded": true,
+              "privateAudioRootRemoved": true
+            },
+            {
+              "allOwnedAppAndPulseProcessesEnded": true,
+              "privateAudioRootRemoved": true
+            }
+          ],
+          "passed": true
+        },
+        "final-inspection": {
+          "passed": true,
+          "source": "792694956ce1c3fd21160797c6a65be0d09a0d4d",
+          "originalProcessesGenerationsPinsAndDocumentsPreserved": true,
+          "installedCoreAndEdgeHashesVerified": true,
+          "currentPageHashVerified": true,
+          "runningInstances": 1,
+          "attachedViewers": 0
+        },
+        "edge-cleanup": {
+          "passed": true,
+          "immutableArtifactsPreserved": true
+        },
+        "browser-cleanup": {
+          "passed": true,
+          "ownedBrowserExited": true,
+          "ownedProfileRemoved": true
+        },
+        "route-final-check": {
+          "passed": true,
+          "samePublicHostname": true,
+          "qualifiedEdgeSelected": true,
+          "accessRequired": true
+        }
+      }
+    }
+  },
+  "resourceObservation": {
+    "lockedCriteria": {
+      "source": "369b1291f787cab16b3c17fda9b0b29c627e59ec",
+      "scope": "three project UATs, two audio Apps, three Viewers, fake microphone",
+      "resourceObservationSeconds": 1800,
+      "resourceSampleSeconds": 30,
+      "gates": {
+        "allViewersConnected": true,
+        "oneSharedAudioWSS": true,
+        "oneCaptureForTwoTargets": true,
+        "knownSpeakerAndMicReadback": true,
+        "noRemoteToneInUnselectedMic": true,
+        "allOffReleasesReadersWritersAndWSS": true,
+        "noOrphanOwnedProcesses": true,
+        "browserExceptions": 0,
+        "processFDGrowthAfterWarmupMax": 8,
+        "finalTenMinutePSSGrowthMiBMax": 32,
+        "browserDOMGrowthAfterWarmupMax": 100,
+        "micReacquiresAfterFailure": 0
+      },
+      "notes": [
+        "PSS includes browser process tree and Manager/Pulse children, recorded separately.",
+        "No GC during natural observation; resource limits are bounded observation gates, not eight-hour or production acceptance.",
+        "Raw audio not persisted; synthetic FFT/level summaries only.",
+        "Physical devices and human perceived quality await one final UAT."
+      ]
+    },
+    "plan": {
+      "source": "792694956ce1c3fd21160797c6a65be0d09a0d4d",
+      "observerSHA256": "974637328e0b6afe2a5720676d7d7fb8e41d2f5b36cf7a5c441d1c7eda2fef9a",
+      "producerSHA256": "89fff37dbd703de9e5b168aefd6899014e6b3373c5a37e48b445806be17f8138",
+      "supportSHA256": "2743bdf1735388dbee87ac422bb692d4b0ce9fbdf336851b464b80ffea5f75fb",
+      "probeSHA256": "1629fc19b7efbf19d270288cec02d1c9dee9524ae611b4fac90047e88fc36ec8",
+      "startedAt": "2026-11-01T09:01:55.232Z",
+      "endAt": "2026-11-01T09:31:55.232Z",
+      "criteriaSHA256": "7fbfae5ad74b3f13dc63cc93492b2accffb6f409763840c4e0de1a8953fb15e8",
+      "durationSeconds": 1800,
+      "sampleSeconds": 30,
+      "workload": "two continuous synthetic remote tones, one fake browser capture to two Apps, three real Viewers",
+      "DOMGate": "attached DOM elements; total CDP DOM nodes including unreclaimed garbage also recorded",
+      "pssGate": "last-ten-minute median 3 samples at each end; browser process tree and Manager separately",
+      "fdGate": "per surviving PID, 5-minute warmup baseline versus final",
+      "noGC": true
+    },
+    "result": {
+      "source": "792694956ce1c3fd21160797c6a65be0d09a0d4d",
+      "passed": true,
+      "naturalSeconds": 1817.822,
+      "samples": 61,
+      "limits": [
+        "synthetic devices",
+        "30 minute bounded observation, not 8 hour soak",
+        "one browser version on Linux",
+        "physical acoustic quality not qualified"
+      ]
+    },
+    "naturalEnd": {
+      "at": "2026-11-01T09:31:58.168Z",
+      "elapsedSeconds": 1802.936,
+      "GCInvoked": false
+    },
+    "review": {
+      "durationSeconds": 1801.474,
+      "samples": 61,
+      "chromeLast10mPSSGrowthMiB": 10.8818359375,
+      "managerLast10mPSSGrowthMiB": -0.59375,
+      "survivingProcessFDGrowthMax": 0,
+      "attachedDOMGrowth": 0,
+      "captureCallsGrowth": 0,
+      "exceptions": 0,
+      "fds": [
+        {
+          "kind": "remote",
+          "name": "Xkasmvnc",
+          "growth": 0
+        },
+        {
+          "kind": "remote",
+          "name": "Xkasmvnc",
+          "growth": 0
+        },
+        {
+          "kind": "remote",
+          "name": "remotexapp-audi",
+          "growth": 0
+        },
+        {
+          "kind": "remote",
+          "name": "Xkasmvnc",
+          "growth": 0
+        },
+        {
+          "kind": "remote",
+          "name": "pulseaudio",
+          "growth": 0
+        },
+        {
+          "kind": "remote",
+          "name": "remotexapp-audi",
+          "growth": 0
+        },
+        {
+          "kind": "remote",
+          "name": "pulseaudio",
+          "growth": 0
+        },
+        {
+          "kind": "remote",
+          "name": "remotexappd",
+          "growth": -1
+        },
+        {
+          "kind": "remote",
+          "name": "pacat",
+          "growth": 0
+        },
+        {
+          "kind": "remote",
+          "name": "pacat",
+          "growth": 0
+        },
+        {
+          "kind": "remote",
+          "name": "parec",
+          "growth": 0
+        },
+        {
+          "kind": "remote",
+          "name": "pacat",
+          "growth": 0
+        },
+        {
+          "kind": "remote",
+          "name": "parec",
+          "growth": 0
+        },
+        {
+          "kind": "remote",
+          "name": "pacat",
+          "growth": 0
+        },
+        {
+          "kind": "chrome",
+          "name": "chrome",
+          "growth": 0
+        },
+        {
+          "kind": "chrome",
+          "name": "cat",
+          "growth": 0
+        },
+        {
+          "kind": "chrome",
+          "name": "cat",
+          "growth": 0
+        },
+        {
+          "kind": "chrome",
+          "name": "chrome",
+          "growth": 0
+        },
+        {
+          "kind": "chrome",
+          "name": "chrome",
+          "growth": 0
+        },
+        {
+          "kind": "chrome",
+          "name": "chrome",
+          "growth": 0
+        },
+        {
+          "kind": "chrome",
+          "name": "chrome",
+          "growth": 0
+        },
+        {
+          "kind": "chrome",
+          "name": "chrome",
+          "growth": 0
+        },
+        {
+          "kind": "chrome",
+          "name": "chrome",
+          "growth": 0
+        },
+        {
+          "kind": "chrome",
+          "name": "chrome",
+          "growth": 0
+        },
+        {
+          "kind": "chrome",
+          "name": "chrome",
+          "growth": 0
+        },
+        {
+          "kind": "chrome",
+          "name": "chrome",
+          "growth": -1
+        },
+        {
+          "kind": "chrome",
+          "name": "chrome",
+          "growth": 0
+        }
+      ],
+      "passed": true
+    },
+    "metrics": {
+      "chrome": {
+        "PssMiB": {
+          "first": 586.863,
+          "last": 645.202,
+          "min": 578.963,
+          "max": 646.043
+        },
+        "Pss_AnonMiB": {
+          "first": 291.982,
+          "last": 349.478,
+          "min": 281.067,
+          "max": 350.368
+        },
+        "RssMiB": {
+          "first": 1443.426,
+          "last": 1501.16,
+          "min": 1436.863,
+          "max": 1501.91
+        }
+      },
+      "manager": {
+        "PssMiB": {
+          "first": 16.082,
+          "last": 19.754,
+          "min": 15.621,
+          "max": 20.824
+        },
+        "Pss_AnonMiB": {
+          "first": 7.238,
+          "last": 10.91,
+          "min": 6.777,
+          "max": 11.98
+        },
+        "RssMiB": {
+          "first": 16.086,
+          "last": 19.758,
+          "min": 15.625,
+          "max": 20.828
+        }
+      },
+      "pulse": {
+        "PssMiB": {
+          "first": 3.957,
+          "last": 7.783,
+          "min": 3.956,
+          "max": 7.783
+        },
+        "Pss_AnonMiB": {
+          "first": 2.055,
+          "last": 5.883,
+          "min": 2.055,
+          "max": 5.883
+        },
+        "RssMiB": {
+          "first": 9.301,
+          "last": 13.113,
+          "min": 9.301,
+          "max": 13.113
+        }
+      },
+      "relays": {
+        "PssMiB": {
+          "first": 3.854,
+          "last": 3.854,
+          "min": 3.853,
+          "max": 3.854
+        },
+        "Pss_AnonMiB": {
+          "first": 2.484,
+          "last": 2.484,
+          "min": 2.484,
+          "max": 2.484
+        },
+        "RssMiB": {
+          "first": 15.758,
+          "last": 15.758,
+          "min": 15.758,
+          "max": 15.758
+        }
+      },
+      "pageJSHeapMiB": {
+        "first": 4.292,
+        "last": 4.429,
+        "min": 4.292,
+        "max": 4.906
+      },
+      "workerJSHeapMiB": {
+        "first": 0.751,
+        "last": 1.11,
+        "min": 0.469,
+        "max": 1.243
+      },
+      "attachedDOMElements": {
+        "first": 808.0,
+        "last": 808.0,
+        "min": 808.0,
+        "max": 808.0
+      },
+      "cdpDOMNodes": {
+        "first": 1131.0,
+        "last": 1144.0,
+        "min": 1131.0,
+        "max": 1435.0
+      },
+      "workerBackingStorageMiB": {
+        "first": 1.931,
+        "last": 4.037,
+        "min": 0.07,
+        "max": 4.876
+      },
+      "observerNodeCPUPercentOfOneCore": 0.571,
+      "observerNodeRSSMiB": {
+        "first": 72.109,
+        "last": 82.008,
+        "min": 72.109,
+        "max": 82.148
+      },
+      "observerNodeHeapMiB": {
+        "first": 8.064,
+        "last": 11.627,
+        "min": 8.064,
+        "max": 11.934
+      },
+      "observerNodeFDs": {
+        "first": 25.0,
+        "last": 25.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    },
+    "sampleSHA256": "67a6b175a2a406902a4db3494732b1ef8df95fd7cca2aa6e193d304f770a4fda",
+    "sampleCount": 61,
+    "sampledToneReadback": {
+      "bothAbove0_05": 59,
+      "tone440": {
+        "first": 0.183,
+        "last": 0.183,
+        "min": 0.016,
+        "max": 0.183
+      },
+      "tone660": {
+        "first": 0.183,
+        "last": 0.183,
+        "min": 0.002,
+        "max": 0.183
+      }
+    },
+    "actualViewerCountsEverySample": true,
+    "threeReadyNonblankViewersEverySample": true,
+    "oneCaptureEverySample": true,
+    "distinctSharedConnectionsDuringInterval": 1,
+    "transportFirst": {
+      "receivedBytes": 7520824,
+      "sentBytes": 3325800,
+      "droppedFrames": 45
+    },
+    "transportLast": {
+      "receivedBytes": 699284472,
+      "sentBytes": 175899184,
+      "droppedFrames": 4941
+    },
+    "workletFirst": {
+      "playback": {
+        "type": "stats",
+        "underrunBlocks": 383,
+        "droppedFrames": 0,
+        "peak": 0.359954833984375,
+        "queuedFrames": 12
+      },
+      "microphone": {
+        "type": "stats",
+        "level": 0.12882162927136653,
+        "droppedFrames": 3
+      }
+    },
+    "workletLast": {
+      "playback": {
+        "type": "stats",
+        "underrunBlocks": 31821,
+        "droppedFrames": 264,
+        "peak": 0.365478515625,
+        "queuedFrames": 14
+      },
+      "microphone": {
+        "type": "stats",
+        "level": 0.12946267290057026,
+        "droppedFrames": 3
+      }
+    },
+    "cleanup": {
+      "pcmRelays": 0,
+      "allCaptureTracksEnded": true,
+      "connection": "idle",
+      "producerChildrenReaped": true
+    }
+  },
+  "scopeLimits": [
+    "Synthetic 48 kHz microphone and known remote tones; physical devices, acoustic quality, echo and perceived WAN delay require the single human UAT.",
+    "One Linux Chrome version; no Safari, Firefox or actual Windows/macOS device qualification.",
+    "Live full Manager audio qualification uses standalone/runit; no live systemd audio deployment qualification.",
+    "Thirty natural minutes on Australia, not an eight-hour soak or production memory-leak proof.",
+    "One Manager per tested browser origin. Multiple Managers behind paths of one origin and cross-origin host bridging are not qualified.",
+    "Standalone and cross-tab SDK UAT; actual embedding host embedding/workspace lifecycle remains downstream acceptance.",
+    "Audio uses separate WSS. No new display UDP forwarding or transport qualification in this audio run.",
+    "PCM16 stereo speaker is 1.536 Mbps per active stream; microphone is 0.768 Mbps once upstream, excluding protocol overhead.",
+    "Same-UID domains provide functional routing isolation, not malicious-tenant security.",
+    "No merge, release or production acceptance is implied."
+  ],
+  "reproducibleHarnessHashes": {
+    "tests/native-audio/browser-integration.mjs": "9d921c25dc8776c2b7fed037ed7bfd55a88fa2acc5f4dc1560e19baf875cd84b",
+    "tests/native-audio/browser-cdp.mjs": "1c8db259fe109d8a908f2ecbc8c92f2d5dfc3b52294c1032cb4b7b996b64b68c",
+    "tests/kasm-native/browser-audio-uat.mjs": "ba757c8a4d988d52433460203e0b1fea36649cd702bac474b5785c6d9f24ec4a",
+    "tests/native-audio/app-experiment.py": "1045279e319974cf9c71c6f481cdf023384531911242131e3d9efe43f82e420a",
+    "tests/native-audio/domain-experiment.py": "e9d9651bf7fc4f6408d2474e27353c4249f5e28200c8129219e2a79d331106e8"
+  }
+}

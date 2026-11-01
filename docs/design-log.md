@@ -4969,3 +4969,15 @@ subscription, turn off its microphone target, and retry requested speaker
 recovery. Authentication errors and shared-channel failures still fence every
 route. Real-browser tests hold one domain unavailable while verifying the other
 domain's actual speaker and microphone readback over the unchanged connection.
+
+
+## 2026-11-01 — D3 standalone automated qualification, physical UAT pending
+
+[Candidate 7926949](../tests/native-audio/qualification-7926949.md) binds the
+AMD64/ARM64 builds, three dedicated standalone UATs, real waveform and App
+lifecycle/fault checks, natural thirty-minute resource observation and cleanup.
+Earlier aborted observations are retained as development findings, not passes.
+Local queue/underrun counters remain separate from packet loss and acoustic
+acceptance. The owner receives one complete physical end-to-end UAT after these
+automated gates. This does not change the accepted provider default, publish a
+release, qualify a merged commit or accept the actual embedding host adapter.

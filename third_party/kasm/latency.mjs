@@ -1,7 +1,8 @@
 // Per-connection diagnostics. Snapshot reads never send traffic.
 export class LatencyProbe {
   constructor({connected, udpActive, peer, sendFence, now = () => performance.now(),
-    token = crypto.randomUUID(), setTimer = setTimeout, clearTimer = clearTimeout}) {
+    token = crypto.randomUUID(), setTimer = (fn, ms) => setTimeout(fn, ms),
+    clearTimer = id => clearTimeout(id)}) {
     Object.assign(this, {connected, udpActive, peer, sendFence, now, setTimer, clearTimer});
     this.prefix = `rx-rtt:${token}:`;
     this.sequence = 0;

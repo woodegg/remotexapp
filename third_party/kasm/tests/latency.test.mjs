@@ -4,6 +4,22 @@ import {readFileSync} from 'node:fs';
 import {LatencyProbe} from '../latency.mjs';
 
 const flush = () => new Promise(resolve => setImmediate(resolve));
+test('default timers preserve the browser timer receiver', async t => {
+  const start = globalThis.setTimeout, stop = globalThis.clearTimeout;
+  for (const [name, fn] of [['setTimeout',start],['clearTimeout',stop]]) {
+    t.mock.method(globalThis, name, function(...args) {
+      assert.ok(this === undefined || this === globalThis, 'browser timer requires Window or no receiver');
+      return fn(...args);
+    });
+  }
+  const p = new LatencyProbe({connected:() => true, udpActive:() => false,
+    peer:() => null, sendFence:() => true, token:'browser-timer'});
+  try {
+    assert.equal(p.measure(),true);
+    assert.equal(p.fence('rx-rtt:browser-timer:1',0),true);
+    assert.equal(p.snapshot().wss.state,'ready');
+  } finally {p.dispose();}
+});
 const report = (responses = 1, rtt = .025) => new Map([
   ['transport', {type:'transport', selectedCandidatePairId:'selected'}],
   ['unused', {type:'candidate-pair', state:'succeeded', currentRoundTripTime:99, responsesReceived:99}],

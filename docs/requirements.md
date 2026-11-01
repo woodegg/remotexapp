@@ -62,6 +62,29 @@ default-off, cross-Tab ownership and lifecycle safeguards remain. Neither audio
 proposal is shipped; acceptance must be recorded before implementation scope
 is locked.
 
+<a id="multi-container-udp-publication"></a>
+
+## Proposed multi-container UDP publication — 2026-11-01
+
+[Issue #42](https://github.com/woodegg/remotexapp/issues/42) and the
+[Host Agent design](udp-host-agent-design.md) define automatic publication
+across containers, independently of single-port multiplexing. All HNA entries
+remain **proposed**: documentation is requested; implementation and deployment
+are not qualified. PR #37's bounded UAT acceptance does not cover this service.
+These extend KNA-005/006/007/009 while retaining non-root Manager ownership,
+Viewer authorization, address filtering and complete WSS operation.
+
+| ID | Proposed requirement | Acceptance boundary |
+| --- | --- | --- |
+| HNA-001 | Discover policy-enabled containers and reconcile their desired UDP publications automatically; host bootstrap replaces per-display manual proxy configuration. | Dynamic addition/removal, missed events and multiple containers/displays; Incus and LXD qualified separately |
+| HNA-002 | Authenticate the calling Manager against host-observed container identity/incarnation; restrict publication to its own allowed services without granting host management privileges. | Forged owner/target, overlapping UIDs, clone/recreate, namespace mismatch and disallowed-container negatives |
+| HNA-003 | Use versioned, idempotent prepare/activate/renew/release/reconcile semantics with one atomic host allocator, durable ownership, quotas, revisions and lease fencing. | Concurrent/reordered requests, response loss, port conflicts, pool exhaustion, write failure and no duplicate ownership |
+| HNA-004 | Reconcile Agent/Manager/host failure and container lifecycle; retire stale identities and verify old forwarding teardown before resource reuse. Bound expiry even if the allocating Agent dies. | Crash, actual reboot, deletion/recreation, clock/boot changes, independent expiry enforcement and residual-resource audit |
+| HNA-005 | Keep network publication leases distinct from Viewer authorization and App keepalive; report actual availability and preserve WSS fallback without restarting Apps or overriding stop/vacancy policy. | Real pixels/input, control loss, expiry, explicit stop, reconnect, reference lifetime and upgrade/cutover tests |
+| HNA-006 | Preserve workload-side source-address privacy through proxy connections and trusted metadata filtering; expose only content-free state and bounded resource diagnostics. | Cross-container routing negatives; host/container packet, signaling, header and log observations |
+| HNA-007 | Qualify automatic multi-port forwarding first; evaluate a single-public-port ICE backend independently under the same publication abstraction. | Authenticated routing, NAT/tuple collision and change, ICE restart, stale packets, independent revoke and bounded load |
+| HNA-008 | Explicitly version static/automatic ownership, protocol and durable-state compatibility; scope migration and rollback to verified resources under deployment ownership. | Exact artifacts, incompatible peers, no dual allocator, partial migration/rollback, preserved data and measured resource/cleanup gates |
+
 ## Selected Core 0.15.0 — managed desktop self-recovery
 
 Accepted and released 2026-10-21 in Core 0.15.0 / SDK 0.30.0.

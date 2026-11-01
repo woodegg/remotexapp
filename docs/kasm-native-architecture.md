@@ -262,6 +262,10 @@ Kasm 无需知道客户端公网 IP，不能把所有 loopback 对端当成同�
 
 ### 7.3 Host、container、edge 具体改什么
 
+2026-11-01 后续提案：[多容器 UDP 自动接入](udp-host-agent-design.md) 将发现、
+登记、租约、恢复和回收交给宿主 Host Agent。它以自动管理多端口代理为首阶段，
+单公网端口复用单独验证。下述静态部署合同保持原范围；新提案尚未实现或替换它。
+
 | 层 | 部署/实现要求 | 所有者 |
 | --- | --- | --- |
 | Cloud security group / host firewall | 只开放经批准的 UDP 有界端口池；入口限速、连接/状态配额、监控；HTTP 与 UDP 策略分别记录 | 部署方 |

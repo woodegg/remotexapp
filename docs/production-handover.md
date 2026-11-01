@@ -12,6 +12,11 @@ implemented with [bounded automated evidence](../tests/kasm-native/README.md);
 later gates await review. The default
 architecture and accepted invariants below still apply.
 
+The proposed [multi-container UDP Host Agent](udp-host-agent-design.md)
+separately defines automatic discovery, publication leases and host-owned
+reconciliation. It is documentation-only, not an installed service or a change
+to the current deployment boundary.
+
 ## Architecture and ownership
 
 RemoteXApp manages Linux X11 applications through four boundaries:

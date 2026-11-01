@@ -4606,3 +4606,28 @@ The completed bounded D1 automation is recorded in
 real Apps, both lifecycle backends, actual container reboot, generation
 retirement, prior-Core rollback and owned cleanup. PR #31 / Issue #30 retain
 the review and merge boundary; D2–D5 qualification is not implied.
+
+## 2026-11-01 — Propose automatic UDP publication across containers
+
+The owner requested a documented solution for automatic host UDP publication
+across multiple containers and displays, beyond single-port multiplexing.
+[Issue #42](https://github.com/woodegg/remotexapp/issues/42) tracks the
+[Host Agent proposal](udp-host-agent-design.md) and proposed HNA-001–008.
+
+The proposed authority is one deployment-owned host allocator. Container
+Managers declare their own allowed service needs through authenticated,
+incarnation-bound channels; they gain no host management API or firewall
+privileges. Prepare/activate, leases, idempotent reconciliation and fenced
+cleanup coordinate discovery, concurrent allocation and failure recovery.
+Network leases remain separate from Viewer authorization and App keepalive.
+
+First qualify automated non-NAT multi-port proxies, then evaluate a single-port
+ICE backend independently. Preserve the existing trusted metadata-filtering
+boundary, complete WSS path and explicit migration/rollback ownership. Agent
+failure requires a tested expiry/enforcement design; static proxies do not
+automatically disappear with the controller. Existing static endpoint decisions
+remain the implementation baseline until a separately qualified replacement.
+
+This records a proposal, not implementation approval, a deployed service or a
+new release commitment. The owner's same-day PR #37 UAT acceptance is recorded
+in that PR against its existing artifacts and does not qualify this proposal.

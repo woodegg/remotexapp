@@ -68,6 +68,7 @@ func main() {
 	flag.StringVar(&cfg.coreDriverDir, "core-driver-dir", coreDriverDir, "immutable core driver helper directory for App Package ABI")
 	flag.StringVar(&cfg.vncLauncher, "vnc-launcher", "direct", "VNC launcher: direct or wrapper")
 	flag.StringVar(&cfg.displayProvider, "display-provider", "tigervnc", "display provider for new runtimes: tigervnc or kasm")
+	flag.BoolVar(&cfg.nativeClipboard, "native-clipboard", false, "enable bounded explicit native text clipboard (requires paired text component)")
 	flag.StringVar(&cfg.kasmBundle, "kasm-bundle", "", "immutable Kasm WSS bundle directory (explicit opt-in)")
 	flag.StringVar(&cfg.lifecycleBackend, "lifecycle-backend", "systemd", "component lifecycle backend: systemd or standalone")
 	flag.StringVar(&cfg.standaloneCgroupRoot, "standalone-cgroup-root", "", "host-delegated cgroup v2 subtree for standalone components")

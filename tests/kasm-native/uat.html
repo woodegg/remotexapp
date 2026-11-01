@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RemoteXApp · 原生输入验证</title>
+<style>
+:root{color-scheme:dark;font:15px system-ui;background:#101823;color:#e7edf5}body{max-width:1500px;margin:24px auto;padding:0 20px}h1{font-size:24px}button,textarea{font:inherit;border:1px solid #516581;border-radius:6px;background:#243249;color:inherit;padding:8px 12px}button{cursor:pointer;margin:4px}textarea{width:min(95%,700px);height:65px}#views{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}iframe{width:100%;height:620px;border:1px solid #516581;border-radius:8px;background:#17202c}small,#identity{color:#acbed5}pre{white-space:pre-wrap;font-size:12px}#status{padding:10px 0;color:#9ee6d7}@media(max-width:1000px){#views{grid-template-columns:1fr}}
+.connections{border:1px solid #394d68;border-radius:10px;padding:16px;margin:18px 0;background:#182334}.connection-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.connection-heading h2{font-size:17px;margin:0}.connection-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}.connection-card{background:#101b2b;border:1px solid #394d68;border-radius:8px;padding:14px}.connection-card header{display:flex;justify-content:space-between;gap:12px;align-items:center}.connection-state{color:#aebed3;font-size:13px}.connection-state:before{content:'●';margin-right:7px}[data-state=ready] .connection-state{color:#8fe5bd}[data-state=connecting] .connection-state,[data-state=unknown] .connection-state{color:#f4ce82}[data-state=failed] .connection-state,[data-state=disconnected] .connection-state{color:#ffb2a6}.stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 8px;margin:16px 0 8px}.stat-grid dt{font-size:12px;color:#aebed3}.stat-grid dd{margin:4px 0 0;font-size:17px;font-variant-numeric:tabular-nums}.connection-detail{display:block;min-height:1.4em;font-size:12px;color:#aebed3}.connections p{margin:12px 0 0;font-size:12px;color:#aebed3}@media(max-width:850px){.connection-cards{grid-template-columns:1fr}}
+</style>
+<h1>RemoteXApp 原生输入验证 · D2</h1>
+<p>这是独立测试环境。先打开应用，再按测试清单验证输入法、剪贴板和两个 Viewer。此页验证 SDK 嵌入行为，不代表业务宿主已经验收。</p>
+<section class="connections" aria-labelledby="connections-title">
+<div class="connection-heading"><h2 id="connections-title">本页连接统计 · Connection stats</h2><span id="connection-summary" role="status">已连接 0 / 2</span></div>
+<div class="connection-cards"><article id="connection-a" class="connection-card" data-state="idle"></article><article id="connection-b" class="connection-card" data-state="idle"></article></div>
+<p>每个 Viewer 独立统计，每秒更新。速率为 WebSocket 有效载荷，不含 TLS/IP 开销；渲染 FPS 是实际画面更新，静止时可为 0。页面隐藏时暂停采样。</p>
+</section>
+<div><button id="launch-mousepad">打开 Mousepad</button><button id="launch-desktop">打开测试桌面</button><button id="toggle-a">隐藏 / 显示 A</button><button id="dispose-a">关闭 Viewer A</button><button id="recreate-a">重新打开 A</button></div>
+<div id="status" role="status">加载测试配置…</div>
+<label for="local-text">本机文本区：用于测试中文输入、切换输入法和复制粘贴</label><br>
+<textarea id="local-text" placeholder="在这里输入，再切换到远程应用"></textarea>
+<div><button id="local-copy">复制本机文本</button><button id="local-read">读取本机剪贴板到文本区</button></div>
+<small>远程 Viewer 内展开 Keyboard and clipboard。先选浏览器所在系统的输入法快捷键，再开启文本剪贴板。Local → Remote 是发送到远程剪贴板；随后在远程应用按 Ctrl+V。Remote → Local 之前先在远程复制文本。</small>
+<details><summary>测试版本与会话信息</summary><pre id="identity"></pre></details>
+<div id="views"><section><strong>Viewer A</strong><div id="slot-a"></div></section><section><strong>Viewer B · 同一个 App</strong><div id="slot-b"></div></section></div>
+<script type="module">
+let current,config;
+const status=text=>{document.querySelector('#status').textContent=text;};
+const views=new Map();
+let statsTimer;
+const fields={protocol:'协议 · Protocol',down:'下行 · Download',up:'上行 · Upload',fps:'渲染 FPS',resolution:'分辨率',uptime:'连接时长',received:'累计接收',sent:'累计发送',buffered:'待发送数据'};
+for(const slot of ['a','b']){
+  const card=document.querySelector('#connection-'+slot);
+  card.innerHTML=`<header><strong>Viewer ${slot.toUpperCase()}</strong><span class="connection-state" role="status">未打开（Not opened）</span></header><dl class="stat-grid">${Object.entries(fields).map(([key,label])=>`<div><dt>${label}</dt><dd data-stat="${key}">—</dd></div>`).join('')}</dl><small class="connection-detail">尚未打开应用</small>`;
+}
+const text=(el,value)=>{if(el.textContent!==value)el.textContent=value;};
+const bytes=n=>n>=1048576?(n/1048576).toFixed(2)+' MiB':n>=1024?(n/1024).toFixed(1)+' KiB':n+' B';
+const rate=n=>n==null?'—':n>=1e6?(n/1e6).toFixed(2)+' Mbit/s':(n/1e3).toFixed(1)+' kbit/s';
+const duration=ms=>{const n=Math.floor(ms/1000);return `${Math.floor(n/3600)}:${String(Math.floor(n/60)%60).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;};
+const labels={idle:'未打开（Not opened）',loading:'加载中（Loading）',connecting:'连接中（Connecting）',ready:'已连接（Connected）',disconnected:'已断开（Disconnected）',failed:'连接失败（Failed）',disposed:'已关闭（Closed）',unknown:'状态未知（Unknown）'};
+function render(slot,item){
+  const card=document.querySelector('#connection-'+slot);
+  card.dataset.state=item.state==='loading'?'connecting':item.state;
+  text(card.querySelector('.connection-state'),labels[item.state]||labels.unknown);
+  const s=item.snapshot,active=item.state==='ready',available=active&&s?.available;
+  const values={protocol:active?(s?.transport||item.transport||'未知').toUpperCase():'—',down:rate(item.rates?.down),up:rate(item.rates?.up),fps:item.rates==null?'—':item.rates.fps.toFixed(1),resolution:available?`${s.width} × ${s.height}`:'—',uptime:active&&s?.connectedForMs!=null?duration(s.connectedForMs):'—',received:available?bytes(s.receivedBytes):'—',sent:available?bytes(s.sentBytes):'—',buffered:available?bytes(s.bufferedBytes):'—'};
+  for(const [key,value]of Object.entries(values))text(card.querySelector(`[data-stat="${key}"]`),value);
+  const details=[item.detail,active&&!available?'此组件未提供实时统计':available&&!item.rates?'正在采样…':'',item.el&&document.querySelector('#slot-'+slot).hidden?'画面已隐藏；连接状态仍独立更新':''].filter(Boolean);
+  text(card.querySelector('.connection-detail'),details.join(' · '));
+  text(document.querySelector('#connection-summary'),`已连接 ${[...views.values()].filter(v=>v.state==='ready').length} / 2`);
+}
+function read(slot,item){
+  if(views.get(slot)!==item)return;
+  try{
+    if(!item.loaded)return;
+    const win=item.el.contentWindow,raw=item.el.contentDocument?.querySelector('#status')?.textContent?.trim()||'';
+    const name=raw.split(' · ')[0].toLowerCase();
+    item.state=name.startsWith('connecting')?'connecting':Object.hasOwn(labels,name)?name:'unknown';
+    item.transport=raw.split(' · ')[1]||null;
+    item.snapshot=win.remoteXAppViewerStats?.()||null;
+    if(item.snapshot)item.state=Object.hasOwn(labels,item.snapshot.state)?item.snapshot.state:'unknown';
+    item.detail=item.state==='ready'?'':item.snapshot?.code||raw||'无法读取 Viewer 状态';
+    const s=item.snapshot,previous=item.previous;
+    if(document.hidden||item.state!=='ready'||!s?.available){item.previous=null;item.rates=null;}
+    else if(!previous||s.connectionEpoch!==previous.connectionEpoch||s.observedAt<=previous.observedAt||s.receivedBytes<previous.receivedBytes||s.sentBytes<previous.sentBytes||s.renderedFrames<previous.renderedFrames){item.previous=s;item.rates=null;}
+    else if(s.observedAt-previous.observedAt>=500){
+      const seconds=(s.observedAt-previous.observedAt)/1000;
+      item.rates={down:(s.receivedBytes-previous.receivedBytes)*8/seconds,up:(s.sentBytes-previous.sentBytes)*8/seconds,fps:(s.renderedFrames-previous.renderedFrames)/seconds};item.previous=s;
+    }
+  }catch{item.state='unknown';item.detail='无法读取 Viewer，请检查登录或打开独立窗口';item.snapshot=null;item.previous=null;item.rates=null;}
+  render(slot,item);
+}
+function scheduleStats(){
+  clearInterval(statsTimer);statsTimer=null;
+  if(!document.hidden&&views.size)statsTimer=setInterval(()=>{for(const [slot,item]of views)read(slot,item);},1000);
+}
+function forget(slot){
+  const old=views.get(slot);if(!old)return;
+  views.delete(slot);old.observer?.disconnect();clearTimeout(old.timeout);old.el.removeEventListener('load',old.load);
+}
+const frame=slot=>{
+  forget(slot);
+  const el=document.createElement('iframe'),node=document.querySelector('#slot-'+slot);
+  const item={el,state:'loading',detail:'等待 Viewer 加载',snapshot:null,previous:null,rates:null};views.set(slot,item);
+  item.load=()=>{
+    if(views.get(slot)!==item)return;
+    item.loaded=true;clearTimeout(item.timeout);item.observer?.disconnect();item.previous=null;item.rates=null;
+    read(slot,item);
+    try{const state=el.contentDocument?.querySelector('#status');if(state){item.observer=new MutationObserver(()=>read(slot,item));item.observer.observe(state,{childList:true,characterData:true,subtree:true});}}catch{}
+  };
+  el.addEventListener('load',item.load);
+  item.timeout=setTimeout(()=>{if(views.get(slot)===item&&item.state==='loading'){item.state='unknown';item.detail='尚未获得 Viewer 状态，请检查登录或网络';render(slot,item);}},15000);
+  el.title='Native remote App '+slot;el.allow='clipboard-read; clipboard-write';el.src=config.baseURL+current.viewerUrl;
+  const link=document.createElement('a');link.href=el.src;link.target='_blank';link.rel='noopener';link.textContent='单独打开此 Viewer（更大画面）';link.style.cssText='display:block;color:#9ee6d7;margin:6px 0';node.replaceChildren(link,el);node.hidden=false;render(slot,item);scheduleStats();
+};
+const closeFrame=slot=>{forget(slot);document.querySelector('#slot-'+slot).replaceChildren();render(slot,{state:'disposed',detail:'仅关闭此 Viewer'});scheduleStats();};
+document.addEventListener('visibilitychange',()=>{for(const [slot,item]of views){item.previous=null;item.rates=null;if(!document.hidden)read(slot,item);}scheduleStats();});
+window.addEventListener('pagehide',()=>{for(const slot of [...views.keys()])forget(slot);clearInterval(statsTimer);},{once:true});
+try{config=await fetch('/fixture-config').then(r=>{if(!r.ok)throw Error('fixture unavailable');return r.json();});status('请选择测试应用。');}catch{status('测试配置不可用。');}
+const api=async(path,body,method)=>{const r=await fetch(config.baseURL+path,{method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const x=await r.json();if(!r.ok)throw Error(x.error||'API request failed');return x;};
+const identity=x=>{document.querySelector('#identity').textContent=JSON.stringify({core:x.versions.current.core,component:x.displayComponentDigest,generation:x.sessionGeneration,clipboard:x.nativeClipboard||'off'},null,2);};
+const show=x=>{current=x;identity(x);frame('a');frame('b');status('应用已打开，当前连接状态和统计见上方。');
+  (async()=>{for(let i=0;i<60&&current===x;i++){await new Promise(r=>setTimeout(r,1000));try{const actual=await api('/api/instances/'+encodeURIComponent(x.id));if(current!==x)return;identity(actual);if(actual.applicationStatus?.state==='ready')return;}catch{return;}}})();
+};
+document.querySelector('#launch-mousepad').onclick=()=>api('/api/instances',{templateId:'mousepad',parameters:{filePath:config.documentFile}}).then(show).catch(e=>status(e.message));
+document.querySelector('#launch-desktop').onclick=()=>api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH').then(x=>show(x.runtime)).catch(e=>status(e.message));
+document.querySelector('#toggle-a').onclick=()=>{const slot=document.querySelector('#slot-a');slot.hidden=!slot.hidden;const item=views.get('a');if(item)render('a',item);};
+document.querySelector('#dispose-a').onclick=()=>closeFrame('a');
+document.querySelector('#recreate-a').onclick=()=>{if(current)frame('a');};
+document.querySelector('#local-copy').onclick=()=>navigator.clipboard.writeText(document.querySelector('#local-text').value).then(()=>status('本机剪贴板已更新。')).catch(()=>status('浏览器拒绝剪贴板写入。'));
+document.querySelector('#local-read').onclick=()=>navigator.clipboard.readText().then(text=>{document.querySelector('#local-text').value=text;status('已读到本机文本区。');}).catch(()=>status('浏览器拒绝剪贴板读取。'));
+</script>
+</html>

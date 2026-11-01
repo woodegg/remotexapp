@@ -52,6 +52,34 @@ source pins and rollback restrictions. No Kasm credentials are delivered to
 the host SDK. The existing Manager/trusted-ingress single-account authorization
 model applies; this adapter does not add a separate multi-tenant ACL system.
 
+## Native connection statistics (development SDK 0.31.0-dev.3)
+
+`viewer.getStats()` returns a read-only snapshot with `schemaVersion:1`,
+`state`, `code`, `connectionEpoch`, monotonic `observedAt` (milliseconds),
+`transport` (`wss` or `ws-loopback`, null when disconnected), and
+`connectedForMs` since Viewer readiness. `available:true` additionally supplies
+`receivedBytes`, `sentBytes`, `bufferedBytes`, `renderedFrames`, `width`, `height`.
+Older components without `capabilities.statistics` return `available:false`;
+missing metrics must not be presented as zero. The method starts no timers or
+network requests and contains no application, clipboard or credential content.
+
+Bytes count WebSocket application payload, including protocol/input traffic,
+excluding TLS/IP framing and browser-managed Ping/Pong. Sent bytes mean accepted
+by the local socket, not remote acknowledgement; `bufferedBytes` is the browser
+socket's pending send queue. Frames count completed paint callbacks containing
+rectangles, not the server's configured frame rate or monitor refresh rate.
+Dimensions are the remote framebuffer, not the CSS-scaled canvas. This component
+remains WSS-only; UDP and RTT metrics are not implemented.
+
+Hosts derive rates from counter deltas divided by elapsed `observedAt` time;
+reset baselines on epoch change, iframe reload or counter rollback. Pause sampling
+when the host document is hidden and reset the baseline on return. Disconnection
+clears displayed live metrics. The native kiosk exposes the same snapshot as
+`iframe.contentWindow.remoteXAppViewerStats()` to same-origin hosts only, without
+Viewer controls or additional cross-origin messaging. The UAT harness samples
+once per second with one shared timer, stops when no Viewers remain and tracks
+A/B independently. Hiding only A's panel leaves its connection active.
+
 ## Optional runtime keepalive (SDK 0.29)
 
 For a windowed host application, see the [host application migration guide](host-runtime-coordinator-migration.md)
@@ -594,3 +622,40 @@ expedited, but live/unknown processes remain protected. The built-in Console
 displays the same projection and uses this SDK method. Clients should refresh
 instance identity before reconnecting after automatic recovery; old transport
 channels and generation-qualified descriptors/offers are retired.
+
+### Native input/clipboard checkpoint (development SDK 0.31.0-dev.2)
+
+Issue #32 adds `configureKeyboard({profile, mode, bindings})`, `keyboardPolicy`,
+`focus()` and `blur()`. Profiles: `windows`, `mac`, `gnome`, `fcitx`, `unknown`,
+`custom`. Detection uses the browser OS; Linux starts unknown. Policy changes
+while keys/composition/buttons are active return `{applied:false}` and take
+effect at neutral state. Observe `keyboardpolicychange`. Hosts must not depend
+on Kasm internals.
+
+With the text component and Manager `-native-clipboard`, capabilities advertise
+`clipboard:true` and `clipboardMaxBytes:65536`. Use `enableClipboard(true)` from
+a consent control, then invoke these methods directly from focused user actions:
+
+- `copyClipboardToRemote()` reads plain text. Empty returns `empty-noop`;
+  otherwise `submitted`. It does not paste or claim App acknowledgement.
+- `copyClipboardToLocal()` writes the latest remote text offer received after
+  enabling. Copy text in the remote App first. Result: `copied-to-local`.
+- `clearRemoteClipboard()` submits empty text without reading locally.
+
+`clipboardchange` contains only enabled/available/byte-count metadata. There
+is no automatic browser clipboard access. Disabling/disconnecting/replacing
+the Viewer invalidates pending reads and clears offers. Reconnect requires
+new consent. An already-started browser write may finish despite retirement;
+`clipboard-uncertain` reports this boundary. Other codes distinguish
+`clipboard-denied`, `-gesture`, `-focus`, `-busy`, `-size`, `-format`, `-empty`,
+`-cancelled` and `-timeout`. Never replay an uncertain action automatically.
+
+Rich formats/files, read-only role authorization and programmatic text remain
+unsupported. host application's legacy prompt/offer and text-ACK consumers must adapt to
+these capabilities/results; the native client is not the legacy client with a
+new renderer. Real host application window/business validation remains a separate gate.
+
+For concurrent native Viewers, ID-based initial connect may retry one prepare
+conflict if another Viewer just activated the same stopped session at the next
+generation with unchanged component/Core/clipboard policy. Explicit descriptor
+connections and upgrades/recovery remain fenced; no input is replayed.

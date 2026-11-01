@@ -384,6 +384,7 @@ func (m *manager) publicInstance(item *instance) *publicInstanceView {
 		componentDigest = item.Components.Kasm.SHA256
 	}
 	return &publicInstanceView{
+		NativeClipboard:        item.Components.NativeClipboard,
 		DisplayProvider:        displayProvider(item.Components),
 		DisplayComponentDigest: componentDigest,
 		Versions:               m.versionView(item), Upgrade: publicUpgrade(item), Recovery: recoveryView(item),

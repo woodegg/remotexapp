@@ -125,6 +125,7 @@ func identifyCore(c runtimeComponents) (*coreIdentity, error) {
 			return nil, err
 		}
 		hashes["kasm-manifest"] = c.Kasm.SHA256
+		hashes["native-clipboard"] = c.NativeClipboard
 	} else {
 		paths["engine"] = c.UnicodeEngine
 	}

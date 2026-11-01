@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.31.0-dev.3';
+export const SDK_VERSION: '0.31.0-dev.4';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -70,6 +70,7 @@ export interface RemoteXAppRecovery {
 
 export interface RemoteXAppInstance {
   displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string; nativeClipboard?:'text';
+  nativeAudio?:'pcm-s16le-48k-v1';
   nativeTransport?:{policy:'wss-only'|'prefer-udp';available:boolean;grantRequired:boolean;reason?:string};
   recovery?:RemoteXAppRecovery;
   versions?:RemoteXAppRuntimeVersions; upgrade?:RemoteXAppUpgradeStatus;
@@ -334,4 +335,36 @@ export interface RemoteXConnections {
   application?:{protocol:string;[key:string]:unknown};
   unavailable?:string[];
   unavailableReasons?:{ibus?:'metadata-missing'|'not-enabled'|'not-running'};
+}
+
+/** Audio references do not attach a Viewer or renew runtime keepalive. */
+export interface RemoteXAudioRouteState {
+  runtime:string;generation:number;slot:number;refs:number;domain:string|null;
+  speaker:boolean;mic:boolean;actualSpeaker:boolean;actualMic:boolean;reason:string;
+}
+export interface RemoteXAudioSnapshot {
+  connection:'idle'|'connected'|'failed';protocol?:string|null;connectionId?:string|null;
+  speakerOwner:boolean;micOwner:boolean;playbackBlocked?:boolean;reason?:string;
+  routes:RemoteXAudioRouteState[];receivedBytes?:number;sentBytes?:number;droppedFrames?:number;
+  playback?:{underrunBlocks:number;droppedFrames:number;peak:number;queuedFrames:number};
+  microphone?:{level:number;droppedFrames:number};
+}
+export interface RemoteXAudioInterest {
+  readonly runtime:string;readonly generation:number;readonly ref:string;readonly released:boolean;
+  /** Enable from a browser user gesture; the switch is shared by this session's tabs. */
+  setSpeaker(enabled:boolean):Promise<RemoteXAudioRouteState>;
+  /** Permission and ownership are explicit. Fault recovery never reopens capture. */
+  setMicrophone(enabled:boolean,options?:{takeover?:boolean}):Promise<RemoteXAudioRouteState>;
+  release():Promise<void>;
+}
+export class RemoteXAppAudio extends EventTarget {
+  constructor(options?:{baseURL?:string;environment?:typeof globalThis;
+    microphoneProcessing?:{echoCancellation:boolean;noiseSuppression:boolean;autoGainControl:boolean}});
+  readonly ready:Promise<{protocol:'pcm-s16le-48k-v1'}>;
+  readonly stats:RemoteXAudioSnapshot;
+  /** Requires an already-prepared audio-capable runtime generation. */
+  acquire(instance:Pick<RemoteXAppInstance,'id'|'sessionGeneration'>):Promise<RemoteXAudioInterest>;
+  /** Revokes the current audio login epoch and retires all its interests. */
+  logout():Promise<void>;
+  dispose():void;
 }

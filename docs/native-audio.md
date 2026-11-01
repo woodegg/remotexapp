@@ -56,6 +56,28 @@ All off releases the WSS and capture. Enabled silence retains the connection.
 Browsers lacking a secure context, SharedWorker or AudioWorklet fail explicitly;
 there is no fallback that silently duplicates playback or channels.
 
+## SDK use
+
+```js
+import {RemoteXAppAudio} from '/sdk/index.js';
+const audio = new RemoteXAppAudio({baseURL: location.origin});
+await audio.ready;
+// instance comes from the host's prepared, running App; acquire does not start it.
+const interest = await audio.acquire(instance);
+speakerButton.onclick = () => interest.setSpeaker(true);
+micButton.onclick = () => interest.setMicrophone(true);
+// Explicit release when this host no longer retains the session audio.
+releaseButton.onclick = () => interest.release();
+// The SDK also disposes automatically on pagehide.
+closeAudioButton.onclick = () => audio.dispose();
+```
+
+Observe `statechange` (`CustomEvent<RemoteXAudioSnapshot>`) for actual route,
+owner, conflict and playback-blocked status. A requested switch is distinct from
+`actualSpeaker` / `actualMic`. The TypeScript declarations accompany the named
+SDK export. Serve the pinned `audio-worker.js`, `audio-coordinator.js` and
+`audio-worklet.js` at the same Manager base as the SDK.
+
 ## Authentication and protocol
 
 Separate audio grants never reuse display/UDP credentials. The Manager issues an

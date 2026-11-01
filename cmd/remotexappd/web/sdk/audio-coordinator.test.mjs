@@ -112,3 +112,25 @@ test('a device ending immediately after permission cannot create a microphone ro
   await f.coordinator.serial;assert.equal(f.coordinator.capture,null);assert.equal(f.sockets.length,0);assert.equal(a.state().routes[0].mic,false);
  }finally{f.cleanup();}
 });
+
+
+test('reconnect refreshes service epoch and retires stale references before granting routes',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a');await a.request('speaker',{ref:'a',enabled:true});
+  f.sockets[0].close();await turn();f.service='f'.repeat(64);f.coordinator.retryAfter=0;
+  f.coordinator._tick();await f.coordinator.serial;
+  assert.equal(f.coordinator.routes.size,0);assert.equal(f.coordinator.capture,null);assert.equal(f.sockets.length,1);
+  assert.ok(a.messages.some(m=>m.type==='retired'));
+  await acquire(a,'new');await a.request('speaker',{ref:'new',enabled:true});assert.equal(f.sockets.length,2);assert.equal(a.state().routes[0].actualSpeaker,true);
+ }finally{f.cleanup();}
+});
+
+test('worker heartbeats continue while a permission prompt is pending',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a');a.port.allowCapture=false;
+  const pending=a.request('microphone',{ref:'a',enabled:true});const rejected=assert.rejects(pending,/cancelled/);await turn();
+  const before=a.messages.filter(m=>m.type==='ping').length;
+  f.coordinator._tick();f.coordinator._tick();assert.equal(a.messages.filter(m=>m.type==='ping').length,before+2);
+  await a.request('microphone',{ref:'a',enabled:false});await rejected;
+ }finally{f.cleanup();}
+});

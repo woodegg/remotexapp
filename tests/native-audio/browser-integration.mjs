@@ -93,6 +93,21 @@ try {
  await amplitude(same,440);const handoffTone=hook('tone','session-a','speaker',440);const handedOff=[];for(let i=0;i<18;i++){await delay(100);handedOff.push(await amplitude(same,440));}await handoffTone;check('closing playback owner hands off once to an unlocked tab',handedOff.filter(x=>x>.08).length>=2);
  await same.evaluate('await sameA.release()');await until(async()=>(await hook('state')).connections===0);
  check('last session reference releases its speaker and channel',(await hook('state')).readers===0);
+ await other.call('Browser.setPermission',{permission:{name:'microphone'},setting:'granted',origin});
+ await speaker(other,'appB',true);await mic(other,'appB',true);
+ const workers=await fetch(b.base+'/json/list').then(r=>r.json());
+ const worker=workers.find(t=>t.type==='shared_worker'&&t.url===origin+'/sdk/audio-worker.js');
+ assert.ok(worker,'owned audio SharedWorker target exists');
+ const debugWorker=new WebSocket(worker.webSocketDebuggerUrl);await new Promise((resolve,reject)=>{debugWorker.onopen=resolve;debugWorker.onerror=reject;});
+ debugWorker.send(JSON.stringify({id:1,method:'Runtime.evaluate',params:{expression:'self.close()'}}));await delay(100);debugWorker.close();
+ await until(()=>other.evaluate('audio.closed && streams.every(s=>s.getTracks().every(t=>t.readyState==="ended"))'),15000);
+ await until(async()=>JSON.stringify(await hook('state'))===JSON.stringify({connections:0,readers:0,writers:0}));
+ check('silent SharedWorker exit ends capture, playback and remote relays',(await state(other)).connection==='failed');
+ await other.evaluate(`const {RemoteXAppAudio}=await import('/sdk/remotexapp-audio.js');window.audio=new RemoteXAppAudio({baseURL:location.origin,microphoneProcessing:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});await audio.ready;window.recoveredB=await audio.acquire({id:'session-b',sessionGeneration:1});`);
+ check('new controller after worker failure starts with audio off',(await hook('state')).connections===0);
+ await speaker(other,'recoveredB',true);await mic(other,'recoveredB',true);
+ check('explicit controller recreation restores real microphone readback',(await hook('readback','session-b')).amplitude>1000);
+ await other.evaluate('await recoveredB.release()');await until(async()=>(await hook('state')).connections===0);
  check('browser exceptions absent',pages.every(p=>p.errors.length===0));
 } catch(error) {failure=error.stack;console.error(failure);for(let i=0;i<pages.length;i++){try{console.error('page',i,await state(pages[i]),pages[i].errors);}catch{}}}
 finally {

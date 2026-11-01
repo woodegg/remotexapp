@@ -17,7 +17,8 @@ implementation; move them to a version section when publishing a release.
   external PulseAudio tools; Core remains statically buildable. Integration
   qualification and physical end-to-end UAT are tracked in #45/#49. Device loss
   during a pending route acknowledgment revokes that microphone writer without
-  stopping other audio or silently reopening capture.
+  stopping other audio or silently reopening capture. Detect lost audio workers,
+  refresh authorization on reconnect and expose explicit audio-controller recovery.
 
 - Extend the native UAT workbench with bounded local speaker/microphone checks,
   same/different-runtime comparison and an exportable audio acceptance checklist.

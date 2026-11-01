@@ -53,6 +53,16 @@ AudioContext; a page without a user gesture must report that limitation.
 No capture, AudioContext or audio WebSocket is created by merely launching an
 App. The first enabled speaker/mic opens one WSS; additional sessions reuse it.
 All off releases the WSS and capture. Enabled silence retains the connection.
+An unresponsive SharedWorker is detected by a ten-second active-page watchdog;
+worker failure stops capture, closes the local audio graph and retires the
+controller. Resuming a browser-suspended page allows a fresh heartbeat grace
+period. Worker heartbeats do not wait behind permission prompts or HTTP calls.
+A restarted Manager changes the service epoch: old interests are retired before
+any fresh route grant. The UAT's **Reconnect audio** action creates a fresh
+controller and references with both switches off; enabling audio remains an
+explicit action. Network recovery within the same epoch may restore requested
+speakers but never reopens microphone capture.
+
 Browsers lacking a secure context, SharedWorker or AudioWorklet fail explicitly;
 there is no fallback that silently duplicates playback or channels.
 

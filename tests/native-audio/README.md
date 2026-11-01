@@ -61,8 +61,10 @@ product binaries. Preserve only sanitized summaries in public documentation.
 The browser cases cover two sessions, three tabs, one shared channel, actual
 440/660 Hz playback, selected/unselected microphone readback, one capture for
 multiple targets, profile conflicts and explicit takeover, permission denial,
-late permission cancellation, domain replacement, playback-owner handoff, and
-last-reference cleanup. Synthetic readback disables browser echo cancellation,
+late permission cancellation, active permission revocation, domain replacement,
+playback-owner handoff, last-reference cleanup, and silent SharedWorker exit.
+Worker failure closes the capture track and playback context; a newly created
+controller starts with audio off and requires an explicit microphone action. Synthetic readback disables browser echo cancellation,
 noise suppression and gain control explicitly; normal SDK defaults enable them.
 This avoids mistaking suppression of a sustained test tone for routing loss.
 

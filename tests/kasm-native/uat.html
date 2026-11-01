@@ -42,7 +42,7 @@
   </div>
   <h3>3 · 远程音频 / Remote audio <span class="audio-blocked" id="remote-audio-availability">正在检查服务 · Checking service</span></h3>
   <p>同一会话多 Tab 共用开关；一个播放者、一个麦克风采集源。隐藏画面或关闭 Viewer 会保留明确持有的音频引用；「释放音频」才释放该引用。麦克风发送到所有明确开启的目标，不跟随焦点。</p>
-  <div class="audio-actions"><button id="launch-audio-a" disabled>打开音频测试 A</button><button id="launch-audio-b" disabled>B → 新音频测试</button><button id="audio-open-tab" disabled>同会话新 Tab ↗</button><button id="audio-logout" disabled>关闭本次登录的全部音频</button></div>
+  <div class="audio-actions"><button id="launch-audio-a" disabled>打开音频测试 A</button><button id="launch-audio-b" disabled>B → 新音频测试</button><button id="audio-open-tab" disabled>同会话新 Tab ↗</button><button id="audio-reconnect" disabled>重新连接音频</button><button id="audio-logout" disabled>关闭本次登录的全部音频</button></div>
   <p>在远程 Audio test 窗口点击 Play tone 听音，点击 Record 3 seconds 测试远程麦克风，再点击 Replay 听回传。录音仅留在该测试 App 内存中，关闭即清除。</p>
   <table aria-label="待验证的远程音频用例"><thead><tr><th>验证项目 · Acceptance case</th><th>状态</th></tr></thead><tbody id="audio-cases"></tbody></table>
 </section>
@@ -157,7 +157,7 @@ let current,config;
 const status=text=>{document.querySelector('#status').textContent=text;};
 const views=new Map();
 const targets=new Map();
-let remoteAudio=null,remoteAudioError='',remoteAudioSnapshot={connection:'idle',routes:[]};
+let remoteAudio=null,remoteAudioError='',remoteAudioInitializing=false,remoteAudioSnapshot={connection:'idle',routes:[]};
 const audioInterests=new Map(),audioBindingEpoch=new Map(),remoteResults=new Map();
 let audioPrevious=null;
 let selectionEpoch=0, selectionBusy=false;
@@ -364,6 +364,7 @@ function renderAudio() {
     $('#audio-state-'+slot).textContent=!interest?(binding?.error||'等待已准备的音频会话'):`Speaker ${route?.actualSpeaker?'已订阅':'关闭'} · Mic ${route?.actualMic?'发送中':'关闭'}${route?.reason?' · '+route.reason:''}${route?.refs?' · '+route.refs+' 引用':''}`;
     $('#remote-mic-'+slot).value=route?.actualMic&&s.micOwner?s.microphone?.level||0:0;
   }
+  if(s.reason&&!connected)$('#audio-link-summary').textContent+=' · '+s.reason+'；可点击「重新连接音频」重新开启';
   $('#audio-open-tab').disabled=!targets.get('a');
 }
 function syncAudioInterests(){
@@ -393,20 +394,23 @@ $('#audio-open-tab').onclick=()=>{const x=targets.get('a');if(x){const u=new URL
 $('#audio-logout').onclick=async()=>{try{await remoteAudio?.logout();for(const [slot,binding]of audioInterests){audioBindingEpoch.set(slot,(audioBindingEpoch.get(slot)||0)+1);binding.interest=null;binding.error='本次登录音频已关闭；刷新页面可重新启用';}renderAudio();}catch(error){status(error.message);}};
 $('#launch-audio-a').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'});if(active())show(x);});
 $('#launch-audio-b').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'});if(active()){targets.set('b',x);frame('b');watchIdentity(x);}});
-async function initializeRemoteAudio(){
-  if(!config)return;
+$('#audio-reconnect').onclick=async()=>{if(remoteAudioInitializing)return;remoteAudio?.dispose();remoteAudio=null;remoteAudioError='';remoteAudioSnapshot={connection:'idle',routes:[]};for(const slot of ['a','b'])audioBindingEpoch.set(slot,(audioBindingEpoch.get(slot)||0)+1);audioInterests.clear();await initializeRemoteAudio(false);status('音频控制器已重新连接；请按需重新开启 Speaker 或 Mic。');};
+async function initializeRemoteAudio(loadRuntime=true){
+  if(!config||remoteAudioInitializing)return;
+  remoteAudioInitializing=true;$('#audio-reconnect').disabled=true;
   try{
     const {RemoteXAppAudio}=await import(config.baseURL+'/sdk/remotexapp-audio.js');
     const controller=new RemoteXAppAudio({baseURL:config.baseURL});
     try{await controller.ready;}catch(error){controller.dispose();throw error;}
     remoteAudio=controller;
-    controller.addEventListener('statechange',event=>{remoteAudioSnapshot=event.detail;renderAudio();});
+    controller.addEventListener('statechange',event=>{if(remoteAudio!==controller)return;remoteAudioSnapshot=event.detail;renderAudio();});
     $('#remote-audio-availability').textContent='实验性集成 · Ready for verification';
     for(const id of ['launch-audio-a','launch-audio-b','audio-logout'])$('#'+id).disabled=false;
     for(const row of $('#audio-cases').rows){const select=document.createElement('select');select.setAttribute('aria-label','人工测试结果 '+row.dataset.case);for(const [value,label]of [['not-run','未执行'],['passed','人工通过'],['failed','失败'],['not-applicable','不适用']]){const option=document.createElement('option');option.value=value;option.textContent=label;select.append(option);}select.onchange=()=>remoteResults.set(row.dataset.case,select.value);row.cells[1].replaceChildren(select);}
     syncAudioInterests();
-    const id=new URL(location.href).searchParams.get('audioRuntime');if(id){const x=await api('/api/instances/'+encodeURIComponent(id));show(x);}
+    const id=new URL(location.href).searchParams.get('audioRuntime');if(loadRuntime&&id){const x=await api('/api/instances/'+encodeURIComponent(id));show(x);}
   }catch(error){remoteAudioError='服务不可用 · '+error.message;$('#remote-audio-availability').textContent=remoteAudioError;renderAudio();}
+  finally{remoteAudioInitializing=false;$('#audio-reconnect').disabled=false;}
 }
 
 const api=async(path,body,method)=>{const r=await fetch(config.baseURL+path,{signal:AbortSignal.timeout(15000),method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const x=await r.json();if(!r.ok)throw Error(x.error||'API request failed');return x;};

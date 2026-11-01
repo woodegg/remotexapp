@@ -10,6 +10,12 @@ export class RemoteXAppAudio extends EventTarget {
     this.worker = new environment.SharedWorker(this.base+'/sdk/audio-worker.js',{type:'module',name:'remotexapp-audio-v1:'+this.base});
     this.port = this.worker.port; this.port.onmessage = event => this._message(event.data); this.port.start();
     this.worker.onerror = () => this._fail('audio-worker-ended');
+    this.lastWorkerMessage = this.lastWatchdogTick = Date.now();
+    this.watchdog = environment.setInterval(()=>{
+      const now = Date.now(), suspended = now-this.lastWatchdogTick>5000; this.lastWatchdogTick = now;
+      if (suspended) { this.lastWorkerMessage = now; return; }
+      if (!this.closed && now-this.lastWorkerMessage>10000) this._fail('audio-worker-unresponsive');
+    },1000);
     this._pagehide = () => this.dispose(); environment.addEventListener('pagehide',this._pagehide);
     this.ready = this._request('init',{base:this.base});
     this.stats = {connection:'idle',speakerOwner:false,micOwner:false,routes:[]};
@@ -97,6 +103,7 @@ export class RemoteXAppAudio extends EventTarget {
     this.stream = this.capture = this.captureSource = null; this.captureToken = null;
   }
   _message(message) {
+    this.lastWorkerMessage = Date.now();
     if (message.reply) { const pending = this.requests.get(message.reply); if (!pending) return; this.requests.delete(message.reply); this.env.clearTimeout(pending.timeout); message.error ? pending.reject(Error(message.error)) : pending.resolve(message.value); return; }
     if (message.type === 'ping') { this._post({op:'pong'}); return; }
     if (message.type === 'capture') { void this._startCapture(message.token); return; }
@@ -113,11 +120,11 @@ export class RemoteXAppAudio extends EventTarget {
     if (message.type === 'state') { this.stats = message; if (!this.activating && !this.requests.size && message.routes.every(r=>!r.speaker&&!r.mic) && !this.stream && this.context?.state === 'running') { this.playback?.port.postMessage({op:'reset'}); void this.context.suspend(); } this._emit(); }
   }
   _emit() { this.dispatchEvent(new CustomEvent('statechange',{detail:{...this.stats,playback:this.playbackStats,microphone:this.captureStats}})); }
-  _fail(reason) { this._stopCapture(); this.playback?.port.postMessage({op:'reset'}); this.stats = {...this.stats,connection:'failed',reason,micOwner:false,speakerOwner:false}; this._emit(); }
+  _fail(reason) { if (this.closed) return; this.dispose(); this.stats = {...this.stats,connection:'failed',reason,micOwner:false,speakerOwner:false,routes:[]}; this._emit(); }
   async logout() { await this.ready; return this._request('logout'); }
   dispose() {
     if (this.closed) return;
-    this._post({op:'dispose'}); this._stopCapture(); this.closed = true;
+    this._post({op:'dispose'}); this._stopCapture(); this.closed = true; this.env.clearInterval(this.watchdog);
     this.playback?.disconnect(); if (this.context) void this.context.close();
     this.context = null; this.port.close(); this.env.removeEventListener('pagehide',this._pagehide);
     for (const pending of this.requests.values()) { this.env.clearTimeout(pending.timeout); pending.reject(Error('Audio controller disposed')); }

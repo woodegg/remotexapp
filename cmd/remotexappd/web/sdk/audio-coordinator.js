@@ -121,6 +121,7 @@ export class AudioCoordinator {
   _releaseCaptureIfUnused() { if (![...this.routes.values()].some(r=>r.mic)) this._stopCapture('all-microphones-disabled'); }
   async _connect() {
     if (this.connection && this.socket?.readyState===1) return;
+    await this._context();
     const grant = await this._api('grant',this._body());
     if (!/^[a-f0-9]{64}$/.test(grant.token || '')) throw Error('Invalid audio grant');
     const url = new URL(this.base+'/api/audio/ws'); url.protocol = url.protocol==='https:'?'wss:':'ws:';
@@ -227,10 +228,13 @@ export class AudioCoordinator {
     peer.refs.clear(); this.ports.delete(peer.port); peer.port.close(); this._selectPlayer(); await this._sync();
   }
   _tick() {
-    if (!this.base || this.tickPending) return;
+    if (!this.base) return;
+    // Heartbeats must not wait behind permission prompts or network requests.
+    for (const peer of this.ports.values()) this._send(peer,{type:'ping'});
+    if (this.tickPending) return;
     this.tickPending = true;
     this._enqueue(async()=>{
-      for (const peer of this.ports.values()) { if (Date.now()-peer.seen>75000) await this._remove(peer); else this._send(peer,{type:'ping'}); }
+      for (const peer of this.ports.values()) { if (Date.now()-peer.seen>75000) await this._remove(peer); }
       if (this.connection && Date.now()-this.lastRenew>=10000) {
         await this._context(); await this._api('renew',this._body()); this.lastRenew = Date.now();
       }

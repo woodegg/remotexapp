@@ -4919,3 +4919,15 @@ The trusted selected-UID service authorization model remains unchanged.
 Full protocol, failure, compatibility and verification limits are maintained in
 [native audio](native-audio.md). Historical PoC results are research inputs;
 product, target architecture, resource and physical-device checks remain distinct.
+
+
+### 2026-11-01 — Audio failure retirement and explicit controller recovery
+
+D3 fault qualification extends the [native audio contract](native-audio.md):
+worker liveness is independent of serialized permission/network operations.
+A ten-second active-page watchdog releases capture and retires an unresponsive
+controller, with a grace period after page suspension. Reconnect refreshes the
+server context before requesting a grant; a service/account epoch change retires
+old references. The UAT offers explicit controller recreation with audio off.
+These safeguards implement the accepted no-silent-microphone-reacquisition rule;
+they do not renew App lifecycle leases or change display UDP ownership.

@@ -4851,3 +4851,9 @@ A second loopback edge listener permits the protected route to move while the
 preceding listener retains existing WebSocket clients. Runtime/App pins and
 saved documents are preserved; the prior listener/config remains available
 for rollback and later retirement after its clients disconnect.
+
+Observed cutover limitation: the US editor lost its last Viewers just after
+the tunnel route update and stopped after its one-minute vacant timeout.
+Retaining the old listener preserves rollback, but does not guarantee tunnel
+connection continuity. The [workbench record](../tests/kasm-native/UAT-WORKBENCH.md)
+retains this result; future cutovers must account for vacant-session cleanup.

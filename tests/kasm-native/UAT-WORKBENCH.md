@@ -47,10 +47,43 @@ qualified edge executable, SDK, Viewer and component assets unchanged; verify
 each retained hash. Start the pinned edge configuration on a second loopback
 listener and validate its response before changing only the protected UAT
 hostname's tunnel destination. Preserve the Access requirements and all other
-routes. Existing WebSockets may finish on the preceding listener, retained
-with its configuration for rollback. No runtime/App restart or Core/component
+routes. Retain the preceding listener and its configuration for rollback. A tunnel
+configuration update may still interrupt existing WebSockets; keeping that
+listener alive does not guarantee continuity. Account for vacant-session
+cleanup before scheduling a cutover. No runtime/App restart or Core/component
 replacement is needed. Refreshing the UAT page loads the new layout.
 
 The dated result record distinguishes page identity, retained runtime/component
 identity, actual checks, rollout verification and cleanup. This UI check does
 not repeat native transport qualification, physical OS IME acceptance or a soak.
+
+## 2026-11-01 verification
+
+Page source `ef126a3c80ef446eb7abe670a402bf8333c70e28` and HTML hash
+`4eaed1fc49ac08b4a373b9616aae19d69ae02e24d83d35df7e7f9686005ad7e2`
+passed 91 preview checks and 91 checks on each authenticated Australia, China
+and US public UAT. All eight viewport sizes, fullscreen, layout identity, real
+input/readback, clipboard allow/deny, and independent close/recreate passed.
+`make check` and [source CI](https://github.com/woodegg/remotexapp/actions/runs/41268928044) passed.
+The [result record](results-uat-workbench-20261101.json) binds exact hashes and
+records the observed transport states and retained runtime identities.
+
+The static HTML is identical in all three regions. Retained binaries, SDK,
+Viewer and component assets matched their hashes; only the protected UAT
+route destination changed. Australia/China existing process identities and
+saved documents were unchanged. US Core and managed desktop remained running,
+but its previously open editor lost its last Viewers five seconds after the
+route update, then stopped under the existing one-minute vacant cleanup policy.
+Its saved files were unchanged. This is evidence that a second listener alone
+does not guarantee connection continuity across tunnel reconfiguration.
+
+Owned temporary Apps were stopped, documents removed, and browser tabs/profile
+cleaned up. The previous edge listeners remain available for rollback. These
+results qualify the UI change; they do not repeat the transport fault matrix,
+physical OS IME or other browser engines. US test traffic used WSS; Australia
+and China also supplied live UDP statistics.
+
+![Focused Viewer with persistent statistics](uat-workbench-focus.png)
+
+[Two-Viewer comparison](uat-workbench-split.png) ·
+[Narrow-screen statistics](uat-workbench-mobile.png)

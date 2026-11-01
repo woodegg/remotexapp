@@ -66,8 +66,14 @@ try{
  await evalJS(`window.scrollTo(0,0)`);
  const bounds=await evalJS(`(()=>{const r=document.querySelector('.connections').getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height,scale:1}})()`);
  const shot=await c.call('Page.captureScreenshot',{format:'png',clip:bounds});mkdirSync(config.evidenceDirectory,{recursive:true});writeFileSync(config.evidenceDirectory+'/connection-stats.png',Buffer.from(shot.data,'base64'));
- await evalJS(`document.querySelector('#launch-desktop').click()`);await ready();
- check('managed desktop supports two independent stats snapshots',(await snap('a')).available&&(await snap('b')).available);
+ await evalJS(`document.querySelector('#launch-desktop').click()`);
+ // The old editor remains ready while the asynchronous managed launch runs.
+ // Require both iframes to change before checking the new desktop's state.
+ await wait(()=>evalJS(`[...document.querySelectorAll('iframe')].length===2&&[...document.querySelectorAll('iframe')].every(f=>f.src.includes('/remotexapps/')&&!f.src.includes('/${ownId}/'))`));
+ await ready();
+ const desktopId=await evalJS(`document.querySelector('#slot-a iframe').src.split('/remotexapps/')[1].split('/')[0]`);
+ const desktop=await api('/api/instances/'+desktopId);
+ check('managed desktop is running with two independent stats snapshots',desktop.sessionState==='running'&&(await snap('a')).available&&(await snap('b')).available);
  writeFileSync(config.evidenceDirectory+'/stats-results.json',JSON.stringify({passed:checks.length,checks},null,2)+'\n');
  console.log('Connection stats browser checks passed:',checks.length);
 }finally{

@@ -10,6 +10,10 @@ The next bounded input/clipboard checkpoint is recorded in
 [D2 automated evidence and physical UAT instructions](D2-UAT.md). It does not
 change the D1 scope or imply full D2 acceptance.
 
+The [Alpine static Core / standalone UAT checkpoint](ALPINE.md#2026-10-31-qualification)
+records the separate native-musl build, live browser/lifecycle matrix and
+authenticated edge-route migration. Physical UAT remains pending on that target.
+
 ## D1 native WSS qualification
 
 D1 exercises an opt-in paired Kasm component through the Manager and native

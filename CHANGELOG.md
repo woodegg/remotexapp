@@ -11,6 +11,11 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Record requirements for native bidirectional automatic text clipboard in
+  Issue #50, including independent opt-in directions, active-Viewer routing,
+  permission fallback and integrated UAT. This is documentation only; the
+  current native SDK still requires explicit manual transfer actions.
+
 - Redesign the native UAT workbench with persistent per-Viewer statistics,
   focus/comparison layouts, fullscreen diagnostics and collapsible input tools.
 

@@ -4857,3 +4857,32 @@ the tunnel route update and stopped after its one-minute vacant timeout.
 Retaining the old listener preserves rollback, but does not guarantee tunnel
 connection continuity. The [workbench record](../tests/kasm-native/UAT-WORKBENCH.md)
 retains this result; future cutovers must account for vacant-session cleanup.
+
+## 2026-11-01 — Register native automatic clipboard as a separate follow-on
+
+The owner requested adding Kasm native bidirectional automatic clipboard to
+RemoteXApp requirements. [Issue #50](https://github.com/woodegg/remotexapp/issues/50)
+and [KNC-001–008](native-clipboard-integration.md) separate this feature from the
+manual D2 checkpoint in Issue #32 and native audio in Issue #45 / PR #49.
+This entry selects requirements work; no runtime behavior or acceptance changes.
+
+The upstream full client offers seamless clipboard, but the embedded component
+disables it and the SDK requires explicit browser actions. Integration must
+reuse the native data path with supported consent, direction, active-target and
+lifecycle policy. It must not restore the legacy XFixes/offer bridge. Multiple
+Viewers/tabs require independent consent, no background local overwrite and no
+cross-session fan-out; audio ownership does not select the clipboard target.
+
+This is a prospective extension of the 2026-10-28 per-transfer-gesture rule for
+explicitly opted-in automatic mode after implementation and qualification.
+The original manual checkpoint and its evidence remain intact. Default-off,
+64 KiB plain-text bounds, explicit clear versus empty no-op, generation/consent
+fencing and uncertain-write handling remain. Rich formats and files require
+separate qualification. The current SDK documentation remains manual-only.
+
+A documentation-only PR records the requirement with `Refs #50`; it does not
+close implementation acceptance. A later implementation PR owns the native
+adapter/SDK, workbench and tests. Complete automation before consolidated human
+UAT, and distinguish actual embedding-host acceptance, immutable candidate
+qualification, publication and deployment. No App restart, UDP provisioning or
+audio deployment is required to register this requirement.

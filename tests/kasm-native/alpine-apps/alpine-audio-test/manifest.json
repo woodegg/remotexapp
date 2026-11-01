@@ -2,7 +2,7 @@
   "apiVersion": "remotexapp/v1",
   "id": "alpine-audio-test",
   "name": "RemoteXApp audio integration test",
-  "driverVersion": "1.0.0",
+  "driverVersion": "1.0.1",
   "singleton": false,
   "profileRef": "default",
   "runMode": "isolated",

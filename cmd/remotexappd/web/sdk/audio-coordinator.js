@@ -82,7 +82,9 @@ export class AudioCoordinator {
     if (data.op === 'microphone') {
       await this._context();
       if (data.enabled) {
-        await this._ensureCapture(peer); route.mic = true; route.takeover = !!data.takeover; route.reason = '';
+        const capture = await this._ensureCapture(peer);
+        if (!capture || this.capture !== capture || !capture.ready) throw Error('microphone-ended-before-routing');
+        route.mic = true; route.takeover = !!data.takeover; route.reason = '';
       } else route.mic = false;
       try { await this._sync(); } catch (error) { route.mic = false; this._releaseCaptureIfUnused(); throw error; }
       return this._routeState(route);
@@ -100,7 +102,7 @@ export class AudioCoordinator {
     if (next !== this.player) { if (this.player) this._send(this.player,{type:'reset-playback'}); this.player = next || null; if (this.player) { this.player.credits = 8; this._send(this.player,{type:'reset-playback'}); } }
   }
   async _ensureCapture(peer) {
-    if (this.capture?.ready) return;
+    if (this.capture?.ready) return this.capture;
     if (this.capture) throw Error('Microphone permission is already pending');
     const token = this.env.crypto.randomUUID();
     await new Promise((resolve,reject)=>{
@@ -108,6 +110,7 @@ export class AudioCoordinator {
       this.capture = {peer,token,ready:false,resolve:()=>{this.env.clearTimeout(timeout);resolve();},reject:error=>{this.env.clearTimeout(timeout);reject(error);}};
       this._send(peer,{type:'capture',token});
     });
+    return this.capture;
   }
   _stopCapture(reason) {
     const capture = this.capture; this.capture = null;
@@ -181,7 +184,10 @@ export class AudioCoordinator {
     const grant = await this._api('route',this._body({runtime:route.runtime,generation:route.generation}));
     const state = await this._control({op:'subscribe',slot:route.slot,token:grant.token,speaker:route.speaker,mic:route.mic,takeover:!!route.takeover});
     route.takeover = false; route.domain = grant.domain;
-    route.applied = this.connection+':'+route.speaker+':'+route.mic;
+    // A device/permission event can change desired state while this ACK waits.
+    // Remember the server's actual configuration so the next sync retires any
+    // in-flight mic grant instead of treating it as already disabled.
+    route.applied = this.connection+':'+!!state.speaker+':'+!!state.mic;
     if (!state.speaker && route.speaker) { route.speaker = false; route.reason = state.reason || 'speaker-unavailable'; }
     if (!state.mic && route.mic) { route.mic = false; route.reason = state.reason || 'mic-unavailable'; }
   }

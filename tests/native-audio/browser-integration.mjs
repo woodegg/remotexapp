@@ -63,6 +63,14 @@ try {
  await speaker(other,'appB',false);await until(async()=> (await hook('state')).connections===0);
  check('all audio off releases WSS/readers/writers',JSON.stringify(await hook('state'))===JSON.stringify({connections:0,readers:0,writers:0}));
 
+ await speaker(a,'appA',true);await mic(a,'appA',true);
+ await a.call('Browser.setPermission',{permission:{name:'microphone'},setting:'denied',origin});
+ await until(async()=>!(await state(a)).routes.find(r=>r.runtime==='session-a').actualMic && (await hook('state')).writers===0);
+ check('revoking active microphone permission retires writer and preserves speaker',(await hook('state')).readers===1&&(await hook('state')).connections===1);
+ const capturesBeforeRestore=await a.evaluate('streams.length');
+ await a.call('Browser.setPermission',{permission:{name:'microphone'},setting:'granted',origin});await delay(500);
+ check('restoring permission does not silently reopen microphone',await a.evaluate('streams.length === '+capturesBeforeRestore+' && streams.every(s=>s.getTracks().every(t=>t.readyState==="ended"))'));
+ await speaker(a,'appA',false);await until(async()=>(await hook('state')).connections===0);
  await a.call('Browser.setPermission',{permission:{name:'microphone'},setting:'denied',origin});
  let denied=false;try{await mic(a,'appA',true);}catch{denied=true;}
  check('permission denial is explicit and opens no audio WSS',denied&&(await hook('state')).connections===0);

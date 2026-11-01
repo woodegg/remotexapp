@@ -15,11 +15,14 @@ implementation; move them to a version section when publishing a release.
   audio authorization, one scoped WSS, per-session speaker/microphone controls
   and cross-tab SDK coordination. Default audio is off. PCM16 48 kHz needs
   external PulseAudio tools; Core remains statically buildable. Integration
-  qualification and physical end-to-end UAT are tracked in #45/#49.
+  qualification and physical end-to-end UAT are tracked in #45/#49. Device loss
+  during a pending route acknowledgment revokes that microphone writer without
+  stopping other audio or silently reopening capture.
 
 - Extend the native UAT workbench with bounded local speaker/microphone checks,
   same/different-runtime comparison and an exportable audio acceptance checklist.
-  Remote audio remains unavailable until its backend and SDK are integrated.
+  Remote controls reflect actual subscriptions; exported manual cases remain
+  untested until the tester records an observation.
 
 - Redesign the native UAT workbench with persistent per-Viewer statistics,
   focus/comparison layouts, fullscreen diagnostics and collapsible input tools.

@@ -75,3 +75,17 @@ not installed as a mutable account-wide executable.
 Full Manager lifecycle, target Alpine/ARM64 deployment, WAN resources and
 physical-device UAT require separate evidence. Unit and local fixture passes
 must not be presented as acceptance of those scopes.
+
+
+Build the target's UAT-only App Package with Python 3, Go, `readelf`, Bash and
+GNU tar:
+
+```sh
+python3 tests/native-audio/package-app.py --goarch amd64 --output /tmp/audio-app-amd64
+python3 tests/native-audio/package-app.py --goarch arm64 --output /tmp/audio-app-arm64
+```
+
+Version 1.0.1 records App input/toolchain/binary hashes and includes XGB and Go
+license notices. The helper omits repository-wide VCS metadata so unrelated Core
+commits do not alter an immutable App version. Do not overwrite an installed
+App version with different contents; bump the App version when its inputs change.

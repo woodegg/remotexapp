@@ -17,9 +17,31 @@ function abortable(promise, signal) {
   });
 }
 
+function latencySample(raw) {
+  const states = ['waiting','pending','ready','timeout','stale','inactive','unavailable'];
+  if (!raw || !states.includes(raw.state)) return {state:'unavailable'};
+  const age = Number.isFinite(raw.ageMs) && raw.ageMs >= 0;
+  if (raw.state === 'ready') return age && Number.isFinite(raw.rttMs) && raw.rttMs >= 0
+    ? {state:'ready', rttMs:raw.rttMs, ageMs:raw.ageMs} : {state:'unavailable'};
+  return {state:raw.state, ...(raw.state === 'stale' && age ? {ageMs:raw.ageMs} : {})};
+}
+
+function udpLossSample(raw) {
+  const unavailable = {state:'unavailable'};
+  if (!raw || !['waiting','ready','stale','inactive','unavailable'].includes(raw.state)) return unavailable;
+  if (raw.state !== 'ready') return {state:raw.state};
+  const keys = ['receivedBlocks','lostBlocks','expectedBlocks'];
+  if (raw.scope !== 'display-blocks' || raw.windowMs !== 10000 || raw.settleMs !== 2000 ||
+      keys.some(k => !Number.isSafeInteger(raw[k]) || raw[k] < 0) || raw.expectedBlocks < 1 ||
+      raw.expectedBlocks !== raw.receivedBlocks + raw.lostBlocks ||
+      !Number.isFinite(raw.ageMs) || raw.ageMs < 0 || raw.ageMs >= 10000) return unavailable;
+  return {state:'ready',scope:'display-blocks',windowMs:10000,settleMs:2000,
+    ...Object.fromEntries(keys.map(k => [k,raw[k]])),ratio:raw.lostBlocks/raw.expectedBlocks,ageMs:raw.ageMs};
+}
+
 /** Minimal opt-in Kasm Viewer. Each object owns one display attachment only. */
 export class RemoteXAppNativeClient extends EventTarget {
-  constructor({ container, manager = new RemoteXAppManager(), timeout = 90000, keyboardPolicy } = {}) {
+  constructor({ container, manager = new RemoteXAppManager(), timeout = 90000, keyboardPolicy, preferUDP = true } = {}) {
     super();
     if (!container?.replaceChildren) throw new TypeError('container is required');
     if (!Number.isFinite(timeout) || timeout < 1 || timeout > 120000) throw new RangeError('invalid connection timeout');
@@ -31,7 +53,9 @@ export class RemoteXAppNativeClient extends EventTarget {
     this.clipboardEnabled = false;
     this.state = 'disconnected';
     this.capabilities = Object.freeze({ display:'kasm-wss-v1', pointer:true, keyboard:true,
-      clipboard:false, keyboardPolicy:false, clipboardMaxBytes:0, statistics:false, programmaticText:false, audio:false, udp:false });
+      clipboard:false, keyboardPolicy:false, clipboardMaxBytes:0, statistics:false, latency:false, udpLoss:false, programmaticText:false, audio:false, udp:false });
+    this.preferUDP = !!preferUDP;
+    this._viewerId = globalThis.crypto?.randomUUID?.() || `viewer-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     this._epoch = 0;
     this._disposed = false;
   }
@@ -93,12 +117,44 @@ export class RemoteXAppNativeClient extends EventTarget {
       socketURL.protocol = socketURL.protocol === 'https:' ? 'wss:' : 'ws:';
       socketURL.searchParams.set('sessionGeneration', String(prepared.sessionGeneration));
       socketURL.searchParams.set('componentDigest', prepared.displayComponentDigest);
+      let grant;
+      if (prepared.nativeTransport?.grantRequired) {
+        const request = {sessionGeneration:prepared.sessionGeneration, componentDigest:prepared.displayComponentDigest,
+          viewerId:this._viewerId, connectionEpoch:epoch};
+        grant = await this.manager.request(`${base}/grant`, {method:'POST', body:request, signal});
+        current();
+        if (!/^[a-f0-9]{64}$/.test(grant?.token || '') || grant.renewAfterMs !== 20000 || grant.expiresInMs !== 90000)
+          throw new RemoteXAppNativeError('invalid-grant', 'Invalid native Viewer grant');
+        this._grant = {base, request:{...request, token:grant.token}};
+      }
       const features = NativeDisplay.capabilities || {};
+      const udp = features.udp === true && prepared.nativeTransport?.available === true;
       const clipboard = prepared.nativeClipboard === 'text' && features.clipboardText === true;
       this.capabilities = Object.freeze({...this.capabilities, keyboardPolicy:features.keyboardPolicy === true,
-        clipboard, clipboardMaxBytes:clipboard ? features.clipboardMaxBytes : 0, statistics:features.statistics === true});
+        clipboard, udp, clipboardMaxBytes:clipboard ? features.clipboardMaxBytes : 0, statistics:features.statistics === true,
+        latency:features.latency === true && typeof NativeDisplay.prototype.measureLatency === 'function',
+        udpLoss:udp && features.udpLoss === true});
       const display = this._display = new NativeDisplay(this.container, socketURL.href, {
-        resize:prepared.effectivePolicy?.display?.allowClientResize === true, clipboard, keyboardPolicy:this._keyboardPolicy });
+        resize:prepared.effectivePolicy?.display?.allowClientResize === true, clipboard, keyboardPolicy:this._keyboardPolicy,
+        udp:udp && this.preferUDP, protocols:grant ? [`remotexapp-grant.${grant.token}`] : [] });
+      display.addEventListener('transportchange', () => {
+        if (epoch === this._epoch) this.dispatchEvent(new CustomEvent('transportchange', {detail:this.getStats()}));
+      });
+      if (grant) display.addEventListener('connect', () => {
+        const renew = async () => {
+          if (epoch !== this._epoch || !this._grant) return;
+          try {
+            await this.manager.request(`${base}/lease`, {method:'POST', body:this._grant.request, signal});
+            current();
+            this._grantTimer = setTimeout(renew, grant.renewAfterMs);
+          } catch {
+            if (epoch !== this._epoch) return;
+            this.disconnect();
+            this._state('failed', {code:'grant-expired'});
+          }
+        };
+        if (epoch === this._epoch) this._grantTimer = setTimeout(renew, grant.renewAfterMs);
+      }, {once:true});
       display.addEventListener('clipboard', event => {
         if (epoch !== this._epoch || !this.clipboardEnabled || !clipboard) return;
         const text = event.detail?.text;
@@ -174,9 +230,29 @@ export class RemoteXAppNativeClient extends EventTarget {
     const raw = this._display?.getStats?.();
     const keys = ['receivedBytes','sentBytes','bufferedBytes','renderedFrames','width','height'];
     if (!raw || keys.some(key => !Number.isSafeInteger(raw[key]) || raw[key] < 0)) return snapshot;
-    return {...snapshot, available:true, ...Object.fromEntries(keys.map(key => [key, raw[key]]))};
+    const udpKeys = ['udpReceivedBytes','udpPackets','udpRectangles'];
+    const udp = this.capabilities.udp && udpKeys.every(key => Number.isSafeInteger(raw[key]) && raw[key] >= 0);
+    return {...snapshot, available:true, ...Object.fromEntries(keys.map(key => [key, raw[key]])),
+      ...(this.capabilities.latency ? {latency:{wss:latencySample(raw.latency?.wss),
+        udp:udp ? latencySample(raw.latency?.udp) : {state:'inactive'}}} : {}),
+      ...(this.capabilities.udpLoss ? {udpLoss:udp ? udpLossSample(raw.udpLoss) : {state:'inactive'}} : {}),
+      ...(udp ? {...Object.fromEntries(udpKeys.map(key => [key,raw[key]])),
+        transport:raw.screenTransport === 'webrtc-udp' && raw.udpRectangles > 0 ? 'webrtc-udp' : this._transport,
+        controlTransport:this._transport, udpState:raw.udpState, udpReason:raw.udpReason} : {})};
   }
 
+  /** Explicit bounded RTT sampling; getStats() remains passive. */
+  measureLatency() {
+    if (this.state !== 'ready' || !this.capabilities.latency) return false;
+    return this._display.measureLatency();
+  }
+
+
+  configureTransport(preferUDP) {
+    if (this.state !== 'ready' || !this.capabilities.udp) throw new RemoteXAppNativeError('unsupported', 'UDP is unavailable');
+    this.preferUDP = !!preferUDP;
+    this._display.configureTransport(this.preferUDP);
+  }
 
   get keyboardPolicy() { return this._display?.keyboardPolicy || null; }
   configureKeyboard(settings) {
@@ -249,6 +325,13 @@ export class RemoteXAppNativeClient extends EventTarget {
 
   disconnect() {
     ++this._epoch;
+    clearTimeout(this._grantTimer);
+    this._grantTimer = null;
+    const grant = this._grant;
+    this._grant = null;
+    // Closing the owned WSS is authoritative; this best-effort authenticated
+    // revocation also cleans pending grants without waiting for expiry.
+    if (grant) this.manager.request(`${grant.base}/revoke`, {method:'POST', body:grant.request}).catch(() => {});
     this._transport = null;
     this._connectedAt = null;
     ++this._clipboardRevision;

@@ -11,6 +11,30 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Redesign the native UAT workbench with persistent per-Viewer statistics,
+  focus/comparison layouts, fullscreen diagnostics and collapsible input tools.
+
+- Allow a separate native test compiler for Alpine ARM64 sanitizer checks;
+  record architecture and compiler provenance in development build artifacts.
+
+- Add per-Viewer UDP display-block loss estimates to UAT and the native Viewer.
+  Bound duplicate/reorder/sequence tracking, expose stale and unavailable data,
+  and distinguish receiver delivery loss from IP packet loss.
+
+- Show separate per-Viewer UDP ICE RTT and end-to-end WebSocket Fence RTT on
+  UAT and native Viewer pages. Explicit sampling is bounded to once per five
+  seconds, pauses on hidden pages, and marks timeout/stale/unavailable results.
+
+- Preserve the full 64 KiB native text clipboard through the trusted edge by
+  sending validated streams as bounded independent binary WebSocket messages.
+
+- Keep idle UAT WebSockets alive through the trusted edge with native Ping/Pong;
+  retire unresponsive peers without treating heartbeats as App activity.
+
+- Develop optional native IPv4 screen UDP with deployment-owned proxy slots,
+  Viewer authorization/expiry, trusted address filtering and WSS fallback;
+  qualify the bounded standalone UAT slice separately from publication.
+
 - Add an experimental Alpine static Core build recipe and lightweight Openbox
   UAT fixtures for the existing standalone lifecycle backend. Keep Kasm as a
   separately pinned Alpine-native component with declared dynamic dependencies.

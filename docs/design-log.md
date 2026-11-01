@@ -4731,3 +4731,129 @@ only the requested hostname; shared connectors and unrelated apps are retained.
 See the [Alpine experiment](../tests/kasm-native/ALPINE.md) for build boundaries
 and qualification gates. No deployment or release acceptance follows from
 this design entry alone.
+
+
+## 2026-10-31 — Select bounded native IPv4 UDP UAT
+
+The owner approved implementation and live tests of [Issue #36](https://github.com/woodegg/remotexapp/issues/36).
+The [bounded contract](native-udp-uat.md) supplements the earlier D1 WSS boundary:
+keep WSS complete, add deployment-owned non-NAT endpoint slots, a separately
+pinned UDP component, trusted pre-container filtering, and one-use Viewer grants
+with 90-second expiry and 20-second authenticated renewals. Retire both channels
+on control loss or generation change. Preserve old WSS artifacts and App data.
+
+For slot reuse, the authenticated negotiation and old component termination are
+the authority boundary: residual host proxy tuple routing grants no access.
+Verify late old credentials/datagrams cannot reach a new display identity and
+retain reservations when termination/ownership is unknown. This refines the
+architecture's proxy-mapping cleanup prerequisite for static infrastructure proxies
+without giving Manager a privileged host-control API. It requires explicit live
+reuse/replay evidence; no production or unrestricted-public-UDP acceptance follows.
+
+
+## 2026-10-31 — Keep idle UAT control channels alive
+
+Live testing of Issue #36 observed idle WebSocket disconnects while App processes
+remained healthy. Authenticated HTTP grant renewals do not exercise that socket.
+Add a separate trusted-edge Ping/Pong owner (20-second ping, 60-second pong
+deadline), retired with the bridge. Browser-native replies remain independent
+of JavaScript background scheduling. Do not forward these control frames to
+the App or count them as user activity. Record the initial disconnects and the
+subsequent idle/fault observations separately; this mitigation does not assert
+a proven root cause for every upstream network closure.
+
+
+## 2026-10-31 — Preserve native stream framing after edge validation
+
+Issue #36 live clipboard qualification exposed the pinned native decoder's
+continuation-frame incompatibility. Complete-message validation remains mandatory
+before forwarding any input message. The trusted edge now sends the validated
+stream in independent binary messages of at most 16 KiB, with a matching upstream
+write buffer so the WebSocket library does not emit continuation frames. This
+also stays below the native decoder's 65535-byte frame limit. A raw-frame bridge
+regression verifies the complete 64 KiB clipboard and subsequent control bytes,
+rather than relying on a WebSocket receiver that silently rejoins fragments.
+
+
+## 2026-10-31 — Add explicit per-Viewer latency diagnostics
+
+The owner requested UDP and WebSocket ping on UAT (Issue #36). Extend the
+existing passive statistics contract with a separate explicit sampling method.
+WebSocket probes use correlated native RFB Fence echo over the current connection
+to Kasm; UDP samples use the current selected ICE pair's STUN RTT. Do not label
+these ICMP ping or input-to-paint latency, and do not substitute HTTP timing.
+
+Allow at most one sample per five seconds and one outstanding request per
+mechanism. Five-second timeouts, ten-second freshness, peer identity and Viewer
+epoch retirement prevent hung or delayed work from publishing misleading values.
+Known late Fence echoes are ignored without disconnecting a healthy Viewer;
+unrelated Fence responses retain the native parser's rejection behavior.
+Expose numeric RTT/age and bounded status only. The UAT/native page initiates
+sampling only while visible; SDK construction and getStats remain passive.
+Native Fence processing does not update user-activity timestamps or App leases.
+The pinned server binary can be reused, but the changed client belongs in a new
+immutable component manifest; never edit an installed component in place.
+
+## 2026-11-01 — Observe UDP display-block loss without changing the transport
+
+KNA-005 gains a passive per-Viewer delivery-loss estimate using the existing
+32-bit block ID and fragment index/count. This extends the latency diagnostics
+accepted on 2026-10-31; it does not change keyboard/audio routing or native wire
+format. A block is one sender UDP application message, not an IP packet or frame.
+
+Count a block received when all unique fragments arrive. A sequence gap or
+incomplete block becomes lost after a two-second reorder allowance; later data
+does not reverse that decision. Handle modular ID wrap and ignore duplicates.
+Project counts over ten one-second buckets; an idle stream becomes stale after
+ten seconds. Initial leading loss and wholly unseen trailing loss are unknown.
+Large sequence jumps, inconsistent metadata or observation capacity overflow
+make the affected ten-second window unavailable. Never infer a zero or 100%
+network-packet loss rate from the absence of samples.
+
+Keep at most 512 incomplete/absent blocks and 8192 fragment bits per block.
+Diagnostics retain no payload, send no traffic and do not alter reassembly,
+paint or fallback policy. Snapshot reads only project state, including expired
+pending blocks; they create no timers and do not renew activity. A new UDP
+assembler/negotiation or explicit close resets the observation. SDK output is
+capability-gated and validates its content-free counters. UAT labels the unit
+and denominator explicitly instead of presenting this as IP packet loss.
+
+## 2026-11-01 — Architecture-specific native build qualification
+
+The owner requested the same development UAT on an ARM64 host. Reuse the
+pinned runtime sources and patches, but build distinct native artifacts and
+verify their ELF machine type. Core/component provenance records the target
+architecture; deployment receipts retain independent artifact hashes.
+
+A fresh Alpine ARM64 build reached the native ownership tests, then failed to
+link GCC's unavailable ASan/UBSan libraries. `KASM_TEST_CXX` now selects only the
+native test compiler, allowing Clang/compiler-rt while preserving the sanitizer
+and leak-detection flags. Record that compiler separately from the server's
+compiler. This extends KNA-010 qualification and the [Alpine build procedure](../tests/kasm-native/ALPINE.md);
+it does not change runtime transport, input or lifecycle behavior. An ARM64
+build alone does not imply target UAT or production acceptance.
+
+## 2026-11-01 — UAT workbench presentation and asset rollout
+
+The owner requested a more usable test surface with diagnostics visible during
+App interaction. The viewport now reserves space for the remote surface and a
+separately scrollable stats rail. Focus A/B and comparison modes retain the
+existing iframe nodes and connection epochs. Fullscreen includes the rail;
+local text/clipboard tools expand inside the workbench. No global keyboard
+shortcuts or new remote-input handlers are introduced. Counters, RTT and block
+loss retain the existing measurement and stale/unavailable semantics.
+
+Embedded Viewer styling hides duplicate header statistics only inside this UAT
+page; the standalone Viewer and pinned SDK/component remain unchanged. This
+presentation-only update is deployed as a separately hashed edge asset bundle,
+with the old SDK/component files and executable copied without modification.
+A second loopback edge listener permits the protected route to move while the
+preceding listener retains existing WebSocket clients. Runtime/App pins and
+saved documents are preserved; the prior listener/config remains available
+for rollback and later retirement after its clients disconnect.
+
+Observed cutover limitation: the US editor lost its last Viewers just after
+the tunnel route update and stopped after its one-minute vacant timeout.
+Retaining the old listener preserves rollback, but does not guarantee tunnel
+connection continuity. The [workbench record](../tests/kasm-native/UAT-WORKBENCH.md)
+retains this result; future cutovers must account for vacant-session cleanup.

@@ -103,6 +103,10 @@ func (m *manager) createLocked(request createRequest) (*instance, error) {
 	} else if !runtimeRef.MatchString(id) {
 		return nil, errors.New("restored runtime id must be a safe lowercase reference")
 	}
+	if err := m.assignUDPEndpoint(id, &components, request.PinnedComponents.GatewayBinary != ""); err != nil {
+		return nil, err
+	}
+
 	runtimeDir := filepath.Join(m.cfg.stateDir, "instances", id)
 	socketName := id
 	if len(socketName) > 12 {

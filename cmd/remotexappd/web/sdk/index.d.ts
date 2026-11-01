@@ -70,6 +70,7 @@ export interface RemoteXAppRecovery {
 
 export interface RemoteXAppInstance {
   displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string; nativeClipboard?:'text';
+  nativeTransport?:{policy:'wss-only'|'prefer-udp';available:boolean;grantRequired:boolean;reason?:string};
   recovery?:RemoteXAppRecovery;
   versions?:RemoteXAppRuntimeVersions; upgrade?:RemoteXAppUpgradeStatus;
 	id:string; classId:string; templateId:string; driverVersion:string; managedInstanceId?:string; profileRef:string;
@@ -138,20 +139,22 @@ export interface NativeKeyboardPolicy {profile:'unknown'|'windows'|'mac'|'gnome'
 export type RemoteXAppNativeStats = {
   schemaVersion:1; state:'disconnected'|'connecting'|'ready'|'failed'|'disposed';
   code:string|null; connectionEpoch:number; observedAt:number;
-  transport:'wss'|'ws-loopback'|null; connectedForMs:number|null;
+  transport:'wss'|'ws-loopback'|'webrtc-udp'|null; connectedForMs:number|null;
 } & ({available:false} | {
   available:true; receivedBytes:number; sentBytes:number; bufferedBytes:number;
   renderedFrames:number; width:number; height:number;
+  controlTransport?:'wss'|'ws-loopback'; udpReceivedBytes?:number;udpPackets?:number;udpRectangles?:number;udpState?:string;udpReason?:string|null;
 });
 export class RemoteXAppNativeClient extends EventTarget {
-  constructor(options:{container:HTMLElement;manager?:RemoteXAppManager;timeout?:number;keyboardPolicy?:NativeKeyboardPolicy});
+  constructor(options:{container:HTMLElement;manager?:RemoteXAppManager;timeout?:number;keyboardPolicy?:NativeKeyboardPolicy;preferUDP?:boolean});
   readonly state:'disconnected'|'connecting'|'ready'|'failed'|'disposed';
   readonly instance?:RemoteXAppInstance;
   readonly capabilities:{readonly display:'kasm-wss-v1';readonly pointer:true;readonly keyboard:true;
-    readonly clipboard:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly statistics:boolean;readonly programmaticText:false;readonly audio:false;readonly udp:false};
+    readonly clipboard:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly statistics:boolean;readonly programmaticText:false;readonly audio:false;readonly udp:boolean};
   readonly keyboardPolicy:NativeKeyboardPolicy|null;
   readonly clipboardEnabled:boolean;
   getStats():RemoteXAppNativeStats;
+  configureTransport(preferUDP:boolean):void;
   configureKeyboard(settings:NativeKeyboardPolicy):{applied:boolean};
   focus():void;
   blur():void;

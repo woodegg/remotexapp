@@ -282,7 +282,8 @@ test('remote resize debounce sends only the latest quiet size', async () => {
   client._disposeRemoteResizeScheduling();
 });
 
-test('remote resize maximum wait makes progress and flush submits the final size', async () => {
+test('remote resize maximum wait makes progress and flush submits the final size', async t => {
+  t.mock.timers.enable({apis:['setTimeout','Date'],now:1000});
   const state = {
     enabled:true, supported:true, pending:false, needsResize:true,
     width:900, height:640, framebufferWidth:800, framebufferHeight:600,
@@ -293,11 +294,11 @@ test('remote resize maximum wait makes progress and flush submits the final size
 
   client._captureRemoteResize(bridge.snapshot());
   for (const width of [910, 920, 930]) {
-    await sleep(12);
+    t.mock.timers.tick(12);
     state.width = width;
     client._captureRemoteResize(bridge.snapshot());
   }
-  await sleep(20);
+  t.mock.timers.tick(20);
   assert.deepEqual(bridge.requests, ['930x640']);
 
   state.pending = false;
@@ -307,7 +308,7 @@ test('remote resize maximum wait makes progress and flush submits the final size
   state.framebufferHeight = 640;
   client._captureRemoteResize(bridge.snapshot());
   assert.equal(client.flushResize(), true);
-  await sleep(5);
+  t.mock.timers.tick(5);
   assert.deepEqual(bridge.requests, ['930x640', '1100x720']);
   client._disposeRemoteResizeScheduling();
 });

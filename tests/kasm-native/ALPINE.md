@@ -55,6 +55,34 @@ python3 scripts/build-kasm-component.py --platform alpine --inputs /inputs \
 
 ## Host and application fixture
 
+### ARM64 build tooling
+
+The [US ARM64 qualification](UDP-US-ARM64.md) records the tested artifacts and
+live checks for this architecture.
+
+Build ARM64 outputs in a separate native Alpine ARM64 environment, using the
+matching Go distribution. Never install the amd64 executables there. Verify the
+ELF machine type as well as linkage; record distinct artifact/component hashes
+and run target-side qualification before claiming support.
+
+Alpine ARM64's GCC package does not supply the sanitizer runtime required by
+the encoding-cache ownership test. Install `clang` and `compiler-rt`, then set
+`KASM_TEST_CXX=clang++` when running the Kasm recipe. This selects the compiler
+for the two native test executables; it does not change the server compiler or
+remove ASan/UBSan/leak checks. The component source record includes the test
+compiler and architecture. Core's static build record includes both machine
+and Go architecture. Fresh work/output directories and clean-source checks
+still apply. Distribution package versions and matching runtime dependencies
+must be recorded with each candidate.
+
+Run Go tests as a non-root user with `xauth` installed. For this standalone
+build, use `CGO_LDFLAGS=-L/path/to/static-work/static/lib go test
+-tags=x11_static ./...`; the default link path expects a distribution-specific
+dynamic libxdo name. Systemd unit tests must supply their existing command
+stubs on Alpine rather than depend on a host `systemctl` installation.
+
+### Runtime provisioning
+
 Run the Manager as the existing non-root test account with
 `-lifecycle-backend standalone`, inside its host-delegated cgroup v2 subtree.
 Runit supervises the Manager. The platform supplies a private runtime directory,

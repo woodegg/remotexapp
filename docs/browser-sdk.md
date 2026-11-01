@@ -68,8 +68,28 @@ excluding TLS/IP framing and browser-managed Ping/Pong. Sent bytes mean accepted
 by the local socket, not remote acknowledgement; `bufferedBytes` is the browser
 socket's pending send queue. Frames count completed paint callbacks containing
 rectangles, not the server's configured frame rate or monitor refresh rate.
-Dimensions are the remote framebuffer, not the CSS-scaled canvas. This component
-remains WSS-only; UDP and RTT metrics are not implemented.
+Dimensions are the remote framebuffer, not the CSS-scaled canvas. The optional
+UDP component also reports separate UDP byte/packet/rectangle counters,
+`controlTransport`, `udpState` and actual screen `transport` (`webrtc-udp` only
+after UDP rectangles have been painted).
+
+Components declaring `capabilities.latency` support explicit
+`viewer.measureLatency()`. It starts at most one bounded sample per five seconds;
+`getStats()` remains passive. Read `getStats().latency.wss` and `.udp` for a
+`state` and, when `ready`, `rttMs` and `ageMs`. Other states are `waiting`,
+`pending`, `timeout`, `stale`, `inactive` and `unavailable`; missing data is not
+zero. A real zero RTT remains valid. Disconnect/reconnect clears old results.
+
+WebSocket RTT uses a correlated RFB Fence request/response over the existing
+socket to the native server, including the trusted edge and any Tunnel path.
+UDP RTT reads the selected ICE pair's `currentRoundTripTime` in seconds and
+converts it to milliseconds; it measures STUN connectivity/consent checks, as
+defined by [WebRTC Stats](https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-currentroundtriptime).
+Repeated reads of the same response count do not refresh the sample. Values
+older than ten seconds are hidden as stale; pending probes time out after five
+seconds. Only numeric RTT/age and bounded states leave the adapter, never raw
+ICE candidates, SDP or addresses. These are distinct protocol RTT measurements,
+not ICMP ping or end-to-end input-to-paint latency.
 
 Hosts derive rates from counter deltas divided by elapsed `observedAt` time;
 reset baselines on epoch change, iframe reload or counter rollback. Pause sampling
@@ -79,6 +99,22 @@ clears displayed live metrics. The native kiosk exposes the same snapshot as
 Viewer controls or additional cross-origin messaging. The UAT harness samples
 once per second with one shared timer, stops when no Viewers remain and tracks
 A/B independently. Hiding only A's panel leaves its connection active.
+The native Viewer page explicitly samples RTT every five seconds while visible;
+it pauses active sampling when its document is hidden and clears live displays
+on disconnect. SDK construction and passive stats reads do not start sampling.
+
+Components declaring `capabilities.udpLoss` expose `getStats().udpLoss`. Its
+`state` is `waiting`, `ready`, `stale`, `inactive` or `unavailable`. Ready data
+has `scope: 'display-blocks'`, `receivedBlocks`, `lostBlocks`, `expectedBlocks`,
+`ratio` (0–1), `ageMs`, `windowMs: 10000` and `settleMs: 2000`. The ratio is
+`lostBlocks / expectedBlocks`, with ten one-second buckets of finalized blocks.
+A sender block ID identifies an application message; it is not an IP packet
+or necessarily a rendered frame. Unique fragments complete a block. Missing
+IDs and incomplete blocks get two seconds for reordering before counting as
+lost. Leading/trailing wholly unseen loss is unobservable. Tracking overflow,
+large sequence gaps or inconsistent headers suppress the affected window.
+Idle data expires; a new UDP negotiation resets counts. Reading this snapshot
+does not generate probes, change decoder retention or renew App activity.
 
 ## Optional runtime keepalive (SDK 0.29)
 

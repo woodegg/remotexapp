@@ -5,20 +5,25 @@ import { RemoteXAppNativeClient } from './remotexapp-native-client.js';
 globalThis.CustomEvent ||= class extends Event { constructor(type,options) { super(type); this.detail = options?.detail; } };
 globalThis.location = new URL('https://viewer.example.test/remotexapps/app/kiosk.html');
 
-function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, statistics = false } = {}) {
+function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, statistics = false, udp = false, latency = false, udpLoss = false } = {}) {
   const state = { id:'app', displayProvider:'kasm', displayComponentDigest:'a'.repeat(64), sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
+  if (udp) state.nativeTransport={available:true,grantRequired:true,policy:'prefer-udp'};
+  const calls=[];
   state.nativeClipboard = clipboard ? "text" : undefined;
   let display, reads = 0;
   class Display extends EventTarget {
-    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardMaxBytes:65536,statistics};
+    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardMaxBytes:65536,statistics,udp,latency,udpLoss};
     counters = {receivedBytes:100, sentBytes:20, bufferedBytes:0, renderedFrames:2, width:1024, height:768};
     getStats() { return this.counters; }
+    probes = 0;
+    measureLatency() {this.probes++;return true;}
     sent = [];
     sendClipboardText(text) { this.sent.push(text); }
     keyboardPolicy = {profile:"unknown",mode:"local",bindings:[]};
     configureKeyboard(settings) { this.keyboardPolicy = settings;return true; }
-    constructor(container,url) {
-      super(); display = this; this.url = url; this.closed = 0;
+    configureTransport(value) {this.preferUDP=value;}
+    constructor(container,url,options) {
+      super(); display = this; this.url = url; this.options=options; this.closed = 0;
       queueMicrotask(() => { this.dispatchEvent(new Event('connect')); if (frame) this.dispatchEvent(new Event('frame')); });
     }
     disconnect() { this.closed++; this.dispatchEvent(new Event('disconnect')); }
@@ -28,13 +33,16 @@ function fixture({ ready = true, frame = true, timeout = 200, clipboard = false,
     getInstance:async () => { reads++; return structuredClone(state); },
     request:async (path,options) => {
       assert.equal(options.body.sessionGeneration,3);
+      calls.push({path,options});
+      if(path.endsWith('/grant')) return {token:'b'.repeat(64),expiresInMs:90000,renewAfterMs:20000};
+      if(path.endsWith('/lease') || path.endsWith('/revoke')) return {status:'ok'};
       assert.equal(path,'/remotexapps/app/native/prepare');
       return structuredClone(state);
     },
   };
   const viewer = new RemoteXAppNativeClient({ container:{ replaceChildren(){} }, manager, timeout });
   viewer._loadDisplay = async () => ({ default:Display });
-  return { viewer,state,get display(){return display;},get reads(){return reads;} };
+  return { viewer,state,calls,get display(){return display;},get reads(){return reads;} };
 }
 
 test('native ready needs current App and painted frame; dispose owns only one attachment', async () => {
@@ -209,4 +217,66 @@ test('old components and malformed statistics report unavailable instead of fabr
     f.display.counters=value;assert.equal(f.viewer.getStats().available,false);
   }
   f.viewer.dispose();
+});
+
+
+test('UDP uses a header grant, actual bytes/paint status, and per-Viewer preference',async()=>{
+  const f=fixture({udp:true,statistics:true});await f.viewer.connect('app');
+  assert.equal(f.viewer.capabilities.udp,true);
+  assert.equal(f.display.options.udp,true);
+  assert.deepEqual(f.display.options.protocols,['remotexapp-grant.'+'b'.repeat(64)]);
+  assert.equal(f.display.url.includes('b'.repeat(64)),false);
+  Object.assign(f.display.counters,{udpReceivedBytes:300,udpPackets:3,udpRectangles:0,screenTransport:'webrtc-udp',udpState:'udp'});
+  assert.equal(f.viewer.getStats().transport,'wss');
+  f.display.counters.udpRectangles=1;
+  assert.equal(f.viewer.getStats().transport,'webrtc-udp');
+  f.viewer.configureTransport(false);assert.equal(f.display.preferUDP,false);
+  f.viewer.dispose();assert.equal(f.calls.at(-1).path,'/remotexapps/app/native/revoke');
+});
+test('UDP renewal failure retires the display and does not renew a replacement',async t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const f=fixture({udp:true});await f.viewer.connect('app');
+  const old=f.display;
+  const request=f.viewer.manager.request;
+  f.viewer.manager.request=async(path,options)=>{if(path.endsWith('/lease'))throw Error('authorization lost');return request(path,options);};
+  t.mock.timers.tick(20000);
+  await new Promise(resolve=>queueMicrotask(resolve));await new Promise(resolve=>queueMicrotask(resolve));
+  assert.equal(f.viewer.state,'failed');assert.equal(old.closed,1);
+  assert.equal(f.viewer.getStats().code,'grant-expired');f.viewer.dispose();
+});
+
+test('RTT sampling is explicit, capability-gated, content-free and reset on reconnect', async () => {
+  const old=fixture({statistics:true});await old.viewer.connect('app');assert.equal(old.viewer.measureLatency(),false);old.viewer.dispose();
+  const f=fixture({statistics:true,udp:true,latency:true});assert.equal(f.viewer.measureLatency(),false);await f.viewer.connect('app');
+  Object.assign(f.display.counters,{udpReceivedBytes:5,udpPackets:1,udpRectangles:1,latency:{
+    wss:{state:'ready',rttMs:0,ageMs:2,token:'must-not-leak'},udp:{state:'stale',ageMs:12000,candidates:['must-not-leak']}}});
+  assert.deepEqual(f.viewer.getStats().latency,{wss:{state:'ready',rttMs:0,ageMs:2},udp:{state:'stale',ageMs:12000}});
+  assert.equal(f.display.probes,0);assert.equal(f.viewer.measureLatency(),true);assert.equal(f.display.probes,1);
+  for (const raw of [null,{state:'bad'},{state:'ready',rttMs:NaN,ageMs:0},{state:'ready',rttMs:1,ageMs:-1}]) {
+    f.display.counters.latency={wss:raw,udp:raw};assert.equal(f.viewer.getStats().latency.wss.state,'unavailable');
+  }
+  for (const state of ['waiting','pending','timeout','inactive','unavailable']) {
+    f.display.counters.latency={wss:{state,extra:'private'}};assert.deepEqual(f.viewer.getStats().latency.wss,{state});
+  }
+  await f.viewer.reconnect();assert.deepEqual(f.viewer.getStats().latency.wss,{state:'unavailable'});
+  f.viewer.disconnect();assert.equal(f.viewer.getStats().latency,undefined);assert.equal(f.viewer.measureLatency(),false);f.viewer.dispose();
+});
+
+test('UDP block loss validates counts, stays passive, gates old components and clears on reconnect', async () => {
+  const old=fixture({statistics:true,udp:true});await old.viewer.connect('app');
+  assert.equal(old.viewer.capabilities.udpLoss,false);assert.equal(old.viewer.getStats().udpLoss,undefined);old.viewer.dispose();
+  const f=fixture({statistics:true,udp:true,udpLoss:true});await f.viewer.connect('app');
+  const loss={state:'ready',scope:'display-blocks',windowMs:10000,settleMs:2000,
+    receivedBlocks:8,lostBlocks:2,expectedBlocks:10,ratio:999,ageMs:20,privateAddress:'must-not-escape'};
+  Object.assign(f.display.counters,{udpReceivedBytes:10,udpPackets:1,udpRectangles:1,udpLoss:loss});
+  const calls=f.calls.length,s=f.viewer.getStats().udpLoss;
+  assert.equal(s.ratio,.2);assert.equal(s.privateAddress,undefined);assert.equal(f.calls.length,calls);assert.equal(f.display.probes,0);
+  for(const bad of [{expectedBlocks:9},{lostBlocks:-1},{receivedBlocks:NaN},{ageMs:10000},{windowMs:20},{scope:'packets'},{state:'made-up'}]){
+    f.display.counters.udpLoss={...loss,...bad};assert.equal(f.viewer.getStats().udpLoss.state,'unavailable');
+  }
+  for(const state of ['waiting','stale','inactive','unavailable']){
+    f.display.counters.udpLoss={...loss,state};assert.deepEqual(f.viewer.getStats().udpLoss,{state});
+  }
+  f.viewer.disconnect();assert.equal(f.viewer.getStats().udpLoss,undefined);
+  await f.viewer.connect('app');assert.equal(f.viewer.getStats().udpLoss.state,'inactive');f.viewer.dispose();
 });

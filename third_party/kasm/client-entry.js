@@ -3,13 +3,16 @@ import RFB from './core/rfb.js';
 import MouseButtonMapper, {XVNC_BUTTONS} from './core/mousebuttonmapper.js';
 import {normalizePolicy} from './core/input/poc-input-policy.mjs';
 import { clipboardBytes } from './core/remotexapp-server-messages.mjs';
+import { LatencyProbe } from './core/remotexapp-latency.mjs';
 
 export default class NativeDisplay extends EventTarget {
-  static capabilities = Object.freeze({keyboardPolicy:true, clipboardText:true, clipboardMaxBytes:65536, statistics:true});
+  static capabilities = Object.freeze({keyboardPolicy:true, clipboardText:true, clipboardMaxBytes:65536, statistics:true, latency:true, udpLoss:true, udp:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP});
   #rfb;
   #input;
   #renderedFrames = 0;
-  constructor(container, url, { resize = false, keyboardPolicy, clipboard = false } = {}) {
+  #udpPaintBaseline = 0;
+  #latency;
+  constructor(container, url, { resize = false, keyboardPolicy, clipboard = false, udp = false, protocols = [] } = {}) {
     super();
     if (keyboardPolicy) normalizePolicy(keyboardPolicy);
     this.#input = document.createElement('textarea');
@@ -19,7 +22,19 @@ export default class NativeDisplay extends EventTarget {
     this.#input.spellcheck = false;
     this.#input.style.cssText = 'position:absolute;left:1px;top:1px;width:1px;height:1px;opacity:0;pointer-events:none';
     container.appendChild(this.#input);
-    const rfb = this.#rfb = new RFB(container, this.#input, url, { shared:true, videoRenderingMode:'canvas2d' }, []);
+    const rfb = this.#rfb = new RFB(container, this.#input, url, { shared:true, videoRenderingMode:'canvas2d', wsProtocols:protocols.length ? protocols : ['binary'] }, []);
+    this.#latency = new LatencyProbe({
+      connected:() => this.#rfb === rfb && rfb.isConnected,
+      peer:() => rfb._udpPeer,
+      udpActive:() => rfb._useUdp && rfb._transitConnectionState === rfb.TransitConnectionStates?.Udp,
+      sendFence:payload => {
+        if (!rfb._supportsFence) return false;
+        RFB.messages.clientFence(rfb._sock, 0x80000000, payload);
+        return true;
+      },
+    });
+    rfb._remoteXAppFenceResponse = (payload, flags) => this.#latency.fence(payload, flags);
+    rfb.addEventListener('disconnect', () => this.#latency.dispose(), {once:true});
     // Upstream initializes this in its full UI. The standalone adapter owns
     // the same required DOM-button -> X11-button mapping before input starts.
     rfb.mouseButtonMapper = new MouseButtonMapper();
@@ -27,7 +42,11 @@ export default class NativeDisplay extends EventTarget {
       [2,XVNC_BUTTONS.RIGHT_BUTTON], [3,XVNC_BUTTONS.BACK_BUTTON], [4,XVNC_BUTTONS.FORWARD_BUTTON]]) {
       rfb.mouseButtonMapper.set(button, mapped);
     }
-    rfb.enableWebRTC = false;
+    rfb.enableWebRTC = !!udp && NativeDisplay.capabilities.udp;
+    rfb.addEventListener('transportchange', () => {
+      this.#udpPaintBaseline = this.#renderedFrames;
+      this.dispatchEvent(new Event('transportchange'));
+    });
     // Browser clipboard access belongs to explicit SDK user actions. The native
     // transport never reads/writes navigator.clipboard, on focus or otherwise.
     rfb.clipboardUp = rfb.clipboardDown = clipboard;
@@ -54,8 +73,21 @@ export default class NativeDisplay extends EventTarget {
   getStats() {
     const rfb = this.#rfb;
     if (!rfb?.isConnected) return null;
-    return {...rfb._sock.trafficStats, renderedFrames:this.#renderedFrames,
+    return {...rfb._sock.trafficStats, renderedFrames:this.#renderedFrames, latency:this.#latency.snapshot(),
+      udpReceivedBytes:rfb._udpReceivedBytes || 0, udpPackets:rfb._udpPackets || 0,
+      udpRectangles:rfb._udpRectangles || 0,
+      udpLoss:rfb._useUdp && rfb._transitConnectionState === rfb.TransitConnectionStates.Udp
+        ? rfb._udpBuffer?.lossStats() || {state:'waiting'} : {state:'inactive'},
+      screenTransport:rfb._transitConnectionState === rfb.TransitConnectionStates.Udp && this.#renderedFrames > this.#udpPaintBaseline ? 'webrtc-udp' : 'wss',
+      udpState:rfb._transitConnectionState.description, udpReason:rfb._udpUnavailableReason || null,
       width:rfb._display.width, height:rfb._display.height};
+  }
+
+  measureLatency() { return this.#latency.measure(); }
+
+  configureTransport(preferUDP) {
+    if (!NativeDisplay.capabilities.udp) throw new Error('UDP is unavailable');
+    this.#rfb.enableWebRTC = !!preferUDP;
   }
 
   get keyboardPolicy() {
@@ -73,6 +105,7 @@ export default class NativeDisplay extends EventTarget {
     RFB.messages.sendBinaryClipboard(rfb._sock, [data], ['text/plain']);
   }
   disconnect() {
+    this.#latency.dispose();
     this.#rfb?.disconnect();
     this.#rfb = null;
     this.#input?.remove();

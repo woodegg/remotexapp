@@ -27,6 +27,7 @@ func (m *manager) newRuntimeComponents() runtimeComponents {
 	c := runtimeComponents{GatewayBinary: m.cfg.gatewayBinary, StatusBinary: m.cfg.statusBinary, UnicodeEngine: m.cfg.engine, CoreDriverDir: m.cfg.coreDriverDir}
 	if m.cfg.displayProvider == "kasm" {
 		c.DisplayProvider, c.Kasm, c.UnicodeEngine = "kasm", m.cfg.kasmPin, ""
+		c.NativeUDP = m.cfg.nativeUDPCapable
 		if m.cfg.nativeClipboard {
 			c.NativeClipboard = "text"
 		}
@@ -42,7 +43,7 @@ func (cfg *config) configureDisplayProvider() error {
 		return errors.New("display-provider must be tigervnc or kasm")
 	}
 	if cfg.displayProvider == "tigervnc" {
-		if cfg.kasmBundle != "" || cfg.nativeClipboard {
+		if cfg.kasmBundle != "" || cfg.nativeClipboard || cfg.udpEndpointsFile != "" {
 			return errors.New("kasm-bundle requires display-provider=kasm")
 		}
 		return nil
@@ -54,23 +55,27 @@ func (cfg *config) configureDisplayProvider() error {
 	if err != nil {
 		return err
 	}
-	if cfg.nativeClipboard && bundle.Manifest.Protocol != kasmbundle.TextProtocol {
+	if cfg.nativeClipboard && !supportsNativeText(bundle.Manifest.Protocol) {
 		return errors.New("native clipboard requires the pinned text clipboard component")
 	}
 	cfg.kasmPin = &bundle.Pin
-	return nil
+	cfg.nativeUDPCapable = bundle.Manifest.Protocol == kasmbundle.UDPProtocol
+	return cfg.loadUDPEndpoints()
 }
 
 func validateDisplayComponents(c runtimeComponents, verify bool) error {
 	switch displayProvider(c) {
 	case "tigervnc":
-		if c.Kasm != nil || c.NativeClipboard != "" {
+		if c.Kasm != nil || c.NativeClipboard != "" || c.NativeUDP || c.UDPEndpoint != nil || c.UDPUnavailableReason != "" {
 			return errors.New("TigerVNC cannot carry a Kasm component pin")
 		}
 		if c.UnicodeEngine == "" {
 			return errors.New("TigerVNC requires the Unicode engine")
 		}
 	case "kasm":
+		if !validUDPLease(c.UDPEndpoint) || (!c.NativeUDP && (c.UDPEndpoint != nil || c.UDPUnavailableReason != "")) || (c.UDPEndpoint != nil && c.UDPUnavailableReason != "") || (c.UDPUnavailableReason != "" && c.UDPUnavailableReason != "endpoint-pool-full" && c.UDPUnavailableReason != "endpoints-not-configured") {
+			return errors.New("invalid native UDP snapshot")
+		}
 		if (c.NativeClipboard != "" && c.NativeClipboard != "text") || c.Kasm == nil || !kasmbundle.ValidDigest(c.Kasm.SHA256) || !filepath.IsAbs(c.Kasm.Directory) || filepath.Clean(c.Kasm.Directory) != c.Kasm.Directory || c.UnicodeEngine != "" {
 			return errors.New("invalid Kasm component snapshot")
 		}
@@ -79,7 +84,10 @@ func validateDisplayComponents(c runtimeComponents, verify bool) error {
 			if err != nil {
 				return fmt.Errorf("locked Kasm bundle: %w", err)
 			}
-			if c.NativeClipboard == "text" && bundle.Manifest.Protocol != kasmbundle.TextProtocol {
+			if c.NativeUDP != (bundle.Manifest.Protocol == kasmbundle.UDPProtocol) {
+				return errors.New("native UDP capability differs from pinned component")
+			}
+			if c.NativeClipboard == "text" && !supportsNativeText(bundle.Manifest.Protocol) {
 				return errors.New("locked component does not support native text clipboard")
 			}
 		}
@@ -91,7 +99,7 @@ func validateDisplayComponents(c runtimeComponents, verify bool) error {
 
 func kasmLaunchArgs(item *instance, class classConfig, port int, authority string) []string {
 	root := item.Components.Kasm.Directory
-	return []string{
+	args := []string{
 		"--user", "--unit=" + strings.TrimSuffix(item.VNCUnit, ".service"), "--collect",
 		"--property=WorkingDirectory=" + item.Home, "--setenv=HOME=" + item.Home,
 		"--setenv=LD_LIBRARY_PATH=" + filepath.Join(root, "lib"),
@@ -105,4 +113,13 @@ func kasmLaunchArgs(item *instance, class classConfig, port int, authority strin
 		"-geometry", class.Server.Geometry, "-depth", "24", "-FrameRate", strconv.Itoa(class.Server.FrameRate),
 		"-AcceptSetDesktopSize=" + boolDigit(class.Server.AllowClientResize), "-FreeKeyMappings", "-auth", authority,
 	}
+	if lease := item.Components.UDPEndpoint; lease != nil {
+		for i := range args {
+			if args[i] == "-publicIP" {
+				args[i+1] = lease.Address
+			}
+		}
+		args = append(args, "-udpPort", strconv.Itoa(lease.Port))
+	}
+	return args
 }

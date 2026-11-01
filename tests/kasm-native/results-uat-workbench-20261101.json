@@ -1,0 +1,1014 @@
+{
+  "date": "2026-11-01",
+  "scope": "Native UAT workbench presentation; same pinned Core, Viewer, SDK and components",
+  "pageSourceCommit": "ef126a3c80ef446eb7abe670a402bf8333c70e28",
+  "pageSHA256": "4eaed1fc49ac08b4a373b9616aae19d69ae02e24d83d35df7e7f9686005ad7e2",
+  "verification": {
+    "makeCheck": "passed",
+    "ci": "https://github.com/woodegg/remotexapp/actions/runs/41268928044",
+    "previewChecks": 91,
+    "publicChecksPerRegion": 91,
+    "browser": "Owned headless Chrome through authenticated public Cloudflare Access routes",
+    "input": "CDP pointer/composition/Unicode/arrow and saved-file readback on owned disposable documents; not physical OS IME acceptance"
+  },
+  "regions": {
+    "australia": {
+      "finishedAt": "2026-11-01T03:25:36.933Z",
+      "publicPageHashMatched": true,
+      "passedChecks": 91,
+      "checks": [
+        "layout a: page has no outer scroll",
+        "layout a: live rail remains inside viewport",
+        "layout a: remote surface is usable",
+        "layout a: key metrics visible with remote window",
+        "layout a: same iframe connections retained",
+        "layout a: epochs unchanged",
+        "layout b: page has no outer scroll",
+        "layout b: live rail remains inside viewport",
+        "layout b: remote surface is usable",
+        "layout b: key metrics visible with remote window",
+        "layout b: same iframe connections retained",
+        "layout b: epochs unchanged",
+        "layout split: page has no outer scroll",
+        "layout split: live rail remains inside viewport",
+        "layout split: remote surface is usable",
+        "layout split: key metrics visible with remote window",
+        "layout split: same iframe connections retained",
+        "layout split: epochs unchanged",
+        "layout a: page has no outer scroll",
+        "layout a: live rail remains inside viewport",
+        "layout a: remote surface is usable",
+        "layout a: key metrics visible with remote window",
+        "layout a: same iframe connections retained",
+        "layout a: epochs unchanged",
+        "pointer, Unicode, arrow and saved file readback",
+        "input tools expanded",
+        "local input is usable beside remote app",
+        "input tools open: page has no outer scroll",
+        "input tools open: live rail remains inside viewport",
+        "input tools open: remote surface is usable",
+        "input tools open: key metrics visible with remote window",
+        "input tools open: same iframe connections retained",
+        "explicit local clipboard copy and read",
+        "local clipboard permission denial is visible",
+        "outside/inside input focus returns to remote app",
+        "fullscreen includes stats and viewers",
+        "fullscreen: page has no outer scroll",
+        "fullscreen: live rail remains inside viewport",
+        "fullscreen: remote surface is usable",
+        "fullscreen: key metrics visible with remote window",
+        "fullscreen: same iframe connections retained",
+        "1920x1080: page has no outer scroll",
+        "1920x1080: live rail remains inside viewport",
+        "1920x1080: remote surface is usable",
+        "1920x1080: key metrics visible with remote window",
+        "1920x1080: same iframe connections retained",
+        "1440x900: page has no outer scroll",
+        "1440x900: live rail remains inside viewport",
+        "1440x900: remote surface is usable",
+        "1440x900: key metrics visible with remote window",
+        "1440x900: same iframe connections retained",
+        "1366x768: page has no outer scroll",
+        "1366x768: live rail remains inside viewport",
+        "1366x768: remote surface is usable",
+        "1366x768: key metrics visible with remote window",
+        "1366x768: same iframe connections retained",
+        "1024x640: page has no outer scroll",
+        "1024x640: live rail remains inside viewport",
+        "1024x640: remote surface is usable",
+        "1024x640: key metrics visible with remote window",
+        "1024x640: same iframe connections retained",
+        "900x700: page has no outer scroll",
+        "900x700: live rail remains inside viewport",
+        "900x700: remote surface is usable",
+        "900x700: key metrics visible with remote window",
+        "900x700: same iframe connections retained",
+        "800x600: page has no outer scroll",
+        "800x600: live rail remains inside viewport",
+        "800x600: remote surface is usable",
+        "800x600: key metrics visible with remote window",
+        "800x600: same iframe connections retained",
+        "768x1024: page has no outer scroll",
+        "768x1024: live rail remains inside viewport",
+        "768x1024: remote surface is usable",
+        "768x1024: key metrics visible with remote window",
+        "768x1024: same iframe connections retained",
+        "390x844: page has no outer scroll",
+        "390x844: live rail remains inside viewport",
+        "390x844: remote surface is usable",
+        "390x844: key metrics visible with remote window",
+        "390x844: same iframe connections retained",
+        "narrow screen can inspect B independently",
+        "mobile stats B: page has no outer scroll",
+        "mobile stats B: live rail remains inside viewport",
+        "mobile stats B: remote surface is usable",
+        "mobile stats B: key metrics visible with remote window",
+        "mobile stats B: same iframe connections retained",
+        "close clears A metrics and retains B",
+        "closed stats have no stale values",
+        "explicit hide control remains available",
+        "no browser exceptions"
+      ],
+      "viewportChecks": [
+        {
+          "label": "layout a",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "layout b",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "layout split",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "layout a",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "input tools open",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "fullscreen",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "1920x1080",
+          "viewport": {
+            "width": 1920,
+            "height": 1080
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "1440x900",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "1366x768",
+          "viewport": {
+            "width": 1366,
+            "height": 768
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "1024x640",
+          "viewport": {
+            "width": 1024,
+            "height": 640
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "900x700",
+          "viewport": {
+            "width": 900,
+            "height": 700
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "800x600",
+          "viewport": {
+            "width": 800,
+            "height": 600
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "768x1024",
+          "viewport": {
+            "width": 768,
+            "height": 1024
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "390x844",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 6
+        },
+        {
+          "label": "mobile stats B",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 6
+        }
+      ],
+      "viewerSnapshots": [
+        {
+          "state": "ready",
+          "available": true,
+          "transport": "wss",
+          "renderedFrames": 5,
+          "receivedBytes": 10889,
+          "sentBytes": 887,
+          "udpReceivedBytes": 0,
+          "width": 1200,
+          "height": 662,
+          "latency": {
+            "wss": {
+              "state": "ready",
+              "rttMs": 225.10000014305115,
+              "ageMs": 1562
+            },
+            "udp": {
+              "state": "inactive"
+            }
+          },
+          "udpLoss": {
+            "state": "inactive"
+          }
+        },
+        {
+          "state": "ready",
+          "available": true,
+          "transport": "webrtc-udp",
+          "renderedFrames": 37,
+          "receivedBytes": 5716,
+          "sentBytes": 1359,
+          "udpReceivedBytes": 48872,
+          "width": 1200,
+          "height": 662,
+          "latency": {
+            "wss": {
+              "state": "pending"
+            },
+            "udp": {
+              "state": "ready",
+              "rttMs": 206,
+              "ageMs": 20.700000047683716
+            }
+          },
+          "udpLoss": {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 47,
+            "lostBlocks": 0,
+            "expectedBlocks": 47,
+            "ratio": 0,
+            "ageMs": 5219.200000047684
+          }
+        }
+      ],
+      "retainedRuntimeCommit": "4bdc54a2cae633adcaffae719f3545397b6b058e",
+      "retainedEdgeBinarySHA256": "a25b6c9f48dbb768dfda76072989dbaa8208c814dc449c2efef9a8a5abd66f63",
+      "verifiedCopiedFiles": 13,
+      "rollout": {
+        "existingAppIDsRetained": true,
+        "existingGenerationAndPinsRetained": true,
+        "existingProcessIdentitiesRetained": true,
+        "existingDocumentHashesRetained": true,
+        "newListenerReady": true,
+        "previousListenerAvailable": true,
+        "assetsStillMatch": true,
+        "onlyUATDestinationChanged": true,
+        "accessStillRequired": true
+      },
+      "cleanup": {
+        "ownedAppsStopped": true,
+        "ownedAppsHaveNoViewers": true,
+        "ownedDocumentsRemoved": true,
+        "managerAndDesktopRetained": true
+      }
+    },
+    "china": {
+      "finishedAt": "2026-11-01T03:24:46.440Z",
+      "publicPageHashMatched": true,
+      "passedChecks": 91,
+      "checks": [
+        "layout a: page has no outer scroll",
+        "layout a: live rail remains inside viewport",
+        "layout a: remote surface is usable",
+        "layout a: key metrics visible with remote window",
+        "layout a: same iframe connections retained",
+        "layout a: epochs unchanged",
+        "layout b: page has no outer scroll",
+        "layout b: live rail remains inside viewport",
+        "layout b: remote surface is usable",
+        "layout b: key metrics visible with remote window",
+        "layout b: same iframe connections retained",
+        "layout b: epochs unchanged",
+        "layout split: page has no outer scroll",
+        "layout split: live rail remains inside viewport",
+        "layout split: remote surface is usable",
+        "layout split: key metrics visible with remote window",
+        "layout split: same iframe connections retained",
+        "layout split: epochs unchanged",
+        "layout a: page has no outer scroll",
+        "layout a: live rail remains inside viewport",
+        "layout a: remote surface is usable",
+        "layout a: key metrics visible with remote window",
+        "layout a: same iframe connections retained",
+        "layout a: epochs unchanged",
+        "pointer, Unicode, arrow and saved file readback",
+        "input tools expanded",
+        "local input is usable beside remote app",
+        "input tools open: page has no outer scroll",
+        "input tools open: live rail remains inside viewport",
+        "input tools open: remote surface is usable",
+        "input tools open: key metrics visible with remote window",
+        "input tools open: same iframe connections retained",
+        "explicit local clipboard copy and read",
+        "local clipboard permission denial is visible",
+        "outside/inside input focus returns to remote app",
+        "fullscreen includes stats and viewers",
+        "fullscreen: page has no outer scroll",
+        "fullscreen: live rail remains inside viewport",
+        "fullscreen: remote surface is usable",
+        "fullscreen: key metrics visible with remote window",
+        "fullscreen: same iframe connections retained",
+        "1920x1080: page has no outer scroll",
+        "1920x1080: live rail remains inside viewport",
+        "1920x1080: remote surface is usable",
+        "1920x1080: key metrics visible with remote window",
+        "1920x1080: same iframe connections retained",
+        "1440x900: page has no outer scroll",
+        "1440x900: live rail remains inside viewport",
+        "1440x900: remote surface is usable",
+        "1440x900: key metrics visible with remote window",
+        "1440x900: same iframe connections retained",
+        "1366x768: page has no outer scroll",
+        "1366x768: live rail remains inside viewport",
+        "1366x768: remote surface is usable",
+        "1366x768: key metrics visible with remote window",
+        "1366x768: same iframe connections retained",
+        "1024x640: page has no outer scroll",
+        "1024x640: live rail remains inside viewport",
+        "1024x640: remote surface is usable",
+        "1024x640: key metrics visible with remote window",
+        "1024x640: same iframe connections retained",
+        "900x700: page has no outer scroll",
+        "900x700: live rail remains inside viewport",
+        "900x700: remote surface is usable",
+        "900x700: key metrics visible with remote window",
+        "900x700: same iframe connections retained",
+        "800x600: page has no outer scroll",
+        "800x600: live rail remains inside viewport",
+        "800x600: remote surface is usable",
+        "800x600: key metrics visible with remote window",
+        "800x600: same iframe connections retained",
+        "768x1024: page has no outer scroll",
+        "768x1024: live rail remains inside viewport",
+        "768x1024: remote surface is usable",
+        "768x1024: key metrics visible with remote window",
+        "768x1024: same iframe connections retained",
+        "390x844: page has no outer scroll",
+        "390x844: live rail remains inside viewport",
+        "390x844: remote surface is usable",
+        "390x844: key metrics visible with remote window",
+        "390x844: same iframe connections retained",
+        "narrow screen can inspect B independently",
+        "mobile stats B: page has no outer scroll",
+        "mobile stats B: live rail remains inside viewport",
+        "mobile stats B: remote surface is usable",
+        "mobile stats B: key metrics visible with remote window",
+        "mobile stats B: same iframe connections retained",
+        "close clears A metrics and retains B",
+        "closed stats have no stale values",
+        "explicit hide control remains available",
+        "no browser exceptions"
+      ],
+      "viewportChecks": [
+        {
+          "label": "layout a",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "layout b",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "layout split",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "layout a",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "input tools open",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "fullscreen",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "1920x1080",
+          "viewport": {
+            "width": 1920,
+            "height": 1080
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "1440x900",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "1366x768",
+          "viewport": {
+            "width": 1366,
+            "height": 768
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "1024x640",
+          "viewport": {
+            "width": 1024,
+            "height": 640
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "900x700",
+          "viewport": {
+            "width": 900,
+            "height": 700
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "800x600",
+          "viewport": {
+            "width": 800,
+            "height": 600
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "768x1024",
+          "viewport": {
+            "width": 768,
+            "height": 1024
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "390x844",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 6
+        },
+        {
+          "label": "mobile stats B",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 6
+        }
+      ],
+      "viewerSnapshots": [
+        {
+          "state": "ready",
+          "available": true,
+          "transport": "wss",
+          "renderedFrames": 4,
+          "receivedBytes": 10603,
+          "sentBytes": 887,
+          "udpReceivedBytes": 0,
+          "width": 1200,
+          "height": 662,
+          "latency": {
+            "wss": {
+              "state": "ready",
+              "rttMs": 796.7999999523163,
+              "ageMs": 866.2000000476837
+            },
+            "udp": {
+              "state": "inactive"
+            }
+          },
+          "udpLoss": {
+            "state": "inactive"
+          }
+        },
+        {
+          "state": "ready",
+          "available": true,
+          "transport": "webrtc-udp",
+          "renderedFrames": 32,
+          "receivedBytes": 14133,
+          "sentBytes": 1369,
+          "udpReceivedBytes": 36077,
+          "width": 1200,
+          "height": 662,
+          "latency": {
+            "wss": {
+              "state": "ready",
+              "rttMs": 330.59999990463257,
+              "ageMs": 323.2000000476837
+            },
+            "udp": {
+              "state": "ready",
+              "rttMs": 217,
+              "ageMs": 648.6000001430511
+            }
+          },
+          "udpLoss": {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 41,
+            "lostBlocks": 2,
+            "expectedBlocks": 43,
+            "ratio": 0.046511627906976744,
+            "ageMs": 4756.5
+          }
+        }
+      ],
+      "retainedRuntimeCommit": "4bdc54a2cae633adcaffae719f3545397b6b058e",
+      "retainedEdgeBinarySHA256": "a25b6c9f48dbb768dfda76072989dbaa8208c814dc449c2efef9a8a5abd66f63",
+      "verifiedCopiedFiles": 11,
+      "rollout": {
+        "existingAppIDsRetained": true,
+        "existingGenerationAndPinsRetained": true,
+        "existingProcessIdentitiesRetained": true,
+        "existingDocumentHashesRetained": true,
+        "newListenerReady": true,
+        "previousListenerAvailable": true,
+        "assetsStillMatch": true,
+        "onlyUATDestinationChanged": true,
+        "accessStillRequired": true
+      },
+      "cleanup": {
+        "ownedAppsStopped": true,
+        "ownedAppsHaveNoViewers": true,
+        "ownedDocumentsRemoved": true,
+        "managerAndDesktopRetained": true
+      }
+    },
+    "us": {
+      "finishedAt": "2026-11-01T03:23:50.064Z",
+      "publicPageHashMatched": true,
+      "passedChecks": 91,
+      "checks": [
+        "layout a: page has no outer scroll",
+        "layout a: live rail remains inside viewport",
+        "layout a: remote surface is usable",
+        "layout a: key metrics visible with remote window",
+        "layout a: same iframe connections retained",
+        "layout a: epochs unchanged",
+        "layout b: page has no outer scroll",
+        "layout b: live rail remains inside viewport",
+        "layout b: remote surface is usable",
+        "layout b: key metrics visible with remote window",
+        "layout b: same iframe connections retained",
+        "layout b: epochs unchanged",
+        "layout split: page has no outer scroll",
+        "layout split: live rail remains inside viewport",
+        "layout split: remote surface is usable",
+        "layout split: key metrics visible with remote window",
+        "layout split: same iframe connections retained",
+        "layout split: epochs unchanged",
+        "layout a: page has no outer scroll",
+        "layout a: live rail remains inside viewport",
+        "layout a: remote surface is usable",
+        "layout a: key metrics visible with remote window",
+        "layout a: same iframe connections retained",
+        "layout a: epochs unchanged",
+        "pointer, Unicode, arrow and saved file readback",
+        "input tools expanded",
+        "local input is usable beside remote app",
+        "input tools open: page has no outer scroll",
+        "input tools open: live rail remains inside viewport",
+        "input tools open: remote surface is usable",
+        "input tools open: key metrics visible with remote window",
+        "input tools open: same iframe connections retained",
+        "explicit local clipboard copy and read",
+        "local clipboard permission denial is visible",
+        "outside/inside input focus returns to remote app",
+        "fullscreen includes stats and viewers",
+        "fullscreen: page has no outer scroll",
+        "fullscreen: live rail remains inside viewport",
+        "fullscreen: remote surface is usable",
+        "fullscreen: key metrics visible with remote window",
+        "fullscreen: same iframe connections retained",
+        "1920x1080: page has no outer scroll",
+        "1920x1080: live rail remains inside viewport",
+        "1920x1080: remote surface is usable",
+        "1920x1080: key metrics visible with remote window",
+        "1920x1080: same iframe connections retained",
+        "1440x900: page has no outer scroll",
+        "1440x900: live rail remains inside viewport",
+        "1440x900: remote surface is usable",
+        "1440x900: key metrics visible with remote window",
+        "1440x900: same iframe connections retained",
+        "1366x768: page has no outer scroll",
+        "1366x768: live rail remains inside viewport",
+        "1366x768: remote surface is usable",
+        "1366x768: key metrics visible with remote window",
+        "1366x768: same iframe connections retained",
+        "1024x640: page has no outer scroll",
+        "1024x640: live rail remains inside viewport",
+        "1024x640: remote surface is usable",
+        "1024x640: key metrics visible with remote window",
+        "1024x640: same iframe connections retained",
+        "900x700: page has no outer scroll",
+        "900x700: live rail remains inside viewport",
+        "900x700: remote surface is usable",
+        "900x700: key metrics visible with remote window",
+        "900x700: same iframe connections retained",
+        "800x600: page has no outer scroll",
+        "800x600: live rail remains inside viewport",
+        "800x600: remote surface is usable",
+        "800x600: key metrics visible with remote window",
+        "800x600: same iframe connections retained",
+        "768x1024: page has no outer scroll",
+        "768x1024: live rail remains inside viewport",
+        "768x1024: remote surface is usable",
+        "768x1024: key metrics visible with remote window",
+        "768x1024: same iframe connections retained",
+        "390x844: page has no outer scroll",
+        "390x844: live rail remains inside viewport",
+        "390x844: remote surface is usable",
+        "390x844: key metrics visible with remote window",
+        "390x844: same iframe connections retained",
+        "narrow screen can inspect B independently",
+        "mobile stats B: page has no outer scroll",
+        "mobile stats B: live rail remains inside viewport",
+        "mobile stats B: remote surface is usable",
+        "mobile stats B: key metrics visible with remote window",
+        "mobile stats B: same iframe connections retained",
+        "close clears A metrics and retains B",
+        "closed stats have no stale values",
+        "explicit hide control remains available",
+        "no browser exceptions"
+      ],
+      "viewportChecks": [
+        {
+          "label": "layout a",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "layout b",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "layout split",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "layout a",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "input tools open",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "fullscreen",
+          "viewport": {
+            "width": 1600,
+            "height": 1000
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "1920x1080",
+          "viewport": {
+            "width": 1920,
+            "height": 1080
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "1440x900",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "1366x768",
+          "viewport": {
+            "width": 1366,
+            "height": 768
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "1024x640",
+          "viewport": {
+            "width": 1024,
+            "height": 640
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "900x700",
+          "viewport": {
+            "width": 900,
+            "height": 700
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "800x600",
+          "viewport": {
+            "width": 800,
+            "height": 600
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "768x1024",
+          "viewport": {
+            "width": 768,
+            "height": 1024
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 12
+        },
+        {
+          "label": "390x844",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 6
+        },
+        {
+          "label": "mobile stats B",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "outerScroll": false,
+          "sameFrames": true,
+          "visibleMetrics": 6
+        }
+      ],
+      "viewerSnapshots": [
+        {
+          "state": "ready",
+          "available": true,
+          "transport": "wss",
+          "renderedFrames": 14,
+          "receivedBytes": 19077,
+          "sentBytes": 513,
+          "udpReceivedBytes": null,
+          "width": 1200,
+          "height": 662,
+          "latency": {
+            "wss": {
+              "state": "ready",
+              "rttMs": 60,
+              "ageMs": 2024.7999999523163
+            },
+            "udp": {
+              "state": "inactive"
+            }
+          },
+          "udpLoss": null
+        },
+        {
+          "state": "ready",
+          "available": true,
+          "transport": "wss",
+          "renderedFrames": 34,
+          "receivedBytes": 41543,
+          "sentBytes": 823,
+          "udpReceivedBytes": null,
+          "width": 1200,
+          "height": 662,
+          "latency": {
+            "wss": {
+              "state": "ready",
+              "rttMs": 46.5,
+              "ageMs": 4445.199999809265
+            },
+            "udp": {
+              "state": "inactive"
+            }
+          },
+          "udpLoss": null
+        }
+      ],
+      "retainedRuntimeCommit": "a7297f3fd5dd9070c73fb62becae1eb76440a5bd",
+      "retainedEdgeBinarySHA256": "9bd048fb42da041e147099f9d7b6b52c0cfd5c2a918f989951e931bb100cb18d",
+      "verifiedCopiedFiles": 9,
+      "rollout": {
+        "existingAppIDsRetained": true,
+        "existingGenerationAndPinsRetained": true,
+        "existingProcessIdentitiesRetained": false,
+        "existingDocumentHashesRetained": true,
+        "newListenerReady": true,
+        "previousListenerAvailable": true,
+        "assetsStillMatch": true,
+        "onlyUATDestinationChanged": true,
+        "accessStillRequired": true,
+        "managerProcessIdentityRetained": true,
+        "existingProcessException": {
+          "class": "alpine-mousepad",
+          "reason": "Previously open editor lost its last Viewer at 03:22:57 UTC, coinciding with the protected tunnel route change; manager scheduled one-minute vacant cleanup and observed session stop at 03:23:57 UTC. Saved document hashes are unchanged. The retained old listener did not guarantee uninterrupted existing connections.",
+          "evidence": "Manager lifecycle log; old/new process snapshots",
+          "oldListenerClientContinuity": "Listener retained; cannot claim every pre-existing Viewer remained connected."
+        }
+      },
+      "cleanup": {
+        "ownedAppsStopped": true,
+        "ownedAppsHaveNoViewers": true,
+        "ownedDocumentsRemoved": true,
+        "managerAndDesktopRetained": true
+      }
+    }
+  },
+  "screenshotsSHA256": {
+    "uat-workbench-focus.png": "c87fb7320ab73c157e4f46888d3f16b6aad7d9452c9cd15cddb56c1522efd318",
+    "uat-workbench-split.png": "8058b820560b0984952fe07f23559fe7890e10490461b4aeca6cf1d243f537f3",
+    "uat-workbench-mobile.png": "56ee01b88610113e6db395662d5af93f294375faf5ad8ddfda2c3751aee3a906"
+  },
+  "localCleanup": {
+    "ownedBrowserClosed": true,
+    "temporaryAuthenticatedProfileRemoved": true,
+    "ownedRemoteAuthenticationTabsClosed": true
+  },
+  "limits": [
+    "A second edge listener preserves rollback but does not guarantee existing WebSocket continuity across a Cloudflare tunnel route update. The US pre-existing editor lost both Viewers five seconds after the route update and stopped one minute later under its vacant-session policy. Its saved documents were unchanged; Core and managed desktop were not restarted.",
+    "US disposable test App used WSS; Australia and China exercised both UDP and WSS. The full UDP fault matrix was not repeated for this HTML-only update.",
+    "Physical OS input methods, other browser engines and a new soak were not repeated. Narrow layouts were viewport emulations, not physical phone acceptance.",
+    "Old edge listeners remain running and available for rollback; retirement is a separate operation.",
+    "One preview attempt found clipped metrics under the headless fullscreen viewport; the bottom-rail minimum height was corrected before the accepted candidate and passing checks."
+  ]
+}

@@ -188,9 +188,19 @@ export class AudioCoordinator {
     }
     const key = this.connection+':'+route.speaker+':'+route.mic;
     if (route.applied === key) return;
-    const grant = await this._api('route',this._body({runtime:route.runtime,generation:route.generation}));
+    let grant;
+    try { grant = await this._api('route',this._body({runtime:route.runtime,generation:route.generation})); }
+    catch (error) {
+      if (error.status!==409) throw error;
+      // An unavailable App domain is local to this route. Authentication and
+      // shared-transport failures still propagate to the connection fence.
+      route.mic = false; route.actualSpeaker = route.actualMic = false; route.reason = 'session-audio-unavailable';
+      if (route.applied) await this._control({op:'unsubscribe',slot:route.slot});
+      route.applied = ''; this._releaseCaptureIfUnused(); return;
+    }
     const state = await this._control({op:'subscribe',slot:route.slot,token:grant.token,speaker:route.speaker,mic:route.mic,takeover:!!route.takeover});
     route.takeover = false; route.domain = grant.domain;
+    if (route.reason==='session-audio-unavailable') route.reason = '';
     // A device/permission event can change desired state while this ACK waits.
     // Remember the server's actual configuration so the next sync retires any
     // in-flight mic grant instead of treating it as already disabled.

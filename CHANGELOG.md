@@ -11,6 +11,12 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Clear an earlier UAT launch error after the audio test App B opens successfully.
+
+- Keep healthy audio routes and their microphone capture active while another
+  App’s private audio domain is temporarily unavailable. Authentication failure
+  still retires the entire shared channel.
+
 - Allocate bounded playback credits per enabled audio speaker so multiplexed
   bursts do not compete for one stream’s allowance. Keep measured UAT audio
   bandwidth visible across worklet updates that carry unchanged counters.

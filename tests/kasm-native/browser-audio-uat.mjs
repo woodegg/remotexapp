@@ -176,6 +176,11 @@ try {
   check('no browser exceptions',errors.length===0);
   simulatedAudio=true;await call('Page.reload',{ignoreCache:true});
   await wait(()=>evaluate('!!window.fixtureAudio&&document.querySelector("#remote-audio-availability").textContent.includes("Ready")'));
+  await click('#toggle-audio');
+  await evaluate('document.querySelector("#status").textContent="打开测试会话失败"');
+  await click('#launch-audio-b');
+  await wait(()=>evaluate('document.querySelector("#status").textContent.includes("App B 已打开")'));
+  check('successful audio App B selection clears earlier failure message',await evaluate('!!document.querySelector("#slot-b iframe")'));
   const audioState=async(connection,id,received,sent)=>evaluate(`fixtureAudio.dispatchEvent(new CustomEvent('statechange',{detail:{connection:${JSON.stringify(connection)},connectionId:${JSON.stringify(id)},receivedBytes:${received},sentBytes:${sent},routes:[]}}))`);
   await audioState('connected','meter-a',0,0);await delay(800);await audioState('connected','meter-a',1000000,100000);
   const measuredRate=await evaluate('document.querySelector("#audio-link-summary").textContent');

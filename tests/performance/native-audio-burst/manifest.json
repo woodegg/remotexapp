@@ -3,9 +3,9 @@
   "primaryVariable": "aggregate playback credits: fixed eight versus eight per enabled speaker",
   "baselineCommit": "299e0d4a1901ec0003efc3f15055c2372e34b024",
   "baselineSourceSHA256": "4f6a5ea8bd70f1052dcbd9d0cde8c9f3aa047783edbe7e7670da4eecc4a785d3",
-  "candidateSourceSHA256": "873f43c7890386e2dfe08c9cb9d78ed869079e5544559d39928b7c169e45a079",
+  "candidateSourceSHA256": "dfc1ce450483b8749bd56f08a2cd776f04ab2b5c718581b44a6bdecce1fb6803",
   "harnessSHA256": "d4de39a099c513c6a8fa42c408959c6667997ce293b990b281865c0932d3d87b",
-  "resultSHA256": "e91aab444b53916b8bc2eef1fc0fcdcc788bb64cb2cee83013ef178fc376c909",
+  "resultSHA256": "3f0dcd0d77981c2ab9f3b26829519ebc5a8b4948ac08e29a27a9e8e590af6ba7",
   "unchanged": [
     "20 ms stereo PCM frames",
     "eight-frame worklet queue per stream",

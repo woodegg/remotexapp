@@ -398,7 +398,7 @@ for(const slot of ['a','b']){
 $('#audio-open-tab').onclick=()=>{const x=targets.get('a');if(x){const u=new URL(location.href);u.searchParams.set('audioRuntime',x.id);window.open(u.href,'_blank','noopener');}};
 $('#audio-logout').onclick=async()=>{try{await remoteAudio?.logout();for(const [slot,binding]of audioInterests){audioBindingEpoch.set(slot,(audioBindingEpoch.get(slot)||0)+1);binding.interest=null;binding.error='本次登录音频已关闭；刷新页面可重新启用';}renderAudio();}catch(error){status(error.message);}};
 $('#launch-audio-a').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'});if(active())show(x);});
-$('#launch-audio-b').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'});if(active()){targets.set('b',x);frame('b');watchIdentity(x);}});
+$('#launch-audio-b').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'});if(active()){targets.set('b',x);frame('b');watchIdentity(x);status('音频测试 App B 已打开，A 的 Viewer 保持连接。');}});
 $('#audio-reconnect').onclick=async()=>{if(remoteAudioInitializing)return;remoteAudio?.dispose();remoteAudio=null;remoteAudioError='';remoteAudioSnapshot={connection:'idle',routes:[]};for(const slot of ['a','b'])audioBindingEpoch.set(slot,(audioBindingEpoch.get(slot)||0)+1);audioInterests.clear();await initializeRemoteAudio(false);status('音频控制器已重新连接；请按需重新开启 Speaker 或 Mic。');};
 async function initializeRemoteAudio(loadRuntime=true){
   if(!config||remoteAudioInitializing)return;

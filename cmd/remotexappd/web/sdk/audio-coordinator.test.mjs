@@ -13,6 +13,7 @@ function fixture(){
  const env={crypto:webcrypto,location:{origin:'https://audio.test'},WebSocket:Socket,setInterval:()=>1,setTimeout,clearTimeout,fetch:async(url,options)=>{
   const body=JSON.parse(options.body),action=url.split('/').at(-1);f.http.push({action,body});
   if(f.denied)return {ok:false,status:403,json:async()=>({error:'auth rejected'})};
+  if(action==='route'&&body.runtime===f.unavailableRuntime)return {ok:false,status:409,json:async()=>({error:'session audio unavailable'})};
   const data=action==='context'?{service:f.service,scope:f.scope,protocol:'pcm-s16le-48k-v1'}:action==='route'?{token:'c'.repeat(64),domain:'d'.repeat(32)}:action==='grant'?{token:'c'.repeat(64)}:{ok:true};
   return {ok:true,json:async()=>data};
  }};
@@ -159,5 +160,22 @@ test('playback credits cover each enabled speaker without starving multiplexed b
   assert.equal(a.messages.filter(m=>m.type==='playback').length,16,'two speakers have a bounded aggregate budget');
   await a.request('speaker',{ref:'a',enabled:false});for(let i=0;i<100;i++)a.send('playback-credit');
   const peer=[...f.coordinator.ports.values()][0];assert.equal(peer.credits,8,'removed speaker cannot retain extra credits');
+ }finally{f.cleanup();}
+});
+
+
+test('one unavailable domain does not disconnect another App or stop its microphone',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a','app-a');await acquire(a,'b','app-b');
+  for(const ref of ['a','b']){await a.request('speaker',{ref,enabled:true});await a.request('microphone',{ref,enabled:true});}
+  const socket=f.sockets[0],capture=f.coordinator.capture;
+  f.unavailableRuntime='app-a';socket.onmessage({data:JSON.stringify({type:'state',slot:1,speaker:false,mic:false,reason:'domain-retired'})});
+  f.coordinator._tick();await f.coordinator.serial;await turn();
+  assert.equal(socket.readyState,1);assert.equal(f.coordinator.capture,capture);assert.equal(a.state().routes[1].actualSpeaker,true);assert.equal(a.state().routes[1].actualMic,true);
+  assert.equal(a.state().routes[0].mic,false);assert.equal(a.state().routes[0].actualSpeaker,false);
+  f.unavailableRuntime=null;f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;await turn();
+  assert.equal(a.state().routes[0].actualSpeaker,true);assert.equal(a.state().routes[0].reason,'');assert.equal(a.state().routes[0].mic,false);assert.equal(f.coordinator.capture,capture);
+  f.denied=true;f.coordinator.lastRenew=0;f.coordinator._tick();await f.coordinator.serial;await turn();
+  assert.equal(socket.readyState,3);assert.equal(f.coordinator.capture,null,'scope authentication failure still fences all capture');
  }finally{f.cleanup();}
 });

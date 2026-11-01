@@ -4956,3 +4956,16 @@ with a 64-frame maximum and a shrinking allowance when routes turn off. Packet
 format, per-stream worklet queues, microphone credits and capture privacy remain
 unchanged. Partial WAN observations that exposed the issue do not qualify the
 repaired candidate; it requires its own artifact-bound resource run.
+
+
+### 2026-11-01 — Isolate unavailable audio routes from the shared channel
+
+The [native audio contract](native-audio.md) requires failure isolation between
+cooperative App domains (AUD-002). A deterministic regression found that a
+single route's HTTP 409 during domain recovery reached the shared connection's
+error handler, closing healthy routes and their microphone capture. Handle that
+specific unavailable-domain response within the affected route, revoke its old
+subscription, turn off its microphone target, and retry requested speaker
+recovery. Authentication errors and shared-channel failures still fence every
+route. Real-browser tests hold one domain unavailable while verifying the other
+domain's actual speaker and microphone readback over the unchanged connection.

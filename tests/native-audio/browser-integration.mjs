@@ -49,6 +49,16 @@ try {
  check('unselected session mic stays silent',readB.amplitude<10);
  await mic(other,'appB',true);check('multi-target mic uses exactly one capture',(await Promise.all([a,same,other].map(p=>p.evaluate('streams.filter(s=>s.getTracks().some(t=>t.readyState==="live")).length')))).reduce((a,b)=>a+b,0)===1);
  const multiReadback=await hook('readback','session-b');console.log('synthetic multi-target readback',multiReadback);check('multi-target remote readback works',multiReadback.amplitude>1000);
+ await speaker(a,'appA',true);const isolatedConnection=(await state(a)).connectionId,captureCount=await a.evaluate('streams.length');
+ await hook('availability','session-a','unavailable');
+ await until(async()=>{const r=(await state(a)).routes.find(r=>r.runtime==='session-a');return !r.actualSpeaker&&!r.mic;});await delay(2200);
+ check('one unavailable domain preserves the shared connection and other mic target',(await state(a)).connectionId===isolatedConnection&&(await hook('readback','session-b')).amplitude>1000);
+ const otherTone=hook('tone','session-b','speaker',660),otherSamples=[];for(let i=0;i<15;i++){await delay(100);otherSamples.push(await amplitude(a,660));}await otherTone;
+ check('unavailable domain does not interrupt the other speaker',otherSamples.filter(v=>v>.08).length>=2);
+ await hook('availability','session-a','ready');await until(async()=>(await state(a)).routes.find(r=>r.runtime==='session-a').actualSpeaker);
+ check('domain recovery leaves its mic off and preserves the existing capture',!(await state(a)).routes.find(r=>r.runtime==='session-a').mic&&await a.evaluate('streams.length=== '+captureCount));
+ await mic(a,'appA',true);await speaker(a,'appA',false);
+
  await mic(a,'appA',false);check('disabling A mic preserves B mic',(await hook('readback','session-a')).amplitude<10&&(await hook('readback','session-b')).amplitude>1000);
  const b2=await chrome(wav);browsers.push(b2);const contender=await makePage(b2);await acquire(contender,'session-b','targetB');
  const conflict=await mic(contender,'targetB',true);check('other browser profile sees explicit writer conflict',conflict.reason==='mic-conflict'&&!conflict.actualMic);

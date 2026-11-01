@@ -65,7 +65,9 @@ late permission cancellation, active permission revocation, domain replacement,
 playback-owner handoff, last-reference cleanup, and silent SharedWorker exit.
 Worker failure closes the capture track and playback context; a newly created
 controller starts with audio off and requires an explicit microphone action.
-Server retirement of the final enabled App must also close the shared channel. Synthetic readback disables browser echo cancellation,
+Server retirement of the final enabled App must also close the shared channel.
+Holding one domain unavailable must preserve the other domain’s real speaker,
+microphone readback and connection; recovery never re-enables the failed mic target. Synthetic readback disables browser echo cancellation,
 noise suppression and gain control explicitly; normal SDK defaults enable them.
 This avoids mistaking suppression of a sustained test tone for routing loss.
 

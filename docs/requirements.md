@@ -73,7 +73,9 @@ coordinator reconciliation; an idle retained reference is not audio demand.
 Playback credits cover each enabled speaker’s bounded queue (eight per route,
 at most 64); removing routes shrinks the allowance. UAT audio rates retain the
 last fresh counter sample across worklet-level updates and reset with the
-connection.
+connection. A temporarily unavailable audio domain fences only its own route;
+other App subscriptions and the existing microphone capture continue. Scope
+authentication failure still fences every route.
 
 
 AUD-002 proposes replacing only AUD-001's global user-mix and single-mic-target

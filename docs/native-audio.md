@@ -23,7 +23,11 @@ the account's audio configuration. `autospawn=no` prevents a failed private
 domain falling back to an account mixer. Applications that explicitly override
 their Pulse endpoint are outside this routing contract.
 
-Audio-only recovery is independent of D-Bus, input and the App. A replacement
+Audio-only recovery is independent of D-Bus, input and the App. A temporarily
+unavailable domain pauses only that App’s route; other Apps retain playback and
+explicit microphone targets on the same connection. A recovered domain may
+restore its requested speaker, but its microphone target stays off. Scope
+authentication or shared-transport failure still fences all capture. A replacement
 has a new domain ID at the App's stable private endpoint. Retries back off to
 30 seconds after three failures. Normal session cleanup closes owned audio;
 borrowed account audio remains untouched. Same-UID separation is functional

@@ -183,6 +183,7 @@ func TestAudioBrowserFixture(t *testing.T) {
 	}
 	defer os.RemoveAll(root)
 	domains := map[string]*sessionaudio.Domain{}
+	unavailable := map[string]bool{}
 	var domainMu sync.Mutex
 	for _, id := range []string{"session-a", "session-b"} {
 		d, e := sessionaudio.Prepare(root, 1, os.Environ())
@@ -199,7 +200,7 @@ func TestAudioBrowserFixture(t *testing.T) {
 		domainMu.Lock()
 		defer domainMu.Unlock()
 		d := domains[id]
-		if d == nil || d.Record.Generation != generation {
+		if d == nil || unavailable[id] || d.Record.Generation != generation {
 			return sessionaudio.Record{}, os.ErrNotExist
 		}
 		if err := sessionaudio.Validate(d.Record, root, generation); err != nil {
@@ -255,6 +256,17 @@ func TestAudioBrowserFixture(t *testing.T) {
 		}
 		record := d.Record
 		domainMu.Unlock()
+		if r.URL.Path == "/fixture/availability" {
+			if req.Route != "ready" && req.Route != "unavailable" {
+				writeError(w, 400, "invalid fixture availability")
+				return
+			}
+			domainMu.Lock()
+			unavailable[req.Runtime] = req.Route == "unavailable"
+			domainMu.Unlock()
+			writeJSON(w, 200, map[string]bool{"ready": req.Route == "ready"})
+			return
+		}
 		if r.URL.Path == "/fixture/retire-generation" {
 			m := &manager{}
 			m.audioOnce.Do(func() { m.audio = a })

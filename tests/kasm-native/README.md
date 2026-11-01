@@ -1,5 +1,8 @@
 # Native Kasm qualification
 
+The [per-Viewer latency checkpoint](LATENCY.md) records separate UDP and
+WebSocket RTT diagnostics, two-region live checks and their exact candidate pins.
+
 **2026-10-31 correction:** the earlier D1/D2 click-then-type checks did not prove
 remote pointer delivery. Physical UAT found missing pointer initialization, and
 the expanded matrix also found a multi-Viewer encoding-cache defect. The original

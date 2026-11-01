@@ -87,3 +87,53 @@ and China also supplied live UDP statistics.
 
 [Two-Viewer comparison](uat-workbench-split.png) ·
 [Narrow-screen statistics](uat-workbench-mobile.png)
+
+
+## Audio test preparation (Issue #47)
+
+The audio drawer keeps the remote surface and statistics in view. Input and
+audio drawers are mutually exclusive; opening input tools stops a local audio
+probe. It is an extension of this test page, not the D3 product audio backend
+tracked in [Issue #45](https://github.com/woodegg/remotexapp/issues/45).
+The SDK still reports `audio:false`. There are no remote speaker/mic switches
+or simulated mux connection counts.
+
+1. Open Mousepad, then **音频 / Audio**. A and B initially show the same runtime.
+   Choose **B → 测试桌面** for two different runtimes. A stays connected; choose
+   **B → 与 A 同会话** to return. If A is already the configured desktop, both
+   remain the same runtime and the page says so. Closing/reopening B uses its
+   own selected target. An App can remain running after its Viewer closes.
+2. Click **播放 1 秒测试音**. Only this browser generates the short quiet tone.
+   Select heard/not heard yourself; finishing playback is not a pass result.
+3. Click **检查麦克风** and grant or deny the browser request. A local RMS meter
+   displays the input level for at most 30 seconds. The microphone is not
+   monitored through the speaker, recorded or sent to a server. Stop/cancel,
+   panel close, page hide/retirement and device loss release it. Waiting more
+   than 15 seconds cancels the request logically; a later browser approval is
+   immediately released and cannot restart capture.
+4. Export JSON to keep local observations, runtime metadata and the pending
+   remote acceptance checklist. It contains no device identifiers, media,
+   endpoint/grant URLs or credentials. A local signal only means a local input
+   level was detected. Automated fake devices cannot qualify physical hardware.
+
+Runtime metadata comes from the Manager descriptor/readiness observation. It
+is not a continuously verified audio-domain identity or proof that a Viewer
+is attached to a particular audio generation. Viewer close/state remains
+separately visible. Local observations belong to this browser page and are
+not attributed to either remote App. The export has schema 1 and scope
+`local-device-check-and-remote-checklist`; every remote case is `not-run` with
+`backend-not-integrated`. No remote pass controls are provided yet.
+
+Remote validation still needs real per-session playback/mic readback, first
+on/last off/silence behavior, same-session multi-Tab ownership, explicit mic
+targets/takeover, workspace references, revocation/fault cleanup and resource
+checks. Physical devices and embedding-host integration remain separate UAT.
+The short local probe stops when hidden; this does not define the lifetime of
+future remote audio interests, which can persist across hidden workspaces.
+
+`node --test tests/kasm-native/audio-probe.test.mjs` exercises the actual inline
+probe with controlled media/clock dependencies. `make check` includes it. Browser
+fixture verification and screenshots must distinguish simulated Viewer/media
+results from live backend or physical-device acceptance. Deploy the HTML using
+the existing immutable edge procedure above; refreshing an old deployed page
+alone cannot load a file that has not yet been staged there.

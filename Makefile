@@ -70,6 +70,7 @@ test: web-assets performance-docs-check
 	node --test third_party/kasm/tests/*.test.mjs
 	node --test tests/app-package/*.test.mjs
 	node --test tests/evidence/*.test.mjs
+	node --test tests/kasm-native/*.test.mjs
 	node --test apps/*/tests/*.test.mjs
 
 vet:

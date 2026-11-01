@@ -11,6 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Extend the native UAT workbench with bounded local speaker/microphone checks,
+  same/different-runtime comparison and an exportable audio acceptance checklist.
+  Remote audio remains unavailable until its backend and SDK are integrated.
+
 - Redesign the native UAT workbench with persistent per-Viewer statistics,
   focus/comparison layouts, fullscreen diagnostics and collapsible input tools.
 

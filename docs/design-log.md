@@ -4857,3 +4857,27 @@ the tunnel route update and stopped after its one-minute vacant timeout.
 Retaining the old listener preserves rollback, but does not guarantee tunnel
 connection continuity. The [workbench record](../tests/kasm-native/UAT-WORKBENCH.md)
 retains this result; future cutovers must account for vacant-session cleanup.
+
+
+## 2026-11-01 — Audio UAT preparation and local probe ownership
+
+Issue #47 extends the existing native workbench for AUD-002 preparation. A and
+B retain separate target descriptors so B can attach to the configured test
+desktop, or return to A, without recreating A. Choosing the desktop when A is
+already that runtime must report the same runtime. Target selection is serialized;
+closing a Viewer does not claim to stop its App. Manager-observed identity and
+Viewer connection state are reported separately from future audio-domain identity.
+
+The local speaker/mic probes require explicit clicks. They run one at a time,
+never record/upload audio, mute local microphone monitoring, bound permission
+waiting to 15 seconds and capture to 30 seconds, and stop on panel close, page
+hide/retirement or device loss. Late permission/resume callbacks cannot resurrect
+capture; acquired tracks and AudioContexts are released. This short local probe
+policy does not supersede the future persistent audio-interest/workspace model.
+
+The current native SDK still advertises audio:false. No remote audio switches,
+connection counts or successful remote test results are synthesized. Exported
+JSON separates local manual observations and measured local levels from remote
+cases blocked on integration. The single HTML artifact remains compatible with
+the existing UAT ingress/edge; no extra asset routes or runtime changes are needed.
+See the [workbench procedure](../tests/kasm-native/UAT-WORKBENCH.md).

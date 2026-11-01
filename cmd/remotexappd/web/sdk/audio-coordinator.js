@@ -7,7 +7,7 @@ export class AudioCoordinator {
     this.timer = env.setInterval(()=>this._tick(),1000);
   }
   add(port) {
-    const peer = {port,id:this.env.crypto.randomUUID(),refs:new Map(),seen:Date.now(),ready:false,credits:8}; this.ports.set(port,peer);
+    const peer = {port,id:this.env.crypto.randomUUID(),refs:new Map(),seen:Date.now(),ready:false,credits:8,creditLimit:8}; this.ports.set(port,peer);
     port.onmessage = ({data}) => this.receive(peer,data); port.onmessageerror = () => this._enqueue(()=>this._remove(peer)); port.start();
   }
   _send(peer,value,transfer) { if (!this.ports.has(peer.port)) return; try { peer.port.postMessage(value,transfer || []); } catch { this._enqueue(()=>this._remove(peer)); } }
@@ -16,7 +16,7 @@ export class AudioCoordinator {
     if (!this.ports.has(peer.port) || !data || typeof data.op !== 'string') return;
     peer.seen = Date.now();
     if (data.op === 'pong') return;
-    if (data.op === 'playback-credit') { peer.credits = Math.min(8,peer.credits+1); return; }
+    if (data.op === 'playback-credit') { peer.credits = Math.min(peer.creditLimit,peer.credits+1); return; }
     if (data.op === 'microphone-frame') { this._mic(peer,data); return; }
     if (data.op === 'capture-ready' || data.op === 'capture-failed') {
       const capture = this.capture;
@@ -97,9 +97,15 @@ export class AudioCoordinator {
     for (const peer of this.ports.values()) this._send(peer,{type:'state',connection:this.socket?.readyState === 1 ? 'connected' : 'idle',protocol:this.connection?'WSS / PCM16 48 kHz':null,playbackBlocked:routes.some(r=>r.speaker)&&!this.player,connectionId:this.connection,speakerOwner:this.player===peer,micOwner:this.capture?.peer===peer,reason:this.reason,routes,receivedBytes:this.received,sentBytes:this.sent,droppedFrames:this.dropped});
   }
   _selectPlayer() {
-    const wanted = [...this.routes.values()].some(r=>r.speaker);
+    const count = [...this.routes.values()].filter(r=>r.speaker).length;
+    const wanted = count>0, budget = Math.max(1,count)*8;
     const next = wanted ? (this.player?.ready && this.ports.has(this.player.port) ? this.player : [...this.ports.values()].find(p=>p.ready)) : null;
-    if (next !== this.player) { if (this.player) this._send(this.player,{type:'reset-playback'}); this.player = next || null; if (this.player) { this.player.credits = 8; this._send(this.player,{type:'reset-playback'}); } }
+    if (next !== this.player) { if (this.player) this._send(this.player,{type:'reset-playback'}); this.player = next || null; if (this.player) { this.player.creditLimit = this.player.credits = budget; this._send(this.player,{type:'reset-playback'}); } }
+    else if (this.player) {
+      // Each speaker already has its own eight-frame worklet queue. Sharing a
+      // fixed eight credits starves ordinary bursts when several routes play.
+      const peer = this.player; peer.credits = Math.max(0,Math.min(budget,peer.credits+budget-peer.creditLimit)); peer.creditLimit = budget;
+    }
   }
   async _ensureCapture(peer) {
     if (this.capture?.ready) return this.capture;

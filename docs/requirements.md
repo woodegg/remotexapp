@@ -70,6 +70,10 @@ UAT/long-duration scope.
 AUD-002 clarification: server-initiated retirement of the final enabled App
 (including vacancy shutdown) releases the shared audio WSS on the next
 coordinator reconciliation; an idle retained reference is not audio demand.
+Playback credits cover each enabled speaker’s bounded queue (eight per route,
+at most 64); removing routes shrinks the allowance. UAT audio rates retain the
+last fresh counter sample across worklet-level updates and reset with the
+connection.
 
 
 AUD-002 proposes replacing only AUD-001's global user-mix and single-mic-target

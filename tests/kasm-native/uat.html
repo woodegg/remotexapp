@@ -48,7 +48,7 @@
 </section>
 
 </section>
-<aside class="connections" data-selected="a" aria-labelledby="connections-title"><div class="connection-heading"><div class="live-label"><span class="live-dot" aria-hidden="true"></span><h2 id="connections-title">实时统计 <small>Live stats</small></h2></div><div class="segmented stats-tabs" role="group" aria-label="选择统计连接"><button data-stats="a" aria-pressed="true">A</button><button data-stats="b" aria-pressed="false">B</button></div><span id="connection-summary" role="status">已连接 0 / 2</span></div><div id="audio-link-summary" class="audio-link-summary" role="status">音频 · 尚未建立连接</div><div class="connection-cards"><article id="connection-a" class="connection-card" data-state="idle"></article><article id="connection-b" class="connection-card viewer-b" data-state="idle"></article></div><details class="stats-help"><summary>这些指标代表什么？</summary><p>每个 Viewer 独立统计，每秒更新。下行／上行是有效载荷速率，不含 TLS/DTLS/IP 开销。FPS 为实际画面更新，静止时可为 0。页面隐藏时暂停采样。</p><p>UDP ping 是当前 ICE/STUN 往返延迟；WebSocket ping 是经边缘网关到 Kasm 的 Fence 回声 RTT。每 5 秒采样，两者均不是 ICMP ping 或画面响应时间。</p><p>UDP 丢失率是近 10 秒的画面块估算，括号为丢失块 / 已判定总块。等待 2 秒仍不完整计为丢失；它不是 IP 包丢包率，也无法判断首个样本前或末尾完全未收到的块。无新样本时不显示百分比。</p></details></aside>
+<aside class="connections" data-selected="a" aria-labelledby="connections-title"><div class="connection-heading"><div class="live-label"><span class="live-dot" aria-hidden="true"></span><h2 id="connections-title">实时统计 <small>Live stats</small></h2></div><div class="segmented stats-tabs" role="group" aria-label="选择统计连接"><button data-stats="a" aria-pressed="true">A</button><button data-stats="b" aria-pressed="false">B</button></div><span id="connection-summary" role="status">已连接 0 / 2</span></div><div id="audio-link-summary" class="audio-link-summary" role="status" title="音频协议负载，含 PCM 帧头，不含 WebSocket/TLS/IP 开销；显示最近有效采样。">音频 · 尚未建立连接</div><div class="connection-cards"><article id="connection-a" class="connection-card" data-state="idle"></article><article id="connection-b" class="connection-card viewer-b" data-state="idle"></article></div><details class="stats-help"><summary>这些指标代表什么？</summary><p>每个 Viewer 独立统计，每秒更新。下行／上行是有效载荷速率，不含 TLS/DTLS/IP 开销。FPS 为实际画面更新，静止时可为 0。页面隐藏时暂停采样。</p><p>UDP ping 是当前 ICE/STUN 往返延迟；WebSocket ping 是经边缘网关到 Kasm 的 Fence 回声 RTT。每 5 秒采样，两者均不是 ICMP ping 或画面响应时间。</p><p>UDP 丢失率是近 10 秒的画面块估算，括号为丢失块 / 已判定总块。等待 2 秒仍不完整计为丢失；它不是 IP 包丢包率，也无法判断首个样本前或末尾完全未收到的块。无新样本时不显示百分比。</p></details></aside>
 </main>
 <footer class="statusbar"><span id="status" role="status">加载测试配置…</span><span class="hint"><span>●</span> 独立测试环境 · Native SDK UAT</span></footer>
 <script id="audio-probe">
@@ -159,7 +159,7 @@ const views=new Map();
 const targets=new Map();
 let remoteAudio=null,remoteAudioError='',remoteAudioInitializing=false,remoteAudioSnapshot={connection:'idle',routes:[]};
 const audioInterests=new Map(),audioBindingEpoch=new Map(),remoteResults=new Map();
-let audioPrevious=null;
+let audioPrevious=null,audioRates=null;
 let selectionEpoch=0, selectionBusy=false;
 let statsTimer;
 const fields={protocol:'协议 · Protocol',down:'下行 · Download',up:'上行 · Upload',udpPing:'UDP ping · ICE RTT',wssPing:'WebSocket ping · RTT',udpLoss:'UDP 丢失率 · 块估算',fps:'渲染 FPS',resolution:'分辨率',uptime:'连接时长',received:'累计接收',sent:'累计发送',buffered:'待发送数据',wss:'WSS 累计接收',udp:'UDP 累计接收'};
@@ -350,9 +350,14 @@ function remoteAudioExport() {
 }
 function renderAudio() {
   const s=remoteAudioSnapshot,connected=s.connection==='connected';
-  const now=performance.now();let rates='';
-  if(connected&&audioPrevious&&now>audioPrevious.at+100){rates=` · ↓ ${((s.receivedBytes-audioPrevious.received)*8/(now-audioPrevious.at)).toFixed(0)} / ↑ ${((s.sentBytes-audioPrevious.sent)*8/(now-audioPrevious.at)).toFixed(0)} kbps`;}
-  if(!audioPrevious||now>audioPrevious.at+700)audioPrevious={at:now,received:s.receivedBytes||0,sent:s.sentBytes||0};
+  const now=performance.now(),received=s.receivedBytes||0,sent=s.sentBytes||0;let rates='';
+  if(!connected){audioPrevious=audioRates=null;}
+  else if(!audioPrevious||audioPrevious.connection!==s.connectionId||received<audioPrevious.received||sent<audioPrevious.sent){audioPrevious={at:now,received,sent,connection:s.connectionId};audioRates=null;}
+  else if(now-audioPrevious.at>=700&&(received!==audioPrevious.received||sent!==audioPrevious.sent)){
+    audioRates={at:now,text:` · ↓ ${((received-audioPrevious.received)*8/(now-audioPrevious.at)).toFixed(0)} / ↑ ${((sent-audioPrevious.sent)*8/(now-audioPrevious.at)).toFixed(0)} kbps`};
+    audioPrevious={at:now,received,sent,connection:s.connectionId};
+  }
+  if(connected)rates=audioRates&&now-audioRates.at<3000?audioRates.text:' · 流量采样中';
   $('#audio-link-summary').textContent=remoteAudio?`音频 ${connected?'1 条共享 WSS':'未连接'}${rates} · ${s.speakerOwner?'本页播放':s.playbackBlocked?'点击 Speaker 解锁播放':'其他页播放／未开启'}${s.micOwner?' · 本页采集 Mic':''}`:'音频 · '+(remoteAudioError||'正在检查服务');
   for(const slot of ['a','b']){
     const binding=audioInterests.get(slot),interest=binding?.interest?.released?null:binding?.interest,target=targets.get(slot);

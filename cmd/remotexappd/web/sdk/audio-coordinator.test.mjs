@@ -147,3 +147,17 @@ test('server retirement of the final App releases an empty shared channel',async
   assert.equal(a.state().connection,'idle');assert.equal(a.state().routes.every(r=>!r.speaker&&!r.mic),true);
  }finally{f.cleanup();}
 });
+
+test('playback credits cover each enabled speaker without starving multiplexed bursts',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a','app-a');await acquire(a,'b','app-b');a.send('playback-ready',{ready:true});
+  await a.request('speaker',{ref:'a',enabled:true});await a.request('speaker',{ref:'b',enabled:true});
+  for(let i=0;i<5;i++)for(const slot of [1,2]){const packet=new ArrayBuffer(3848);new Uint8Array(packet).set([1,1,slot,0]);f.coordinator._speaker(packet);}
+  assert.equal(a.messages.filter(m=>m.type==='playback').length,10,'a 100 ms burst per speaker fits its own bounded queue');
+  assert.equal(f.coordinator.dropped,0);
+  const packet=new ArrayBuffer(3848);new Uint8Array(packet).set([1,1,2,0]);for(let i=0;i<100;i++)f.coordinator._speaker(packet);
+  assert.equal(a.messages.filter(m=>m.type==='playback').length,16,'two speakers have a bounded aggregate budget');
+  await a.request('speaker',{ref:'a',enabled:false});for(let i=0;i<100;i++)a.send('playback-credit');
+  const peer=[...f.coordinator.ports.values()][0];assert.equal(peer.credits,8,'removed speaker cannot retain extra credits');
+ }finally{f.cleanup();}
+});

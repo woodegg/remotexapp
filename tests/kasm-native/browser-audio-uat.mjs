@@ -69,7 +69,7 @@ try {
       URL.createObjectURL=blob=>{blob.text().then(text=>window.__export=JSON.parse(text));return create(blob);};
     }
   `});
-  let failDesktop=false, holdDesktop=false, releaseDesktop;
+  let failDesktop=false, holdDesktop=false, releaseDesktop, simulatedAudio=false;
   const runtime=id=>({id,viewerUrl:'/viewer/'+id,sessionGeneration:1,displayComponentDigest:'fixture-component',versions:{current:{core:'fixture-core'}},applicationStatus:{state:'ready'}});
   const viewer=id=>`<!doctype html><style>body{margin:0;background:#ecf2f5;color:#253441;font:14px system-ui}header{padding:10px;background:#1e3146;color:white}main{padding:26px}textarea{box-sizing:border-box;width:100%;height:180px;padding:12px;font:14px system-ui}</style><header><strong>Fixture Viewer</strong> <span id="status">Ready · WSS</span></header><main><h2>${id==='editor'?'Mousepad':'Test desktop'}</h2><p>SIMULATED VIEWER · Browser fixture only</p><textarea aria-label="fixture document">Audio UAT layout check\nNo remote backend or real audio session.</textarea></main><script>window.remoteXAppViewerStats=()=>({state:'ready',available:true,transport:'wss',connectionEpoch:1,observedAt:performance.now(),width:1280,height:720,connectedForMs:performance.now(),receivedBytes:24000,sentBytes:2000,udpReceivedBytes:0,renderedFrames:10,bufferedBytes:0,latency:{udp:{state:'inactive'},wss:{state:'ready',rttMs:24}},udpLoss:{state:'inactive'}});</script>`;
   handlers.set('Fetch.requestPaused',async e=>{
@@ -77,6 +77,7 @@ try {
     let body='',type='application/json',code=200;
     if(url.origin!==origin)code=404;
     else if(url.pathname==='/'){body=html;type='text/html; charset=utf-8';}
+    else if(url.pathname==='/rx/sdk/remotexapp-audio.js'&&simulatedAudio){body='export class RemoteXAppAudio extends EventTarget { constructor(){super();window.fixtureAudio=this;this.ready=Promise.resolve();} dispose(){} }';type='text/javascript; charset=utf-8';}
     else if(url.pathname==='/fixture-config')body=JSON.stringify({baseURL:'/rx',templateId:'mousepad',documentFile:'/fixture/document.txt',managedId:'desktop-fixture'});
     else if(url.pathname==='/rx/api/instances'&&e.request.method==='POST')body=JSON.stringify(runtime('editor'));
     else if(url.pathname.startsWith('/rx/api/managed-instances/')){if(holdDesktop)await new Promise(r=>releaseDesktop=r);body=JSON.stringify(failDesktop?{error:'fixture failure'}:{runtime:runtime('desktop')});if(failDesktop)code=503;}
@@ -173,6 +174,19 @@ try {
   check('all probe AudioContexts closed',true);
   check('unavailable backend sends no audio or device payloads',requests.every(r=>r.method!=='PUT'&&(!r.path.includes('audio')||(r.method==='GET'&&r.path==='/rx/sdk/remotexapp-audio.js'))));
   check('no browser exceptions',errors.length===0);
+  simulatedAudio=true;await call('Page.reload',{ignoreCache:true});
+  await wait(()=>evaluate('!!window.fixtureAudio&&document.querySelector("#remote-audio-availability").textContent.includes("Ready")'));
+  const audioState=async(connection,id,received,sent)=>evaluate(`fixtureAudio.dispatchEvent(new CustomEvent('statechange',{detail:{connection:${JSON.stringify(connection)},connectionId:${JSON.stringify(id)},receivedBytes:${received},sentBytes:${sent},routes:[]}}))`);
+  await audioState('connected','meter-a',0,0);await delay(800);await audioState('connected','meter-a',1000000,100000);
+  const measuredRate=await evaluate('document.querySelector("#audio-link-summary").textContent');
+  check('advancing audio counters produce positive bandwidth',/↓ [1-9][0-9]* \/ ↑ [1-9][0-9]* kbps/.test(measuredRate));
+  await delay(900);await audioState('connected','meter-a',1000000,100000);
+  check('repeated worklet state preserves measured bandwidth',await evaluate('document.querySelector("#audio-link-summary").textContent')===measuredRate);
+  await audioState('connected','meter-b',0,0);
+  check('new audio connection retires prior rates',await evaluate('document.querySelector("#audio-link-summary").textContent.includes("采样中")'));
+  await audioState('idle',null,0,0);
+  check('idle audio hides stale rates',await evaluate('!document.querySelector("#audio-link-summary").textContent.includes("kbps")'));
+  check('bandwidth fixture has no browser exceptions',errors.length===0);
   const version=await call('Browser.getVersion');
   await writeFile(join(output,'browser-results.json'),JSON.stringify({schema:1,scope:'synthetic-browser-fixture-only',pageSHA256:createHash('sha256').update(html).digest('hex'),browser:version.product,checks,errors,notVerified:['real-Manager/runtime/audio-backend','physical speaker/microphone','other browser engines','embedding-host workspace lifecycle','live UAT rollout']},null,2)+'\n');
   console.log(JSON.stringify({checks:checks.length,errors:errors.length,pageSHA256:createHash('sha256').update(html).digest('hex')}));

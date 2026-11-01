@@ -11,6 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Allocate bounded playback credits per enabled audio speaker so multiplexed
+  bursts do not compete for one stream’s allowance. Keep measured UAT audio
+  bandwidth visible across worklet updates that carry unchanged counters.
+
 - Release the shared audio connection when the server retires the final active
   App, including vacancy shutdown; other Apps retain their audio routes.
 

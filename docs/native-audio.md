@@ -117,10 +117,16 @@ versions, sizes, slots, sequences or over-limit traffic are rejected.
 
 Non-silent PCM payload is 1.536 Mbit/s per speaker and 0.768 Mbit/s for one mic
 before WebSocket/TLS/IP overhead. Silence markers reduce quiet traffic, not
-connection lifetime. No MP2/Opus codec or third-party player is imported. Eight
+connection lifetime. The audio rate display counts protocol packets including their PCM headers,
+excluding WebSocket/TLS/IP overhead. Its discard counter reports local credit or
+queue pressure, not network packet loss. No MP2/Opus codec or third-party player
+is imported. Eight
 session slots, bounded queues and HTTP/grant/message limits prevent unbounded
 buffer growth. Browser playback/capture use worklet credits so a stalled page
-cannot accumulate unlimited queued audio. PCM quality, WAN buffering and actual
+cannot accumulate unlimited queued audio. Playback has eight credits per
+enabled speaker (at most 64 for eight slots), matching the unchanged eight-frame
+queue per stream; microphone credits remain eight. [P17](../tests/performance/native-audio-burst/README.md)
+records the deterministic burst comparison. PCM quality, WAN buffering and actual
 bandwidth remain measured qualification items rather than codec assumptions.
 
 ## Verification

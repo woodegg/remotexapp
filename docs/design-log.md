@@ -4943,3 +4943,16 @@ coordinator tick only synchronized when a desired route remained. It now also
 reconciles an existing connection, releasing it when the server has retired the
 last enabled route. A two-App regression checks that retiring the first App
 preserves the other route and retiring the last closes the channel.
+
+
+### 2026-11-01 — Match shared playback credits to bounded speaker queues
+
+Supersedes the fixed aggregate playback allowance in the initial
+[native audio contract](native-audio.md), retaining its bounded-memory invariant
+(AUD-002). Two enabled speakers previously shared eight credits even though each
+worklet stream has an eight-frame queue. [P17](../tests/performance/native-audio-burst/README.md)
+reproduces dropped ordinary bursts and selects eight credits per enabled speaker,
+with a 64-frame maximum and a shrinking allowance when routes turn off. Packet
+format, per-stream worklet queues, microphone credits and capture privacy remain
+unchanged. Partial WAN observations that exposed the issue do not qualify the
+repaired candidate; it requires its own artifact-bound resource run.

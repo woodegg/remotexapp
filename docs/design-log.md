@@ -4864,8 +4864,9 @@ retains this result; future cutovers must account for vacant-session cleanup.
 Issue #47 extends the existing native workbench for AUD-002 preparation. A and
 B retain separate target descriptors so B can attach to the configured test
 desktop, or return to A, without recreating A. Choosing the desktop when A is
-already that runtime must report the same runtime. Target selection is serialized;
-closing a Viewer does not claim to stop its App. Manager-observed identity and
+already that runtime must report the same runtime. Target selection is serialized and API waits are bounded to 15 seconds. An
+explicit Viewer close/recreate fences late selection responses; it does not
+claim to stop an App already started by the Manager. Manager-observed identity and
 Viewer connection state are reported separately from future audio-domain identity.
 
 The local speaker/mic probes require explicit clicks. They run one at a time,

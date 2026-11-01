@@ -137,3 +137,27 @@ fixture verification and screenshots must distinguish simulated Viewer/media
 results from live backend or physical-device acceptance. Deploy the HTML using
 the existing immutable edge procedure above; refreshing an old deployed page
 alone cannot load a file that has not yet been staged there.
+
+
+### 2026-11-01 audio drawer verification
+
+Run `node tests/kasm-native/browser-audio-uat.mjs /absolute/private/evidence-dir`
+with Node 22 and local Chrome (`CHROME_BIN` can select its executable). The
+harness starts its own temporary browser profile and supplies an intercepted
+HTTPS fixture, synthetic Viewers and a fake microphone. It never contacts an
+existing UAT or opens a user's document. It does not start a preview web server.
+
+[The result](results-audio-uat-20261101.json) binds the tested HTML SHA-256 and
+sanitized screenshots: 15 controlled lifecycle tests and 50 Chrome fixture
+checks passed. Checks include two-runtime selection and API failure, A iframe
+preservation, B close/recreate, late selection cancellation, actual browser
+permission denial, cancellation
+with late synthetic media, real tab hiding, local RMS and manual-result export,
+eight screen sizes, fullscreen and final track/context cleanup. The harness
+clicks the heard button to test export; that is not evidence of human hearing.
+The owned browser/profile was removed. There was no live rollout, remote audio
+readback, physical device acceptance, other-engine or embedding-host UAT.
+
+![Audio drawer with synthetic Viewers and persistent stats](audio-uat-desktop.png)
+
+[Mobile audio drawer and statistics](audio-uat-mobile.png)

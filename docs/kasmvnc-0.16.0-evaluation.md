@@ -87,7 +87,11 @@ runtime/UID/cgroup model before changing systemd or standalone ownership.
 ## Audio scope
 
 [AUD-001](release-pending.md#aud-001--server-scoped-shared-audio-integration)
-remains authoritative. Kasm container startup references separate audio-out
+retains the historical shared-user/single-target comparison. The native
+[AUD-002 model](kasm-native-architecture.md#audio-model) and
+[D3 integration plan](native-audio-integration.md) track the per-session target
+design and its remaining proof; only R3 connection timing is already accepted.
+Kasm container startup references separate audio-out
 and audio-input helpers plus PulseAudio/encoding processes. Identify each
 helper's source, license, buildability, protocol and authentication. Verify
 which features work without Kasm Workspaces; do not infer usable audio from
@@ -95,8 +99,10 @@ KasmVNC installation or a browser control alone.
 
 Use one bidirectional connection per server/client coordination scope, shared
 across that server's runtimes, with independent playback/microphone controls,
-both off initially. One explicit microphone target and cross-Tab playback
-ownership must survive handoff without silent capture or duplicate sound.
+both off initially. AUD-002 proposes explicit multiple microphone targets with
+one writer per target; cross-Tab playback ownership must survive handoff without
+silent capture or duplicate sound. Verify this separately from the historical
+AUD-001 single-target scope.
 Stopping one App must not stop another App's audio; audio activity must not
 implicitly keep every runtime alive. Shared-user audio is not per-App isolation.
 

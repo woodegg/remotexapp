@@ -4857,3 +4857,28 @@ the tunnel route update and stopped after its one-minute vacant timeout.
 Retaining the old listener preserves rollback, but does not guarantee tunnel
 connection continuity. The [workbench record](../tests/kasm-native/UAT-WORKBENCH.md)
 retains this result; future cutovers must account for vacant-session cleanup.
+
+## 2026-11-01 — Return to D3 audio integration after bounded native UAT
+
+The owner abandoned the separate multi-container UDP Host Agent proposal
+(#42/#43/#44), then asked for the next step in the original plan including audio.
+[Issue #45](https://github.com/woodegg/remotexapp/issues/45) tracks D3 preparation
+and implementation acceptance. The [integration plan](native-audio-integration.md)
+records the actual merged D1/D2/Alpine/bounded-D4 status and preserves their
+artifact-specific limits. It does not revive the abandoned host automation or
+make it an audio dependency.
+
+The frozen audio PoC demonstrates bounded mux/SharedWorker ownership and known
+waveform routing across two UID/Pulse domains. Its fixed backend registry and
+coordinator namespace do not establish product session ACLs. Choose same-UID
+domain/lifecycle verification as the first implementation checkpoint, followed
+by Manager-owned registry and generation-qualified authorization, shared SDK
+audio interests, then combined product/browser/device and embedding-host qualification.
+Routing isolation within one UID is not a malicious-tenant boundary.
+
+Retain the accepted R3 connection rule: first enabled speaker/mic connects,
+all off releases, enabled silence stays connected. Domain readiness before App
+launch is a separate lifecycle/cost decision to measure. Do not infer finalized
+R4/R5 protocol, codec, lease or isolation choices from historical PoC UAT.
+This entry and preparation PR change no runtime capability, deployed service or
+release artifact; native audio remains unsupported until implemented and tested.

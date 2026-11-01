@@ -15,12 +15,15 @@ go/no-go. The [2026-10-24 interpretation](kasmvnc-0.16.0-evaluation.md#2026-10-2
 distinguishes historical API compatibility constraints from preserved safety
 semantics. Accepted 0.15.0 runtime behavior is not superseded by this proposal.
 
-## Proposed native architecture — owner review pending
+<a id="proposed-native-architecture--owner-review-pending"></a>
+
+## Native architecture — staged implementation
 
 [Architecture detail](kasm-native-architecture.md) accepts KNP-BASELINE-20261024
-as research input, not production qualification. Entries below remain
-**proposed** except AUD-002's connection-lifetime clause, accepted as a design
-decision on 2026-10-25 (R3). D1 implementation and its bounded automated matrix are recorded in
+as research input, not production qualification. Requirements below are delivered
+by bounded checkpoints, not accepted as one complete feature set. AUD-002's
+connection-lifetime clause was accepted as a design decision on 2026-10-25 (R3).
+D1 implementation and its bounded automated matrix are recorded in
 [the native qualification results](../tests/kasm-native/README.md); they do not
 qualify the remaining architecture. Stable IDs support subsequent
 implementation Issues; KVE-001–008 remain evaluation/qualification gates.
@@ -52,6 +55,14 @@ standalone UAT; it does not accept production UDP, audio or remaining D4 gates.
 The [bounded live evidence](../tests/kasm-native/UDP.md) records its exact
 artifacts, functional checks, short resource observations and remaining human
 UAT/long-duration scope.
+
+As of 2026-11-01, #31/#33/#35/#37 are merged and the owner accepted #37's
+bounded UAT against its recorded artifacts. Remaining D2/D4 and release scope
+are not implied. [D3 / #45](https://github.com/woodegg/remotexapp/issues/45) prepares
+[audio integration](native-audio-integration.md): same-UID audio-domain evidence,
+then Manager authorization/lifecycle, SDK coordination and combined UAT.
+AUD-002 is not implemented; preparation does not enable the native SDK's audio
+capability or lock its remaining protocol/codec/domain choices.
 
 | ID | Proposed requirement | Acceptance boundary |
 | --- | --- | --- |

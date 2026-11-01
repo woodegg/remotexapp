@@ -38,6 +38,10 @@ within the scope and release when all are off; silence does not disconnect.
 Its proposed
 replacement scope is recorded in [requirements](requirements.md#proposed-native-architecture--owner-review-pending).
 The remaining choices are not locked implementation requirements.
+[D3 / #45](https://github.com/woodegg/remotexapp/issues/45) prepares the
+[product integration checkpoints](native-audio-integration.md), starting with
+same-UID session-domain evidence. The historical scope below remains a comparison,
+not a second audio implementation to develop alongside AUD-002.
 
 Integrate shared speaker playback and microphone through one bidirectional
 audio connection per server per client coordination scope. The remote audio

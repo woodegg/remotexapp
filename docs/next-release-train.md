@@ -5,22 +5,31 @@ Source identity is maintained in [current-state.md](current-state.md). The relea
 Earlier candidate labels are historical. Deployment is owned by each target's
 operator.
 
-## Proposed Core 0.16.0 — KasmVNC integration evaluation
+<a id="proposed-core-0160--kasmvnc-integration-evaluation"></a>
+
+## Core 0.16.0 development — native integration
 
 The owner selected evaluating KasmVNC as the replacement for the current
 TigerVNC/noVNC integration, including container audio and clipboard.
 [Issue #24](https://github.com/woodegg/remotexapp/issues/24) and
 [Milestone 0.16.0](https://github.com/woodegg/remotexapp/milestone/3) track the
 [evaluation and acceptance gates](kasmvnc-0.16.0-evaluation.md), KVE-001–008.
-This selects investigation, not a default transport switch. VERSION remains
-0.15.0 until feasibility and implementation scope are accepted. SDK/App version
-changes depend on the resulting contracts. The frozen research baseline now
-feeds the [native architecture proposal](kasm-native-architecture.md), with
-KNA-001–010 and the remaining AUD-002 choices pending owner review. AUD-002's
+The research direction now has bounded implementations merged through
+#31, #33, #35 and #37: Kasm/WSS, native input/text clipboard, Alpine static Core
+and optional IPv4 UDP/diagnostics. Source is Core 0.16.0-dev.3 / SDK 0.31.0-dev.3;
+the published baseline remains 0.15.0 / 0.30.0. The default provider has not
+changed, and the bounded #37 UAT does not qualify the full release.
+The frozen research baseline feeds the
+[native architecture](kasm-native-architecture.md), with remaining input/host,
+audio and product qualification tracked separately. AUD-002's
 connection timing (R3) was accepted as a design decision on 2026-10-25, without
 implementation acceptance. AUD-002 explicitly proposes changes
 to the original AUD-001 audio scope; KasmVNC and optional audio services remain
-separate components. This design stage does not change current runtime behavior.
+separate components. [D3 / Issue #45](https://github.com/woodegg/remotexapp/issues/45)
+now prepares [session audio integration](native-audio-integration.md), beginning
+with same-UID domain verification before Manager/SDK integration. Native product
+audio remains unsupported. The abandoned multi-container UDP Host Agent proposal
+is not a dependency; current static deployment-owned UDP configuration remains.
 
 ## Separate release train: Core 0.14.5, Go 1.27.3
 

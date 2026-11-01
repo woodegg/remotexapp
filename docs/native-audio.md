@@ -52,7 +52,9 @@ AudioContext; a page without a user gesture must report that limitation.
 
 No capture, AudioContext or audio WebSocket is created by merely launching an
 App. The first enabled speaker/mic opens one WSS; additional sessions reuse it.
-All off releases the WSS and capture. Enabled silence retains the connection.
+All off releases the WSS and capture. Server-side retirement of the last
+enabled App also releases the WSS on the next coordinator reconciliation;
+retained references alone do not keep an empty audio connection open. Enabled silence retains the connection.
 An unresponsive SharedWorker is detected by a ten-second active-page watchdog;
 worker failure stops capture, closes the local audio graph and retires the
 controller. Resuming a browser-suspended page allows a fresh heartbeat grace

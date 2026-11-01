@@ -11,6 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Release the shared audio connection when the server retires the final active
+  App, including vacancy shutdown; other Apps retain their audio routes.
+
+
 - Develop opt-in native session audio: private Pulse domains, generation-bound
   audio authorization, one scoped WSS, per-session speaker/microphone controls
   and cross-tab SDK coordination. Default audio is off. PCM16 48 kHz needs

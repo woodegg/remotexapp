@@ -238,7 +238,9 @@ export class AudioCoordinator {
       if (this.connection && Date.now()-this.lastRenew>=10000) {
         await this._context(); await this._api('renew',this._body()); this.lastRenew = Date.now();
       }
-      if (Date.now()>=(this.retryAfter || 0) && [...this.routes.values()].some(r=>r.speaker||r.mic)) await this._sync();
+      // Server-side retirement can clear the last desired route without a UI command.
+      // Reconcile an existing connection too, so an empty channel is released.
+      if (Date.now()>=(this.retryAfter || 0) && (this.connection || [...this.routes.values()].some(r=>r.speaker||r.mic))) await this._sync();
       this._broadcast();
     }).catch(error=>{
       this.reason = error.message; this._disconnect('audio-lease-or-route-failed'); this._stopCapture('audio-lease-or-route-failed');

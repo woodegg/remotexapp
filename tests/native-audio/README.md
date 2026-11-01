@@ -64,7 +64,8 @@ multiple targets, profile conflicts and explicit takeover, permission denial,
 late permission cancellation, active permission revocation, domain replacement,
 playback-owner handoff, last-reference cleanup, and silent SharedWorker exit.
 Worker failure closes the capture track and playback context; a newly created
-controller starts with audio off and requires an explicit microphone action. Synthetic readback disables browser echo cancellation,
+controller starts with audio off and requires an explicit microphone action.
+Server retirement of the final enabled App must also close the shared channel. Synthetic readback disables browser echo cancellation,
 noise suppression and gain control explicitly; normal SDK defaults enable them.
 This avoids mistaking suppression of a sustained test tone for routing loss.
 

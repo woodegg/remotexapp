@@ -107,7 +107,10 @@ try {
  check('new controller after worker failure starts with audio off',(await hook('state')).connections===0);
  await speaker(other,'recoveredB',true);await mic(other,'recoveredB',true);
  check('explicit controller recreation restores real microphone readback',(await hook('readback','session-b')).amplitude>1000);
- await other.evaluate('await recoveredB.release()');await until(async()=>(await hook('state')).connections===0);
+ await hook('retire-generation','session-b');
+ await until(async()=>JSON.stringify(await hook('state'))===JSON.stringify({connections:0,readers:0,writers:0}));
+ check('server retirement of final App closes shared channel and microphone',await other.evaluate('audio.stats.connection==="idle" && streams.every(s=>s.getTracks().every(t=>t.readyState==="ended"))'));
+ await other.evaluate('await recoveredB.release()');
  check('browser exceptions absent',pages.every(p=>p.errors.length===0));
 } catch(error) {failure=error.stack;console.error(failure);for(let i=0;i<pages.length;i++){try{console.error('page',i,await state(pages[i]),pages[i].errors);}catch{}}}
 finally {

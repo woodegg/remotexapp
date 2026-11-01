@@ -255,6 +255,13 @@ func TestAudioBrowserFixture(t *testing.T) {
 		}
 		record := d.Record
 		domainMu.Unlock()
+		if r.URL.Path == "/fixture/retire-generation" {
+			m := &manager{}
+			m.audioOnce.Do(func() { m.audio = a })
+			m.fenceAudio(req.Runtime, record.Generation)
+			writeJSON(w, 200, map[string]bool{"retired": true})
+			return
+		}
 		if r.URL.Path == "/fixture/tone" {
 			if req.Frequency < 100 || req.Frequency > 2000 {
 				writeError(w, 400, "invalid synthetic frequency")

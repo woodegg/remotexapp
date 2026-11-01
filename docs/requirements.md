@@ -67,6 +67,11 @@ UAT/long-duration scope.
 | KNA-010 | Qualify exact product artifacts, clean distribution inputs, resource/performance and host integration separately from research/UAT history. Rebuild for each target architecture, record machine/compiler identity, verify ELF architecture/linkage and preserve native sanitizer gates when selecting another test compiler. | Fixed candidate plus workload/baseline/thresholds, corrected harness, target-side native checks, actual cleanup, physical UAT and publication gates |
 | AUD-002 | Develop opt-in per-session audio domains and controls over one scoped mux connection, same-session multi-Tab deduplication, explicit multi-target mic with per-target writer ownership; default off. Connection lifetime accepted: connect when at least one App's speaker or mic is enabled, share within the scope, release when all are off; App launch alone does not connect and silence does not disconnect. | R3 design accepted 2026-10-25; full D3 implementation selected 2026-11-01 in #45/#49. One final end-to-end human UAT follows automated integration and fault qualification. See [native audio contract](native-audio.md). The UAT workbench must distinguish local device observations from remote audio acceptance, support same/different-runtime comparison, cancel local capture on panel close/page retirement and fence late permission results; export only content-free observations and explicitly unexecuted remote cases while audio is unavailable. Verify first enable, additional subscription, partial disable, final disable and enabled-but-silent behavior, plus real playback/readback, permission/owner/worker/outage tests, including permission/device loss while a route acknowledgment is pending, silent worker termination, and Manager epoch replacement without automatic capture; see [audio model](kasm-native-architecture.md#audio-model) |
 
+AUD-002 clarification: server-initiated retirement of the final enabled App
+(including vacancy shutdown) releases the shared audio WSS on the next
+coordinator reconciliation; an idle retained reference is not audio demand.
+
+
 AUD-002 proposes replacing only AUD-001's global user-mix and single-mic-target
 scope for the native architecture. Shared connection, explicit permission,
 default-off, cross-Tab ownership and lifecycle safeguards remain. Neither audio

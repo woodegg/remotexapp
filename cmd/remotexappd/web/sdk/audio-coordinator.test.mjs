@@ -134,3 +134,16 @@ test('worker heartbeats continue while a permission prompt is pending',async()=>
   await a.request('microphone',{ref:'a',enabled:false});await rejected;
  }finally{f.cleanup();}
 });
+
+test('server retirement of the final App releases an empty shared channel',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a','app-a');await acquire(a,'b','app-b');
+  await a.request('speaker',{ref:'a',enabled:true});await a.request('microphone',{ref:'b',enabled:true});
+  const socket=f.sockets[0],retire=slot=>socket.onmessage({data:JSON.stringify({type:'state',slot,speaker:false,mic:false,reason:'generation-retired'})});
+  retire(1);f.coordinator._tick();await f.coordinator.serial;await turn();
+  assert.equal(socket.readyState,1);assert.equal(a.state().routes[1].actualMic,true);
+  retire(2);f.coordinator._tick();await f.coordinator.serial;await turn();
+  assert.equal(socket.readyState,3);assert.equal(f.coordinator.connection,null);assert.equal(f.coordinator.capture,null);
+  assert.equal(a.state().connection,'idle');assert.equal(a.state().routes.every(r=>!r.speaker&&!r.mic),true);
+ }finally{f.cleanup();}
+});

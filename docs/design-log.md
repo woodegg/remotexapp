@@ -4931,3 +4931,15 @@ server context before requesting a grant; a service/account epoch change retires
 old references. The UAT offers explicit controller recreation with audio off.
 These safeguards implement the accepted no-silent-microphone-reacquisition rule;
 they do not renew App lifecycle leases or change display UDP ownership.
+
+
+### 2026-11-01 — Reconcile audio after final server-side retirement
+
+Supersedes the incomplete cleanup trigger in the initial [native audio
+contract](native-audio.md), without changing its first/last-demand invariant
+(AUD-002). Full ARM64 lifecycle testing found that normal App retirement stopped
+all readers, writers and microphone capture but retained an empty WSS: the
+coordinator tick only synchronized when a desired route remained. It now also
+reconciles an existing connection, releasing it when the server has retired the
+last enabled route. A two-App regression checks that retiring the first App
+preserves the other route and retiring the last closes the channel.

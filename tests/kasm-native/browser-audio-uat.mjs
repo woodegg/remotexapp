@@ -171,7 +171,7 @@ try {
   check('page retirement handler stops tracks',await evaluate('__streams.every(s=>s.getTracks().every(t=>t.readyState==="ended"))'));
   await wait(()=>evaluate('__contexts.every(c=>c.state==="closed")'));
   check('all probe AudioContexts closed',true);
-  check('no audio upload or remote audio requests',requests.every(r=>!r.path.includes('audio')&&r.method!=='PUT'));
+  check('unavailable backend sends no audio or device payloads',requests.every(r=>r.method!=='PUT'&&(!r.path.includes('audio')||(r.method==='GET'&&r.path==='/rx/sdk/remotexapp-audio.js'))));
   check('no browser exceptions',errors.length===0);
   const version=await call('Browser.getVersion');
   await writeFile(join(output,'browser-results.json'),JSON.stringify({schema:1,scope:'synthetic-browser-fixture-only',pageSHA256:createHash('sha256').update(html).digest('hex'),browser:version.product,checks,errors,notVerified:['real-Manager/runtime/audio-backend','physical speaker/microphone','other browser engines','embedding-host workspace lifecycle','live UAT rollout']},null,2)+'\n');

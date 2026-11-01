@@ -11,6 +11,12 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Develop opt-in native session audio: private Pulse domains, generation-bound
+  audio authorization, one scoped WSS, per-session speaker/microphone controls
+  and cross-tab SDK coordination. Default audio is off. PCM16 48 kHz needs
+  external PulseAudio tools; Core remains statically buildable. Integration
+  qualification and physical end-to-end UAT are tracked in #45/#49.
+
 - Extend the native UAT workbench with bounded local speaker/microphone checks,
   same/different-runtime comparison and an exportable audio acceptance checklist.
   Remote audio remains unavailable until its backend and SDK are integrated.
@@ -58,7 +64,7 @@ implementation; move them to a version section when publishing a release.
   multiple Viewers do not receive JPEG payloads with stale lengths; add applied
   source cache tests with address, undefined-behavior and leak checks.
 
-Target: `0.16.0-dev.3`. Development only.
+Target: `0.16.0-dev.4`. Development only.
 
 Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
 remains the default. D1 is recorded in Issue #30; Issue #32 tracks the first

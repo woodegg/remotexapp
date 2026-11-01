@@ -18,6 +18,7 @@ func (m *manager) handler() http.Handler {
 	mux.HandleFunc("/healthz", m.serveHealth)
 	mux.HandleFunc("/readyz", m.serveReady)
 	mux.HandleFunc("/api/version", m.serveVersion)
+	mux.HandleFunc("/api/audio/", m.serveAudio)
 	mux.HandleFunc("/", m.serveClient)
 	mux.HandleFunc("/api/classes", m.serveClasses)
 	mux.HandleFunc("/api/templates", m.serveClasses)
@@ -385,6 +386,7 @@ func (m *manager) publicInstance(item *instance) *publicInstanceView {
 	}
 	return &publicInstanceView{
 		NativeTransport:        nativeTransport(item),
+		NativeAudio:            item.Components.NativeAudio,
 		NativeClipboard:        item.Components.NativeClipboard,
 		DisplayProvider:        displayProvider(item.Components),
 		DisplayComponentDigest: componentDigest,

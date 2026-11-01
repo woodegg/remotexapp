@@ -18,6 +18,7 @@
 .audio-tools{flex:none;max-height:min(43%,max(80px,calc(100% - 300px)));overflow:auto;border:1px solid #36576a;border-radius:9px;padding:12px;background:var(--surface);scrollbar-width:thin;font-size:12px}.audio-tools h2{font-size:14px}.audio-tools h3{font-size:12px;margin-bottom:6px}.audio-title,.audio-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.audio-title{justify-content:space-between;margin-bottom:8px}.audio-tools p{color:var(--muted);margin:6px 0;line-height:1.55}.audio-tools button{font-size:11px;padding:6px 9px}.audio-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.audio-card{padding:10px;border:1px solid var(--line);border-radius:7px;min-width:0}.audio-card output{display:block;margin:7px 0;color:#b5d9eb;overflow-wrap:anywhere}.audio-blocked{color:#f4ce82;font-size:11px}.audio-tools meter{width:100%;height:16px}.audio-tools table{width:100%;border-collapse:collapse;font-size:11px}.audio-tools td,.audio-tools th{padding:7px 4px;text-align:left;border-bottom:1px solid var(--line)}.audio-tools td:last-child{white-space:nowrap;color:#f4ce82}.audio-tools details>summary{cursor:pointer;color:#b9cce1}.audio-tools pre{margin:6px 0}.audio-tools .local-boundary{color:#b9cce1}.audio-tools button:disabled{cursor:default}.audio-tools label{display:block;color:var(--muted)}
 @media(min-width:601px) and (max-width:1000px){.workbench.audio-open{grid-template-columns:minmax(0,1fr) 280px;grid-template-rows:minmax(0,1fr)}.audio-open .connections{overflow:auto}.audio-open .connection-cards{display:flex;flex-direction:column;overflow:visible}.audio-open .connection-card{flex:none}.audio-open .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.audio-tools{padding:8px}.audio-grid{grid-template-columns:1fr}.audio-tools h2{font-size:12px}#toggle-audio{padding:5px;font-size:11px}}
+.audio-link-summary{font-size:11px;color:#9ddfcf;padding:7px 10px;background:#132b2c;border:1px solid #2b4b4c;border-radius:7px;flex:none}.remote-audio-controls{margin-top:10px;border-top:1px solid var(--line);padding-top:9px}.remote-audio-controls .audio-actions{gap:5px}.remote-audio-controls button{padding:5px 7px;font-size:10px}.remote-audio-controls button[aria-pressed=true]{border-color:#78d3bd;background:#1e4840;color:#b2ffe9}.remote-audio-controls output{display:block;font-size:10px;color:var(--muted);margin-top:6px;overflow-wrap:anywhere}.remote-audio-controls meter{width:100%;height:10px}.audio-tools select{background:#172537;color:#d6e2f2;border:1px solid var(--line);border-radius:4px;padding:4px}
 </style>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg"><symbol id="icon-window" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01M8 13l-2 2 2 2m8-4 2 2-2 2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol><symbol id="icon-expand" viewBox="0 0 24 24"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol><symbol id="icon-input" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7 10h.01M12 10h.01M17 10h.01M7 14h.01M11 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol></svg>
 <header class="topbar"><div class="brand"><span class="brand-mark"><svg aria-hidden="true"><use href="#icon-window"/></svg></span><div><h1>RemoteXApp</h1><small>Remote application workbench</small></div><span class="badge">UAT 工作台</span></div><div class="launch-actions"><span class="launch-label">开始测试</span><button id="launch-mousepad"><svg aria-hidden="true"><use href="#icon-input"/></svg>打开 Mousepad</button><button id="launch-desktop" class="primary"><svg aria-hidden="true"><use href="#icon-window"/></svg>打开测试桌面</button></div></header>
@@ -31,7 +32,7 @@
 <section id="input-tools" class="input-tools" hidden aria-label="本机输入与剪贴板测试"><h2><label for="local-text">本机输入区 <small>· Local input</small></label></h2><div class="input-body"><textarea id="local-text" placeholder="在这里输入中文或英文，再回到远程窗口，测试输入法切换…"></textarea><div class="input-buttons"><button id="local-copy">复制本机文本</button><button id="local-read">读取本机剪贴板</button></div></div><p>远程窗口内展开 Keyboard and clipboard，选择本机输入法快捷键并开启文本剪贴板。Local → Remote 后在应用内粘贴；Remote → Local 前先在应用内复制。</p><details><summary>测试版本与会话信息</summary><pre id="identity"></pre></details></section>
 <section id="audio-tools" class="audio-tools" hidden aria-labelledby="audio-title">
   <div class="audio-title"><h2 id="audio-title">音频测试 <small>Audio test bench</small></h2><button id="audio-export">导出测试记录 · JSON</button></div>
-  <p class="local-boundary">先检查本机设备，再验证远程声路。当前产品尚未接入远程音频；本机测试成功不代表远程 speaker / mic 通过。</p>
+  <p class="local-boundary">先检查本机设备，再验证远程声路。本机检查与远程集成分开记录；连接正常不代表你已经听到声音。远程开关在右侧统计卡片中。</p>
   <div class="audio-actions"><button id="audio-same" disabled>B → 与 A 同会话</button><button id="audio-separate" disabled>B → 测试桌面</button><span id="audio-topology" role="status">尚未打开会话</span></div>
   <p>先打开 Mousepad，再将 B 切到测试桌面，可对照两会话。此操作只替换 B 的 Viewer；关闭 Viewer 不等于停止 App。</p>
   <details><summary>会话身份 · Runtime identity</summary><pre id="audio-identities">尚未打开会话</pre></details>
@@ -39,13 +40,15 @@
     <section class="audio-card"><h3>1 · 本机扬声器 / Local speaker</h3><div class="audio-actions"><button id="audio-tone">播放 1 秒测试音</button><button id="audio-tone-stop" disabled>停止</button></div><output id="audio-tone-status" role="status">未测试；需要人工确认听见声音</output><div class="audio-actions"><button id="audio-heard" disabled>听到了</button><button id="audio-not-heard" disabled>没听到</button></div></section>
     <section class="audio-card"><h3>2 · 本机麦克风 / Local microphone</h3><div class="audio-actions"><button id="audio-mic">检查麦克风 · 最长 30 秒</button><button id="audio-mic-stop" disabled>停止 / 取消</button></div><output id="audio-mic-status" role="status">未测试；点击后请求浏览器权限</output><label for="audio-level">实时电平 · Local input level</label><meter id="audio-level" min="0" max="1" value="0"></meter><p>仅在本机分析电平，不录制、不上传、不回放。关闭面板或离开此页面会停止检查。</p></section>
   </div>
-  <h3>3 · 远程音频 / Remote audio <span class="audio-blocked">未接入 · Not integrated</span></h3>
-  <p>远程开关、复用连接数和声路结果尚不可测。以下项目等待 D3 集成后执行，不会由本机电平或 Viewer 连接自动判为通过。</p>
+  <h3>3 · 远程音频 / Remote audio <span class="audio-blocked" id="remote-audio-availability">正在检查服务 · Checking service</span></h3>
+  <p>同一会话多 Tab 共用开关；一个播放者、一个麦克风采集源。隐藏画面或关闭 Viewer 会保留明确持有的音频引用；「释放音频」才释放该引用。麦克风发送到所有明确开启的目标，不跟随焦点。</p>
+  <div class="audio-actions"><button id="launch-audio-a" disabled>打开音频测试 A</button><button id="launch-audio-b" disabled>B → 新音频测试</button><button id="audio-open-tab" disabled>同会话新 Tab ↗</button><button id="audio-logout" disabled>关闭本次登录的全部音频</button></div>
+  <p>在远程 Audio test 窗口点击 Play tone 听音，点击 Record 3 seconds 测试远程麦克风，再点击 Replay 听回传。录音仅留在该测试 App 内存中，关闭即清除。</p>
   <table aria-label="待验证的远程音频用例"><thead><tr><th>验证项目 · Acceptance case</th><th>状态</th></tr></thead><tbody id="audio-cases"></tbody></table>
 </section>
 
 </section>
-<aside class="connections" data-selected="a" aria-labelledby="connections-title"><div class="connection-heading"><div class="live-label"><span class="live-dot" aria-hidden="true"></span><h2 id="connections-title">实时统计 <small>Live stats</small></h2></div><div class="segmented stats-tabs" role="group" aria-label="选择统计连接"><button data-stats="a" aria-pressed="true">A</button><button data-stats="b" aria-pressed="false">B</button></div><span id="connection-summary" role="status">已连接 0 / 2</span></div><div class="connection-cards"><article id="connection-a" class="connection-card" data-state="idle"></article><article id="connection-b" class="connection-card viewer-b" data-state="idle"></article></div><details class="stats-help"><summary>这些指标代表什么？</summary><p>每个 Viewer 独立统计，每秒更新。下行／上行是有效载荷速率，不含 TLS/DTLS/IP 开销。FPS 为实际画面更新，静止时可为 0。页面隐藏时暂停采样。</p><p>UDP ping 是当前 ICE/STUN 往返延迟；WebSocket ping 是经边缘网关到 Kasm 的 Fence 回声 RTT。每 5 秒采样，两者均不是 ICMP ping 或画面响应时间。</p><p>UDP 丢失率是近 10 秒的画面块估算，括号为丢失块 / 已判定总块。等待 2 秒仍不完整计为丢失；它不是 IP 包丢包率，也无法判断首个样本前或末尾完全未收到的块。无新样本时不显示百分比。</p></details></aside>
+<aside class="connections" data-selected="a" aria-labelledby="connections-title"><div class="connection-heading"><div class="live-label"><span class="live-dot" aria-hidden="true"></span><h2 id="connections-title">实时统计 <small>Live stats</small></h2></div><div class="segmented stats-tabs" role="group" aria-label="选择统计连接"><button data-stats="a" aria-pressed="true">A</button><button data-stats="b" aria-pressed="false">B</button></div><span id="connection-summary" role="status">已连接 0 / 2</span></div><div id="audio-link-summary" class="audio-link-summary" role="status">音频 · 尚未建立连接</div><div class="connection-cards"><article id="connection-a" class="connection-card" data-state="idle"></article><article id="connection-b" class="connection-card viewer-b" data-state="idle"></article></div><details class="stats-help"><summary>这些指标代表什么？</summary><p>每个 Viewer 独立统计，每秒更新。下行／上行是有效载荷速率，不含 TLS/DTLS/IP 开销。FPS 为实际画面更新，静止时可为 0。页面隐藏时暂停采样。</p><p>UDP ping 是当前 ICE/STUN 往返延迟；WebSocket ping 是经边缘网关到 Kasm 的 Fence 回声 RTT。每 5 秒采样，两者均不是 ICMP ping 或画面响应时间。</p><p>UDP 丢失率是近 10 秒的画面块估算，括号为丢失块 / 已判定总块。等待 2 秒仍不完整计为丢失；它不是 IP 包丢包率，也无法判断首个样本前或末尾完全未收到的块。无新样本时不显示百分比。</p></details></aside>
 </main>
 <footer class="statusbar"><span id="status" role="status">加载测试配置…</span><span class="hint"><span>●</span> 独立测试环境 · Native SDK UAT</span></footer>
 <script id="audio-probe">
@@ -154,6 +157,9 @@ let current,config;
 const status=text=>{document.querySelector('#status').textContent=text;};
 const views=new Map();
 const targets=new Map();
+let remoteAudio=null,remoteAudioError='',remoteAudioSnapshot={connection:'idle',routes:[]};
+const audioInterests=new Map(),audioBindingEpoch=new Map(),remoteResults=new Map();
+let audioPrevious=null;
 let selectionEpoch=0, selectionBusy=false;
 let statsTimer;
 const fields={protocol:'协议 · Protocol',down:'下行 · Download',up:'上行 · Upload',udpPing:'UDP ping · ICE RTT',wssPing:'WebSocket ping · RTT',udpLoss:'UDP 丢失率 · 块估算',fps:'渲染 FPS',resolution:'分辨率',uptime:'连接时长',received:'累计接收',sent:'累计发送',buffered:'待发送数据',wss:'WSS 累计接收',udp:'UDP 累计接收'};
@@ -162,7 +168,7 @@ const captions={udpPing:'UDP ping · ICE',wssPing:'WSS ping · RTT',udpLoss:'UDP
 for(const slot of ['a','b']){
   const card=document.querySelector('#connection-'+slot);
   const cell=(key,label)=>`<div><dt>${label}</dt><dd data-stat="${key}" class="${key==='udpLoss'?'loss-value':''}">—</dd></div>`;
-  card.innerHTML=`<header><strong><span class="viewer-letter">${slot.toUpperCase()}</span>Viewer ${slot.toUpperCase()}</strong><span class="connection-state" role="status">未打开</span></header><div class="protocol-row"><span class="protocol-badge" data-stat="protocol">—</span><span data-stat="resolution">—</span><span data-stat="uptime">—</span></div><dl class="stat-grid">${essential.map(key=>cell(key,captions[key])).join('')}</dl><small class="connection-detail">尚未打开应用</small><details class="counter-details"><summary>累计流量与队列 · Counters</summary><dl class="stat-grid">${['received','sent','wss','udp','buffered'].map(key=>cell(key,fields[key])).join('')}</dl></details>`;
+  card.innerHTML=`<header><strong><span class="viewer-letter">${slot.toUpperCase()}</span>Viewer ${slot.toUpperCase()}</strong><span class="connection-state" role="status">未打开</span></header><div class="protocol-row"><span class="protocol-badge" data-stat="protocol">—</span><span data-stat="resolution">—</span><span data-stat="uptime">—</span></div><dl class="stat-grid">${essential.map(key=>cell(key,captions[key])).join('')}</dl><small class="connection-detail">尚未打开应用</small><details class="counter-details"><summary>累计流量与队列 · Counters</summary><dl class="stat-grid">${['received','sent','wss','udp','buffered'].map(key=>cell(key,fields[key])).join('')}</dl></details><section class="remote-audio-controls"><div class="audio-actions"><button id="speaker-${slot}" disabled aria-pressed="false">Speaker 关闭</button><button id="microphone-${slot}" disabled aria-pressed="false">Mic 关闭</button><button id="takeover-${slot}" disabled title="显式接管此会话的麦克风">接管 Mic</button><button id="release-audio-${slot}" disabled>释放音频</button></div><output id="audio-state-${slot}">等待可用音频会话</output><meter id="remote-mic-${slot}" min="0" max="1" value="0" aria-label="本机采集电平"></meter></section>`;
 }
 function selectStats(slot){
   document.querySelector('.connections').dataset.selected=slot;
@@ -326,16 +332,85 @@ function refreshAudioIdentity() {
   $('#audio-identities').textContent = JSON.stringify(audioIdentities(), null, 2);
   $('#audio-same').disabled = selectionBusy || !targets.has('a');
   $('#audio-separate').disabled = selectionBusy || !targets.has('a') || !config?.managedId;
+  syncAudioInterests();
 }
 $('#audio-export').onclick = () => {
-  const record = {schema:1,scope:'local-device-check-and-remote-checklist',createdAt:new Date().toISOString(),topology:audioTopology(),viewers:audioIdentities(),localDevices:localResults,remoteAudio:{available:false,reason:'not-integrated',cases:remoteCases.map(([id]) => ({id,result:'not-run',reason:'backend-not-integrated'}))}};
+  const record = {schema:1,scope:'local-device-check-and-remote-checklist',createdAt:new Date().toISOString(),topology:audioTopology(),viewers:audioIdentities(),localDevices:localResults,remoteAudio:remoteAudioExport()};
   const url = URL.createObjectURL(new Blob([JSON.stringify(record,null,2) + '\n'], {type:'application/json'}));
   const link = document.createElement('a'); link.href = url; link.download = 'remotexapp-audio-uat.json'; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  status('已导出本机观察与未执行的远程用例；不包含音频或设备标识。');
+  status('已导出本机观察、远程音频状态和人工记录；不包含音频、凭据或设备标识。');
 };
+
+function remoteAudioExport() {
+  return {available:!!remoteAudio,reason:remoteAudio?'experimental-integration':remoteAudioError||'not-integrated',
+    connection:remoteAudioSnapshot.connection,protocol:remoteAudioSnapshot.protocol||null,playbackOwner:!!remoteAudioSnapshot.speakerOwner,microphoneOwner:!!remoteAudioSnapshot.micOwner,
+    routes:remoteAudioSnapshot.routes.map(r=>({runtime:r.runtime,generation:r.generation,speaker:r.actualSpeaker,mic:r.actualMic,reason:r.reason,refs:r.refs})),
+    cases:remoteCases.map(([id])=>({id,result:remoteResults.get(id)||'not-run',reason:remoteAudio?'manual-observation':'backend-not-integrated'}))};
+}
+function renderAudio() {
+  const s=remoteAudioSnapshot,connected=s.connection==='connected';
+  const now=performance.now();let rates='';
+  if(connected&&audioPrevious&&now>audioPrevious.at+100){rates=` · ↓ ${((s.receivedBytes-audioPrevious.received)*8/(now-audioPrevious.at)).toFixed(0)} / ↑ ${((s.sentBytes-audioPrevious.sent)*8/(now-audioPrevious.at)).toFixed(0)} kbps`;}
+  if(!audioPrevious||now>audioPrevious.at+700)audioPrevious={at:now,received:s.receivedBytes||0,sent:s.sentBytes||0};
+  $('#audio-link-summary').textContent=remoteAudio?`音频 ${connected?'1 条共享 WSS':'未连接'}${rates} · ${s.speakerOwner?'本页播放':s.playbackBlocked?'点击 Speaker 解锁播放':'其他页播放／未开启'}${s.micOwner?' · 本页采集 Mic':''}`:'音频 · '+(remoteAudioError||'正在检查服务');
+  for(const slot of ['a','b']){
+    const binding=audioInterests.get(slot),interest=binding?.interest?.released?null:binding?.interest,target=targets.get(slot);
+    const route=s.routes.find(r=>r.runtime===target?.id&&r.generation===target?.sessionGeneration);
+    for(const [kind,label,enabled]of [['speaker','Speaker',route?.speaker],['microphone','Mic',route?.mic]]){
+      const button=$('#'+kind+'-'+slot);button.disabled=!interest;button.setAttribute('aria-pressed',String(!!enabled));button.textContent=label+' '+(enabled?'开启':'关闭');
+    }
+    $('#takeover-'+slot).disabled=!interest;$('#release-audio-'+slot).disabled=!interest;
+    $('#audio-state-'+slot).textContent=!interest?(binding?.error||'等待已准备的音频会话'):`Speaker ${route?.actualSpeaker?'已订阅':'关闭'} · Mic ${route?.actualMic?'发送中':'关闭'}${route?.reason?' · '+route.reason:''}${route?.refs?' · '+route.refs+' 引用':''}`;
+    $('#remote-mic-'+slot).value=route?.actualMic&&s.micOwner?s.microphone?.level||0:0;
+  }
+  $('#audio-open-tab').disabled=!targets.get('a');
+}
+function syncAudioInterests(){
+  if(!remoteAudio){renderAudio();return;}
+  for(const slot of ['a','b']){
+    const target=targets.get(slot),key=target?.id+':'+target?.sessionGeneration,previous=audioInterests.get(slot);
+    if(previous?.key===key)continue;
+    const epoch=(audioBindingEpoch.get(slot)||0)+1;audioBindingEpoch.set(slot,epoch);
+    if(previous?.interest)void previous.interest.release().catch(()=>{});
+    const binding={key,interest:null,error:''};audioInterests.set(slot,binding);
+    if(!target||target.sessionGeneration<1||target.nativeAudio!=='pcm-s16le-48k-v1'){binding.error=target?'此会话未启用音频；请打开新的音频测试 App':'尚未打开会话';continue;}
+    remoteAudio.acquire(target).then(interest=>{if(audioBindingEpoch.get(slot)!==epoch){void interest.release();return;}binding.interest=interest;renderAudio();}).catch(error=>{if(audioBindingEpoch.get(slot)===epoch){binding.error=error.message;renderAudio();}});
+  }
+  renderAudio();
+}
+for(const slot of ['a','b']){
+  for(const kind of ['speaker','microphone','takeover'])$('#'+kind+'-'+slot).onclick=()=>{
+    const interest=audioInterests.get(slot)?.interest;if(!interest)return;
+    audioProbe.stop('remote-audio-started');
+    const r=remoteAudioSnapshot.routes.find(r=>r.runtime===interest.runtime&&r.generation===interest.generation);
+    const job=kind==='speaker'?interest.setSpeaker(!r?.speaker):interest.setMicrophone(kind==='takeover'||!r?.mic,{takeover:kind==='takeover'});
+    job.catch(error=>status('音频操作未完成：'+error.message));
+  };
+  $('#release-audio-'+slot).onclick=async()=>{const binding=audioInterests.get(slot);if(!binding?.interest)return;try{await binding.interest.release();binding.interest=null;binding.error='音频引用已释放；重新打开 Viewer 可重新取得引用';renderAudio();}catch(error){status(error.message);}};
+}
+$('#audio-open-tab').onclick=()=>{const x=targets.get('a');if(x){const u=new URL(location.href);u.searchParams.set('audioRuntime',x.id);window.open(u.href,'_blank','noopener');}};
+$('#audio-logout').onclick=async()=>{try{await remoteAudio?.logout();for(const [slot,binding]of audioInterests){audioBindingEpoch.set(slot,(audioBindingEpoch.get(slot)||0)+1);binding.interest=null;binding.error='本次登录音频已关闭；刷新页面可重新启用';}renderAudio();}catch(error){status(error.message);}};
+$('#launch-audio-a').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'});if(active())show(x);});
+$('#launch-audio-b').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'});if(active()){targets.set('b',x);frame('b');watchIdentity(x);}});
+async function initializeRemoteAudio(){
+  if(!config)return;
+  try{
+    const {RemoteXAppAudio}=await import(config.baseURL+'/sdk/remotexapp-audio.js');
+    const controller=new RemoteXAppAudio({baseURL:config.baseURL});
+    try{await controller.ready;}catch(error){controller.dispose();throw error;}
+    remoteAudio=controller;
+    controller.addEventListener('statechange',event=>{remoteAudioSnapshot=event.detail;renderAudio();});
+    $('#remote-audio-availability').textContent='实验性集成 · Ready for verification';
+    for(const id of ['launch-audio-a','launch-audio-b','audio-logout'])$('#'+id).disabled=false;
+    for(const row of $('#audio-cases').rows){const select=document.createElement('select');select.setAttribute('aria-label','人工测试结果 '+row.dataset.case);for(const [value,label]of [['not-run','未执行'],['passed','人工通过'],['failed','失败'],['not-applicable','不适用']]){const option=document.createElement('option');option.value=value;option.textContent=label;select.append(option);}select.onchange=()=>remoteResults.set(row.dataset.case,select.value);row.cells[1].replaceChildren(select);}
+    syncAudioInterests();
+    const id=new URL(location.href).searchParams.get('audioRuntime');if(id){const x=await api('/api/instances/'+encodeURIComponent(id));show(x);}
+  }catch(error){remoteAudioError='服务不可用 · '+error.message;$('#remote-audio-availability').textContent=remoteAudioError;renderAudio();}
+}
+
 const api=async(path,body,method)=>{const r=await fetch(config.baseURL+path,{signal:AbortSignal.timeout(15000),method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const x=await r.json();if(!r.ok)throw Error(x.error||'API request failed');return x;};
-const identity=x=>{$('#identity').textContent=JSON.stringify({core:x.versions?.current?.core,component:x.displayComponentDigest,generation:x.sessionGeneration,clipboard:x.nativeClipboard||'off'},null,2);};
+const identity=x=>{$('#identity').textContent=JSON.stringify({core:x.versions?.current?.core,component:x.displayComponentDigest,generation:x.sessionGeneration,clipboard:x.nativeClipboard||'off',audio:x.nativeAudio||'off'},null,2);};
 function watchIdentity(target) {
   (async () => {
     for (let i=0;i<60 && [...targets.values()].includes(target);i++) {
@@ -345,7 +420,7 @@ function watchIdentity(target) {
         const actual = await api('/api/instances/' + encodeURIComponent(target.id));
         if (![...targets.values()].includes(target)) return;
         // Keep the attached descriptor/token stable; only refresh displayed identity.
-        Object.assign(target, {sessionGeneration:actual.sessionGeneration,displayComponentDigest:actual.displayComponentDigest,versions:actual.versions});
+        Object.assign(target, {nativeAudio:actual.nativeAudio,sessionGeneration:actual.sessionGeneration,displayComponentDigest:actual.displayComponentDigest,versions:actual.versions});
         if (current === target) identity(target);
         refreshAudioIdentity();
         if (actual.applicationStatus?.state === 'ready') return;
@@ -381,10 +456,11 @@ $('#audio-separate').onclick=()=>selectTarget(async active=>{
 $('#audio-same').onclick=()=>{if(selectionBusy || !targets.has('a'))return;targets.set('b',targets.get('a'));frame('b');status('B 已回到 A 的会话；A 的 Viewer 保持连接。');};
 for(const id of ['launch-mousepad','launch-desktop']) $('#'+id).disabled=true;
 try{config=await fetch('/fixture-config').then(r=>{if(!r.ok)throw Error('fixture unavailable');return r.json();});for(const id of ['launch-mousepad','launch-desktop']) $('#'+id).disabled=false;refreshAudioIdentity();status('请选择测试应用，或展开音频面板检查本机设备。');}catch{status('测试配置不可用；本机音频检查仍可使用。');}
+void initializeRemoteAudio();
 for(const name of ['a','b']){
   document.querySelector('#toggle-'+name).onclick=()=>{const slot=document.querySelector('#slot-'+name);slot.hidden=!slot.hidden;const item=views.get(name);if(item)render(name,item);};
   document.querySelector('#dispose-'+name).onclick=()=>closeFrame(name);
-  document.querySelector('#recreate-'+name).onclick=()=>{selectionEpoch++;if(targets.has(name))frame(name);};
+  document.querySelector('#recreate-'+name).onclick=()=>{selectionEpoch++;if(!audioInterests.get(name)?.interest)audioInterests.delete(name);if(targets.has(name))frame(name);};
 }
 document.querySelector('#local-copy').onclick=()=>navigator.clipboard.writeText(document.querySelector('#local-text').value).then(()=>status('本机剪贴板已更新。')).catch(()=>status('浏览器拒绝剪贴板写入。'));
 document.querySelector('#local-read').onclick=()=>navigator.clipboard.readText().then(text=>{document.querySelector('#local-text').value=text;status('已读到本机文本区。');}).catch(()=>status('浏览器拒绝剪贴板读取。'));

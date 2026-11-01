@@ -34,5 +34,44 @@ Pulse remains an external distribution package. No upstream codec or Pulse
 source is vendored. Sources: [Pulse modules](https://wiki.freedesktop.org/www/Software/PulseAudio/Documentation/User/Modules/),
 [16.1 null-sink implementation](https://github.com/pulseaudio/pulseaudio/blob/v16.1/src/modules/module-null-sink.c).
 
-Manager authorization/lifecycle, browser/SDK coordination, WAN quality, physical
-devices and long-duration resources still need product integration evidence.
+## Product integration harnesses
+
+`go test ./internal/sessionaudio ./cmd/remotexappd ./tests/kasm-native/edge`
+checks packet bounds, bounded queues, route grants, account and generation
+fencing, runtime compatibility, shutdown, and the edge cookie boundary.
+`REMOTEXAPP_TEST_AUDIO_LIVE=1 go test ./internal/sessionaudio` also exercises
+real private Pulse recovery. SDK coordinator/worklet tests run with `make check`.
+
+For browser verification, start the test-only fixture in one terminal:
+
+```sh
+REMOTEXAPP_AUDIO_FIXTURE=/tmp/audio-fixture.json go test ./cmd/remotexappd \
+  -run '^TestAudioBrowserFixture$' -count=1 -timeout=50m -v
+```
+
+Then run `node tests/native-audio/browser-integration.mjs` with three absolute
+arguments: that private fixture JSON, a synthetic 48 kHz mono WAV containing an
+880 Hz test signal, and a private output directory. It owns ephemeral Chrome
+profiles and two private Pulse domains. The fixture deliberately replaces the
+Manager's runtime resolver: this proves the real audio service, SDK,
+SharedWorker and AudioWorklet, not full App supervision or WAN delivery.
+The fixture stops on POST `/fixture/stop`; its test-only routes are absent from
+product binaries. Preserve only sanitized summaries in public documentation.
+
+The browser cases cover two sessions, three tabs, one shared channel, actual
+440/660 Hz playback, selected/unselected microphone readback, one capture for
+multiple targets, profile conflicts and explicit takeover, permission denial,
+late permission cancellation, domain replacement, playback-owner handoff, and
+last-reference cleanup. Synthetic readback disables browser echo cancellation,
+noise suppression and gain control explicitly; normal SDK defaults enable them.
+This avoids mistaking suppression of a sustained test tone for routing loss.
+
+`tests/native-audio/app-experiment.py --binary PATH --output PATH` uses an owned
+Xvfb display and real private Pulse server to verify the test App's Play,
+three-second Record, Replay and Stop controls. Its recording stays in memory.
+The helper is packaged inside the immutable `alpine-audio-test` App Package,
+not installed as a mutable account-wide executable.
+
+Full Manager lifecycle, target Alpine/ARM64 deployment, WAN resources and
+physical-device UAT require separate evidence. Unit and local fixture passes
+must not be presented as acceptance of those scopes.

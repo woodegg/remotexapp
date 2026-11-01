@@ -135,6 +135,7 @@ func (m *manager) fenceViewerChannels(item *instance) error {
 	if !m.canFenceViewerChannels(item) {
 		return errors.New("Viewer ownership is uncertain")
 	}
+	m.fenceAudio(item.ID, item.SessionGeneration)
 	m.mu.Lock()
 	var retired []*viewerChannel
 	for channel := range m.viewerChannels {

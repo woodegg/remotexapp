@@ -20,6 +20,7 @@ type config struct {
 	udpEndpoints         []udpEndpoint
 	nativeUDPCapable     bool
 	nativeClipboard      bool
+	nativeAudio          bool
 	listen               string
 	stateDir             string
 	classConfigPath      string

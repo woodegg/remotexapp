@@ -4882,3 +4882,40 @@ JSON separates local manual observations and measured local levels from remote
 cases blocked on integration. The single HTML artifact remains compatible with
 the existing UAT ingress/edge; no extra asset routes or runtime changes are needed.
 See the [workbench procedure](../tests/kasm-native/UAT-WORKBENCH.md).
+
+
+## 2026-11-01 — D3 private audio domains and scoped PCM transport
+
+Issue #45 / PR #49 implement AUD-002 after the owner requested complete audio
+integration followed by one end-to-end UAT. This supersedes the preceding
+preparation entry's product-unavailable state only as each qualified artifact
+is delivered; it does not reinterpret earlier local checks as remote acceptance.
+
+An opt-in native runtime pins the audio protocol and durable schema 6. Its Core
+session supervisor prepares a private Pulse server before App launch and passes
+explicit PULSE configuration/runtime/state/cookie paths without changing HOME or
+the App's account bus. The domain loads only virtual speaker and microphone
+modules. Empty App audio preparation does not create a browser connection.
+Same-UID routing is not a malicious-tenant isolation boundary. Audio-only faults
+replace the domain ID at the same App endpoint with bounded retries; input and
+the App remain alive. Old runtime generations and audio domain IDs are fenced.
+
+The first protocol is PCM16LE, 48 kHz, 20 ms frames: stereo speaker, mono mic.
+Go stays statically buildable; Pulse tools remain explicit distribution runtime
+dependencies. No codec is imported. Non-silent payload costs 1.536 Mbit/s per
+speaker and 0.768 Mbit/s per shared mic, before framing/TLS. Exact digital silence
+uses a short marker while the enabled channel remains connected. Queues and
+stream counts are bounded; actual WAN delay/quality require measurement.
+
+A separate authenticated cookie epoch scopes one audio WSS. One-use connection
+and route grants bind authenticated principal, scope, runtime generation and
+private domain identity. HTTP leases expire after 30 seconds without renewal;
+audio traffic is not authorization renewal or App keepalive. SharedWorker
+coordinates per-session switches/references, one playback owner and one explicit
+microphone capture. Server arbitration permits one writer per target and visible
+explicit takeover. Owner loss or failure never silently reacquires a microphone.
+The trusted selected-UID service authorization model remains unchanged.
+
+Full protocol, failure, compatibility and verification limits are maintained in
+[native audio](native-audio.md). Historical PoC results are research inputs;
+product, target architecture, resource and physical-device checks remain distinct.

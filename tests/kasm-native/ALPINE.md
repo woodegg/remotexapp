@@ -72,6 +72,12 @@ and Go architecture. Fresh work/output directories and clean-source checks
 still apply. Distribution package versions and matching runtime dependencies
 must be recorded with each candidate.
 
+Run Go tests as a non-root user with `xauth` installed. For this standalone
+build, use `CGO_LDFLAGS=-L/path/to/static-work/static/lib go test
+-tags=x11_static ./...`; the default link path expects a distribution-specific
+dynamic libxdo name. Systemd unit tests must supply their existing command
+stubs on Alpine rather than depend on a host `systemctl` installation.
+
 ### Runtime provisioning
 
 Run the Manager as the existing non-root test account with

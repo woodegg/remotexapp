@@ -1,0 +1,582 @@
+{
+  "schemaVersion": 1,
+  "dateUTC": "2026-11-01",
+  "issue": 36,
+  "scope": "US ARM64 native development UAT deployment; two displays and three Viewers",
+  "status": "bounded-arm64-automated-checks-passed-awaiting-physical-UAT",
+  "artifacts": {
+    "core": {
+      "sourceCommit": "a7297f3fd5dd9070c73fb62becae1eb76440a5bd",
+      "file": "remotexapp-a7297f3fd5dd-arm64.tar.gz",
+      "archiveSHA256": "0d6dbc22153a43baac4150b719d63edebb13da895827ac669d1d0103b23b8499"
+    },
+    "edge": {
+      "sourceCommit": "a7297f3fd5dd9070c73fb62becae1eb76440a5bd",
+      "file": "remotexapp-edge-a7297f3fd5dd-arm64.tar.gz",
+      "archiveSHA256": "d7cc901aae72d8aea8802dbbb32241ec723f29ad4eaff89812e38133687ecd29"
+    },
+    "component": {
+      "sourceCommit": "a7297f3fd5dd9070c73fb62becae1eb76440a5bd",
+      "file": "kasm-51905551ea09.tar.gz",
+      "archiveSHA256": "304a28c4f65acc78535f9c0cbaea1afb067f37578b81f27b6f53053471414d92",
+      "manifestSHA256": "51905551ea098e6151d0dc59d4f55aceafafb5466d73049823fed3bbd0b6ca2c"
+    }
+  },
+  "platform": {
+    "architecture": "aarch64",
+    "goArchitecture": "arm64",
+    "alpine": "3.24.3",
+    "containerManager": "LXD 5.21.9 LTS",
+    "unprivileged": true,
+    "runtimeUID": 1000,
+    "cpuLimit": 1,
+    "memoryLimitMiB": 1024
+  },
+  "build": {
+    "go": "go1.27.3",
+    "nativeTestCompiler": "Clang 22.1.3 with compiler-rt",
+    "nativeServerCompiler": "GCC 15.2.0",
+    "staticCoreExecutables": 4,
+    "staticFixtureExecutables": 2,
+    "nativeComponentLinkage": "dynamic; all target runtime libraries resolved",
+    "componentTestsPassed": 55,
+    "sanitizers": [
+      "address",
+      "undefined",
+      "leak detection"
+    ],
+    "makeCheckPassed": true,
+    "targetGoTests": {
+      "passed": true,
+      "testSourceCommit": "8eaeb8a03feb4efc365119ecff99e737f97c2271",
+      "artifactSourceCommit": "a7297f3fd5dd9070c73fb62becae1eb76440a5bd",
+      "differences": [
+        "cmd/remotexappd/runtime_manifest_test.go",
+        "tests/kasm-native/ALPINE.md"
+      ],
+      "nonRoot": true,
+      "buildTag": "x11_static"
+    },
+    "runtimeChangesInTestFix": false,
+    "runtimeCodeAndNativePatchesUnchangedFromPreviousCandidate": true,
+    "nativeCompilationInputsVerifiedBeforeReusingBuildOutput": true,
+    "browserBundleComparison": {
+      "arm64Client": "96dfa9dd5269e8e3e7fba742b53a3d4687101e5beda7fa410ac69f3c5b0b5e57",
+      "amd64Client": "6d2f7ebd0e24ee1cbffb769dc72b184d5d2946129e103c3248f8151cf1a040ab",
+      "identical": false,
+      "onlyDependencyBuildPathsDiffer": true,
+      "normalizedEqual": true
+    },
+    "ci": [
+      "https://github.com/woodegg/remotexapp/actions/runs/41261828976",
+      "https://github.com/woodegg/remotexapp/actions/runs/41262672602"
+    ]
+  },
+  "browser": "Chrome 149.0.7827.102, dedicated Linux profile; additional owner-provided Chrome verified UDP",
+  "network": {
+    "publicAccessRedirectVerified": true,
+    "existingIngressRulesPreserved": true,
+    "twoUDPPortsRoundtripVerified": true,
+    "forwarding": "host proxy to container loopback, non-NAT, no PROXY protocol",
+    "hostSourcePolicyRetained": true,
+    "observedAuthenticatedSources": 1,
+    "privacy": {
+      "workloadUDPPackets": 400,
+      "allUDPPeersLoopback": true,
+      "httpRequestsChecked": 21,
+      "sourceHeadersAbsent": true,
+      "offersChecked": 3,
+      "clientCandidatesAbsent": true,
+      "clientOriginZeroed": true
+    }
+  },
+  "checks": {
+    "threeViewersTwoDisplays": true,
+    "input": [
+      {
+        "label": "UDP Viewer A",
+        "remoteMotion": true,
+        "buttons": [
+          1,
+          2,
+          3,
+          8,
+          9
+        ],
+        "clickCommand": true,
+        "doubleClickSelection": true,
+        "dragSelection": true,
+        "arrowsAndEditingKeys": true,
+        "targetFocus": true,
+        "wheel": true,
+        "browserExceptions": 0
+      },
+      {
+        "label": "UDP Viewer B",
+        "remoteMotion": true,
+        "buttons": [
+          1,
+          2,
+          3,
+          8,
+          9
+        ],
+        "clickCommand": true,
+        "doubleClickSelection": true,
+        "dragSelection": true,
+        "arrowsAndEditingKeys": true,
+        "targetFocus": true,
+        "wheel": true,
+        "browserExceptions": 0
+      },
+      {
+        "label": "WSS fallback Viewer A",
+        "remoteMotion": true,
+        "buttons": [
+          1,
+          2,
+          3,
+          8,
+          9
+        ],
+        "clickCommand": true,
+        "doubleClickSelection": true,
+        "dragSelection": true,
+        "arrowsAndEditingKeys": true,
+        "targetFocus": true,
+        "wheel": true,
+        "browserExceptions": 0
+      }
+    ],
+    "text": [
+      {
+        "label": "synthetic Chinese composition and Unicode file readback",
+        "passed": true
+      },
+      {
+        "label": "browser clipboard to real remote paste/save",
+        "passed": true
+      },
+      {
+        "label": "remote copy requires explicit local clipboard write",
+        "passed": true
+      },
+      {
+        "label": "64 KiB native boundary and oversized rejection",
+        "passed": true
+      },
+      {
+        "label": "clipboard permission denial reported",
+        "passed": true
+      },
+      {
+        "label": "four shortcut profiles suppress terminal Space and preserve editing",
+        "passed": true
+      },
+      {
+        "label": "three outside/inside composition focus cycles",
+        "passed": true
+      },
+      {
+        "label": "reconnect clears clipboard consent",
+        "passed": true
+      }
+    ],
+    "webSocketGrantCases": [
+      {
+        "label": "missing grant",
+        "opened": false
+      },
+      {
+        "label": "unknown grant",
+        "opened": false
+      },
+      {
+        "label": "one-use replay",
+        "opened": false
+      },
+      {
+        "label": "stale generation",
+        "opened": false
+      },
+      {
+        "label": "explicit revoke closes only its Viewer",
+        "passed": true
+      },
+      {
+        "label": "new grant reconnects retired Viewer",
+        "passed": true
+      }
+    ],
+    "stunPositiveAndNegativeControls": {
+      "mode": "active",
+      "cases": [
+        {
+          "case": "valid authenticated non-nominating positive control",
+          "expectedResponse": true,
+          "receivedSuccessResponse": true,
+          "passed": true
+        },
+        {
+          "case": "missing integrity",
+          "expectedResponse": false,
+          "receivedSuccessResponse": false,
+          "passed": true
+        },
+        {
+          "case": "invalid integrity",
+          "expectedResponse": false,
+          "receivedSuccessResponse": false,
+          "passed": true
+        },
+        {
+          "case": "unknown credentials",
+          "expectedResponse": false,
+          "receivedSuccessResponse": false,
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    "retiredStunCredential": {
+      "mode": "retired",
+      "cases": [
+        {
+          "case": "retired Viewer credential",
+          "expectedResponse": false,
+          "receivedSuccessResponse": false,
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    "serverExpiry": {
+      "serverExpiredWithoutRenewal": true,
+      "elapsedMs": 90790,
+      "suppressedRenewals": 4
+    },
+    "endpointPoolFullWSSFallback": true,
+    "managerAdoptionPreservedProcessesAndDocuments": true,
+    "actualContainerReboot": {
+      "managedRecovered": true,
+      "generationAdvanced": true,
+      "componentPinsRetained": true,
+      "documentHashesRetained": true,
+      "otherContainersUnchanged": true,
+      "threeViewersPaintedAfterRebootWithChangingPixels": true
+    },
+    "latencyAndLoss": {
+      "baselineLoss": [
+        0,
+        0
+      ],
+      "finiteRTT": true,
+      "rtcObservation": [
+        {
+          "rttMs": 50,
+          "responsesReceived": 9,
+          "state": "succeeded"
+        },
+        {
+          "rttMs": 48,
+          "responsesReceived": 9,
+          "state": "succeeded"
+        }
+      ],
+      "actualSelectedICEPair": true,
+      "paintDuringLoss": true,
+      "uiCards": true,
+      "viewerHeaders": true,
+      "realFaultDrops": 227,
+      "faultCleanup": true,
+      "recoveredLoss": [
+        0,
+        0
+      ],
+      "independentTransportSwitch": true,
+      "disconnectClears": true,
+      "reconnectFreshEpoch": true,
+      "hiddenPageStopsFenceProbes": true,
+      "idleShowsStale": true,
+      "javascriptExceptions": 0,
+      "realFenceRequests": 27
+    },
+    "blockLossSamples": {
+      "baseline-healthy-traffic": [
+        {
+          "state": "ready",
+          "scope": "display-blocks",
+          "windowMs": 10000,
+          "settleMs": 2000,
+          "receivedBlocks": 276,
+          "lostBlocks": 0,
+          "expectedBlocks": 276,
+          "ratio": 0,
+          "ageMs": 99.09999990463257
+        },
+        {
+          "state": "ready",
+          "scope": "display-blocks",
+          "windowMs": 10000,
+          "settleMs": 2000,
+          "receivedBlocks": 276,
+          "lostBlocks": 0,
+          "expectedBlocks": 276,
+          "ratio": 0,
+          "ageMs": 119.19999980926514
+        }
+      ],
+      "controlled-receiver-datagram-loss": [
+        {
+          "state": "ready",
+          "scope": "display-blocks",
+          "windowMs": 10000,
+          "settleMs": 2000,
+          "receivedBlocks": 207,
+          "lostBlocks": 96,
+          "expectedBlocks": 303,
+          "ratio": 0.31683168316831684,
+          "ageMs": 122.70000004768372
+        },
+        {
+          "state": "ready",
+          "scope": "display-blocks",
+          "windowMs": 10000,
+          "settleMs": 2000,
+          "receivedBlocks": 211,
+          "lostBlocks": 81,
+          "expectedBlocks": 292,
+          "ratio": 0.2773972602739726,
+          "ageMs": 127.40000009536743
+        }
+      ],
+      "recovered-healthy-traffic": [
+        {
+          "state": "ready",
+          "scope": "display-blocks",
+          "windowMs": 10000,
+          "settleMs": 2000,
+          "receivedBlocks": 282,
+          "lostBlocks": 0,
+          "expectedBlocks": 282,
+          "ratio": 0,
+          "ageMs": 174.5
+        },
+        {
+          "state": "ready",
+          "scope": "display-blocks",
+          "windowMs": 10000,
+          "settleMs": 2000,
+          "receivedBlocks": 282,
+          "lostBlocks": 0,
+          "expectedBlocks": 282,
+          "ratio": 0,
+          "ageMs": 177.79999995231628
+        }
+      ],
+      "viewer-a-wss-only": [
+        {
+          "state": "inactive"
+        },
+        {
+          "state": "ready",
+          "scope": "display-blocks",
+          "windowMs": 10000,
+          "settleMs": 2000,
+          "receivedBlocks": 282,
+          "lostBlocks": 0,
+          "expectedBlocks": 282,
+          "ratio": 0,
+          "ageMs": 197.90000009536743
+        }
+      ],
+      "viewer-a-disconnected": [
+        null,
+        {
+          "state": "ready",
+          "scope": "display-blocks",
+          "windowMs": 10000,
+          "settleMs": 2000,
+          "receivedBlocks": 276,
+          "lostBlocks": 0,
+          "expectedBlocks": 276,
+          "ratio": 0,
+          "ageMs": 72.39999985694885
+        }
+      ],
+      "viewer-a-reconnected": [
+        {
+          "state": "ready",
+          "scope": "display-blocks",
+          "windowMs": 10000,
+          "settleMs": 2000,
+          "receivedBlocks": 72,
+          "lostBlocks": 0,
+          "expectedBlocks": 72,
+          "ratio": 0,
+          "ageMs": 213.79999995231628
+        },
+        {
+          "state": "ready",
+          "scope": "display-blocks",
+          "windowMs": 10000,
+          "settleMs": 2000,
+          "receivedBlocks": 299,
+          "lostBlocks": 0,
+          "expectedBlocks": 299,
+          "ratio": 0,
+          "ageMs": 32.799999952316284
+        }
+      ],
+      "idle-stale": [
+        {
+          "state": "stale"
+        },
+        {
+          "state": "stale"
+        }
+      ]
+    },
+    "lossFault": {
+      "location": "owned-browser-host-input",
+      "configuredDatagramDrop": 0.2,
+      "automaticExpirySeconds": 40,
+      "droppedDatagrams": 227,
+      "removed": true,
+      "guardUnchanged": true
+    }
+  },
+  "verification": {
+    "runtimeFiles": {
+      "core": {
+        "files": 21,
+        "allHashesMatch": true
+      },
+      "component": {
+        "files": 45,
+        "allHashesMatch": true
+      },
+      "componentDependenciesResolved": true,
+      "alpineVersion": "3.24.3",
+      "executables": {
+        "novnc-input": {
+          "architecture": "AArch64",
+          "static": true
+        },
+        "remotexapp-operator-helper": {
+          "architecture": "AArch64",
+          "static": true
+        },
+        "remotexapp-status": {
+          "architecture": "AArch64",
+          "static": true
+        },
+        "remotexappd": {
+          "architecture": "AArch64",
+          "static": true
+        },
+        "uat-edge": {
+          "architecture": "AArch64",
+          "static": true
+        },
+        "uat-ingress": {
+          "architecture": "AArch64",
+          "static": true
+        }
+      },
+      "componentELF": {
+        "architecture": "AArch64",
+        "static": false
+      },
+      "nonRootRuntime": true
+    },
+    "edgeFiles": {
+      "pinnedFiles": 11,
+      "allHashesMatch": true,
+      "edgeAndTunnelRunning": true,
+      "originMatched": true
+    },
+    "runtimeCleanup": {
+      "activeRuntimes": 1,
+      "runtimeManifests": 1,
+      "noFailedRuntime": true,
+      "testProcessesAbsent": true,
+      "managedUATReady": true,
+      "runtimeUID": 1000
+    },
+    "viewers": {
+      "attachedTestViewers": 0,
+      "failedRuntimes": 0
+    }
+  },
+  "resources": {
+    "observation": "single final idle sample; not a leak slope or capacity qualification",
+    "runtimeUIDProcesses": 15,
+    "pssMiB": 125.21,
+    "anonymousPssMiB": 43.53,
+    "aggregateRssMiB": 139.34,
+    "rssDoubleCountsSharedPages": true,
+    "oomEvents": 0,
+    "oomKills": 0,
+    "forcedGC": false
+  },
+  "cleanup": {
+    "ownedPagesClosed": true,
+    "ownedBrowserStopped": true,
+    "scopedCookieProfileRemoved": true,
+    "userBrowserTabsPreserved": true,
+    "remoteARM64BuilderStopped": true,
+    "ownedFaultRulesRemoved": true,
+    "temporaryTargetTestPackagesRemoved": true,
+    "ownedCapturesStopped": true
+  },
+  "retainedAttempts": [
+    {
+      "kind": "upstream-ingress-preflight",
+      "outcome": "Initial public UDP probes were absent at the host; after owner enabled upstream ingress, both ports passed actual round trips."
+    },
+    {
+      "kind": "ARM64-sanitizer-runtime",
+      "outcome": "Alpine GCC sanitizer libraries unavailable; Clang/compiler-rt passed all 55 component checks with the sanitizer and leak flags retained."
+    },
+    {
+      "kind": "fresh-runtime-dependencies",
+      "outcome": "Pre-activation checks found missing native runtime libraries and App executables; required packages were installed and linker, dependency, ELF and hash checks passed."
+    },
+    {
+      "kind": "Go-test-environment",
+      "outcome": "Default dynamic linking and UID 0 were unsuitable for this Alpine fixture. Non-root x11_static tests with xauth exposed one host-systemctl dependency; the existing test stub fixed it and every Go package passed. Production files are unchanged by that test-only correction."
+    },
+    {
+      "kind": "idle-reboot-transport-assertion",
+      "outcome": "Three Viewers painted via WSS but no new UDP display data existed on the static screen. ICE was connected; normal changing pixels activated UDP without a server/proxy restart. The revised post-reboot check required actual traffic."
+    },
+    {
+      "kind": "competing-browser-setup",
+      "outcome": "A concurrent expiry test took foreground while two other Viewers were connecting; that setup timed out, and a later STUN positive control used stale credentials. Neither attempt was accepted. Serial fresh foreground setup, freshly captured credentials and all grant/STUN controls passed. Hidden initial-connection recovery remains unqualified."
+    }
+  ],
+  "unverified": [
+    "physical OS keyboard/IME and other browser engines",
+    "initial connection recovery after backgrounding",
+    "new ARM64 long-duration soak or capacity/performance benchmark",
+    "full preceding MTU/NAT/proxy fault matrix on ARM64",
+    "whole-host reboot",
+    "audio, file clipboard and embedding-host integration",
+    "formal release qualification"
+  ],
+  "privateEvidenceSHA256": {
+    "arm-native-tests.log": "8fca0599191c82a5d4aea12bb8ec62dfa2a27cbec7022ab13de73635d0beb916",
+    "component-tests-arm64.log": "9b948f849824895c9593fff5e98f55e8655c53cab1d483c2f151149d68e33984",
+    "arm64-go-portable-tests.log": "87f7f1de7f2ca2ef6359d4f7f28db07a57f52b6bd3c5a15aa24cf2ac432dc586",
+    "arm64-input-reuse.json": "a1c515740661907bc4ecebc87c4668945ed40a0c37bdcd59d25c548c2b1c33c9",
+    "input-results.json": "d00757bf7723ecd2a28c298e8d8b38c373d01ae93160a7ff362be97f5a552e64",
+    "text-results.json": "6fb2867ff278afd67626d3f41988e17984afd2448a8a5a0dc1c6c705a9368c02",
+    "privacy-results.json": "7ad845b37f26ded42a2d235f40fdddfaf1a40b392c8a06a81ef464c3fb41dea7",
+    "post-reboot-browser.json": "567bfcf79ceb83563539186fad4fe7e4cdb336f23f752235a3c8bdf129366397",
+    "us-browser-results.json": "a2bf887719fd22df0d69dde6f28218303a02b56dfa486a2cb607c9a02151fb24",
+    "stun-active.json": "3a0350da644a78de021d1ea7fa4e61dcc818a15a73b39b2ea5ad0c9ce8c147e4",
+    "stun-retired.json": "abb72435fafb07bee490825bb01564b242697265e7e93da086607af1b7cde83b",
+    "cleanup.json": "e29637680cf97c068289aebe96aea514e617d2cf1d964d48d9990e51a940e390"
+  }
+}

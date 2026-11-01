@@ -57,6 +57,9 @@ python3 scripts/build-kasm-component.py --platform alpine --inputs /inputs \
 
 ### ARM64 build tooling
 
+The [US ARM64 qualification](UDP-US-ARM64.md) records the tested artifacts and
+live checks for this architecture.
+
 Build ARM64 outputs in a separate native Alpine ARM64 environment, using the
 matching Go distribution. Never install the amd64 executables there. Verify the
 ELF machine type as well as linkage; record distinct artifact/component hashes

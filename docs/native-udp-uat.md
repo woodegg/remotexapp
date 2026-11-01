@@ -100,3 +100,6 @@ The [latency checkpoint](../tests/kasm-native/LATENCY.md) records the subsequent
 client/Core/edge pins and focused UDP/WebSocket RTT checks on both fixtures.
 The [UDP loss checkpoint](../tests/kasm-native/UDP-LOSS.md) defines the bounded
 display-block estimate and records controlled receive-side loss checks.
+The [US ARM64 checkpoint](../tests/kasm-native/UDP-US-ARM64.md) records native
+architecture-specific builds, three-Viewer input/authorization/reboot checks,
+diagnostics, failed test attempts and scoped cleanup on the third fixture.

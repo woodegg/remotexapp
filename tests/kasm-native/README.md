@@ -1,5 +1,8 @@
 # Native Kasm qualification
 
+The [UDP loss checkpoint](UDP-LOSS.md) defines the per-Viewer display-block
+estimate, its measurement limits and controlled receive-side loss checks.
+
 The [per-Viewer latency checkpoint](LATENCY.md) records separate UDP and
 WebSocket RTT diagnostics, two-region live checks and their exact candidate pins.
 

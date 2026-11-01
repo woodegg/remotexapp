@@ -98,3 +98,5 @@ The [second-region record](../tests/kasm-native/UDP-CHINA.md) covers deployment
 behind an upstream EIP without rebuilding the qualified development artifacts.
 The [latency checkpoint](../tests/kasm-native/LATENCY.md) records the subsequent
 client/Core/edge pins and focused UDP/WebSocket RTT checks on both fixtures.
+The [UDP loss checkpoint](../tests/kasm-native/UDP-LOSS.md) defines the bounded
+display-block estimate and records controlled receive-side loss checks.

@@ -12,10 +12,11 @@ implemented with [bounded automated evidence](../tests/kasm-native/README.md);
 later gates await review. The default
 architecture and accepted invariants below still apply.
 
-The proposed [multi-container UDP Host Agent](udp-host-agent-design.md)
+The approved [multi-container UDP Host Agent design](udp-host-agent-design.md)
 separately defines automatic discovery, publication leases and host-owned
-reconciliation. It is documentation-only, not an installed service or a change
-to the current deployment boundary.
+reconciliation. Its first checkpoint is protocol/state-machine development;
+real Incus identity, independent expiry and multi-container qualification follow.
+The design is not an installed service or a change to the current deployment boundary.
 
 ## Architecture and ownership
 

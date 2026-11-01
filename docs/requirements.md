@@ -75,17 +75,21 @@ is locked.
 
 <a id="multi-container-udp-publication"></a>
 
-## Proposed multi-container UDP publication — 2026-11-01
+## Multi-container UDP publication design — 2026-11-01
 
 [Issue #42](https://github.com/woodegg/remotexapp/issues/42) and the
 [Host Agent design](udp-host-agent-design.md) define automatic publication
-across containers, independently of single-port multiplexing. All HNA entries
-remain **proposed**: documentation is requested; implementation and deployment
-are not qualified. PR #37's bounded UAT acceptance does not cover this service.
+across containers, independently of single-port multiplexing. The owner approved
+the architecture direction on 2026-11-01: automatic multi-port publication first,
+single-port experiments separately. HNA entries are **accepted design requirements,
+not implemented or qualified capabilities**. [HNA-A1 / #44](https://github.com/woodegg/remotexapp/issues/44)
+starts with protocol/state-machine tests behind simulated adapters; real Incus
+identity, independent expiry and multi-container UAT remain subsequent gates.
+PR #37's bounded UAT acceptance does not cover this service.
 These extend KNA-005/006/007/009 while retaining non-root Manager ownership,
 Viewer authorization, address filtering and complete WSS operation.
 
-| ID | Proposed requirement | Acceptance boundary |
+| ID | Design requirement | Acceptance boundary |
 | --- | --- | --- |
 | HNA-001 | Discover policy-enabled containers and reconcile their desired UDP publications automatically; host bootstrap replaces per-display manual proxy configuration. | Dynamic addition/removal, missed events and multiple containers/displays; Incus and LXD qualified separately |
 | HNA-002 | Authenticate the calling Manager against host-observed container identity/incarnation; restrict publication to its own allowed services without granting host management privileges. | Forged owner/target, overlapping UIDs, clone/recreate, namespace mismatch and disallowed-container negatives |

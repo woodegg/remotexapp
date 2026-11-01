@@ -4882,3 +4882,29 @@ remain the implementation baseline until a separately qualified replacement.
 This records a proposal, not implementation approval, a deployed service or a
 new release commitment. The owner's same-day PR #37 UAT acceptance is recorded
 in that PR against its existing artifacts and does not qualify this proposal.
+
+## 2026-11-01 — Accept Host Agent direction and select the first development slice
+
+After #33, #35 and #37 merged, the owner approved the next design review and
+scope-selection step for #43. This entry supersedes the proposal-only status of
+the preceding Host Agent entry; it does not replace the current static endpoint
+implementation or claim a newly accepted service.
+
+Accept HNA-001–008 as architecture requirements: automate non-NAT multi-port
+publication first and retain single-port multiplexing as an independent
+experiment. The first real host adapter target is Linux/Incus; LXD needs separate
+evidence. [Issue #44](https://github.com/woodegg/remotexapp/issues/44) selects A1,
+a versioned protocol and bounded lease state machine tested through identity,
+clock, disposable durable-store and simulated forwarding interfaces. It does
+not wire automatic mode into Manager or operate host networking.
+
+The [delivery slices](udp-host-agent-design.md#11-分期范围与实现前置条件--delivery-slices-and-prerequisites)
+separate that checkpoint from real container identity/socket/namespace and
+independent expiry experiments, then Manager integration and the full dedicated
+multi-container qualification matrix. Model tests do not prove real identity
+or expiry enforcement while the Agent is dead. Protocol details, production
+lease/failure budgets, quotas and rollout remain reviewable engineering work.
+Viewer grants remain owned by Manager; phase A host quotas bound publications
+and forwarding state, while phase B separately bounds registered Viewer routes.
+Keep #42 open; this approval and design merge do not publish, deploy or qualify
+the new service. Existing UAT artifacts and deployment ownership remain intact.

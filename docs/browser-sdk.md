@@ -672,8 +672,9 @@ channels and generation-qualified descriptors/offers are retired.
 ### Native input/clipboard checkpoint (development SDK 0.31.0-dev.2)
 
 The [native automatic clipboard requirement](native-clipboard-integration.md)
-in Issue #50 is a follow-on, not an available mode of this implementation.
-The explicit methods and consent rules below remain the current contract.
+in Issue #50 adds experimental directional modes in development SDK
+0.31.0-dev.5. Its exact-artifact qualification and human UAT remain pending.
+The explicit methods below remain available with default-off consent.
 
 Issue #32 adds `configureKeyboard({profile, mode, bindings})`, `keyboardPolicy`,
 `focus()` and `blur()`. Profiles: `windows`, `mac`, `gnome`, `fcitx`, `unknown`,
@@ -709,3 +710,32 @@ For concurrent native Viewers, ID-based initial connect may retry one prepare
 conflict if another Viewer just activated the same stopped session at the next
 generation with unchanged component/Core/clipboard policy. Explicit descriptor
 connections and upgrades/recovery remain fenced; no input is replayed.
+
+### Native automatic text clipboard (development SDK 0.31.0-dev.5)
+
+Use a component advertising `clipboardAutomatic`; older paired components
+remain manual-only. From an explicit user action, call
+`await viewer.configureClipboard({toRemote:'auto', toLocal:'auto'})`, then
+`await viewer.requestClipboardPermission()` if the state requires permission.
+Both directions independently accept `off`, `manual` and `auto`. Listen to
+`clipboardstatechange` or call `getClipboardState()` for requested/effective
+modes, permission states, active target and content-free operation status.
+Permission denial or unsupported observation falls back to manual operation.
+
+The host calls `focus()` for its selected Viewer and `blur()` when hiding or
+switching away. Container focus events also select that Viewer. No automatic
+browser access occurs without a focused visible target. Activation acquires a
+fresh baseline; a normal paste shortcut reads/submits local text before native
+paste keys are released. An empty read suppresses that paste without clearing
+the remote clipboard. Remote notifications never activate a Viewer. Conflicts
+require an explicit existing manual transfer action. Submission is not an App
+paste acknowledgment. Automatic mode uses the reliable native clipboard path
+regardless of display WSS/UDP; audio switches do not select clipboard targets.
+
+Call `resetClipboard()` on an authenticated scope change and disconnect the
+Viewer on logout or runtime replacement. Reconnect resets consent. Disposal
+removes observers and timers. Retired writes can report `clipboard-uncertain`;
+do not automatically replay them. Clipboard payloads are not present in state
+snapshots, counters or UAT exports. Plain UTF-8 up to 64 KiB is the only format;
+HTML, images and files are not enabled. See the
+[requirements and qualification boundaries](native-clipboard-integration.md).

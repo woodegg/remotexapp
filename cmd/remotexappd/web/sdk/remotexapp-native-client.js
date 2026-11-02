@@ -1,4 +1,5 @@
 import { RemoteXAppManager } from './remotexapp-manager.js';
+import { NativeClipboard } from './native-clipboard.js';
 
 export class RemoteXAppNativeError extends Error {
   constructor(code, message, options) {
@@ -58,6 +59,7 @@ export class RemoteXAppNativeClient extends EventTarget {
     this._viewerId = globalThis.crypto?.randomUUID?.() || `viewer-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     this._epoch = 0;
     this._disposed = false;
+    this._clipboardSync = new NativeClipboard(this, code => new RemoteXAppNativeError(code, code));
   }
 
   _state(state, detail = {}) {
@@ -131,11 +133,12 @@ export class RemoteXAppNativeClient extends EventTarget {
       const udp = features.udp === true && prepared.nativeTransport?.available === true;
       const clipboard = prepared.nativeClipboard === 'text' && features.clipboardText === true;
       this.capabilities = Object.freeze({...this.capabilities, keyboardPolicy:features.keyboardPolicy === true,
-        clipboard, udp, clipboardMaxBytes:clipboard ? features.clipboardMaxBytes : 0, statistics:features.statistics === true,
+        clipboard, clipboardAutomatic:clipboard && features.clipboardAutomatic === true, udp, clipboardMaxBytes:clipboard ? features.clipboardMaxBytes : 0, statistics:features.statistics === true,
         latency:features.latency === true && typeof NativeDisplay.prototype.measureLatency === 'function',
         udpLoss:udp && features.udpLoss === true});
       const display = this._display = new NativeDisplay(this.container, socketURL.href, {
         resize:prepared.effectivePolicy?.display?.allowClientResize === true, clipboard, keyboardPolicy:this._keyboardPolicy,
+        prepareClipboardPaste:() => this._clipboardSync.paste(),
         udp:udp && this.preferUDP, protocols:grant ? [`remotexapp-grant.${grant.token}`] : [] });
       display.addEventListener('transportchange', () => {
         if (epoch === this._epoch) this.dispatchEvent(new CustomEvent('transportchange', {detail:this.getStats()}));
@@ -159,8 +162,10 @@ export class RemoteXAppNativeClient extends EventTarget {
         if (epoch !== this._epoch || !this.clipboardEnabled || !clipboard) return;
         const text = event.detail?.text;
         if (typeof text !== 'string' || new TextEncoder().encode(text).length > this.capabilities.clipboardMaxBytes) return;
+        try { this._clipboardSync.valid(text); } catch (_) { return; }
         this._clipboardText = text;
         this._clipboardChanged();
+        this._clipboardSync.offer(text);
       });
       display.addEventListener('keyboardpolicychange', () => {
         if (epoch === this._epoch) this.dispatchEvent(new CustomEvent('keyboardpolicychange', {detail:this.keyboardPolicy}));
@@ -261,8 +266,21 @@ export class RemoteXAppNativeClient extends EventTarget {
     this._keyboardPolicy = structuredClone(settings);
     return {applied};
   }
-  focus() { if (this.state === 'ready') this._display?.focus?.(); }
-  blur() { this._display?.blur?.(); }
+  focus() { if (this.state === 'ready') { this._display?.focus?.(); this._clipboardSync.activate(); } }
+  blur() { this._clipboardSync.deactivate(); this._display?.blur?.(); }
+
+  getClipboardState() { return this._clipboardSync.snapshot(); }
+  async configureClipboard(options) {
+    if (!this.capabilities.clipboard) throw new RemoteXAppNativeError('unsupported', 'Native clipboard is unavailable');
+    const pending = this._clipboardSync.configure(options);
+    this.clipboardEnabled = Object.values(this._clipboardSync.requested).some(mode => mode !== 'off');
+    ++this._clipboardRevision;
+    this._clipboardText = undefined;
+    this._clipboardChanged();
+    return pending;
+  }
+  requestClipboardPermission() { return this._clipboardSync.requestPermission(); }
+  resetClipboard() { this.enableClipboard(false); }
 
   _clipboardChanged() {
     this.dispatchEvent(new CustomEvent('clipboardchange', {detail:{enabled:this.clipboardEnabled,
@@ -270,6 +288,8 @@ export class RemoteXAppNativeClient extends EventTarget {
   }
   enableClipboard(enabled = true) {
     if (enabled && (this.state !== 'ready' || !this.capabilities.clipboard)) throw new RemoteXAppNativeError('unsupported', 'Native text clipboard is unavailable');
+    this._clipboardSync.reset();
+    this._clipboardSync.requested = {toRemote:enabled ? 'manual' : 'off', toLocal:enabled ? 'manual' : 'off'};
     ++this._clipboardRevision;
     this._clipboardBusy = false;
     this.clipboardEnabled = !!enabled;
@@ -287,8 +307,12 @@ export class RemoteXAppNativeClient extends EventTarget {
     const epoch = this._epoch, grant = this._clipboardRevision;
     this._clipboardContext(epoch, grant);
     if (!globalThis.navigator?.userActivation?.isActive) throw new RemoteXAppNativeError('clipboard-gesture', 'Use an explicit clipboard action');
+    const mode = this._clipboardSync.requested[direction === 'download' ? 'toLocal' : 'toRemote'];
+    if (mode === 'off') throw new RemoteXAppNativeError('clipboard-disabled', 'Clipboard direction is off');
+    if (this._clipboardSync.busy) throw new RemoteXAppNativeError('clipboard-busy', 'Automatic clipboard action is pending');
     if (this._clipboardBusy) throw new RemoteXAppNativeError('clipboard-busy', 'Another clipboard action is pending');
     if (direction === 'download' && this._clipboardText === undefined) throw new RemoteXAppNativeError('clipboard-empty', 'Copy text inside the remote App first');
+    this._clipboardSync.retire();
     this._clipboardBusy = true;
     let timer, startedWrite = false;
     const bounded = promise => Promise.race([promise, new Promise((_,reject) => {
@@ -314,7 +338,7 @@ export class RemoteXAppNativeClient extends EventTarget {
       throw new RemoteXAppNativeError(error?.name === 'NotAllowedError' ? 'clipboard-denied' : 'clipboard-unavailable', 'Browser clipboard action failed', {cause:error});
     } finally {
       clearTimeout(timer);
-      if (epoch === this._epoch && grant === this._clipboardRevision) this._clipboardBusy = false;
+      if (epoch === this._epoch && grant === this._clipboardRevision) { this._clipboardBusy = false; this._clipboardSync.manualCompleted(); }
     }
   }
   copyClipboardToRemote() { return this._clipboardAction('upload'); }
@@ -324,6 +348,7 @@ export class RemoteXAppNativeClient extends EventTarget {
   reconnect() { return this.connect(this.instance?.id); }
 
   disconnect() {
+    this._clipboardSync.reset();
     ++this._epoch;
     clearTimeout(this._grantTimer);
     this._grantTimer = null;
@@ -351,6 +376,7 @@ export class RemoteXAppNativeClient extends EventTarget {
   dispose() {
     if (this._disposed) return;
     this.disconnect();
+    this._clipboardSync.dispose();
     this._disposed = true;
     this._state('disposed');
   }

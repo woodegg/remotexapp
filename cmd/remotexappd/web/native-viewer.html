@@ -11,8 +11,10 @@ html,body{margin:0;height:100%;background:#17202c;color:#edf2fa;font:14px system
 <label>Local input shortcuts <select id="keyboard-profile"><option value="unknown">No preset / unknown Linux</option><option value="windows">Windows · Win+Space</option><option value="mac">macOS · Control+Space</option><option value="gnome">Linux GNOME · Super+Space</option><option value="fcitx">Linux Fcitx · Control+Space</option></select></label>
 <span id="keyboard-status" role="status"></span>
 <p><label><input id="clipboard-enable" type="checkbox" disabled>Enable text clipboard actions</label><button id="clipboard-upload" disabled>Local → Remote</button><button id="clipboard-download" disabled>Remote → Local</button><button id="clipboard-clear" disabled>Clear remote clipboard</button><span id="clipboard-status" role="status">Off</span></p>
+<p id="clipboard-modes"><label>Local → Remote <select id="clipboard-to-remote"><option value="off">Off</option><option value="manual">Manual</option><option value="auto">Auto</option></select></label> <label>Remote → Local <select id="clipboard-to-local"><option value="off">Off</option><option value="manual">Manual</option><option value="auto">Auto</option></select></label> <button id="clipboard-permission">Allow automatic clipboard</button></p>
+<output id="clipboard-auto-status" role="status">Off</output>
 <small>Choose the profile for the computer running this browser. OS shortcuts may still require system configuration.</small>
-<small>Clipboard actions transfer plain text, up to 64 KiB. Enable actions, then copy text in the remote App before using Remote → Local. Empty local reads preserve the remote clipboard. Nothing reads or writes your local clipboard in the background.</small>
+<small>Clipboard actions transfer plain text, up to 64 KiB. Enable actions, then copy text in the remote App before using Remote → Local. Empty local reads preserve the remote clipboard. Automatic mode requires explicit opt-in and browser permission. Only the active Viewer synchronizes text. On return, paste with Ctrl+V (Command+V on macOS) or Shift+Insert to submit a fresh local copy. Conflicts require a manual direction choice; reconnect resets consent.</small>
 </details>
 <main id="display"></main>
 <script type="module">
@@ -23,6 +25,15 @@ const { RemoteXAppManager, RemoteXAppNativeClient } = await import(`${baseURL}/s
 const viewer = new RemoteXAppNativeClient({ container:document.querySelector('#display'), manager:new RemoteXAppManager({ baseURL }) });
 // Same-origin hosts may read this snapshot; it exposes no controls or payloads.
 Object.defineProperty(window, 'remoteXAppViewerStats', {value:() => viewer.getStats()});
+Object.defineProperty(window, 'remoteXAppViewerClipboard', {value:Object.freeze({
+  state:() => viewer.getClipboardState(),
+  configure:options => viewer.configureClipboard(options),
+  permission:() => {viewer.focus();return viewer.requestClipboardPermission();},
+  focus:() => viewer.focus(), blur:() => viewer.blur(), reset:() => viewer.resetClipboard(),
+  upload:() => {viewer.focus();return viewer.copyClipboardToRemote();},
+  download:() => {viewer.focus();return viewer.copyClipboardToLocal();},
+  clear:() => {viewer.focus();return viewer.clearRemoteClipboard();}
+})});
 const profile = document.querySelector('#keyboard-profile'), enable = document.querySelector('#clipboard-enable');
 const message = text => { document.querySelector('#clipboard-status').textContent = text; };
 const controls = () => {
@@ -31,6 +42,10 @@ const controls = () => {
   profile.disabled = !ready || !viewer.capabilities.keyboardPolicy;
   enable.disabled = !ready || !viewer.capabilities.clipboard;
   enable.checked = viewer.clipboardEnabled;
+  const clipboard = viewer.getClipboardState();
+  for (const [id,direction] of [['clipboard-to-remote','toRemote'],['clipboard-to-local','toLocal']]) {
+    document.getElementById(id).value=clipboard.requested[direction];document.getElementById(id).disabled=!ready || !viewer.capabilities.clipboard;
+  }
   for (const id of ['clipboard-upload','clipboard-download','clipboard-clear']) document.getElementById(id).disabled = !ready || !viewer.clipboardEnabled;
 };
 viewer.addEventListener('statechange', ({ detail }) => {
@@ -44,6 +59,15 @@ viewer.addEventListener('statechange', ({ detail }) => {
 viewer.addEventListener('clipboardchange', ({detail}) => {
   controls();message(!detail.enabled ? 'Off' : detail.available ? `Remote text available · ${detail.bytes} bytes` : 'Enabled · copy remote text to receive');
 });
+const clipboardState = () => {
+  const s=viewer.getClipboardState();controls();
+  document.querySelector('#clipboard-auto-status').textContent = `${s.active ? 'Active Viewer' : 'Inactive'} · Local → Remote: ${s.requested.toRemote} / ${s.effective.toRemote} · Remote → Local: ${s.requested.toLocal} / ${s.effective.toLocal} · Read: ${s.permissions.read} · Write: ${s.permissions.write} · ${s.phase}`;
+};
+viewer.addEventListener('clipboardstatechange', clipboardState);
+for (const id of ['clipboard-to-remote','clipboard-to-local']) document.getElementById(id).onchange = () => {
+  viewer.configureClipboard({toRemote:document.querySelector('#clipboard-to-remote').value,toLocal:document.querySelector('#clipboard-to-local').value}).then(clipboardState).catch(error=>message(error.code||'Clipboard configuration failed'));
+};
+document.querySelector('#clipboard-permission').onclick=()=>viewer.requestClipboardPermission().then(clipboardState).catch(error=>message(error.code||'Permission unavailable'));
 profile.onchange = () => {
   try { const result=viewer.configureKeyboard({profile:profile.value,mode:'local'});document.querySelector('#keyboard-status').textContent=result.applied ? 'Applied' : 'Release keys to apply'; }
   catch (e) {document.querySelector('#keyboard-status').textContent=e.code || 'Invalid keyboard policy';}

@@ -11,10 +11,12 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-- Record requirements for native bidirectional automatic text clipboard in
-  Issue #50, including independent opt-in directions, active-Viewer routing,
-  permission fallback and integrated UAT. This is documentation only; the
-  current native SDK still requires explicit manual transfer actions.
+- Add experimental native automatic plain-text clipboard with independent
+  direction modes, explicit permission requests, focused-Viewer ownership,
+  conflict detection and lifecycle fencing. Keep default-off and manual APIs;
+  order paste keys after a fresh bounded native clipboard submission. Extend
+  the UAT workbench with controls, state and content-free acceptance records.
+  Exact artifact and consolidated human qualification remain pending in #50.
 
 - Correct Clipman regression tests to distinguish clearing a gateway-owned
   selection from preserving an external owner, including an identical PNG copy.

@@ -4,15 +4,17 @@ import MouseButtonMapper, {XVNC_BUTTONS} from './core/mousebuttonmapper.js';
 import {normalizePolicy} from './core/input/poc-input-policy.mjs';
 import { clipboardBytes } from './core/remotexapp-server-messages.mjs';
 import { LatencyProbe } from './core/remotexapp-latency.mjs';
+import { ClipboardInputGate } from './core/remotexapp-clipboard-input.mjs';
 
 export default class NativeDisplay extends EventTarget {
-  static capabilities = Object.freeze({keyboardPolicy:true, clipboardText:true, clipboardMaxBytes:65536, statistics:true, latency:true, udpLoss:true, udp:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP});
+  static capabilities = Object.freeze({keyboardPolicy:true, clipboardText:true, clipboardAutomatic:true, clipboardMaxBytes:65536, statistics:true, latency:true, udpLoss:true, udp:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP});
   #rfb;
   #input;
   #renderedFrames = 0;
   #udpPaintBaseline = 0;
   #latency;
-  constructor(container, url, { resize = false, keyboardPolicy, clipboard = false, udp = false, protocols = [] } = {}) {
+  #clipboardInput;
+  constructor(container, url, { resize = false, keyboardPolicy, clipboard = false, udp = false, protocols = [], prepareClipboardPaste } = {}) {
     super();
     if (keyboardPolicy) normalizePolicy(keyboardPolicy);
     this.#input = document.createElement('textarea');
@@ -33,6 +35,14 @@ export default class NativeDisplay extends EventTarget {
         return true;
       },
     });
+    this.#clipboardInput = new ClipboardInputGate({send:(...args) => rfb._handleKeyEvent(...args), prepare:prepareClipboardPaste});
+    rfb._keyboard.onkeyevent = (...args) => this.#clipboardInput.key(...args);
+    const cancelKeys = rfb._keyboard.onkeycancel;
+    rfb._keyboard.onkeycancel = codes => {
+      this.#clipboardInput.cancel();
+      cancelKeys?.(codes);
+    };
+    this.#input.addEventListener('blur', () => this.#clipboardInput.cancel());
     rfb._remoteXAppFenceResponse = (payload, flags) => this.#latency.fence(payload, flags);
     rfb.addEventListener('disconnect', () => this.#latency.dispose(), {once:true});
     // Upstream initializes this in its full UI. The standalone adapter owns
@@ -47,7 +57,7 @@ export default class NativeDisplay extends EventTarget {
       this.#udpPaintBaseline = this.#renderedFrames;
       this.dispatchEvent(new Event('transportchange'));
     });
-    // Browser clipboard access belongs to explicit SDK user actions. The native
+    // Browser clipboard access belongs to the SDK consent/focus policy. The native
     // transport never reads/writes navigator.clipboard, on focus or otherwise.
     rfb.clipboardUp = rfb.clipboardDown = clipboard;
     rfb.clipboardSeamless = false;
@@ -97,6 +107,7 @@ export default class NativeDisplay extends EventTarget {
   configureKeyboard(settings) { return this.#rfb._keyboard.inputPolicy.configure(settings); }
   focus() { this.#rfb?.focus(); }
   blur() { this.#rfb?.blur(); }
+  cancelClipboardPaste() { this.#clipboardInput.cancel(); }
   sendClipboardText(text) {
     const data = clipboardBytes(text), rfb = this.#rfb;
     if (!rfb || rfb._rfbConnectionState !== 'connected' || !rfb.clipboardUp) throw new Error('Clipboard transport unavailable');
@@ -105,6 +116,7 @@ export default class NativeDisplay extends EventTarget {
     RFB.messages.sendBinaryClipboard(rfb._sock, [data], ['text/plain']);
   }
   disconnect() {
+    this.#clipboardInput.cancel();
     this.#latency.dispose();
     this.#rfb?.disconnect();
     this.#rfb = null;

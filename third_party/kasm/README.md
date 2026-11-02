@@ -132,3 +132,12 @@ it the server keeps clipboard off. Restarting Manager is not a runtime upgrade.
 Browser clipboard actions require separate per-Viewer consent/user gesture.
 The native kiosk exposes those actions. HTML/PNG/RTF/files are not supported
 by this checkpoint; no passive browser clipboard synchronization is enabled.
+
+The automatic text integration adds `clipboard-input.mjs` and the adapter's
+`prepareClipboardPaste` callback. The bounded input gate holds paste and
+subsequent key events until SDK permission/focus checks and native submission
+finish; retirement releases submitted keys without replay. Browser access
+remains exclusively in SDK policy. The binary native clipboard messages and
+server bounds are unchanged. `clipboardAutomatic` is a distinct capability,
+requiring a newly packaged, qualified immutable component; old components
+remain manual-only. Qualification is tracked in #50 / #54.

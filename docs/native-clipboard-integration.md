@@ -1,8 +1,8 @@
 # Native automatic clipboard integration requirements
 
 Status: requirements selected on 2026-11-01; the owner authorized proceeding
-with requirements review and implementation on 2026-11-02. Implementation and
-qualification remain pending. [Issue #50](https://github.com/woodegg/remotexapp/issues/50)
+with requirements review and implementation on 2026-11-02. Implementation is in progress in [PR #54](https://github.com/woodegg/remotexapp/pull/54);
+qualification remains pending. [Issue #50](https://github.com/woodegg/remotexapp/issues/50)
 tracks this follow-on under the proposed 0.16.0 milestone. This document does
 not enable automatic clipboard access in a current build.
 

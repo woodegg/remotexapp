@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.31.0-dev.4';
+export const SDK_VERSION: '0.31.0-dev.5';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -146,12 +146,19 @@ export type RemoteXAppNativeStats = {
   renderedFrames:number; width:number; height:number;
   controlTransport?:'wss'|'ws-loopback'; udpReceivedBytes?:number;udpPackets?:number;udpRectangles?:number;udpState?:string;udpReason?:string|null;
 });
+export type NativeClipboardMode = 'off'|'manual'|'auto';
+export interface NativeClipboardState {
+  requested:{toRemote:NativeClipboardMode;toLocal:NativeClipboardMode};
+  effective:{toRemote:NativeClipboardMode;toLocal:NativeClipboardMode};
+  permissions:{read:string;write:string}; active:boolean; phase:string;
+  formats:string[]; maxBytes:number; automaticSupported:boolean;
+}
 export class RemoteXAppNativeClient extends EventTarget {
   constructor(options:{container:HTMLElement;manager?:RemoteXAppManager;timeout?:number;keyboardPolicy?:NativeKeyboardPolicy;preferUDP?:boolean});
   readonly state:'disconnected'|'connecting'|'ready'|'failed'|'disposed';
   readonly instance?:RemoteXAppInstance;
   readonly capabilities:{readonly display:'kasm-wss-v1';readonly pointer:true;readonly keyboard:true;
-    readonly clipboard:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly statistics:boolean;readonly programmaticText:false;readonly audio:false;readonly udp:boolean};
+    readonly clipboard:boolean;readonly clipboardAutomatic?:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly statistics:boolean;readonly programmaticText:false;readonly audio:false;readonly udp:boolean};
   readonly keyboardPolicy:NativeKeyboardPolicy|null;
   readonly clipboardEnabled:boolean;
   getStats():RemoteXAppNativeStats;
@@ -160,6 +167,10 @@ export class RemoteXAppNativeClient extends EventTarget {
   focus():void;
   blur():void;
   enableClipboard(enabled?:boolean):void;
+  configureClipboard(options:{toRemote:NativeClipboardMode;toLocal:NativeClipboardMode}):Promise<NativeClipboardState>;
+  getClipboardState():NativeClipboardState;
+  requestClipboardPermission():Promise<NativeClipboardState>;
+  resetClipboard():void;
   copyClipboardToRemote():Promise<{status:'submitted'|'empty-noop'}>;
   copyClipboardToLocal():Promise<{status:'copied-to-local'}>;
   clearRemoteClipboard():Promise<{status:'submitted'}>;

@@ -11,6 +11,13 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Correct Clipman regression tests to distinguish clearing a gateway-owned
+  selection from preserving an external owner, including an identical PNG copy.
+  Document the existing ownership boundary; runtime clearing is unchanged.
+
+- Give the twenty-repeat Go reliability gate an explicit 20-minute package
+  budget; preserve lifecycle deadlines, repeat counts and the hosted job limit.
+
 - Record owner acceptance of the current standalone native audio UAT for
   candidate `7926949` on 2026-11-01. Runtime artifacts are unchanged;
   post-merge qualification and publication remain separate.

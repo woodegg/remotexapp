@@ -5,6 +5,7 @@ BUILD_DATE := $(shell date -u -d '@$(SOURCE_DATE_EPOCH)' +%Y-%m-%dT%H:%M:%SZ)
 LDFLAGS := -s -w -X main.version=$(VERSION) -X main.commit=$(COMMIT) -X main.buildDate=$(BUILD_DATE)
 COVERAGE_DIR ?= dist/coverage
 SOAK_COUNT ?= 20
+SOAK_TIMEOUT ?= 20m
 FUZZ_TIME ?= 10s
 GO_TOOLCHAIN := go1.27.3
 
@@ -87,7 +88,7 @@ coverage-check:
 		cmd/remotexappd/web/sdk/*.test.mjs
 
 soak-check:
-	go test -shuffle=on -count=$(SOAK_COUNT) ./...
+	go test -shuffle=on -count=$(SOAK_COUNT) -timeout=$(SOAK_TIMEOUT) ./...
 	@node_log="$$(mktemp)"; trap 'rm -f "$$node_log"' EXIT; \
 	for iteration in $$(seq 1 $(SOAK_COUNT)); do \
 		if ! node --test cmd/remotexappd/web/sdk/*.test.mjs tests/app-package/*.test.mjs tests/evidence/*.test.mjs apps/*/tests/*.test.mjs >"$$node_log" 2>&1; then \

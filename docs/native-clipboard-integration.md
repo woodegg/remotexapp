@@ -2,11 +2,13 @@
 
 Status: requirements selected on 2026-11-01; the owner authorized proceeding
 with requirements review and implementation on 2026-11-02. Implementation is in progress in [PR #54](https://github.com/woodegg/remotexapp/pull/54);
-qualification remains pending. [Issue #50](https://github.com/woodegg/remotexapp/issues/50)
+the [bounded automated checkpoint](../tests/kasm-native/NATIVE-CLIPBOARD.md) records
+implementation evidence; consolidated physical UAT remains pending.
+[Issue #50](https://github.com/woodegg/remotexapp/issues/50)
 tracks this follow-on under the proposed 0.16.0 milestone. This document does
 not enable automatic clipboard access in a current build.
 
-## Problem and current behavior
+## Problem and pre-integration baseline
 
 A user should be able to opt into copying text between a local application and
 a remote App without pressing a transfer button for every copy/paste operation.
@@ -15,7 +17,7 @@ provides Clipboard Up, Clipboard Down and Clipboard Seamless in supported
 Chromium browsers. That capability is input to this work, not evidence that
 RemoteXApp has integrated or qualified it.
 
-The current native adapter sets `clipboardSeamless = false`. Its patched
+Before this increment, the native adapter sets `clipboardSeamless = false`. Its patched
 receiver emits bounded text events instead of writing directly to the browser
 clipboard. `RemoteXAppNativeClient` requires a focused user gesture for each
 browser transfer. See the [implemented SDK contract](browser-sdk.md#native-inputclipboard-checkpoint-development-sdk-0310-dev2)

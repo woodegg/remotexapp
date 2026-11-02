@@ -1,5 +1,9 @@
 # Native Kasm qualification
 
+The [native automatic clipboard checkpoint](NATIVE-CLIPBOARD.md) records exact
+candidate artifacts, standalone/public browser checks and the remaining
+[consolidated human UAT](NATIVE-CLIPBOARD-UAT.md).
+
 The [UDP loss checkpoint](UDP-LOSS.md) defines the per-Viewer display-block
 estimate, its measurement limits and controlled receive-side loss checks.
 

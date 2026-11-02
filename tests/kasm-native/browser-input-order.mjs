@@ -1,5 +1,6 @@
 // Real input batching in an owned disposable browser and single-App fixture.
 // Coalescing existing RFB messages models a network read, without changing order.
+// Menu observation additionally requires Python Xlib in the owned X11 fixture.
 import assert from 'node:assert/strict';
 import {writeFileSync} from 'node:fs';
 import {config,instance,open,ready,focus,ctrl,key,wait,save,x} from './browser-fixture.mjs';
@@ -29,5 +30,24 @@ try {
  await wait(()=>/Save As/.test(title()));await key(c,'Escape','Escape',27);await wait(()=>!/Save As/.test(title()));
  await focus(c);await ctrl(c,'a','KeyA',65);await ctrl(c,'v','KeyV',86);assert.equal(await save(c),'Batched paste 19');
  results.push({name:'save-as dialog and return preserve editor focus',status:'pass'});
+ const menus=()=>JSON.parse(x(['python3','-c',`import json
+from Xlib import display,X,error
+d=display.Display();atom=d.intern_atom('_NET_WM_WINDOW_TYPE');types=[]
+for w in d.screen().root.query_tree().children:
+ try:
+  if w.get_attributes().map_state!=X.IsViewable:continue
+  p=w.get_full_property(atom,X.AnyPropertyType)
+  if p:types.extend(d.get_atom_name(a) for a in p.value)
+ except error.BadWindow:pass
+print(json.dumps([t for t in types if t.endswith(('POPUP_MENU','DROPDOWN_MENU'))]))`]));
+ const point=await c.evaluate(`(()=>{const r=document.querySelector('canvas').getBoundingClientRect();return {x:r.x+150,y:r.y+180}})()`);
+ for(const type of ['mousePressed','mouseReleased'])await c.call('Input.dispatchMouseEvent',{type,...point,button:'right',clickCount:1});
+ await wait(()=>menus().length>0);writeFileSync(config.evidenceDirectory+'/input-context-menu.png',Buffer.from((await c.call('Page.captureScreenshot')).data,'base64'));
+ await key(c,'Escape','Escape',27);await wait(()=>menus().length===0);assert.equal(await save(c),'Batched paste 19');
+ results.push({name:'real remote context menu opens and dismisses without editing',status:'pass'});
+ await c.call('Input.dispatchKeyEvent',{type:'rawKeyDown',key:'Alt',code:'AltLeft',windowsVirtualKeyCode:18,modifiers:1});
+ await key(c,'f','KeyF',70,1);await c.call('Input.dispatchKeyEvent',{type:'keyUp',key:'Alt',code:'AltLeft',windowsVirtualKeyCode:18});
+ await wait(()=>menus().length>0);await key(c,'Escape','Escape',27);await wait(()=>menus().length===0);assert.equal(await save(c),'Batched paste 19');
+ results.push({name:'keyboard File menu opens and dismisses without editing',status:'pass'});
  completed=true;
-}finally{writeFileSync(config.evidenceDirectory+'/batched-input-results.json',JSON.stringify({status:completed&&results.length===22?'pass':'fail',component:instance.displayComponentDigest,app:instance.driverVersion,cases:results},null,2));await c.evaluate('if(window.inputBatch){if(inputBatch.holding)inputBatch.flush();inputBatch.restore()}remoteXAppViewerClipboard.reset()').catch(()=>{});c.close();await fetch(config.cdpURL+'/json/close/'+c.page.id);}
+}finally{writeFileSync(config.evidenceDirectory+'/batched-input-results.json',JSON.stringify({status:completed&&results.length===24?'pass':'fail',component:instance.displayComponentDigest,app:instance.driverVersion,cases:results},null,2));await c.evaluate('if(window.inputBatch){if(inputBatch.holding)inputBatch.flush();inputBatch.restore()}remoteXAppViewerClipboard.reset()').catch(()=>{});c.close();await fetch(config.cdpURL+'/json/close/'+c.page.id);}

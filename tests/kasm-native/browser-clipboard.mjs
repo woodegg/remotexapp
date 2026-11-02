@@ -62,7 +62,7 @@ try {
  });
  await check('simultaneous local and remote changes require an explicit source choice',async()=>{
   await localWrite(a,'conflict baseline');await modes(a);await enter(a,'remote conflict');
-  await a.evaluate(`window.heldRead=false;const read=navigator.clipboard.readText;navigator.clipboard.readText=()=>{navigator.clipboard.readText=read;heldRead=true;return new Promise(resolve=>resumeRead=()=>clipboardProbe.read().then(resolve))}`);
+  await a.evaluate(`(()=>{window.heldRead=false;const read=navigator.clipboard.readText;navigator.clipboard.readText=()=>{navigator.clipboard.readText=read;heldRead=true;return new Promise(resolve=>resumeRead=()=>clipboardProbe.read().then(resolve))}})()`);
   await wait(()=>a.evaluate('heldRead'));await localWrite(a,'local conflict');await ctrl(a,'a','KeyA',65);await ctrl(a,'c','KeyC',67);await delay(300);await a.evaluate('resumeRead()');await wait(async()=>(await state(a)).phase==='conflict');assert.equal(await localRead(a),'local conflict');assert.equal(remoteRead(),'remote conflict');
   await ctrl(a,'v','KeyV',86);await wait(async()=>await save(a)==='local conflict');
  });
@@ -78,7 +78,7 @@ try {
  });
  await check('delayed read is retired by scope reset and cannot submit later',async()=>{
   await paste(a,'read retirement sentinel');const before=remoteRead();
-  await a.evaluate(`window.heldRead=null;window.resumeRead=null;const read=navigator.clipboard.readText;navigator.clipboard.readText=()=>{navigator.clipboard.readText=read;heldRead=true;return new Promise(resolve=>resumeRead=()=>resolve('retired read'))}`);
+  await a.evaluate(`(()=>{window.heldRead=null;window.resumeRead=null;const read=navigator.clipboard.readText;navigator.clipboard.readText=()=>{navigator.clipboard.readText=read;heldRead=true;return new Promise(resolve=>resumeRead=()=>resolve('retired read'))}})()`);
   await wait(()=>a.evaluate('heldRead'));await a.evaluate('remoteXAppViewerClipboard.reset();resumeRead()');await delay(400);assert.equal(remoteRead(),before);assert.deepEqual((await state(a)).requested,{toRemote:'off',toLocal:'off'});
  });
  await check('disconnect and reconnect require new consent',async()=>{

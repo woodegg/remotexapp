@@ -5115,3 +5115,15 @@ requirements-only work selection; it does not imply feature acceptance,
 publication or actual embedding-host qualification. Preserve the independent
 consent, active-target, native-transport and lifecycle boundaries in
 [native clipboard integration](native-clipboard-integration.md).
+
+## 2026-11-02 — Select native clipboard consent and input ordering
+
+The #50 implementation uses independent off/manual/auto directions, public
+requested/effective state, explicit permission requests and one active Viewer.
+Automatic browser writes check fresh local state for conflicts; activation
+establishes a baseline without replaying inactive remote offers. A bounded native
+paste gate orders a fresh local read/submission before the paste keys and cancels
+stale input on lifecycle retirement. The native text wire remains unchanged;
+upstream browser access is delegated to the SDK policy instead of running two
+clipboard systems. See the [implementation contract](native-clipboard-integration.md).
+This records the implementation decision, not qualification or acceptance.

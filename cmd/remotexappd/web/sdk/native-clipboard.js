@@ -24,6 +24,9 @@ export class NativeClipboard {
       this.listeners.push(() => target?.removeEventListener?.(name, fn));
     };
     listen(client.container, 'focusin', () => this.activate());
+    // Kasm can focus its input before readiness; clicking it again does not
+    // produce focusin. Select on this explicit pointer intent, never connect.
+    listen(client.container, 'pointerdown', () => this.activate());
     listen(client.container, 'focusout', event => {
       if (!client.container.contains?.(event.relatedTarget)) this.deactivate();
     });

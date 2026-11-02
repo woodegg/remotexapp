@@ -131,3 +131,13 @@ test('a real browser denial changes effective mode; fallback leaves native manua
   assert.equal(c.clipboard.snapshot().effective.toRemote,'manual');assert.equal(c.clipboard.paste(),null);
   assert.deepEqual(c.sent,[]);
 });
+
+
+test('clicking an already-focused native input selects it only after readiness',async t=>{
+  const f=fixture(t),c=f.create();c.state='connecting';
+  c.container.dispatchEvent(new Event('focusin'));assert.equal(c.clipboard.snapshot().active,false);
+  c.state='ready';await c.clipboard.configure({toRemote:'auto',toLocal:'auto'});
+  assert.equal(c.clipboard.snapshot().active,false);
+  c.container.dispatchEvent(new Event('pointerdown'));assert.equal(c.clipboard.snapshot().active,true);
+  await c.clipboard.sync();assert.deepEqual(c.sent,[]);
+});

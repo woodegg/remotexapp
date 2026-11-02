@@ -404,8 +404,18 @@ func TestXClipboardBridgeExpiryAndClipmanStaleReplay(t *testing.T) {
 		t.Fatalf("image did not survive offer metadata expiry: bytes=%d err=%v", len(output), err)
 	}
 
+	logOwner := func(stage string) {
+		t.Helper()
+		owner, ownerErr := xproto.GetSelectionOwner(bridge.conn, bridge.atoms.clipboard).Reply()
+		if ownerErr != nil {
+			t.Fatalf("%s owner query: %v", stage, ownerErr)
+		}
+		t.Logf("%s data-owner=%v empty-owner=%v no-owner=%v", stage, owner.Owner == bridge.window, owner.Owner == bridge.emptyWindow, owner.Owner == xproto.WindowNone)
+	}
+	logOwner("before-clear")
 	bridge.Clear()
 	time.Sleep(300 * time.Millisecond)
+	logOwner("after-clear")
 	if output, err := readXClipboard(display, "UTF8_STRING"); len(output) != 0 {
 		t.Fatalf("Clipman replayed stale text after explicit clear: output=%q err=%v", output, err)
 	}

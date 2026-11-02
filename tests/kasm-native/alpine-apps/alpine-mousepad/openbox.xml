@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openbox_config xmlns="http://openbox.org/3.4/rc">
+  <!-- This single-App fixture does not need WM bindings inside its content.
+       Explicitly clear defaults: Openbox otherwise grabs clicks synchronously
+       while keyboard input continues, breaking coalesced click + shortcuts. -->
+  <mouse/>
   <applications>
     <application type="normal">
       <decor>no</decor>

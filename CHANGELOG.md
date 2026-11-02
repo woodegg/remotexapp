@@ -11,6 +11,12 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Make the single-App Alpine Mousepad UAT package explicitly omit Openbox's
+  default content-area mouse bindings (package 1.0.3). A synchronous click grab
+  could leave subsequent batched shortcuts with a stale mouse-button state.
+  Add a real browser batching and dialog-focus regression; existing App pins
+  and the native component remain unchanged.
+
 - Fix the Alpine Mousepad UAT package's Openbox option and require window
   manager readiness before opening the editor. Publish it as package 1.0.2;
   existing pinned Apps retain their package and documents.

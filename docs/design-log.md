@@ -5148,3 +5148,21 @@ the option and checks the window manager before launching the editor. A visible
 unmanaged window must not satisfy the intended maximized-editor fixture setup.
 Install the new immutable package for new test Apps; preserve existing runtime
 pins and documents. This changes the test fixture, not production App packages.
+
+## 2026-11-02 — Avoid synchronous content-click grabs in the single-App fixture
+
+This supplements the preceding window-manager readiness decision. A single
+network batch containing pointer press/release and Ctrl+A exposed a second
+fixture issue: X11 key events retained Button1 despite the browser releasing it.
+Draining the Kasm input queue did not fix it; removing Openbox in an owned
+diagnostic did. Openbox's [content bindings](https://github.com/danakj/openbox/blob/master/openbox/mouse.c)
+use a synchronous pointer grab while its [grab implementation](https://github.com/danakj/openbox/blob/master/openbox/grab.c)
+leaves the keyboard asynchronous. An omitted mouse section inherits bindings.
+
+Alpine Mousepad package 1.0.3 explicitly clears these bindings with `<mouse/>`.
+Its single-App configuration retains window management and new-dialog focus;
+test batched real editor replacement and return from dialogs. Do not add sleeps
+to hide the race, weaken clipboard ownership, or claim this qualifies arbitrary
+desktop window-manager policies. The unsuccessful native patches are excluded;
+Core and the paired Kasm component remain unchanged. Install a new immutable
+App package and preserve existing Apps rather than modifying a pinned package.

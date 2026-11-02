@@ -1,7 +1,8 @@
 # Release pending
 
 Future requirements recorded 2026-09-18. RTC-005/006 remain unselected. AUD-001 is selected for feasibility review in
-the [proposed next train](next-release-train.md), not locked implementation. Promote an
+the [native integration train](next-release-train.md) as historical scope; its
+AUD-002 replacement is implemented in a separate development PR as recorded below. Promote an
 item explicitly into a future train before development and preserve its stable
 ID in [requirements.md](requirements.md). This list does not reclassify other
 historical deferred requirements.
@@ -37,7 +38,13 @@ design decision on 2026-10-25: connect on the first enabled speaker/mic, reuse
 within the scope and release when all are off; silence does not disconnect.
 Its proposed
 replacement scope is recorded in [requirements](requirements.md#proposed-native-architecture--owner-review-pending).
-The remaining choices are not locked implementation requirements.
+[D3 / #45](https://github.com/woodegg/remotexapp/issues/45) now implements the
+replacement in PR #49, using private session domains and shared PCM transport.
+The owner accepted the current standalone audio UAT on 2026-11-01; see the
+[candidate record](https://github.com/woodegg/remotexapp/blob/5c2a5f386e42f4529c206c2ed63e341b483d4830/tests/native-audio/qualification-7926949.md).
+The [original checkpoints](native-audio-integration.md) remain historical design
+context. Actual embedding-host and post-merge release qualification remain open. The historical scope below remains a comparison,
+not a second audio implementation to develop alongside AUD-002.
 
 Integrate shared speaker playback and microphone through one bidirectional
 audio connection per server per client coordination scope. The remote audio

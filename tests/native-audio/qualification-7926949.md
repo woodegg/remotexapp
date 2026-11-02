@@ -1,13 +1,33 @@
 # Native audio candidate qualification
 
 Candidate `792694956ce1c3fd21160797c6a65be0d09a0d4d` implements Core
-`0.16.0-dev.4` / SDK `0.31.0-dev.4`. This record qualifies the opt-in D3 audio
-implementation for one complete physical-device UAT. It does not accept a
-release, a merged commit, production deployment or the downstream embedding host.
+`0.16.0-dev.4` / SDK `0.31.0-dev.4`. Automated evidence below qualified the
+opt-in D3 implementation for physical-device UAT. The owner subsequently reported
+that UAT passed on 2026-11-01. This does not accept a release, a merged commit,
+production deployment or the downstream embedding host.
 The [machine-readable record](qualification-7926949.json) binds the exact
 static AMD64/ARM64 archives, installed page, harnesses and resource samples.
 Private credentials, endpoints, runtime identifiers, recordings and deployment
 logs are excluded.
+
+## Owner UAT acceptance — 2026-11-01
+
+The owner reported “UAT通过” for the current audio PR and requested proceeding
+with the PR workflow. Record this as owner-reported standalone audio acceptance
+for the deployed candidate above. No runtime code or deployed artifact changed
+between the automated handoff and this documentation update.
+
+No per-case export, final device/browser matrix or list of individually tested
+regions accompanied the report. Do not manufacture those observations, mark
+every checklist row passed, or infer broader platform/acoustic coverage. The
+automated measurements and their scope remain unchanged; hearing acceptance
+is not a new latency, underrun or memory measurement. Earlier diagnostic
+observations do not establish a root cause for an intermittent sound report.
+
+The next gates are PR review/merge, exact post-merge candidate qualification and
+any selected release process. Actual embedding-host workflows, longer soaks and
+other unverified topologies retain the limitations below. Automatic clipboard
+requirements in Issue #50 / PR #51 are independent of this audio UAT.
 
 ## Evidence and boundaries
 
@@ -75,8 +95,8 @@ by 4896; playback worklet discards increased by
 264 and microphone worklet discards by
 0. Playback underrun blocks increased by
 31438. These are bounded local scheduling/queue observations, not measured IP
-packet loss or acoustic-quality acceptance. Physical UAT must assess audible
-gaps and delay; the resource gate is not a claim of zero audio discontinuities.
+packet loss or acoustic-quality acceptance. The owner UAT decision above is
+separate; the resource gate does not claim zero audible gaps or zero delay.
 
 ![Two remote audio Apps and persistent per-session controls/statistics](screenshots/audio-uat-7926949.png)
 
@@ -128,6 +148,9 @@ own embedding behavior.
 
 ## One physical end-to-end UAT
 
+This checklist is retained for reproducibility. The owner acceptance above
+does not supply individual results for its rows.
+
 Use a fresh browser tab after closing older UAT tabs so the SharedWorker and
 SDK belong to this candidate. Headphones make playback/mic observations easier.
 
@@ -151,5 +174,6 @@ SDK belong to this candidate. Headphones make playback/mic observations easier.
    browser/OS and action sequence. The page never marks manual cases passed
    automatically.
 
-Only that physical UAT remains for this standalone integration. Merge, formal
-release and actual embedding host integration retain their own acceptance boundaries.
+The owner has accepted the current standalone audio UAT. PR merge, exact
+post-merge qualification, formal release and actual embedding-host integration
+retain their own acceptance boundaries.

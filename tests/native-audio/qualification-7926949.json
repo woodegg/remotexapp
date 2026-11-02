@@ -9,7 +9,7 @@
   },
   "coreVersion": "0.16.0-dev.4",
   "sdkVersion": "0.31.0-dev.4",
-  "status": "functional-and-resource-qualified-awaiting-one-physical-UAT",
+  "status": "functional-and-resource-qualified-owner-standalone-UAT-passed",
   "localPulseBrowser": {
     "schema": 1,
     "scope": "real-pulse-product-sdk-synthetic-chrome",
@@ -933,5 +933,22 @@
     "tests/kasm-native/browser-audio-uat.mjs": "ba757c8a4d988d52433460203e0b1fea36649cd702bac474b5785c6d9f24ec4a",
     "tests/native-audio/app-experiment.py": "1045279e319974cf9c71c6f481cdf023384531911242131e3d9efe43f82e420a",
     "tests/native-audio/domain-experiment.py": "e9d9651bf7fc4f6408d2474e27353c4249f5e28200c8129219e2a79d331106e8"
+  },
+  "humanUAT": {
+    "date": "2026-11-01",
+    "status": "passed-owner-reported",
+    "sourceCommit": "792694956ce1c3fd21160797c6a65be0d09a0d4d",
+    "scope": "current standalone native audio UAT",
+    "basis": "Owner reported UAT passed for the current audio PR in the project conversation.",
+    "perCaseResultsProvided": false,
+    "deviceBrowserRegionMatrixProvided": false,
+    "extendsAutomatedEvidenceScope": false,
+    "changesDeployedArtifacts": false,
+    "remainingGates": [
+      "PR review and merge",
+      "exact post-merge candidate qualification",
+      "release and publication when selected",
+      "actual embedding-host acceptance and other unqualified scopes"
+    ]
   }
 }

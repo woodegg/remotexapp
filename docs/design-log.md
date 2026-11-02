@@ -4981,3 +4981,20 @@ Local queue/underrun counters remain separate from packet loss and acoustic
 acceptance. The owner receives one complete physical end-to-end UAT after these
 automated gates. This does not change the accepted provider default, publish a
 release, qualify a merged commit or accept the actual embedding host adapter.
+
+
+## 2026-11-01 — Owner accepts the standalone audio UAT
+
+The owner reported the current audio UAT passed and requested continuing PR
+#49. [The candidate record](../tests/native-audio/qualification-7926949.md#owner-uat-acceptance--2026-11-01)
+records that human decision for source `7926949`, separately from the existing
+waveform/resource evidence. No runtime code, protocol, dependency or deployed
+artifact changes in this acceptance update. No per-case export or final
+device/browser/region matrix was supplied; those details are not inferred.
+
+This supersedes the preceding qualification entry's pending human-UAT status
+only for the current standalone integration. It does not establish an
+intermittent-sound root cause, broaden measured resource/acoustic guarantees,
+accept an actual embedding host or approve a release. The next gates are
+review/merge and qualification of the exact post-merge candidate. Native
+automatic clipboard requirements in Issue #50 / PR #51 remain independent.

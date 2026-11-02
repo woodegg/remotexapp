@@ -11,6 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Record owner acceptance of the current standalone native audio UAT for
+  candidate `7926949` on 2026-11-01. Runtime artifacts are unchanged;
+  post-merge qualification and publication remain separate.
+
 - Clear an earlier UAT launch error after the audio test App B opens successfully.
 
 - Keep healthy audio routes and their microphone capture active while another

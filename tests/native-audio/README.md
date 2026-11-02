@@ -9,8 +9,10 @@ integration, not separate manual gates for each implementation checkpoint.
 [Candidate 7926949 qualification](qualification-7926949.md) records 36 local real
 Pulse/Chrome cases, 56 UAT fixture checks, three-region AMD64/ARM64 playback and
 App lifecycle checks, 27 live fault checks, six logout checks, the natural
-30-minute resource observation and cleanup. Physical audio UAT and actual embedding host
-embedding remain separate; see the report's scope and queue-counter limits.
+30-minute resource observation and cleanup. The owner reported the current
+standalone audio UAT passed on 2026-11-01; the report records that decision
+separately without inventing per-case/device results. Actual embedding-host
+acceptance remains separate; resource and queue-counter limits still apply.
 
 ## Same-UID routing experiment
 

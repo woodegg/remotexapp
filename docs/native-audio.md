@@ -2,12 +2,13 @@
 
 Development contract for Core `0.16.0-dev.4` / SDK `0.31.0-dev.4`, tracked in
 [Issue #45](https://github.com/woodegg/remotexapp/issues/45) and
-[draft PR #49](https://github.com/woodegg/remotexapp/pull/49). The opt-in standalone
+[PR #49](https://github.com/woodegg/remotexapp/pull/49). The opt-in standalone
 integration is implemented and automatically qualified at
 [immutable candidate 7926949](../tests/native-audio/qualification-7926949.md).
-Three project-owned UATs are ready for the owner’s one complete physical
-end-to-end audio UAT. Acoustic quality and actual embedding host embedding are not accepted
-by the automated result.
+The owner reported the current standalone audio UAT passed on 2026-11-01.
+That human decision is separate from automated measurements; no per-device,
+per-browser or per-region checklist was supplied. Actual embedding-host
+acceptance, post-merge qualification and publication remain separate.
 
 ## Ownership and compatibility
 

@@ -15,7 +15,9 @@ architecture and accepted invariants below still apply.
 The opt-in [native audio contract](native-audio.md) and its
 [exact standalone candidate evidence](../tests/native-audio/qualification-7926949.md)
 cover per-session domains, shared speaker/mic transport, recovery and cleanup.
-They leave physical sound quality and actual embedding-host acceptance pending.
+The owner accepted the current standalone audio UAT on 2026-11-01. That report
+does not extend the recorded device/browser matrix or establish actual
+embedding-host, post-merge candidate or release acceptance.
 
 ## Architecture and ownership
 

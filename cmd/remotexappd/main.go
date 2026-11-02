@@ -69,6 +69,7 @@ func main() {
 	flag.StringVar(&cfg.vncLauncher, "vnc-launcher", "direct", "VNC launcher: direct or wrapper")
 	flag.StringVar(&cfg.displayProvider, "display-provider", "tigervnc", "display provider for new runtimes: tigervnc or kasm")
 	flag.StringVar(&cfg.udpEndpointsFile, "udp-endpoints", "", "deployment-owned IPv4 UDP endpoint catalog (optional; no host mutations)")
+	flag.BoolVar(&cfg.nativeAudio, "native-audio", false, "enable private session audio domains (requires PulseAudio tools and paired SDK)")
 	flag.BoolVar(&cfg.nativeClipboard, "native-clipboard", false, "enable bounded explicit native text clipboard (requires paired text component)")
 	flag.StringVar(&cfg.kasmBundle, "kasm-bundle", "", "immutable Kasm WSS bundle directory (explicit opt-in)")
 	flag.StringVar(&cfg.lifecycleBackend, "lifecycle-backend", "systemd", "component lifecycle backend: systemd or standalone")
@@ -441,6 +442,7 @@ func main() {
 		}
 	case signal := <-signals:
 		stopRecovery()
+		m.closeAudio()
 		log.Printf("received %s; draining HTTP connections", signal)
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 		defer cancel()

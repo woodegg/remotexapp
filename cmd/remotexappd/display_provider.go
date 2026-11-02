@@ -8,9 +8,11 @@ import (
 	"strings"
 
 	"github.com/woodegg/remotexapp/internal/kasmbundle"
+	"github.com/woodegg/remotexapp/internal/sessionaudio"
 )
 
 const nativeManifestSchema = 4
+const nativeAudioManifestSchema = 6
 
 func displayProvider(c runtimeComponents) string {
 	if c.DisplayProvider == "" {
@@ -28,6 +30,9 @@ func (m *manager) newRuntimeComponents() runtimeComponents {
 	if m.cfg.displayProvider == "kasm" {
 		c.DisplayProvider, c.Kasm, c.UnicodeEngine = "kasm", m.cfg.kasmPin, ""
 		c.NativeUDP = m.cfg.nativeUDPCapable
+		if m.cfg.nativeAudio {
+			c.NativeAudio = sessionaudio.Protocol
+		}
 		if m.cfg.nativeClipboard {
 			c.NativeClipboard = "text"
 		}
@@ -43,7 +48,7 @@ func (cfg *config) configureDisplayProvider() error {
 		return errors.New("display-provider must be tigervnc or kasm")
 	}
 	if cfg.displayProvider == "tigervnc" {
-		if cfg.kasmBundle != "" || cfg.nativeClipboard || cfg.udpEndpointsFile != "" {
+		if cfg.kasmBundle != "" || cfg.nativeClipboard || cfg.nativeAudio || cfg.udpEndpointsFile != "" {
 			return errors.New("kasm-bundle requires display-provider=kasm")
 		}
 		return nil
@@ -58,6 +63,11 @@ func (cfg *config) configureDisplayProvider() error {
 	if cfg.nativeClipboard && !supportsNativeText(bundle.Manifest.Protocol) {
 		return errors.New("native clipboard requires the pinned text clipboard component")
 	}
+	if cfg.nativeAudio {
+		if err := sessionaudio.CheckDependencies(); err != nil {
+			return err
+		}
+	}
 	cfg.kasmPin = &bundle.Pin
 	cfg.nativeUDPCapable = bundle.Manifest.Protocol == kasmbundle.UDPProtocol
 	return cfg.loadUDPEndpoints()
@@ -66,13 +76,16 @@ func (cfg *config) configureDisplayProvider() error {
 func validateDisplayComponents(c runtimeComponents, verify bool) error {
 	switch displayProvider(c) {
 	case "tigervnc":
-		if c.Kasm != nil || c.NativeClipboard != "" || c.NativeUDP || c.UDPEndpoint != nil || c.UDPUnavailableReason != "" {
+		if c.Kasm != nil || c.NativeAudio != "" || c.NativeClipboard != "" || c.NativeUDP || c.UDPEndpoint != nil || c.UDPUnavailableReason != "" {
 			return errors.New("TigerVNC cannot carry a Kasm component pin")
 		}
 		if c.UnicodeEngine == "" {
 			return errors.New("TigerVNC requires the Unicode engine")
 		}
 	case "kasm":
+		if c.NativeAudio != "" && c.NativeAudio != sessionaudio.Protocol {
+			return errors.New("invalid native audio protocol")
+		}
 		if !validUDPLease(c.UDPEndpoint) || (!c.NativeUDP && (c.UDPEndpoint != nil || c.UDPUnavailableReason != "")) || (c.UDPEndpoint != nil && c.UDPUnavailableReason != "") || (c.UDPUnavailableReason != "" && c.UDPUnavailableReason != "endpoint-pool-full" && c.UDPUnavailableReason != "endpoints-not-configured") {
 			return errors.New("invalid native UDP snapshot")
 		}

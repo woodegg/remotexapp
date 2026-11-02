@@ -16,6 +16,45 @@ implementation; move them to a version section when publishing a release.
   permission fallback and integrated UAT. This is documentation only; the
   current native SDK still requires explicit manual transfer actions.
 
+- Correct Clipman regression tests to distinguish clearing a gateway-owned
+  selection from preserving an external owner, including an identical PNG copy.
+  Document the existing ownership boundary; runtime clearing is unchanged.
+
+- Give the twenty-repeat Go reliability gate an explicit 20-minute package
+  budget; preserve lifecycle deadlines, repeat counts and the hosted job limit.
+
+- Record owner acceptance of the current standalone native audio UAT for
+  candidate `7926949` on 2026-11-01. Runtime artifacts are unchanged;
+  post-merge qualification and publication remain separate.
+
+- Clear an earlier UAT launch error after the audio test App B opens successfully.
+
+- Keep healthy audio routes and their microphone capture active while another
+  App’s private audio domain is temporarily unavailable. Authentication failure
+  still retires the entire shared channel.
+
+- Allocate bounded playback credits per enabled audio speaker so multiplexed
+  bursts do not compete for one stream’s allowance. Keep measured UAT audio
+  bandwidth visible across worklet updates that carry unchanged counters.
+
+- Release the shared audio connection when the server retires the final active
+  App, including vacancy shutdown; other Apps retain their audio routes.
+
+
+- Develop opt-in native session audio: private Pulse domains, generation-bound
+  audio authorization, one scoped WSS, per-session speaker/microphone controls
+  and cross-tab SDK coordination. Default audio is off. PCM16 48 kHz needs
+  external PulseAudio tools; Core remains statically buildable. Integration
+  qualification and physical end-to-end UAT are tracked in #45/#49. Device loss
+  during a pending route acknowledgment revokes that microphone writer without
+  stopping other audio or silently reopening capture. Detect lost audio workers,
+  refresh authorization on reconnect and expose explicit audio-controller recovery.
+
+- Extend the native UAT workbench with bounded local speaker/microphone checks,
+  same/different-runtime comparison and an exportable audio acceptance checklist.
+  Remote controls reflect actual subscriptions; exported manual cases remain
+  untested until the tester records an observation.
+
 - Redesign the native UAT workbench with persistent per-Viewer statistics,
   focus/comparison layouts, fullscreen diagnostics and collapsible input tools.
 
@@ -59,7 +98,7 @@ implementation; move them to a version section when publishing a release.
   multiple Viewers do not receive JPEG payloads with stale lengths; add applied
   source cache tests with address, undefined-behavior and leak checks.
 
-Target: `0.16.0-dev.3`. Development only.
+Target: `0.16.0-dev.4`. Development only.
 
 Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
 remains the default. D1 is recorded in Issue #30; Issue #32 tracks the first

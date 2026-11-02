@@ -1,0 +1,76 @@
+{
+  "apiVersion": "remotexapp/v1",
+  "id": "alpine-audio-test",
+  "name": "RemoteXApp audio integration test",
+  "driverVersion": "1.0.1",
+  "singleton": false,
+  "profileRef": "default",
+  "runMode": "isolated",
+  "ports": {},
+  "parameters": {},
+  "driver": {
+    "config": {}
+  },
+  "overrides": {
+    "allowed": [
+      "geometry",
+      "frameRate",
+      "allowClientResize"
+    ]
+  },
+  "dependencies": {
+    "executables": [
+      "openbox",
+      "pacat",
+      "parec",
+      "seq",
+      "sleep",
+      "xdotool"
+    ],
+    "pythonModules": []
+  },
+  "server": {
+    "activation": "on-demand",
+    "driver": "server.sh",
+    "displayMode": "dynamic",
+    "display": 0,
+    "rfbPort": 0,
+    "gatewayPort": 0,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 10,
+    "allowClientResize": true,
+    "readinessPids": [
+      "server.pid"
+    ],
+    "readinessTimeout": "10s"
+  },
+  "session": {
+    "services": "core-v1",
+    "activation": "immediate",
+    "driver": "session.sh",
+    "shutdownDriver": "shutdown.sh",
+    "readinessPid": "audio-test.pid",
+    "readinessTimeout": "20s",
+    "vacantTimeout": "60s",
+    "vacantAction": "stop-instance",
+    "status": {
+      "mode": "driver",
+      "details": {
+        "application": {
+          "type": "enum",
+          "values": [
+            "audio-test"
+          ]
+        }
+      }
+    }
+  },
+  "input": {
+    "backend": "ibus",
+    "lifecycle": "session",
+    "allowedWmClasses": [
+      "RemoteXAppAudioTest"
+    ]
+  }
+}

@@ -14,26 +14,153 @@
 @media(max-height:760px) and (min-width:1001px){body{grid-template-rows:58px minmax(0,1fr) 27px}.workbench{padding:10px 16px;gap:12px}.main-pane,.connections,.connection-cards{gap:8px}.connection-card{padding:10px}.protocol-row{margin:8px 0}.stat-grid{gap:8px;padding-top:8px}.stat-grid dd{font-size:14px;margin-top:2px}.connection-detail{margin-top:5px}.counter-details{margin-top:5px;padding-top:5px}.stats-help{padding:8px}}
 @media(max-width:1000px){.workbench{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(180px,1fr) minmax(220px,34%);gap:12px;padding:12px}.connections{gap:6px;overflow:hidden}.connection-heading{min-height:24px}.connection-cards{display:grid;grid-template-columns:1fr 1fr;overflow:auto;gap:10px;min-height:0}.connection-card{padding:10px}.stats-help{display:none}.topbar{padding:0 16px}.launch-label{display:none}.badge{display:none}.statusbar{padding:0 12px}.statusbar .hint{display:none}.stat-grid{gap:8px}.stat-grid dd{font-size:14px}.protocol-row{margin:8px 0}.input-tools{max-height:50%}}
 @media(max-width:600px){body{grid-template-rows:90px minmax(0,1fr) 27px}.topbar{align-items:flex-start;flex-direction:column;justify-content:center;gap:7px;padding:8px 12px}.brand{gap:8px}.brand-mark{width:27px;height:27px;border-radius:7px}.brand h1{font-size:15px}.brand small{display:none}.launch-actions{align-self:stretch;gap:6px}.launch-actions button{flex:1;font-size:11px;padding:5px 8px}.workbench{padding:8px;gap:8px;grid-template-rows:minmax(170px,1fr) minmax(190px,34%)}.workspace-toolbar{gap:5px;min-height:31px}.segmented button{padding:4px 8px;font-size:11px}.toolbar-actions button{padding:6px}.toolbar-actions .button-label{display:none}.main-pane{gap:7px}.viewer-heading{padding:7px 9px;min-height:36px}.viewer-heading small{display:none}.viewer-tools{gap:4px;padding:4px}.viewer-tools small{display:none}.stats-tabs{display:inline-flex}.stats-tabs button{padding:2px 8px}.connection-heading h2{font-size:12px}.connection-cards{grid-template-columns:1fr}.connections[data-selected=a] #connection-b,.connections[data-selected=b] #connection-a{display:none}.connection-card{padding:9px}.connection-card header{display:none}.protocol-row{margin:0 0 7px}.stat-grid{padding-top:7px;gap:7px 12px}.stat-grid dd{font-size:15px}.connection-detail{margin-top:5px}.input-body{grid-template-columns:minmax(0,1fr)}.input-buttons{flex-direction:row}.input-tools p{display:none}.workbench:fullscreen{padding:8px}}
+
+.audio-tools{flex:none;max-height:min(43%,max(80px,calc(100% - 300px)));overflow:auto;border:1px solid #36576a;border-radius:9px;padding:12px;background:var(--surface);scrollbar-width:thin;font-size:12px}.audio-tools h2{font-size:14px}.audio-tools h3{font-size:12px;margin-bottom:6px}.audio-title,.audio-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.audio-title{justify-content:space-between;margin-bottom:8px}.audio-tools p{color:var(--muted);margin:6px 0;line-height:1.55}.audio-tools button{font-size:11px;padding:6px 9px}.audio-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.audio-card{padding:10px;border:1px solid var(--line);border-radius:7px;min-width:0}.audio-card output{display:block;margin:7px 0;color:#b5d9eb;overflow-wrap:anywhere}.audio-blocked{color:#f4ce82;font-size:11px}.audio-tools meter{width:100%;height:16px}.audio-tools table{width:100%;border-collapse:collapse;font-size:11px}.audio-tools td,.audio-tools th{padding:7px 4px;text-align:left;border-bottom:1px solid var(--line)}.audio-tools td:last-child{white-space:nowrap;color:#f4ce82}.audio-tools details>summary{cursor:pointer;color:#b9cce1}.audio-tools pre{margin:6px 0}.audio-tools .local-boundary{color:#b9cce1}.audio-tools button:disabled{cursor:default}.audio-tools label{display:block;color:var(--muted)}
+@media(min-width:601px) and (max-width:1000px){.workbench.audio-open{grid-template-columns:minmax(0,1fr) 280px;grid-template-rows:minmax(0,1fr)}.audio-open .connections{overflow:auto}.audio-open .connection-cards{display:flex;flex-direction:column;overflow:visible}.audio-open .connection-card{flex:none}.audio-open .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.audio-tools{padding:8px}.audio-grid{grid-template-columns:1fr}.audio-tools h2{font-size:12px}#toggle-audio{padding:5px;font-size:11px}}
+.audio-link-summary{font-size:11px;color:#9ddfcf;padding:7px 10px;background:#132b2c;border:1px solid #2b4b4c;border-radius:7px;flex:none}.remote-audio-controls{margin-top:10px;border-top:1px solid var(--line);padding-top:9px}.remote-audio-controls .audio-actions{gap:5px}.remote-audio-controls button{padding:5px 7px;font-size:10px}.remote-audio-controls button[aria-pressed=true]{border-color:#78d3bd;background:#1e4840;color:#b2ffe9}.remote-audio-controls output{display:block;font-size:10px;color:var(--muted);margin-top:6px;overflow-wrap:anywhere}.remote-audio-controls meter{width:100%;height:10px}.audio-tools select{background:#172537;color:#d6e2f2;border:1px solid var(--line);border-radius:4px;padding:4px}
 </style>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg"><symbol id="icon-window" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01M8 13l-2 2 2 2m8-4 2 2-2 2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol><symbol id="icon-expand" viewBox="0 0 24 24"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol><symbol id="icon-input" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7 10h.01M12 10h.01M17 10h.01M7 14h.01M11 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol></svg>
 <header class="topbar"><div class="brand"><span class="brand-mark"><svg aria-hidden="true"><use href="#icon-window"/></svg></span><div><h1>RemoteXApp</h1><small>Remote application workbench</small></div><span class="badge">UAT 工作台</span></div><div class="launch-actions"><span class="launch-label">开始测试</span><button id="launch-mousepad"><svg aria-hidden="true"><use href="#icon-input"/></svg>打开 Mousepad</button><button id="launch-desktop" class="primary"><svg aria-hidden="true"><use href="#icon-window"/></svg>打开测试桌面</button></div></header>
 <main class="workbench" id="workbench">
 <section class="main-pane" aria-label="远程应用测试窗口">
-<div class="workspace-toolbar"><div class="segmented" role="group" aria-label="窗口布局"><button data-layout="a" aria-pressed="true" title="聚焦 Viewer A">聚焦 A</button><button data-layout="b" aria-pressed="false" title="聚焦 Viewer B">聚焦 B</button><button data-layout="split" aria-pressed="false" title="并排查看两个 Viewer">双窗口</button></div><div class="toolbar-actions"><button id="toggle-tools" class="quiet" aria-expanded="false" aria-controls="input-tools" title="输入与剪贴板测试"><svg aria-hidden="true"><use href="#icon-input"/></svg><span class="button-label">输入测试</span></button><button id="fullscreen" class="quiet" title="全屏工作台，保留连接统计"><svg aria-hidden="true"><use href="#icon-expand"/></svg><span class="button-label">全屏工作台</span></button></div></div>
+<div class="workspace-toolbar"><div class="segmented" role="group" aria-label="窗口布局"><button data-layout="a" aria-pressed="true" title="聚焦 Viewer A">聚焦 A</button><button data-layout="b" aria-pressed="false" title="聚焦 Viewer B">聚焦 B</button><button data-layout="split" aria-pressed="false" title="并排查看两个 Viewer">双窗口</button></div><div class="toolbar-actions"><button id="toggle-tools" class="quiet" aria-expanded="false" aria-controls="input-tools" title="输入与剪贴板测试"><svg aria-hidden="true"><use href="#icon-input"/></svg><span class="button-label">输入测试</span></button><button id="toggle-audio" class="quiet" aria-expanded="false" aria-controls="audio-tools" title="音频测试 · Audio tests">音频</button><button id="fullscreen" class="quiet" title="全屏工作台，保留连接统计"><svg aria-hidden="true"><use href="#icon-expand"/></svg><span class="button-label">全屏工作台</span></button></div></div>
 <div id="views" data-layout="a">
 <section class="viewer-panel viewer-a" data-viewer="a"><header class="viewer-heading"><span class="viewer-letter">A</span><h2>Viewer A</h2><small>独立连接</small><a id="open-a" target="_blank" rel="noopener" aria-disabled="true" title="在独立窗口打开 Viewer A">独立打开 ↗</a></header><div id="slot-a" class="slot"><div class="empty-view"><svg aria-hidden="true"><use href="#icon-window"/></svg><strong>你的远程应用，从这里开始</strong><p>打开测试桌面或 Mousepad。操作画面时，连接指标始终在旁边。</p></div></div><footer class="viewer-tools"><small>Viewer controls</small><button id="toggle-a">隐藏 / 显示</button><button id="dispose-a">关闭 A</button><button id="recreate-a">重新打开 A</button></footer></section>
-<section class="viewer-panel viewer-b" data-viewer="b" data-out-of-view="true" inert aria-hidden="true"><header class="viewer-heading"><span class="viewer-letter">B</span><h2>Viewer B</h2><small>同一个 App · 独立连接</small><a id="open-b" target="_blank" rel="noopener" aria-disabled="true" title="在独立窗口打开 Viewer B">独立打开 ↗</a></header><div id="slot-b" class="slot"><div class="empty-view"><svg aria-hidden="true"><use href="#icon-window"/></svg><strong>第二个观察视角</strong><p>同一个应用，另一条独立连接。切换双窗口可对照测试。</p></div></div><footer class="viewer-tools"><small>Viewer controls</small><button id="toggle-b">隐藏 / 显示</button><button id="dispose-b">关闭 B</button><button id="recreate-b">重新打开 B</button></footer></section>
+<section class="viewer-panel viewer-b" data-viewer="b" data-out-of-view="true" inert aria-hidden="true"><header class="viewer-heading"><span class="viewer-letter">B</span><h2>Viewer B</h2><small id="viewer-b-relation">尚未打开</small><a id="open-b" target="_blank" rel="noopener" aria-disabled="true" title="在独立窗口打开 Viewer B">独立打开 ↗</a></header><div id="slot-b" class="slot"><div class="empty-view"><svg aria-hidden="true"><use href="#icon-window"/></svg><strong>第二个观察视角</strong><p>同一个应用，另一条独立连接。切换双窗口可对照测试。</p></div></div><footer class="viewer-tools"><small>Viewer controls</small><button id="toggle-b">隐藏 / 显示</button><button id="dispose-b">关闭 B</button><button id="recreate-b">重新打开 B</button></footer></section>
 </div>
 <section id="input-tools" class="input-tools" hidden aria-label="本机输入与剪贴板测试"><h2><label for="local-text">本机输入区 <small>· Local input</small></label></h2><div class="input-body"><textarea id="local-text" placeholder="在这里输入中文或英文，再回到远程窗口，测试输入法切换…"></textarea><div class="input-buttons"><button id="local-copy">复制本机文本</button><button id="local-read">读取本机剪贴板</button></div></div><p>远程窗口内展开 Keyboard and clipboard，选择本机输入法快捷键并开启文本剪贴板。Local → Remote 后在应用内粘贴；Remote → Local 前先在应用内复制。</p><details><summary>测试版本与会话信息</summary><pre id="identity"></pre></details></section>
+<section id="audio-tools" class="audio-tools" hidden aria-labelledby="audio-title">
+  <div class="audio-title"><h2 id="audio-title">音频测试 <small>Audio test bench</small></h2><button id="audio-export">导出测试记录 · JSON</button></div>
+  <p class="local-boundary">先检查本机设备，再验证远程声路。本机检查与远程集成分开记录；连接正常不代表你已经听到声音。远程开关在右侧统计卡片中。</p>
+  <div class="audio-actions"><button id="audio-same" disabled>B → 与 A 同会话</button><button id="audio-separate" disabled>B → 测试桌面</button><span id="audio-topology" role="status">尚未打开会话</span></div>
+  <p>先打开 Mousepad，再将 B 切到测试桌面，可对照两会话。此操作只替换 B 的 Viewer；关闭 Viewer 不等于停止 App。</p>
+  <details><summary>会话身份 · Runtime identity</summary><pre id="audio-identities">尚未打开会话</pre></details>
+  <div class="audio-grid">
+    <section class="audio-card"><h3>1 · 本机扬声器 / Local speaker</h3><div class="audio-actions"><button id="audio-tone">播放 1 秒测试音</button><button id="audio-tone-stop" disabled>停止</button></div><output id="audio-tone-status" role="status">未测试；需要人工确认听见声音</output><div class="audio-actions"><button id="audio-heard" disabled>听到了</button><button id="audio-not-heard" disabled>没听到</button></div></section>
+    <section class="audio-card"><h3>2 · 本机麦克风 / Local microphone</h3><div class="audio-actions"><button id="audio-mic">检查麦克风 · 最长 30 秒</button><button id="audio-mic-stop" disabled>停止 / 取消</button></div><output id="audio-mic-status" role="status">未测试；点击后请求浏览器权限</output><label for="audio-level">实时电平 · Local input level</label><meter id="audio-level" min="0" max="1" value="0"></meter><p>仅在本机分析电平，不录制、不上传、不回放。关闭面板或离开此页面会停止检查。</p></section>
+  </div>
+  <h3>3 · 远程音频 / Remote audio <span class="audio-blocked" id="remote-audio-availability">正在检查服务 · Checking service</span></h3>
+  <p>同一会话多 Tab 共用开关；一个播放者、一个麦克风采集源。隐藏画面或关闭 Viewer 会保留明确持有的音频引用；「释放音频」才释放该引用。麦克风发送到所有明确开启的目标，不跟随焦点。</p>
+  <div class="audio-actions"><button id="launch-audio-a" disabled>打开音频测试 A</button><button id="launch-audio-b" disabled>B → 新音频测试</button><button id="audio-open-tab" disabled>同会话新 Tab ↗</button><button id="audio-reconnect" disabled>重新连接音频</button><button id="audio-logout" disabled>关闭本次登录的全部音频</button></div>
+  <p>在远程 Audio test 窗口点击 Play tone 听音，点击 Record 3 seconds 测试远程麦克风，再点击 Replay 听回传。录音仅留在该测试 App 内存中，关闭即清除。</p>
+  <table aria-label="待验证的远程音频用例"><thead><tr><th>验证项目 · Acceptance case</th><th>状态</th></tr></thead><tbody id="audio-cases"></tbody></table>
 </section>
-<aside class="connections" data-selected="a" aria-labelledby="connections-title"><div class="connection-heading"><div class="live-label"><span class="live-dot" aria-hidden="true"></span><h2 id="connections-title">实时统计 <small>Live stats</small></h2></div><div class="segmented stats-tabs" role="group" aria-label="选择统计连接"><button data-stats="a" aria-pressed="true">A</button><button data-stats="b" aria-pressed="false">B</button></div><span id="connection-summary" role="status">已连接 0 / 2</span></div><div class="connection-cards"><article id="connection-a" class="connection-card" data-state="idle"></article><article id="connection-b" class="connection-card viewer-b" data-state="idle"></article></div><details class="stats-help"><summary>这些指标代表什么？</summary><p>每个 Viewer 独立统计，每秒更新。下行／上行是有效载荷速率，不含 TLS/DTLS/IP 开销。FPS 为实际画面更新，静止时可为 0。页面隐藏时暂停采样。</p><p>UDP ping 是当前 ICE/STUN 往返延迟；WebSocket ping 是经边缘网关到 Kasm 的 Fence 回声 RTT。每 5 秒采样，两者均不是 ICMP ping 或画面响应时间。</p><p>UDP 丢失率是近 10 秒的画面块估算，括号为丢失块 / 已判定总块。等待 2 秒仍不完整计为丢失；它不是 IP 包丢包率，也无法判断首个样本前或末尾完全未收到的块。无新样本时不显示百分比。</p></details></aside>
+
+</section>
+<aside class="connections" data-selected="a" aria-labelledby="connections-title"><div class="connection-heading"><div class="live-label"><span class="live-dot" aria-hidden="true"></span><h2 id="connections-title">实时统计 <small>Live stats</small></h2></div><div class="segmented stats-tabs" role="group" aria-label="选择统计连接"><button data-stats="a" aria-pressed="true">A</button><button data-stats="b" aria-pressed="false">B</button></div><span id="connection-summary" role="status">已连接 0 / 2</span></div><div id="audio-link-summary" class="audio-link-summary" role="status" title="音频协议负载，含 PCM 帧头，不含 WebSocket/TLS/IP 开销；显示最近有效采样。">音频 · 尚未建立连接</div><div class="connection-cards"><article id="connection-a" class="connection-card" data-state="idle"></article><article id="connection-b" class="connection-card viewer-b" data-state="idle"></article></div><details class="stats-help"><summary>这些指标代表什么？</summary><p>每个 Viewer 独立统计，每秒更新。下行／上行是有效载荷速率，不含 TLS/DTLS/IP 开销。FPS 为实际画面更新，静止时可为 0。页面隐藏时暂停采样。</p><p>UDP ping 是当前 ICE/STUN 往返延迟；WebSocket ping 是经边缘网关到 Kasm 的 Fence 回声 RTT。每 5 秒采样，两者均不是 ICMP ping 或画面响应时间。</p><p>UDP 丢失率是近 10 秒的画面块估算，括号为丢失块 / 已判定总块。等待 2 秒仍不完整计为丢失；它不是 IP 包丢包率，也无法判断首个样本前或末尾完全未收到的块。无新样本时不显示百分比。</p></details></aside>
 </main>
 <footer class="statusbar"><span id="status" role="status">加载测试配置…</span><span class="hint"><span>●</span> 独立测试环境 · Native SDK UAT</span></footer>
+<script id="audio-probe">
+// Fixture-only local device probe. No SDK audio capability, remote route or media upload.
+class RemoteXAppLocalAudioProbe {
+  constructor(env = globalThis, changed = () => {}) {
+    this.env = env;
+    this.changed = changed;
+    this.job = null;
+  }
+  supported(kind) {
+    return !!(this.env.isSecureContext && this.env.AudioContext &&
+      (kind === 'tone' || this.env.navigator?.mediaDevices?.getUserMedia));
+  }
+  report(job, phase, reason = '') {
+    this.changed({kind: job.kind, phase, reason, level: job.level || 0, peak: job.peak || 0});
+  }
+  stop(reason = 'stopped') {
+    const job = this.job;
+    if (!job) return;
+    this.job = null; // Fence late permission/resume callbacks before releasing anything.
+    this.env.clearTimeout(job.timer);
+    this.env.cancelAnimationFrame(job.raf);
+    for (const track of job.stream?.getTracks() || []) { track.onended = null; track.stop(); }
+    try { job.oscillator?.stop(); } catch {}
+    for (const node of job.nodes || []) { try { node.disconnect(); } catch {} }
+    try { Promise.resolve(job.context?.close()).catch(() => {}); } catch {}
+    job.level = 0;
+    this.report(job, reason === 'completed' ? 'completed' : 'stopped', reason);
+  }
+  begin(kind) {
+    this.stop('replaced');
+    const job = {kind, nodes: [], level: 0, peak: 0};
+    if (!this.supported(kind)) { this.report(job, 'unavailable'); return null; }
+    this.job = job;
+    this.report(job, 'requesting');
+    job.timer = this.env.setTimeout(() => this.job === job && this.stop('request-timeout'), 15000);
+    return job;
+  }
+  fail(job, error) {
+    if (this.job !== job) return;
+    this.stop('failed');
+    this.report(job, error?.name === 'NotAllowedError' ? 'denied' : 'failed');
+  }
+  async tone() {
+    const job = this.begin('tone');
+    if (!job) return;
+    try {
+      job.context = new this.env.AudioContext();
+      await job.context.resume();
+      if (this.job !== job) return;
+      if (job.context.state !== 'running') throw Error('audio suspended');
+      this.env.clearTimeout(job.timer);
+      const ctx = job.context, osc = ctx.createOscillator(), gain = ctx.createGain();
+      job.oscillator = osc; job.nodes = [osc, gain];
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      osc.frequency.setValueAtTime(660, ctx.currentTime + .5);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(.05, ctx.currentTime + .02);
+      gain.gain.setValueAtTime(.05, ctx.currentTime + .95);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + 1);
+      this.report(job, 'playing');
+      job.timer = this.env.setTimeout(() => this.job === job && this.stop('completed'), 1100);
+    } catch (error) { this.fail(job, error); }
+  }
+  async microphone() {
+    const job = this.begin('mic');
+    if (!job) return;
+    try {
+      job.context = new this.env.AudioContext();
+      const resumed = job.context.resume(); // Resume in the original user gesture.
+      resumed.catch(() => {});
+      const stream = await this.env.navigator.mediaDevices.getUserMedia({audio: true, video: false});
+      if (this.job !== job) { for (const track of stream.getTracks()) track.stop(); return; }
+      job.stream = stream;
+      for (const track of stream.getTracks()) track.onended = () => this.job === job && this.stop('device-lost');
+      await resumed;
+      if (this.job !== job) return;
+      if (job.context.state !== 'running' || !stream.getAudioTracks().some(t => t.readyState === 'live')) throw Error('device unavailable');
+      this.env.clearTimeout(job.timer);
+      const ctx = job.context, source = ctx.createMediaStreamSource(stream), analyser = ctx.createAnalyser(), mute = ctx.createGain();
+      analyser.fftSize = 1024; mute.gain.value = 0;
+      job.nodes = [source, analyser, mute];
+      source.connect(analyser); analyser.connect(mute); mute.connect(ctx.destination);
+      const samples = new Float32Array(analyser.fftSize);
+      const tick = () => {
+        if (this.job !== job) return;
+        analyser.getFloatTimeDomainData(samples);
+        job.level = Math.min(1, Math.sqrt(samples.reduce((sum, n) => sum + n * n, 0) / samples.length));
+        job.peak = Math.max(job.peak, job.level);
+        this.report(job, 'listening');
+        job.raf = this.env.requestAnimationFrame(tick);
+      };
+      tick();
+      job.timer = this.env.setTimeout(() => this.job === job && this.stop('completed'), 30000);
+    } catch (error) { this.fail(job, error); }
+  }
+}
+globalThis.RemoteXAppLocalAudioProbe = RemoteXAppLocalAudioProbe;
+</script>
 <script type="module">
 
 let current,config;
 const status=text=>{document.querySelector('#status').textContent=text;};
 const views=new Map();
+const targets=new Map();
+let remoteAudio=null,remoteAudioError='',remoteAudioInitializing=false,remoteAudioSnapshot={connection:'idle',routes:[]};
+const audioInterests=new Map(),audioBindingEpoch=new Map(),remoteResults=new Map();
+let audioPrevious=null,audioRates=null;
+let selectionEpoch=0, selectionBusy=false;
 let statsTimer;
 const fields={protocol:'协议 · Protocol',down:'下行 · Download',up:'上行 · Upload',udpPing:'UDP ping · ICE RTT',wssPing:'WebSocket ping · RTT',udpLoss:'UDP 丢失率 · 块估算',fps:'渲染 FPS',resolution:'分辨率',uptime:'连接时长',received:'累计接收',sent:'累计发送',buffered:'待发送数据',wss:'WSS 累计接收',udp:'UDP 累计接收'};
 const essential=['udpPing','wssPing','udpLoss','down','up','fps'];
@@ -41,7 +168,7 @@ const captions={udpPing:'UDP ping · ICE',wssPing:'WSS ping · RTT',udpLoss:'UDP
 for(const slot of ['a','b']){
   const card=document.querySelector('#connection-'+slot);
   const cell=(key,label)=>`<div><dt>${label}</dt><dd data-stat="${key}" class="${key==='udpLoss'?'loss-value':''}">—</dd></div>`;
-  card.innerHTML=`<header><strong><span class="viewer-letter">${slot.toUpperCase()}</span>Viewer ${slot.toUpperCase()}</strong><span class="connection-state" role="status">未打开</span></header><div class="protocol-row"><span class="protocol-badge" data-stat="protocol">—</span><span data-stat="resolution">—</span><span data-stat="uptime">—</span></div><dl class="stat-grid">${essential.map(key=>cell(key,captions[key])).join('')}</dl><small class="connection-detail">尚未打开应用</small><details class="counter-details"><summary>累计流量与队列 · Counters</summary><dl class="stat-grid">${['received','sent','wss','udp','buffered'].map(key=>cell(key,fields[key])).join('')}</dl></details>`;
+  card.innerHTML=`<header><strong><span class="viewer-letter">${slot.toUpperCase()}</span>Viewer ${slot.toUpperCase()}</strong><span class="connection-state" role="status">未打开</span></header><div class="protocol-row"><span class="protocol-badge" data-stat="protocol">—</span><span data-stat="resolution">—</span><span data-stat="uptime">—</span></div><dl class="stat-grid">${essential.map(key=>cell(key,captions[key])).join('')}</dl><small class="connection-detail">尚未打开应用</small><details class="counter-details"><summary>累计流量与队列 · Counters</summary><dl class="stat-grid">${['received','sent','wss','udp','buffered'].map(key=>cell(key,fields[key])).join('')}</dl></details><section class="remote-audio-controls"><div class="audio-actions"><button id="speaker-${slot}" disabled aria-pressed="false">Speaker 关闭</button><button id="microphone-${slot}" disabled aria-pressed="false">Mic 关闭</button><button id="takeover-${slot}" disabled title="显式接管此会话的麦克风">接管 Mic</button><button id="release-audio-${slot}" disabled>释放音频</button></div><output id="audio-state-${slot}">等待可用音频会话</output><meter id="remote-mic-${slot}" min="0" max="1" value="0" aria-label="本机采集电平"></meter></section>`;
 }
 function selectStats(slot){
   document.querySelector('.connections').dataset.selected=slot;
@@ -58,10 +185,17 @@ function layout(mode){
 }
 for(const button of document.querySelectorAll('button[data-layout]'))button.onclick=()=>layout(button.dataset.layout);
 for(const button of document.querySelectorAll('[data-stats]'))button.onclick=()=>selectStats(button.dataset.stats);
-document.querySelector('#toggle-tools').onclick=()=>{
-  const tools=document.querySelector('#input-tools');tools.hidden=!tools.hidden;
-  document.querySelector('#toggle-tools').setAttribute('aria-expanded',String(!tools.hidden));
-};
+function setTools(name, open) {
+  document.querySelector('#workbench').classList.toggle('audio-open', name === 'audio' && open);
+  for (const kind of ['input', 'audio']) {
+    const visible = kind === name && open;
+    document.querySelector('#' + kind + '-tools').hidden = !visible;
+    document.querySelector(kind === 'input' ? '#toggle-tools' : '#toggle-audio').setAttribute('aria-expanded', String(visible));
+    if (kind === 'audio' && !visible) audioProbe.stop('panel-closed');
+  }
+}
+document.querySelector('#toggle-tools').onclick=()=>setTools('input',document.querySelector('#input-tools').hidden);
+document.querySelector('#toggle-audio').onclick=()=>setTools('audio',document.querySelector('#audio-tools').hidden);
 const fullscreen=document.querySelector('#fullscreen');
 fullscreen.onclick=async()=>{
   try{if(document.fullscreenElement)await document.exitFullscreen();else await document.querySelector('#workbench').requestFullscreen();}
@@ -124,6 +258,7 @@ function forget(slot){
   views.delete(slot);old.observer?.disconnect();clearTimeout(old.timeout);old.el.removeEventListener('load',old.load);
 }
 const frame=slot=>{
+  const target=targets.get(slot);if(!target)return;
   forget(slot);
   const el=document.createElement('iframe'),node=document.querySelector('#slot-'+slot);
   const item={el,state:'loading',detail:'等待 Viewer 加载',snapshot:null,previous:null,rates:null};views.set(slot,item);
@@ -136,24 +271,205 @@ const frame=slot=>{
   };
   el.addEventListener('load',item.load);
   item.timeout=setTimeout(()=>{if(views.get(slot)===item&&item.state==='loading'){item.state='unknown';item.detail='尚未获得 Viewer 状态，请检查登录或网络';render(slot,item);}},15000);
-  el.title='Native remote App '+slot;el.allow='clipboard-read; clipboard-write';el.src=config.baseURL+current.viewerUrl;
-  const link=document.querySelector('#open-'+slot);link.href=el.src;link.setAttribute('aria-disabled','false');node.replaceChildren(el);node.hidden=false;render(slot,item);scheduleStats();
+  el.title='Native remote App '+slot;el.allow='clipboard-read; clipboard-write';el.src=config.baseURL+target.viewerUrl;
+  const link=document.querySelector('#open-'+slot);link.href=el.src;link.setAttribute('aria-disabled','false');node.replaceChildren(el);node.hidden=false;render(slot,item);scheduleStats();refreshAudioIdentity();
 };
-const closeFrame=slot=>{forget(slot);const node=document.querySelector('#slot-'+slot);node.hidden=false;const empty=document.createElement('div');empty.className='empty-view';empty.textContent='Viewer 已关闭，点击「重新打开」恢复连接。';node.replaceChildren(empty);render(slot,{state:'disposed',detail:'仅关闭此 Viewer'});scheduleStats();};
-document.addEventListener('visibilitychange',()=>{for(const [slot,item]of views){item.previous=null;item.rates=null;if(!document.hidden)read(slot,item);}scheduleStats();});
-window.addEventListener('pagehide',()=>{for(const slot of [...views.keys()])forget(slot);clearInterval(statsTimer);},{once:true});
-try{config=await fetch('/fixture-config').then(r=>{if(!r.ok)throw Error('fixture unavailable');return r.json();});status('请选择测试应用。');}catch{status('测试配置不可用。');}
-const api=async(path,body,method)=>{const r=await fetch(config.baseURL+path,{method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const x=await r.json();if(!r.ok)throw Error(x.error||'API request failed');return x;};
-const identity=x=>{document.querySelector('#identity').textContent=JSON.stringify({core:x.versions.current.core,component:x.displayComponentDigest,generation:x.sessionGeneration,clipboard:x.nativeClipboard||'off'},null,2);};
-const show=x=>{current=x;identity(x);frame('a');frame('b');status('应用已打开，连接统计持续显示在侧栏。');
-  (async()=>{for(let i=0;i<60&&current===x;i++){await new Promise(r=>setTimeout(r,1000));try{const actual=await api('/api/instances/'+encodeURIComponent(x.id));if(current!==x)return;identity(actual);if(actual.applicationStatus?.state==='ready')return;}catch{return;}}})();
+const closeFrame=slot=>{selectionEpoch++;forget(slot);const node=document.querySelector('#slot-'+slot);node.hidden=false;const empty=document.createElement('div');empty.className='empty-view';empty.textContent='Viewer 已关闭，点击「重新打开」恢复连接。';node.replaceChildren(empty);render(slot,{state:'disposed',detail:'仅关闭此 Viewer'});scheduleStats();refreshAudioIdentity();};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)audioProbe.stop('page-hidden');for(const [slot,item]of views){item.previous=null;item.rates=null;if(!document.hidden)read(slot,item);}scheduleStats();});
+window.addEventListener('pagehide',()=>{selectionEpoch++;targets.clear();current=null;audioProbe.stop('page-retired');for(const slot of [...views.keys()])forget(slot);clearInterval(statsTimer);},{once:true});
+const $ = selector => document.querySelector(selector);
+const remoteCases = [
+  ['connection-lifetime', '首开建立 / 全关释放 / 已启用但静音时保持连接'],
+  ['session-isolation', 'A/B 各自 speaker / mic 开关，单路关闭不影响另一会话'],
+  ['same-session-tabs', '同会话多 Tab 状态同步、唯一播放者、关闭最后引用'],
+  ['mic-targets', 'mic 显式多目标、每目标唯一 writer、冲突与接管'],
+  ['permissions-devices', '权限拒绝 / 撤销 / 设备丢失后停止采集'],
+  ['workspace-lifecycle', 'workspace 隐藏 / 恢复 / 关闭与音频引用分离'],
+  ['fault-cleanup', 'logout / generation 变化 / worker / 网络故障与最终清理'],
+  ['remote-readback', '远程播放实际听音、mic 远端波形读回、延迟与资源']
+];
+for (const [id, title] of remoteCases) {
+  const row = document.createElement('tr'); row.dataset.case = id;
+  for (const value of [title, '待接入 · 未执行']) { const cell = document.createElement('td'); cell.textContent = value; row.append(cell); }
+  $('#audio-cases').append(row);
+}
+const localResults = {speaker: {observation: 'not-tested'}, microphone: {observation: 'not-tested'}};
+const phaseLabels = {requesting:'等待浏览器权限 / 音频启动…',playing:'正在播放测试音…',listening:'正在本机分析电平；没有远程传输',completed:'检查已结束',stopped:'检查已停止',denied:'浏览器拒绝了权限',unavailable:'需要 HTTPS 和可用的浏览器音频接口',failed:'设备或音频接口不可用'};
+const stopLabels = {'request-timeout':'等待超过 15 秒；晚到的授权会立即释放','panel-closed':'面板已关闭','page-hidden':'页面已隐藏','page-retired':'页面已离开','device-lost':'设备已失效',replaced:'已切换检查',stopped:'已手动停止'};
+const audioProbe = new RemoteXAppLocalAudioProbe(globalThis, event => {
+  const tone = event.kind === 'tone', key = tone ? 'speaker' : 'microphone';
+  const previous = localResults[key];
+  const active = ['requesting','playing','listening'].includes(event.phase);
+  const observation = ['denied','unavailable','failed'].includes(event.phase) ? 'not-tested' : event.phase === 'requesting' ? 'not-confirmed' : tone ? previous.observation : event.peak > 0 ? 'local-level-detected' : 'no-local-level-observed';
+  localResults[key] = {phase:event.phase,reason:event.reason,observation,...(!tone ? {peakRMS:Math.round(event.peak * 10000) / 10000} : {})};
+  $(tone ? '#audio-tone-status' : '#audio-mic-status').textContent = (phaseLabels[event.phase] || event.phase) + (stopLabels[event.reason] ? ' · ' + stopLabels[event.reason] : '') + (tone && event.phase === 'completed' ? '；请确认是否听到声音' : '');
+  $(tone ? '#audio-tone-stop' : '#audio-mic-stop').disabled = !active;
+  $(tone ? '#audio-tone' : '#audio-mic').disabled = active;
+  if (tone) { $('#audio-heard').disabled = $('#audio-not-heard').disabled = event.phase !== 'completed'; }
+  else $('#audio-level').value = event.level;
+});
+$('#audio-tone').onclick = () => audioProbe.tone();
+$('#audio-mic').onclick = () => audioProbe.microphone();
+$('#audio-tone-stop').onclick = $('#audio-mic-stop').onclick = () => audioProbe.stop();
+for (const [id, observation, message] of [['audio-heard','heard','人工确认：听到了本机测试音'],['audio-not-heard','not-heard','人工确认：没听到本机测试音']]) {
+  $('#' + id).onclick = () => { localResults.speaker.observation = observation; $('#audio-tone-status').textContent = message; };
+}
+function audioIdentities() {
+  return Object.fromEntries(['a','b'].map(slot => {
+    const x = targets.get(slot);
+    return [slot, x ? {runtimeId:x.id,generation:x.sessionGeneration ?? null,core:x.versions?.current?.core ?? null,component:x.displayComponentDigest ?? null,viewerState:views.get(slot)?.state || 'closed'} : null];
+  }));
+}
+function audioTopology() {
+  const a = targets.get('a'), b = targets.get('b');
+  return !a || !b ? 'not-opened' : a.id === b.id ? 'same-runtime' : 'different-runtimes';
+}
+function refreshAudioIdentity() {
+  const topology = audioTopology();
+  const label = {'not-opened':'尚未打开会话','same-runtime':'同一会话 · 两个独立 Viewer','different-runtimes':'两个不同会话 · A / B'}[topology];
+  $('#audio-topology').textContent = label;
+  $('#viewer-b-relation').textContent = label;
+  $('#audio-identities').textContent = JSON.stringify(audioIdentities(), null, 2);
+  $('#audio-same').disabled = selectionBusy || !targets.has('a');
+  $('#audio-separate').disabled = selectionBusy || !targets.has('a') || !config?.managedId;
+  syncAudioInterests();
+}
+$('#audio-export').onclick = () => {
+  const record = {schema:1,scope:'local-device-check-and-remote-checklist',createdAt:new Date().toISOString(),topology:audioTopology(),viewers:audioIdentities(),localDevices:localResults,remoteAudio:remoteAudioExport()};
+  const url = URL.createObjectURL(new Blob([JSON.stringify(record,null,2) + '\n'], {type:'application/json'}));
+  const link = document.createElement('a'); link.href = url; link.download = 'remotexapp-audio-uat.json'; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  status('已导出本机观察、远程音频状态和人工记录；不包含音频、凭据或设备标识。');
 };
-document.querySelector('#launch-mousepad').onclick=()=>api('/api/instances',{templateId:config.templateId||'mousepad',parameters:{filePath:config.documentFile}}).then(show).catch(e=>status(e.message));
-document.querySelector('#launch-desktop').onclick=()=>api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH').then(x=>show(x.runtime)).catch(e=>status(e.message));
+
+function remoteAudioExport() {
+  return {available:!!remoteAudio,reason:remoteAudio?'experimental-integration':remoteAudioError||'not-integrated',
+    connection:remoteAudioSnapshot.connection,protocol:remoteAudioSnapshot.protocol||null,playbackOwner:!!remoteAudioSnapshot.speakerOwner,microphoneOwner:!!remoteAudioSnapshot.micOwner,
+    routes:remoteAudioSnapshot.routes.map(r=>({runtime:r.runtime,generation:r.generation,speaker:r.actualSpeaker,mic:r.actualMic,reason:r.reason,refs:r.refs})),
+    cases:remoteCases.map(([id])=>({id,result:remoteResults.get(id)||'not-run',reason:remoteAudio?'manual-observation':'backend-not-integrated'}))};
+}
+function renderAudio() {
+  const s=remoteAudioSnapshot,connected=s.connection==='connected';
+  const now=performance.now(),received=s.receivedBytes||0,sent=s.sentBytes||0;let rates='';
+  if(!connected){audioPrevious=audioRates=null;}
+  else if(!audioPrevious||audioPrevious.connection!==s.connectionId||received<audioPrevious.received||sent<audioPrevious.sent){audioPrevious={at:now,received,sent,connection:s.connectionId};audioRates=null;}
+  else if(now-audioPrevious.at>=700&&(received!==audioPrevious.received||sent!==audioPrevious.sent)){
+    audioRates={at:now,text:` · ↓ ${((received-audioPrevious.received)*8/(now-audioPrevious.at)).toFixed(0)} / ↑ ${((sent-audioPrevious.sent)*8/(now-audioPrevious.at)).toFixed(0)} kbps`};
+    audioPrevious={at:now,received,sent,connection:s.connectionId};
+  }
+  if(connected)rates=audioRates&&now-audioRates.at<3000?audioRates.text:' · 流量采样中';
+  $('#audio-link-summary').textContent=remoteAudio?`音频 ${connected?'1 条共享 WSS':'未连接'}${rates} · ${s.speakerOwner?'本页播放':s.playbackBlocked?'点击 Speaker 解锁播放':'其他页播放／未开启'}${s.micOwner?' · 本页采集 Mic':''}`:'音频 · '+(remoteAudioError||'正在检查服务');
+  for(const slot of ['a','b']){
+    const binding=audioInterests.get(slot),interest=binding?.interest?.released?null:binding?.interest,target=targets.get(slot);
+    const route=s.routes.find(r=>r.runtime===target?.id&&r.generation===target?.sessionGeneration);
+    for(const [kind,label,enabled]of [['speaker','Speaker',route?.speaker],['microphone','Mic',route?.mic]]){
+      const button=$('#'+kind+'-'+slot);button.disabled=!interest;button.setAttribute('aria-pressed',String(!!enabled));button.textContent=label+' '+(enabled?'开启':'关闭');
+    }
+    $('#takeover-'+slot).disabled=!interest;$('#release-audio-'+slot).disabled=!interest;
+    $('#audio-state-'+slot).textContent=!interest?(binding?.error||'等待已准备的音频会话'):`Speaker ${route?.actualSpeaker?'已订阅':'关闭'} · Mic ${route?.actualMic?'发送中':'关闭'}${route?.reason?' · '+route.reason:''}${route?.refs?' · '+route.refs+' 引用':''}`;
+    $('#remote-mic-'+slot).value=route?.actualMic&&s.micOwner?s.microphone?.level||0:0;
+  }
+  if(s.reason&&!connected)$('#audio-link-summary').textContent+=' · '+s.reason+'；可点击「重新连接音频」重新开启';
+  $('#audio-open-tab').disabled=!targets.get('a');
+}
+function syncAudioInterests(){
+  if(!remoteAudio){renderAudio();return;}
+  for(const slot of ['a','b']){
+    const target=targets.get(slot),key=target?.id+':'+target?.sessionGeneration,previous=audioInterests.get(slot);
+    if(previous?.key===key)continue;
+    const epoch=(audioBindingEpoch.get(slot)||0)+1;audioBindingEpoch.set(slot,epoch);
+    if(previous?.interest)void previous.interest.release().catch(()=>{});
+    const binding={key,interest:null,error:''};audioInterests.set(slot,binding);
+    if(!target||target.sessionGeneration<1||target.nativeAudio!=='pcm-s16le-48k-v1'){binding.error=target?'此会话未启用音频；请打开新的音频测试 App':'尚未打开会话';continue;}
+    remoteAudio.acquire(target).then(interest=>{if(audioBindingEpoch.get(slot)!==epoch){void interest.release();return;}binding.interest=interest;renderAudio();}).catch(error=>{if(audioBindingEpoch.get(slot)===epoch){binding.error=error.message;renderAudio();}});
+  }
+  renderAudio();
+}
+for(const slot of ['a','b']){
+  for(const kind of ['speaker','microphone','takeover'])$('#'+kind+'-'+slot).onclick=()=>{
+    const interest=audioInterests.get(slot)?.interest;if(!interest)return;
+    audioProbe.stop('remote-audio-started');
+    const r=remoteAudioSnapshot.routes.find(r=>r.runtime===interest.runtime&&r.generation===interest.generation);
+    const job=kind==='speaker'?interest.setSpeaker(!r?.speaker):interest.setMicrophone(kind==='takeover'||!r?.mic,{takeover:kind==='takeover'});
+    job.catch(error=>status('音频操作未完成：'+error.message));
+  };
+  $('#release-audio-'+slot).onclick=async()=>{const binding=audioInterests.get(slot);if(!binding?.interest)return;try{await binding.interest.release();binding.interest=null;binding.error='音频引用已释放；重新打开 Viewer 可重新取得引用';renderAudio();}catch(error){status(error.message);}};
+}
+$('#audio-open-tab').onclick=()=>{const x=targets.get('a');if(x){const u=new URL(location.href);u.searchParams.set('audioRuntime',x.id);window.open(u.href,'_blank','noopener');}};
+$('#audio-logout').onclick=async()=>{try{await remoteAudio?.logout();for(const [slot,binding]of audioInterests){audioBindingEpoch.set(slot,(audioBindingEpoch.get(slot)||0)+1);binding.interest=null;binding.error='本次登录音频已关闭；刷新页面可重新启用';}renderAudio();}catch(error){status(error.message);}};
+$('#launch-audio-a').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'});if(active())show(x);});
+$('#launch-audio-b').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'});if(active()){targets.set('b',x);frame('b');watchIdentity(x);status('音频测试 App B 已打开，A 的 Viewer 保持连接。');}});
+$('#audio-reconnect').onclick=async()=>{if(remoteAudioInitializing)return;remoteAudio?.dispose();remoteAudio=null;remoteAudioError='';remoteAudioSnapshot={connection:'idle',routes:[]};for(const slot of ['a','b'])audioBindingEpoch.set(slot,(audioBindingEpoch.get(slot)||0)+1);audioInterests.clear();await initializeRemoteAudio(false);status('音频控制器已重新连接；请按需重新开启 Speaker 或 Mic。');};
+async function initializeRemoteAudio(loadRuntime=true){
+  if(!config||remoteAudioInitializing)return;
+  remoteAudioInitializing=true;$('#audio-reconnect').disabled=true;
+  try{
+    const {RemoteXAppAudio}=await import(config.baseURL+'/sdk/remotexapp-audio.js');
+    const controller=new RemoteXAppAudio({baseURL:config.baseURL});
+    try{await controller.ready;}catch(error){controller.dispose();throw error;}
+    remoteAudio=controller;
+    controller.addEventListener('statechange',event=>{if(remoteAudio!==controller)return;remoteAudioSnapshot=event.detail;renderAudio();});
+    $('#remote-audio-availability').textContent='实验性集成 · Ready for verification';
+    for(const id of ['launch-audio-a','launch-audio-b','audio-logout'])$('#'+id).disabled=false;
+    for(const row of $('#audio-cases').rows){const select=document.createElement('select');select.setAttribute('aria-label','人工测试结果 '+row.dataset.case);for(const [value,label]of [['not-run','未执行'],['passed','人工通过'],['failed','失败'],['not-applicable','不适用']]){const option=document.createElement('option');option.value=value;option.textContent=label;select.append(option);}select.onchange=()=>remoteResults.set(row.dataset.case,select.value);row.cells[1].replaceChildren(select);}
+    syncAudioInterests();
+    const id=new URL(location.href).searchParams.get('audioRuntime');if(loadRuntime&&id){const x=await api('/api/instances/'+encodeURIComponent(id));show(x);}
+  }catch(error){remoteAudioError='服务不可用 · '+error.message;$('#remote-audio-availability').textContent=remoteAudioError;renderAudio();}
+  finally{remoteAudioInitializing=false;$('#audio-reconnect').disabled=false;}
+}
+
+const api=async(path,body,method)=>{const r=await fetch(config.baseURL+path,{signal:AbortSignal.timeout(15000),method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const x=await r.json();if(!r.ok)throw Error(x.error||'API request failed');return x;};
+const identity=x=>{$('#identity').textContent=JSON.stringify({core:x.versions?.current?.core,component:x.displayComponentDigest,generation:x.sessionGeneration,clipboard:x.nativeClipboard||'off',audio:x.nativeAudio||'off'},null,2);};
+function watchIdentity(target) {
+  (async () => {
+    for (let i=0;i<60 && [...targets.values()].includes(target);i++) {
+      await new Promise(resolve => setTimeout(resolve,1000));
+      if (![...targets.values()].includes(target)) return;
+      try {
+        const actual = await api('/api/instances/' + encodeURIComponent(target.id));
+        if (![...targets.values()].includes(target)) return;
+        // Keep the attached descriptor/token stable; only refresh displayed identity.
+        Object.assign(target, {nativeAudio:actual.nativeAudio,sessionGeneration:actual.sessionGeneration,displayComponentDigest:actual.displayComponentDigest,versions:actual.versions});
+        if (current === target) identity(target);
+        refreshAudioIdentity();
+        if (actual.applicationStatus?.state === 'ready') return;
+      } catch { return; }
+    }
+  })();
+}
+function show(x) {
+  current=x;targets.set('a',x);targets.set('b',x);identity(x);frame('a');frame('b');watchIdentity(x);
+  status('应用已打开，连接统计持续显示在侧栏。');
+}
+async function selectTarget(action) {
+  if (selectionBusy || !config) return;
+  selectionBusy=true;const epoch=++selectionEpoch;
+  for (const id of ['launch-mousepad','launch-desktop']) $('#'+id).disabled=true;
+  refreshAudioIdentity();
+  try { await action(() => epoch === selectionEpoch); }
+  catch { if(epoch === selectionEpoch)status('打开测试会话失败，请检查配置、登录与服务。'); }
+  finally {
+    selectionBusy=false;
+    for (const id of ['launch-mousepad','launch-desktop']) $('#'+id).disabled=!config;
+    refreshAudioIdentity();
+  }
+}
+$('#launch-mousepad').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:config.templateId||'mousepad',parameters:{filePath:config.documentFile}});if(active())show(x);});
+$('#launch-desktop').onclick=()=>selectTarget(async active=>{const x=await api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH');if(active())show(x.runtime);});
+$('#audio-separate').onclick=()=>selectTarget(async active=>{
+  const x=await api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH');
+  if(!active())return;
+  targets.set('b',x.runtime);frame('b');watchIdentity(x.runtime);
+  status(audioTopology()==='same-runtime'?'A 已是测试桌面；两路仍是同一会话。':'B 已切到测试桌面；A 的 Viewer 保持连接。');
+});
+$('#audio-same').onclick=()=>{if(selectionBusy || !targets.has('a'))return;targets.set('b',targets.get('a'));frame('b');status('B 已回到 A 的会话；A 的 Viewer 保持连接。');};
+for(const id of ['launch-mousepad','launch-desktop']) $('#'+id).disabled=true;
+try{config=await fetch('/fixture-config').then(r=>{if(!r.ok)throw Error('fixture unavailable');return r.json();});for(const id of ['launch-mousepad','launch-desktop']) $('#'+id).disabled=false;refreshAudioIdentity();status('请选择测试应用，或展开音频面板检查本机设备。');}catch{status('测试配置不可用；本机音频检查仍可使用。');}
+void initializeRemoteAudio();
 for(const name of ['a','b']){
   document.querySelector('#toggle-'+name).onclick=()=>{const slot=document.querySelector('#slot-'+name);slot.hidden=!slot.hidden;const item=views.get(name);if(item)render(name,item);};
   document.querySelector('#dispose-'+name).onclick=()=>closeFrame(name);
-  document.querySelector('#recreate-'+name).onclick=()=>{if(current)frame(name);};
+  document.querySelector('#recreate-'+name).onclick=()=>{selectionEpoch++;if(!audioInterests.get(name)?.interest)audioInterests.delete(name);if(targets.has(name))frame(name);};
 }
 document.querySelector('#local-copy').onclick=()=>navigator.clipboard.writeText(document.querySelector('#local-text').value).then(()=>status('本机剪贴板已更新。')).catch(()=>status('浏览器拒绝剪贴板写入。'));
 document.querySelector('#local-read').onclick=()=>navigator.clipboard.readText().then(text=>{document.querySelector('#local-text').value=text;status('已读到本机文本区。');}).catch(()=>status('浏览器拒绝剪贴板读取。'));

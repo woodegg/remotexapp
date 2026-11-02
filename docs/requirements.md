@@ -15,12 +15,15 @@ go/no-go. The [2026-10-24 interpretation](kasmvnc-0.16.0-evaluation.md#2026-10-2
 distinguishes historical API compatibility constraints from preserved safety
 semantics. Accepted 0.15.0 runtime behavior is not superseded by this proposal.
 
-## Proposed native architecture — owner review pending
+<a id="proposed-native-architecture--owner-review-pending"></a>
+
+## Native architecture — staged implementation
 
 [Architecture detail](kasm-native-architecture.md) accepts KNP-BASELINE-20261024
-as research input, not production qualification. Entries below remain
-**proposed** except AUD-002's connection-lifetime clause, accepted as a design
-decision on 2026-10-25 (R3). D1 implementation and its bounded automated matrix are recorded in
+as research input, not production qualification. Requirements below are delivered
+by bounded checkpoints, not accepted as one complete feature set. AUD-002's
+connection-lifetime clause was accepted as a design decision on 2026-10-25 (R3).
+D1 implementation and its bounded automated matrix are recorded in
 [the native qualification results](../tests/kasm-native/README.md); they do not
 qualify the remaining architecture. Stable IDs support subsequent
 implementation Issues; KVE-001–008 remain evaluation/qualification gates.
@@ -53,6 +56,15 @@ The [bounded live evidence](../tests/kasm-native/UDP.md) records its exact
 artifacts, functional checks, short resource observations and remaining human
 UAT/long-duration scope.
 
+As of 2026-11-01, #31/#33/#35/#37 are merged and the owner accepted #37's
+bounded UAT against its recorded artifacts. Remaining D2/D4 and release scope
+are not implied. [D3 / #45](https://github.com/woodegg/remotexapp/issues/45) now has
+an implemented standalone candidate in PR #49, including private domains,
+Manager authorization/lifecycle and shared SDK audio. The owner reported its
+current UAT passed on 2026-11-01; see [candidate acceptance](https://github.com/woodegg/remotexapp/blob/5c2a5f386e42f4529c206c2ed63e341b483d4830/tests/native-audio/qualification-7926949.md).
+The [integration plan](native-audio-integration.md) preserves the original steps.
+Review/merge, actual embedding-host and post-merge release qualification remain separate.
+
 | ID | Proposed requirement | Acceptance boundary |
 | --- | --- | --- |
 | KNA-001 | Pair and pin Kasm server/client behind a distinct display provider. Preserve Manager/App ownership, UID, HOME and App contracts; do not require legacy SDK method shapes. | WSS vertical slice with a single App and managed desktop; dependency/App audit and explicit SDK versioning; server-enforced class rendering/resize policy; multiple Viewers paint valid frames across resize and reconnect, with matching cache payload lengths |
@@ -65,13 +77,26 @@ UAT/long-duration scope.
 | KNA-008 | Separate host window/workspace references, Viewer lifetime, audio interests and App keepalive. | Real host hidden/closed/recreated window, multiple Tabs, login change and last-reference tests |
 | KNA-009 | Version provider-specific durable state and lock resources before launch; migrate/rollback only with scoped stop and preserved data. | Old/new format rejection/adoption, write failures, duplicate-port prevention and paired SDK/Core rollback rehearsal |
 | KNA-010 | Qualify exact product artifacts, clean distribution inputs, resource/performance and host integration separately from research/UAT history. Rebuild for each target architecture, record machine/compiler identity, verify ELF architecture/linkage and preserve native sanitizer gates when selecting another test compiler. | Fixed candidate plus workload/baseline/thresholds, corrected harness, target-side native checks, actual cleanup, physical UAT and publication gates |
-| AUD-002 | Propose per-session audio domains and controls over one scoped mux connection, same-session multi-Tab deduplication, explicit multi-target mic with per-target writer ownership; default off. Connection lifetime accepted: connect when at least one App's speaker or mic is enabled, share within the scope, release when all are off; App launch alone does not connect and silence does not disconnect. | R3 design accepted 2026-10-25; remaining choices await review. Verify first enable, additional subscription, partial disable, final disable and enabled-but-silent behavior, plus real playback/readback, permission/owner/worker/outage tests; see [audio model](kasm-native-architecture.md#audio-model) |
+| AUD-002 | Develop opt-in per-session audio domains and controls over one scoped mux connection, same-session multi-Tab deduplication, explicit multi-target mic with per-target writer ownership; default off. Connection lifetime accepted: connect when at least one App's speaker or mic is enabled, share within the scope, release when all are off; App launch alone does not connect and silence does not disconnect. | R3 design accepted 2026-10-25; full D3 implementation selected 2026-11-01 in #45/#49. Standalone automation and cleanup are qualified for [candidate 7926949](../tests/native-audio/qualification-7926949.md); the owner reported the current standalone audio UAT passed on 2026-11-01, without supplying a per-device/browser/region checklist. Actual embedding-host and post-merge release qualification remain separate. See [native audio contract](native-audio.md). The UAT workbench must distinguish local device observations from remote audio acceptance, support same/different-runtime comparison, cancel local capture on panel close/page retirement and fence late permission results; export only content-free observations and explicitly unexecuted remote cases while audio is unavailable. Verify first enable, additional subscription, partial disable, final disable and enabled-but-silent behavior, plus real playback/readback, permission/owner/worker/outage tests, including permission/device loss while a route acknowledgment is pending, silent worker termination, and Manager epoch replacement without automatic capture; see [audio model](kasm-native-architecture.md#audio-model) |
+
+AUD-002 clarification: server-initiated retirement of the final enabled App
+(including vacancy shutdown) releases the shared audio WSS on the next
+coordinator reconciliation; an idle retained reference is not audio demand.
+Playback credits cover each enabled speaker’s bounded queue (eight per route,
+at most 64); removing routes shrinks the allowance. UAT audio rates retain the
+last fresh counter sample across worklet-level updates and reset with the
+connection. A temporarily unavailable audio domain fences only its own route;
+other App subscriptions and the existing microphone capture continue. Scope
+authentication failure still fences every route.
+
 
 AUD-002 proposes replacing only AUD-001's global user-mix and single-mic-target
 scope for the native architecture. Shared connection, explicit permission,
 default-off, cross-Tab ownership and lifecycle safeguards remain. Neither audio
-proposal is shipped; acceptance must be recorded before implementation scope
-is locked.
+proposal is shipped. The 2026-11-01 D3 implementation selection in #45 supersedes
+the earlier proposed implementation scope. Owner standalone audio UAT passed
+on 2026-11-01; downstream host integration, post-merge qualification and
+publication remain separately recorded acceptance steps.
 
 ## Native automatic clipboard integration
 
@@ -434,7 +459,7 @@ See [the release design](lightview-app-package-release.md).
 | REL-007 | The release branch and host expose no obsolete transport/input PoC code, runtime data, or listeners; accepted regressions remain under `tests/` and removed source remains recoverable from Git history. | implemented | rc.13 repository and host cleanup |
 | REL-008 | Tracked source, reachable Git history, and release archives are checked for credentials and private environment identifiers before publication. Current public documentation additionally rejects operational disclosures; historical copies require separate exposure assessment and are not erased by a source edit. | implemented | `scripts/check-sensitive-data.sh`, public documentation gate, package gate, and Gitleaks CI |
 | REL-009 | Portable CI and release builds use exact Go `1.27.3`; source plus every packaged Go binary fail closed on reachable known vulnerabilities. | implemented; renewed qualification and human UAT pending | [Go toolchain train](go-toolchain-0.14.5-release.md); Go 1.27.3 qualification required after the 2026-10-21 security-pin update |
-| REL-010 | Fast verification enforces the measured Go and SDK coverage floors with Xvfb/xclip/Clipman dependencies present; scheduled reliability runs race, shuffled repeat, and bounded fuzz checks, while candidate acceptance retains synthetic and target-like real-App E2E. Missing integration dependencies must not silently redefine the coverage baseline. | accepted | Hosted Verify/Candidate runs, exact candidate E2E, and [`development-quality-0.5.2-stable-acceptance.json`](private-history.md) |
+| REL-010 | Fast verification enforces the measured Go and SDK coverage floors with Xvfb/xclip/Clipman dependencies present; scheduled reliability runs race, shuffled repeat, and bounded fuzz checks, while candidate acceptance retains synthetic and target-like real-App E2E. The repeated Go package run has an explicit bounded aggregate timeout covering all repetitions; retain per-case deadlines and assertions. Missing integration dependencies must not silently redefine the coverage baseline. | accepted | Hosted Verify/Candidate runs, exact candidate E2E, and [`development-quality-0.5.2-stable-acceptance.json`](private-history.md) |
 | REL-011 | A release archive is built once by the candidate workflow and identified by full commit plus SHA-256. Human UAT and target-like E2E use that candidate, and an exact tag may only publish the unchanged candidate bytes. | accepted | Candidate SHA-256 verification and [`development-quality-0.5.2-stable-acceptance.json`](private-history.md) |
 | REL-012 | Every third-party GitHub Action is pinned to a full commit SHA. Release automation rejects lightweight tags, tag/version disagreement, absent same-commit candidates, and evidence that a tag previously ran at a different commit. | accepted | Workflow audit, immutable `v0.5.2-rc.1`, and release dependency regression |
 | REL-013 | New candidate, integration, UAT, publication, alignment, security, and audit evidence uses the versioned v1 envelope; current source identities are generated from canonical metadata rather than manually copied. | accepted | `tests/evidence/`, `scripts/check-evidence.mjs`, generated `docs/current-state.md`, and stable acceptance evidence |
@@ -829,7 +854,7 @@ and Human UAT passed on 2026-09-02.
 | CLP-013 | In `prompt` or `auto`, the SDK checks for local clipboard changes on supported `clipboardchange` events and reconciles once when the top-level document regains system focus or becomes visible. It does not react to client/IME DOM refocus, deduplicates combined signals, and never raises a fresh browser permission prompt solely because focus changed; without permission it waits for explicit activation or paste. | accepted | [Local rc.1 evidence](private-history.md) and [rc.3 Human UAT](private-history.md) |
 | CLP-014 | A `toRemote` change is still broadcast to all Viewers with an opaque `sourceViewerId`; the source Viewer suppresses only its redundant sync-back prompt while other Viewers handle it normally. Gateway transaction identity and non-persistent client fingerprints prevent feedback loops. One Viewer's acceptance or dismissal never changes another Viewer's pending state. | accepted | [Local rc.1 evidence](private-history.md) and [rc.3 Human UAT](private-history.md) |
 | CLP-015 | The Unified Console is the built-in integration and UAT surface for clipboard sync. For the active Viewer it exposes independent `toRemote` and `toLocal` selectors for `off`, `manual`, `prompt`, and `auto`, manual sync actions, capability/permission state, pending offers, and bounded result/error status. Console choices are session-local, require explicit user action, never enter launch parameters, URLs, browser persistence, or server configuration, and exercise the same public SDK used by external consumers. | accepted | [Local rc.1 evidence](private-history.md) and [rc.3 Human UAT](private-history.md) |
-| CLP-016 | The 60-second offer/API lifetime and current `toRemote` X11 selection lifetime are independent. Expiry or metadata eviction deletes offer bodies and history eligibility, while at most one bounded, memory-only gateway selection remains pasteable until another selection replaces it, an unexpired source offer is explicitly cancelled, the session generation ends, or the runtime exits. Clean clear keeps an empty X11 tombstone owner so a clipboard manager cannot replay stale content; a real application can replace it normally. This behavior is template-neutral and must pass with and without Clipman. | accepted | [Local rc.2 evidence](private-history.md) and [rc.3 Human UAT](private-history.md) |
+| CLP-016 | The 60-second offer/API lifetime and current `toRemote` X11 selection lifetime are independent. Expiry or metadata eviction deletes offer bodies and history eligibility, while at most one bounded, memory-only gateway selection remains pasteable until another selection replaces it, an unexpired source offer is explicitly cancelled, the session generation ends, or the runtime exits. When the gateway still owns the selection, clean clear replaces it with an empty X11 tombstone to prevent stale replay. Clear and gateway exit preserve an external owner, including a clipboard manager holding an identical copy. Clearing gateway-owned state does not purge another process's clipboard history. This behavior is template-neutral and must pass with and without Clipman; see the [ownership clarification](design-log.md#2026-11-01--qualify-clipboard-clearing-by-current-ownership-52). | accepted | [Local rc.2 evidence](private-history.md) and [rc.3 Human UAT](private-history.md) |
 | CLP-017 | SDK `client.clipboard.checkAccess()` reports secure-context, document-focus, user-activation, capability, and read/write permission state without reading or writing. A direct user gesture may call `requestReadAccess()` to perform and verify one real read while discarding content without decoding, returning, fingerprinting, uploading, or writing it back. No dummy or read-then-write write probe is allowed; only a real `syncToLocal()` verifies write access. Expected denial and context failures return structured state. The Unified Console exercises both public methods. | accepted | `make check`, all 68 SDK subtests, focused tests, exact rc.3 real-Chromium direct-click validation, and [Human UAT](private-history.md) |
 
 ## Client-active clipboard release train

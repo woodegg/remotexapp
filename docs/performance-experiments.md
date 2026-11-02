@@ -60,8 +60,9 @@ The current production-candidate URLs remain:
 | P14 | Moving private D-Bus, IBus and the Unicode engine into the on-demand session removes their vacant server-layer cost without breaking input lifecycle | Input-stack lifecycle ownership only | **Accepted:** isolated plus live XFCE/Mousepad/Edge regression passed; deployed to all production classes |
 | P15 | Caller-scheduled trailing remote resize reduces repeated desktop/application reflow while retaining bounded progress and final-size correctness | SDK remote-resize scheduling only | **Accepted:** compatibility, trailing, max-wait, flush, reconnect and real-stack input checks passed |
 | P16 | Core-owned session input supervision stays within bounded startup and resource overhead | Service ownership with unchanged Mousepad policies | **Accepted:** matched fresh/warm launches, cgroup resources and cleanup pass locked gates; human UAT is separate |
+| P17 | Per-speaker credits avoid competition between bounded audio queues | Aggregate playback credit allocation only | **Accepted:** deterministic two-speaker burst delivers ten of ten frames instead of eight; eight-slot aggregate remains capped at 64; WAN and physical quality are separate |
 
-P01 through P16 are complete. Start the next experiment only after defining a
+P01 through P17 have recorded experiment outcomes. Start the next experiment only after defining a
 new isolated primary variable.
 
 ## P16: Core-owned session services
@@ -1068,3 +1069,15 @@ A non-performance lifecycle follow-up then made XFCE report orderly Logout as
 `:2` both reached `stopped/exited` with the RFB peer still attached, restarted
 as generation 2 on reconnect, and cleaned all session input artifacts after
 final detach. It does not alter P14's resource comparison.
+
+
+## P17: bounded playback credits per speaker
+
+The deterministic [native audio burst experiment](../tests/performance/native-audio-burst/README.md)
+compares commit `299e0d4a1901ec0003efc3f15055c2372e34b024` with the selected
+per-speaker allowance. The primary variable is aggregate credits; packet format,
+per-stream queue limits and microphone credits remain unchanged. A 100 ms burst
+from each of two speakers previously lost two of ten frames before reaching
+worklet queues. The selected allocation delivers all ten, with a 16-frame cap
+for two speakers and a 64-frame cap for eight. This is an allocation result,
+not a claim that arbitrary WAN jitter or physical audio quality has passed.

@@ -285,6 +285,23 @@ ambiguous transfer. Public
 `auth-mode=none` deployments fail closed unless an explicit insecure-public
 clipboard opt-in exists; ordinary loopback development remains possible.
 
+### Ownership clarification — 2026-11-01
+
+The unconditional clear wording above is qualified by the
+[current ownership decision](design-log.md#2026-11-01--qualify-clipboard-clearing-by-current-ownership-52).
+The empty tombstone is installed only while the gateway owns `CLIPBOARD`.
+Once an application or clipboard manager takes ownership, clear preserves its
+selection, even when it contains an identical copy. Gateway cleanup cannot
+promise to erase another process's selection or clipboard history. A PNG-only
+selection can be copied and adopted by modern Clipman/libxfce4ui before a clear;
+this is an external-owner case, not proof that a gateway-owned clear failed.
+
+The regression gate separately checks rich-content expiry/clear/exit with a
+real Clipman while ownership is retained, and deterministic external takeover
+with identical PNG content or new text. Both owner identity and clipboard
+readback must agree; neither a skipped assertion nor extra sleeps establish
+clearing success.
+
 ## Acceptance gate
 
 Acceptance requires exact-limit and malformed-input tests, Go race tests,

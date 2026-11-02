@@ -671,6 +671,10 @@ channels and generation-qualified descriptors/offers are retired.
 
 ### Native input/clipboard checkpoint (development SDK 0.31.0-dev.2)
 
+The [native automatic clipboard requirement](native-clipboard-integration.md)
+in Issue #50 is a follow-on, not an available mode of this implementation.
+The explicit methods and consent rules below remain the current contract.
+
 Issue #32 adds `configureKeyboard({profile, mode, bindings})`, `keyboardPolicy`,
 `focus()` and `blur()`. Profiles: `windows`, `mac`, `gnome`, `fcitx`, `unknown`,
 `custom`. Detection uses the browser OS; Linux starts unknown. Policy changes

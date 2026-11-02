@@ -198,6 +198,11 @@ Windows Win+Space、macOS Control+Space、Linux 桌面/输入法配置及用户�
 
 ### 6.3 剪贴板与文件
 
+2026-11-01 补充：Issue #50 将原生双向自动剪贴板列为独立后续需求，详见
+[KNC-001–008 与验收范围](native-clipboard-integration.md)。当前 D2 的手动文本
+接口保持原状；自动模式需实现独立方向授权、活动 Viewer 路由、权限回退及多 Tab
+隔离后单独验收。此处登记需求，不代表自动模式已经实现，也不扩展音频 PR 的范围。
+
 原生 clipboard 为唯一数据通道；SDK 提供能力、用户同意和状态，不同时运行旧
 XFixes/offer 桥造成回弹。第一阶段只承诺候选实际验证的 text/HTML/PNG 子集，
 按浏览器和权限返回能力。RTF、文件对象、目录、拖放、上传下载单独定义，默认不宣称支持。

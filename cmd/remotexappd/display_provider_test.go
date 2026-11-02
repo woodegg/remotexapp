@@ -213,7 +213,7 @@ func TestNativeClipboardIsPinnedAndServerEnforced(t *testing.T) {
 	c.NativeClipboard = "text"
 	item := &instance{Components: c}
 	args := strings.Join(kasmLaunchArgs(item, classConfig{}, 5903, "/tmp/fixture-authority"), " ")
-	for _, value := range []string{"-AcceptCutText=1", "-SendCutText=1", "-DLP_ClipAcceptMax=65536", "-DLP_ClipSendMax=65537", "-DLP_ClipTypes=text/plain", "-DLP_Log=off"} {
+	for _, value := range []string{"-AcceptCutText=1", "-SendCutText=1", "-SetPrimary=0", "-SendPrimary=0", "-DLP_ClipAcceptMax=65536", "-DLP_ClipSendMax=65537", "-DLP_ClipTypes=text/plain", "-DLP_Log=off"} {
 		if !strings.Contains(args, value) {
 			t.Fatalf("missing server policy %s", value)
 		}

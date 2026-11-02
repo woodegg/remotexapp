@@ -14,6 +14,7 @@ export class NativeClipboard {
     this.error = error;
     this.requested = {toRemote:'off', toLocal:'off'};
     this.permissions = {read:'unknown', write:'unknown'};
+    this.active = false;
     this.revision = 0;
     this.consent = 0;
     this.observers = [];
@@ -228,7 +229,7 @@ export class NativeClipboard {
       if (revision === this.revision) {
         this.conflict = true;
         if (error.name === 'NotAllowedError') this.permissions[startedWrite ? 'write' : 'read'] = 'denied';
-        this.emit(startedWrite ? 'clipboard-uncertain' : error.code || (error.name === 'NotAllowedError' ? 'clipboard-denied' : 'clipboard-unavailable'));
+        this.emit(startedWrite ? 'clipboard-uncertain' : (typeof error.code === 'string' ? error.code : error.name === 'NotAllowedError' ? 'clipboard-denied' : 'clipboard-unavailable'));
       } else if (startedWrite) this.emit('clipboard-uncertain');
       if (paste) throw error;
     } finally {

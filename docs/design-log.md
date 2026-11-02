@@ -5127,3 +5127,15 @@ stale input on lifecycle retirement. The native text wire remains unchanged;
 upstream browser access is delegated to the SDK policy instead of running two
 clipboard systems. See the [implementation contract](native-clipboard-integration.md).
 This records the implementation decision, not qualification or acceptance.
+
+## 2026-11-02 — Preserve remote selection during native clipboard paste
+
+Live #50 browser testing found that a fresh clipboard submission immediately
+before paste replaced X11 PRIMARY ownership: Kasm defaults `SetPrimary` to
+true. The remote editor lost its selected range, so paste inserted text instead
+of replacing the selection. Native launch now explicitly disables SetPrimary
+and SendPrimary; only CLIPBOARD crosses the browser boundary. Keep PRIMARY
+and remote middle-click selection local. The regression must verify selected
+text replacement by reading the saved remote document, not just clipboard
+submission or connection status. This supersedes the implicit native launcher
+default for PRIMARY; it does not alter the legacy provider.

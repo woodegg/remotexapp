@@ -178,3 +178,9 @@ manual text capability and cannot advertise this automatic integration.
 Qualification is pending. The implementation PR must include the UAT workbench,
 real browser and remote App readback, artifact identities and explicit coverage
 limits before consolidated physical UAT.
+
+Native integration synchronizes the X11 `CLIPBOARD` selection only. The launcher
+sets `SetPrimary=0` and `SendPrimary=0`: receiving browser clipboard text must
+not take ownership of `PRIMARY` and clear the remote editor's selected text.
+X11 selection/middle-click remains local to the remote desktop. This is necessary
+for selecting text and then replacing it with an automatic browser paste.

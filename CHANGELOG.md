@@ -14,7 +14,8 @@ implementation; move them to a version section when publishing a release.
 - Add experimental native automatic plain-text clipboard with independent
   direction modes, explicit permission requests, focused-Viewer ownership,
   conflict detection and lifecycle fencing. Keep default-off and manual APIs;
-  order paste keys after a fresh bounded native clipboard submission. Extend
+  order paste keys after a fresh bounded native clipboard submission and keep
+  remote X11 PRIMARY selection local so paste preserves the selected range. Extend
   the UAT workbench with controls, state and content-free acceptance records.
   Exact artifact and consolidated human qualification remain pending in #50.
 

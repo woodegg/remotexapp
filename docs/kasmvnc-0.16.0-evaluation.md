@@ -90,7 +90,10 @@ runtime/UID/cgroup model before changing systemd or standalone ownership.
 retains the historical shared-user/single-target comparison. The native
 [AUD-002 model](kasm-native-architecture.md#audio-model) and
 [D3 integration plan](native-audio-integration.md) track the per-session target
-design and its remaining proof; only R3 connection timing is already accepted.
+design and its qualification boundaries. R3 connection timing was accepted
+in advance; PR #49 now implements standalone audio and the owner reported the
+current UAT passed on 2026-11-01. Actual host and release qualification remain
+separate; see [candidate evidence](https://github.com/woodegg/remotexapp/blob/5c2a5f386e42f4529c206c2ed63e341b483d4830/tests/native-audio/qualification-7926949.md).
 Kasm container startup references separate audio-out
 and audio-input helpers plus PulseAudio/encoding processes. Identify each
 helper's source, license, buildability, protocol and authentication. Verify

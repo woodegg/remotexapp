@@ -10,9 +10,9 @@ The [Kasm native architecture proposal](kasm-native-architecture.md) describes
 a replacement and its migration/UDP/audio gates. Its bounded D1 WSS scope is
 implemented with [bounded automated evidence](../tests/kasm-native/README.md).
 The initial D2 input/text checkpoint, Alpine static Core and bounded D4 UDP/UAT
-are also merged; their exact evidence remains scoped. [D3 audio preparation](native-audio-integration.md)
-starts with same-UID domains, then Manager authorization and shared SDK audio.
-Native product audio and full host/release qualification remain incomplete. The default
+are also merged; their exact evidence remains scoped. [D3 audio](native-audio-integration.md)
+is implemented in PR #49 with owner-reported standalone UAT acceptance; full
+embedding-host and post-merge release qualification remain separate. The default
 architecture and accepted invariants below still apply.
 
 ## Architecture and ownership

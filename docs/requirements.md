@@ -58,11 +58,12 @@ UAT/long-duration scope.
 
 As of 2026-11-01, #31/#33/#35/#37 are merged and the owner accepted #37's
 bounded UAT against its recorded artifacts. Remaining D2/D4 and release scope
-are not implied. [D3 / #45](https://github.com/woodegg/remotexapp/issues/45) prepares
-[audio integration](native-audio-integration.md): same-UID audio-domain evidence,
-then Manager authorization/lifecycle, SDK coordination and combined UAT.
-AUD-002 is not implemented; preparation does not enable the native SDK's audio
-capability or lock its remaining protocol/codec/domain choices.
+are not implied. [D3 / #45](https://github.com/woodegg/remotexapp/issues/45) now has
+an implemented standalone candidate in PR #49, including private domains,
+Manager authorization/lifecycle and shared SDK audio. The owner reported its
+current UAT passed on 2026-11-01; see [candidate acceptance](https://github.com/woodegg/remotexapp/blob/5c2a5f386e42f4529c206c2ed63e341b483d4830/tests/native-audio/qualification-7926949.md).
+The [integration plan](native-audio-integration.md) preserves the original steps.
+Review/merge, actual embedding-host and post-merge release qualification remain separate.
 
 | ID | Proposed requirement | Acceptance boundary |
 | --- | --- | --- |

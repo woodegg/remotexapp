@@ -1,21 +1,25 @@
 # D3 音频接入计划 / Native audio integration
 
-状态：**接入准备；产品音频尚未实现**。2026-11-01 用户要求回到原生架构的下一步，
-包括原计划的音频集成。[Issue #45](https://github.com/woodegg/remotexapp/issues/45)
-跟踪实现与验收；本文提供研究输入、缺口和开发顺序，不把准备完成写成 UAT 通过。
+状态：**独立音频候选已实现，用户于 2026-11-01 确认当前 UAT 通过；等待 PR 审阅／合并。**
+[Issue #45](https://github.com/woodegg/remotexapp/issues/45) 与 PR #49 跟踪实现和验收，
+PR #48 提供工作台。实现候选为 `7926949`，Core `0.16.0-dev.4` / SDK `0.31.0-dev.4`。
+见 [候选证据与用户验收](https://github.com/woodegg/remotexapp/blob/5c2a5f386e42f4529c206c2ed63e341b483d4830/tests/native-audio/qualification-7926949.md) 和 [实际音频合同](https://github.com/woodegg/remotexapp/blob/5c2a5f386e42f4529c206c2ed63e341b483d4830/docs/native-audio.md)。
+本文保留接入时的研究输入、缺口和开发顺序；旧准备步骤不再表示当前待开发任务。
+实际宿主集成、其他未验证范围及合并后的正式发布资格仍独立验收。
 对应 [AUD-002](kasm-native-architecture.md#audio-model)、KNA-002/008/010。
 
-## 1. 当前基线 / Current baseline
+## 1. 接入起点 / Preparation baseline
 
 源码基线为 `ea0087fdb052b9c0791250f04846b3f0b5e1f6ee`，Core `0.16.0-dev.3` /
 SDK `0.31.0-dev.3`；已发布版本仍是 Core 0.15.0 / SDK 0.30.0。
-原生 SDK 的 `audio:false` 仍是准确能力声明。
+这里的 `audio:false` 描述接入起点；当前候选通过独立 `RemoteXAppAudio` API
+提供音频，不将音频生命周期绑定到原生 Viewer。已发布版本不因此自动获得该能力。
 
 | 原计划阶段 | 已完成的限定范围 | 后续边界 |
 | --- | --- | --- |
 | D1 | #31 已合并：Kasm/WSS、Manager 生命周期及基础 SDK | 默认 provider 未切换，正式发布资格单独验证 |
 | D2 | #33 已合并：原生输入、显式文本剪贴板和统计；#35 提供 Alpine 静态 Core/UAT | 物理 OS/浏览器矩阵、程序化输入、丰富格式及实际 宿主应用 流程仍有未完成项 |
-| D3 | 有冻结 PoC、音频模型和已确认连接时机 | 本文与 #45 准备产品接入；尚无产品音频能力 |
+| D3 | #49 候选已完成域、Manager/SDK、独立音频及限定自动化；用户确认当前 UAT 通过 | #46 → #48 → #49 审阅／合并、合并后候选资格和实际宿主集成分别处理 |
 | D4 | #37 已合并，受限 UDP/诊断/工作台 UAT 已接受 | 维持部署方配置端口池和 non-NAT 代理；更广网络与资源范围未自动验收 |
 | D5 | 原有候选发布流程保留 | 合并后确切产物、迁移回退、长稳、配对 UAT 与发布分别验证 |
 
@@ -42,7 +46,10 @@ SDK `0.31.0-dev.3`；已发布版本仍是 Core 0.15.0 / SDK 0.30.0。
 这些结果不包含真实浏览器、Pulse 设备、WAN、物理声卡或当前产品组合的重新验收。
 PoC 的固定后端清单、Access 身份哈希和 reconnect capability 都不能直接充当产品 ACL。
 
-## 3. 开发步骤及目的 / Delivery sequence
+## 3. 原定开发步骤及目的 / Original delivery sequence
+
+以下为接入开始时的开发顺序，作为历史设计保留。D3.1–D3.4 的产品实现、限定自动化
+和用户当前 UAT 决定见本文开头的候选记录；未验证边界以该记录为准。
 
 ### D3.1：同 UID 会话音频域
 
@@ -100,6 +107,10 @@ logout、workspace、worker/网络/Manager 故障和最终进程/FD/socket/track
 真实设备和 宿主应用 业务验收需要对应环境及人工参与；不能只凭连接成功标记通过。
 
 ## 4. 开发和交付边界 / Workflow
+
+当前下一步是整理 #46 → #48 → #49 的依赖、完成审阅与 CI 后合并，再对确切合并
+提交建立不可变候选。用户当前 UAT 通过不等于正式发布，也不要求重复每个开发检查点。
+以下保留最初的分工；原首个实验已完成，不能把历史步骤误列为仍未开始的工作。
 
 #45 保存实施进度和验收项。准备文档用独立 PR；运行行为用新的实现分支、工作目录
 和关联 Draft PR，按检查点保留可运行验证路径。代码变更同步 requirements、

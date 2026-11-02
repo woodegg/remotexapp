@@ -23,12 +23,16 @@ The frozen research baseline feeds the
 [native architecture](kasm-native-architecture.md), with remaining input/host,
 audio and product qualification tracked separately. AUD-002's
 connection timing (R3) was accepted as a design decision on 2026-10-25, without
-implementation acceptance. AUD-002 explicitly proposes changes
+full implementation acceptance at that time. Current standalone acceptance is
+recorded below. AUD-002 explicitly proposes changes
 to the original AUD-001 audio scope; KasmVNC and optional audio services remain
 separate components. [D3 / Issue #45](https://github.com/woodegg/remotexapp/issues/45)
-now prepares [session audio integration](native-audio-integration.md), beginning
-with same-UID domain verification before Manager/SDK integration. Native product
-audio remains unsupported. The abandoned multi-container UDP Host Agent proposal
+now has an implemented standalone candidate in PR #49 (workbench #48), Core
+0.16.0-dev.4 / SDK 0.31.0-dev.4 at `7926949`. The owner reported its current
+audio UAT passed on 2026-11-01; [evidence and limits](https://github.com/woodegg/remotexapp/blob/5c2a5f386e42f4529c206c2ed63e341b483d4830/tests/native-audio/qualification-7926949.md)
+remain separate from actual embedding-host and release qualification. The
+[original integration plan](native-audio-integration.md) retains the preparation
+sequence; PR review/merge and exact post-merge qualification are next. The abandoned multi-container UDP Host Agent proposal
 is not a dependency; current static deployment-owned UDP configuration remains.
 
 ## Separate release train: Core 0.14.5, Go 1.27.3
@@ -76,7 +80,9 @@ remain in force unless a dated replacement explicitly supersedes them.
 [Release pending](release-pending.md) records multiple concurrent servers
 (RTC-005), reliable external lease owners (RTC-006) and shared playback/microphone
 integration (AUD-001). These are proposals, not shipped features. AUD-001 is included in the
-KasmVNC evaluation above, but implementation is not locked. Promote a requirement into a reviewed train before coding.
+KasmVNC evaluation above as historical scope. Its AUD-002 replacement now has
+a standalone implementation and owner UAT decision in #45/#49; it remains
+unpublished and does not qualify deferred multi-server work.
 
 ## Selecting a new train
 

@@ -4882,3 +4882,15 @@ launch is a separate lifecycle/cost decision to measure. Do not infer finalized
 R4/R5 protocol, codec, lease or isolation choices from historical PoC UAT.
 This entry and preparation PR change no runtime capability, deployed service or
 release artifact; native audio remains unsupported until implemented and tested.
+
+
+## 2026-11-01 — Refresh D3 delivery status after owner UAT
+
+The owner reported the current standalone audio UAT passed and requested
+continuing PR #49. Refresh the preparation document and release-plan status
+to distinguish the implemented `7926949` candidate from the original research
+checkpoints. Keep those historical steps and their evidence limits; do not
+repeat the original unsupported-product description as current candidate state.
+The design/workbench/implementation chain is #46, #48, #49. Review/merge, exact
+post-merge qualification, publication and actual embedding-host acceptance remain
+separate. This documentation-only update changes no deployed artifacts.

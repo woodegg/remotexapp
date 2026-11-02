@@ -115,3 +115,19 @@ test('unavailable cross-tab lock suppresses writes; scope reset revokes requeste
   await assert.rejects(c.clipboard.paste(),{code:'clipboard-busy'});
   c.clipboard.reset();assert.deepEqual(c.clipboard.snapshot().requested,{toRemote:'off',toLocal:'off'});
 });
+
+
+test('explicit permission action reads once but never transfers, even when it grants access',async t=>{
+  const f=fixture(t),c=f.create();f.permissions['clipboard-read'].state='prompt';
+  await c.clipboard.configure({toRemote:'auto',toLocal:'auto'});
+  f.nav.clipboard.readText=async()=>{f.io.reads++;f.permissions['clipboard-read'].state='granted';return 'permission-only';};
+  await c.clipboard.requestPermission();assert.equal(f.io.reads,1);assert.deepEqual(c.sent,[]);assert.deepEqual(f.io.writes,[]);
+  f.nav.userActivation.isActive=false;await assert.rejects(c.clipboard.requestPermission(),{code:'clipboard-gesture'});
+});
+test('a real browser denial changes effective mode; fallback leaves native manual paste available',async t=>{
+  const f=fixture(t),c=await f.start();
+  f.nav.clipboard.readText=async()=>{throw new DOMException('denied','NotAllowedError');};
+  await assert.rejects(c.clipboard.paste(),{name:'NotAllowedError'});
+  assert.equal(c.clipboard.snapshot().effective.toRemote,'manual');assert.equal(c.clipboard.paste(),null);
+  assert.deepEqual(c.sent,[]);
+});

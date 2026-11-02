@@ -137,6 +137,7 @@ export class NativeClipboard {
     catch (_) { if (consent === this.consent) this.emit('permission-required'); }
     if (consent === this.consent) {
       await this.observePermissions(consent);
+      this.emit('permission-updated');
       this.schedule(0);
     }
     return this.snapshot();
@@ -223,6 +224,7 @@ export class NativeClipboard {
     } catch (error) {
       if (revision === this.revision) {
         this.conflict = true;
+        if (error.name === 'NotAllowedError') this.permissions[startedWrite ? 'write' : 'read'] = 'denied';
         this.emit(startedWrite ? 'clipboard-uncertain' : error.code || (error.name === 'NotAllowedError' ? 'clipboard-denied' : 'clipboard-unavailable'));
       } else if (startedWrite) this.emit('clipboard-uncertain');
       if (paste) throw error;
@@ -234,7 +236,7 @@ export class NativeClipboard {
     }
   }
   paste() {
-    if (this.requested.toRemote !== 'auto') return null;
+    if (this.effective('toRemote') !== 'auto') return null;
     const revision = this.revision;
     const ready = this.busy ? this.busy.done : Promise.resolve();
     return ready.then(() => { this.check(revision); return this.sync({paste:true}); }).then(result => {

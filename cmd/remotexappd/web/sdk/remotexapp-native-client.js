@@ -138,7 +138,7 @@ export class RemoteXAppNativeClient extends EventTarget {
         udpLoss:udp && features.udpLoss === true});
       const display = this._display = new NativeDisplay(this.container, socketURL.href, {
         resize:prepared.effectivePolicy?.display?.allowClientResize === true, clipboard, keyboardPolicy:this._keyboardPolicy,
-        prepareClipboardPaste:() => this._clipboardSync.paste(),
+        prepareClipboardPaste:() => { current(); return this._clipboardSync.paste(); },
         udp:udp && this.preferUDP, protocols:grant ? [`remotexapp-grant.${grant.token}`] : [] });
       display.addEventListener('transportchange', () => {
         if (epoch === this._epoch) this.dispatchEvent(new CustomEvent('transportchange', {detail:this.getStats()}));
@@ -318,15 +318,21 @@ export class RemoteXAppNativeClient extends EventTarget {
     const bounded = promise => Promise.race([promise, new Promise((_,reject) => {
       timer = setTimeout(() => reject(new RemoteXAppNativeError(startedWrite ? 'clipboard-uncertain' : 'clipboard-timeout', 'Clipboard action did not finish in time')), 5000);
     })]);
+    const localCall = action => globalThis.navigator?.locks?.request
+      ? navigator.locks.request('remotexapp-native-clipboard', {ifAvailable:true}, lock => {
+        if (!lock) throw new RemoteXAppNativeError('clipboard-busy', 'Another Viewer clipboard call is pending');
+        this._clipboardContext(epoch, grant);
+        return action();
+      }) : action();
     try {
       if (direction === 'download') {
         startedWrite = true;
-        await bounded(navigator.clipboard.writeText(this._clipboardText));
+        await bounded(localCall(() => navigator.clipboard.writeText(this._clipboardText)));
         try { this._clipboardContext(epoch, grant); }
         catch { throw new RemoteXAppNativeError('clipboard-uncertain', 'Local clipboard write may have completed after the Viewer changed'); }
         return {status:'copied-to-local'};
       }
-      const text = direction === 'clear' ? '' : await bounded(navigator.clipboard.readText());
+      const text = direction === 'clear' ? '' : await bounded(localCall(() => navigator.clipboard.readText()));
       const display = this._clipboardContext(epoch, grant);
       if (direction !== 'clear' && text === '') return {status:'empty-noop'};
       if (typeof text !== 'string' || !text.isWellFormed() || text.includes('\0')) throw new RemoteXAppNativeError('clipboard-format', 'Only valid plain text is supported');

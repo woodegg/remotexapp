@@ -100,12 +100,12 @@ implementation; move them to a version section when publishing a release.
   multiple Viewers do not receive JPEG payloads with stale lengths; add applied
   source cache tests with address, undefined-behavior and leak checks.
 
-Target: `0.16.0-dev.4`. Development only.
+Target: `0.16.0-dev.5`. Development only.
 
 Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
 remains the default. D1 is recorded in Issue #30; Issue #32 tracks the first
 D2 physical-input UAT checkpoint.
-Development identities are Core `0.16.0-dev.3` and SDK `0.31.0-dev.3`;
+Development identities are Core `0.16.0-dev.5` and SDK `0.31.0-dev.5`;
 these are not published or UAT-qualified releases.
 
 - Initialize the native adapter's mouse button map without the upstream UI.

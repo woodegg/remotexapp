@@ -386,7 +386,14 @@ func TestXClipboardBridgeExpiryAndClipmanStaleReplay(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := service.setRemote(7, "viewer_abcdefgh", "set", []clipboardItem{{Type: "image/png", Data: png}}); err != nil {
+	// libxfce4ui 4.20's image-only persistence takes a copy and becomes the
+	// selection owner. Clear must preserve that external owner. Use a rich
+	// selection here to exercise clearing a selection still owned by the
+	// gateway; external takeover is covered independently below.
+	if _, err := service.setRemote(7, "viewer_abcdefgh", "set", []clipboardItem{
+		{Type: "image/png", Data: png},
+		{Type: "text/plain", Data: []byte("stale image description")},
+	}); err != nil {
 		t.Fatal(err)
 	}
 	if output, err := readXClipboard(display, "image/png"); err != nil || !bytes.Equal(output, png) {
@@ -404,18 +411,22 @@ func TestXClipboardBridgeExpiryAndClipmanStaleReplay(t *testing.T) {
 		t.Fatalf("image did not survive offer metadata expiry: bytes=%d err=%v", len(output), err)
 	}
 
-	logOwner := func(stage string) {
-		t.Helper()
-		owner, ownerErr := xproto.GetSelectionOwner(bridge.conn, bridge.atoms.clipboard).Reply()
-		if ownerErr != nil {
-			t.Fatalf("%s owner query: %v", stage, ownerErr)
-		}
-		t.Logf("%s data-owner=%v empty-owner=%v no-owner=%v", stage, owner.Owner == bridge.window, owner.Owner == bridge.emptyWindow, owner.Owner == xproto.WindowNone)
+	owner, err := xproto.GetSelectionOwner(bridge.conn, bridge.atoms.clipboard).Reply()
+	if err != nil {
+		t.Fatal(err)
 	}
-	logOwner("before-clear")
+	if owner.Owner != bridge.window {
+		t.Fatal("clear fixture must still own the selection before clearing")
+	}
 	bridge.Clear()
+	owner, err = xproto.GetSelectionOwner(bridge.conn, bridge.atoms.clipboard).Reply()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if owner.Owner != bridge.emptyWindow {
+		t.Fatal("clear did not install the empty tombstone owner")
+	}
 	time.Sleep(300 * time.Millisecond)
-	logOwner("after-clear")
 	if output, err := readXClipboard(display, "UTF8_STRING"); len(output) != 0 {
 		t.Fatalf("Clipman replayed stale text after explicit clear: output=%q err=%v", output, err)
 	}
@@ -428,6 +439,76 @@ func TestXClipboardBridgeExpiryAndClipmanStaleReplay(t *testing.T) {
 	time.Sleep(300 * time.Millisecond)
 	if output, err := readXClipboard(display, "UTF8_STRING"); len(output) != 0 {
 		t.Fatalf("Clipman replayed stale text after cleared gateway exit: output=%q err=%v", output, err)
+	}
+	if output, err := readXClipboard(display, "image/png"); err == nil || len(output) != 0 {
+		t.Fatalf("Clipman replayed stale image after cleared gateway exit: bytes=%d err=%v", len(output), err)
+	}
+}
+
+func TestXClipboardClearPreservesExternalOwner(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires local Xvfb and xclip")
+	}
+	for _, binary := range []string{"Xvfb", "xclip"} {
+		if _, err := exec.LookPath(binary); err != nil {
+			t.Skipf("%s is unavailable", binary)
+		}
+	}
+	t.Setenv("XAUTHORITY", "")
+	png, err := base64.StdEncoding.DecodeString("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, test := range []struct {
+		name, target string
+		item         clipboardItem
+	}{
+		{"identical-image-copy", "image/png", clipboardItem{Type: "image/png", Data: png}},
+		{"new-application-text", "UTF8_STRING", clipboardItem{Type: "text/plain", Data: []byte("external application content")}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			display := startTestXvfb(t)
+			bridgeValue, err := newXClipboardBridge(display, func([]clipboardItem, string) {})
+			if err != nil {
+				t.Fatal(err)
+			}
+			bridge := bridgeValue.(*xClipboardBridge)
+			t.Cleanup(func() { _ = bridge.Close() })
+			if err := bridge.Set([]clipboardItem{{Type: "image/png", Data: png}}, nil); err != nil {
+				t.Fatal(err)
+			}
+			externalValue, err := newXClipboardBridge(display, func([]clipboardItem, string) {})
+			if err != nil {
+				t.Fatal(err)
+			}
+			external := externalValue.(*xClipboardBridge)
+			t.Cleanup(func() { _ = external.Close() })
+			if err := external.Set([]clipboardItem{test.item}, nil); err != nil {
+				t.Fatal(err)
+			}
+			assertExternal := func() {
+				t.Helper()
+				owner, err := xproto.GetSelectionOwner(external.conn, external.atoms.clipboard).Reply()
+				if err != nil {
+					t.Fatal(err)
+				}
+				if owner.Owner != external.window {
+					t.Fatal("external clipboard owner was replaced")
+				}
+				if data, err := readXClipboard(display, test.target); err != nil || !bytes.Equal(data, test.item.Data) {
+					t.Fatalf("external clipboard changed: bytes=%d err=%v", len(data), err)
+				}
+			}
+			assertExternal()
+			bridge.Clear()
+			assertExternal()
+			bridge.Clear()
+			assertExternal()
+			if err := bridge.Close(); err != nil {
+				t.Fatal(err)
+			}
+			assertExternal()
+		})
 	}
 }
 

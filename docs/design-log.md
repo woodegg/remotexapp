@@ -5035,3 +5035,42 @@ repeat the original unsupported-product description as current candidate state.
 The design/workbench/implementation chain is #46, #48, #49. Review/merge, exact
 post-merge qualification, publication and actual embedding-host acceptance remain
 separate. This documentation-only update changes no deployed artifacts.
+
+## 2026-11-01 — Bound the full repeated-test package budget (#52)
+
+The Nightly `soak-check` used Go's implicit ten-minute timeout for all twenty
+repetitions of each package. Existing lifecycle fixtures deliberately wait for
+readiness failures and descendant-preservation windows; a passing supervisor
+package run at `9c97e80` took 48.389 seconds. The observed ten-minute package
+alarm therefore does not establish a deadlock. Supersede the implicit budget
+with an explicit `SOAK_TIMEOUT` default of twenty minutes, while preserving
+production timeouts, all test assertions, twenty repetitions, bounded fuzzing
+and the workflow's 35-minute limit. The [test process](development-quality-process.md#repeated-test-time-budget)
+records interpretation and override rules. Completion of the complete gate,
+including the separate clipboard finding, remains required by
+[Issue #52](https://github.com/woodegg/remotexapp/issues/52).
+
+## 2026-11-01 — Qualify clipboard clearing by current ownership (#52)
+
+The original Clipman clear regression assumed that a PNG-only offer stayed
+owned by the gateway. Hosted Ubuntu 26.04 with Clipman 1.6.6/libxfce4ui 4.20.2
+reproduced eighteen failures out of twenty attempts; each failure already had
+an external owner before `Clear`. The upstream image-persistence path in
+[`owner_change`](https://gitlab.xfce.org/xfce/libxfce4ui/-/blob/libxfce4ui-4.20.2/libxfce4ui/xfce-clipboard-manager.c)
+copies image-only representations and installs a GTK selection owner.
+
+Supersede the unconditional stale-replay guarantee in CLP-016's original
+wording with an ownership-qualified contract: install an empty tombstone when
+the gateway still owns the selection; preserve an external owner even when
+its bytes match the former gateway selection. Never infer deletion authority
+from content equality or purge external history. This clarifies the existing
+runtime behavior, which is unchanged.
+
+Use a rich PNG-plus-text selection to verify retained-ownership expiry,
+explicit clear, empty tombstone and text/image readback after gateway exit
+with a real Clipman. Separately verify deterministic takeover by an independent
+owner for both identical PNG content and new application text, including
+repeated clear and gateway exit. Keep all readback assertions; do not make the
+previous failure pass by accepting stale data in the retained-owner case.
+[Issue #52](https://github.com/woodegg/remotexapp/issues/52) and its PR retain
+exact source, environment, reproduction and final gate evidence.

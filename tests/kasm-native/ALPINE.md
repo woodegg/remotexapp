@@ -96,6 +96,12 @@ not replace the shipped Mousepad or XFCE definitions. Install them with the
 normal package/install scripts. The UAT page accepts `templateId` in fixture
 configuration, defaulting to the existing `mousepad` template.
 
+Mousepad fixture package 1.0.2 uses Openbox's `--config-file` option and waits
+for window-manager readiness. Earlier 1.0.1 could start an unmanaged editor
+after Openbox rejected `--config`; an editor process alone is insufficient
+readiness. Install 1.0.2 as a new immutable package and reload the Manager's
+catalog for new Apps; existing pinned Apps are not restarted or rewritten.
+
 `ingress/` is a test-only HTTP proxy, built with `CGO_ENABLED=0`. It accepts only
 loopback and one configured edge IP, overwrites the test identity, and serves
 only the UAT page, fixture configuration and `/rx/` Manager proxy. The edge

@@ -11,6 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Fix the Alpine Mousepad UAT package's Openbox option and require window
+  manager readiness before opening the editor. Publish it as package 1.0.2;
+  existing pinned Apps retain their package and documents.
+
 - Add experimental native automatic plain-text clipboard with independent
   direction modes, explicit permission requests, focused-Viewer ownership,
   conflict detection and lifecycle fencing. Keep default-off and manual APIs;

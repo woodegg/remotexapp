@@ -2,7 +2,7 @@
   "apiVersion": "remotexapp/v1",
   "id": "alpine-mousepad",
   "name": "Alpine UAT Openbox + Mousepad",
-  "driverVersion": "1.0.1",
+  "driverVersion": "1.0.2",
   "singleton": false,
   "profileRef": "default",
   "runMode": "isolated",

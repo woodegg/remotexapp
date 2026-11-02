@@ -5139,3 +5139,12 @@ and remote middle-click selection local. The regression must verify selected
 text replacement by reading the saved remote document, not just clipboard
 submission or connection status. This supersedes the implicit native launcher
 default for PRIMARY; it does not alter the legacy provider.
+
+## 2026-11-02 — Require the UAT editor's window manager to be ready
+
+Native clipboard qualification exposed a pre-existing Alpine Mousepad fixture
+error: Openbox accepts `--config-file`, not `--config`. Package 1.0.2 corrects
+the option and checks the window manager before launching the editor. A visible
+unmanaged window must not satisfy the intended maximized-editor fixture setup.
+Install the new immutable package for new test Apps; preserve existing runtime
+pins and documents. This changes the test fixture, not production App packages.

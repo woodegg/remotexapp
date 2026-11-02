@@ -40,8 +40,22 @@ session_status_report --state loading --summary "Preparing Mousepad session" \
   --detail-string application=mousepad
 
 
-openbox --sm-disable --config "$script_dir/openbox.xml" >"$REMOTEXAPP_RUNTIME/openbox.log" 2>&1 &
+openbox --sm-disable --config-file "$script_dir/openbox.xml" >"$REMOTEXAPP_RUNTIME/openbox.log" 2>&1 &
 wm_pid=$!
+
+wm_ready=false
+for _ in $(seq 1 100); do
+  if ! kill -0 "$wm_pid" 2>/dev/null; then
+    echo "Openbox exited before window management became ready" >&2
+    exit 1
+  fi
+  if xdotool get_desktop >/dev/null 2>&1; then
+    wm_ready=true
+    break
+  fi
+  sleep 0.1
+done
+[ "$wm_ready" = true ] || { echo "Openbox readiness timed out" >&2; exit 1; }
 
 document_path=$(/usr/bin/jq -er 'if has("filePath") then .filePath | strings | select(length > 0) else "" end' "$REMOTEXAPP_PARAMETERS")
 set --

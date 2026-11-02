@@ -219,3 +219,44 @@ func TestNativeClipboardIsPinnedAndServerEnforced(t *testing.T) {
 		}
 	}
 }
+
+func TestNativeAudioPinRequiresSchemaSixAndCannotImplicitlyUpgrade(t *testing.T) {
+	pin := testfixture.Kasm(t)
+	m := &manager{cfg: config{stateDir: t.TempDir(), displayProvider: "kasm", kasmPin: &pin}}
+	item := testRuntimeManifest(t, m.cfg.stateDir, "audio-app-0123456789ab", "")
+	item.Components.DisplayProvider, item.Components.Kasm, item.Components.UnicodeEngine = "kasm", &pin, ""
+	item.Components.NativeAudio = "pcm-s16le-48k-v1"
+	if err := m.persistRuntime(item); err != nil {
+		t.Fatal(err)
+	}
+	records, err := m.loadRuntimeManifests()
+	if err != nil || len(records) != 1 || records[0].SchemaVersion != 6 || records[0].Components.NativeAudio != item.Components.NativeAudio {
+		t.Fatal("audio pin roundtrip failed", err)
+	}
+	for _, schema := range []int{2, 3, 4, 5} {
+		copy := records[0]
+		copy.SchemaVersion = schema
+		if m.validateRuntimeManifest("fixture", &copy) == nil {
+			t.Fatal("audio accepted by legacy schema", schema)
+		}
+	}
+	copy := records[0]
+	copy.Components.NativeAudio = ""
+	if m.validateRuntimeManifest("fixture", &copy) == nil {
+		t.Fatal("schema6 missing audio accepted")
+	}
+	if m.preflightUpgrade(item, item.Spec) == nil {
+		t.Fatal("audio removed by implicit upgrade")
+	}
+	if m.newRuntimeComponents().NativeAudio != "" {
+		t.Fatal("default audio enabled")
+	}
+	m.cfg.nativeAudio = true
+	if m.newRuntimeComponents().NativeAudio != "pcm-s16le-48k-v1" {
+		t.Fatal("new audio runtime lacks pin")
+	}
+	legacy := config{displayProvider: "tigervnc", nativeAudio: true}
+	if legacy.configureDisplayProvider() == nil {
+		t.Fatal("legacy provider accepted native audio")
+	}
+}

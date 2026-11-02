@@ -71,6 +71,9 @@ func (m *manager) persistRuntime(item *instance) error {
 		if item.Components.NativeUDP {
 			record.SchemaVersion = nativeUDPManifestSchema
 		}
+		if item.Components.NativeAudio != "" {
+			record.SchemaVersion = nativeAudioManifestSchema
+		}
 	}
 	if record.DesiredState == "" {
 		record.DesiredState = "running"
@@ -221,25 +224,28 @@ func (m *manager) loadRuntimeManifests() ([]runtimeManifestRecord, error) {
 }
 
 func (m *manager) validateRuntimeManifest(path string, record *runtimeManifestRecord) error {
-	if record.SchemaVersion != runtimeManifestSchema && record.SchemaVersion != runtimeRecoverySchema && record.SchemaVersion != nativeManifestSchema && record.SchemaVersion != nativeUDPManifestSchema {
+	if record.SchemaVersion != runtimeManifestSchema && record.SchemaVersion != runtimeRecoverySchema && record.SchemaVersion != nativeManifestSchema && record.SchemaVersion != nativeUDPManifestSchema && record.SchemaVersion != nativeAudioManifestSchema {
 		return fmt.Errorf("load runtime manifest %s: unsupported schemaVersion %d", path, record.SchemaVersion)
 	}
-	if record.SchemaVersion == nativeManifestSchema || record.SchemaVersion == nativeUDPManifestSchema {
+	if record.SchemaVersion == nativeManifestSchema || record.SchemaVersion == nativeUDPManifestSchema || record.SchemaVersion == nativeAudioManifestSchema {
 		if record.DisplayProvider != "kasm" || displayProvider(record.Components) != "kasm" {
 			return errors.New("schema 4 requires a pinned Kasm display provider")
 		}
 	} else if record.DisplayProvider != "" || displayProvider(record.Components) != "tigervnc" {
 		return errors.New("legacy runtime schema cannot contain a native display provider")
 	}
-	if record.SchemaVersion == runtimeRecoverySchema || (record.SchemaVersion == nativeManifestSchema || record.SchemaVersion == nativeUDPManifestSchema) && record.Recovery != nil {
+	if record.SchemaVersion == runtimeRecoverySchema || (record.SchemaVersion == nativeManifestSchema || record.SchemaVersion == nativeUDPManifestSchema || record.SchemaVersion == nativeAudioManifestSchema) && record.Recovery != nil {
 		if err := validateManagedRecovery(record.Recovery, &record.Runtime, record.ResolvedSpec); err != nil {
 			return fmt.Errorf("load runtime manifest %s: %w", path, err)
 		}
 	} else if record.Recovery != nil {
 		return errors.New("schema 2 cannot contain managed recovery metadata")
 	}
-	if record.Components.NativeUDP != (record.SchemaVersion == nativeUDPManifestSchema) {
+	if record.SchemaVersion != nativeAudioManifestSchema && record.Components.NativeUDP != (record.SchemaVersion == nativeUDPManifestSchema) {
 		return errors.New("native UDP requires schema 5")
+	}
+	if (record.Components.NativeAudio != "") != (record.SchemaVersion == nativeAudioManifestSchema) {
+		return errors.New("native audio requires schema 6")
 	}
 	if err := m.validateUDPCatalogLease(record.Components.UDPEndpoint); err != nil {
 		return err

@@ -215,7 +215,7 @@ func downgrade(a, b string) bool {
 }
 func (m *manager) versionView(item *instance) *runtimeVersions {
 	v := &runtimeVersions{Current: versionFor(item.Spec, item.Components)}
-	if displayProvider(item.Components) != displayProvider(m.currentComponents()) || item.Components.NativeUDP != m.currentComponents().NativeUDP {
+	if displayProvider(item.Components) != displayProvider(m.currentComponents()) || item.Components.NativeUDP != m.currentComponents().NativeUDP || item.Components.NativeAudio != m.currentComponents().NativeAudio {
 		v.Reason = "display provider or native transport changes require a stopped, scoped migration"
 		return v
 	}
@@ -290,7 +290,7 @@ func (m *manager) setUpgrade(item *instance, u *runtimeUpgrade, phase, code, mes
 	return nil
 }
 func (m *manager) preflightUpgrade(item *instance, target classConfig) error {
-	if displayProvider(item.Components) != displayProvider(m.currentComponents()) || item.Components.NativeUDP != m.currentComponents().NativeUDP {
+	if displayProvider(item.Components) != displayProvider(m.currentComponents()) || item.Components.NativeUDP != m.currentComponents().NativeUDP || item.Components.NativeAudio != m.currentComponents().NativeAudio {
 		return errors.New("display provider or native transport changes require a stopped, scoped migration")
 	}
 	if target.Package == nil {

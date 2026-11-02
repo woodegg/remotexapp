@@ -832,6 +832,9 @@ func (m *manager) startSession(id string) (sessionErr error) {
 	args = append(args, appSystemdEnvironmentArgs(item, class)...)
 	if isKasm(item) {
 		args = append(args, "--setenv=REMOTEXAPP_INPUT_PROVIDER=native")
+		if item.Components.NativeAudio != "" {
+			args = append(args, "--setenv=REMOTEXAPP_NATIVE_AUDIO="+item.Components.NativeAudio)
+		}
 	}
 	if class.RunMode == "user-home" {
 		// Main-process loss must not make systemd kill surviving editors before
@@ -991,6 +994,7 @@ func (m *manager) stopSession(id string, options stopOptions) error {
 // retired. In standalone mode an empty cgroup still consumes the delegated
 // descendant quota, so merely publishing SessionState=stopped is insufficient.
 func (m *manager) cleanupSessionComponent(item *instance) error {
+	m.fenceAudio(item.ID, item.SessionGeneration)
 	if item.SessionUnit != "" {
 		output, err := m.stopComponent(item.SessionUnit)
 		if err != nil && !strings.Contains(output, "not loaded") {

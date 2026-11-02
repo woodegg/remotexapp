@@ -77,13 +77,26 @@ Review/merge, actual embedding-host and post-merge release qualification remain 
 | KNA-008 | Separate host window/workspace references, Viewer lifetime, audio interests and App keepalive. | Real host hidden/closed/recreated window, multiple Tabs, login change and last-reference tests |
 | KNA-009 | Version provider-specific durable state and lock resources before launch; migrate/rollback only with scoped stop and preserved data. | Old/new format rejection/adoption, write failures, duplicate-port prevention and paired SDK/Core rollback rehearsal |
 | KNA-010 | Qualify exact product artifacts, clean distribution inputs, resource/performance and host integration separately from research/UAT history. Rebuild for each target architecture, record machine/compiler identity, verify ELF architecture/linkage and preserve native sanitizer gates when selecting another test compiler. | Fixed candidate plus workload/baseline/thresholds, corrected harness, target-side native checks, actual cleanup, physical UAT and publication gates |
-| AUD-002 | Propose per-session audio domains and controls over one scoped mux connection, same-session multi-Tab deduplication, explicit multi-target mic with per-target writer ownership; default off. Connection lifetime accepted: connect when at least one App's speaker or mic is enabled, share within the scope, release when all are off; App launch alone does not connect and silence does not disconnect. | R3 design accepted 2026-10-25; remaining choices await review. The UAT workbench must distinguish local device observations from remote audio acceptance, support same/different-runtime comparison, cancel local capture on panel close/page retirement and fence late permission results; export only content-free observations and explicitly unexecuted remote cases while audio is unavailable. Verify first enable, additional subscription, partial disable, final disable and enabled-but-silent behavior, plus real playback/readback, permission/owner/worker/outage tests; see [audio model](kasm-native-architecture.md#audio-model) |
+| AUD-002 | Develop opt-in per-session audio domains and controls over one scoped mux connection, same-session multi-Tab deduplication, explicit multi-target mic with per-target writer ownership; default off. Connection lifetime accepted: connect when at least one App's speaker or mic is enabled, share within the scope, release when all are off; App launch alone does not connect and silence does not disconnect. | R3 design accepted 2026-10-25; full D3 implementation selected 2026-11-01 in #45/#49. Standalone automation and cleanup are qualified for [candidate 7926949](../tests/native-audio/qualification-7926949.md); the owner reported the current standalone audio UAT passed on 2026-11-01, without supplying a per-device/browser/region checklist. Actual embedding-host and post-merge release qualification remain separate. See [native audio contract](native-audio.md). The UAT workbench must distinguish local device observations from remote audio acceptance, support same/different-runtime comparison, cancel local capture on panel close/page retirement and fence late permission results; export only content-free observations and explicitly unexecuted remote cases while audio is unavailable. Verify first enable, additional subscription, partial disable, final disable and enabled-but-silent behavior, plus real playback/readback, permission/owner/worker/outage tests, including permission/device loss while a route acknowledgment is pending, silent worker termination, and Manager epoch replacement without automatic capture; see [audio model](kasm-native-architecture.md#audio-model) |
+
+AUD-002 clarification: server-initiated retirement of the final enabled App
+(including vacancy shutdown) releases the shared audio WSS on the next
+coordinator reconciliation; an idle retained reference is not audio demand.
+Playback credits cover each enabled speaker’s bounded queue (eight per route,
+at most 64); removing routes shrinks the allowance. UAT audio rates retain the
+last fresh counter sample across worklet-level updates and reset with the
+connection. A temporarily unavailable audio domain fences only its own route;
+other App subscriptions and the existing microphone capture continue. Scope
+authentication failure still fences every route.
+
 
 AUD-002 proposes replacing only AUD-001's global user-mix and single-mic-target
 scope for the native architecture. Shared connection, explicit permission,
 default-off, cross-Tab ownership and lifecycle safeguards remain. Neither audio
-proposal is shipped; acceptance must be recorded before implementation scope
-is locked.
+proposal is shipped. The 2026-11-01 D3 implementation selection in #45 supersedes
+the earlier proposed implementation scope. Owner standalone audio UAT passed
+on 2026-11-01; downstream host integration, post-merge qualification and
+publication remain separately recorded acceptance steps.
 
 ## Selected Core 0.15.0 — managed desktop self-recovery
 

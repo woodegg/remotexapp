@@ -15,6 +15,9 @@ type requestIdentityKey struct{}
 func (m *manager) secure(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		setSecurityHeaders(w)
+		if m.cfg.nativeAudio {
+			w.Header().Set("Permissions-Policy", "camera=(), microphone=(self), geolocation=(), payment=(), usb=(), clipboard-read=(self), clipboard-write=(self)")
+		}
 		requestID := strings.TrimSpace(r.Header.Get("X-Request-ID"))
 		if !validRequestID(requestID) {
 			var value [12]byte

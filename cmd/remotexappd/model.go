@@ -80,6 +80,7 @@ type sessionRecovery struct {
 // can be adopted; they must never leak into the V1 public API.
 type publicInstanceView struct {
 	NativeTransport        *nativeTransportView         `json:"nativeTransport,omitempty"`
+	NativeAudio            string                       `json:"nativeAudio,omitempty"`
 	NativeClipboard        string                       `json:"nativeClipboard,omitempty"`
 	DisplayProvider        string                       `json:"displayProvider"`
 	DisplayComponentDigest string                       `json:"displayComponentDigest,omitempty"`
@@ -157,6 +158,7 @@ type createRequest struct {
 }
 
 type runtimeComponents struct {
+	NativeAudio          string          `json:"nativeAudio,omitempty"`
 	NativeUDP            bool            `json:"nativeUDP,omitempty"`
 	UDPEndpoint          *udpLease       `json:"udpEndpoint,omitempty"`
 	UDPUnavailableReason string          `json:"udpUnavailableReason,omitempty"`
@@ -260,6 +262,8 @@ type managedPatchRequest struct {
 }
 
 type manager struct {
+	audioOnce       sync.Once
+	audio           *audioService
 	nativeGrants    map[[32]byte]*nativeGrant
 	viewerChannels  map[*viewerChannel]struct{}
 	cfg             config

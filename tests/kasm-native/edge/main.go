@@ -81,6 +81,12 @@ func upstreamHeaders(r *http.Request) http.Header {
 			h.Set(key, value)
 		}
 	}
+	if strings.HasPrefix(r.URL.Path, "/rx/api/audio/") {
+		if cookies := audioCookies(r); cookies != "" {
+			h.Set("Cookie", cookies)
+		}
+		h.Set("X-Forwarded-Proto", "https")
+	}
 	return h
 }
 
@@ -101,7 +107,11 @@ func edgeHandler(c configuration) (http.Handler, error) {
 		if r.StatusCode >= 300 && r.StatusCode < 400 {
 			return fmt.Errorf("upstream redirects are unavailable")
 		}
+		cookies := audioResponseCookies(r)
 		r.Header = make(http.Header)
+		for _, cookie := range cookies {
+			r.Header.Add("Set-Cookie", cookie)
+		}
 		r.Header.Set("Content-Type", "application/json")
 		r.Header.Set("Cache-Control", "no-store")
 		r.Header.Set("X-Content-Type-Options", "nosniff")
@@ -153,6 +163,10 @@ func edgeHandler(c configuration) (http.Handler, error) {
 				return
 			}
 			bridge(w, r, target)
+			return
+		}
+		if r.URL.Path == "/rx/api/audio/ws" {
+			audioBridge(w, r, target)
 			return
 		}
 		if r.URL.Path == "/fixture-config" || strings.HasPrefix(r.URL.Path, "/rx/api/") || (match != nil && (match[2] == "prepare" || match[2] == "grant" || match[2] == "lease" || match[2] == "revoke")) {

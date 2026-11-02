@@ -4909,6 +4909,122 @@ the existing UAT ingress/edge; no extra asset routes or runtime changes are need
 See the [workbench procedure](../tests/kasm-native/UAT-WORKBENCH.md).
 
 
+## 2026-11-01 — D3 private audio domains and scoped PCM transport
+
+Issue #45 / PR #49 implement AUD-002 after the owner requested complete audio
+integration followed by one end-to-end UAT. This supersedes the preceding
+preparation entry's product-unavailable state only as each qualified artifact
+is delivered; it does not reinterpret earlier local checks as remote acceptance.
+
+An opt-in native runtime pins the audio protocol and durable schema 6. Its Core
+session supervisor prepares a private Pulse server before App launch and passes
+explicit PULSE configuration/runtime/state/cookie paths without changing HOME or
+the App's account bus. The domain loads only virtual speaker and microphone
+modules. Empty App audio preparation does not create a browser connection.
+Same-UID routing is not a malicious-tenant isolation boundary. Audio-only faults
+replace the domain ID at the same App endpoint with bounded retries; input and
+the App remain alive. Old runtime generations and audio domain IDs are fenced.
+
+The first protocol is PCM16LE, 48 kHz, 20 ms frames: stereo speaker, mono mic.
+Go stays statically buildable; Pulse tools remain explicit distribution runtime
+dependencies. No codec is imported. Non-silent payload costs 1.536 Mbit/s per
+speaker and 0.768 Mbit/s per shared mic, before framing/TLS. Exact digital silence
+uses a short marker while the enabled channel remains connected. Queues and
+stream counts are bounded; actual WAN delay/quality require measurement.
+
+A separate authenticated cookie epoch scopes one audio WSS. One-use connection
+and route grants bind authenticated principal, scope, runtime generation and
+private domain identity. HTTP leases expire after 30 seconds without renewal;
+audio traffic is not authorization renewal or App keepalive. SharedWorker
+coordinates per-session switches/references, one playback owner and one explicit
+microphone capture. Server arbitration permits one writer per target and visible
+explicit takeover. Owner loss or failure never silently reacquires a microphone.
+The trusted selected-UID service authorization model remains unchanged.
+
+Full protocol, failure, compatibility and verification limits are maintained in
+[native audio](native-audio.md). Historical PoC results are research inputs;
+product, target architecture, resource and physical-device checks remain distinct.
+
+
+### 2026-11-01 — Audio failure retirement and explicit controller recovery
+
+D3 fault qualification extends the [native audio contract](native-audio.md):
+worker liveness is independent of serialized permission/network operations.
+A ten-second active-page watchdog releases capture and retires an unresponsive
+controller, with a grace period after page suspension. Reconnect refreshes the
+server context before requesting a grant; a service/account epoch change retires
+old references. The UAT offers explicit controller recreation with audio off.
+These safeguards implement the accepted no-silent-microphone-reacquisition rule;
+they do not renew App lifecycle leases or change display UDP ownership.
+
+
+### 2026-11-01 — Reconcile audio after final server-side retirement
+
+Supersedes the incomplete cleanup trigger in the initial [native audio
+contract](native-audio.md), without changing its first/last-demand invariant
+(AUD-002). Full ARM64 lifecycle testing found that normal App retirement stopped
+all readers, writers and microphone capture but retained an empty WSS: the
+coordinator tick only synchronized when a desired route remained. It now also
+reconciles an existing connection, releasing it when the server has retired the
+last enabled route. A two-App regression checks that retiring the first App
+preserves the other route and retiring the last closes the channel.
+
+
+### 2026-11-01 — Match shared playback credits to bounded speaker queues
+
+Supersedes the fixed aggregate playback allowance in the initial
+[native audio contract](native-audio.md), retaining its bounded-memory invariant
+(AUD-002). Two enabled speakers previously shared eight credits even though each
+worklet stream has an eight-frame queue. [P17](../tests/performance/native-audio-burst/README.md)
+reproduces dropped ordinary bursts and selects eight credits per enabled speaker,
+with a 64-frame maximum and a shrinking allowance when routes turn off. Packet
+format, per-stream worklet queues, microphone credits and capture privacy remain
+unchanged. Partial WAN observations that exposed the issue do not qualify the
+repaired candidate; it requires its own artifact-bound resource run.
+
+
+### 2026-11-01 — Isolate unavailable audio routes from the shared channel
+
+The [native audio contract](native-audio.md) requires failure isolation between
+cooperative App domains (AUD-002). A deterministic regression found that a
+single route's HTTP 409 during domain recovery reached the shared connection's
+error handler, closing healthy routes and their microphone capture. Handle that
+specific unavailable-domain response within the affected route, revoke its old
+subscription, turn off its microphone target, and retry requested speaker
+recovery. Authentication errors and shared-channel failures still fence every
+route. Real-browser tests hold one domain unavailable while verifying the other
+domain's actual speaker and microphone readback over the unchanged connection.
+
+
+## 2026-11-01 — D3 standalone automated qualification, physical UAT pending
+
+[Candidate 7926949](../tests/native-audio/qualification-7926949.md) binds the
+AMD64/ARM64 builds, three dedicated standalone UATs, real waveform and App
+lifecycle/fault checks, natural thirty-minute resource observation and cleanup.
+Earlier aborted observations are retained as development findings, not passes.
+Local queue/underrun counters remain separate from packet loss and acoustic
+acceptance. The owner receives one complete physical end-to-end UAT after these
+automated gates. This does not change the accepted provider default, publish a
+release, qualify a merged commit or accept the actual embedding host adapter.
+
+
+## 2026-11-01 — Owner accepts the standalone audio UAT
+
+The owner reported the current audio UAT passed and requested continuing PR
+#49. [The candidate record](../tests/native-audio/qualification-7926949.md#owner-uat-acceptance--2026-11-01)
+records that human decision for source `7926949`, separately from the existing
+waveform/resource evidence. No runtime code, protocol, dependency or deployed
+artifact changes in this acceptance update. No per-case export or final
+device/browser/region matrix was supplied; those details are not inferred.
+
+This supersedes the preceding qualification entry's pending human-UAT status
+only for the current standalone integration. It does not establish an
+intermittent-sound root cause, broaden measured resource/acoustic guarantees,
+accept an actual embedding host or approve a release. The next gates are
+review/merge and qualification of the exact post-merge candidate. Native
+automatic clipboard requirements in Issue #50 / PR #51 remain independent.
+
+
 ## 2026-11-01 — Refresh D3 delivery status after owner UAT
 
 The owner reported the current standalone audio UAT passed and requested

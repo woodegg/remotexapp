@@ -8,6 +8,11 @@ The owner accepted the reference-host UAT on 2026-11-03 in
 qualification and publication are tracked in
 [#59](https://github.com/woodegg/remotexapp/issues/59).
 
+Release qualification also found and corrected stale Viewer counts blocking
+managed desktop recovery after Manager restart and a changed boot (#62).
+Startup discards counts belonging to the previous Manager; current connection
+ownership checks, live-process protection and retry policy remain intact.
+
 ## Install and select capabilities
 
 The published Core archive contains four Linux AMD64 binaries, eight versioned

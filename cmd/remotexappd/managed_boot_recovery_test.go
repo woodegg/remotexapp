@@ -74,6 +74,25 @@ func TestManagedBootRecoveryDurableDeadlineAndPins(t *testing.T) {
 	}
 }
 
+func TestManagedBootRecoveryStartupDiscardsPreviousManagerViewerCount(t *testing.T) {
+	m, item, now, calls := managedBootFixture(t)
+	record := runtimeManifestRecord{Runtime: *item, DesiredState: "running", ResolvedSpec: item.Spec, Components: item.Components}
+	// A crash can persist counts from sockets owned by the previous Manager.
+	// There are no live Viewer channels in the new Manager at startup.
+	record.Runtime.AttachedClients = 2
+	m.restoreRuntimeManifests([]runtimeManifestRecord{record})
+	restored := m.get(item.ID)
+	if restored.AttachedClients != 0 || restored.Recovery == nil || !restored.Recovery.NextAttemptAt.After(*now) || *calls != 0 {
+		t.Fatalf("startup retained stale Viewers or bypassed recovery delay: %+v", restored)
+	}
+	*now = restored.Recovery.NextAttemptAt
+	stepBackgroundRecovery(t, m, restored, *now)
+	got := m.get(item.ID)
+	if *calls != 1 || got.SessionGeneration != 10 || got.SessionState != "stopped" || got.AttachedClients != 0 || got.Recovery.Attempts != 1 {
+		t.Fatalf("stale persisted Viewer count blocked pinned boot recovery: %+v", got)
+	}
+}
+
 func TestManagedBootRecoveryGuards(t *testing.T) {
 	for _, guard := range []string{"managed-stop", "runtime-stop", "shutdown", "upgrade", "process", "viewer", "port", "storage"} {
 		t.Run(guard, func(t *testing.T) {

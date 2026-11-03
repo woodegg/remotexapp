@@ -24,6 +24,11 @@ the Core archive includes their source recipe and the host migration guides.
 Owner-reported reference-host UAT was accepted on 2026-11-03; exact post-merge
 publication qualification is tracked in Issue #59.
 
+- Fix managed boot recovery retaining a previous Manager's Viewer count (#62).
+  Startup discards the old connection count before restoring manifests, so an
+  otherwise eligible desktop is not permanently blocked by nonexistent
+  Viewers. Live ownership checks, recovery delay and component pins remain intact.
+
 - Fix user-home template launch in the host workbench: connect the unique running
   managed target instead of sending an ordinary create request that returns 409.
   Stopped, missing or ambiguous targets show explicit managed-state guidance;

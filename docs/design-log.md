@@ -5271,3 +5271,15 @@ it does not bundle or silently install Kasm/PulseAudio/application binaries.
 Exact post-merge archive checks and publication identities remain distinct from
 the earlier PR candidate and owner-reported functional UAT. Downstream deployment
 and automatic multi-container UDP orchestration remain separate work.
+
+## 2026-11-03 — Discard previous-Manager Viewer counts before restoration
+
+Release qualification found that the managed boot-recovery branch bypassed the
+attachment-count reset already performed during healthy adoption (RTM-007).
+A manifest saved while a Viewer was attached could then block an otherwise
+safe recovery as `viewer-attached`, although the new Manager owned no socket.
+Issue #62 extends that existing startup invariant to every manifest restoration
+branch. This does not grant authority to fence unregistered live channels:
+in-process ownership checks, retained retry deadlines/budgets, live-process
+protection and component pins are unchanged. A failing regression and the
+unchanged disposable-UID boot simulation cover the original failure boundary.

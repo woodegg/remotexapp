@@ -11,6 +11,11 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Specify the selected native rich clipboard extension: plain text, HTML and
+  PNG with a 2 MiB aggregate transaction limit, retaining text-only pinned App
+  compatibility and excluding file/directory copy. Implementation and separate
+  qualification are tracked in #55; this entry does not advertise runtime support.
+
 - Make the single-App Alpine Mousepad UAT package explicitly omit Openbox's
   default content-area mouse bindings (package 1.0.3). A synchronous click grab
   could leave subsequent batched shortcuts with a stale mouse-button state.

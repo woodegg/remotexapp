@@ -119,6 +119,10 @@ manual-checkpoint results do not accept this feature.
 
 ## Delivery and compatibility
 
+The selected follow-on [rich clipboard extension](native-rich-clipboard.md)
+tracks HTML/PNG and a 2 MiB aggregate limit separately in Issue #55. It does
+not expand the scope or evidence of this initial 64 KiB text checkpoint.
+
 1. Review this requirements-only PR with `Refs #50`. Keep the Issue open.
 2. Use a separate linked implementation PR for the SDK/adapter, minimal native
    changes, workbench and tests. Update API/version/provenance records with the

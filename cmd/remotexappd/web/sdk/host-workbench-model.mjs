@@ -1,3 +1,17 @@
+// A user-home template can only be opened through its registered managed target.
+// Resolving a template never creates a registration or changes desired state.
+export function templateTarget(template, managed = []) {
+  if (!template?.id) throw new Error('template-unavailable');
+  if (template.runMode !== 'user-home') return {templateId:template.id};
+  const matches=managed.filter(item=>item.templateId===template.id);
+  if (!matches.length) throw new Error('managed-registration-required');
+  if (matches.length !== 1) throw new Error('managed-selection-required');
+  const target=matches[0];
+  if (target.desiredState !== 'running') throw new Error('managed-start-required');
+  if (target.observedState !== 'running') throw new Error('managed-unavailable');
+  return {managedId:target.id};
+}
+
 export function parameterValue(definition, value) {
   if (definition.type === 'boolean') return !!value;
   if (value === '') {

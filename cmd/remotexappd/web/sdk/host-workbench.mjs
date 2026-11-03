@@ -1,5 +1,5 @@
 import {RemoteXAppHost, SDK_VERSION} from './index.js';
-import {parameterValue,rateSnapshot,latencyText} from './host-workbench-model.mjs';
+import {templateTarget,parameterValue,rateSnapshot,latencyText} from './host-workbench-model.mjs';
 
 const $=selector=>document.querySelector(selector);
 const baseURL=location.pathname.slice(0,location.pathname.lastIndexOf('/sdk/'));
@@ -20,7 +20,14 @@ async function perform(label,action,control){
   try {const result=await action();report(label);return result;}
   catch(error){const raw=error.code || (error.status?`HTTP-${error.status}`:error.name==='AbortError'?'cancelled':error.message);
     const code=typeof raw==='string' && /^[a-zA-Z0-9_-]{1,64}$/.test(raw)?raw:'operation-failed';
-    notice(`${label}：${code || '操作失败'}`,true);report(label,'failed',code);}
+    const managedHelp={
+      'managed-registration-required':'此模板需要先配置托管桌面。',
+      'managed-selection-required':'有多个托管目标，请在「已有应用与托管桌面」中选择具体桌面。',
+      'managed-start-required':'桌面已停止，请先在「已有应用与托管桌面」中明确启动，再连接。',
+      'managed-unavailable':'托管桌面尚未就绪，请检查下方状态；连接操作不会自动重启桌面。',
+    }[code];
+    if(managedHelp)$('#managed').closest('details').open=true;
+    notice(`${label}：${managedHelp || code || '操作失败'}`,true);report(label,'failed',code);}
   finally{if(control)control.disabled=false;}
 }
 function parameters(container,definitions,values={}) {
@@ -44,9 +51,12 @@ let launchParameters=()=>({});
 function templateSelected(){
   const template=templates.find(t=>t.id===$('#template').value);
   if(!template){$('#launch-button').disabled=true;return;}
+  const managed=template.runMode==='user-home';
   $('#launch-button').disabled=false;
-  $('#template-info').textContent=`${template.runMode} · ${template.singleton?'共享单例':'独立实例'} · ${template.sessionActivation} · ${template.display.allowClientResize?'可调整远端尺寸':'固定远端尺寸'}`;
-  launchParameters=parameters($('#parameters'),template.parameters);
+  $('#launch-button').textContent=managed?'连接托管桌面':'打开应用';
+  $('#profile').disabled=managed;
+  $('#template-info').textContent=managed?'托管桌面 · Managed desktop · 使用已有配置；已停止的桌面需要先明确启动。':`${template.runMode} · ${template.singleton?'共享单例':'独立实例'} · ${template.sessionActivation} · ${template.display.allowClientResize?'可调整远端尺寸':'固定远端尺寸'}`;
+  launchParameters=parameters($('#parameters'),managed?{}:template.parameters);
 }
 async function refresh(){
   const [catalog,instances,managed,version]=await Promise.all([host.templates({refresh:true}),host.manager.listInstances(),host.manager.listManagedInstances(),host.manager.getVersion()]);
@@ -178,7 +188,13 @@ function update(w){
   w.audioState.textContent=`${audio.connection} · 播放 ${route?.actualSpeaker?'开':'关'} · 麦克风 ${route?.actualMic?'开':'关'}${route?.reason?` · ${route.reason}`:''}`;
 }
 $('#template').addEventListener('change',templateSelected);
-$('#launch').addEventListener('submit',event=>{event.preventDefault();perform('打开应用',()=>open({templateId:$('#template').value,parameters:launchParameters(),profileRef:$('#profile').value || undefined}),$('#launch-button'));});
+$('#launch').addEventListener('submit',event=>{event.preventDefault();perform('打开应用',async()=>{
+  const template=templates.find(t=>t.id===$('#template').value);
+  const managed=template?.runMode==='user-home';
+  // Read current registrations at the time of user intent, not a cached catalog.
+  const target=templateTarget(template,managed?await host.manager.listManagedInstances():[]);
+  return open(managed?target:{...target,parameters:launchParameters(),profileRef:$('#profile').value || undefined});
+},$('#launch-button'));});
 $('#refresh').addEventListener('click',()=>perform('刷新目录',refresh,$('#refresh')));
 document.querySelectorAll('[data-workspace]').forEach(b=>b.addEventListener('click',()=>{workspace=Number(b.dataset.workspace);show();report('切换工作区');}));
 $('#logout').addEventListener('click',()=>perform('退出并释放',async()=>{await host.logout();windows.clear();tasks.clear();$('#windows').replaceChildren();$('#window-tabs').replaceChildren();$('#tasks').replaceChildren();show();notice('本页已释放；应用遵循自身空闲策略。重新加载页面可继续。');},$('#logout')));

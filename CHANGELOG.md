@@ -11,6 +11,11 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Fix user-home template launch in the host workbench: connect the unique running
+  managed target instead of sending an ordinary create request that returns 409.
+  Stopped, missing or ambiguous targets show explicit managed-state guidance;
+  catalog launch never starts or restarts a managed desktop implicitly.
+
 - Add the native host SDK and `/sdk/host.html` reference workbench (#57):
   template launch/reuse, managed attachment, separate window/task ownership,
   bounded generation-fenced reconnect, native text/shortcut submission,

@@ -30,6 +30,11 @@ resulting generation. It does not acquire an audio channel or attach a hidden
 Viewer. A lifecycle observer never starts a stopped application. Managed
 attachment requires an explicitly running managed target; use the existing
 Manager managed-state API for a separate start/stop decision.
+The workbench resolves a selected `user-home` template using the current managed
+catalog, then calls `host.open({managedId})` for its unique running registration.
+Missing or multiple registrations require explicit selection/configuration;
+stopped targets require the separate Start action. `host.open({templateId})`
+remains the ordinary App creation API and cannot create user-home desktops.
 
 ## Workflow changes
 

@@ -1,6 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parameterValue,rateSnapshot,latencyText} from './host-workbench-model.mjs';
+import {templateTarget,parameterValue,rateSnapshot,latencyText} from './host-workbench-model.mjs';
+test('user-home catalog launch attaches the registered desktop rather than creating a runtime',()=>{
+  const desktop={id:'openbox',runMode:'user-home'};
+  const running={id:'managed-desktop',templateId:'openbox',desiredState:'running',observedState:'running'};
+  assert.deepEqual(templateTarget(desktop,[{...running,id:'unrelated',templateId:'other'},running]),{managedId:'managed-desktop'});
+  assert.deepEqual(templateTarget({id:'editor',runMode:'isolated'},[running]),{templateId:'editor'});
+  assert.deepEqual(templateTarget({id:'browser',runMode:'shared'},[running]),{templateId:'browser'});
+  assert.throws(()=>templateTarget(undefined),/template-unavailable/);
+  assert.throws(()=>templateTarget(desktop,[]),/managed-registration-required/);
+  assert.throws(()=>templateTarget(desktop,[running,{...running,id:'another'}]),/managed-selection-required/);
+  assert.throws(()=>templateTarget(desktop,[{...running,desiredState:'stopped'}]),/managed-start-required/);
+  assert.throws(()=>templateTarget(desktop,[{...running,observedState:'failed'}]),/managed-unavailable/);
+  assert.equal(running.desiredState,'running');
+});
 test('template forms preserve typed booleans, integers, JSON and omitted defaults',()=>{
   assert.equal(parameterValue({type:'boolean'},false),false);
   assert.equal(parameterValue({type:'file'},''),undefined);

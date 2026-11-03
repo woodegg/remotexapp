@@ -15,6 +15,9 @@ continuity is required; legacy SDK method compatibility is not. The reference
 host simulates downstream behavior without modifying the downstream project.
 NHI-008 control discovery accepts native `unsupported-provider` IBus absence
 while retaining descriptor generation and consistency validation.
+NHI-001 catalog launch resolves a `user-home` template to its unique running
+managed registration. It must not call ordinary instance creation, guess among
+multiple registrations, or change a stopped registration's desired state.
 Status: implemented with [bounded combined qualification](../tests/kasm-native/NATIVE-HOST.md);
 new consolidated human UAT remains pending. Eight-template Ubuntu workflows,
 regional Alpine transport, recovery and scoped rollback have separate evidence;

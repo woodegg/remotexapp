@@ -5249,3 +5249,14 @@ The older standalone UAT page's App creation deadline is extended to 60 seconds,
 covering server/application startup budgets rather than the ordinary 15-second
 API deadline. This is fixture behavior; it does not extend server readiness
 budgets or replay a possibly completed launch.
+
+## 2026-11-03 — Route user-home catalog choices through managed registration
+
+An Openbox UAT report exposed an NHI-001 reference-host gap: the template form
+sent ordinary instance creation for `runMode=user-home`, correctly rejected by
+Core with HTTP 409. The earlier formal-template probe used `managedId` directly,
+so it did not cover this catalog-button path. The workbench now resolves the
+current registration and attaches its unique running target. A missing or
+ambiguous registration is explained; stopped or unhealthy registrations require
+explicit managed controls. This supersedes the workbench's indiscriminate
+catalog-create behavior without changing Core's HOME ownership or stop intent.

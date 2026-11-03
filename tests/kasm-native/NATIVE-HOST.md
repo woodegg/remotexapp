@@ -10,7 +10,8 @@ The previous standalone audio/clipboard UAT does not accept this new host layer.
 
 Production source: `4490361c699242bb88b74bc6daf861d6dffbbc4e`.
 Core `0.16.0-dev.7`, SDK `0.31.0-dev.7`. Later test/documentation commits
-reference these exact artifacts; they do not replace their identity.
+reference these exact artifacts; they do not replace their identity. The managed
+desktop catalog fix below separately identifies its updated workbench modules.
 [Machine-readable results](results-native-host-20261103.json) retain Core,
 component and App digests, archive hashes, scoped checks and evidence hashes.
 
@@ -53,6 +54,39 @@ late async completion, stale ownership and no input/action replay. Go/native
 wire tests exercise direct read-only writes, bounded parsing and exact-generation
 stop rejection. A public browser success alone is not used as proof of those
 server boundaries.
+
+## Managed desktop catalog regression — 2026-11-03
+
+Human UAT found that selecting Openbox in the template form returned HTTP 409.
+The workbench submitted an ordinary instance creation for a `user-home` template;
+Core correctly requires a registered managed target for that run mode. The
+earlier desktop probes used `managedId` directly and missed this UI entry point.
+
+Workbench source `899a71f` resolves a unique, running managed registration at
+click time and attaches using `managedId`. Missing, ambiguous, stopped or unready
+registrations produce an actionable message. The template button never registers,
+starts or restarts a desktop. Parameters and profiles remain the managed
+registration's configuration. Ordinary template launches keep their existing path.
+
+[Regression evidence](results-native-host-managed-20261103.json) separates the
+local browser's synthetic negative responses from real running-desktop
+attachments through the four authenticated UAT entries. Each public check clicks
+the template button twice, observes actual paint in both Viewers, verifies the
+same instance/generation, and confirms no ordinary creation or managed-state
+mutation request. Tests release only their own attachments. This verifies the
+reported launcher defect; it does not renew the prior UDP, audio or clipboard
+qualification or accept human UAT.
+
+The update changes two static workbench modules. New edge listeners serve those
+assets while existing listeners retain active connections. Core, native runtime
+components, desktop desired state and Access verifier requirements are retained.
+Open a new workbench Tab to load the fix without disrupting an existing editor.
+
+To reproduce the local regression, run `node tests/kasm-native/browser-host-managed.mjs
+<owned-fixture.json>` with the existing fixture contract and an already running
+`host-desktop`. Negative states are intercepted HTTP responses confined to the
+isolated test page; the real desktop is never stopped for this probe. Public
+verification also requires an unexpired Access login and live UAT ingress.
 
 ## Findings and limits
 

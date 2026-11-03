@@ -32,10 +32,13 @@ already running Apps intentionally retain their immutable component pins.
    invoke their advertised `openUrl` action and verify the intended shared
    browser is reused. Inspect action/control metadata without treating a
    loopback descriptor as a browser-accessible URL.
-2. **Desktop lifecycle.** Expand existing/managed targets, explicitly start the
-   test desktop, attach, close the window and attach again. Explicitly stop it;
+2. **Desktop lifecycle.** Expand existing/managed targets and explicitly start
+   the test desktop if stopped. Select its template in the main catalog and use
+   **连接托管桌面** to attach; open it twice and check that both windows share the
+   same desktop. Close a window and attach again. Explicitly stop it;
    observation and workspace switching must not restart it. Start it again only
-   with the explicit start action. Automated fault/reboot checks are recorded
+   with the explicit start action; the catalog button must explain a stopped
+   desktop rather than start it. Automated fault/reboot checks are recorded
    separately; do not inject faults into an active human session.
 3. **Windows, workspaces and tasks.** Duplicate a window, move one to workspace 2
    and switch repeatedly. Verify pointer, focus and independent display stats.

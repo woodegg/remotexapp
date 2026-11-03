@@ -5260,3 +5260,14 @@ current registration and attaches its unique running target. A missing or
 ambiguous registration is explained; stopped or unhealthy registrations require
 explicit managed controls. This supersedes the workbench's indiscriminate
 catalog-create behavior without changing Core's HOME ownership or stop intent.
+
+## 2026-11-03 — Prepare the accepted native host integration for Core 0.16.0
+
+The owner accepted the reference-host UAT and authorized ordered merge and
+formal release in Issue #59. Core 0.16.0 / SDK 0.31.0 retain the existing default
+provider and runtime pins. The Core archive now carries native setup, ownership,
+audio/clipboard/UDP migration guides and the pinned component source recipe;
+it does not bundle or silently install Kasm/PulseAudio/application binaries.
+Exact post-merge archive checks and publication identities remain distinct from
+the earlier PR candidate and owner-reported functional UAT. Downstream deployment
+and automatic multi-container UDP orchestration remain separate work.

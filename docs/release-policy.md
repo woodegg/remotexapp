@@ -35,7 +35,11 @@ runit can supervise the Manager. See [dependencies](dependencies.md),
 Qualification is scenario- and environment-specific. Historical Ubuntu and
 standalone results are not certification for every distribution, architecture,
 clean host or reboot. Keep any unexecuted real-host/reboot gates explicit.
-Audio and reliable external/background lease ownership remain deferred.
+Native session audio is opt-in and requires its declared PulseAudio dependencies.
+Browser-owned background handles are available in the native host SDK; reliable
+external/service ownership and automatic multi-container UDP orchestration remain
+separate work. Native component binaries are built and installed separately;
+the Core archive includes the pinned reconstruction recipe and migration guides.
 
 An authenticated Manager operates within one Unix-account trust boundary.
 Separate mutually untrusted tenants by UID/container. The deployment owner

@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.31.0-dev.7';
+export const SDK_VERSION: '0.31.0';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 

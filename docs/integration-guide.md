@@ -4,6 +4,17 @@ Use the [current release-matched SDK](current-state.md) served by your Manager.
 Version labels in feature sections describe when their contracts were introduced;
 they are not instructions to install older releases.
 
+## Native host integration (Core 0.16 / SDK 0.31)
+
+For a Kasm-configured Manager, use `RemoteXAppHost` and `RemoteXAppSession` from
+`/sdk/index.js`. The [native migration guide](native-host-migration.md) defines
+window/task/display/audio ownership, template versus managed-desktop calls,
+file mapping, native input, clipboard and logout. The served `/sdk/host.html`
+workbench is the reference host. See [release setup](native-0.16.0-release.md)
+for separately pinned runtime components and deployment requirements.
+
+The Coordinator-only integration below remains available for the default provider.
+
 ## Single-server runtime coordination
 
 For a windowed host application, start with the [Coordinator migration guide](host-runtime-coordinator-migration.md)

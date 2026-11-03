@@ -357,7 +357,7 @@ export interface RemoteXConnections {
   };
   application?:{protocol:string;[key:string]:unknown};
   unavailable?:string[];
-  unavailableReasons?:{ibus?:'metadata-missing'|'not-enabled'|'not-running'};
+  unavailableReasons?:{ibus?:'metadata-missing'|'not-enabled'|'not-running'|'unsupported-provider'};
 }
 
 /** Audio references do not attach a Viewer or renew runtime keepalive. */

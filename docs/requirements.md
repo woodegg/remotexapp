@@ -13,6 +13,8 @@ handoff in [Issue #57](https://github.com/woodegg/remotexapp/issues/57).
 SDK, reference host, template workflow and migration acceptance. Functional
 continuity is required; legacy SDK method compatibility is not. The reference
 host simulates downstream behavior without modifying the downstream project.
+NHI-008 control discovery accepts native `unsupported-provider` IBus absence
+while retaining descriptor generation and consistency validation.
 Status: implementation selected; qualification and new human UAT pending.
 
 ## Proposed Core 0.16.0 — KasmVNC evaluation

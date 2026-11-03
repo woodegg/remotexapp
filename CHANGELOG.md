@@ -18,6 +18,8 @@ implementation; move them to a version section when publishing a release.
   controls and live statistics. Stop requests may now require an exact
   generation. All native display sockets use renewable one-use grants,
   including WSS-only components. See the [migration guide](docs/native-host-migration.md).
+  Accept the native `unsupported-provider` IBus absence reason when reading
+  generation-qualified App control descriptors.
   Combined candidate qualification remains separate from human UAT acceptance.
 
 - Develop the native rich clipboard extension: plain text, HTML and

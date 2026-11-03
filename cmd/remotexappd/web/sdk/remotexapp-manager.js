@@ -188,7 +188,7 @@ export class RemoteXAppManager extends EventTarget {
     const reasons = result.unavailableReasons;
     if ((ibus !== undefined && (!ibus || typeof ibus.address !== 'string' || !ibus.address.startsWith('unix:path=/') || /[;\r\n\0]/.test(ibus.address) || ibus.scope !== 'runtime')) ||
         (reasons !== undefined && (!reasons || typeof reasons !== 'object' || Array.isArray(reasons))) ||
-        (reasons?.ibus !== undefined && (!['metadata-missing', 'not-enabled', 'not-running'].includes(reasons.ibus) || !Array.isArray(result.unavailable) || !result.unavailable.includes('ibus') || ibus !== undefined))) {
+        (reasons?.ibus !== undefined && (!['metadata-missing', 'not-enabled', 'not-running', 'unsupported-provider'].includes(reasons.ibus) || !Array.isArray(result.unavailable) || !result.unavailable.includes('ibus') || ibus !== undefined))) {
       throw new RemoteXAppAPIError('Invalid IBus connection descriptor', { status:409 });
     }
     return result;

@@ -6,6 +6,8 @@ import {join} from 'node:path';
 import {current,config,instance,ctrl,delay,remote,wait,ready} from './browser-fixture.mjs';
 const c=await current(),owned=[],cases=[];
 const resultDirectory=config.evidenceDirectory;mkdirSync(resultDirectory,{recursive:true});
+const clipboardOrigin=config.publicOrigin || config.ingressURL;
+assert(!config.publicOrigin || (config.projectOwnedDisposable && new URL(config.publicOrigin).protocol==='https:'));
 const gesture=async expression=>{const r=await c.call('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true,userGesture:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description||r.exceptionDetails.text);return r.result.value;};
 const xargs=[...(config.remoteExec?['chpst','-u',config.user+':'+config.user]:['runuser','-u',config.user,'--']),'env','DISPLAY='+instance.display,'XAUTHORITY='+config.xauthority];
 const xread=type=>Buffer.from(remote([...xargs,'python3','-c','import subprocess,base64,sys;print(base64.b64encode(subprocess.check_output(["xclip","-selection","clipboard","-o","-t",sys.argv[1]])).decode())',type]).trim(),'base64');
@@ -22,7 +24,7 @@ async function owner(formats,options={}){
 }
 function pass(name){cases.push({name,status:'passed'});console.log('PASS '+name);}
 try{
- await ready(c);await c.call('Browser.grantPermissions',{origin:config.ingressURL,permissions:['clipboardReadWrite','clipboardSanitizedWrite']});
+ await ready(c);await c.call('Browser.grantPermissions',{origin:clipboardOrigin,permissions:['clipboardReadWrite','clipboardSanitizedWrite']});
  assert.deepEqual((await c.evaluate('remoteXAppViewerClipboard.state()')).formats,['text/plain','text/html','image/png']);
  await gesture("remoteXAppViewerClipboard.configure({toRemote:'manual',toLocal:'manual'})");await c.evaluate('remoteXAppViewerClipboard.focus()');
  await gesture(`navigator.clipboard.write([new ClipboardItem({'text/plain':new Blob(['Native 中文 rich test'],{type:'text/plain'}),'text/html':new Blob(['<b>Native 中文 rich test</b>'],{type:'text/html'})})])`);

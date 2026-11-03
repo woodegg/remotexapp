@@ -193,7 +193,7 @@ for(const slot of ['a','b']) {
   };
   renderClipboard(slot);
 }
-$('#local-copy-html').onclick=async()=>{
+document.querySelector('#local-copy-html').onclick=async()=>{
   try {
     const plain='RemoteXApp 中文 clipboard — bold, blue and a list.\nOne\nTwo';
     const html='<p><b>RemoteXApp 中文 clipboard</b> — <span style="color:blue">bold, blue and a list.</span></p><ul><li>One</li><li>Two</li></ul>';
@@ -201,7 +201,7 @@ $('#local-copy-html').onclick=async()=>{
     status('测试 HTML 已复制到本机；在 Writer 中粘贴并检查格式。');
   }catch{status('浏览器未完成 HTML 复制；请检查权限与浏览器支持。');}
 };
-$('#local-copy-png').onclick=async()=>{
+document.querySelector('#local-copy-png').onclick=async()=>{
   try {
     const canvas=document.createElement('canvas');canvas.width=128;canvas.height=96;const ctx=canvas.getContext('2d');
     ctx.fillStyle='#235c74';ctx.fillRect(0,0,128,96);ctx.fillStyle='#66edc7';ctx.fillRect(12,12,45,45);ctx.fillStyle='#ffffff';ctx.font='16px sans-serif';ctx.fillText('RemoteXApp',12,80);

@@ -10,11 +10,11 @@ html,body{margin:0;height:100%;background:#17202c;color:#edf2fa;font:14px system
 <details><summary>Keyboard and clipboard</summary>
 <label>Local input shortcuts <select id="keyboard-profile"><option value="unknown">No preset / unknown Linux</option><option value="windows">Windows · Win+Space</option><option value="mac">macOS · Control+Space</option><option value="gnome">Linux GNOME · Super+Space</option><option value="fcitx">Linux Fcitx · Control+Space</option></select></label>
 <span id="keyboard-status" role="status"></span>
-<p><label><input id="clipboard-enable" type="checkbox" disabled>Enable text clipboard actions</label><button id="clipboard-upload" disabled>Local → Remote</button><button id="clipboard-download" disabled>Remote → Local</button><button id="clipboard-clear" disabled>Clear remote clipboard</button><span id="clipboard-status" role="status">Off</span></p>
+<p><label><input id="clipboard-enable" type="checkbox" disabled>Enable clipboard actions</label><button id="clipboard-upload" disabled>Local → Remote</button><button id="clipboard-download" disabled>Remote → Local</button><button id="clipboard-clear" disabled>Clear remote clipboard</button><span id="clipboard-status" role="status">Off</span></p>
 <p id="clipboard-modes"><label>Local → Remote <select id="clipboard-to-remote"><option value="off">Off</option><option value="manual">Manual</option><option value="auto">Auto</option></select></label> <label>Remote → Local <select id="clipboard-to-local"><option value="off">Off</option><option value="manual">Manual</option><option value="auto">Auto</option></select></label> <button id="clipboard-permission">Allow automatic clipboard</button></p>
 <output id="clipboard-auto-status" role="status">Off</output>
 <small>Choose the profile for the computer running this browser. OS shortcuts may still require system configuration.</small>
-<small>Clipboard actions transfer plain text, up to 64 KiB. Enable actions, then copy text in the remote App before using Remote → Local. Empty local reads preserve the remote clipboard. Automatic mode requires explicit opt-in and browser permission. Only the active Viewer synchronizes text. On return, paste with Ctrl+V (Command+V on macOS) or Shift+Insert to submit a fresh local copy. Conflicts require a manual direction choice; reconnect resets consent.</small>
+<small>Supported formats and aggregate byte limit are shown below for this runtime and browser. File and folder copy are unavailable. Enable actions, then copy content in the remote App before using Remote → Local. Empty local reads preserve the remote clipboard. Automatic mode requires explicit opt-in and browser permission. Only the active Viewer synchronizes clipboard content. On return, paste with Ctrl+V (Command+V on macOS) or Shift+Insert to submit a fresh local copy. Conflicts require a manual direction choice; reconnect resets consent.</small>
 </details>
 <main id="display"></main>
 <script type="module">
@@ -61,7 +61,7 @@ viewer.addEventListener('clipboardchange', ({detail}) => {
 });
 const clipboardState = () => {
   const s=viewer.getClipboardState();controls();
-  document.querySelector('#clipboard-auto-status').textContent = `${s.active ? 'Active Viewer' : 'Inactive'} · Local → Remote: ${s.requested.toRemote} / ${s.effective.toRemote} · Remote → Local: ${s.requested.toLocal} / ${s.effective.toLocal} · Read: ${s.permissions.read} · Write: ${s.permissions.write} · ${s.phase}`;
+  document.querySelector('#clipboard-auto-status').textContent = `${s.active ? 'Active Viewer' : 'Inactive'} · Local → Remote: ${s.requested.toRemote} / ${s.effective.toRemote} · Remote → Local: ${s.requested.toLocal} / ${s.effective.toLocal} · Read: ${s.permissions.read} · Write: ${s.permissions.write} · ${s.phase} · ${s.formats.join(", ") || "unavailable"} · ${s.maxBytes} bytes total`;
 };
 viewer.addEventListener('clipboardstatechange', clipboardState);
 for (const id of ['clipboard-to-remote','clipboard-to-local']) document.getElementById(id).onchange = () => {

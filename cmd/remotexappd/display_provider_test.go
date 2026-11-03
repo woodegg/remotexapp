@@ -260,3 +260,41 @@ func TestNativeAudioPinRequiresSchemaSixAndCannotImplicitlyUpgrade(t *testing.T)
 		t.Fatal("legacy provider accepted native audio")
 	}
 }
+
+func TestNativeRichClipboardPreservesPinnedTextCompatibility(t *testing.T) {
+	old := testfixture.KasmProtocol(t, "kasm-wss-text-v1")
+	for _, protocol := range []string{"kasm-wss-clipboard-v2", "kasm-udp-clipboard-v2"} {
+		pin := testfixture.KasmProtocol(t, protocol)
+		cfg := config{displayProvider: "kasm", vncLauncher: "direct", kasmBundle: pin.Directory, nativeClipboard: true}
+		if err := cfg.configureDisplayProvider(); err != nil {
+			t.Fatal(err)
+		}
+		m := manager{cfg: cfg}
+		c := m.newRuntimeComponents()
+		if c.NativeClipboard != "rich-v1" || c.NativeUDP != strings.Contains(protocol, "-udp-") {
+			t.Fatal("wrong new pin capability")
+		}
+		if err := validateDisplayComponents(c, true); err != nil {
+			t.Fatal(err)
+		}
+		args := strings.Join(kasmLaunchArgs(&instance{Components: c}, classConfig{}, 5903, "/tmp/auth"), " ")
+		for _, flag := range []string{"-DLP_ClipAcceptMax=2097152", "-DLP_ClipTypes=text/plain,text/html,image/png", "-SetPrimary=0"} {
+			if !strings.Contains(args, flag) {
+				t.Fatal("missing rich bound", flag)
+			}
+		}
+		c.Kasm = &old
+		c.NativeUDP = false
+		if validateDisplayComponents(c, true) == nil {
+			t.Fatal("rich metadata accepted on old component")
+		}
+		c.NativeClipboard = "text"
+		if err := validateDisplayComponents(c, true); err != nil {
+			t.Fatal("old text pin rejected", err)
+		}
+		args = strings.Join(kasmLaunchArgs(&instance{Components: c}, classConfig{}, 5903, "/tmp/auth"), " ")
+		if !strings.Contains(args, "-DLP_ClipAcceptMax=65536") || strings.Contains(args, "text/html") {
+			t.Fatal("old App contract changed")
+		}
+	}
+}

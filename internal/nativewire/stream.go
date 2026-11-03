@@ -9,7 +9,8 @@ import (
 
 var ErrStream = errors.New("unsupported native client stream")
 
-const MaxBuffered = 128 * 1024
+const MaxClipboardBytes = 2 * 1024 * 1024
+const MaxBuffered = MaxClipboardBytes + 128*1024
 
 // ClientFilter accepts arbitrary WebSocket message boundaries. No byte of a
 // client message is forwarded until its complete bounded grammar is validated.
@@ -51,10 +52,8 @@ func (f *ClientFilter) Feed(data []byte) ([]byte, error) {
 				return nil, e
 			}
 			message = append([]byte{181, byte(len(offer) >> 8), byte(len(offer))}, offer...)
-		} else if message[0] == 180 && (!utf8.Valid(message[17:]) || bytes.IndexByte(message[17:], 0) >= 0) {
-			f.failed = true
-			return nil, ErrStream
 		}
+
 		output = append(output, message...)
 		f.pending = f.pending[n:]
 	}
@@ -96,17 +95,7 @@ func (f *ClientFilter) length() (int, error) {
 	case 179:
 		return 12, nil
 	case 180:
-		if len(p) < 17 {
-			return 0, nil
-		}
-		if p[1] != 1 || p[2] != 10 || string(p[3:13]) != "text/plain" {
-			return 0, ErrStream
-		}
-		length := binary.BigEndian.Uint32(p[13:])
-		if length > 65536 {
-			return 0, ErrStream
-		}
-		return 17 + int(length), nil
+		return clipboardLength(p)
 	case 181:
 		if len(p) < 3 {
 			return 0, nil
@@ -152,4 +141,57 @@ func (f *ClientFilter) length() (int, error) {
 	default:
 		return 0, ErrStream
 	}
+}
+
+// Validate all representations before the edge forwards any clipboard bytes.
+// Old pinned servers retain their independent 64 KiB/text contract.
+func clipboardLength(p []byte) (int, error) {
+	if len(p) < 2 {
+		return 0, nil
+	}
+	if p[1] < 1 || p[1] > 3 {
+		return 0, ErrStream
+	}
+	offset, total := 2, uint32(0)
+	seen := make(map[string]bool, 3)
+	var textParts [][]byte
+	for i := 0; i < int(p[1]); i++ {
+		if len(p) < offset+1 {
+			return 0, nil
+		}
+		n := int(p[offset])
+		offset++
+		if n < 9 || n > 10 {
+			return 0, ErrStream
+		}
+		if len(p) < offset+n+4 {
+			return 0, nil
+		}
+		mime := string(p[offset : offset+n])
+		offset += n
+		if seen[mime] || (mime != "text/plain" && mime != "text/html" && mime != "image/png") {
+			return 0, ErrStream
+		}
+		seen[mime] = true
+		size := binary.BigEndian.Uint32(p[offset:])
+		offset += 4
+		if size > MaxClipboardBytes-total {
+			return 0, ErrStream
+		}
+		total += size
+		if len(p) < offset+int(size) {
+			return 0, nil
+		}
+		data := p[offset : offset+int(size)]
+		if mime != "image/png" {
+			textParts = append(textParts, data)
+		}
+		offset += int(size)
+	}
+	for _, data := range textParts {
+		if !utf8.Valid(data) || bytes.IndexByte(data, 0) >= 0 {
+			return 0, ErrStream
+		}
+	}
+	return offset, nil
 }

@@ -1,0 +1,900 @@
+diff --git a/common/rfb/NativeClipboard.h b/common/rfb/NativeClipboard.h
+new file mode 100644
+index 0000000..1964bb3
+--- /dev/null
++++ b/common/rfb/NativeClipboard.h
+@@ -0,0 +1,43 @@
++// RemoteXApp native clipboard validation. No allocation or content logging.
++#ifndef REMOTEXAPP_NATIVE_CLIPBOARD_H
++#define REMOTEXAPP_NATIVE_CLIPBOARD_H
++#include <string.h>
++#define NATIVE_CLIPBOARD_LIMIT (2U * 1024U * 1024U)
++static inline int nativeClipboardMime(const char *mime) {
++  if (!strcmp(mime, "text/plain")) return 0;
++  if (!strcmp(mime, "text/html")) return 1;
++  if (!strcmp(mime, "image/png")) return 2;
++  return -1;
++}
++static inline int nativeClipboardAllowed(const char *list, const char *mime) {
++  const size_t n = strlen(mime);
++  while (*list) {
++    const char *end = strchr(list, ',');
++    const size_t size = end ? (size_t)(end - list) : strlen(list);
++    if (size == n && !memcmp(list, mime, n)) return 1;
++    if (!end) break;
++    list = end + 1;
++  }
++  return 0;
++}
++static inline int nativeClipboardUTF8(const unsigned char *p, unsigned n) {
++  unsigned i = 0;
++  while (i < n) {
++    unsigned c = p[i++], need = 0, min = 0;
++    if (!c) return 0;
++    if (c < 0x80) continue;
++    if (c >= 0xc2 && c <= 0xdf) { need = 1; min = 0x80; c &= 0x1f; }
++    else if (c >= 0xe0 && c <= 0xef) { need = 2; min = 0x800; c &= 0xf; }
++    else if (c >= 0xf0 && c <= 0xf4) { need = 3; min = 0x10000; c &= 7; }
++    else return 0;
++    if (need > n - i) return 0;
++    while (need--) {
++      unsigned b = p[i++];
++      if ((b & 0xc0) != 0x80) return 0;
++      c = (c << 6) | (b & 0x3f);
++    }
++    if (c < min || c > 0x10ffff || (c >= 0xd800 && c <= 0xdfff)) return 0;
++  }
++  return 1;
++}
++#endif
+diff --git a/common/rfb/SConnection.cxx b/common/rfb/SConnection.cxx
+index 4fa9909..af2e578 100644
+--- a/common/rfb/SConnection.cxx
++++ b/common/rfb/SConnection.cxx
+@@ -297,7 +297,7 @@ void SConnection::addBinaryClipboard(const char mime[], const rdr::U8 *data,
+   bin.mime[sizeof(bin.mime) - 1] = '\0';
+ 
+   bin.data.resize(len);
+-  memcpy(&bin.data[0], data, len);
++  if (len) memcpy(bin.data.data(), data, len);
+ 
+   bin.id = id;
+ 
+diff --git a/common/rfb/SMsgReader.cxx b/common/rfb/SMsgReader.cxx
+index 8963db1..2b0e49e 100644
+--- a/common/rfb/SMsgReader.cxx
++++ b/common/rfb/SMsgReader.cxx
+@@ -31,6 +31,8 @@
+ #include <rfb/Configuration.h>
+ #include <rfb/LogWriter.h>
+ #include <rfb/ServerCore.h>
++#include <rfb/NativeClipboard.h>
++#include <vector>
+ 
+ using namespace rfb;
+ 
+@@ -264,49 +266,36 @@ void SMsgReader::readClientCutText()
+   vlog.error("Client sent old cuttext msg, ignoring");
+ }
+ 
+-// Native text clipboard is bounded before allocation or clipboard mutation.
+-// Reject invalid UTF-8 and embedded NUL instead of publishing ambiguous text.
+-static bool nativeClipboardUTF8(const unsigned char *p, unsigned n)
+-{
+-  for (unsigned i = 0; i < n;) {
+-    unsigned c = p[i++], need = 0, min = 0;
+-    if (c == 0) return false;
+-    if (c < 0x80) continue;
+-    if (c >= 0xc2 && c <= 0xdf) { need = 1; min = 0x80; c &= 0x1f; }
+-    else if (c >= 0xe0 && c <= 0xef) { need = 2; min = 0x800; c &= 0xf; }
+-    else if (c >= 0xf0 && c <= 0xf4) { need = 3; min = 0x10000; c &= 7; }
+-    else return false;
+-    if (need > n - i) return false;
+-    while (need--) {
+-      unsigned b = p[i++];
+-      if ((b & 0xc0) != 0x80) return false;
+-      c = (c << 6) | (b & 0x3f);
+-    }
+-    if (c < min || c > 0x10ffff || (c >= 0xd800 && c <= 0xdfff)) return false;
+-  }
+-  return true;
+-}
+-
++// Stage the complete transaction before changing selection ownership.
+ void SMsgReader::readBinaryClipboard()
+ {
+-  const rdr::U8 num = is->readU8();
+-  if (num != 1) throw Exception("Native clipboard requires one text/plain item");
+-  const rdr::U8 mimelen = is->readU8();
+-  if (mimelen != 10) throw Exception("Native clipboard requires text/plain");
+-  char mime[11];
+-  is->readBytes(mime, 10); mime[10] = '\0';
+-  if (strcmp(mime, "text/plain")) throw Exception("Native clipboard requires text/plain");
+-  const rdr::U32 len = is->readU32();
+-  if (len > 65536 || (rfb::Server::DLP_ClipAcceptMax && len > (unsigned)rfb::Server::DLP_ClipAcceptMax))
+-    throw Exception("Native clipboard exceeds byte limit");
+-  CharArray data(len);
+-  is->readBytes(data.buf, len);
+-  if (!nativeClipboardUTF8((unsigned char*)data.buf, len))
+-    throw Exception("Native clipboard is not valid UTF-8 text");
+-  char mimes[1][32] = {"text/plain"};
++  const rdr::U8 count = is->readU8();
++  if (!count || count > 3) throw Exception("Invalid native clipboard count");
++  char mimes[3][32] = {};
++  std::vector<rdr::U8> data[3];
++  unsigned total = 0, seen = 0;
++  for (unsigned i = 0; i < count; i++) {
++    const unsigned n = is->readU8();
++    if (n < 9 || n > 10) throw Exception("Invalid native clipboard MIME");
++    is->readBytes(mimes[i], n);
++    const int type = nativeClipboardMime(mimes[i]);
++    if (strlen(mimes[i]) != n || type < 0 || (seen & (1U << type)) || !nativeClipboardAllowed(rfb::Server::DLP_Clip_Types, mimes[i]))
++      throw Exception("Unsupported native clipboard MIME");
++    seen |= 1U << type;
++    const rdr::U32 length = is->readU32();
++    if (length > NATIVE_CLIPBOARD_LIMIT - total) throw Exception("Native clipboard exceeds byte limit");
++    total += length;
++    if (rfb::Server::DLP_ClipAcceptMax && total > (unsigned)rfb::Server::DLP_ClipAcceptMax)
++      throw Exception("Native clipboard exceeds byte limit");
++    data[i].resize(length);
++    if (length) is->readBytes(data[i].data(), length);
++    if (type != 2 && !nativeClipboardUTF8(data[i].data(), length))
++      throw Exception("Native clipboard is not valid UTF-8 text");
++  }
+   handler->clearBinaryClipboard();
+-  handler->addBinaryClipboard("text/plain", (rdr::U8*)data.buf, len, 0);
+-  handler->handleClipboardAnnounceBinary(1, mimes);
++  for (unsigned i = 0; i < count; i++)
++    handler->addBinaryClipboard(mimes[i], data[i].data(), data[i].size(), 0);
++  handler->handleClipboardAnnounceBinary(count, mimes);
+ }
+ 
+ void SMsgReader::readExtendedClipboard(rdr::S32 len)
+diff --git a/common/rfb/SMsgWriter.cxx b/common/rfb/SMsgWriter.cxx
+index ee1033f..3b06b6c 100644
+--- a/common/rfb/SMsgWriter.cxx
++++ b/common/rfb/SMsgWriter.cxx
+@@ -92,7 +92,7 @@ void SMsgWriter::writeBinaryClipboard(const std::vector<SConnection::binaryClipb
+     os->writeBytes(b[i].mime, mimelen);
+ 
+     os->writeU32(b[i].data.size());
+-    os->writeBytes(&b[i].data[0], b[i].data.size());
++    if (!b[i].data.empty()) os->writeBytes(b[i].data.data(), b[i].data.size());
+   }
+ 
+   endMsg();
+diff --git a/common/rfb/VNCSConnectionST.cxx b/common/rfb/VNCSConnectionST.cxx
+index 6d983ef..7b0d2d8 100644
+--- a/common/rfb/VNCSConnectionST.cxx
++++ b/common/rfb/VNCSConnectionST.cxx
+@@ -26,6 +26,7 @@
+ #include <rfb/LogWriter.h>
+ #include <rfb/Security.h>
+ #include <rfb/ServerCore.h>
++#include <rfb/NativeClipboard.h>
+ #include <rfb/SMsgWriter.h>
+ #include <rfb/VNCServerST.h>
+ #include <rfb/VNCSConnectionST.h>
+@@ -467,18 +468,34 @@ void VNCSConnectionST::announceClipboardOrClose(bool available)
+ 
+ void VNCSConnectionST::clearBinaryClipboardData()
+ {
++  binclipTimer.stop();
++  nativeClipboardRejected = false;
+   clearBinaryClipboard();
+ }
+ 
+ void VNCSConnectionST::sendBinaryClipboardDataOrClose(const char* mime,
+                                                       const unsigned char *data,
+                                                       const unsigned len,
+-                                                      const unsigned id)
++                                                      const unsigned id, bool complete)
+ {
+   try {
+     if (!(accessRights & AccessCutText)) return;
+     if (!rfb::Server::sendCutText) return;
+-    if (strcmp(mime, "text/plain") || len > 65537) return;
++    if (nativeClipboardRejected) return;
++    size_t total = len;
++    const int type = nativeClipboardMime(mime);
++    bool invalid = type < 0 || !nativeClipboardAllowed(rfb::Server::DLP_Clip_Types, mime) || binaryClipboard.size() >= 3;
++    for (const auto &item : binaryClipboard) {
++      total += item.data.size();
++      if (!strcmp(item.mime, mime)) invalid = true;
++    }
++    if (total > NATIVE_CLIPBOARD_LIMIT || (type != 2 && !nativeClipboardUTF8(data, len))) invalid = true;
++    if (invalid) {
++      nativeClipboardRejected = true;
++      binclipTimer.stop();
++      clearBinaryClipboard();
++      return;
++    }
+     if (rfb::Server::DLP_ClipSendMax && len > (unsigned) rfb::Server::DLP_ClipSendMax) {
+       vlog.info("DLP: client %s: refused to send binary clipboard, too large",
+                 sock->getPeerAddress());
+@@ -490,7 +507,7 @@ void VNCSConnectionST::sendBinaryClipboardDataOrClose(const char* mime,
+     if (state() != RFBSTATE_NORMAL) return;
+ 
+     addBinaryClipboard(mime, data, len, id);
+-    binclipTimer.start(100);
++    if (complete) writeBinaryClipboard();
+   } catch(rdr::Exception& e) {
+     close(e.str());
+   }
+@@ -502,7 +519,7 @@ void VNCSConnectionST::getBinaryClipboardData(const char* mime, const unsigned c
+   unsigned i;
+   for (i = 0; i < binaryClipboard.size(); i++) {
+     if (!strcmp(binaryClipboard[i].mime, mime)) {
+-      *data = &binaryClipboard[i].data[0];
++      *data = binaryClipboard[i].data.empty() ? (const unsigned char*)"" : binaryClipboard[i].data.data();
+       *len = binaryClipboard[i].data.size();
+       return;
+     }
+@@ -1636,6 +1653,7 @@ void VNCSConnectionST::writeDataUpdate()
+ 
+ void VNCSConnectionST::writeBinaryClipboard()
+ {
++  if (nativeClipboardRejected || binaryClipboard.empty()) return;
+   if (msSince(&lastClipboardOp) < (unsigned) rfb::Server::DLP_ClipDelay) {
+     vlog.info("DLP: client %s: refused to send binary clipboard, too soon",
+               sock->getPeerAddress());
+diff --git a/common/rfb/VNCSConnectionST.h b/common/rfb/VNCSConnectionST.h
+index 49400e5..ecd0211 100644
+--- a/common/rfb/VNCSConnectionST.h
++++ b/common/rfb/VNCSConnectionST.h
+@@ -84,7 +84,7 @@ namespace rfb {
+     void announceClipboardOrClose(bool available);
+     void clearBinaryClipboardData();
+     void sendBinaryClipboardDataOrClose(const char* mime, const unsigned char *data,
+-                                        const unsigned len, const unsigned id);
++                                        const unsigned len, const unsigned id, bool complete);
+     void getBinaryClipboardData(const char* mime, const unsigned char **data,
+                                 unsigned *len);
+ 
+@@ -322,6 +322,7 @@ namespace rfb {
+     Timer losslessTimer;
+     Timer kbdLogTimer;
+     Timer binclipTimer;
++    bool nativeClipboardRejected = false;
+ 
+     VNCServerST* server;
+     SimpleUpdateTracker updates;
+diff --git a/common/rfb/VNCServerST.cxx b/common/rfb/VNCServerST.cxx
+index fa7746d..d57757e 100644
+--- a/common/rfb/VNCServerST.cxx
++++ b/common/rfb/VNCServerST.cxx
+@@ -583,12 +583,12 @@ void VNCServerST::announceClipboard(bool available)
+ }
+ 
+ void VNCServerST::sendBinaryClipboardData(const char* mime, const unsigned char *data,
+-                                          const unsigned len)
++                                          const unsigned len, bool complete)
+ {
+   std::list<VNCSConnectionST*>::iterator ci, ci_next;
+   for (ci = clients.begin(); ci != clients.end(); ci = ci_next) {
+     ci_next = ci; ci_next++;
+-    (*ci)->sendBinaryClipboardDataOrClose(mime, data, len, clipboardId);
++    (*ci)->sendBinaryClipboardDataOrClose(mime, data, len, clipboardId, complete);
+   }
+ 
+   clipboardId++;
+diff --git a/common/rfb/VNCServerST.h b/common/rfb/VNCServerST.h
+index df2f0aa..5144c7d 100644
+--- a/common/rfb/VNCServerST.h
++++ b/common/rfb/VNCServerST.h
+@@ -103,7 +103,7 @@ namespace rfb {
+     virtual void announceClipboard(bool available);
+     virtual void clearBinaryClipboardData();
+     virtual void sendBinaryClipboardData(const char* mime, const unsigned char *data,
+-                                         const unsigned len);
++                                         const unsigned len, bool complete = true);
+     virtual void getBinaryClipboardData(const char *mime, const unsigned char **ptr,
+                                         unsigned *len);
+     virtual void add_changed(const Region &region);
+diff --git a/unix/xserver/hw/vnc/XserverDesktop.cc b/unix/xserver/hw/vnc/XserverDesktop.cc
+index 3085ec5..a8677d9 100644
+--- a/unix/xserver/hw/vnc/XserverDesktop.cc
++++ b/unix/xserver/hw/vnc/XserverDesktop.cc
+@@ -210,10 +210,10 @@ void XserverDesktop::clearBinaryClipboardData()
+ 
+ void XserverDesktop::sendBinaryClipboardData(const char* mime,
+                                              const unsigned char *data,
+-                                             const unsigned len)
++                                             const unsigned len, bool complete)
+ {
+   try {
+-    server->sendBinaryClipboardData(mime, data, len);
++    server->sendBinaryClipboardData(mime, data, len, complete);
+   } catch (rdr::Exception& e) {
+     vlog.error("XserverDesktop::sendBinaryClipboardData: %s",e.str());
+   }
+diff --git a/unix/xserver/hw/vnc/XserverDesktop.h b/unix/xserver/hw/vnc/XserverDesktop.h
+index b9ceadc..5db1ed3 100644
+--- a/unix/xserver/hw/vnc/XserverDesktop.h
++++ b/unix/xserver/hw/vnc/XserverDesktop.h
+@@ -66,7 +66,7 @@ public:
+   void announceClipboard(bool available);
+   void clearBinaryClipboardData();
+   void sendBinaryClipboardData(const char* mime, const unsigned char *data,
+-                               const unsigned len);
++                               const unsigned len, bool complete);
+   void getBinaryClipboardData(const char *mime, const unsigned char **ptr,
+                               unsigned *len);
+   void bell();
+diff --git a/unix/xserver/hw/vnc/vncExtInit.cc b/unix/xserver/hw/vnc/vncExtInit.cc
+index c2498d5..b4793f9 100644
+--- a/unix/xserver/hw/vnc/vncExtInit.cc
++++ b/unix/xserver/hw/vnc/vncExtInit.cc
+@@ -402,10 +402,10 @@ void vncAnnounceClipboard(int available)
+ }
+ 
+ void vncSendBinaryClipboardData(const char* mime, const unsigned char *data,
+-                                const unsigned len)
++                                const unsigned len, int complete)
+ {
+   for (int scr = 0; scr < vncGetScreenCount(); scr++)
+-    desktop[scr]->sendBinaryClipboardData(mime, data, len);
++    desktop[scr]->sendBinaryClipboardData(mime, data, len, complete);
+ }
+ 
+ void vncGetBinaryClipboardData(const char *mime, const unsigned char **ptr,
+diff --git a/unix/xserver/hw/vnc/vncExtInit.h b/unix/xserver/hw/vnc/vncExtInit.h
+index f9934cc..a3056c9 100644
+--- a/unix/xserver/hw/vnc/vncExtInit.h
++++ b/unix/xserver/hw/vnc/vncExtInit.h
+@@ -72,7 +72,7 @@ void vncUpdateDesktopName(void);
+ void vncAnnounceClipboard(int available);
+ void vncClearBinaryClipboardData(void);
+ void vncSendBinaryClipboardData(const char* mime, const unsigned char *data,
+-                                const unsigned len);
++                                const unsigned len, int complete);
+ void vncGetBinaryClipboardData(const char *mime, const unsigned char **ptr,
+                                unsigned *len);
+ 
+diff --git a/unix/xserver/hw/vnc/vncSelection.c b/unix/xserver/hw/vnc/vncSelection.c
+index bd7f457..00b1f6c 100644
+--- a/unix/xserver/hw/vnc/vncSelection.c
++++ b/unix/xserver/hw/vnc/vncSelection.c
+@@ -23,6 +23,9 @@
+ #include <X11/Xatom.h>
+ 
+ #include "propertyst.h"
++#include "property.h"
++#include "os.h"
++#include "rfb/NativeClipboard.h"
+ #include "scrnintstr.h"
+ #include "selection.h"
+ #include "windowstr.h"
+@@ -55,8 +58,7 @@ static Bool textFromClient;
+ static WindowPtr pWindow;
+ static Window wid;
+ 
+-static Bool probing;
+-static Atom activeSelection = None;
++
+ 
+ struct VncDataTarget {
+   ClientPtr client;
+@@ -76,7 +78,9 @@ static int vncConvertSelection(ClientPtr client, Atom selection,
+                                Atom target, Atom property,
+                                Window requestor, CARD32 time);
+ static int vncProcConvertSelection(ClientPtr client);
+-static void vncSelectionRequest(Atom selection, Atom target);
++static int vncProcChangeProperty(ClientPtr client);
++static void vncSnapshotCancel(void);
++static void vncSnapshotStart(Selection *selection);
+ static int vncProcSendEvent(ClientPtr client);
+ static void vncSelectionCallback(CallbackListPtr *callbacks,
+                                  void * data, void * args);
+@@ -85,6 +89,7 @@ static void vncClientStateCallback(CallbackListPtr * l,
+ 
+ static int (*origProcConvertSelection)(ClientPtr);
+ static int (*origProcSendEvent)(ClientPtr);
++static int (*origProcChangeProperty)(ClientPtr);
+ 
+ void vncSelectionInit(void)
+ {
+@@ -127,6 +132,8 @@ void vncSelectionInit(void)
+    * override the relevant handlers. */
+   origProcConvertSelection = ProcVector[X_ConvertSelection];
+   ProcVector[X_ConvertSelection] = vncProcConvertSelection;
++  origProcChangeProperty = ProcVector[X_ChangeProperty];
++  ProcVector[X_ChangeProperty] = vncProcChangeProperty;
+   origProcSendEvent = ProcVector[X_SendEvent];
+   ProcVector[X_SendEvent] = vncProcSendEvent;
+ 
+@@ -136,19 +143,6 @@ void vncSelectionInit(void)
+     FatalError("Add VNC ClientStateCallback failed\n");
+ }
+ 
+-static void vncHandleClipboardRequest(void)
+-{
+-  if (activeSelection == None) {
+-    LOG_DEBUG("Got request for local clipboard although no clipboard is active");
+-    return;
+-  }
+-
+-  LOG_DEBUG("Got request for local clipboard, re-probing formats");
+-
+-  probing = FALSE;
+-  vncSelectionRequest(activeSelection, xaTARGETS);
+-}
+-
+ void vncHandleClipboardAnnounce(int available)
+ {
+   if (available) {
+@@ -211,6 +205,7 @@ void vncHandleClipboardAnnounceBinary(const unsigned num, const char mimes[][32]
+     if (rc != Success)
+       LOG_ERROR("Could not set CLIPBOARD selection");
+ 
++    textFromClient = FALSE;
+     unsigned i, valid = 0;
+     for (i = 0; i < num; i++) {
+       unsigned j;
+@@ -392,17 +387,16 @@ static int vncConvertSelection(ClientPtr client, Atom selection,
+     Atom targets[5 + numMimesFromClient];
+     targets[0] = xaTARGETS;
+     targets[1] = xaTIMESTAMP;
+-    targets[2] = xaSTRING;
+-    targets[3] = xaTEXT;
+-    targets[4] = xaUTF8_STRING;
++    unsigned base = 2;
++    if (textFromClient) { targets[base++] = xaSTRING; targets[base++] = xaTEXT; targets[base++] = xaUTF8_STRING; }
+ 
+     unsigned i;
+     for (i = 0; i < numMimesFromClient; i++)
+-      targets[5 + i] = xaBinclips[mimeIndexesFromClient[i]];
++      targets[base + i] = xaBinclips[mimeIndexesFromClient[i]];
+ 
+     rc = dixChangeWindowProperty(serverClient, pWin, realProperty,
+                                  XA_ATOM, 32, PropModeReplace,
+-                                 5 + numMimesFromClient,
++                                 base + numMimesFromClient,
+                                  targets, TRUE);
+     if (rc != Success)
+       return rc;
+@@ -435,13 +429,13 @@ static int vncConvertSelection(ClientPtr client, Atom selection,
+ 
+     if ((target == xaSTRING) || (target == xaTEXT)) {
+       char* latin1;
+-      latin1 = vncUTF8ToLatin1(data, (size_t)-1);
++      latin1 = vncUTF8ToLatin1((const char*)data, len);
+       if (latin1 == NULL)
+         return BadAlloc;
+ 
+       rc = dixChangeWindowProperty(serverClient, pWin, realProperty,
+                                    XA_STRING, 8, PropModeReplace,
+-                                   len, latin1, TRUE);
++                                   strlen(latin1), latin1, TRUE);
+ 
+       vncStrFree(latin1);
+ 
+@@ -518,183 +512,210 @@ static int vncProcConvertSelection(ClientPtr client)
+   return origProcConvertSelection(client);
+ }
+ 
+-static void vncSelectionRequest(Atom selection, Atom target)
+-{
+-  Selection *pSel;
+-  xEvent event;
+-  int rc;
++/* Collect one owner revision before publishing any representation. A fresh
++ * requestor window fences late responses; INCR and ordinary properties share
++ * an aggregate bound and a five-second whole-transaction deadline. */
++static struct {
++  WindowPtr window;
++  Window owner;
++  ClientPtr client;
++  Atom selection, target;
++  TimeStamp revision;
++  CARD32 time;
++  unsigned count, index, total;
++  Bool incr;
++  struct { Atom target; const char *mime; unsigned char *data; unsigned size; } items[3];
++} snapshot;
++static OsTimerPtr snapshotTimer;
+ 
+-  rc = vncCreateSelectionWindow();
+-  if (rc != Success)
+-    return;
++static void vncSnapshotCancel(void)
++{
++  unsigned i;
++  if (snapshotTimer) TimerCancel(snapshotTimer);
++  for (i = 0; i < 3; i++) free(snapshot.items[i].data);
++  WindowPtr window = snapshot.window;
++  memset(&snapshot, 0, sizeof(snapshot));
++  if (window) FreeResource(window->drawable.id, RT_NONE);
++}
+ 
+-  LOG_DEBUG("Requesting %s for %s selection",
+-            NameForAtom(target), NameForAtom(selection));
++static CARD32 vncSnapshotTimeout(OsTimerPtr timer, CARD32 time, void *arg)
++{
++  vncSnapshotCancel();
++  return 0;
++}
+ 
+-  rc = dixLookupSelection(&pSel, selection, serverClient, DixGetAttrAccess);
+-  if (rc != Success)
+-    return;
++static Bool vncSnapshotCurrent(void)
++{
++  Selection *selection;
++  return snapshot.window &&
++    dixLookupSelection(&selection, snapshot.selection, serverClient, DixGetAttrAccess) == Success &&
++    selection->client == snapshot.client && selection->window == snapshot.owner &&
++    selection->lastTimeChanged.milliseconds == snapshot.revision.milliseconds &&
++    selection->lastTimeChanged.months == snapshot.revision.months;
++}
+ 
++static void vncSnapshotRequest(Atom target)
++{
++  if (!vncSnapshotCurrent()) { vncSnapshotCancel(); return; }
++  xEvent event = {0};
++  snapshot.target = target;
++  snapshot.time = currentTime.milliseconds;
+   event.u.u.type = SelectionRequest;
+-  event.u.selectionRequest.owner = pSel->window;
+-  event.u.selectionRequest.time = currentTime.milliseconds;
+-  event.u.selectionRequest.requestor = wid;
+-  event.u.selectionRequest.selection = selection;
++  event.u.selectionRequest.owner = snapshot.owner;
++  event.u.selectionRequest.time = snapshot.time;
++  event.u.selectionRequest.requestor = snapshot.window->drawable.id;
++  event.u.selectionRequest.selection = snapshot.selection;
+   event.u.selectionRequest.target = target;
+   event.u.selectionRequest.property = target;
+-  WriteEventsToClient(pSel->client, 1, &event);
++  WriteEventsToClient(snapshot.client, 1, &event);
+ }
+ 
+-static Bool vncHasAtom(Atom atom, const Atom list[], size_t size)
++static void vncSnapshotStart(Selection *selection)
+ {
+-  size_t i;
+-
+-  for (i = 0;i < size;i++) {
+-    if (list[i] == atom)
+-      return TRUE;
+-  }
++  int result;
++  vncSnapshotCancel();
++  if (!selection->client || selection->client == serverClient) return;
++  ScreenPtr screen = screenInfo.screens[0];
++  Window id = FakeClientID(0);
++  snapshot.window = CreateWindow(id, screen->root, 0, 0, 1, 1, 0, InputOnly,
++    0, NULL, 0, serverClient, CopyFromParent, &result);
++  if (!snapshot.window) return;
++  if (!AddResource(id, RT_WINDOW, snapshot.window)) { snapshot.window = NULL; return; }
++  snapshot.owner = selection->window;
++  snapshot.client = selection->client;
++  snapshot.selection = selection->selection;
++  snapshot.revision = selection->lastTimeChanged;
++  snapshotTimer = TimerSet(snapshotTimer, 0, 5000, vncSnapshotTimeout, NULL);
++  vncSnapshotRequest(xaTARGETS);
++}
+ 
++static Bool vncHasAtom(Atom atom, const Atom *list, size_t count)
++{
++  size_t i;
++  for (i = 0; i < count; i++) if (list[i] == atom) return TRUE;
+   return FALSE;
+ }
+ 
+-static Bool vncHasBinaryClipboardAtom(const Atom list[], size_t size)
++static void vncSnapshotTargets(PropertyPtr prop)
+ {
+-  size_t i, b;
+-  const unsigned num = dlp_num_mimetypes();
++  if (prop->type != XA_ATOM || prop->format != 32 || prop->size > 256) { vncSnapshotCancel(); return; }
++  const Atom *targets = prop->data;
++  /* File-manager selections are not clipboard file transfer. */
++  const char *fileTypes[] = {"text/uri-list", "x-special/gnome-copied-files", "application/x-kde-cutselection"};
++  unsigned i;
++  for (i = 0; i < 3; i++) {
++    Atom type = MakeAtom(fileTypes[i], strlen(fileTypes[i]), TRUE);
++    if (vncHasAtom(type, targets, prop->size)) { vncSnapshotCancel(); return; }
++  }
++  Atom plain = MakeAtom("text/plain", 10, TRUE);
++  Atom target = vncHasAtom(xaUTF8_STRING, targets, prop->size) ? xaUTF8_STRING :
++    vncHasAtom(plain, targets, prop->size) ? plain : vncHasAtom(xaSTRING, targets, prop->size) ? xaSTRING : None;
++  if (target) {
++    snapshot.items[0].target = target;
++    snapshot.items[0].mime = "text/plain";
++    snapshot.count = 1;
++  }
++  for (i = 0; i < dlp_num_mimetypes(); i++) {
++    const char *mime = dlp_get_mimetype(i);
++    if (nativeClipboardMime(mime) <= 0 || !vncHasAtom(xaBinclips[i], targets, prop->size)) continue;
++    if (snapshot.count >= 3) { vncSnapshotCancel(); return; }
++    snapshot.items[snapshot.count].target = xaBinclips[i];
++    snapshot.items[snapshot.count++].mime = mime;
++  }
++  if (!snapshot.count) { vncSnapshotCancel(); return; }
++  vncSnapshotRequest(snapshot.items[0].target);
++}
+ 
+-  for (i = 0;i < size;i++) {
+-    for (b = 0; b < num; b++) {
+-      if (list[i] == xaBinclips[b])
+-        return TRUE;
++static void vncSnapshotCompleteItem(void)
++{
++  unsigned index = snapshot.index, size = snapshot.items[index].size;
++  unsigned char *data = snapshot.items[index].data;
++  const char *mime = snapshot.items[index].mime;
++  if (strcmp(mime, "image/png")) {
++    if (size && data[size-1] == 0) size--;
++    if (size && memchr(data, 0, size)) { vncSnapshotCancel(); return; }
++    if (snapshot.target == xaSTRING) {
++      char *utf8 = vncLatin1ToUTF8((const char*)data, size);
++      if (!utf8) { vncSnapshotCancel(); return; }
++      free(data);
++      data = (unsigned char*)utf8;
++      snapshot.items[index].data = data;
++      size = strlen(utf8);
+     }
++    if (!nativeClipboardUTF8(data, size)) { vncSnapshotCancel(); return; }
++  }
++  if (size > NATIVE_CLIPBOARD_LIMIT - snapshot.total) { vncSnapshotCancel(); return; }
++  snapshot.items[index].size = size;
++  snapshot.total += size;
++  snapshot.incr = FALSE;
++  if (++snapshot.index < snapshot.count) {
++    vncSnapshotRequest(snapshot.items[snapshot.index].target);
++    return;
+   }
++  if (!vncSnapshotCurrent()) { vncSnapshotCancel(); return; }
++  /* No event-loop yield between validation and native publication. */
++  vncAnnounceClipboard(TRUE);
++  vncClearBinaryClipboardData();
++  for (index = 0; index < snapshot.count; index++)
++    vncSendBinaryClipboardData(snapshot.items[index].mime, snapshot.items[index].data, snapshot.items[index].size, index + 1 == snapshot.count);
++  vncSnapshotCancel();
++}
+ 
+-  return FALSE;
++static void vncSnapshotData(PropertyPtr prop)
++{
++  unsigned index = snapshot.index;
++  if (index >= snapshot.count || prop->format != 8 || prop->type != snapshot.target) { vncSnapshotCancel(); return; }
++  unsigned limit = NATIVE_CLIPBOARD_LIMIT - snapshot.total;
++  if (strcmp(snapshot.items[index].mime, "image/png")) limit++; /* terminal X11 NUL */
++  unsigned old = snapshot.items[index].size;
++  if (old > limit || prop->size > limit - old) { vncSnapshotCancel(); return; }
++  if (prop->size) {
++    unsigned char *data = realloc(snapshot.items[index].data, old + prop->size);
++    if (!data) { vncSnapshotCancel(); return; }
++    memcpy(data + old, prop->data, prop->size);
++    snapshot.items[index].data = data;
++    snapshot.items[index].size += prop->size;
++  }
++  if (!snapshot.incr || prop->size == 0) vncSnapshotCompleteItem();
++  else DeleteProperty(serverClient, snapshot.window, snapshot.target);
+ }
+ 
+-static void vncHandleSelection(Atom selection, Atom target,
+-                               Atom property, Atom requestor,
+-                               TimeStamp time)
++static void vncSnapshotNotify(ClientPtr client, const xEvent *event)
+ {
++  if (client != snapshot.client || !vncSnapshotCurrent()) { vncSnapshotCancel(); return; }
++  if (event->u.selectionNotify.selection != snapshot.selection || event->u.selectionNotify.target != snapshot.target ||
++      event->u.selectionNotify.time != snapshot.time || snapshot.incr) return;
++  if (event->u.selectionNotify.property != snapshot.target) { vncSnapshotCancel(); return; }
+   PropertyPtr prop;
+-  int rc;
+-
+-  rc = dixLookupProperty(&prop, pWindow, property,
+-                         serverClient, DixReadAccess);
+-  if (rc != Success)
+-    return;
+-
+-  LOG_DEBUG("Selection notification for %s (target %s, property %s, type %s)",
+-            NameForAtom(selection), NameForAtom(target),
+-            NameForAtom(property), NameForAtom(prop->type));
+-
+-  if (target != property)
+-    return;
+-
+-  if (prop->type == xaINCR)
+-    LOG_INFO("Incremental clipboard transfer denied, too large");
+-
+-  if (target == xaTARGETS) {
+-    if (prop->format != 32)
+-      return;
+-    if (prop->type != XA_ATOM)
+-      return;
+-
+-    if (probing) {
+-      if (vncHasAtom(xaSTRING, (const Atom*)prop->data, prop->size) ||
+-          vncHasAtom(xaUTF8_STRING, (const Atom*)prop->data, prop->size) ||
+-          vncHasBinaryClipboardAtom((const Atom*)prop->data, prop->size)) {
+-        LOG_DEBUG("Compatible format found, notifying clients");
+-        vncClearBinaryClipboardData();
+-        activeSelection = selection;
+-        vncAnnounceClipboard(TRUE);
+-        vncHandleClipboardRequest();
+-      }
+-    } else {
+-      if (vncHasAtom(xaUTF8_STRING, (const Atom*)prop->data, prop->size))
+-        vncSelectionRequest(selection, xaUTF8_STRING);
+-      else if (vncHasAtom(xaSTRING, (const Atom*)prop->data, prop->size))
+-        vncSelectionRequest(selection, xaSTRING);
+-
+-      unsigned i;
+-
+-      Bool skiphtml = FALSE;
+-      if (htmlPngPresent &&
+-          vncHasAtom(xaBinclips[xaHtmlIndex], (const Atom*)prop->data, prop->size) &&
+-          vncHasAtom(xaBinclips[xaPngIndex], (const Atom*)prop->data, prop->size))
+-        skiphtml = TRUE;
+-
+-      for (i = 0; i < dlp_num_mimetypes(); i++) {
+-        if (skiphtml && i == xaHtmlIndex)
+-          continue;
+-        if (vncHasAtom(xaBinclips[i], (const Atom*)prop->data, prop->size)) {
+-          vncSelectionRequest(selection, xaBinclips[i]);
+-          //break;
+-        }
+-      }
+-    }
+-  } else if (target == xaSTRING) {
+-    char* filtered;
+-    char* utf8;
+-
+-    if (prop->format != 8)
+-      return;
+-    if (prop->type != xaSTRING)
+-      return;
+-
+-    filtered = vncConvertLF(prop->data, prop->size);
+-    if (filtered == NULL)
+-      return;
+-
+-    utf8 = vncLatin1ToUTF8(filtered, (size_t)-1);
+-    vncStrFree(filtered);
+-    if (utf8 == NULL)
+-      return;
+-
+-    LOG_DEBUG("Sending text part of binary clipboard to clients (%d bytes)",
+-              (int)strlen(utf8));
+-
+-    vncSendBinaryClipboardData("text/plain", utf8, strlen(utf8));
+-
+-    vncStrFree(utf8);
+-  } else if (target == xaUTF8_STRING) {
+-    char *filtered;
+-
+-    if (prop->format != 8)
+-      return;
+-    if (prop->type != xaUTF8_STRING)
+-      return;
+-
+-    filtered = vncConvertLF(prop->data, prop->size);
+-    if (filtered == NULL)
+-      return;
+-
+-    LOG_DEBUG("Sending text part of binary clipboard to clients (%d bytes)",
+-              (int)strlen(filtered));
+-
+-    vncSendBinaryClipboardData("text/plain", filtered, strlen(filtered));
+-
+-    vncStrFree(filtered);
+-  } else {
+-    unsigned i;
+-
+-    if (prop->format != 8)
+-      return;
+-
+-    for (i = 0; i < dlp_num_mimetypes(); i++) {
+-      if (target == xaBinclips[i]) {
+-        if (prop->type != xaBinclips[i])
+-          return;
+-
+-        LOG_DEBUG("Sending binary clipboard to clients (%d bytes)",
+-                  prop->size);
+-
+-        vncSendBinaryClipboardData(dlp_get_mimetype(i), prop->data, prop->size);
++  if (dixLookupProperty(&prop, snapshot.window, snapshot.target, serverClient, DixReadAccess) != Success) { vncSnapshotCancel(); return; }
++  if (snapshot.target == xaTARGETS) { vncSnapshotTargets(prop); return; }
++  if (prop->type == xaINCR) {
++    if (prop->format != 32 || prop->size != 1 || *(CARD32*)prop->data > NATIVE_CLIPBOARD_LIMIT - snapshot.total + 1) { vncSnapshotCancel(); return; }
++    snapshot.incr = TRUE;
++    DeleteProperty(serverClient, snapshot.window, snapshot.target);
++  } else vncSnapshotData(prop);
++}
+ 
+-        break;
+-      }
+-    }
++static int vncProcChangeProperty(ClientPtr client)
++{
++  REQUEST(xChangePropertyReq);
++  REQUEST_AT_LEAST_SIZE(xChangePropertyReq);
++  if (!snapshot.window || stuff->window != snapshot.window->drawable.id) return origProcChangeProperty(client);
++  /* Bound this private requestor's allocation before Xorg copies the property. */
++  if (client != snapshot.client || !vncSnapshotCurrent() || stuff->property != snapshot.target ||
++      stuff->mode != PropModeReplace || (snapshot.target == xaTARGETS && (stuff->format != 32 || stuff->nUnits > 256)) || (stuff->format != 8 && stuff->format != 32) ||
++      stuff->nUnits > (NATIVE_CLIPBOARD_LIMIT + 1) / (stuff->format / 8)) {
++    vncSnapshotCancel();
++    return BadValue;
++  }
++  int result = origProcChangeProperty(client);
++  if (result != Success) { vncSnapshotCancel(); return result; }
++  if (snapshot.incr) {
++    PropertyPtr prop;
++    if (dixLookupProperty(&prop, snapshot.window, snapshot.target, serverClient, DixReadAccess) != Success) vncSnapshotCancel();
++    else vncSnapshotData(prop);
+   }
++  return Success;
+ }
+ 
+ #define SEND_EVENT_BIT 0x80
+@@ -706,15 +727,10 @@ static int vncProcSendEvent(ClientPtr client)
+ 
+   stuff->event.u.u.type &= ~(SEND_EVENT_BIT);
+ 
+-  if (stuff->event.u.u.type == SelectionNotify &&
+-      stuff->event.u.selectionNotify.requestor == wid) {
+-    TimeStamp time;
+-    time = ClientTimeToServerTime(stuff->event.u.selectionNotify.time);
+-    vncHandleSelection(stuff->event.u.selectionNotify.selection,
+-                       stuff->event.u.selectionNotify.target,
+-                       stuff->event.u.selectionNotify.property,
+-                       stuff->event.u.selectionNotify.requestor,
+-                       time);
++  if (stuff->event.u.u.type == SelectionNotify && snapshot.window &&
++      stuff->event.u.selectionNotify.requestor == snapshot.window->drawable.id) {
++    vncSnapshotNotify(client, &stuff->event);
++    return Success;
+   }
+ 
+   return origProcSendEvent(client);
+@@ -725,32 +741,11 @@ static void vncSelectionCallback(CallbackListPtr *callbacks,
+ {
+   SelectionInfoRec *info = (SelectionInfoRec *) args;
+ 
+-  if (info->selection->selection == activeSelection) {
+-    LOG_DEBUG("Local clipboard lost, notifying clients");
+-    activeSelection = None;
+-    vncAnnounceClipboard(FALSE);
+-  }
+-
+-  if (info->kind != SelectionSetOwner)
+-    return;
+-  if (info->client == serverClient)
+-    return;
+-
+-  LOG_DEBUG("Selection owner change for %s",
+-            NameForAtom(info->selection->selection));
+-
+-  if ((info->selection->selection != xaPRIMARY) &&
+-      (info->selection->selection != xaCLIPBOARD))
+-    return;
+-
+-  if ((info->selection->selection == xaPRIMARY) &&
+-      !vncGetSendPrimary())
+-    return;
+-
+-  LOG_DEBUG("Got clipboard notification, probing for formats");
+-
+-  probing = TRUE;
+-  vncSelectionRequest(info->selection->selection, xaTARGETS);
++  if (snapshot.window && info->selection->selection == snapshot.selection) vncSnapshotCancel();
++  if (info->kind != SelectionSetOwner || info->client == serverClient) return;
++  if (info->selection->selection != xaCLIPBOARD &&
++      !(info->selection->selection == xaPRIMARY && vncGetSendPrimary())) return;
++  vncSnapshotStart(info->selection);
+ }
+ 
+ static void vncClientStateCallback(CallbackListPtr * l,
+@@ -758,6 +753,7 @@ static void vncClientStateCallback(CallbackListPtr * l,
+ {
+   ClientPtr client = ((NewClientInfoRec*)p)->client;
+   if (client->clientState == ClientStateGone) {
++    if (client == snapshot.client) vncSnapshotCancel();
+     struct VncDataTarget** nextPtr = &vncDataTargetHead;
+     for (struct VncDataTarget* cur = vncDataTargetHead; cur; cur = *nextPtr) {
+       if (cur->client == client) {

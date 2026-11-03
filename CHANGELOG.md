@@ -11,10 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-- Specify the selected native rich clipboard extension: plain text, HTML and
+- Develop the native rich clipboard extension: plain text, HTML and
   PNG with a 2 MiB aggregate transaction limit, retaining text-only pinned App
   compatibility and excluding file/directory copy. Implementation and separate
-  qualification are tracked in #55; this entry does not advertise runtime support.
+  qualification are tracked in #55; development source does not establish UAT acceptance.
 
 - Make the single-App Alpine Mousepad UAT package explicitly omit Openbox's
   default content-area mouse bindings (package 1.0.3). A synchronous click grab
@@ -116,12 +116,12 @@ implementation; move them to a version section when publishing a release.
   multiple Viewers do not receive JPEG payloads with stale lengths; add applied
   source cache tests with address, undefined-behavior and leak checks.
 
-Target: `0.16.0-dev.5`. Development only.
+Target: `0.16.0-dev.6`. Development only.
 
 Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
 remains the default. D1 is recorded in Issue #30; Issue #32 tracks the first
 D2 physical-input UAT checkpoint.
-Development identities are Core `0.16.0-dev.5` and SDK `0.31.0-dev.5`;
+Development identities are Core `0.16.0-dev.6` and SDK `0.31.0-dev.6`;
 these are not published or UAT-qualified releases.
 
 - Initialize the native adapter's mouse button map without the upstream UI.

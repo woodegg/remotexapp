@@ -16,10 +16,11 @@ import (
 )
 
 type fixture struct {
-	BaseURL      string `json:"baseURL"`
-	DocumentFile string `json:"documentFile"`
-	ManagedID    string `json:"managedId"`
-	TemplateID   string `json:"templateId"`
+	BaseURL        string `json:"baseURL"`
+	DocumentFile   string `json:"documentFile"`
+	ManagedID      string `json:"managedId"`
+	TemplateID     string `json:"templateId"`
+	RichTemplateID string `json:"richTemplateId,omitempty"`
 }
 
 func handler(target *url.URL, page []byte, config fixture, edge string) http.Handler {
@@ -64,6 +65,7 @@ func main() {
 	flag.StringVar(&config.DocumentFile, "document", "", "owned test document")
 	flag.StringVar(&config.ManagedID, "managed-id", "", "owned managed desktop")
 	flag.StringVar(&config.TemplateID, "template", "alpine-mousepad", "test editor template")
+	flag.StringVar(&config.RichTemplateID, "rich-template", "", "optional rich clipboard editor template")
 	flag.Parse()
 	target, err := url.Parse(*manager)
 	if err != nil || target.Scheme != "http" || !net.ParseIP(target.Hostname()).IsLoopback() || target.User != nil || target.Path != "" {

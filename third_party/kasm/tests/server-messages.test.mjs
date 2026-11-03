@@ -107,3 +107,47 @@ test('native clipboard rejects size, format and malformed Unicode before consumi
   assert.deepEqual(readClipboardText(new ReceiveQueue(clipboardMessage('ok\0'))),{text:'ok'});
   assert.throws(()=>readClipboardText(new ReceiveQueue(clipboardMessage('x\0y'))));
 });
+
+const {readClipboard} = await import('../server-messages.mjs');
+const {clipboardPayload, textPayload, sameClipboard, MAX_RICH_CLIPBOARD_BYTES:richLimit} = await import('../clipboard-payload.mjs');
+const richMessage = items => {
+  const parts = [Buffer.from([180,items.length])];
+  for (const {type,data} of items) parts.push(Buffer.from([...u32(1),type.length]),Buffer.from(type),Buffer.from(u32(data.length)),Buffer.from(data));
+  return Buffer.concat(parts);
+};
+test('rich parser commits every representation atomically at every split and owns its bytes', () => {
+  const source = [{type:'text/plain',data:new TextEncoder().encode('中文🙂')},{type:'text/html',data:new TextEncoder().encode('<b>中文🙂</b>')},{type:'image/png',data:Uint8Array.of(137,80,78,71)}];
+  const bytes = richMessage(source);
+  for (let split=1;split<bytes.length;split++) {
+    const q=new ReceiveQueue(bytes.subarray(0,split));
+    assert.equal(readClipboard(q),null);assert.equal(q.at,0);
+    q.bytes=Buffer.concat([bytes,Buffer.from([2])]);q.rQshift8();
+    const payload=readClipboard(q);assert(sameClipboard(payload,clipboardPayload(source)));
+    assert.equal(q.rQshift8(),2);q.bytes.fill(0);
+    assert(sameClipboard(payload,clipboardPayload(source)),'does not retain mutable receive buffer');
+  }
+});
+test('rich aggregate boundary counts representations and preserves old text-only limit', () => {
+  const items=[{type:'text/plain',data:new Uint8Array(richLimit-3).fill(97)},{type:'text/html',data:Uint8Array.of(120,121,122)}];
+  assert.equal(readClipboard(new ReceiveQueue(richMessage(items))).bytes,richLimit);
+  assert.equal(textPayload('x'.repeat(richLimit)).bytes,richLimit);
+  assert.throws(()=>textPayload('中'.repeat(Math.floor(richLimit/3)+1)),{code:'clipboard-size'});
+  assert.throws(()=>clipboardBytes('x'.repeat(65537)));
+  items[1].data=Uint8Array.of(1,2,3,4);
+  const q=new ReceiveQueue(richMessage(items));assert.throws(()=>readClipboard(q),/limit/);assert.equal(q.at,1);
+  // An oversized length alone is rejected, without buffering its claimed body.
+  const header=richMessage([{type:'image/png',data:new Uint8Array()}]);header.writeUInt32BE(richLimit+1,header.length-4);
+  assert.throws(()=>readClipboard(new ReceiveQueue(header)),/limit/);
+});
+test('rich parser rejects duplicates, unknown MIME and malformed text without partial consumption', () => {
+  for (const items of [
+    [{type:'text/plain',data:Uint8Array.of(97)},{type:'text/plain',data:Uint8Array.of(98)}],
+    [{type:'text/html',data:Uint8Array.of(255)}],
+    [{type:'text/html',data:Uint8Array.of(97,0,98)}],
+    [{type:'text/rtf',data:Uint8Array.of(97)}],
+  ]) {
+    const q=new ReceiveQueue(richMessage(items));assert.throws(()=>readClipboard(q));assert.equal(q.at,1);
+  }
+  assert.deepEqual(readClipboard(new ReceiveQueue([180,0])),{items:null});
+  assert.equal(readClipboard(new ReceiveQueue(richMessage([{type:'text/html',data:Uint8Array.of(97,0)}]))).bytes,1);
+});

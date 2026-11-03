@@ -86,6 +86,7 @@ def build(inputs, work, platform='ubuntu', transport='wss'):
         shutil.copyfile(COMPONENT / name, deps / name)
     run(['npm', 'ci', '--ignore-scripts', '--no-audit', '--no-fund'], deps)
     shutil.copyfile(COMPONENT / 'client-entry.js', client / 'remotexapp-entry.js')
+    shutil.copyfile(COMPONENT / 'clipboard-payload.mjs', client / 'core/clipboard-payload.mjs')
     shutil.copyfile(COMPONENT / 'server-messages.mjs', client / 'core/remotexapp-server-messages.mjs')
     shutil.copyfile(COMPONENT / 'udp.mjs', client / 'core/remotexapp-udp.mjs')
     shutil.copyfile(COMPONENT / 'latency.mjs', client / 'core/remotexapp-latency.mjs')
@@ -110,6 +111,7 @@ def package(inputs, work, output, platform='ubuntu', transport='wss'):
     (output / 'bin/Xkasmvnc').chmod(0o755)
     run(['strip', '--strip-debug', str(output / 'bin/Xkasmvnc')], work)
     copy(work / 'client.js', 'web/client.js')
+    copy(COMPONENT / 'clipboard-payload.mjs', 'sources/clipboard-payload.mjs')
     copy(COMPONENT / 'server-messages.mjs', 'sources/server-messages.mjs')
     copy(COMPONENT / 'udp.mjs', 'sources/udp.mjs')
     copy(COMPONENT / 'latency.mjs', 'sources/latency.mjs')
@@ -137,7 +139,7 @@ def package(inputs, work, output, platform='ubuntu', transport='wss'):
         patches[patch.name] = digest(patch)
     if platform == 'alpine':
         packages = subprocess.check_output(['apk', 'info', '-v'], text=True).splitlines()
-    source = {'status':'experimental-d2-not-a-release', 'serverCommit':SERVER, 'clientCommit':CLIENT,
+    source = {'status':'experimental-native-rich-clipboard-not-a-release', 'serverCommit':SERVER, 'clientCommit':CLIENT,
               'platform':platform, 'architecture':host_platform.machine(),
               'linkage':'dynamic; target runtime libraries required',
               'archives':INPUTS, 'patches':patches, 'runtimeLibraryPackages':packages,
@@ -146,12 +148,12 @@ def package(inputs, work, output, platform='ubuntu', transport='wss'):
               'nativeTestCompiler':{
                   'command':os.environ.get('KASM_TEST_CXX', 'c++'),
                   'version':subprocess.check_output([os.environ.get('KASM_TEST_CXX', 'c++'), '--version'], text=True).splitlines()[0]},
-              'scope':'Optional bounded UDP development component' if transport == 'udp' else 'WSS only; bounded explicit text clipboard; no UDP, QOI workers, audio or rich clipboard qualification',
+              'scope':'Bounded native text/HTML/PNG clipboard; optional UDP=' + str(transport == 'udp') + '; integration qualification required; no file/folder transfer',
               'tools':{name:subprocess.check_output([name,'--version'],text=True).splitlines()[0]
                        for name in ['c++','cmake','node','npm']}}
     (output / 'SOURCE.json').write_text(json.dumps(source, indent=2)+'\n')
     files = {str(p.relative_to(output)):digest(p) for p in sorted(output.rglob('*')) if p.is_file()}
-    manifest = {'schemaVersion':1, 'protocol':'kasm-udp-text-v1' if transport == 'udp' else 'kasm-wss-text-v1', 'serverCommit':SERVER,
+    manifest = {'schemaVersion':1, 'protocol':'kasm-udp-clipboard-v2' if transport == 'udp' else 'kasm-wss-clipboard-v2', 'serverCommit':SERVER,
                 'clientCommit':CLIENT, 'binary':'bin/Xkasmvnc', 'client':'web/client.js', 'files':files}
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
     print('Kasm component manifest SHA256:', digest(output / 'manifest.json'))

@@ -192,5 +192,5 @@ func nativeTransport(item *instance) *nativeTransportView {
 }
 
 func supportsNativeText(protocol string) bool {
-	return protocol == kasmbundle.TextProtocol || protocol == kasmbundle.UDPProtocol
+	return protocol == kasmbundle.TextProtocol || protocol == kasmbundle.UDPProtocol || kasmbundle.SupportsRichClipboard(protocol)
 }

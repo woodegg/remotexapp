@@ -5180,3 +5180,21 @@ Keep the new work in a separate Draft PR dependent on #54 so text qualification
 and rich implementation remain independently reviewable. See the
 [rich clipboard contract](native-rich-clipboard.md); no implementation, UAT,
 merge, deployment or release acceptance is established by this selection.
+
+## 2026-11-02 — Stage complete native rich clipboard transactions
+
+Issue #55 implementation selects new immutable `kasm-*-clipboard-v2` paired
+components and the `rich-v1` runtime descriptor. Core, gateway and SDK recognize
+the new pin; existing text-only Apps retain their old component and 64 KiB limit.
+Both directions validate all representations against a 2 MiB aggregate bound.
+The trusted edge buffers a whole bounded client transaction before forwarding.
+
+The X11 sender replaces time-based per-format aggregation with an owner-revision
+snapshot: a fresh private requestor window fences late responses, bounded INCR
+chunks support large selections, and a five-second deadline retires incomplete
+work. Publish only a complete validated snapshot; unsupported file selections,
+oversize or failed formats leave the destination unchanged. Text conversion uses
+explicit lengths and new PNG-only selections cannot inherit previous text targets.
+Browser readback after a rich write establishes the actual normalized baseline,
+preventing HTML sanitization or PNG re-encoding from creating a feedback loop.
+This is an implementation decision, not candidate or UAT acceptance.

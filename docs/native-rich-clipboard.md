@@ -3,7 +3,8 @@
 Status: selected for implementation on 2026-11-02 in
 [Issue #55](https://github.com/woodegg/remotexapp/issues/55), dependent on the
 native automatic text integration in [PR #54](https://github.com/woodegg/remotexapp/pull/54).
-This contract is prospective; previous text-only qualification does not
+Implementation is present on the development branch; exact-artifact qualification
+and human acceptance remain pending. Previous text-only qualification does not
 establish rich support in an installed component.
 
 ## Formats and limits
@@ -68,3 +69,14 @@ provider behavior and the existing manual text API.
 Keep this work in a separate Draft PR stacked on #54 until its dependency is
 merged, then retarget to `main`. Issue #55 holds progress; the PR holds review
 and CI evidence. Merge, post-merge qualification and publication remain separate.
+
+## Reproducible live regression
+
+`tests/kasm-native/browser-rich-clipboard.mjs` takes the disposable fixture JSON
+used by `browser-fixture.mjs`, with a ready `alpine-writer` instance and a dedicated
+browser. Install LibreOffice Writer, xclip and Python Xlib in that fixture. The
+test replaces only synthetic clipboard/document content, exercises real Writer
+HTML/PNG paste and copy, drives a temporary X11 owner for INCR and stale-selection
+cases, and deletes that owner's processes and files in `finally`. Its result JSON
+contains case status only; the optional screenshot contains synthetic content.
+Do not run this helper against a user's editor or personal browser clipboard.

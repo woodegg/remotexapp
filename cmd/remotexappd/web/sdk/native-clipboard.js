@@ -1,3 +1,5 @@
+import {clipboardFormats, richBrowserClipboard, validateClipboard, readClipboard, writeClipboard, sendClipboard} from './native-clipboard-data.js';
+import {sameClipboard} from '../../../../third_party/kasm/clipboard-payload.mjs';
 // Native clipboard policy. Payloads are bounded, ephemeral and never emitted.
 const modes = new Set(['off', 'manual', 'auto']);
 const coordinatorKey = Symbol.for('remotexapp.native-clipboard.owner.v1');
@@ -36,10 +38,9 @@ export class NativeClipboard {
     listen(globalThis, 'pagehide', () => this.deactivate());
   }
   fail(code) { return this.error(code); }
-  valid(text) {
-    if (typeof text !== 'string' || !text.isWellFormed() || text.includes('\0')) throw this.fail('clipboard-format');
-    if (text.length > 65536 || new TextEncoder().encode(text).length > this.client.capabilities.clipboardMaxBytes) throw this.fail('clipboard-size');
-    return text;
+  valid(value) {
+    try { return validateClipboard(value, this.client.capabilities); }
+    catch (error) { throw this.fail(error.code || 'clipboard-format'); }
   }
   eligible() {
     return this.active && coordinator().owner === this && this.client.state === 'ready' &&
@@ -50,15 +51,16 @@ export class NativeClipboard {
     if (!this.client.capabilities.clipboard || this.client.state !== 'ready') return 'off';
     if (mode !== 'auto') return mode;
     const supported = this.client.capabilities.clipboardAutomatic && globalThis.navigator?.locks?.request &&
-      globalThis.navigator?.clipboard?.readText && globalThis.navigator?.clipboard?.writeText;
+      globalThis.navigator?.clipboard?.readText && globalThis.navigator?.clipboard?.writeText &&
+      (!this.client.capabilities.clipboardRich || richBrowserClipboard());
     return supported && this.permissions.read === 'granted' &&
       (direction !== 'toLocal' || this.permissions.write === 'granted') ? 'auto' : 'manual';
   }
   snapshot() {
     return {requested:{...this.requested}, effective:{toRemote:this.effective('toRemote'),toLocal:this.effective('toLocal')},
       permissions:{...this.permissions}, active:this.eligible(), phase:this.phase,
-      formats:this.client.capabilities.clipboard ? ['text/plain'] : [], maxBytes:this.client.capabilities.clipboardMaxBytes,
-      automaticSupported:!!(this.client.capabilities.clipboardAutomatic && globalThis.navigator?.locks?.request && globalThis.navigator?.permissions?.query)};
+      formats:clipboardFormats(this.client.capabilities), maxBytes:this.client.capabilities.clipboardMaxBytes,
+      automaticSupported:!!(this.client.capabilities.clipboardAutomatic && globalThis.navigator?.locks?.request && globalThis.navigator?.permissions?.query && (!this.client.capabilities.clipboardRich || richBrowserClipboard()))};
   }
   emit(phase = this.phase) {
     this.phase = phase;
@@ -137,7 +139,7 @@ export class NativeClipboard {
     if (!Object.values(this.requested).includes('auto')) throw this.fail('clipboard-disabled');
     const consent = this.consent;
     // Explicit UI action only. Discard this payload; consent is not a transfer.
-    try { await navigator.clipboard.readText(); }
+    try { await readClipboard(this.client.capabilities); }
     catch (_) { if (consent === this.consent) this.emit('permission-required'); }
     if (consent === this.consent) {
       await this.observePermissions(consent);
@@ -150,8 +152,8 @@ export class NativeClipboard {
     if (revision !== this.revision || !this.eligible()) throw this.fail('clipboard-cancelled');
   }
   offer(text) {
-    try { this.valid(text); } catch (error) { this.emit(error.code); return; }
-    if (!this.eligible() || this.effective('toLocal') !== 'auto' || text === '' || text === this.lastSent) return;
+    try { text = this.valid(text); } catch (error) { this.emit(error.code); return; }
+    if (!this.eligible() || this.effective('toLocal') !== 'auto' || text.bytes === 0 || sameClipboard(text, this.lastSent)) return;
     // Do not replay an offer observed during baseline acquisition or a conflict.
     if (this.baseline === undefined || this.conflict) return;
     this.remote = text;
@@ -190,35 +192,38 @@ export class NativeClipboard {
       return await navigator.locks.request('remotexapp-native-clipboard', {ifAvailable:true}, async lock => {
         this.check(revision);
         if (!lock) { if (paste) throw this.fail('clipboard-busy'); return; }
-        const text = this.valid(await navigator.clipboard.readText());
+        const text = await readClipboard(this.client.capabilities);
         this.check(revision);
         const remote = this.remote;
         this.remote = undefined;
         if (paste) {
           // A paste is an explicit source choice, including after refocusing.
-          if (text) { this.client._display.sendClipboardText(text); this.lastSent = text; }
+          if (text.bytes) { sendClipboard(this.client._display, text, this.client.capabilities); this.lastSent = text; }
           this.baseline = text; this.conflict = false;
-          this.emit(text ? 'submitted' : 'empty-noop');
-          return {revision, empty:!text};
+          this.emit(text.bytes ? 'submitted' : 'empty-noop');
+          return {revision, empty:!text.bytes};
         }
         if (this.baseline === undefined) { this.baseline = text; this.emit('watching'); return; }
-        const changed = text !== this.baseline;
-        if (remote !== undefined && remote !== text && changed) {
+        const changed = !sameClipboard(text, this.baseline);
+        if (remote !== undefined && !sameClipboard(remote, text) && changed) {
           this.conflict = true; this.emit('conflict'); return;
         }
-        if (remote !== undefined && remote !== text && this.effective('toLocal') === 'auto') {
+        if (remote !== undefined && !sameClipboard(remote, text) && this.effective('toLocal') === 'auto') {
           this.check(revision);
           startedWrite = true;
-          await navigator.clipboard.writeText(remote);
+          await writeClipboard(remote, this.client.capabilities);
           if (revision !== this.revision || !this.eligible()) {
             this.emit('clipboard-uncertain'); return;
           }
-          this.baseline = remote;
+          // Rich browser writes can sanitize HTML or re-encode PNG. Establish
+          // the actual local value once, preventing a normalization echo.
+          this.baseline = this.client.capabilities.clipboardRich ? await readClipboard(this.client.capabilities) : remote;
+          this.check(revision);
           this.emit('copied-to-local');
         } else {
-          if (changed && text && this.effective('toRemote') === 'auto') {
+          if (changed && text.bytes && this.effective('toRemote') === 'auto') {
             this.check(revision);
-            this.client._display.sendClipboardText(text);
+            sendClipboard(this.client._display, text, this.client.capabilities);
             this.lastSent = text;
             this.emit('submitted');
           }

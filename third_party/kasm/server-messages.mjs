@@ -1,4 +1,5 @@
 // RemoteXApp integration with the MPL-2.0 Kasm client; see LICENSE.client.txt.
+import {CLIPBOARD_FORMATS, MAX_RICH_CLIPBOARD_BYTES, clipboardPayload} from './clipboard-payload.mjs';
 // The message type was consumed by RFB._normalMsg. Peek the entire variable
 // payload before committing any bytes, so a split message can retry safely.
 export function readVideoEncoders(sock) {
@@ -55,4 +56,40 @@ export function readClipboardText(sock) {
   if (text.includes('\0')) throw new TypeError('Invalid clipboard text');
   sock.rQskipBytes(20 + size);
   return {text};
+}
+
+// Rich server transactions are committed only when every representation exists.
+// Copy the bounded data after validation; never retain the receive queue itself.
+export function readClipboard(sock) {
+  const need = size => sock.rQwait('Native rich clipboard', size, 1);
+  if (need(1)) return null;
+  const bytes = sock.rQslice(0), count = bytes[0];
+  if (count === 0) { sock.rQskipBytes(1); return {items:null}; }
+  if (count > 3) throw new Error('Unsupported clipboard representations');
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const items = [], seen = new Set();
+  let offset = 1, total = 0;
+  for (let i = 0; i < count; i++) {
+    if (need(offset + 5)) return null;
+    const mimeLength = bytes[offset + 4];
+    if (mimeLength < 9 || mimeLength > 10) throw new Error('Unsupported clipboard MIME');
+    if (need(offset + 9 + mimeLength)) return null;
+    const type = new TextDecoder().decode(bytes.subarray(offset + 5, offset + 5 + mimeLength));
+    if (!CLIPBOARD_FORMATS.includes(type) || seen.has(type)) throw new Error('Unsupported clipboard MIME');
+    seen.add(type);
+    const size = view.getUint32(offset + 5 + mimeLength);
+    offset += 9 + mimeLength;
+    if (size > MAX_RICH_CLIPBOARD_BYTES - total + (type.startsWith('text/') ? 1 : 0)) throw new RangeError('Clipboard exceeds byte limit');
+    if (need(offset + size)) return null;
+    let data = bytes.subarray(offset, offset + size);
+    if (type.startsWith('text/') && data.at(-1) === 0) data = data.subarray(0, data.length - 1);
+    total += data.length;
+    if (total > MAX_RICH_CLIPBOARD_BYTES) throw new RangeError('Clipboard exceeds byte limit');
+    items.push({type,data});
+    offset += size;
+  }
+  const result = clipboardPayload(items);
+  result.items = result.items.map(({type,data}) => ({type,data:Uint8Array.from(data)}));
+  sock.rQskipBytes(offset);
+  return result;
 }

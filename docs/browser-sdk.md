@@ -739,3 +739,26 @@ do not automatically replay them. Clipboard payloads are not present in state
 snapshots, counters or UAT exports. Plain UTF-8 up to 64 KiB is the only format;
 HTML, images and files are not enabled. See the
 [requirements and qualification boundaries](native-clipboard-integration.md).
+
+### Native rich clipboard (development SDK 0.31.0-dev.6)
+
+Issue #55 / PR #56 extends new `rich-v1` runtime descriptors and immutable
+`kasm-wss-clipboard-v2` / `kasm-udp-clipboard-v2` components to `text/plain`,
+`text/html` and `image/png`, with a 2 MiB aggregate content limit per clipboard
+transaction. `getClipboardState().formats` reports the actual browser/component
+intersection; `maxBytes` reports the aggregate limit. The same directional
+configuration and manual methods apply. Old `text` runtime pins keep their
+64 KiB text contract. Missing rich browser APIs expose text-only manual fallback.
+Files, folders, URI-list selections, RTF and custom MIME types are excluded.
+
+HTML remains data and is never rendered by the SDK. A remote-to-local browser
+write may sanitize HTML or re-encode PNG; synchronization reads back the actual
+browser representation to prevent a feedback loop. A successful native send
+still does not prove the remote application pasted the content. Consent, active
+Viewer selection, cross-tab serialization, conflict handling, no inactive replay
+and retirement fences from the text integration remain in force.
+
+Both transports use the same reliable native clipboard control path. Rich data
+does not change UDP ports or audio routing. This is development source; exact
+artifact qualification and consolidated human UAT remain pending. See the
+[rich clipboard contract](native-rich-clipboard.md).

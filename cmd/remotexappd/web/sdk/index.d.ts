@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.31.0-dev.5';
+export const SDK_VERSION: '0.31.0-dev.6';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -69,7 +69,7 @@ export interface RemoteXAppRecovery {
 }
 
 export interface RemoteXAppInstance {
-  displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string; nativeClipboard?:'text';
+  displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string; nativeClipboard?:'text'|'rich-v1';
   nativeAudio?:'pcm-s16le-48k-v1';
   nativeTransport?:{policy:'wss-only'|'prefer-udp';available:boolean;grantRequired:boolean;reason?:string};
   recovery?:RemoteXAppRecovery;
@@ -158,7 +158,7 @@ export class RemoteXAppNativeClient extends EventTarget {
   readonly state:'disconnected'|'connecting'|'ready'|'failed'|'disposed';
   readonly instance?:RemoteXAppInstance;
   readonly capabilities:{readonly display:'kasm-wss-v1';readonly pointer:true;readonly keyboard:true;
-    readonly clipboard:boolean;readonly clipboardAutomatic?:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly statistics:boolean;readonly programmaticText:false;readonly audio:false;readonly udp:boolean};
+    readonly clipboard:boolean;readonly clipboardAutomatic?:boolean;readonly clipboardRich?:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly statistics:boolean;readonly programmaticText:false;readonly audio:false;readonly udp:boolean};
   readonly keyboardPolicy:NativeKeyboardPolicy|null;
   readonly clipboardEnabled:boolean;
   getStats():RemoteXAppNativeStats;

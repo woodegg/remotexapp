@@ -1181,6 +1181,13 @@ func (m *manager) stopVacant(id string, timer *time.Timer, expected *instance, g
 func (m *manager) stop(item *instance, options stopOptions) error {
 	m.lifecycleMu.Lock()
 	defer m.lifecycleMu.Unlock()
+	if options.ExpectedGeneration != nil {
+		current := m.get(item.ID)
+		if current == nil || current.SessionGeneration != *options.ExpectedGeneration {
+			return errStopGeneration
+		}
+		*item = *current
+	}
 	return m.stopInstanceLocked(item, options)
 }
 

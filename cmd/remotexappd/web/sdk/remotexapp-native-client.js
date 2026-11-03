@@ -1,5 +1,6 @@
 import { RemoteXAppManager } from './remotexapp-manager.js';
 import { NativeClipboard } from './native-clipboard.js';
+import { NativeReconnect } from './native-reconnect.js';
 import {readClipboard, writeClipboard, sendClipboard, validateClipboard} from './native-clipboard-data.js';
 
 export class RemoteXAppNativeError extends Error {
@@ -41,12 +42,15 @@ function udpLossSample(raw) {
     ...Object.fromEntries(keys.map(k => [k,raw[k]])),ratio:raw.lostBlocks/raw.expectedBlocks,ageMs:raw.ageMs};
 }
 
-/** Minimal opt-in Kasm Viewer. Each object owns one display attachment only. */
+/** Native display attachment. Runtime/audio ownership is explicit and separate. */
 export class RemoteXAppNativeClient extends EventTarget {
-  constructor({ container, manager = new RemoteXAppManager(), timeout = 90000, keyboardPolicy, preferUDP = true } = {}) {
+  constructor({ container, runtime, manager = runtime?.manager || new RemoteXAppManager(), timeout = 90000, keyboardPolicy, preferUDP = true, reconnect = false, readOnly = false } = {}) {
     super();
     if (!container?.replaceChildren) throw new TypeError('container is required');
     if (!Number.isFinite(timeout) || timeout < 1 || timeout > 120000) throw new RangeError('invalid connection timeout');
+    if (typeof readOnly !== 'boolean') throw new TypeError('readOnly must be boolean');
+    Object.defineProperty(this,'readOnly',{value:readOnly,enumerable:true});
+    this._displaySettings = {scale:true,resize:null};
     this.container = container;
     this.manager = manager;
     this.timeout = timeout;
@@ -61,6 +65,39 @@ export class RemoteXAppNativeClient extends EventTarget {
     this._epoch = 0;
     this._disposed = false;
     this._clipboardSync = new NativeClipboard(this, code => new RemoteXAppNativeError(code, code));
+    this._reconnect = new NativeReconnect({policy:reconnect,
+      read:(id, options) => this.manager.getInstance(id, options),
+      connect:(instance, signal) => this._connect(instance, signal),
+      event:(name, detail) => {
+        if (name === 'reconnecting') this._state('reconnecting', detail);
+        if (name === 'reconnectexhausted' || name === 'reconnectstopped') this._state('disconnected', detail);
+        this.dispatchEvent(new CustomEvent(name, {detail}));
+      }});
+    if (runtime) this.bindRuntime(runtime);
+  }
+
+  /** Bind shared lifecycle observation without taking ownership of its handle. */
+  bindRuntime(runtime) {
+    if (this._disposed) throw new RemoteXAppNativeError('disposed', 'Viewer has been disposed');
+    if (!runtime || runtime.manager !== this.manager || runtime.state !== 'tracking' ||
+        !Number.isSafeInteger(runtime.sessionGeneration) || runtime.sessionGeneration < 1 ||
+        !runtime.instanceId || typeof runtime.addEventListener !== 'function') throw new TypeError('An active same-Manager runtime handle is required');
+    if (this.instance && (runtime.instanceId !== this.instance.id || runtime.sessionGeneration !== this.instance.sessionGeneration))
+      throw new RemoteXAppNativeError('stale-generation', 'Runtime handle does not match the Viewer');
+    this._unbindRuntime?.();
+    this.runtime = runtime;
+    const invalidated = () => {
+      this.disconnect();
+      this._state('disconnected', {code:'runtime-invalidated'});
+      this.dispatchEvent(new CustomEvent('runtimeinvalidated', {detail:{generation:runtime.sessionGeneration}}));
+    };
+    runtime.addEventListener('invalidated', invalidated);
+    runtime.addEventListener('release', invalidated);
+    this._unbindRuntime = () => {
+      runtime.removeEventListener('invalidated', invalidated);
+      runtime.removeEventListener('release', invalidated);
+      this.runtime = null; this._unbindRuntime = null;
+    };
   }
 
   _state(state, detail = {}) {
@@ -71,13 +108,21 @@ export class RemoteXAppNativeClient extends EventTarget {
 
   _loadDisplay(url) { return import(url); }
 
-  async connect(instance = this.instance?.id) {
+  connect(instance = this.instance?.id || this.runtime?.instanceId) {
+    this._reconnect.cancel();
+    return this._connect(instance);
+  }
+
+  async _connect(instance, parentSignal) {
     if (this._disposed) throw new RemoteXAppNativeError('disposed', 'Viewer has been disposed');
     if (!instance) throw new TypeError('instance is required');
-    this.disconnect();
+    this._closeConnection();
     const epoch = ++this._epoch;
     const controller = this._controller = new AbortController();
     const { signal } = controller;
+    const cancelParent = () => controller.abort(parentSignal.reason);
+    parentSignal?.addEventListener('abort', cancelParent, {once:true});
+    if (parentSignal?.aborted) cancelParent();
     const current = () => {
       if (epoch !== this._epoch || signal.aborted) throw signal.reason || new DOMException('Connection replaced', 'AbortError');
     };
@@ -86,6 +131,8 @@ export class RemoteXAppNativeClient extends EventTarget {
     try {
       let selected = typeof instance === 'string' ? await this.manager.getInstance(instance, { signal }) : instance;
       current();
+      if (this.runtime && (this.runtime.state !== 'tracking' || this.runtime.instanceId !== selected.id ||
+          this.runtime.sessionGeneration !== selected.sessionGeneration)) throw new RemoteXAppNativeError('stale-generation', 'Runtime handle has ended or changed');
       if (selected.displayProvider !== 'kasm') throw new RemoteXAppNativeError('provider-mismatch', 'Native Viewer requires a Kasm runtime');
       if (!Number.isSafeInteger(selected.sessionGeneration) || selected.sessionGeneration < 0) throw new RemoteXAppNativeError('invalid-descriptor', 'Invalid session generation');
       if (!/^[a-f0-9]{64}$/.test(selected.displayComponentDigest || '')) throw new RemoteXAppNativeError('invalid-descriptor', 'Missing paired component identity');
@@ -112,6 +159,7 @@ export class RemoteXAppNativeClient extends EventTarget {
       }
       current();
       if (prepared.id !== selected.id || prepared.displayProvider !== 'kasm' || prepared.displayComponentDigest !== selected.displayComponentDigest || !Number.isSafeInteger(prepared.sessionGeneration) || prepared.sessionGeneration < 1) throw new RemoteXAppNativeError('invalid-descriptor', 'Invalid prepared session');
+      if (this.runtime && this.runtime.sessionGeneration !== prepared.sessionGeneration) throw new RemoteXAppNativeError('stale-generation','Prepared generation differs from the runtime handle');
       this.instance = prepared;
       moduleURL.searchParams.set('componentDigest', prepared.displayComponentDigest);
       const { default:NativeDisplay } = await abortable(this._loadDisplay(moduleURL.href), signal);
@@ -120,26 +168,34 @@ export class RemoteXAppNativeClient extends EventTarget {
       socketURL.protocol = socketURL.protocol === 'https:' ? 'wss:' : 'ws:';
       socketURL.searchParams.set('sessionGeneration', String(prepared.sessionGeneration));
       socketURL.searchParams.set('componentDigest', prepared.displayComponentDigest);
+      const features = NativeDisplay.capabilities || {};
+      if (this.readOnly && (prepared.nativeTransport?.readOnly !== true || features.readOnly !== true))
+        throw new RemoteXAppNativeError('unsupported', 'Server-enforced read-only attachment is unavailable');
       let grant;
       if (prepared.nativeTransport?.grantRequired) {
         const request = {sessionGeneration:prepared.sessionGeneration, componentDigest:prepared.displayComponentDigest,
-          viewerId:this._viewerId, connectionEpoch:epoch};
+          viewerId:this._viewerId, connectionEpoch:epoch, ...(this.readOnly ? {readOnly:true} : {})};
         grant = await this.manager.request(`${base}/grant`, {method:'POST', body:request, signal});
         current();
         if (!/^[a-f0-9]{64}$/.test(grant?.token || '') || grant.renewAfterMs !== 20000 || grant.expiresInMs !== 90000)
           throw new RemoteXAppNativeError('invalid-grant', 'Invalid native Viewer grant');
         this._grant = {base, request:{...request, token:grant.token}};
       }
-      const features = NativeDisplay.capabilities || {};
       const udp = features.udp === true && prepared.nativeTransport?.available === true;
       const rich = prepared.nativeClipboard === 'rich-v1' && features.clipboardRich === true && features.clipboardMaxBytes === 2097152;
-      const clipboard = rich || prepared.nativeClipboard === 'text' && features.clipboardText === true && Number.isSafeInteger(features.clipboardMaxBytes) && features.clipboardMaxBytes > 0;
-      this.capabilities = Object.freeze({...this.capabilities, keyboardPolicy:features.keyboardPolicy === true,
+      const clipboard = !this.readOnly && (rich || prepared.nativeClipboard === 'text' && features.clipboardText === true && Number.isSafeInteger(features.clipboardMaxBytes) && features.clipboardMaxBytes > 0);
+      this.capabilities = Object.freeze({...this.capabilities,
+        pointer:!this.readOnly, keyboard:!this.readOnly, readOnly:this.readOnly,
+        programmaticText:!this.readOnly && features.programmaticInput === true && typeof NativeDisplay.prototype.sendText === 'function',
+        programmaticKeys:!this.readOnly && features.programmaticInput === true && typeof NativeDisplay.prototype.sendKey === 'function',
+        displayControls:features.displayControls === true,
+        remoteResize:!this.readOnly && features.displayControls === true && prepared.effectivePolicy?.display?.allowClientResize === true,
+        keyboardPolicy:features.keyboardPolicy === true,
         clipboard, clipboardRich:rich, clipboardAutomatic:clipboard && features.clipboardAutomatic === true, udp, clipboardMaxBytes:clipboard ? Math.min(features.clipboardMaxBytes, rich ? 2097152 : 65536) : 0, statistics:features.statistics === true,
         latency:features.latency === true && typeof NativeDisplay.prototype.measureLatency === 'function',
         udpLoss:udp && features.udpLoss === true});
       const display = this._display = new NativeDisplay(this.container, socketURL.href, {
-        resize:prepared.effectivePolicy?.display?.allowClientResize === true, clipboard, keyboardPolicy:this._keyboardPolicy,
+        resize:!this.readOnly && prepared.effectivePolicy?.display?.allowClientResize === true, scale:this._displaySettings.scale, readOnly:this.readOnly, clipboard, keyboardPolicy:this._keyboardPolicy,
         prepareClipboardPaste:() => { current(); return this._clipboardSync.paste(); },
         udp:udp && this.preferUDP, protocols:grant ? [`remotexapp-grant.${grant.token}`] : [] });
       display.addEventListener('transportchange', () => {
@@ -154,7 +210,7 @@ export class RemoteXAppNativeClient extends EventTarget {
             this._grantTimer = setTimeout(renew, grant.renewAfterMs);
           } catch {
             if (epoch !== this._epoch) return;
-            this.disconnect();
+            this._closeConnection();
             this._state('failed', {code:'grant-expired'});
           }
         };
@@ -206,9 +262,14 @@ export class RemoteXAppNativeClient extends EventTarget {
       current();
       display.addEventListener('disconnect', () => {
         if (epoch !== this._epoch) return;
-        this.disconnect();
+        const expected = this.instance;
+        this._closeConnection(false);
+        const closedEpoch = this._epoch;
         this._state('disconnected', { code:'display-disconnected' });
+        if (closedEpoch === this._epoch && !this._disposed && (!this.runtime || this.runtime.state === 'tracking'))
+          this._reconnect.begin(expected, new RemoteXAppNativeError('display-disconnected', 'Display disconnected'));
       }, { once:true });
+      if (this._displaySettings.resize !== null && this.capabilities.displayControls) display.configureDisplay(this._displaySettings);
       this._transport = socketURL.protocol === 'wss:' ? 'wss' : 'ws-loopback';
       this._connectedAt = performance.now();
       this._state('ready', { generation:prepared.sessionGeneration, transport:this._transport });
@@ -216,13 +277,13 @@ export class RemoteXAppNativeClient extends EventTarget {
       return this.instance;
     } catch (cause) {
       if (epoch === this._epoch) {
-        this.disconnect();
+        this._closeConnection();
         const error = cause instanceof RemoteXAppNativeError ? cause : new RemoteXAppNativeError('connection-failed', 'Native Viewer connection failed', { cause });
         this._state('failed', { code:error.code });
         throw error;
       }
       throw cause;
-    } finally { clearTimeout(timer); }
+    } finally { clearTimeout(timer); parentSignal?.removeEventListener('abort', cancelParent); }
   }
 
   /** Read-only, per-connection counters. No timer, traffic or content logging. */
@@ -246,6 +307,33 @@ export class RemoteXAppNativeClient extends EventTarget {
         transport:raw.screenTransport === 'webrtc-udp' && raw.udpRectangles > 0 ? 'webrtc-udp' : this._transport,
         controlTransport:this._transport, udpState:raw.udpState, udpReason:raw.udpReason} : {})};
   }
+
+  /** Native wire submission, never an App ACK or implicit clipboard operation. */
+  _input(method, value, {signal, requestId = globalThis.crypto?.randomUUID?.(), ...options} = {}) {
+    if (signal?.aborted) throw signal.reason;
+    if (this.state !== 'ready' || !this.capabilities[method === 'sendText' ? 'programmaticText' : 'programmaticKeys'])
+      throw new RemoteXAppNativeError('input-unavailable', 'Native programmatic input is unavailable');
+    if (this.runtime && this.runtime.state !== 'tracking') throw new RemoteXAppNativeError('stale-generation', 'Runtime has ended');
+    if (requestId !== undefined && (typeof requestId !== 'string' || !/^[a-zA-Z0-9_-]{1,64}$/.test(requestId))) throw new TypeError('Invalid requestId');
+    const target={instanceId:this.instance.id,sessionGeneration:this.instance.sessionGeneration,connectionEpoch:this._epoch};
+    try {
+      const result=this._display[method](value,options);
+      return {...result,...target,...(requestId ? {requestId} : {})};
+    } catch(error) {
+      throw new RemoteXAppNativeError(error.code || 'input-uncertain', 'Native input submission failed', {cause:error});
+    }
+  }
+  sendText(text, options) { return this._input('sendText',text,options); }
+  sendKey(key, options) { return this._input('sendKey',key,options); }
+  configureDisplay({scale = true, resize = false} = {}) {
+    if (this.state !== 'ready' || !this.capabilities.displayControls) throw new RemoteXAppNativeError('unsupported','Display controls are unavailable');
+    if (typeof scale !== 'boolean' || typeof resize !== 'boolean') throw new TypeError('Invalid display settings');
+    if (resize && !this.capabilities.remoteResize) throw new RemoteXAppNativeError('unsupported','Remote resize is unavailable');
+    const result=this._display.configureDisplay({scale,resize});
+    this._displaySettings={scale,resize};
+    return result;
+  }
+  flushResize() { return this.state === 'ready' && this.capabilities.remoteResize ? this._display.flushResize() : false; }
 
   /** Explicit bounded RTT sampling; getStats() remains passive. */
   measureLatency() {
@@ -353,6 +441,11 @@ export class RemoteXAppNativeClient extends EventTarget {
   reconnect() { return this.connect(this.instance?.id); }
 
   disconnect() {
+    this._reconnect.cancel();
+    this._closeConnection();
+  }
+
+  _closeConnection(notify = true) {
     this._clipboardSync.reset();
     ++this._epoch;
     clearTimeout(this._grantTimer);
@@ -375,12 +468,13 @@ export class RemoteXAppNativeClient extends EventTarget {
     this._display = null;
     display?.disconnect();
     this.container.replaceChildren();
-    if (!this._disposed) this._state('disconnected');
+    if (notify && !this._disposed) this._state('disconnected');
   }
 
   dispose() {
     if (this._disposed) return;
     this.disconnect();
+    this._unbindRuntime?.();
     this._clipboardSync.dispose();
     this._disposed = true;
     this._state('disposed');

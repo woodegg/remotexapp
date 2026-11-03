@@ -11,10 +11,14 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-- Select the native SDK and host workflow integration train (#57): a served
-  reference host exercises templates, windows/workspaces, ownership, native
-  capabilities and application controls; deliver a migration guide and an
-  exact-candidate UAT handoff without changing the downstream application.
+- Add the native host SDK and `/sdk/host.html` reference workbench (#57):
+  template launch/reuse, managed attachment, separate window/task ownership,
+  bounded generation-fenced reconnect, native text/shortcut submission,
+  display controls, server-filtered read-only attachments, audio/clipboard
+  controls and live statistics. Stop requests may now require an exact
+  generation. All native display sockets use renewable one-use grants,
+  including WSS-only components. See the [migration guide](docs/native-host-migration.md).
+  Combined candidate qualification remains separate from human UAT acceptance.
 
 - Develop the native rich clipboard extension: plain text, HTML and
   PNG with a 2 MiB aggregate transaction limit, retaining text-only pinned App
@@ -123,12 +127,12 @@ implementation; move them to a version section when publishing a release.
   multiple Viewers do not receive JPEG payloads with stale lengths; add applied
   source cache tests with address, undefined-behavior and leak checks.
 
-Target: `0.16.0-dev.6`. Development only.
+Target: `0.16.0-dev.7`. Development only.
 
 Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
 remains the default. D1 is recorded in Issue #30; Issue #32 tracks the first
 D2 physical-input UAT checkpoint.
-Development identities are Core `0.16.0-dev.6` and SDK `0.31.0-dev.6`;
+Development identities are Core `0.16.0-dev.7` and SDK `0.31.0-dev.7`;
 these are not published or UAT-qualified releases.
 
 - Initialize the native adapter's mouse button map without the upstream UI.

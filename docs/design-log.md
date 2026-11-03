@@ -5209,3 +5209,26 @@ and task/control handoff. Functional behavior and lifecycle ownership are the
 compatibility target; old SDK method shapes are not. Actual downstream code
 and deployment remain outside this train. The simulator and SDK evolve
 together, and its evidence cannot stand in for actual downstream acceptance.
+
+## 2026-11-03 — Explicit native ownership, input and read-only grants
+
+[NHI-002–005](native-host-integration.md) are implemented through a host service
+and per-window/task session ownership. Preparing an on-attach runtime precedes
+binding its positive generation; releasing one owner does not stop the App.
+Bounded reconnect may reattach only the same running component/generation,
+never activate a stopped App or replay input/actions. Optional stop generation
+is checked under the lifecycle lock before any shutdown/idle mutation.
+
+Native programmatic input shares Kasm's key transport and returns a submission
+receipt, not the old input bridge's acknowledgement. It rejects human input or
+IME/paste overlap and never uses clipboard as a fallback. Resize remains a
+template permission; hosts select one resize owner for a shared framebuffer.
+
+Core grants now cover WSS-only as well as UDP-capable native components. An
+immutable read-only grant selects a bounded server-side RFB filter: no exclusive
+client initialization, keyboard, pointer, clipboard or desktop resizing. Display
+negotiation, per-client video resolution limits, statistics and optional UDP are
+allowed. This protects the attachment, not a new account role or separate audio
+and Manager operations. Old Core/component pairs cannot silently downgrade a
+requested read-only attachment. The [migration guide](native-host-migration.md)
+records host changes and the remaining downstream responsibilities.

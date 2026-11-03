@@ -15,6 +15,9 @@ const MaxBuffered = MaxClipboardBytes + 128*1024
 // ClientFilter accepts arbitrary WebSocket message boundaries. No byte of a
 // client message is forwarded until its complete bounded grammar is validated.
 type ClientFilter struct {
+	// ReadOnly permits display negotiation and statistics but no input,
+	// clipboard, desktop resizing or extensible remote-control messages.
+	ReadOnly  bool
 	pending   []byte
 	handshake int
 	failed    bool
@@ -44,7 +47,15 @@ func (f *ClientFilter) Feed(data []byte) ([]byte, error) {
 				f.failed = true
 				return nil, ErrStream
 			}
+			if f.ReadOnly && f.handshake == 2 && message[0] != 1 {
+				f.failed = true
+				return nil, ErrStream
+			}
 			f.handshake++
+		} else if f.ReadOnly && !readOnlyMessage(message[0]) {
+			f.failed = true
+			f.pending = nil
+			return nil, ErrStream
 		} else if message[0] == 181 && n > 3 {
 			offer, e := PrivateOffer(message[3:])
 			if e != nil {
@@ -62,6 +73,14 @@ func (f *ClientFilter) Feed(data []byte) ([]byte, error) {
 		f.pending = nil
 	}
 	return output, nil
+}
+
+func readOnlyMessage(kind byte) bool {
+	switch kind {
+	case 0, 2, 3, 150, 178, 179, 181, 184, 185, 248, 252:
+		return true
+	}
+	return false
 }
 
 func (f *ClientFilter) length() (int, error) {

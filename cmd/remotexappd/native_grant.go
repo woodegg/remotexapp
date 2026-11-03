@@ -21,6 +21,7 @@ type nativeGrant struct {
 	generation, epoch                     int64
 	expires                               time.Time
 	claimed                               bool
+	readOnly                              bool
 	channel                               *viewerChannel
 	timer                                 *time.Timer
 }
@@ -31,6 +32,7 @@ type nativeGrantRequest struct {
 	ViewerID          string `json:"viewerId"`
 	ConnectionEpoch   int64  `json:"connectionEpoch"`
 	Token             string `json:"token,omitempty"`
+	ReadOnly          bool   `json:"readOnly,omitempty"`
 }
 
 func grantIdentity(r *http.Request) string {
@@ -59,7 +61,7 @@ func (m *manager) serveNativeGrant(w http.ResponseWriter, r *http.Request, item 
 	var cancel context.CancelFunc
 	m.mu.Lock()
 	current := m.instances[item.ID]
-	if current == nil || !current.Components.NativeUDP || current.Components.Kasm == nil ||
+	if current == nil || !isKasm(current) || current.Components.Kasm == nil ||
 		current.Components.Kasm.SHA256 != req.ComponentDigest || current.SessionGeneration != req.SessionGeneration || current.SessionState != "running" ||
 		(current.State != "ready" && current.State != "server-ready") {
 		m.mu.Unlock()
@@ -95,7 +97,7 @@ func (m *manager) serveNativeGrant(w http.ResponseWriter, r *http.Request, item 
 		token := hex.EncodeToString(random[:])
 		key, _ := grantKey(token)
 		m.nativeGrants[key] = &nativeGrant{principal: grantIdentity(r), runtime: item.ID, generation: req.SessionGeneration,
-			component: req.ComponentDigest, viewer: req.ViewerID, epoch: req.ConnectionEpoch, expires: now.Add(nativeGrantLifetime)}
+			component: req.ComponentDigest, viewer: req.ViewerID, epoch: req.ConnectionEpoch, readOnly: req.ReadOnly, expires: now.Add(nativeGrantLifetime)}
 		m.mu.Unlock()
 		writeJSON(w, http.StatusOK, map[string]any{"token": token, "expiresInMs": nativeGrantLifetime.Milliseconds(), "renewAfterMs": 20000})
 		return
@@ -103,7 +105,7 @@ func (m *manager) serveNativeGrant(w http.ResponseWriter, r *http.Request, item 
 	key, valid := grantKey(req.Token)
 	g := m.nativeGrants[key]
 	if !valid || g == nil || !now.Before(g.expires) || g.principal != grantIdentity(r) || g.runtime != item.ID ||
-		g.generation != req.SessionGeneration || g.component != req.ComponentDigest || g.viewer != req.ViewerID || g.epoch != req.ConnectionEpoch {
+		g.generation != req.SessionGeneration || g.component != req.ComponentDigest || g.viewer != req.ViewerID || g.epoch != req.ConnectionEpoch || g.readOnly != req.ReadOnly {
 		m.mu.Unlock()
 		writeError(w, http.StatusForbidden, "native Viewer grant rejected")
 		return

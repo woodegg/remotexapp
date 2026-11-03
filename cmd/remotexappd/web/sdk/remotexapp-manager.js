@@ -242,9 +242,19 @@ export class RemoteXAppManager extends EventTarget {
     return this.request(`/api/instances/${encodeURIComponent(instanceId)}/attach`, { method: 'POST', signal });
   }
 
-  stopInstance(instanceId, { force = false, signal } = {}) {
+  prepareNativeInstance(instance, {signal} = {}) {
+    if (!instance?.id || instance.displayProvider !== 'kasm' || !Number.isSafeInteger(instance.sessionGeneration) ||
+        instance.sessionGeneration < 0 || !/^[a-f0-9]{64}$/.test(instance.displayComponentDigest || '')) throw new TypeError('A current native descriptor is required');
+    return this.request(`/remotexapps/${encodeURIComponent(instance.id)}/native/prepare`, {
+      method:'POST',body:{sessionGeneration:instance.sessionGeneration,componentDigest:instance.displayComponentDigest},signal,
+    });
+  }
+
+  stopInstance(instanceId, { force = false, sessionGeneration, signal } = {}) {
+    if (sessionGeneration !== undefined && (!Number.isSafeInteger(sessionGeneration) || sessionGeneration < 0)) throw new RangeError('Invalid sessionGeneration');
+    const body = {...(force ? {force:true} : {}), ...(sessionGeneration === undefined ? {} : {sessionGeneration})};
     return this.request(`/api/instances/${encodeURIComponent(instanceId)}/stop`, {
-      method: 'POST', body: force ? { force:true } : undefined, signal,
+      method: 'POST', body: Object.keys(body).length ? body : undefined, signal,
     });
   }
 

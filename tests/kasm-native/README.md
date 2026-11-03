@@ -1,5 +1,10 @@
 # Native Kasm qualification
 
+The [native rich clipboard checkpoint](NATIVE-RICH-CLIPBOARD.md) extends the
+text baseline to HTML/PNG and a 2 MiB aggregate bound. It records three-region
+candidate checks, old-pin compatibility and open observations, with one
+[combined physical UAT checklist](NATIVE-RICH-CLIPBOARD-UAT.md).
+
 The [native automatic clipboard checkpoint](NATIVE-CLIPBOARD.md) records exact
 candidate artifacts, standalone/public browser checks and the remaining
 [consolidated human UAT](NATIVE-CLIPBOARD-UAT.md).

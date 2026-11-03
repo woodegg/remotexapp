@@ -3,9 +3,11 @@
 Status: selected for implementation on 2026-11-02 in
 [Issue #55](https://github.com/woodegg/remotexapp/issues/55), dependent on the
 native automatic text integration in [PR #54](https://github.com/woodegg/remotexapp/pull/54).
-Implementation is present on the development branch; exact-artifact qualification
-and human acceptance remain pending. Previous text-only qualification does not
-establish rich support in an installed component.
+Implementation is present on the development branch. The
+[candidate report](../tests/kasm-native/NATIVE-RICH-CLIPBOARD.md) records exact
+artifacts, automated checks and open observations; human acceptance remains
+pending. Previous text-only qualification does not establish rich support in an
+installed component.
 
 ## Formats and limits
 
@@ -80,3 +82,16 @@ HTML/PNG paste and copy, drives a temporary X11 owner for INCR and stale-selecti
 cases, and deletes that owner's processes and files in `finally`. Its result JSON
 contains case status only; the optional screenshot contains synthetic content.
 Do not run this helper against a user's editor or personal browser clipboard.
+
+Use the [combined human UAT checklist](../tests/kasm-native/NATIVE-RICH-CLIPBOARD-UAT.md)
+for one end-to-end pass across #54 and #56. The reusable
+`browser-rich-lifecycle.mjs` also exercises real same-runtime and different-runtime
+tabs, inactive baseline handling, manual source choice and consent reset. Public
+fixtures require an explicitly named HTTPS origin, a project-owned disposable
+runtime and an isolated authenticated browser; permission overrides do not
+qualify physical prompts.
+
+The rich suite also accepts `--wss-roundtrip` to repeat real Writer HTML/PNG
+copy and paste with UDP explicitly disabled. Its normal public run requires
+actual UDP display bytes and painted frames. Every run creates a fresh Writer
+document and resets consent; run suites serially within one browser profile.

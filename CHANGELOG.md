@@ -15,6 +15,8 @@ implementation; move them to a version section when publishing a release.
   PNG with a 2 MiB aggregate transaction limit, retaining text-only pinned App
   compatibility and excluding file/directory copy. Implementation and separate
   qualification are tracked in #55; development source does not establish UAT acceptance.
+  Add a Writer HTML/PNG fixture and allow its workbench launch request to wait
+  through the longer application startup budget.
 
 - Make the single-App Alpine Mousepad UAT package explicitly omit Openbox's
   default content-area mouse bindings (package 1.0.3). A synchronous click grab

@@ -11,6 +11,11 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Select the native SDK and host workflow integration train (#57): a served
+  reference host exercises templates, windows/workspaces, ownership, native
+  capabilities and application controls; deliver a migration guide and an
+  exact-candidate UAT handoff without changing the downstream application.
+
 - Develop the native rich clipboard extension: plain text, HTML and
   PNG with a 2 MiB aggregate transaction limit, retaining text-only pinned App
   compatibility and excluding file/directory copy. Implementation and separate

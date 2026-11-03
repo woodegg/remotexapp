@@ -5,6 +5,16 @@
 > [current source versions](current-state.md). Host labels and runtime IDs in
 > historical examples are anonymized.
 
+## Native host workflow integration
+
+On 2026-11-03 the owner authorized implementation through a complete UAT
+handoff in [Issue #57](https://github.com/woodegg/remotexapp/issues/57).
+[NHI-001–010](native-host-integration.md#stable-requirements) define the native
+SDK, reference host, template workflow and migration acceptance. Functional
+continuity is required; legacy SDK method compatibility is not. The reference
+host simulates downstream behavior without modifying the downstream project.
+Status: implementation selected; qualification and new human UAT pending.
+
 ## Proposed Core 0.16.0 — KasmVNC evaluation
 
 The owner selected feasibility investigation on 2026-10-21. KVE-001–008 in

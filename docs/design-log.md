@@ -5198,3 +5198,14 @@ explicit lengths and new PNG-only selections cannot inherit previous text target
 Browser readback after a rich write establishes the actual normalized baseline,
 preventing HTML sanitization or PNG re-encoding from creating a feedback loop.
 This is an implementation decision, not candidate or UAT acceptance.
+
+
+## 2026-11-03 — Native host workflow qualification
+
+The owner authorized [NHI-001–010](native-host-integration.md) and Issue #57
+through UAT readiness. This extends the native architecture with a public-SDK
+reference host that simulates downstream windows, workspaces, template calls
+and task/control handoff. Functional behavior and lifecycle ownership are the
+compatibility target; old SDK method shapes are not. Actual downstream code
+and deployment remain outside this train. The simulator and SDK evolve
+together, and its evidence cannot stand in for actual downstream acceptance.

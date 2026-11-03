@@ -25,6 +25,10 @@ func TestNativeReadOnlyGrantBlocksDirectWireWrites(t *testing.T) {
 		}
 		received := make(chan []byte, 8)
 		backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Header.Get("Origin") != "http://"+r.Host {
+				http.Error(w, "same-origin required", 403)
+				return
+			}
 			if r.Header.Get("Sec-WebSocket-Protocol") != "binary" {
 				t.Error("upstream received a credential")
 			}
@@ -51,7 +55,7 @@ func TestNativeReadOnlyGrantBlocksDirectWireWrites(t *testing.T) {
 			m.serveNativeInstance(w, r, m.get(item.ID), "native/websockify")
 		}))
 		d := websocket.Dialer{Subprotocols: []string{nativeGrantProtocol + q.Token}}
-		c, _, err := d.Dial("ws"+strings.TrimPrefix(front.URL, "http")+"/?sessionGeneration=3&componentDigest="+q.ComponentDigest+"&readOnly=false", nil)
+		c, _, err := d.Dial("ws"+strings.TrimPrefix(front.URL, "http")+"/?sessionGeneration=3&componentDigest="+q.ComponentDigest+"&readOnly=false", http.Header{"Origin": []string{front.URL}})
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -15,7 +15,10 @@ import (
 // this is an immutable attachment permission, not a new tenant ACL.
 func (m *manager) serveReadOnlyNative(w http.ResponseWriter, r *http.Request, item *instance, channel *viewerChannel) {
 	dialer := websocket.Dialer{HandshakeTimeout: 10 * time.Second, WriteBufferSize: 16384, Subprotocols: []string{"binary"}}
-	up, response, err := dialer.DialContext(r.Context(), "ws://"+item.GatewayAddr+"/websockify", nil)
+	// Preserve the already-validated browser origin/Host pair for the loopback
+	// gateway's independent same-origin check. Never forward the grant or login.
+	headers := http.Header{"Origin": []string{r.Header.Get("Origin")}, "Host": []string{r.Host}}
+	up, response, err := dialer.DialContext(r.Context(), "ws://"+item.GatewayAddr+"/websockify", headers)
 	if err != nil {
 		if response != nil {
 			response.Body.Close()

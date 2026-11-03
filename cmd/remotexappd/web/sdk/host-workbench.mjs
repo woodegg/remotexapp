@@ -75,7 +75,7 @@ function show(){
 }
 function section(parent,title){const d=node('details'),s=node('summary',title);d.append(s);parent.append(d);return d;}
 function checkbox(parent,label,action){const row=node('label',undefined,'check'),input=node('input');input.type='checkbox';row.append(input,document.createTextNode(label));parent.append(row);
-  input.addEventListener('change',()=>perform(label,()=>action(input.checked),input));return input;}
+  input.addEventListener('change',()=>{const wanted=input.checked;perform(label,async()=>{try{return await action(wanted);}catch(error){input.checked=!wanted;throw error;}},input);});return input;}
 function select(parent,label,choices,action){const row=node('label',label),input=node('select');for(const [value,text] of choices)input.append(new Option(text,value));row.append(input);parent.append(row);
   input.addEventListener('change',()=>perform(label,()=>action(input.value),input));return input;}
 function viewerCall(w,action){if(!w.viewer)throw Error('viewer-unloaded');return action(w.viewer);}
@@ -85,6 +85,10 @@ async function attach(w){
     const viewer=await w.session.attach(w.display,{readOnly:w.readOnly});
     if(!windows.has(w.key)){viewer.dispose();return;}
     w.viewer=viewer;w.previous=null;w.status.dataset.state=viewer.state;
+    w.resizeToggle.checked=viewer.capabilities.remoteResize===true;
+    w.resizeToggle.disabled=!viewer.capabilities.remoteResize;
+    w.udpToggle.checked=viewer.capabilities.udp===true;
+    w.udpToggle.disabled=!viewer.capabilities.udp;
     viewer.addEventListener('statechange',()=>update(w));
     viewer.addEventListener('clipboardstatechange',()=>update(w));
     update(w);notice('应用已就绪：已确认应用状态与实际画面。');
@@ -114,6 +118,7 @@ async function open(options){
   const display=section(inspector,'画面与输入 · Display & input');
   w.resizeToggle=checkbox(display,'调整远端尺寸',enabled=>viewerCall(w,v=>v.configureDisplay({scale:true,resize:enabled})));
   w.resizeToggle.checked=!w.readOnly && session.instance.effectivePolicy?.display?.allowClientResize===true;
+  w.udpToggle=checkbox(display,'优先使用 UDP',enabled=>viewerCall(w,v=>v.configureTransport(enabled)));
   select(display,'输入法快捷键', [['unknown','选择本机平台'],['windows','Windows'],['mac','macOS'],['gnome','Linux GNOME'],['fcitx','Linux Fcitx']],profile=>viewerCall(w,v=>v.configureKeyboard({profile,mode:'local'})));
   const text=node('textarea');text.placeholder='原生文字输入；最大 4096 UTF-8 字节';text.setAttribute('aria-label','原生文字输入');display.append(text);
   display.append(button('发送文字',()=>viewerCall(w,v=>{const receipt=v.sendText(text.value);notice(`已发送 ${receipt.count} 个字符；请检查应用内容。`);})),
@@ -127,8 +132,8 @@ async function open(options){
   w.clipState=node('output');clip.append(w.clipState,node('p','文本 / HTML / PNG，合计 2 MiB；不支持文件和文件夹。重连后重新启用。','note'));
   const audio=section(inspector,'声音 · Speaker & microphone');w.audioState=node('output','未持有音频');
   audio.append(button('准备音频控制',async()=>{w.audio=await session.audio();update(w);}));
-  checkbox(audio,'远程播放 · Speaker',enabled=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setSpeaker(enabled);});
-  checkbox(audio,'麦克风 · Microphone',enabled=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setMicrophone(enabled);});
+  w.speakerToggle=checkbox(audio,'远程播放 · Speaker',enabled=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setSpeaker(enabled);});
+  w.micToggle=checkbox(audio,'麦克风 · Microphone',enabled=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setMicrophone(enabled);});
   audio.append(button('接管麦克风',()=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setMicrophone(true,{takeover:true});}),w.audioState,
     node('p','先准备控制，再明确启用；仅持有引用不会打开音频通道。同一会话的开关在标签页间共享。','note'));
   const actions=section(inspector,'应用动作与控制 · Actions');
@@ -157,6 +162,8 @@ function update(w){
     resolution:stats?.available?`${stats.width}×${stats.height}`:'—'}))w.metrics[id].textContent=value;
   const clipboard=w.viewer?.getClipboardState();w.clipState.textContent=clipboard?`${clipboard.phase} · ${clipboard.effective.toRemote} / ${clipboard.effective.toLocal}`:'未连接';
   const audio=host.getAudioState(),route=audio.routes?.find(r=>r.runtime===w.session.id && r.generation===w.session.generation);
+  if(!w.speakerToggle.disabled)w.speakerToggle.checked=!!route?.speaker;
+  if(!w.micToggle.disabled)w.micToggle.checked=!!route?.mic;
   w.audioState.textContent=`${audio.connection} · 播放 ${route?.actualSpeaker?'开':'关'} · 麦克风 ${route?.actualMic?'开':'关'}${route?.reason?` · ${route.reason}`:''}`;
 }
 $('#template').addEventListener('change',templateSelected);

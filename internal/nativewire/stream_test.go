@@ -86,7 +86,7 @@ func TestStreamRejectsUnknownAndBounds(t *testing.T) {
 	}
 	for _, invalid := range [][]byte{append(append([]byte{}, clip[:17]...), 0, 0, 0), append([]byte{}, clip...)} {
 		if invalid[17] != 0 {
-			binary.BigEndian.PutUint32(invalid[13:], 65537)
+			binary.BigEndian.PutUint32(invalid[13:], MaxClipboardBytes+1)
 		}
 		f := ClientFilter{handshake: 3}
 		if _, err := f.Feed(invalid); err == nil {
@@ -111,4 +111,56 @@ func FuzzClientStream(f *testing.F) {
 			t.Fatal("unbounded buffering")
 		}
 	})
+}
+
+func richClipboardMessage(items ...struct {
+	mime string
+	data []byte
+}) []byte {
+	p := []byte{180, byte(len(items))}
+	for _, item := range items {
+		p = append(p, byte(len(item.mime)))
+		p = append(p, item.mime...)
+		p = binary.BigEndian.AppendUint32(p, uint32(len(item.data)))
+		p = append(p, item.data...)
+	}
+	return p
+}
+func TestRichClipboardAtomicFragmentsAndAggregateBound(t *testing.T) {
+	type item = struct {
+		mime string
+		data []byte
+	}
+	wire := richClipboardMessage(item{"text/plain", []byte("中文🙂")}, item{"text/html", []byte("<b>中文🙂</b>")}, item{"image/png", []byte{137, 80, 78, 71}})
+	for split := 0; split < len(wire); split++ {
+		f := ClientFilter{handshake: 3}
+		first, err := f.Feed(wire[:split])
+		if err != nil || len(first) != 0 {
+			t.Fatal("partial clipboard escaped", split, err)
+		}
+		out, err := f.Feed(append(append([]byte{}, wire[split:]...), 185))
+		if err != nil || !bytes.Equal(out, append(append([]byte{}, wire...), 185)) {
+			t.Fatal("complete clipboard changed", split, err)
+		}
+		if f.pending != nil {
+			t.Fatal("large backing buffer retained")
+		}
+	}
+	boundary := richClipboardMessage(item{"text/plain", bytes.Repeat([]byte{'x'}, MaxClipboardBytes-1)}, item{"text/html", []byte{'x'}})
+	f := ClientFilter{handshake: 3}
+	if out, err := f.Feed(boundary); err != nil || len(out) != len(boundary) {
+		t.Fatal("exact boundary", err)
+	}
+	for _, invalid := range [][]byte{
+		richClipboardMessage(item{"text/plain", []byte{'a'}}, item{"text/plain", []byte{'b'}}),
+		richClipboardMessage(item{"text/plain", []byte{'a'}}, item{"text/html", []byte{255}}),
+		richClipboardMessage(item{"text/plain", []byte{'a'}}, item{"text/rtf", []byte{'x'}}),
+		richClipboardMessage(item{"text/plain", bytes.Repeat([]byte{'x'}, MaxClipboardBytes)}, item{"image/png", []byte{1}}),
+	} {
+		f := ClientFilter{handshake: 3}
+		out, err := f.Feed(invalid)
+		if err == nil || len(out) > 0 {
+			t.Fatal("invalid rich transaction forwarded")
+		}
+	}
 }

@@ -21,7 +21,7 @@
 .audio-link-summary{font-size:11px;color:#9ddfcf;padding:7px 10px;background:#132b2c;border:1px solid #2b4b4c;border-radius:7px;flex:none}.remote-audio-controls{margin-top:10px;border-top:1px solid var(--line);padding-top:9px}.remote-audio-controls .audio-actions{gap:5px}.remote-audio-controls button{padding:5px 7px;font-size:10px}.remote-audio-controls button[aria-pressed=true]{border-color:#78d3bd;background:#1e4840;color:#b2ffe9}.remote-audio-controls output{display:block;font-size:10px;color:var(--muted);margin-top:6px;overflow-wrap:anywhere}.remote-audio-controls meter{width:100%;height:10px}.audio-tools select{background:#172537;color:#d6e2f2;border:1px solid var(--line);border-radius:4px;padding:4px}
 </style>
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg"><symbol id="icon-window" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01M8 13l-2 2 2 2m8-4 2 2-2 2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol><symbol id="icon-expand" viewBox="0 0 24 24"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol><symbol id="icon-input" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7 10h.01M12 10h.01M17 10h.01M7 14h.01M11 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol></svg>
-<header class="topbar"><div class="brand"><span class="brand-mark"><svg aria-hidden="true"><use href="#icon-window"/></svg></span><div><h1>RemoteXApp</h1><small>Remote application workbench</small></div><span class="badge">UAT 工作台</span></div><div class="launch-actions"><span class="launch-label">开始测试</span><button id="launch-mousepad"><svg aria-hidden="true"><use href="#icon-input"/></svg>打开 Mousepad</button><button id="launch-desktop" class="primary"><svg aria-hidden="true"><use href="#icon-window"/></svg>打开测试桌面</button></div></header>
+<header class="topbar"><div class="brand"><span class="brand-mark"><svg aria-hidden="true"><use href="#icon-window"/></svg></span><div><h1>RemoteXApp</h1><small>Remote application workbench</small></div><span class="badge">UAT 工作台</span></div><div class="launch-actions"><span class="launch-label">开始测试</span><button id="launch-mousepad"><svg aria-hidden="true"><use href="#icon-input"/></svg>打开 Mousepad</button><button id="launch-writer" disabled>打开 Writer · HTML / PNG</button><button id="launch-desktop" class="primary"><svg aria-hidden="true"><use href="#icon-window"/></svg>打开测试桌面</button></div></header>
 <main class="workbench" id="workbench">
 <section class="main-pane" aria-label="远程应用测试窗口">
 <div class="workspace-toolbar"><div class="segmented" role="group" aria-label="窗口布局"><button data-layout="a" aria-pressed="true" title="聚焦 Viewer A">聚焦 A</button><button data-layout="b" aria-pressed="false" title="聚焦 Viewer B">聚焦 B</button><button data-layout="split" aria-pressed="false" title="并排查看两个 Viewer">双窗口</button></div><div class="toolbar-actions"><button id="toggle-tools" class="quiet" aria-expanded="false" aria-controls="input-tools" title="输入与剪贴板测试"><svg aria-hidden="true"><use href="#icon-input"/></svg><span class="button-label">输入测试</span></button><button id="toggle-audio" class="quiet" aria-expanded="false" aria-controls="audio-tools" title="音频测试 · Audio tests">音频</button><button id="fullscreen" class="quiet" title="全屏工作台，保留连接统计"><svg aria-hidden="true"><use href="#icon-expand"/></svg><span class="button-label">全屏工作台</span></button></div></div>
@@ -29,7 +29,7 @@
 <section class="viewer-panel viewer-a" data-viewer="a"><header class="viewer-heading"><span class="viewer-letter">A</span><h2>Viewer A</h2><small>独立连接</small><a id="open-a" target="_blank" rel="noopener" aria-disabled="true" title="在独立窗口打开 Viewer A">独立打开 ↗</a></header><div id="slot-a" class="slot"><div class="empty-view"><svg aria-hidden="true"><use href="#icon-window"/></svg><strong>你的远程应用，从这里开始</strong><p>打开测试桌面或 Mousepad。操作画面时，连接指标始终在旁边。</p></div></div><footer class="viewer-tools"><small>Viewer controls</small><button id="toggle-a">隐藏 / 显示</button><button id="dispose-a">关闭 A</button><button id="recreate-a">重新打开 A</button></footer></section>
 <section class="viewer-panel viewer-b" data-viewer="b" data-out-of-view="true" inert aria-hidden="true"><header class="viewer-heading"><span class="viewer-letter">B</span><h2>Viewer B</h2><small id="viewer-b-relation">尚未打开</small><a id="open-b" target="_blank" rel="noopener" aria-disabled="true" title="在独立窗口打开 Viewer B">独立打开 ↗</a></header><div id="slot-b" class="slot"><div class="empty-view"><svg aria-hidden="true"><use href="#icon-window"/></svg><strong>第二个观察视角</strong><p>同一个应用，另一条独立连接。切换双窗口可对照测试。</p></div></div><footer class="viewer-tools"><small>Viewer controls</small><button id="toggle-b">隐藏 / 显示</button><button id="dispose-b">关闭 B</button><button id="recreate-b">重新打开 B</button></footer></section>
 </div>
-<section id="input-tools" class="input-tools" hidden aria-label="本机输入与剪贴板测试"><h2><label for="local-text">本机输入区 <small>· Local input</small></label></h2><div class="input-body"><textarea id="local-text" placeholder="在这里输入中文或英文，再回到远程窗口，测试输入法切换…"></textarea><div class="input-buttons"><button id="local-copy">复制本机文本</button><button id="local-read">读取本机剪贴板</button></div></div><p>远程窗口内展开 Keyboard and clipboard，选择本机输入法快捷键并开启文本剪贴板。也可在右侧统计卡片的 Clipboard 面板选择两个方向的自动模式并授权。手动模式使用方向按钮，自动模式使用普通复制／粘贴。</p><details><summary>测试版本与会话信息</summary><pre id="identity"></pre></details></section>
+<section id="input-tools" class="input-tools" hidden aria-label="本机输入与剪贴板测试"><h2><label for="local-text">本机输入区 <small>· Local input</small></label></h2><div class="input-body"><textarea id="local-text" placeholder="在这里输入中文或英文，再回到远程窗口，测试输入法切换…"></textarea><div class="input-buttons"><button id="local-copy">复制本机文本</button><button id="local-read">读取本机剪贴板</button><button id="local-copy-html">复制测试 HTML</button><button id="local-copy-png">复制测试 PNG</button></div></div><p>远程窗口内展开 Keyboard and clipboard，选择本机输入法快捷键并开启剪贴板。也可在右侧统计卡片的 Clipboard 面板选择两个方向的自动模式并授权。手动模式使用方向按钮，自动模式使用普通复制／粘贴。</p><details><summary>测试版本与会话信息</summary><pre id="identity"></pre></details></section>
 <section id="audio-tools" class="audio-tools" hidden aria-labelledby="audio-title">
   <div class="audio-title"><h2 id="audio-title">音频测试 <small>Audio test bench</small></h2><button id="audio-export">导出测试记录 · JSON</button></div>
   <p class="local-boundary">先检查本机设备，再验证远程声路。本机检查与远程集成分开记录；连接正常不代表你已经听到声音。远程开关在右侧统计卡片中。</p>
@@ -175,7 +175,7 @@ function clipboardAPI(slot) {
 }
 function renderClipboard(slot) {
   const panel=document.querySelector('#clipboard-panel-'+slot), api=clipboardAPI(slot), s=api?.state();
-  panel.querySelector('output').textContent=s ? `${s.active?'当前活动窗口 · Active':'未激活 · Inactive'} · ${s.phase}\n读取权限 ${s.permissions.read} / 写入 ${s.permissions.write}\n实际模式 → ${s.effective.toRemote} / ← ${s.effective.toLocal}${s.automaticSupported?'':' · 组件或浏览器不支持自动模式'}` : '尚未连接 · Not connected';
+  panel.querySelector('output').textContent=s ? `${s.active?'当前活动窗口 · Active':'未激活 · Inactive'} · ${s.phase}\n读取权限 ${s.permissions.read} / 写入 ${s.permissions.write}\n实际模式 → ${s.effective.toRemote} / ← ${s.effective.toLocal}${s.automaticSupported?'':' · 组件或浏览器不支持自动模式'}\n格式 ${s.formats.join(', ')||'不支持'} · 合计上限 ${s.maxBytes} bytes` : '尚未连接 · Not connected';
   for(const select of panel.querySelectorAll('select')){select.disabled=!s;if(s)select.value=s.requested[select.dataset.direction];}
   for(const button of panel.querySelectorAll('button'))button.disabled=!s;
 }
@@ -193,7 +193,24 @@ for(const slot of ['a','b']) {
   };
   renderClipboard(slot);
 }
-const clipboardCases=[['text-both','双向中文／多行／emoji：实际粘贴读回'],['directions','单向、关闭与手动模式'],['permissions','首次授权、拒绝与撤销'],['focus-tabs','同一／不同 App、多 Tab 与隐藏窗口'],['retirement','切换、断线重连、退出账号后无旧内容重放'],['conflict-bounds','同时变化、空文本、64 KiB 与超限'],['transports','WSS、WebRTC 与回退'],['audio','扬声器／麦克风同时启用']];
+document.querySelector('#local-copy-html').onclick=async()=>{
+  try {
+    const plain='RemoteXApp 中文 clipboard — bold, blue and a list.\nOne\nTwo';
+    const html='<p><b>RemoteXApp 中文 clipboard</b> — <span style="color:blue">bold, blue and a list.</span></p><ul><li>One</li><li>Two</li></ul>';
+    await navigator.clipboard.write([new ClipboardItem({'text/plain':new Blob([plain],{type:'text/plain'}),'text/html':new Blob([html],{type:'text/html'})})]);
+    status('测试 HTML 已复制到本机；在 Writer 中粘贴并检查格式。');
+  }catch{status('浏览器未完成 HTML 复制；请检查权限与浏览器支持。');}
+};
+document.querySelector('#local-copy-png').onclick=async()=>{
+  try {
+    const canvas=document.createElement('canvas');canvas.width=128;canvas.height=96;const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#235c74';ctx.fillRect(0,0,128,96);ctx.fillStyle='#66edc7';ctx.fillRect(12,12,45,45);ctx.fillStyle='#ffffff';ctx.font='16px sans-serif';ctx.fillText('RemoteXApp',12,80);
+    const png=new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error()),'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({'image/png':png})]);
+    status('测试 PNG 已复制到本机；在 Writer 中粘贴并检查图片。文件／文件夹复制不支持。');
+  }catch{status('浏览器未完成 PNG 复制；请检查权限与浏览器支持。');}
+};
+const clipboardCases=[['rich-html','HTML 格式文本双向粘贴'],['rich-png','PNG 图片双向粘贴'],['rich-combined','同一内容的多种表示保持完整'],['rich-boundary','2 MiB 合计边界与超限拒绝'],['rich-files','文件／文件夹复制不支持'],['text-both','双向中文／多行／emoji：实际粘贴读回'],['directions','单向、关闭与手动模式'],['permissions','首次授权、拒绝与撤销'],['focus-tabs','同一／不同 App、多 Tab 与隐藏窗口'],['retirement','切换、断线重连、退出账号后无旧内容重放'],['conflict-bounds','同时变化、空文本及当前组件大小边界'],['transports','WSS、WebRTC 与回退'],['audio','扬声器／麦克风同时启用']];
 const clipboardMatrix=document.createElement('details');clipboardMatrix.id='clipboard-matrix';
 clipboardMatrix.innerHTML='<summary>剪贴板验收记录 · Clipboard UAT</summary><p>状态仅记录人工实际读回结果；连接成功不代表粘贴通过。导出不包含剪贴板内容。</p>'+clipboardCases.map(([id,label])=>`<p><label>${label} <select data-case="${id}"><option value="not-run">未测试</option><option value="pass">通过</option><option value="fail">失败</option><option value="not-supported">不支持</option></select></label></p>`).join('')+'<button id="clipboard-export">导出剪贴板记录</button>';
 document.querySelector('#input-tools').append(clipboardMatrix);
@@ -450,7 +467,7 @@ async function initializeRemoteAudio(loadRuntime=true){
   finally{remoteAudioInitializing=false;$('#audio-reconnect').disabled=false;}
 }
 
-const api=async(path,body,method)=>{const r=await fetch(config.baseURL+path,{signal:AbortSignal.timeout(15000),method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const x=await r.json();if(!r.ok)throw Error(x.error||'API request failed');return x;};
+const api=async(path,body,method,timeout=15000)=>{const r=await fetch(config.baseURL+path,{signal:AbortSignal.timeout(timeout),method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const x=await r.json();if(!r.ok)throw Error(x.error||'API request failed');return x;};
 const identity=x=>{$('#identity').textContent=JSON.stringify({core:x.versions?.current?.core,component:x.displayComponentDigest,generation:x.sessionGeneration,clipboard:x.nativeClipboard||'off',audio:x.nativeAudio||'off'},null,2);};
 function watchIdentity(target) {
   (async () => {
@@ -476,17 +493,21 @@ function show(x) {
 async function selectTarget(action) {
   if (selectionBusy || !config) return;
   selectionBusy=true;const epoch=++selectionEpoch;
-  for (const id of ['launch-mousepad','launch-desktop']) $('#'+id).disabled=true;
+  for (const id of ['launch-mousepad','launch-desktop','launch-writer']) $('#'+id).disabled=true;
   refreshAudioIdentity();
   try { await action(() => epoch === selectionEpoch); }
   catch { if(epoch === selectionEpoch)status('打开测试会话失败，请检查配置、登录与服务。'); }
   finally {
     selectionBusy=false;
     for (const id of ['launch-mousepad','launch-desktop']) $('#'+id).disabled=!config;
+    $('#launch-writer').disabled=!config?.richTemplateId;
     refreshAudioIdentity();
   }
 }
 $('#launch-mousepad').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:config.templateId||'mousepad',parameters:{filePath:config.documentFile}});if(active())show(x);});
+// Writer allows 45 seconds for application readiness, plus server startup and
+// network transit. Keep the request alive for that startup budget.
+$('#launch-writer').onclick=()=>selectTarget(async active=>{if(!config.richTemplateId)throw Error('Writer 未配置');const x=await api('/api/instances',{templateId:config.richTemplateId},undefined,60000);if(active())show(x);});
 $('#launch-desktop').onclick=()=>selectTarget(async active=>{const x=await api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH');if(active())show(x.runtime);});
 $('#audio-separate').onclick=()=>selectTarget(async active=>{
   const x=await api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH');
@@ -496,7 +517,7 @@ $('#audio-separate').onclick=()=>selectTarget(async active=>{
 });
 $('#audio-same').onclick=()=>{if(selectionBusy || !targets.has('a'))return;targets.set('b',targets.get('a'));frame('b');status('B 已回到 A 的会话；A 的 Viewer 保持连接。');};
 for(const id of ['launch-mousepad','launch-desktop']) $('#'+id).disabled=true;
-try{config=await fetch('/fixture-config').then(r=>{if(!r.ok)throw Error('fixture unavailable');return r.json();});for(const id of ['launch-mousepad','launch-desktop']) $('#'+id).disabled=false;refreshAudioIdentity();status('请选择测试应用，或展开音频面板检查本机设备。');}catch{status('测试配置不可用；本机音频检查仍可使用。');}
+try{config=await fetch('/fixture-config').then(r=>{if(!r.ok)throw Error('fixture unavailable');return r.json();});for(const id of ['launch-mousepad','launch-desktop']) $('#'+id).disabled=false;$('#launch-writer').disabled=!config.richTemplateId;refreshAudioIdentity();status('请选择测试应用，或展开音频面板检查本机设备。');}catch{status('测试配置不可用；本机音频检查仍可使用。');}
 void initializeRemoteAudio();
 for(const name of ['a','b']){
   document.querySelector('#toggle-'+name).onclick=()=>{const slot=document.querySelector('#slot-'+name);slot.hidden=!slot.hidden;if(slot.hidden)clipboardAPI(name)?.blur();const item=views.get(name);if(item)render(name,item);};

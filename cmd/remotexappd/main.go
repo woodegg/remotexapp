@@ -70,7 +70,7 @@ func main() {
 	flag.StringVar(&cfg.displayProvider, "display-provider", "tigervnc", "display provider for new runtimes: tigervnc or kasm")
 	flag.StringVar(&cfg.udpEndpointsFile, "udp-endpoints", "", "deployment-owned IPv4 UDP endpoint catalog (optional; no host mutations)")
 	flag.BoolVar(&cfg.nativeAudio, "native-audio", false, "enable private session audio domains (requires PulseAudio tools and paired SDK)")
-	flag.BoolVar(&cfg.nativeClipboard, "native-clipboard", false, "enable bounded explicit native text clipboard (requires paired text component)")
+	flag.BoolVar(&cfg.nativeClipboard, "native-clipboard", false, "enable bounded native clipboard supported by the pinned component (per-Viewer consent required)")
 	flag.StringVar(&cfg.kasmBundle, "kasm-bundle", "", "immutable Kasm WSS bundle directory (explicit opt-in)")
 	flag.StringVar(&cfg.lifecycleBackend, "lifecycle-backend", "systemd", "component lifecycle backend: systemd or standalone")
 	flag.StringVar(&cfg.standaloneCgroupRoot, "standalone-cgroup-root", "", "host-delegated cgroup v2 subtree for standalone components")

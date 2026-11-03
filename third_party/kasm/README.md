@@ -3,10 +3,10 @@
 The default recipe remains WSS. The explicitly selected `--transport udp`
 development profile adds patches 0020/0021, authenticated native UDP negotiation,
 loopback-only UDP sockets, bounded client reassembly and measured transport
-counters. It emits `kasm-udp-text-v1`; it requires Core's bounded endpoint and
+counters. It now emits `kasm-udp-clipboard-v2`; it requires Core's bounded endpoint and
 Viewer grant contract plus an outside-container trusted edge. See
-[bounded UDP UAT](../../docs/native-udp-uat.md). Neither profile qualifies audio,
-QOI workers or rich clipboard.
+[bounded UDP UAT](../../docs/native-udp-uat.md). Neither profile alone qualifies browser integration, audio or QOI workers.
+Rich clipboard integration and its exact candidate tests are tracked in #55/#56.
 
 The UDP assembler also exposes bounded, payload-free display-block loss
 observations. These are receiver delivery estimates, not IP packet loss; they
@@ -119,7 +119,7 @@ point an older Core at native runtime records or share a live profile writer.
 ## D2 input and text checkpoint
 
 Patch 0009 removes ordinary content-bearing keyboard mapping logs.
-The recipe now emits protocol `kasm-wss-text-v1`. Patch 0008 bounds incoming
+The initial D2 recipe emitted protocol `kasm-wss-text-v1`. Patch 0008 bounds incoming
 UTF-8 text before allocation/mutation and filters outgoing formats/sizes.
 Patch 0014 uses the bounded transactional browser parser. The adapter exposes
 keyboard policy and explicit native text sends; it never accesses the browser
@@ -141,3 +141,27 @@ remains exclusively in SDK policy. The binary native clipboard messages and
 server bounds are unchanged. `clipboardAutomatic` is a distinct capability,
 requiring a newly packaged, qualified immutable component; old components
 remain manual-only. Qualification is tracked in #50 / #54.
+
+## Rich clipboard development component
+
+Patches 0023/0024 extend new paired components to `text/plain`, `text/html` and
+`image/png`, using `kasm-wss-clipboard-v2` or `kasm-udp-clipboard-v2`.
+The aggregate content limit is 2 MiB; duplicate/unsupported representations and
+malformed text are rejected before destination mutation. The SDK owns browser
+access, consent and focus; the native adapter does not call clipboard browser APIs.
+Existing immutable text-only components and their 64 KiB contract remain valid.
+
+The native server stages incoming representations before selecting an X11 owner.
+Outgoing snapshots collect a complete owner revision, including bounded INCR
+transfers, with a fresh requestor window and a five-second deadline. Only the
+completed snapshot is sent; the old 100 ms per-format aggregation timer is not
+used for this path. Invalid, oversize, failed or superseded snapshots preserve
+the destination. X11 file/URI-list selections are excluded. Empty reads remain
+no-ops in automatic policy; explicit clear uses empty plain text.
+
+`clipboard-payload.mjs` supplies shared bounded byte validation/equality to the
+adapter and SDK. The build retains it, both patches and the applied reader's
+ASan/UBSan test in the component provenance. HTML is data, never SDK DOM;
+Browser clipboard sanitization/re-encoding is reconciled by SDK readback.
+The limit covers encoded clipboard representations, not decoded image memory.
+See the [contract and qualification scope](../../docs/native-rich-clipboard.md).

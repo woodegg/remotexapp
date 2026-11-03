@@ -5,20 +5,21 @@ import { RemoteXAppNativeClient } from './remotexapp-native-client.js';
 globalThis.CustomEvent ||= class extends Event { constructor(type,options) { super(type); this.detail = options?.detail; } };
 globalThis.location = new URL('https://viewer.example.test/remotexapps/app/kiosk.html');
 
-function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, clipboardAutomatic = false, statistics = false, udp = false, latency = false, udpLoss = false } = {}) {
+function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, clipboardAutomatic = false, rich = false, componentRich = rich, statistics = false, udp = false, latency = false, udpLoss = false } = {}) {
   const state = { id:'app', displayProvider:'kasm', displayComponentDigest:'a'.repeat(64), sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
   if (udp) state.nativeTransport={available:true,grantRequired:true,policy:'prefer-udp'};
   const calls=[];
-  state.nativeClipboard = clipboard ? "text" : undefined;
+  state.nativeClipboard = rich ? "rich-v1" : clipboard ? "text" : undefined;
   let display, reads = 0;
   class Display extends EventTarget {
-    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardAutomatic,clipboardMaxBytes:65536,statistics,udp,latency,udpLoss};
+    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardAutomatic,clipboardRich:componentRich,clipboardMaxBytes:componentRich?2097152:65536,statistics,udp,latency,udpLoss};
     counters = {receivedBytes:100, sentBytes:20, bufferedBytes:0, renderedFrames:2, width:1024, height:768};
     getStats() { return this.counters; }
     probes = 0;
     measureLatency() {this.probes++;return true;}
     sent = [];
     sendClipboardText(text) { this.sent.push(text); }
+    sendClipboard(items) { this.sent.push(items); }
     keyboardPolicy = {profile:"unknown",mode:"local",bindings:[]};
     configureKeyboard(settings) { this.keyboardPolicy = settings;return true; }
     configureTransport(value) {this.preferUDP=value;}
@@ -306,4 +307,26 @@ test('manual calls respect another tab clipboard lock without starting a browser
   const f=fixture({clipboard:true});await f.viewer.connect('app');t.after(()=>f.viewer.dispose());f.viewer.enableClipboard();
   f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{text:'remote'}}));
   await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-busy'});assert.equal(writes,0);
+});
+
+
+test('rich capability is pinned; old descriptors retain their text limit even with a newer adapter',async t=>{
+  clipboardBrowser(t);
+  for(const [options,enabled,limit] of [[{rich:true},true,2097152],[{rich:true,componentRich:false},false,0],[{clipboard:true,componentRich:true},true,65536]]) {
+    const f=fixture(options);await f.viewer.connect('app');
+    assert.equal(f.viewer.capabilities.clipboard,enabled);assert.equal(f.viewer.capabilities.clipboardMaxBytes,limit);
+    assert.equal(f.viewer.capabilities.clipboardRich,options.rich===true&&options.componentRich!==false);
+    f.viewer.dispose();
+  }
+});
+test('rich native metadata contains size only and unsupported remote offers cannot replace it',async t=>{
+  clipboardBrowser(t);const f=fixture({rich:true});await f.viewer.connect('app');t.after(()=>f.viewer.dispose());f.viewer.enableClipboard();
+  const events=[];f.viewer.addEventListener('clipboardchange',e=>events.push(e.detail));
+  f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{items:[{type:'text/html',data:new TextEncoder().encode('<b>private payload</b>')}]}}));
+  assert.deepEqual(events.at(-1),{enabled:true,available:true,bytes:22});
+  assert.equal(JSON.stringify(events).includes('private'),false);
+  const count=events.length;f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{items:[{type:'text/uri-list',data:Uint8Array.of(97)}]}}));
+  assert.equal(events.length,count);
+  await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-format'});
+  assert.equal((await f.viewer.clearRemoteClipboard()).status,'submitted');assert.equal(f.display.sent.at(-1)[0].type,'text/plain');assert.equal(f.display.sent.at(-1)[0].data.length,0);
 });

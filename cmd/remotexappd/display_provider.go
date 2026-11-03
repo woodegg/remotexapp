@@ -35,6 +35,9 @@ func (m *manager) newRuntimeComponents() runtimeComponents {
 		}
 		if m.cfg.nativeClipboard {
 			c.NativeClipboard = "text"
+			if m.cfg.nativeRichClipboard {
+				c.NativeClipboard = "rich-v1"
+			}
 		}
 	}
 	return c
@@ -69,7 +72,8 @@ func (cfg *config) configureDisplayProvider() error {
 		}
 	}
 	cfg.kasmPin = &bundle.Pin
-	cfg.nativeUDPCapable = bundle.Manifest.Protocol == kasmbundle.UDPProtocol
+	cfg.nativeUDPCapable = kasmbundle.SupportsUDP(bundle.Manifest.Protocol)
+	cfg.nativeRichClipboard = kasmbundle.SupportsRichClipboard(bundle.Manifest.Protocol)
 	return cfg.loadUDPEndpoints()
 }
 
@@ -89,7 +93,7 @@ func validateDisplayComponents(c runtimeComponents, verify bool) error {
 		if !validUDPLease(c.UDPEndpoint) || (!c.NativeUDP && (c.UDPEndpoint != nil || c.UDPUnavailableReason != "")) || (c.UDPEndpoint != nil && c.UDPUnavailableReason != "") || (c.UDPUnavailableReason != "" && c.UDPUnavailableReason != "endpoint-pool-full" && c.UDPUnavailableReason != "endpoints-not-configured") {
 			return errors.New("invalid native UDP snapshot")
 		}
-		if (c.NativeClipboard != "" && c.NativeClipboard != "text") || c.Kasm == nil || !kasmbundle.ValidDigest(c.Kasm.SHA256) || !filepath.IsAbs(c.Kasm.Directory) || filepath.Clean(c.Kasm.Directory) != c.Kasm.Directory || c.UnicodeEngine != "" {
+		if (c.NativeClipboard != "" && c.NativeClipboard != "text" && c.NativeClipboard != "rich-v1") || c.Kasm == nil || !kasmbundle.ValidDigest(c.Kasm.SHA256) || !filepath.IsAbs(c.Kasm.Directory) || filepath.Clean(c.Kasm.Directory) != c.Kasm.Directory || c.UnicodeEngine != "" {
 			return errors.New("invalid Kasm component snapshot")
 		}
 		if verify {
@@ -97,8 +101,11 @@ func validateDisplayComponents(c runtimeComponents, verify bool) error {
 			if err != nil {
 				return fmt.Errorf("locked Kasm bundle: %w", err)
 			}
-			if c.NativeUDP != (bundle.Manifest.Protocol == kasmbundle.UDPProtocol) {
+			if c.NativeUDP != kasmbundle.SupportsUDP(bundle.Manifest.Protocol) {
 				return errors.New("native UDP capability differs from pinned component")
+			}
+			if c.NativeClipboard == "rich-v1" && !kasmbundle.SupportsRichClipboard(bundle.Manifest.Protocol) {
+				return errors.New("locked component does not support native rich clipboard")
 			}
 			if c.NativeClipboard == "text" && !supportsNativeText(bundle.Manifest.Protocol) {
 				return errors.New("locked component does not support native text clipboard")
@@ -112,6 +119,10 @@ func validateDisplayComponents(c runtimeComponents, verify bool) error {
 
 func kasmLaunchArgs(item *instance, class classConfig, port int, authority string) []string {
 	root := item.Components.Kasm.Directory
+	accept, send, types := "65536", "65537", "text/plain"
+	if item.Components.NativeClipboard == "rich-v1" {
+		accept, send, types = "2097152", "2097153", "text/plain,text/html,image/png"
+	}
 	args := []string{
 		"--user", "--unit=" + strings.TrimSuffix(item.VNCUnit, ".service"), "--collect",
 		"--property=WorkingDirectory=" + item.Home, "--setenv=HOME=" + item.Home,
@@ -120,9 +131,9 @@ func kasmLaunchArgs(item *instance, class classConfig, port int, authority strin
 		"-interface", "127.0.0.1", "-websocketPort", strconv.Itoa(port),
 		"-DisableBasicAuth", "-sslOnly", "0", "-SecurityTypes", "None",
 		"-publicIP", "127.0.0.1", "-httpd", "", "-nolisten", "tcp",
-		"-AcceptCutText=" + boolDigit(item.Components.NativeClipboard == "text"), "-SendCutText=" + boolDigit(item.Components.NativeClipboard == "text"),
+		"-AcceptCutText=" + boolDigit(item.Components.NativeClipboard != ""), "-SendCutText=" + boolDigit(item.Components.NativeClipboard != ""),
 		"-SetPrimary=0", "-SendPrimary=0",
-		"-DLP_ClipAcceptMax=65536", "-DLP_ClipSendMax=65537", "-DLP_ClipTypes=text/plain", "-DLP_Log=off",
+		"-DLP_ClipAcceptMax=" + accept, "-DLP_ClipSendMax=" + send, "-DLP_ClipTypes=" + types, "-DLP_Log=off",
 		"-IgnoreClientSettingsKasm=1",
 		"-geometry", class.Server.Geometry, "-depth", "24", "-FrameRate", strconv.Itoa(class.Server.FrameRate),
 		"-AcceptSetDesktopSize=" + boolDigit(class.Server.AllowClientResize), "-FreeKeyMappings", "-auth", authority,

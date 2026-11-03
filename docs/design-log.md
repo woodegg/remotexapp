@@ -5166,3 +5166,35 @@ to hide the race, weaken clipboard ownership, or claim this qualifies arbitrary
 desktop window-manager policies. The unsuccessful native patches are excluded;
 Core and the paired Kasm component remain unchanged. Install a new immutable
 App package and preserve existing Apps rather than modifying a pinned package.
+
+## 2026-11-02 — Select a separate native rich clipboard increment
+
+The owner requested every format supported by the pinned Kasm browser path,
+with a 2 MB limit and no file/directory copy. Issue #55 selects text/plain,
+text/html and image/png, with an explicit 2 MiB aggregate content limit per
+transaction. This prospectively supersedes KNC-005's initial text-only limit
+only for new rich-capable component pins; old Apps keep their existing contract.
+Preserve consent, focus ownership, conflict handling and generation fencing.
+Browser normalization and complete X11 selection transactions require new tests.
+Keep the new work in a separate Draft PR dependent on #54 so text qualification
+and rich implementation remain independently reviewable. See the
+[rich clipboard contract](native-rich-clipboard.md); no implementation, UAT,
+merge, deployment or release acceptance is established by this selection.
+
+## 2026-11-02 — Stage complete native rich clipboard transactions
+
+Issue #55 implementation selects new immutable `kasm-*-clipboard-v2` paired
+components and the `rich-v1` runtime descriptor. Core, gateway and SDK recognize
+the new pin; existing text-only Apps retain their old component and 64 KiB limit.
+Both directions validate all representations against a 2 MiB aggregate bound.
+The trusted edge buffers a whole bounded client transaction before forwarding.
+
+The X11 sender replaces time-based per-format aggregation with an owner-revision
+snapshot: a fresh private requestor window fences late responses, bounded INCR
+chunks support large selections, and a five-second deadline retires incomplete
+work. Publish only a complete validated snapshot; unsupported file selections,
+oversize or failed formats leave the destination unchanged. Text conversion uses
+explicit lengths and new PNG-only selections cannot inherit previous text targets.
+Browser readback after a rich write establishes the actual normalized baseline,
+preventing HTML sanitization or PNG re-encoding from creating a feedback loop.
+This is an implementation decision, not candidate or UAT acceptance.

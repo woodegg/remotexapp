@@ -141,3 +141,73 @@ test('clicking an already-focused native input selects it only after readiness',
   c.container.dispatchEvent(new Event('pointerdown'));assert.equal(c.clipboard.snapshot().active,true);
   await c.clipboard.sync();assert.deepEqual(c.sent,[]);
 });
+
+import {textPayload,clipboardPayload,payloadText,sameClipboard} from '../../../../third_party/kasm/clipboard-payload.mjs';
+function richFixture(t) {
+  const f=fixture(t),old=Object.getOwnPropertyDescriptor(globalThis,'ClipboardItem');
+  class Item { constructor(values) { this.values=values;this.types=Object.keys(values); } async getType(type) { return this.values[type]; } static supports() { return true; } }
+  Object.defineProperty(globalThis,'ClipboardItem',{configurable:true,value:Item});
+  t.after(()=>{if(old)Object.defineProperty(globalThis,'ClipboardItem',old);else delete globalThis.ClipboardItem;});
+  f.io.payload=textPayload('baseline');f.io.richWrites=[];
+  f.nav.clipboard.read=async()=>[new Item(Object.fromEntries(f.io.payload.items.map(({type,data})=>[type,new Blob([data],{type})])))];
+  f.nav.clipboard.write=async items=>{
+    const representations=[];
+    for(const type of items[0].types)representations.push({type,data:new Uint8Array(await (await items[0].getType(type)).arrayBuffer())});
+    f.io.payload=clipboardPayload(representations);f.io.richWrites.push(f.io.payload);
+  };
+  const client=f.create();client.capabilities.clipboardRich=true;client.capabilities.clipboardMaxBytes=2097152;
+  client._display.sendClipboard=items=>client.sent.push(clipboardPayload(items));
+  return {...f,client};
+}
+const richText = (plain,html) => clipboardPayload([{type:'text/html',data:new TextEncoder().encode(html)},{type:'text/plain',data:new TextEncoder().encode(plain)}]);
+test('rich automatic payload preserves representations, paste ordering and browser normalization without echo',async t=>{
+  const f=richFixture(t),c=await f.start(f.client),s=c.clipboard;
+  f.io.payload=richText('local','<b>local</b>');assert.equal(await s.paste(),true);
+  assert(sameClipboard(c.sent[0],f.io.payload));s.offer(f.io.payload);await s.sync();assert.equal(f.io.richWrites.length,0);
+  const originalWrite=f.nav.clipboard.write;
+  f.nav.clipboard.write=async items=>{await originalWrite(items);f.io.payload=richText('remote','<html><b>remote</b></html>');};
+  s.offer(richText('remote','<b>remote</b>'));await s.sync();await s.sync();
+  assert.equal(f.io.richWrites.length,1);assert.equal(c.sent.length,1);
+  assert.deepEqual(s.snapshot().formats,['text/plain','text/html','image/png']);
+  assert.equal(JSON.stringify(c.events).includes('<b>'),false);
+});
+test('rich browser denial, oversize and unsupported representations never submit partial text',async t=>{
+  const f=richFixture(t),c=await f.start(f.client),s=c.clipboard;
+  f.nav.clipboard.read=async()=>[new ClipboardItem({'text/plain':new Blob(['small']), 'text/html':new Blob(['x'.repeat(2097152)])})];
+  await assert.rejects(s.paste(),{code:'clipboard-size'});assert.equal(c.sent.length,0);
+  f.nav.clipboard.read=async()=>[new ClipboardItem({'text/plain':new Blob(['small']), 'text/uri-list':new Blob(['file:///example'])})];
+  await assert.rejects(s.paste(),{code:'clipboard-format'});assert.equal(c.sent.length,0);
+  delete f.nav.clipboard.read;assert.equal(s.snapshot().effective.toRemote,'manual');assert.deepEqual(s.snapshot().formats,['text/plain']);
+});
+test('rich delayed read is retired on target change and late write stays uncertain',async t=>{
+  const f=richFixture(t),c=await f.start(f.client),s=c.clipboard,read=deferred();
+  f.nav.clipboard.read=()=>read.promise;const pending=s.sync();await turn();s.deactivate();
+  read.resolve([new ClipboardItem({'text/html':new Blob(['<b>retired</b>'])})]);await pending;assert.equal(c.sent.length,0);
+  f.nav.clipboard.read=async()=>[new ClipboardItem({'text/plain':new Blob(['baseline'])})];s.activate();await s.sync();
+  const write=deferred();f.nav.clipboard.write=()=>write.promise;s.offer(richText('remote','<b>remote</b>'));
+  const writing=s.sync();await turn();s.deactivate();write.resolve();await writing;assert.equal(s.phase,'clipboard-uncertain');
+});
+test('rich focus ownership, conflict and permission retirement preserve independent viewers',async t=>{
+  const f=richFixture(t),a=await f.start(f.client),b=f.create();
+  b.capabilities={...a.capabilities};b._display.sendClipboard=items=>b.sent.push(clipboardPayload(items));await f.start(b);
+  a.clipboard.offer(richText('inactive','<b>inactive</b>'));
+  await assert.rejects(a.clipboard.sync(),{code:'clipboard-cancelled'});
+  f.io.payload=richText('B local','<b>B local</b>');await b.clipboard.sync();
+  assert.equal(a.sent.length,0);assert.equal(b.sent.length,1);assert.equal(f.io.richWrites.length,0);
+  f.io.payload=richText('local conflict','<b>local conflict</b>');b.clipboard.offer(richText('remote conflict','<b>remote conflict</b>'));await b.clipboard.sync();
+  assert.equal(b.clipboard.snapshot().phase,'conflict');assert.equal(b.sent.length,1);assert.equal(f.io.richWrites.length,0);
+  assert.equal(await b.clipboard.paste(),true);assert.equal(b.sent.length,2);
+  f.permissions['clipboard-read'].state='denied';f.permissions['clipboard-read'].dispatchEvent(new Event('change'));
+  assert.equal(b.clipboard.snapshot().effective.toRemote,'manual');
+  b.clipboard.reset();assert.deepEqual(b.clipboard.snapshot().requested,{toRemote:'off',toLocal:'off'});
+  a.clipboard.activate();await a.clipboard.sync();assert.equal(a.sent.length,0);
+});
+test('rich image normalization is reconciled; unavailable tab lock cannot write',async t=>{
+  const f=richFixture(t),c=await f.start(f.client),s=c.clipboard;
+  const image=bytes=>clipboardPayload([{type:'image/png',data:new Uint8Array(bytes)}]);
+  const originalWrite=f.nav.clipboard.write;
+  f.nav.clipboard.write=async items=>{await originalWrite(items);f.io.payload=image([1,2,3,4]);};
+  s.offer(image([1,2,3]));await s.sync();await s.sync();assert.equal(f.io.richWrites.length,1);assert.equal(c.sent.length,0);
+  f.io.lock=false;s.offer(image([5,6,7]));await s.sync();assert.equal(f.io.richWrites.length,1);
+  f.io.lock=true;s.reset();s.offer(image([8,9]));assert.equal(f.io.richWrites.length,1);
+});

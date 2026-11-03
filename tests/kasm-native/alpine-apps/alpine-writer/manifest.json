@@ -1,0 +1,84 @@
+{
+  "apiVersion": "remotexapp/v1",
+  "id": "alpine-writer",
+  "name": "Alpine UAT LibreOffice Writer",
+  "driverVersion": "1.0.0",
+  "singleton": false,
+  "profileRef": "default",
+  "runMode": "isolated",
+  "ports": {},
+  "parameters": {
+    "filePath": {
+      "type": "file",
+      "maxLength": 4096
+    }
+  },
+  "driver": {
+    "config": {}
+  },
+  "overrides": {
+    "allowed": [
+      "geometry",
+      "frameRate",
+      "allowClientResize"
+    ]
+  },
+  "dependencies": {
+    "executables": [
+      "openbox",
+      "libreoffice",
+      "jq",
+      "python3",
+      "sed",
+      "seq",
+      "sleep",
+      "xdotool"
+    ],
+    "pythonModules": []
+  },
+  "server": {
+    "activation": "on-demand",
+    "driver": "server.sh",
+    "displayMode": "dynamic",
+    "display": 0,
+    "rfbPort": 0,
+    "gatewayPort": 0,
+    "geometry": "1280x720",
+    "depth": 16,
+    "frameRate": 10,
+    "allowClientResize": true,
+    "readinessPids": [
+      "server.pid"
+    ],
+    "readinessTimeout": "10s"
+  },
+  "session": {
+    "services": "core-v1",
+    "activation": "immediate",
+    "driver": "session.sh",
+    "shutdownDriver": "shutdown.sh",
+    "readinessPid": "writer.pid",
+    "readinessTimeout": "45s",
+    "vacantTimeout": "60s",
+    "vacantAction": "stop-instance",
+    "status": {
+      "mode": "driver",
+      "details": {
+        "application": {
+          "type": "enum",
+          "values": [
+            "writer"
+          ]
+        }
+      }
+    }
+  },
+  "input": {
+    "backend": "ibus",
+    "lifecycle": "session",
+    "allowedWmClasses": [
+      "libreoffice-writer",
+      "Soffice"
+    ]
+  }
+}

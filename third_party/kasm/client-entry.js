@@ -2,12 +2,12 @@
 import RFB from './core/rfb.js';
 import MouseButtonMapper, {XVNC_BUTTONS} from './core/mousebuttonmapper.js';
 import {normalizePolicy} from './core/input/poc-input-policy.mjs';
-import { clipboardBytes } from './core/remotexapp-server-messages.mjs';
+import {clipboardPayload, textPayload, MAX_RICH_CLIPBOARD_BYTES} from './core/clipboard-payload.mjs';
 import { LatencyProbe } from './core/remotexapp-latency.mjs';
 import { ClipboardInputGate } from './core/remotexapp-clipboard-input.mjs';
 
 export default class NativeDisplay extends EventTarget {
-  static capabilities = Object.freeze({keyboardPolicy:true, clipboardText:true, clipboardAutomatic:true, clipboardMaxBytes:65536, statistics:true, latency:true, udpLoss:true, udp:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP});
+  static capabilities = Object.freeze({keyboardPolicy:true, clipboardText:true, clipboardAutomatic:true, clipboardRich:true, clipboardMaxBytes:MAX_RICH_CLIPBOARD_BYTES, statistics:true, latency:true, udpLoss:true, udp:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP});
   #rfb;
   #input;
   #renderedFrames = 0;
@@ -69,7 +69,7 @@ export default class NativeDisplay extends EventTarget {
     rfb._keyboard.onpolicychange = () => this.dispatchEvent(new Event('keyboardpolicychange'));
     rfb.addEventListener('clipboard', event => {
       if (this.#rfb !== rfb || !clipboard) return;
-      this.dispatchEvent(new CustomEvent('clipboard', {detail:{text:event.detail.text}}));
+      this.dispatchEvent(new CustomEvent('clipboard', {detail:event.detail}));
     });
     for (const event of ['connect', 'frame', 'disconnect']) {
       rfb.addEventListener(event, () => {
@@ -108,12 +108,12 @@ export default class NativeDisplay extends EventTarget {
   focus() { this.#rfb?.focus(); }
   blur() { this.#rfb?.blur(); }
   cancelClipboardPaste() { this.#clipboardInput.cancel(); }
-  sendClipboardText(text) {
-    const data = clipboardBytes(text), rfb = this.#rfb;
+  sendClipboardText(text) { this.sendClipboard(textPayload(text).items); }
+  sendClipboard(items) {
+    const payload = clipboardPayload(items), rfb = this.#rfb;
     if (!rfb || rfb._rfbConnectionState !== 'connected' || !rfb.clipboardUp) throw new Error('Clipboard transport unavailable');
-    // No asynchronous hash/browser API: retirement cannot send this to a new
-    // generation after a pending clipboard read resolves. Native wire only.
-    RFB.messages.sendBinaryClipboard(rfb._sock, [data], ['text/plain']);
+    // Synchronous native submission preserves the SDK generation/consent fence.
+    RFB.messages.sendBinaryClipboard(rfb._sock, payload.items.map(item => item.data), payload.items.map(item => item.type));
   }
   disconnect() {
     this.#clipboardInput.cancel();

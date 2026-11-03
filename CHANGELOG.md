@@ -11,7 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-No changes recorded.
+- Fix managed boot recovery retaining a previous Manager's Viewer count.
+  Startup discards the old connection count before restoring manifests, so an
+  otherwise eligible desktop is not permanently blocked by nonexistent
+  Viewers. Live ownership checks, recovery delay and component pins remain intact.
 
 ## 0.16.0 — 2026-11-03
 

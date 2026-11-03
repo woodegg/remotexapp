@@ -482,6 +482,10 @@ func (m *manager) restoreRuntimeManifests(records []runtimeManifestRecord) {
 	for i := range records {
 		record := &records[i]
 		item := &record.Runtime
+		// Startup cannot inherit the previous Manager's Viewer sockets. Reset
+		// the ephemeral count before every restoration branch, including boot
+		// recovery, which does not pass through adoptRuntimeManifest.
+		item.AttachedClients = 0
 		if m.restoreUpgrade(record) {
 			continue
 		}

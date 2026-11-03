@@ -72,6 +72,9 @@ contains `instanceId`, `sessionGeneration`, `action` and `result: {tabId, url}`;
 it means browser acknowledgement, not successful website loading. Existing
 pins without this action need an explicit upgrade; no action starts/restarts
 the app. Firefox returns `control-busy` while another BiDi controller owns it.
+Treat `tabId` as an opaque acknowledgement from the handler's control session.
+Firefox can assign new context IDs in a later BiDi session; do not use this
+value as a persistent tab key across sessions.
 The host application needs no new raw CDP/BiDi service. Normal Manager authentication applies.
 
 ## Existing clipboard integration

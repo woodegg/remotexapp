@@ -446,8 +446,8 @@ for(const slot of ['a','b']){
 }
 $('#audio-open-tab').onclick=()=>{const x=targets.get('a');if(x){const u=new URL(location.href);u.searchParams.set('audioRuntime',x.id);window.open(u.href,'_blank','noopener');}};
 $('#audio-logout').onclick=async()=>{try{await remoteAudio?.logout();for(const [slot,binding]of audioInterests){audioBindingEpoch.set(slot,(audioBindingEpoch.get(slot)||0)+1);binding.interest=null;binding.error='本次登录音频已关闭；刷新页面可重新启用';}renderAudio();}catch(error){status(error.message);}};
-$('#launch-audio-a').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'});if(active())show(x);});
-$('#launch-audio-b').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'});if(active()){targets.set('b',x);frame('b');watchIdentity(x);status('音频测试 App B 已打开，A 的 Viewer 保持连接。');}});
+$('#launch-audio-a').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'},undefined,60000);if(active())show(x);});
+$('#launch-audio-b').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:'alpine-audio-test'},undefined,60000);if(active()){targets.set('b',x);frame('b');watchIdentity(x);status('音频测试 App B 已打开，A 的 Viewer 保持连接。');}});
 $('#audio-reconnect').onclick=async()=>{if(remoteAudioInitializing)return;remoteAudio?.dispose();remoteAudio=null;remoteAudioError='';remoteAudioSnapshot={connection:'idle',routes:[]};for(const slot of ['a','b'])audioBindingEpoch.set(slot,(audioBindingEpoch.get(slot)||0)+1);audioInterests.clear();await initializeRemoteAudio(false);status('音频控制器已重新连接；请按需重新开启 Speaker 或 Mic。');};
 async function initializeRemoteAudio(loadRuntime=true){
   if(!config||remoteAudioInitializing)return;
@@ -504,13 +504,13 @@ async function selectTarget(action) {
     refreshAudioIdentity();
   }
 }
-$('#launch-mousepad').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:config.templateId||'mousepad',parameters:{filePath:config.documentFile}});if(active())show(x);});
-// Writer allows 45 seconds for application readiness, plus server startup and
-// network transit. Keep the request alive for that startup budget.
+// App launches include server/application readiness and network transit. The
+// ordinary 15-second API deadline is shorter than these template budgets.
+$('#launch-mousepad').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:config.templateId||'mousepad',parameters:{filePath:config.documentFile}},undefined,60000);if(active())show(x);});
 $('#launch-writer').onclick=()=>selectTarget(async active=>{if(!config.richTemplateId)throw Error('Writer 未配置');const x=await api('/api/instances',{templateId:config.richTemplateId},undefined,60000);if(active())show(x);});
-$('#launch-desktop').onclick=()=>selectTarget(async active=>{const x=await api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH');if(active())show(x.runtime);});
+$('#launch-desktop').onclick=()=>selectTarget(async active=>{const x=await api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH',60000);if(active())show(x.runtime);});
 $('#audio-separate').onclick=()=>selectTarget(async active=>{
-  const x=await api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH');
+  const x=await api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH',60000);
   if(!active())return;
   targets.set('b',x.runtime);frame('b');watchIdentity(x.runtime);
   status(audioTopology()==='same-runtime'?'A 已是测试桌面；两路仍是同一会话。':'B 已切到测试桌面；A 的 Viewer 保持连接。');

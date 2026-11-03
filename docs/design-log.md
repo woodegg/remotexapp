@@ -5232,3 +5232,20 @@ allowed. This protects the attachment, not a new account role or separate audio
 and Manager operations. Old Core/component pairs cannot silently downgrade a
 requested read-only attachment. The [migration guide](native-host-migration.md)
 records host changes and the remaining downstream responsibilities.
+
+## 2026-11-03 — Combined host qualification and explicit fixture scope
+
+[Native host qualification](../tests/kasm-native/NATIVE-HOST.md) exercises
+NHI-001–010 through public SDK operations on eight formal Ubuntu App templates
+and regional static Alpine candidates. Lifecycle evidence distinguishes Manager
+adoption from runtime replacement, retains populated failed sessions, honors an
+explicit veto, and verifies two actual reboots plus a scoped prior-Manager
+rollback. These results do not accept the downstream product or change the
+legacy default provider. Human acceptance remains one consolidated UAT.
+
+The complete-template fixture and regional transport fixtures have different
+catalogs and transport scope. Neither is presented as cross-distribution proof.
+The older standalone UAT page's App creation deadline is extended to 60 seconds,
+covering server/application startup budgets rather than the ordinary 15-second
+API deadline. This is fixture behavior; it does not extend server readiness
+budgets or replay a possibly completed launch.

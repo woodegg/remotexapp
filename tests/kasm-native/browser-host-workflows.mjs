@@ -51,6 +51,7 @@ try {
   assert.equal(remote(['cat',path]),text);
   pass('server-granted read-only Viewer paints and refuses programmatic input');
   await b.call('Emulation.setDeviceMetricsOverride',{width:1600,height:1000,deviceScaleFactor:1,mobile:false});
+  await b.evaluate("document.querySelector('.window-layout:not([hidden]) .inspector').scrollTop=0;window.scrollTo(0,0)");
   await delay(500);let shot=await b.call('Page.captureScreenshot',{format:'png'});writeFileSync(config.evidenceDirectory+'/host-desktop.png',Buffer.from(shot.data,'base64'));
   await b.call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await delay(400);
   assert(await b.evaluate('document.documentElement.scrollWidth<=innerWidth'));

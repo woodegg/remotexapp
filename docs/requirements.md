@@ -15,7 +15,10 @@ continuity is required; legacy SDK method compatibility is not. The reference
 host simulates downstream behavior without modifying the downstream project.
 NHI-008 control discovery accepts native `unsupported-provider` IBus absence
 while retaining descriptor generation and consistency validation.
-Status: implementation selected; qualification and new human UAT pending.
+Status: implemented with [bounded combined qualification](../tests/kasm-native/NATIVE-HOST.md);
+new consolidated human UAT remains pending. Eight-template Ubuntu workflows,
+regional Alpine transport, recovery and scoped rollback have separate evidence;
+none establishes actual downstream product acceptance.
 
 ## Proposed Core 0.16.0 — KasmVNC evaluation
 

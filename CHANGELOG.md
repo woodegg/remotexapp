@@ -20,7 +20,10 @@ implementation; move them to a version section when publishing a release.
   including WSS-only components. See the [migration guide](docs/native-host-migration.md).
   Accept the native `unsupported-provider` IBus absence reason when reading
   generation-qualified App control descriptors.
-  Combined candidate qualification remains separate from human UAT acceptance.
+  Record [combined candidate qualification](tests/kasm-native/NATIVE-HOST.md)
+  and one consolidated human UAT checklist. Standalone UAT App launches allow
+  60 seconds for server/application startup; ordinary API requests remain bounded
+  separately. Automated results remain separate from human UAT acceptance.
 
 - Develop the native rich clipboard extension: plain text, HTML and
   PNG with a 2 MiB aggregate transaction limit, retaining text-only pinned App

@@ -85,11 +85,12 @@ try{
   assert.equal(await a.evaluate("qViewer.copyClipboardToRemote().then(()=>'',e=>e.code)",true),'clipboard-size');
   assert.equal((await xread(a,'UTF8_STRING')).length,2097152);
   pass('exact 2 MiB succeeds and one-byte excess preserves remote selection');
-  await a.evaluate("qViewer.configureClipboard({toRemote:'auto',toLocal:'auto'});qViewer.focus()",true);await delay(300);
-  await same.call('Page.bringToFront');await same.evaluate("qViewer.configureClipboard({toRemote:'auto',toLocal:'auto'});qViewer.focus()",true);await delay(300);
+  await a.evaluate("navigator.clipboard.writeText('automatic baseline')",true);
+  await a.evaluate("qViewer.configureClipboard({toRemote:'auto',toLocal:'auto'});qViewer.focus()",true);await wait(()=>a.evaluate('qViewer.getClipboardState().phase==="watching"'));
+  await same.call('Page.bringToFront');await same.evaluate("qViewer.configureClipboard({toRemote:'auto',toLocal:'auto'});qViewer.focus()",true);await wait(()=>same.evaluate('qViewer.getClipboardState().phase==="watching"'));
   await same.evaluate("navigator.clipboard.writeText('same-session automatic')",true);await wait(async()=>(await xread(same,'UTF8_STRING')).toString()==='same-session automatic');
   assert.equal(await a.evaluate('qViewer.getClipboardState().active'),false);
-  await other.call('Page.bringToFront');await other.evaluate("qViewer.configureClipboard({toRemote:'auto',toLocal:'auto'});qViewer.focus()",true);await delay(300);
+  await other.call('Page.bringToFront');await other.evaluate("qViewer.configureClipboard({toRemote:'auto',toLocal:'auto'});qViewer.focus()",true);await wait(()=>other.evaluate('qViewer.getClipboardState().phase==="watching"'));
   await other.evaluate("navigator.clipboard.writeText('different-session automatic')",true);await wait(async()=>(await xread(other,'UTF8_STRING')).toString()==='different-session automatic');
   assert.equal((await xread(a,'UTF8_STRING')).toString(),'same-session automatic');
   pass('focused tab owns automatic clipboard and another session receives no fan-out');

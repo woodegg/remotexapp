@@ -2,7 +2,9 @@
 
 Issue [#57](https://github.com/woodegg/remotexapp/issues/57) owns implementation
 and qualification. The owner authorized completion through a consolidated UAT
-handoff on 2026-11-03. This is an implementation plan, not a passing test report.
+handoff on 2026-11-03. This document defines the contract; the separate
+[candidate qualification](../tests/kasm-native/NATIVE-HOST.md) records evidence
+and links the single human UAT checklist.
 The owner accepted the current combined clipboard/audio UAT baseline in #54/#56;
 that acceptance does not qualify the additional behavior below.
 

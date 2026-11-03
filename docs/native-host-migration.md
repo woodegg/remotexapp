@@ -128,4 +128,5 @@ The host must still supply its own file picker/backend mapping, application
 selection rules, durable window restoration, permission UX and trusted Agent
 executor. The standalone workbench does not substitute for downstream product
 acceptance. Exact candidate qualification and the consolidated UAT checklist
-belong with the implementation evidence for Issue #57.
+are recorded in the [candidate evidence](../tests/kasm-native/NATIVE-HOST.md)
+and [single UAT checklist](../tests/kasm-native/NATIVE-HOST-UAT.md) for Issue #57.

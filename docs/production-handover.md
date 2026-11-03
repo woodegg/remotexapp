@@ -6,21 +6,20 @@ Historical measurements below are scoped experiments, not the identity or
 health of a live installation. Private deployment diaries remain outside this
 public guide.
 
-The [Kasm native architecture proposal](kasm-native-architecture.md) describes
-a replacement and its migration/UDP/audio gates. Its bounded D1 WSS scope is
-implemented with [bounded automated evidence](../tests/kasm-native/README.md).
-The initial D2 input/text checkpoint, Alpine static Core and bounded D4 UDP/UAT
-are also merged; their exact evidence remains scoped. [D3 audio](native-audio-integration.md)
-is implemented in PR #49 with owner-reported standalone UAT acceptance; full
-embedding-host and post-merge release qualification remain separate. The default
-architecture and accepted invariants below still apply.
+Core 0.16.0 includes the opt-in Kasm-native display, input, clipboard, audio and
+host SDK contracts. The owner accepted reference-host UAT on 2026-11-03 in
+[Issue #57](https://github.com/woodegg/remotexapp/issues/57). Exact post-merge
+qualification/publication is tracked in [Issue #59](https://github.com/woodegg/remotexapp/issues/59).
+See [setup and release boundaries](native-0.16.0-release.md), the
+[native migration guide](native-host-migration.md), [audio contract](native-audio.md)
+and [candidate evidence](../tests/kasm-native/NATIVE-HOST.md).
 
-The opt-in [native audio contract](native-audio.md) and its
-[exact standalone candidate evidence](../tests/native-audio/qualification-7926949.md)
-cover per-session domains, shared speaker/mic transport, recovery and cleanup.
-The owner accepted the current standalone audio UAT on 2026-11-01. That report
-does not extend the recorded device/browser matrix or establish actual
-embedding-host, post-merge candidate or release acceptance.
+TigerVNC/noVNC remains the default. The architecture and IBus/input invariants
+below describe that provider; the native provider uses its separately pinned
+Kasm pair and native input/clipboard path. Lifecycle, generation, identity and
+deployment ownership invariants apply to both. Actual downstream integration,
+additional platform matrices and automatic multi-container UDP orchestration
+remain outside this release qualification.
 
 ## Architecture and ownership
 

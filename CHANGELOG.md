@@ -11,6 +11,19 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+No changes recorded.
+
+## 0.16.0 — 2026-11-03
+
+Target: `0.16.0`. SDK `0.31.0`.
+
+Adds the opt-in Kasm-native host integration, session audio, consented rich
+clipboard and optional screen UDP. The existing TigerVNC/noVNC provider remains
+the default. Native server/client components are separately built and pinned;
+the Core archive includes their source recipe and the host migration guides.
+Owner-reported reference-host UAT was accepted on 2026-11-03; exact post-merge
+publication qualification is tracked in Issue #59.
+
 - Fix user-home template launch in the host workbench: connect the unique running
   managed target instead of sending an ordinary create request that returns 409.
   Stopped, missing or ambiguous targets show explicit managed-state guidance;
@@ -53,7 +66,7 @@ implementation; move them to a version section when publishing a release.
   order paste keys after a fresh bounded native clipboard submission and keep
   remote X11 PRIMARY selection local so paste preserves the selected range. Extend
   the UAT workbench with controls, state and content-free acceptance records.
-  Exact artifact and consolidated human qualification remain pending in #50.
+  Exact artifact and consolidated human qualification are recorded in #50/#57.
 
 - Correct Clipman regression tests to distinguish clearing a gateway-owned
   selection from preserving an external owner, including an identical PNG copy.
@@ -137,13 +150,8 @@ implementation; move them to a version section when publishing a release.
   multiple Viewers do not receive JPEG payloads with stale lengths; add applied
   source cache tests with address, undefined-behavior and leak checks.
 
-Target: `0.16.0-dev.7`. Development only.
-
-Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
-remains the default. D1 is recorded in Issue #30; Issue #32 tracks the first
-D2 physical-input UAT checkpoint.
-Development identities are Core `0.16.0-dev.7` and SDK `0.31.0-dev.7`;
-these are not published or UAT-qualified releases.
+The following checkpoints introduced the native provider, lifecycle and input
+contracts; their individual experimental records retain their original scope.
 
 - Initialize the native adapter's mouse button map without the upstream UI.
   Missing initialization previously threw on pointer events, preventing remote

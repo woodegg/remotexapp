@@ -19,7 +19,8 @@ NHI-001 catalog launch resolves a `user-home` template to its unique running
 managed registration. It must not call ordinary instance creation, guess among
 multiple registrations, or change a stopped registration's desired state.
 Status: implemented with [bounded combined qualification](../tests/kasm-native/NATIVE-HOST.md);
-new consolidated human UAT remains pending. Eight-template Ubuntu workflows,
+the owner accepted the consolidated reference-host UAT on 2026-11-03 in #57.
+Exact post-merge release qualification is tracked in #59. Eight-template Ubuntu workflows,
 regional Alpine transport, recovery and scoped rollback have separate evidence;
 none establishes actual downstream product acceptance.
 

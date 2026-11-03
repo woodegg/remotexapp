@@ -467,7 +467,7 @@ async function initializeRemoteAudio(loadRuntime=true){
   finally{remoteAudioInitializing=false;$('#audio-reconnect').disabled=false;}
 }
 
-const api=async(path,body,method)=>{const r=await fetch(config.baseURL+path,{signal:AbortSignal.timeout(15000),method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const x=await r.json();if(!r.ok)throw Error(x.error||'API request failed');return x;};
+const api=async(path,body,method,timeout=15000)=>{const r=await fetch(config.baseURL+path,{signal:AbortSignal.timeout(timeout),method:method||(body?'POST':'GET'),headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});const x=await r.json();if(!r.ok)throw Error(x.error||'API request failed');return x;};
 const identity=x=>{$('#identity').textContent=JSON.stringify({core:x.versions?.current?.core,component:x.displayComponentDigest,generation:x.sessionGeneration,clipboard:x.nativeClipboard||'off',audio:x.nativeAudio||'off'},null,2);};
 function watchIdentity(target) {
   (async () => {
@@ -505,7 +505,9 @@ async function selectTarget(action) {
   }
 }
 $('#launch-mousepad').onclick=()=>selectTarget(async active=>{const x=await api('/api/instances',{templateId:config.templateId||'mousepad',parameters:{filePath:config.documentFile}});if(active())show(x);});
-$('#launch-writer').onclick=()=>selectTarget(async active=>{if(!config.richTemplateId)throw Error('Writer 未配置');const x=await api('/api/instances',{templateId:config.richTemplateId});if(active())show(x);});
+// Writer allows 45 seconds for application readiness, plus server startup and
+// network transit. Keep the request alive for that startup budget.
+$('#launch-writer').onclick=()=>selectTarget(async active=>{if(!config.richTemplateId)throw Error('Writer 未配置');const x=await api('/api/instances',{templateId:config.richTemplateId},undefined,60000);if(active())show(x);});
 $('#launch-desktop').onclick=()=>selectTarget(async active=>{const x=await api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH');if(active())show(x.runtime);});
 $('#audio-separate').onclick=()=>selectTarget(async active=>{
   const x=await api('/api/managed-instances/'+encodeURIComponent(config.managedId),{desiredState:'running'},'PATCH');

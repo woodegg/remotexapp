@@ -207,7 +207,10 @@ test('connections validate additive IBus fields and accept legacy absence',async
  await read();
  value={...base,environment:{...base.environment,ibus:{address:'unix:path=/private/ibus.sock',scope:'runtime'}}};await read();
  for(const ibus of [null,{address:'tcp:host=localhost',scope:'runtime'},{address:'unix:path=/p',scope:'user'}]){value={...base,environment:{...base.environment,ibus}};await assert.rejects(read,e=>e.status===409);}
- value={...base,unavailable:['ibus'],unavailableReasons:{ibus:'metadata-missing'}};await read();
+ for(const reason of ['metadata-missing','not-enabled','not-running','unsupported-provider']){
+  value={...base,unavailable:['ibus'],unavailableReasons:{ibus:reason}};await read();
+  value={...value,environment:{...base.environment,ibus:{address:'unix:path=/private/ibus.sock',scope:'runtime'}}};await assert.rejects(read,e=>e.status===409);
+ }
  for(const unavailable of [undefined,{},[],['sessionBus']]){value={...base,unavailable,unavailableReasons:{ibus:'not-running'}};await assert.rejects(read,e=>e.status===409);}
  value={...base,unavailable:['ibus'],unavailableReasons:{ibus:'invented'}};await assert.rejects(read,e=>e.status===409);
 });

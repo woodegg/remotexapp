@@ -47,6 +47,7 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 		return
 	}
 	var channel *viewerChannel
+	readOnly := false
 	if member == "websockify" {
 		if r.Method != http.MethodGet || !isWebSocket(r) {
 			writeError(w, http.StatusBadRequest, "WebSocket upgrade required")
@@ -54,14 +55,14 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 		}
 		var grant [32]byte
 		var err error
-		if item.Components.NativeUDP {
+		if isKasm(item) {
 			grant, err = m.claimNativeGrant(r, item)
 			if err != nil {
 				writeError(w, http.StatusForbidden, "native Viewer grant rejected")
 				return
 			}
 		}
-		if item.Components.NativeUDP {
+		if isKasm(item) {
 			defer func() {
 				m.mu.Lock()
 				defer m.mu.Unlock()
@@ -76,11 +77,15 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 			return
 		}
 		defer m.closeViewerChannel(channel)
-		if item.Components.NativeUDP {
+		if isKasm(item) {
 			if err := m.attachNativeGrant(grant, channel); err != nil {
 				writeError(w, http.StatusForbidden, "native Viewer grant retired")
 				return
 			}
+			m.mu.RLock()
+			g := m.nativeGrants[grant]
+			readOnly = g != nil && g.readOnly
+			m.mu.RUnlock()
 		}
 	} else if r.Method != http.MethodGet && r.Method != http.MethodHead {
 		methodNotAllowed(w, "GET, HEAD")
@@ -89,12 +94,16 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 		http.NotFound(w, r)
 		return
 	}
+	if channel != nil && readOnly {
+		m.serveReadOnlyNative(w, r, item, channel)
+		return
+	}
 	target := &url.URL{Scheme: "http", Host: item.GatewayAddr}
 	proxy := httputil.NewSingleHostReverseProxy(target)
 	director := proxy.Director
 	proxy.Director = func(request *http.Request) {
 		director(request)
-		if item.Components.NativeUDP {
+		if channel != nil {
 			// Terminate the Viewer credential here. The pinned Kasm HTTP parser
 			// requires a protocol header even for an ordinary binary stream.
 			request.Header.Set("Sec-WebSocket-Protocol", "binary")
@@ -106,7 +115,7 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 			if err := m.bindViewerChannel(channel, response); err != nil {
 				return err
 			}
-			if item.Components.NativeUDP && response.StatusCode == http.StatusSwitchingProtocols {
+			if response.StatusCode == http.StatusSwitchingProtocols {
 				response.Header.Set("Sec-WebSocket-Protocol", r.Header.Get("Sec-WebSocket-Protocol"))
 			}
 			return nil

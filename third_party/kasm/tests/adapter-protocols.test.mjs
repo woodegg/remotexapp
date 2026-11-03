@@ -21,6 +21,8 @@ test('adapter passes the one-use grant through RFB WebSocket options, not video 
       .replace("import RFB from './core/rfb.js';",'const RFB=globalThis.__adapterRFB;')
       .replace("import MouseButtonMapper, {XVNC_BUTTONS} from './core/mousebuttonmapper.js';",'const MouseButtonMapper=Map, XVNC_BUTTONS={LEFT_BUTTON:1,MIDDLE_BUTTON:2,RIGHT_BUTTON:4,BACK_BUTTON:8,FORWARD_BUTTON:16};')
       .replace("import {normalizePolicy} from './core/input/poc-input-policy.mjs';",'const normalizePolicy=x=>x;')
+      .replace("'./core/remotexapp-native-input.mjs'",JSON.stringify(new URL('../native-input.mjs',import.meta.url).href))
+      .replace("import keysyms from './core/input/keysymdef.js';",'const keysyms={lookup:x=>x};')
       .replace("'./core/clipboard-payload.mjs'",JSON.stringify(new URL('../clipboard-payload.mjs',import.meta.url).href))
       .replace("import { LatencyProbe } from './core/remotexapp-latency.mjs';",'const LatencyProbe=globalThis.__latencyProbe;')
       .replace("import { ClipboardInputGate } from './core/remotexapp-clipboard-input.mjs';",'const ClipboardInputGate=globalThis.__clipboardInputGate;');

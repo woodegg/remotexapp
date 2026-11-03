@@ -187,7 +187,8 @@ type shutdownStatus struct {
 }
 
 type stopRequest struct {
-	Force bool `json:"force,omitempty"`
+	Force             bool   `json:"force,omitempty"`
+	SessionGeneration *int64 `json:"sessionGeneration,omitempty"`
 }
 
 type restartRequest struct {

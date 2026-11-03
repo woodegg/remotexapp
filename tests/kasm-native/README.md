@@ -1,5 +1,10 @@
 # Native Kasm qualification
 
+The [native host qualification](NATIVE-HOST.md) covers the public host SDK,
+eight formal App workflows, window/task ownership, combined channels, recovery,
+reboot and scoped rollback. Use its [single UAT checklist](NATIVE-HOST-UAT.md)
+for the current host candidate; earlier checkpoint acceptance remains scoped.
+
 The [native rich clipboard checkpoint](NATIVE-RICH-CLIPBOARD.md) extends the
 text baseline to HTML/PNG and a 2 MiB aggregate bound. It records three-region
 candidate checks, old-pin compatibility and open observations, with one

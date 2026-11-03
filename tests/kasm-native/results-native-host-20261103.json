@@ -1,0 +1,772 @@
+{
+  "schemaVersion": 1,
+  "recordedOn": "2026-11-03",
+  "status": "ready-for-consolidated-human-uat",
+  "humanAcceptance": "not-evaluated",
+  "sourceCommit": "4490361c699242bb88b74bc6daf861d6dffbbc4e",
+  "coreVersion": "0.16.0-dev.7",
+  "sdkVersion": "0.31.0-dev.7",
+  "local": {
+    "workflows": {
+      "evidenceSHA256": "aec5cebbfab0bc025ed1baa5d49860b4eae44d31588d5f3d303729b6c20f605f",
+      "status": "passed",
+      "checks": [
+        {
+          "name": "metadata-driven formal Mousepad launch, App readiness and actual paint",
+          "status": "passed"
+        },
+        {
+          "name": "public native text/shortcut submission with Unicode file readback",
+          "status": "passed"
+        },
+        {
+          "name": "duplicate Viewer and workspace switch retain independent display attachments",
+          "status": "passed"
+        },
+        {
+          "name": "unload/restore display retains runtime ownership and generation",
+          "status": "passed"
+        },
+        {
+          "name": "background task independently retains App after both windows close",
+          "status": "passed"
+        },
+        {
+          "name": "server-granted read-only Viewer paints and refuses programmatic input",
+          "status": "passed"
+        },
+        {
+          "name": "desktop/mobile workbench viewport and visible stats layout",
+          "status": "passed"
+        },
+        {
+          "name": "logout releases host ownership without treating it as App stop",
+          "status": "passed"
+        }
+      ]
+    },
+    "templates": {
+      "evidenceSHA256": "e17cda1f079e4e21e9e44e409b6a23586a9fac8899a4e1d52f372b28dc206a70",
+      "status": "passed",
+      "checks": [
+        {
+          "template": "mousepad",
+          "status": "passed",
+          "protocol": "environment",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": false,
+          "controlReadback": true,
+          "pins": {
+            "core": "ff888688c84bd492349a9aea3fce99a24083b81c377cfa376306ea75ffff2d6a",
+            "app": {
+              "id": "mousepad",
+              "version": "4.0.1",
+              "sha256": "a42c90f2313bb4e487fb07fdde1c12357c646a58bf100eaa38a127a44ce9a7d2"
+            },
+            "component": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3"
+          }
+        },
+        {
+          "template": "kate",
+          "status": "passed",
+          "protocol": "dbus",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": false,
+          "controlReadback": true,
+          "pins": {
+            "core": "ff888688c84bd492349a9aea3fce99a24083b81c377cfa376306ea75ffff2d6a",
+            "app": {
+              "id": "kate",
+              "version": "2.0.1",
+              "sha256": "14a36a0eb68f1446d4e8dfa628b4e0ae14de8fde8f5532616f5650f83869377b"
+            },
+            "component": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3"
+          }
+        },
+        {
+          "template": "kwrite",
+          "status": "passed",
+          "protocol": "dbus",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": false,
+          "controlReadback": true,
+          "pins": {
+            "core": "ff888688c84bd492349a9aea3fce99a24083b81c377cfa376306ea75ffff2d6a",
+            "app": {
+              "id": "kwrite",
+              "version": "2.0.1",
+              "sha256": "9ea2e48b642bf026edc936f3146da70687a6351ae2c4222a49c440b6e31c4a4c"
+            },
+            "component": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3"
+          }
+        },
+        {
+          "template": "libreoffice",
+          "status": "passed",
+          "protocol": "libreoffice-uno",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": false,
+          "controlReadback": true,
+          "pins": {
+            "core": "ff888688c84bd492349a9aea3fce99a24083b81c377cfa376306ea75ffff2d6a",
+            "app": {
+              "id": "libreoffice",
+              "version": "4.0.0",
+              "sha256": "758cd5d3d4e79843ef2c7b720d05dcf275241542e5ad51461b5227d090b74fd5"
+            },
+            "component": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3"
+          }
+        },
+        {
+          "template": "edge",
+          "status": "passed",
+          "protocol": "cdp",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": true,
+          "controlReadback": true,
+          "pins": {
+            "core": "ff888688c84bd492349a9aea3fce99a24083b81c377cfa376306ea75ffff2d6a",
+            "app": {
+              "id": "edge",
+              "version": "2.0.4",
+              "sha256": "17e3d0316899f189a5f0165c43d1551e7376bd80812d40d34547876d1ee78efe"
+            },
+            "component": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3"
+          }
+        },
+        {
+          "template": "firefox-esr",
+          "status": "passed",
+          "protocol": "webdriver-bidi",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": true,
+          "controlReadback": true,
+          "pins": {
+            "core": "ff888688c84bd492349a9aea3fce99a24083b81c377cfa376306ea75ffff2d6a",
+            "app": {
+              "id": "firefox-esr",
+              "version": "3.0.1",
+              "sha256": "1511de381178e2fc6124fc68e888204bf0a81ad6d3d42831e1f03fb0bfbf8b47"
+            },
+            "component": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3"
+          }
+        },
+        {
+          "template": "lightview",
+          "status": "passed",
+          "protocol": "lightview-json-v1",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": true,
+          "controlReadback": true,
+          "pins": {
+            "core": "ff888688c84bd492349a9aea3fce99a24083b81c377cfa376306ea75ffff2d6a",
+            "app": {
+              "id": "lightview",
+              "version": "1.0.13",
+              "sha256": "98d16a6c657177fbea346b2e19ee8602633c923ac65d395f6f45b67c4676b7ac"
+            },
+            "component": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3"
+          }
+        },
+        {
+          "template": "xfce-user-desktop",
+          "status": "passed",
+          "protocol": "environment",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": false,
+          "controlReadback": true,
+          "pins": {
+            "core": "ff888688c84bd492349a9aea3fce99a24083b81c377cfa376306ea75ffff2d6a",
+            "app": {
+              "id": "xfce-user-desktop",
+              "version": "3.0.1",
+              "sha256": "d270ff4d18e637e06e3d8c1af6b9492612cd8973d1813a243808591467f51028"
+            },
+            "component": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3"
+          }
+        }
+      ]
+    },
+    "channels": {
+      "evidenceSHA256": "be4bad80da16b27100dfc29b3cfcc57255e24e36327b6ad0a14551c6709945a2",
+      "status": "passed",
+      "checks": [
+        {
+          "name": "three host interests create no audio transport or device before explicit enable",
+          "status": "passed"
+        },
+        {
+          "name": "two real session speakers and three tabs share one channel and one measured playback graph",
+          "status": "passed"
+        },
+        {
+          "name": "same-session speaker switch is shared while the other session remains connected",
+          "status": "passed"
+        },
+        {
+          "name": "one synthetic microphone capture reaches only explicitly selected remote sessions",
+          "status": "passed"
+        },
+        {
+          "name": "display unload and restore preserve separately owned audio without reconnect",
+          "status": "passed"
+        },
+        {
+          "name": "last audio switch off releases the channel and every microphone track",
+          "status": "passed"
+        },
+        {
+          "name": "public host Viewer sends text HTML and PNG together to real X11 selection",
+          "status": "passed"
+        },
+        {
+          "name": "public host Viewer reads all remote representations back into browser clipboard",
+          "status": "passed"
+        },
+        {
+          "name": "exact 2 MiB succeeds and one-byte excess preserves remote selection",
+          "status": "passed"
+        },
+        {
+          "name": "focused tab owns automatic clipboard and another session receives no fan-out",
+          "status": "passed"
+        },
+        {
+          "name": "disposing all hosts releases display and audio interests without browser exceptions",
+          "status": "passed"
+        }
+      ]
+    },
+    "lifecycle": {
+      "evidenceSHA256": "0056ef0c1bf3bfc57815cd28ebebbb5db5b579fc5d2e6625a5d3ca9f72a587f6",
+      "status": "passed",
+      "checks": [
+        {
+          "name": "native file save readback and independent document-root rejection",
+          "status": "passed"
+        },
+        {
+          "name": "Manager restart adopts identical App processes and pins; bounded Viewer reconnect resets consent and ends mic",
+          "status": "passed"
+        },
+        {
+          "name": "native remote resize converges and scale-only retains framebuffer size",
+          "status": "passed"
+        },
+        {
+          "name": "initially hidden attachment and reveal retain generation and real canvas paint",
+          "status": "passed"
+        },
+        {
+          "name": "explicit runtime replacement fences old Viewer input audio and generation-qualified stop",
+          "status": "passed"
+        },
+        {
+          "name": "unexpected managed Driver loss preserves live editor and blocks destructive replacement",
+          "status": "passed"
+        },
+        {
+          "name": "confirmed empty failed desktop self-recovers with pinned components and fresh painted generation",
+          "status": "passed"
+        },
+        {
+          "name": "explicit managed stop is durable and observation cannot revive it",
+          "status": "passed"
+        }
+      ]
+    },
+    "boot": {
+      "evidenceSHA256": "504ba196d8e10152c6e4f06c1a37c571581ad086a24a1504889e440421054ad9",
+      "status": "passed",
+      "checks": [
+        {
+          "name": "actual reboot preserves managed intent HOME data and pins; fresh generation paints and rejects retired prepare",
+          "status": "passed"
+        },
+        {
+          "name": "second actual reboot respects explicit stop and preserves saved data",
+          "status": "passed"
+        }
+      ]
+    },
+    "rollback": {
+      "evidenceSHA256": "4dfac8b741d6621d1e37956a6b5a5000f55a6bf5641e9884369eeaa0d29ed24f",
+      "status": "passed",
+      "checks": [
+        {
+          "name": "previous Manager adopts current pinned App without changing processes generation or saved data",
+          "status": "passed"
+        },
+        {
+          "name": "restored candidate reattaches same pinned App and saves after scoped rollback",
+          "status": "passed"
+        }
+      ],
+      "priorSource": "b1c4385fdb869a3155b6ef437e1aa8d6405e757f",
+      "priorArchiveSHA256": "5bddfb0247d31fd9c4aff909bc7b8c25812b90e6e6cae41fad8fe945195b6668",
+      "scope": "Manager-only rollback/adoption; no provider or runtime component downgrade"
+    },
+    "veto": {
+      "evidenceSHA256": "d7beb9e0ef2dfcca7c9a92cded8caebd59c067aa66fc5e699edd102438dd8f4b",
+      "status": "passed",
+      "checks": [
+        {
+          "name": "public session stop honors explicit veto and retains the same live generation and display",
+          "status": "passed"
+        },
+        {
+          "name": "release does not turn a refused normal stop into a force stop",
+          "status": "passed"
+        }
+      ]
+    }
+  },
+  "regional": {
+    "australia": {
+      "architecture": "amd64",
+      "sourceCommit": "4490361c699242bb88b74bc6daf861d6dffbbc4e",
+      "componentManifest": "66b4aaf6f23347d8dc11b58584e23cdfec802470b66ec0b953d1219a388fa7e6",
+      "hostChecks": [
+        {
+          "name": "authenticated public host workbench loads template metadata",
+          "status": "passed"
+        },
+        {
+          "name": "exact new Core/component paints with no implicit audio channel",
+          "status": "passed"
+        },
+        {
+          "name": "public host native text and save shortcut persist exact Unicode",
+          "status": "passed"
+        },
+        {
+          "name": "generation-qualified control descriptor accepts native unsupported IBus",
+          "status": "passed"
+        },
+        {
+          "name": "actual native UDP display frames coexist with public host input and statistics",
+          "status": "passed"
+        },
+        {
+          "name": "explicit WSS fallback and return to painted UDP retain the same session",
+          "status": "passed"
+        },
+        {
+          "name": "second read-only host owner paints and releases without closing writable owner",
+          "status": "passed"
+        },
+        {
+          "name": "display unload and restore retain runtime generation",
+          "status": "passed"
+        },
+        {
+          "name": "host disposal releases every display without uncaught browser errors",
+          "status": "passed"
+        }
+      ],
+      "standaloneChecks": [
+        {
+          "name": "authenticated public workbench uses the exact new Core/component/App",
+          "status": "pass"
+        },
+        {
+          "name": "public native Chinese multiline emoji paste and remote copy read back exactly",
+          "status": "pass"
+        },
+        {
+          "name": "established UDP paints real frames during clipboard use",
+          "status": "pass"
+        },
+        {
+          "name": "explicit WSS fallback preserves bidirectional clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "restoring UDP resumes frame traffic without restoring old clipboard content",
+          "status": "pass"
+        },
+        {
+          "name": "second embedded Viewer has independent opt-in and active ownership",
+          "status": "pass"
+        },
+        {
+          "name": "speaker and microphone coexist with automatic clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "real remote Pulse playback reaches the browser while clipboard stays usable",
+          "status": "pass"
+        },
+        {
+          "name": "all audio off retains the selected clipboard connection",
+          "status": "pass"
+        }
+      ],
+      "displayEvidence": {
+        "transport": "webrtc-udp",
+        "renderedFrames": 17,
+        "udpReceivedBytes": 4199,
+        "udpRectangles": 15
+      },
+      "oldAppsPreserved": true,
+      "documentsPreserved": true,
+      "hostEvidenceSHA256": "c7f47f3007b02b4250445c2e1ecedbf327c739ac7eab9baa379c7ff5cd8351c4",
+      "standaloneEvidenceSHA256": "27eca132f7cab4b530ba069a5a9dde1ccacc5d25ab873b506ffb76485df8793c",
+      "fixturePageSHA256": "b6fbfea0c4a6608e7691ab7e78875640a8bffe1658f6582931b1c8293f03ad3b",
+      "cleanup": {
+        "region": "australia",
+        "documentsMatchBefore": true,
+        "ownedLiveApps": 0,
+        "attachedViewers": 0,
+        "pageHashesVerified": true,
+        "sourceCommit": "4490361c699242bb88b74bc6daf861d6dffbbc4e",
+        "pageSHA256": "b6fbfea0c4a6608e7691ab7e78875640a8bffe1658f6582931b1c8293f03ad3b"
+      }
+    },
+    "china": {
+      "architecture": "amd64",
+      "sourceCommit": "4490361c699242bb88b74bc6daf861d6dffbbc4e",
+      "componentManifest": "66b4aaf6f23347d8dc11b58584e23cdfec802470b66ec0b953d1219a388fa7e6",
+      "hostChecks": [
+        {
+          "name": "authenticated public host workbench loads template metadata",
+          "status": "passed"
+        },
+        {
+          "name": "exact new Core/component paints with no implicit audio channel",
+          "status": "passed"
+        },
+        {
+          "name": "public host native text and save shortcut persist exact Unicode",
+          "status": "passed"
+        },
+        {
+          "name": "generation-qualified control descriptor accepts native unsupported IBus",
+          "status": "passed"
+        },
+        {
+          "name": "actual native UDP display frames coexist with public host input and statistics",
+          "status": "passed"
+        },
+        {
+          "name": "explicit WSS fallback and return to painted UDP retain the same session",
+          "status": "passed"
+        },
+        {
+          "name": "second read-only host owner paints and releases without closing writable owner",
+          "status": "passed"
+        },
+        {
+          "name": "display unload and restore retain runtime generation",
+          "status": "passed"
+        },
+        {
+          "name": "host disposal releases every display without uncaught browser errors",
+          "status": "passed"
+        }
+      ],
+      "standaloneChecks": [
+        {
+          "name": "authenticated public workbench uses the exact new Core/component/App",
+          "status": "pass"
+        },
+        {
+          "name": "public native Chinese multiline emoji paste and remote copy read back exactly",
+          "status": "pass"
+        },
+        {
+          "name": "established UDP paints real frames during clipboard use",
+          "status": "pass"
+        },
+        {
+          "name": "explicit WSS fallback preserves bidirectional clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "restoring UDP resumes frame traffic without restoring old clipboard content",
+          "status": "pass"
+        },
+        {
+          "name": "second embedded Viewer has independent opt-in and active ownership",
+          "status": "pass"
+        },
+        {
+          "name": "speaker and microphone coexist with automatic clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "real remote Pulse playback reaches the browser while clipboard stays usable",
+          "status": "pass"
+        },
+        {
+          "name": "all audio off retains the selected clipboard connection",
+          "status": "pass"
+        }
+      ],
+      "displayEvidence": {
+        "transport": "webrtc-udp",
+        "renderedFrames": 14,
+        "udpReceivedBytes": 6739,
+        "udpRectangles": 29
+      },
+      "oldAppsPreserved": true,
+      "documentsPreserved": true,
+      "hostEvidenceSHA256": "cdaace240e51dd8ce0bd3299b41e6bf47ec179997d19c77f0c61b07982eb8a2b",
+      "standaloneEvidenceSHA256": "168f9586e15b478e958531db80ade74c8e0256f6dc4cf0b177ad31296df32bf6",
+      "fixturePageSHA256": "b6fbfea0c4a6608e7691ab7e78875640a8bffe1658f6582931b1c8293f03ad3b",
+      "cleanup": {
+        "region": "china",
+        "documentsMatchBefore": true,
+        "ownedLiveApps": 0,
+        "attachedViewers": 0,
+        "pageHashesVerified": true,
+        "sourceCommit": "4490361c699242bb88b74bc6daf861d6dffbbc4e",
+        "pageSHA256": "b6fbfea0c4a6608e7691ab7e78875640a8bffe1658f6582931b1c8293f03ad3b"
+      }
+    },
+    "us": {
+      "architecture": "arm64",
+      "sourceCommit": "4490361c699242bb88b74bc6daf861d6dffbbc4e",
+      "componentManifest": "436b46d55e59df31456aa64ccf7769ceaa57977683c5f24945b0e5628be162aa",
+      "hostChecks": [
+        {
+          "name": "authenticated public host workbench loads template metadata",
+          "status": "passed"
+        },
+        {
+          "name": "exact new Core/component paints with no implicit audio channel",
+          "status": "passed"
+        },
+        {
+          "name": "public host native text and save shortcut persist exact Unicode",
+          "status": "passed"
+        },
+        {
+          "name": "generation-qualified control descriptor accepts native unsupported IBus",
+          "status": "passed"
+        },
+        {
+          "name": "actual native UDP display frames coexist with public host input and statistics",
+          "status": "passed"
+        },
+        {
+          "name": "explicit WSS fallback and return to painted UDP retain the same session",
+          "status": "passed"
+        },
+        {
+          "name": "second read-only host owner paints and releases without closing writable owner",
+          "status": "passed"
+        },
+        {
+          "name": "display unload and restore retain runtime generation",
+          "status": "passed"
+        },
+        {
+          "name": "host disposal releases every display without uncaught browser errors",
+          "status": "passed"
+        }
+      ],
+      "standaloneChecks": [
+        {
+          "name": "authenticated public workbench uses the exact new Core/component/App",
+          "status": "pass"
+        },
+        {
+          "name": "public native Chinese multiline emoji paste and remote copy read back exactly",
+          "status": "pass"
+        },
+        {
+          "name": "established UDP paints real frames during clipboard use",
+          "status": "pass"
+        },
+        {
+          "name": "explicit WSS fallback preserves bidirectional clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "restoring UDP resumes frame traffic without restoring old clipboard content",
+          "status": "pass"
+        },
+        {
+          "name": "second embedded Viewer has independent opt-in and active ownership",
+          "status": "pass"
+        },
+        {
+          "name": "speaker and microphone coexist with automatic clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "real remote Pulse playback reaches the browser while clipboard stays usable",
+          "status": "pass"
+        },
+        {
+          "name": "all audio off retains the selected clipboard connection",
+          "status": "pass"
+        }
+      ],
+      "displayEvidence": {
+        "transport": "webrtc-udp",
+        "renderedFrames": 17,
+        "udpReceivedBytes": 4478,
+        "udpRectangles": 24
+      },
+      "oldAppsPreserved": true,
+      "documentsPreserved": true,
+      "hostEvidenceSHA256": "97dd6f92415ea6c1ec77eec723e39536707a42057b2ba76c54c93b474637ccb8",
+      "standaloneEvidenceSHA256": "b792d31859184981303362b6f30b5d643d920462ce43f7c25ebaef0b6dc592e9",
+      "fixturePageSHA256": "b6fbfea0c4a6608e7691ab7e78875640a8bffe1658f6582931b1c8293f03ad3b",
+      "cleanup": {
+        "region": "us",
+        "documentsMatchBefore": true,
+        "ownedLiveApps": 0,
+        "attachedViewers": 0,
+        "pageHashesVerified": true,
+        "sourceCommit": "4490361c699242bb88b74bc6daf861d6dffbbc4e",
+        "pageSHA256": "b6fbfea0c4a6608e7691ab7e78875640a8bffe1658f6582931b1c8293f03ad3b"
+      }
+    }
+  },
+  "artifacts": {
+    "amd64": {
+      "sourceCommit": "4490361c699242bb88b74bc6daf861d6dffbbc4e",
+      "coreArchiveSHA256": "df14cd0c348724a5dd5d524a3b0e4b7eea9b5006d59e7eadb4382edfd5fe6e6f",
+      "edgeArchiveSHA256": "4be01eaf42a08aa3a30dee13d1fdaf2c8fc8b5ce4c72e14a381907cb8ce69686",
+      "componentManifest": "66b4aaf6f23347d8dc11b58584e23cdfec802470b66ec0b953d1219a388fa7e6",
+      "componentArchiveSHA256": "515ced3cb0c8df9b6244c3cdd887466fe480343ab1fff598603e2271a48075c3"
+    },
+    "arm64": {
+      "sourceCommit": "4490361c699242bb88b74bc6daf861d6dffbbc4e",
+      "coreArchiveSHA256": "f0231c20b0ac3ca8a859678a07d719a7517c30ca762935b84ef3b3322e681f3e",
+      "edgeArchiveSHA256": "7faf3bbaab83b351258b4a58644de2dcd80728a72df0f0b46cb398c909cb9b32",
+      "componentManifest": "436b46d55e59df31456aa64ccf7769ceaa57977683c5f24945b0e5628be162aa",
+      "componentArchiveSHA256": "3e23b3b101849de23be1d9c99f53ddbf65264a8a1d0eddad9f0164fc79f24f9c"
+    },
+    "ubuntuNativeComponent": {
+      "manifest": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3",
+      "builtFrom": "fc0838cc7920b7ef454d066340ecc2abe8359507",
+      "nativeComponentSourceIdenticalToCandidate": true
+    }
+  },
+  "gates": {
+    "check": {
+      "status": "passed",
+      "logSHA256": "5e55ae11fc1fd4cc6d6e7d360cfca19e21cf3c724e26963a3422d03a46309eea"
+    },
+    "coverage": {
+      "status": "passed",
+      "logSHA256": "74351b5b92fece38a9d84f8627f90ca0ef8cedd337b68a0b7b6139cc3283800d",
+      "goStatements": 63.1,
+      "sdkLines": 89.69,
+      "sdkBranches": 82.94,
+      "sdkFunctions": 83.87
+    },
+    "race": {
+      "status": "passed",
+      "logSHA256": "50831a1e4d8fcda922e87333431cd8f52555dd96fa82e6fc67c21d1a6f00a77b"
+    },
+    "vulnerability": {
+      "status": "passed",
+      "logSHA256": "a32d5c22712dfd83ab1cf823a127d0b72e1b9a8049571c2ff1d598b3484b5216"
+    },
+    "module": {
+      "status": "passed",
+      "logSHA256": "1d63c9bc1cc8ff11cb0dfa35b3efadb08a8dfa940cc9d9f4d955a7b943bb7eb0"
+    },
+    "githubCI": {
+      "status": "passed",
+      "runID": 41594141323,
+      "sourceCommit": "4490361c699242bb88b74bc6daf861d6dffbbc4e"
+    },
+    "handoffCheck": {
+      "status": "passed",
+      "logSHA256": "36c608cddde0d223b857bb95d71115b249e4576dd5f63981774ab7d65adb6cd4"
+    }
+  },
+  "publicCompleteTemplate": {
+    "status": "passed",
+    "templateCount": 8,
+    "authenticatedBrowser": true,
+    "anonymousStatus": 302,
+    "actualPaint": true,
+    "transport": "wss",
+    "humanAcceptance": "not-evaluated"
+  },
+  "limitations": [
+    "Physical speaker/microphone and OS IME require consolidated human UAT",
+    "Reference host only; no downstream product deployment or acceptance",
+    "Eight formal templates qualified on Ubuntu, narrower installed Alpine catalogs",
+    "New host-layer long-duration/load and unlisted browser variants not qualified",
+    "Existing optional IPv4 UDP endpoints only; no multi-container orchestration",
+    "Manager-only rollback; pinned runtime components not downgraded"
+  ],
+  "attempts": [
+    {
+      "area": "action tests",
+      "observation": "Two one-second-budget tests timed out during parallel native compilation",
+      "resolution": "Five quiet repeats and complete make check passed",
+      "logSHA256": "290be5613e2325142218c9d2121d8c67ffc2a063d26f114f97be286e0a02d6ef"
+    },
+    {
+      "area": "reboot fixture",
+      "observation": "Ingress HTML under /tmp was removed by reboot",
+      "resolution": "Persisted fixture page/content; both real reboots passed"
+    },
+    {
+      "area": "standalone UAT launch",
+      "observation": "First application launch did not reach Viewer setup; subsequent full regression passed",
+      "resolution": "Request budget extended from 15 to 60 seconds to cover template startup; injected-delay check recorded separately"
+    }
+  ],
+  "delayedLaunch": {
+    "status": "passed",
+    "injectedClientDelayMs": 16000,
+    "requestTimeoutMs": 60000,
+    "signalLiveAfterDelay": true,
+    "delayApplied": true,
+    "twoViewersPainted": true,
+    "pageSHA256": "b6fbfea0c4a6608e7691ab7e78875640a8bffe1658f6582931b1c8293f03ad3b",
+    "humanAcceptance": "not-evaluated"
+  },
+  "portablePublicHarness": {
+    "status": "passed",
+    "architecture": "arm64",
+    "evidenceSHA256": "6fc2ecc9a20f05562849d96a68dfc14b13fbefe83a3b8045059260e31ae293c7",
+    "checks": 9
+  },
+  "evidenceSources": {
+    "tests/kasm-native/host-browser.mjs": "c7e8d131dd1f1ae25babcab6759a624999922de5ea3b2773a72126d3956d1730",
+    "tests/kasm-native/browser-host-workflows.mjs": "be88c384d12fd404138a834cad84b0c2ff1012d0c3a92b0a6125e3eecfa115f3",
+    "tests/kasm-native/browser-host-templates.mjs": "dd6c719426be50630e1a07662098b66842cc60e9c79d42fef0ee88cafceb2c3a",
+    "tests/kasm-native/browser-host-channels.mjs": "f8b8c804ec1489e556fc31f599458d73fe8d1673e397883e34878f7f3eeba426",
+    "tests/kasm-native/browser-host-lifecycle.mjs": "904d11f716be831b9a1468ec2910f93f396e9dca69300e3669c3e025b0cf35e1",
+    "tests/kasm-native/browser-host-boot.mjs": "8d68cbba092fec7d1ab12cfde5b2b7008c24923add3fde6f34742513fbfc424d",
+    "tests/kasm-native/browser-host-rollback.mjs": "282d2a81fa15cdadea5d3f0dd6a1d4bb98caa1a3df8551d0dc62e5e3f41d1d7d",
+    "tests/kasm-native/browser-host-veto.mjs": "2cec2f4e66cc63245c0104895641b0fc991e5964301d8ff810fd8b0c9b7c8a0e",
+    "tests/kasm-native/browser-host-public.mjs": "873c42105c620e1a34c6e8866f38dbfa1a549e87598c54bcd10ce277bf8d2203",
+    "tests/kasm-native/host-public-browser.mjs": "8658f9e37ec59be4e729efdeee3d02a1c21fcf18a98ba124c0e519a9aa51e7f5"
+  },
+  "cleanup": {
+    "ownedLocalBrowserStopped": true,
+    "ownedBrowserContainerStopped": true,
+    "scopedAuthenticationProfilesRemoved": true,
+    "userBrowserUntouched": true,
+    "buildersRestoredStopped": true,
+    "localOwnedLiveApps": 0,
+    "fullTemplateCatalogCount": 8,
+    "fullTemplateManagedDesiredState": "stopped",
+    "uatServicesRetained": true
+  },
+  "anonymousAPIRefusal": {
+    "australia": 302,
+    "china": 302,
+    "us": 302
+  }
+}

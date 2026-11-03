@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RemoteXApp · Host workbench</title>
+  <link rel="stylesheet" href="./host-workbench.css">
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="./host.html"><span class="brand-icon">R</span><span>RemoteXApp <small>HOST WORKBENCH</small></span></a>
+    <span id="version" class="muted">Connecting…</span><span class="grow"></span>
+    <button id="refresh">刷新目录</button><button id="export">导出记录</button><button id="logout">退出并释放</button>
+  </header>
+  <main>
+    <aside class="catalog">
+      <p class="eyebrow">APPLICATIONS</p><h1>你的远程工作台</h1>
+      <p class="muted">用真实模板、窗口与工作区，验证宿主集成。</p>
+      <label>应用模板 · Template<select id="template"></select></label>
+      <p id="template-info" class="note"></p>
+      <form id="launch"><div id="parameters"></div>
+        <label>配置档 · Profile <input id="profile" placeholder="使用模板默认值" autocomplete="off"></label>
+        <label class="check"><input id="launch-keepalive" type="checkbox"> 保持运行 · Keep alive</label>
+        <label class="check"><input id="launch-readonly" type="checkbox"> 只读窗口 · Read only</label>
+        <button class="primary wide" id="launch-button">打开应用</button>
+      </form>
+      <details><summary>已有应用与托管桌面</summary><div id="existing" class="choices"></div><div id="managed" class="choices"></div></details>
+      <p class="note">文件参数是服务端允许的路径；文件选择与路径映射由宿主后端负责。本页不会上传文件。</p>
+      <div class="ownership"><p class="eyebrow">OWNERSHIP</p><output id="ownership">没有本页持有的运行时</output><div id="tasks"></div></div>
+    </aside>
+    <section class="workspace">
+      <nav class="workspace-bar" aria-label="工作区"><button data-workspace="1" aria-pressed="true">工作区 1</button><button data-workspace="2" aria-pressed="false">工作区 2</button><span class="grow"></span><span id="window-count" class="muted">0 个窗口</span></nav>
+      <div id="notice" role="status" aria-live="polite">准备加载应用目录…</div>
+      <div id="window-tabs" role="tablist" aria-label="应用窗口"></div>
+      <div id="empty"><div class="empty-icon">↗</div><h2>从一个应用开始</h2><p>打开浏览器、编辑文件或连接托管桌面。<br>连接状态与统计会始终显示在画面旁边。</p></div>
+      <div id="windows"></div>
+      <details class="journal"><summary>操作记录 · Operation journal <span class="muted">仅元数据，不记录文字、剪贴板或文件路径</span></summary><ol id="journal"></ol></details>
+    </section>
+  </main>
+  <dialog id="confirm"><form method="dialog"><h2>确认停止应用</h2><p>停止会影响这个应用的所有窗口。请先保存文件，停止可能丢失未保存内容。本页不会自动保存；应用的关闭策略由模板决定。</p><div class="buttons"><button value="cancel">取消</button><button value="stop" class="danger">正常停止</button></div></form></dialog>
+  <script type="module" src="./host-workbench.mjs"></script>
+</body>
+</html>

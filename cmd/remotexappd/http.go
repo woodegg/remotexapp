@@ -38,6 +38,7 @@ func (m *manager) handler() http.Handler {
 	mux.HandleFunc("/sdk/index.js", serveSDKEntry)
 	mux.HandleFunc("/sdk/console.html", m.serveConsolePage)
 	mux.HandleFunc("/sdk/minimal.html", m.serveConsolePage)
+	mux.HandleFunc("/sdk/host.html", m.serveHostPage)
 	mux.Handle("/sdk/", m.serveSDKFiles(http.StripPrefix("/sdk/", http.FileServer(http.FS(sdkRoot)))))
 	return m.secure(mux)
 }
@@ -145,8 +146,32 @@ func (m *manager) serveConsolePage(w http.ResponseWriter, r *http.Request) {
 
 func (m *manager) serveSDKFiles(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/sdk/host-workbench") {
+			w.Header().Set("Cache-Control", "no-cache")
+		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+func (m *manager) serveHostPage(w http.ResponseWriter, r *http.Request) {
+	if m.cfg.disableConsole {
+		http.NotFound(w, r)
+		return
+	}
+	if r.Method != http.MethodGet && r.Method != http.MethodHead {
+		methodNotAllowed(w, "GET, HEAD")
+		return
+	}
+	page, err := sdkFiles.ReadFile("web/sdk/host.html")
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "host workbench unavailable")
+		return
+	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	if r.Method == http.MethodGet {
+		_, _ = w.Write(page)
+	}
 }
 
 func (m *manager) serveClasses(w http.ResponseWriter, r *http.Request) {
@@ -318,9 +343,13 @@ func (m *manager) serveInstance(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-		if err := m.stop(item, stopOptions{Reason: "api-stop", Scope: "instance", Force: request.Force}); err != nil {
+		if request.SessionGeneration != nil && *request.SessionGeneration < 0 {
+			writeError(w, http.StatusBadRequest, "invalid sessionGeneration")
+			return
+		}
+		if err := m.stop(item, stopOptions{Reason: "api-stop", Scope: "instance", Force: request.Force, ExpectedGeneration: request.SessionGeneration}); err != nil {
 			status := http.StatusInternalServerError
-			if isShutdownBlocked(err) {
+			if isShutdownBlocked(err) || err == errStopGeneration {
 				status = http.StatusConflict
 			}
 			writeError(w, status, err.Error())

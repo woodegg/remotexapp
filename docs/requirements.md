@@ -5,6 +5,24 @@
 > [current source versions](current-state.md). Host labels and runtime IDs in
 > historical examples are anonymized.
 
+## Native host workflow integration
+
+On 2026-11-03 the owner authorized implementation through a complete UAT
+handoff in [Issue #57](https://github.com/woodegg/remotexapp/issues/57).
+[NHI-001–010](native-host-integration.md#stable-requirements) define the native
+SDK, reference host, template workflow and migration acceptance. Functional
+continuity is required; legacy SDK method compatibility is not. The reference
+host simulates downstream behavior without modifying the downstream project.
+NHI-008 control discovery accepts native `unsupported-provider` IBus absence
+while retaining descriptor generation and consistency validation.
+NHI-001 catalog launch resolves a `user-home` template to its unique running
+managed registration. It must not call ordinary instance creation, guess among
+multiple registrations, or change a stopped registration's desired state.
+Status: implemented with [bounded combined qualification](../tests/kasm-native/NATIVE-HOST.md);
+new consolidated human UAT remains pending. Eight-template Ubuntu workflows,
+regional Alpine transport, recovery and scoped rollback have separate evidence;
+none establishes actual downstream product acceptance.
+
 ## Proposed Core 0.16.0 — KasmVNC evaluation
 
 The owner selected feasibility investigation on 2026-10-21. KVE-001–008 in

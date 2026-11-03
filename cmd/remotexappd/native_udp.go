@@ -36,6 +36,7 @@ type nativeTransportView struct {
 	Available     bool   `json:"available"`
 	Reason        string `json:"reason,omitempty"`
 	GrantRequired bool   `json:"grantRequired"`
+	ReadOnly      bool   `json:"readOnly"`
 }
 
 func validUDPEndpoint(e udpEndpoint) bool {
@@ -181,10 +182,11 @@ func (m *manager) assignUDPEndpoint(id string, c *runtimeComponents, pinned bool
 }
 
 func nativeTransport(item *instance) *nativeTransportView {
-	if !isKasm(item) || !item.Components.NativeUDP {
+	if !isKasm(item) {
 		return nil
 	}
 	v := &nativeTransportView{Policy: "wss-only", Reason: item.Components.UDPUnavailableReason, GrantRequired: true}
+	v.ReadOnly = true
 	if item.Components.UDPEndpoint != nil {
 		v.Policy, v.Available = "prefer-udp", true
 	}

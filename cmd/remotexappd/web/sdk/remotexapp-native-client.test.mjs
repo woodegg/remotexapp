@@ -5,16 +5,22 @@ import { RemoteXAppNativeClient } from './remotexapp-native-client.js';
 globalThis.CustomEvent ||= class extends Event { constructor(type,options) { super(type); this.detail = options?.detail; } };
 globalThis.location = new URL('https://viewer.example.test/remotexapps/app/kiosk.html');
 
-function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, clipboardAutomatic = false, rich = false, componentRich = rich, statistics = false, udp = false, latency = false, udpLoss = false } = {}) {
+function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, clipboardAutomatic = false, rich = false, componentRich = rich, statistics = false, udp = false, latency = false, udpLoss = false, controls = false, readOnly = false, reconnect = false } = {}) {
   const state = { id:'app', displayProvider:'kasm', displayComponentDigest:'a'.repeat(64), sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
   if (udp) state.nativeTransport={available:true,grantRequired:true,policy:'prefer-udp'};
+  if (controls) state.nativeTransport={available:udp,grantRequired:true,policy:udp?'prefer-udp':'wss-only',readOnly:true};
+  state.effectivePolicy={display:{allowClientResize:true}};
   const calls=[];
   state.nativeClipboard = rich ? "rich-v1" : clipboard ? "text" : undefined;
   let display, reads = 0;
   class Display extends EventTarget {
-    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardAutomatic,clipboardRich:componentRich,clipboardMaxBytes:componentRich?2097152:65536,statistics,udp,latency,udpLoss};
+    static capabilities = {programmaticInput:controls,displayControls:controls,readOnly:controls,keyboardPolicy:true,clipboardText:true,clipboardAutomatic,clipboardRich:componentRich,clipboardMaxBytes:componentRich?2097152:65536,statistics,udp,latency,udpLoss};
     counters = {receivedBytes:100, sentBytes:20, bufferedBytes:0, renderedFrames:2, width:1024, height:768};
     getStats() { return this.counters; }
+    sendText(text) {this.sent.push(text);return {status:'submitted',count:[...text].length};}
+    sendKey(key,options) {this.sent.push({key,options});return {status:'submitted',count:1};}
+    configureDisplay(options) {this.settings=options;return options;}
+    flushResize() {return true;}
     probes = 0;
     measureLatency() {this.probes++;return true;}
     sent = [];
@@ -41,7 +47,7 @@ function fixture({ ready = true, frame = true, timeout = 200, clipboard = false,
       return structuredClone(state);
     },
   };
-  const viewer = new RemoteXAppNativeClient({ container:{ replaceChildren(){} }, manager, timeout });
+  const viewer = new RemoteXAppNativeClient({ container:{ replaceChildren(){} }, manager, timeout, readOnly, reconnect });
   viewer._loadDisplay = async () => ({ default:Display });
   return { viewer,state,calls,get display(){return display;},get reads(){return reads;} };
 }
@@ -329,4 +335,55 @@ test('rich native metadata contains size only and unsupported remote offers cann
   assert.equal(events.length,count);
   await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-format'});
   assert.equal((await f.viewer.clearRemoteClipboard()).status,'submitted');assert.equal(f.display.sent.at(-1)[0].type,'text/plain');assert.equal(f.display.sent.at(-1)[0].data.length,0);
+});
+
+
+test('native input receipts identify the current target and reject cancellation and stale owners',async()=>{
+  const f=fixture({controls:true});await f.viewer.connect('app');
+  const receipt=f.viewer.sendText('中文😀',{requestId:'input-1'});
+  assert.deepEqual(receipt,{status:'submitted',count:3,instanceId:'app',sessionGeneration:3,connectionEpoch:f.viewer.getStats().connectionEpoch,requestId:'input-1'});
+  f.viewer.sendKey('ArrowLeft',{modifiers:['Control']});
+  assert.equal(f.display.sent.length,2);
+  const abort=new AbortController();abort.abort();
+  assert.throws(()=>f.viewer.sendText('cancel',{signal:abort.signal}),{name:'AbortError'});
+  assert.throws(()=>f.viewer.sendText('bad',{requestId:'contains spaces'}),TypeError);
+  assert.equal(f.display.sent.length,2);
+  f.viewer.disconnect();assert.throws(()=>f.viewer.sendText('late'),{code:'input-unavailable'});
+  f.viewer.dispose();
+});
+test('readonly is immutable and requires both the server grant and native capability',async()=>{
+  const f=fixture({controls:true,readOnly:true,clipboard:true});await f.viewer.connect('app');
+  assert.equal(f.calls.find(c=>c.path.endsWith('/grant')).options.body.readOnly,true);
+  assert.equal(f.display.options.readOnly,true);
+  assert.equal(f.viewer.capabilities.pointer,false);assert.equal(f.viewer.capabilities.clipboard,false);
+  assert.throws(()=>f.viewer.sendKey('Enter'),{code:'input-unavailable'});
+  assert.throws(()=>f.viewer.configureDisplay({resize:true}),{code:'unsupported'});
+  assert.throws(()=>{f.viewer.readOnly=false;},TypeError);f.viewer.dispose();
+  const unsupported=fixture({readOnly:true});await assert.rejects(unsupported.viewer.connect('app'),{code:'unsupported'});unsupported.viewer.dispose();
+});
+test('display configuration is capability-gated and restored on reconnect',async()=>{
+  const f=fixture({controls:true});await f.viewer.connect('app');
+  assert.deepEqual(f.viewer.configureDisplay({scale:false,resize:true}),{scale:false,resize:true});
+  assert.equal(f.viewer.flushResize(),true);
+  assert.throws(()=>f.viewer.configureDisplay({scale:1}),TypeError);
+  await f.viewer.reconnect();assert.deepEqual(f.display.settings,{scale:false,resize:true});
+  f.viewer.dispose();assert.equal(f.viewer.flushResize(),false);
+});
+test('runtime handle release cancels reconnect and never releases the shared handle itself',async()=>{
+  const f=fixture({reconnect:{maxAttempts:2,delays:[20]}});
+  const runtime=new EventTarget();Object.assign(runtime,{manager:f.viewer.manager,state:'tracking',instanceId:'app',sessionGeneration:3});
+  f.viewer.bindRuntime(runtime);await f.viewer.connect('app');
+  const old=f.display;old.dispatchEvent(new Event('disconnect'));
+  assert.equal(f.viewer.state,'reconnecting');
+  runtime.state='released';runtime.dispatchEvent(new Event('release'));
+  await new Promise(resolve=>setTimeout(resolve,35));
+  assert.equal(f.viewer.state,'disconnected');assert.equal(f.display,old);
+  await assert.rejects(f.viewer.connect('app'),{code:'stale-generation'});f.viewer.dispose();
+});
+test('real client retry fetches the current generation and reattaches once',async()=>{
+  const f=fixture({reconnect:{maxAttempts:2,delays:[1]}});await f.viewer.connect('app');
+  f.state.state='ready';const old=f.display;
+  const ready=new Promise(resolve=>f.viewer.addEventListener('reconnected',resolve,{once:true}));
+  old.dispatchEvent(new Event('disconnect'));await ready;
+  assert.equal(f.viewer.state,'ready');assert.notEqual(f.display,old);f.viewer.dispose();
 });

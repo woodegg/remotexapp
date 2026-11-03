@@ -5,16 +5,20 @@ import {normalizePolicy} from './core/input/poc-input-policy.mjs';
 import {clipboardPayload, textPayload, MAX_RICH_CLIPBOARD_BYTES} from './core/clipboard-payload.mjs';
 import { LatencyProbe } from './core/remotexapp-latency.mjs';
 import { ClipboardInputGate } from './core/remotexapp-clipboard-input.mjs';
+import { NativeInput } from './core/remotexapp-native-input.mjs';
+import keysyms from './core/input/keysymdef.js';
 
 export default class NativeDisplay extends EventTarget {
-  static capabilities = Object.freeze({keyboardPolicy:true, clipboardText:true, clipboardAutomatic:true, clipboardRich:true, clipboardMaxBytes:MAX_RICH_CLIPBOARD_BYTES, statistics:true, latency:true, udpLoss:true, udp:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP});
+  static capabilities = Object.freeze({programmaticInput:true, displayControls:true, readOnly:true, keyboardPolicy:true, clipboardText:true, clipboardAutomatic:true, clipboardRich:true, clipboardMaxBytes:MAX_RICH_CLIPBOARD_BYTES, statistics:true, latency:true, udpLoss:true, udp:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP});
   #rfb;
   #input;
   #renderedFrames = 0;
   #udpPaintBaseline = 0;
   #latency;
   #clipboardInput;
-  constructor(container, url, { resize = false, keyboardPolicy, clipboard = false, udp = false, protocols = [], prepareClipboardPaste } = {}) {
+  #nativeInput;
+  #allowResize;
+  constructor(container, url, { resize = false, scale = true, readOnly = false, keyboardPolicy, clipboard = false, udp = false, protocols = [], prepareClipboardPaste } = {}) {
     super();
     if (keyboardPolicy) normalizePolicy(keyboardPolicy);
     this.#input = document.createElement('textarea');
@@ -36,6 +40,10 @@ export default class NativeDisplay extends EventTarget {
       },
     });
     this.#clipboardInput = new ClipboardInputGate({send:(...args) => rfb._handleKeyEvent(...args), prepare:prepareClipboardPaste});
+    this.#nativeInput = new NativeInput({current:() => this.#rfb, lookup:point => keysyms.lookup(point),
+      busy:() => !!this.#clipboardInput.queue});
+    this.#allowResize = resize && !readOnly;
+    rfb.viewOnly = readOnly;
     rfb._keyboard.onkeyevent = (...args) => this.#clipboardInput.key(...args);
     const cancelKeys = rfb._keyboard.onkeycancel;
     rfb._keyboard.onkeycancel = codes => {
@@ -62,8 +70,8 @@ export default class NativeDisplay extends EventTarget {
     rfb.clipboardUp = rfb.clipboardDown = clipboard;
     rfb.clipboardSeamless = false;
     rfb.clipboardBinary = true;
-    rfb.scaleViewport = true;
-    rfb.resizeSession = resize;
+    rfb.scaleViewport = scale;
+    rfb.resizeSession = this.#allowResize;
     rfb._keyboard.enableIME = true;
     if (keyboardPolicy) this.configureKeyboard(keyboardPolicy);
     rfb._keyboard.onpolicychange = () => this.dispatchEvent(new Event('keyboardpolicychange'));
@@ -94,6 +102,21 @@ export default class NativeDisplay extends EventTarget {
   }
 
   measureLatency() { return this.#latency.measure(); }
+
+  sendText(text) { return this.#nativeInput.text(text); }
+  sendKey(key, options) { return this.#nativeInput.key(key, options); }
+  configureDisplay({scale = true, resize = false} = {}) {
+    if (typeof scale !== 'boolean' || typeof resize !== 'boolean') throw new TypeError('Invalid display settings');
+    if (resize && !this.#allowResize) throw new Error('Remote resize is unavailable');
+    this.#rfb.scaleViewport = scale;
+    this.#rfb.resizeSession = resize;
+    return {scale,resize};
+  }
+  flushResize() {
+    if (!this.#allowResize || !this.#rfb?.resizeSession || !this.#rfb.isConnected) return false;
+    this.#rfb._requestRemoteResize();
+    return true;
+  }
 
   configureTransport(preferUDP) {
     if (!NativeDisplay.capabilities.udp) throw new Error('UDP is unavailable');

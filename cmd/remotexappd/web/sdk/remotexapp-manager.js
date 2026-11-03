@@ -188,7 +188,7 @@ export class RemoteXAppManager extends EventTarget {
     const reasons = result.unavailableReasons;
     if ((ibus !== undefined && (!ibus || typeof ibus.address !== 'string' || !ibus.address.startsWith('unix:path=/') || /[;\r\n\0]/.test(ibus.address) || ibus.scope !== 'runtime')) ||
         (reasons !== undefined && (!reasons || typeof reasons !== 'object' || Array.isArray(reasons))) ||
-        (reasons?.ibus !== undefined && (!['metadata-missing', 'not-enabled', 'not-running'].includes(reasons.ibus) || !Array.isArray(result.unavailable) || !result.unavailable.includes('ibus') || ibus !== undefined))) {
+        (reasons?.ibus !== undefined && (!['metadata-missing', 'not-enabled', 'not-running', 'unsupported-provider'].includes(reasons.ibus) || !Array.isArray(result.unavailable) || !result.unavailable.includes('ibus') || ibus !== undefined))) {
       throw new RemoteXAppAPIError('Invalid IBus connection descriptor', { status:409 });
     }
     return result;
@@ -242,9 +242,19 @@ export class RemoteXAppManager extends EventTarget {
     return this.request(`/api/instances/${encodeURIComponent(instanceId)}/attach`, { method: 'POST', signal });
   }
 
-  stopInstance(instanceId, { force = false, signal } = {}) {
+  prepareNativeInstance(instance, {signal} = {}) {
+    if (!instance?.id || instance.displayProvider !== 'kasm' || !Number.isSafeInteger(instance.sessionGeneration) ||
+        instance.sessionGeneration < 0 || !/^[a-f0-9]{64}$/.test(instance.displayComponentDigest || '')) throw new TypeError('A current native descriptor is required');
+    return this.request(`/remotexapps/${encodeURIComponent(instance.id)}/native/prepare`, {
+      method:'POST',body:{sessionGeneration:instance.sessionGeneration,componentDigest:instance.displayComponentDigest},signal,
+    });
+  }
+
+  stopInstance(instanceId, { force = false, sessionGeneration, signal } = {}) {
+    if (sessionGeneration !== undefined && (!Number.isSafeInteger(sessionGeneration) || sessionGeneration < 0)) throw new RangeError('Invalid sessionGeneration');
+    const body = {...(force ? {force:true} : {}), ...(sessionGeneration === undefined ? {} : {sessionGeneration})};
     return this.request(`/api/instances/${encodeURIComponent(instanceId)}/stop`, {
-      method: 'POST', body: force ? { force:true } : undefined, signal,
+      method: 'POST', body: Object.keys(body).length ? body : undefined, signal,
     });
   }
 

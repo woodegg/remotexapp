@@ -20,7 +20,7 @@ export function remote(args,input=''){
   // LXC's stream copier can lose output on Node's socket-backed stdio. Python
   // supplies ordinary pipes, as in the existing native browser fixture helper.
   const script='import subprocess,sys,json\np=subprocess.run(["sudo","-n","/snap/bin/lxc","exec","local:"+sys.argv[1],"--"]+json.loads(sys.argv[2]),input=sys.stdin.buffer.read(),capture_output=True,timeout=110)\nif p.returncode:raise RuntimeError(p.stderr.decode(errors="replace")[-1200:])\nsys.stdout.buffer.write(p.stdout)';
-  return execFileSync('python3',['-c',script,config.container,JSON.stringify(args)],{input,encoding:'utf8',timeout:120000,maxBuffer:2*1024*1024});
+  return execFileSync('python3',['-c',script,config.container,JSON.stringify(args)],{input,encoding:'utf8',timeout:120000,maxBuffer:4*1024*1024});
 }
 export async function open(url){
   const page=await fetch(config.cdpURL+'/json/new?'+encodeURIComponent(url),{method:'PUT'}).then(r=>r.json());

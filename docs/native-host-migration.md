@@ -44,7 +44,7 @@ Manager managed-state API for a separate start/stop decision.
 | Hidden workspace/window | Retain the session and DOM Viewer; blur inactive input | Hidden is not closed. If the host unloads the Viewer, restore with `session.attach()` and re-establish clipboard consent |
 | Background agent/task | A separate `host.open({instanceId, keepAlive:true})` handle | Closing a window cannot release the task's interest. Generation invalidation ends its authority |
 | Close window | `session.release()` | Releases only this owner's display/audio/runtime references; does not stop a shared App |
-| Close-and-stop editor | Explicit `session.stop()` followed by `session.release()` | Preserve unsaved-document veto. A stale generation cannot stop its replacement. Do not force automatically |
+| Close-and-stop editor | Explicit `session.stop()` followed by `session.release()` | Honor the template shutdown policy and any veto. A stale generation cannot stop its replacement. Do not force automatically |
 | Text/shortcut injection | `viewer.sendText(text)` / `viewer.sendKey(key, {modifiers})` | Native key path, no clipboard fallback; validate receipt target and perform App readback when required |
 | Clipboard prompts | `configureClipboard`, `requestClipboardPermission`, manual directional actions | Replace legacy prompt/offer UI. Explain auto/manual/off, focus ownership, permissions and reset on reconnect |
 | Speaker/microphone | `await session.audio()`, then explicit interest switches inside browser gestures | Prepare interest before the user enables playback/capture. Shared server transport remains separate from display sockets |
@@ -55,6 +55,12 @@ The old input socket, IBus/Unicode injection ACK interpretation, remote-caret
 positioning and old clipboard offer negotiation are removed from the Kasm
 Viewer integration. They remain in the legacy provider. Do not retain two
 clipboard or IME controllers for the same native Viewer.
+
+Closing a window only releases its references. Explicit App stop follows the
+pinned package shutdown contract: several shipped editor packages deliberately
+terminate the process without saving. The host must tell the user to save first;
+it cannot infer an unsaved-document veto from an editor name. A package that
+reports a veto remains blocked unless an independently authorized force is used.
 
 ## Native input and display
 

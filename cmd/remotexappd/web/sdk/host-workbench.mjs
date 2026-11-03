@@ -58,8 +58,17 @@ async function refresh(){
   for(const instance of instances.filter(i=>i.displayProvider==='kasm' && ['ready','server-ready'].includes(i.state)))
     $('#existing').append(button(`${instance.templateId} · ${instance.id.slice(-8)} · ${instance.sessionState}`,()=>open({instanceId:instance.id})));
   $('#managed').replaceChildren(node('small','托管应用 · Managed'));
-  for(const item of managed){const b=button(`${item.id} · ${item.observedState}`,()=>open({managedId:item.id}));
-    b.disabled=item.desiredState!=='running' || item.observedState!=='running';$('#managed').append(b);}
+  for(const item of managed){const row=node('div'),b=button(`${item.id} · ${item.observedState}`,()=>open({managedId:item.id}));
+    b.disabled=item.desiredState!=='running' || item.observedState!=='running';row.append(b);
+    row.append(button(item.desiredState==='running'?'停止托管应用':'启动托管应用',async()=>{
+      const desired=item.desiredState==='running'?'stopped':'running';
+      if(desired==='stopped' && !await confirmStop())return;
+      await host.manager.setManagedInstanceState(item.id,desired);await refresh();
+    }));
+    if(item.runtime?.recovery)row.append(button('重试恢复',async()=>{
+      await host.manager.retryRecovery(item.runtime.id,{sessionGeneration:item.runtime.sessionGeneration});await refresh();
+    }));
+    $('#managed').append(row);}
   notice(`已加载 ${catalog.length} 个模板。选择应用开始测试。`);
 }
 function show(){
@@ -152,8 +161,10 @@ async function task(w){const session=await host.open({instanceId:w.session.id,ke
   const row=node('div',undefined,'task');row.append(node('small',`后台任务 ${key} · ${session.instance.templateId}`),button('释放',async()=>{await session.release();tasks.delete(key);row.remove();}));
   tasks.set(key,{session,row});$('#tasks').append(row);notice('后台任务已独立持有运行时；可以关闭原窗口。');}
 async function close(w){windows.delete(w.key);w.element.remove();w.tab.remove();await w.session.release();show();}
-async function stop(w){const dialog=$('#confirm');dialog.showModal();const choice=await new Promise(resolve=>dialog.addEventListener('close',()=>resolve(dialog.returnValue),{once:true}));
-  if(choice!=='stop')return;await w.session.stop();notice('已请求正常停止应用。');await refresh();}
+async function confirmStop(){const dialog=$('#confirm');dialog.returnValue='cancel';dialog.showModal();return await new Promise(resolve=>dialog.addEventListener('close',()=>resolve(dialog.returnValue==='stop'),{once:true}));}
+async function stop(w){if(!await confirmStop())return;
+  if(w.session.instance.managedInstanceId)await host.manager.setManagedInstanceState(w.session.instance.managedInstanceId,'stopped');
+  else await w.session.stop();notice('已请求正常停止应用。');await refresh();}
 function update(w){
   const stats=w.viewer?.getStats(),rate=rateSnapshot(w.previous,stats);w.previous=stats;
   w.stateText.textContent=w.session.state==='active'?(stats?.state || '画面已卸载'):w.session.state;w.status.dataset.state=stats?.state || '';

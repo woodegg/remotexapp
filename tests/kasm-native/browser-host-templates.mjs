@@ -38,7 +38,7 @@ try {
       const control=JSON.parse(remote(['runuser','-u',config.user,'--','python3','/tmp/host-control-probe.py',JSON.stringify(descriptor),template]));
       if(['mousepad','kate','kwrite'].includes(template)){
         await b.evaluate("qViewer.sendKey('a',{modifiers:['Control']});qViewer.sendText('Native document 中文 saved');qViewer.sendKey('s',{modifiers:['Control']})");
-        await wait(()=>remote(['cat',path])==='Native document 中文 saved',10000);
+        await wait(()=>['Native document 中文 saved','Native document 中文 saved\n'].includes(remote(['cat',path])),10000);
       }
       await assert.rejects(api('/api/instances/'+sessionId+'/connections?sessionGeneration='+(outcome.generation+1)),e=>e.status===409);
       const pinned={core:outcome.instance.versions?.current?.core?.sha256,app:outcome.instance.versions?.current?.app,component:outcome.instance.displayComponentDigest};

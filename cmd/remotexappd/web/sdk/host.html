@@ -35,7 +35,7 @@
       <details class="journal"><summary>操作记录 · Operation journal <span class="muted">仅元数据，不记录文字、剪贴板或文件路径</span></summary><ol id="journal"></ol></details>
     </section>
   </main>
-  <dialog id="confirm"><form method="dialog"><h2>确认停止应用</h2><p>停止会影响这个应用的所有窗口。请先保存文件；应用可以拒绝正常关闭。</p><div class="buttons"><button value="cancel">取消</button><button value="stop" class="danger">正常停止</button></div></form></dialog>
+  <dialog id="confirm"><form method="dialog"><h2>确认停止应用</h2><p>停止会影响这个应用的所有窗口。请先保存文件，停止可能丢失未保存内容。本页不会自动保存；应用的关闭策略由模板决定。</p><div class="buttons"><button value="cancel">取消</button><button value="stop" class="danger">正常停止</button></div></form></dialog>
   <script type="module" src="./host-workbench.mjs"></script>
 </body>
 </html>

@@ -11,10 +11,23 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-- Record requirements for native bidirectional automatic text clipboard in
-  Issue #50, including independent opt-in directions, active-Viewer routing,
-  permission fallback and integrated UAT. This is documentation only; the
-  current native SDK still requires explicit manual transfer actions.
+- Make the single-App Alpine Mousepad UAT package explicitly omit Openbox's
+  default content-area mouse bindings (package 1.0.3). A synchronous click grab
+  could leave subsequent batched shortcuts with a stale mouse-button state.
+  Add a real browser batching and dialog-focus regression; existing App pins
+  and the native component remain unchanged.
+
+- Fix the Alpine Mousepad UAT package's Openbox option and require window
+  manager readiness before opening the editor. Publish it as package 1.0.2;
+  existing pinned Apps retain their package and documents.
+
+- Add experimental native automatic plain-text clipboard with independent
+  direction modes, explicit permission requests, focused-Viewer ownership,
+  conflict detection and lifecycle fencing. Keep default-off and manual APIs;
+  order paste keys after a fresh bounded native clipboard submission and keep
+  remote X11 PRIMARY selection local so paste preserves the selected range. Extend
+  the UAT workbench with controls, state and content-free acceptance records.
+  Exact artifact and consolidated human qualification remain pending in #50.
 
 - Correct Clipman regression tests to distinguish clearing a gateway-owned
   selection from preserving an external owner, including an identical PNG copy.
@@ -98,12 +111,12 @@ implementation; move them to a version section when publishing a release.
   multiple Viewers do not receive JPEG payloads with stale lengths; add applied
   source cache tests with address, undefined-behavior and leak checks.
 
-Target: `0.16.0-dev.4`. Development only.
+Target: `0.16.0-dev.5`. Development only.
 
 Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
 remains the default. D1 is recorded in Issue #30; Issue #32 tracks the first
 D2 physical-input UAT checkpoint.
-Development identities are Core `0.16.0-dev.3` and SDK `0.31.0-dev.3`;
+Development identities are Core `0.16.0-dev.5` and SDK `0.31.0-dev.5`;
 these are not published or UAT-qualified releases.
 
 - Initialize the native adapter's mouse button map without the upstream UI.

@@ -121,6 +121,7 @@ func kasmLaunchArgs(item *instance, class classConfig, port int, authority strin
 		"-DisableBasicAuth", "-sslOnly", "0", "-SecurityTypes", "None",
 		"-publicIP", "127.0.0.1", "-httpd", "", "-nolisten", "tcp",
 		"-AcceptCutText=" + boolDigit(item.Components.NativeClipboard == "text"), "-SendCutText=" + boolDigit(item.Components.NativeClipboard == "text"),
+		"-SetPrimary=0", "-SendPrimary=0",
 		"-DLP_ClipAcceptMax=65536", "-DLP_ClipSendMax=65537", "-DLP_ClipTypes=text/plain", "-DLP_Log=off",
 		"-IgnoreClientSettingsKasm=1",
 		"-geometry", class.Server.Geometry, "-depth", "24", "-FrameRate", strconv.Itoa(class.Server.FrameRate),

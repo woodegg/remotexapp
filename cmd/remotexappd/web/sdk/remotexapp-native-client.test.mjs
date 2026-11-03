@@ -5,14 +5,14 @@ import { RemoteXAppNativeClient } from './remotexapp-native-client.js';
 globalThis.CustomEvent ||= class extends Event { constructor(type,options) { super(type); this.detail = options?.detail; } };
 globalThis.location = new URL('https://viewer.example.test/remotexapps/app/kiosk.html');
 
-function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, statistics = false, udp = false, latency = false, udpLoss = false } = {}) {
+function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, clipboardAutomatic = false, statistics = false, udp = false, latency = false, udpLoss = false } = {}) {
   const state = { id:'app', displayProvider:'kasm', displayComponentDigest:'a'.repeat(64), sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
   if (udp) state.nativeTransport={available:true,grantRequired:true,policy:'prefer-udp'};
   const calls=[];
   state.nativeClipboard = clipboard ? "text" : undefined;
   let display, reads = 0;
   class Display extends EventTarget {
-    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardMaxBytes:65536,statistics,udp,latency,udpLoss};
+    static capabilities = {keyboardPolicy:true,clipboardText:true,clipboardAutomatic,clipboardMaxBytes:65536,statistics,udp,latency,udpLoss};
     counters = {receivedBytes:100, sentBytes:20, bufferedBytes:0, renderedFrames:2, width:1024, height:768};
     getStats() { return this.counters; }
     probes = 0;
@@ -279,4 +279,31 @@ test('UDP block loss validates counts, stays passive, gates old components and c
   }
   f.viewer.disconnect();assert.equal(f.viewer.getStats().udpLoss,undefined);
   await f.viewer.connect('app');assert.equal(f.viewer.getStats().udpLoss.state,'inactive');f.viewer.dispose();
+});
+
+
+test('public directional configuration, native paste callback and reset are connection-scoped',async t=>{
+  clipboardBrowser(t);
+  navigator.permissions={query:async()=>({state:'granted'})};
+  navigator.locks={request:async(name,options,fn)=>fn({})};
+  navigator.clipboard.readText=async()=> 'fresh paste';
+  const f=fixture({clipboard:true,clipboardAutomatic:true});await f.viewer.connect('app');t.after(()=>f.viewer.dispose());
+  await f.viewer.configureClipboard({toRemote:'auto',toLocal:'off'});
+  assert.equal(f.viewer.getClipboardState().effective.toRemote,'auto');
+  f.viewer.focus();assert.equal(await f.display.options.prepareClipboardPaste(),true);
+  assert.deepEqual(f.display.sent,['fresh paste']);
+  await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-disabled'});
+  const retired=f.display;await f.viewer.reconnect();
+  assert.deepEqual(f.viewer.getClipboardState().requested,{toRemote:'off',toLocal:'off'});
+  assert.throws(()=>retired.options.prepareClipboardPaste(),{name:'AbortError'});
+  f.viewer.enableClipboard();assert.equal(f.viewer.getClipboardState().requested.toRemote,'manual');
+  f.viewer.resetClipboard();assert.equal(f.viewer.clipboardEnabled,false);
+});
+
+test('manual calls respect another tab clipboard lock without starting a browser write',async t=>{
+  clipboardBrowser(t);navigator.locks={request:async(name,options,fn)=>fn(null)};
+  let writes=0;navigator.clipboard.writeText=async()=>{writes++;};
+  const f=fixture({clipboard:true});await f.viewer.connect('app');t.after(()=>f.viewer.dispose());f.viewer.enableClipboard();
+  f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{text:'remote'}}));
+  await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-busy'});assert.equal(writes,0);
 });

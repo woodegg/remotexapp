@@ -1,12 +1,14 @@
 # Native automatic clipboard integration requirements
 
 Status: requirements selected on 2026-11-01; the owner authorized proceeding
-with requirements review and implementation on 2026-11-02. Implementation and
-qualification remain pending. [Issue #50](https://github.com/woodegg/remotexapp/issues/50)
+with requirements review and implementation on 2026-11-02. Implementation is in progress in [PR #54](https://github.com/woodegg/remotexapp/pull/54);
+the [bounded automated checkpoint](../tests/kasm-native/NATIVE-CLIPBOARD.md) records
+implementation evidence; consolidated physical UAT remains pending.
+[Issue #50](https://github.com/woodegg/remotexapp/issues/50)
 tracks this follow-on under the proposed 0.16.0 milestone. This document does
 not enable automatic clipboard access in a current build.
 
-## Problem and current behavior
+## Problem and pre-integration baseline
 
 A user should be able to opt into copying text between a local application and
 a remote App without pressing a transfer button for every copy/paste operation.
@@ -15,7 +17,7 @@ provides Clipboard Up, Clipboard Down and Clipboard Seamless in supported
 Chromium browsers. That capability is input to this work, not evidence that
 RemoteXApp has integrated or qualified it.
 
-The current native adapter sets `clipboardSeamless = false`. Its patched
+Before this increment, the native adapter sets `clipboardSeamless = false`. Its patched
 receiver emits bounded text events instead of writing directly to the browser
 clipboard. `RemoteXAppNativeClient` requires a focused user gesture for each
 browser transfer. See the [implemented SDK contract](browser-sdk.md#native-inputclipboard-checkpoint-development-sdk-0310-dev2)
@@ -137,3 +139,50 @@ UDP selection; it needs no new UDP ports and does not share the audio WSS.
 [PR #49](https://github.com/woodegg/remotexapp/pull/49) retain their scope;
 coexistence is a later combined-candidate gate. No App, runtime pin, deployment
 or provider default changes as a result of this document.
+
+## Implementation contract (in progress)
+
+Issue #50 implementation adds `configureClipboard({toRemote, toLocal})`,
+`getClipboardState()` and `requestClipboardPermission()` to the native SDK.
+Each direction accepts `off`, `manual` or `auto`; requested modes differ from
+effective modes when the component, browser or permissions cannot support auto.
+`enableClipboard(true)` remains a compatibility shorthand for both manual modes.
+`resetClipboard()` retires consent and payloads when the embedding host changes
+its authenticated scope, without requiring ownership of the remote App. Hosts
+must disconnect viewers on logout and generation replacement as before.
+
+Automatic access requires a visible, focused, active Viewer and granted read
+permission; automatic local writes additionally require granted write permission.
+Reading local state before writing permits conflict detection without overwriting
+a newly copied local value. Permission queries never request permission; only an
+explicit permission action can invoke a browser read to request access. Unsupported
+permission observation falls back to manual mode. No clipboard polling runs while
+inactive, hidden or disconnected.
+
+Activation establishes a new baseline, with no replay of retired remote offers.
+A native paste shortcut synchronizes a fresh local read before releasing its
+queued key events; failures suppress the paste rather than paste stale data.
+This also supports copying outside the Viewer and returning to paste. Ordinary
+remote copy notifications use the native reliable clipboard channel. Observed
+local changes while active can synchronize automatically; simultaneous local
+and remote changes stop automation and require an explicit manual direction.
+Browser writes already started at retirement remain uncertain until observed;
+they are never retried. Payloads and equality baselines exist only in bounded
+connection memory and never appear in state snapshots or diagnostics.
+
+The adapter retains upstream binary text clipboard messages and patches for
+transactional, bounded reception. Ungated upstream browser clipboard helpers
+remain disabled. A bounded input gate provides paste ordering through the
+supported adapter callback; it must release submitted modifiers on cancellation
+and preserve the existing OS-local IME policy. Old components continue to expose
+manual text capability and cannot advertise this automatic integration.
+
+Qualification is pending. The implementation PR must include the UAT workbench,
+real browser and remote App readback, artifact identities and explicit coverage
+limits before consolidated physical UAT.
+
+Native integration synchronizes the X11 `CLIPBOARD` selection only. The launcher
+sets `SetPrimary=0` and `SendPrimary=0`: receiving browser clipboard text must
+not take ownership of `PRIMARY` and clear the remote editor's selected text.
+X11 selection/middle-click remains local to the remote desktop. This is necessary
+for selecting text and then replacing it with an automatic browser paste.

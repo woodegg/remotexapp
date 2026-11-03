@@ -96,6 +96,22 @@ not replace the shipped Mousepad or XFCE definitions. Install them with the
 normal package/install scripts. The UAT page accepts `templateId` in fixture
 configuration, defaulting to the existing `mousepad` template.
 
+Mousepad fixture package 1.0.2 uses Openbox's `--config-file` option and waits
+for window-manager readiness. Earlier 1.0.1 could start an unmanaged editor
+after Openbox rejected `--config`; an editor process alone is insufficient
+readiness. Install 1.0.2 as a new immutable package and reload the Manager's
+catalog for new Apps; existing pinned Apps are not restarted or rewritten.
+
+Package 1.0.3 further specifies an empty `<mouse/>` section. Omitting that
+section inherits Openbox's content-area click bindings: a synchronous pointer
+grab can delay the release while keyboard events continue. Coalesced click,
+Ctrl+A and paste then append text instead of replacing the selection.
+This maximized single-App fixture leaves content clicks to the application;
+Openbox still manages geometry, new-window focus and dialogs. This is not a
+recommended generic desktop configuration or a change to the Kasm transport.
+Run `browser-input-order.mjs` with the disposable browser fixture configuration
+to test coalesced input and dialog focus alongside the clipboard matrix.
+
 `ingress/` is a test-only HTTP proxy, built with `CGO_ENABLED=0`. It accepts only
 loopback and one configured edge IP, overwrites the test identity, and serves
 only the UAT page, fixture configuration and `/rx/` Manager proxy. The edge

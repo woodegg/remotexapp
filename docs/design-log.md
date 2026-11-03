@@ -5115,3 +5115,54 @@ requirements-only work selection; it does not imply feature acceptance,
 publication or actual embedding-host qualification. Preserve the independent
 consent, active-target, native-transport and lifecycle boundaries in
 [native clipboard integration](native-clipboard-integration.md).
+
+## 2026-11-02 — Select native clipboard consent and input ordering
+
+The #50 implementation uses independent off/manual/auto directions, public
+requested/effective state, explicit permission requests and one active Viewer.
+Automatic browser writes check fresh local state for conflicts; activation
+establishes a baseline without replaying inactive remote offers. A bounded native
+paste gate orders a fresh local read/submission before the paste keys and cancels
+stale input on lifecycle retirement. The native text wire remains unchanged;
+upstream browser access is delegated to the SDK policy instead of running two
+clipboard systems. See the [implementation contract](native-clipboard-integration.md).
+This records the implementation decision, not qualification or acceptance.
+
+## 2026-11-02 — Preserve remote selection during native clipboard paste
+
+Live #50 browser testing found that a fresh clipboard submission immediately
+before paste replaced X11 PRIMARY ownership: Kasm defaults `SetPrimary` to
+true. The remote editor lost its selected range, so paste inserted text instead
+of replacing the selection. Native launch now explicitly disables SetPrimary
+and SendPrimary; only CLIPBOARD crosses the browser boundary. Keep PRIMARY
+and remote middle-click selection local. The regression must verify selected
+text replacement by reading the saved remote document, not just clipboard
+submission or connection status. This supersedes the implicit native launcher
+default for PRIMARY; it does not alter the legacy provider.
+
+## 2026-11-02 — Require the UAT editor's window manager to be ready
+
+Native clipboard qualification exposed a pre-existing Alpine Mousepad fixture
+error: Openbox accepts `--config-file`, not `--config`. Package 1.0.2 corrects
+the option and checks the window manager before launching the editor. A visible
+unmanaged window must not satisfy the intended maximized-editor fixture setup.
+Install the new immutable package for new test Apps; preserve existing runtime
+pins and documents. This changes the test fixture, not production App packages.
+
+## 2026-11-02 — Avoid synchronous content-click grabs in the single-App fixture
+
+This supplements the preceding window-manager readiness decision. A single
+network batch containing pointer press/release and Ctrl+A exposed a second
+fixture issue: X11 key events retained Button1 despite the browser releasing it.
+Draining the Kasm input queue did not fix it; removing Openbox in an owned
+diagnostic did. Openbox's [content bindings](https://github.com/danakj/openbox/blob/master/openbox/mouse.c)
+use a synchronous pointer grab while its [grab implementation](https://github.com/danakj/openbox/blob/master/openbox/grab.c)
+leaves the keyboard asynchronous. An omitted mouse section inherits bindings.
+
+Alpine Mousepad package 1.0.3 explicitly clears these bindings with `<mouse/>`.
+Its single-App configuration retains window management and new-dialog focus;
+test batched real editor replacement and return from dialogs. Do not add sleeps
+to hide the race, weaken clipboard ownership, or claim this qualifies arbitrary
+desktop window-manager policies. The unsuccessful native patches are excluded;
+Core and the paired Kasm component remain unchanged. Install a new immutable
+App package and preserve existing Apps rather than modifying a pinned package.

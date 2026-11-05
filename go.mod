@@ -9,7 +9,7 @@ require github.com/gorilla/websocket v1.5.3
 require (
 	github.com/jezek/xgb v1.3.1
 	golang.org/x/mod v0.42.0
-	golang.org/x/sys v0.48.0
+	golang.org/x/sys v0.49.0
 )
 
 require (

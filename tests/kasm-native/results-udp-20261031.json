@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-31",
+  "issue": 36,
+  "status": "bounded-automated-checks-passed-awaiting-human-uat",
+  "scope": "Optional IPv4 screen UDP on dedicated Alpine standalone UAT; WSS reliable control/input; explicit text clipboard",
+  "artifacts": {
+    "core": {
+      "sourceCommit": "f074cb9c6114539a388b196572d62cca51eda58d",
+      "archiveSHA256": "e878fd22e4a1f3053e51befdeafe113b3970081c162d99f2c199ab805190a2f2"
+    },
+    "edge": {
+      "sourceCommit": "80815e5df839a19a0b253be5417de0aa49eab5bb",
+      "archiveSHA256": "a84159c787065e66b609f36cf5fafceabb80af31f4e7f87a46354f6ed7664432"
+    },
+    "component": {
+      "sourceCommit": "4ea9523d606dbefabc8641d574de03f101174e16",
+      "archiveSHA256": "05e55c785c4a8d548572ef4e751547036944af2f1533a0404af419713cba7fbb",
+      "manifestSHA256": "22273bc7867a9a4e2afc57d5be0974fad6d10ce7e5900b151b40a4923afeefea"
+    }
+  },
+  "build": {
+    "staticCoreExecutables": 4,
+    "staticEdge": true,
+    "component": "separately pinned musl-native Kasm; explicit shared graphical dependencies"
+  },
+  "validation": {
+    "makeCheck": true,
+    "focusedGoRace": true,
+    "coverageCheck": true,
+    "componentAppliedTests": 40,
+    "ci": "https://github.com/woodegg/remotexapp/actions/runs/41245581535"
+  },
+  "topology": {
+    "displays": 2,
+    "isolatedBrowserViewers": 3,
+    "viewersSharingFirstDisplay": 2,
+    "udpSlots": 2,
+    "proxyMode": "non-NAT, loopback destination, no PROXY protocol",
+    "publicIngress": "authenticated HTTPS/WSS through trusted edge",
+    "publicUDP": "restricted to authenticated measured test egress",
+    "workloadAccount": "non-root",
+    "browsers": [
+      "Chrome 149.0.7827.102, isolated Linux browser",
+      "Chrome 156.0.8078.47, user-supplied Linux CDP browser"
+    ]
+  },
+  "checks": {
+    "threeViewersChangingUDPPixels": true,
+    "independentTransportPreference": true,
+    "blockFallbackAndAutomaticReturnSameWSS": true,
+    "configured20PercentBidirectionalLoss": true,
+    "largePacketBlackholeBytes": 1100,
+    "proxyRestartAndInternalTupleChange": true,
+    "missingUnknownReplayedStaleGrantDenied": true,
+    "independentViewerRevocation": true,
+    "validBadMissingUnknownSTUNCredentials": true,
+    "expiryWithoutRenewal": {
+      "serverExpiredWithoutRenewal": true,
+      "elapsedMs": 92953,
+      "suppressedRenewals": 4
+    },
+    "slotReuseNewOwnerAndEpoch": true,
+    "oldCredentialAndCapturedPacketRejectedAfterReuse": true,
+    "workloadAddressPrivacy": {
+      "workloadUDPPackets": 400,
+      "allUDPPeersLoopback": true,
+      "httpRequestsChecked": 21,
+      "sourceHeadersAbsent": true,
+      "offersChecked": 3,
+      "clientCandidatesAbsent": true,
+      "clientOriginZeroed": true
+    },
+    "fullPoolWSSDescriptor": true,
+    "pointerNavigationFocusUDPAndWSS": true,
+    "syntheticCompositionAndExplicitTextClipboard": true,
+    "clipboardUTF8BoundaryBytes": 65536,
+    "oversizedTextAndDeniedPermission": true,
+    "fourShortcutProfilesAndFocusCycles": true,
+    "reconnectResetsClipboardConsent": true,
+    "managerAdoptionPreservesProcessesPinsGenerationSlotsAndDocuments": true,
+    "actualContainerReboot": true,
+    "rebootPreservesDocumentsPinsSlotsAndAdvancesGeneration": true,
+    "onDemandSessionActivationPreserved": true,
+    "anonymousVacancyPolicyPreserved": true,
+    "installedCoreAndComponentFilesVerified": {
+      "core": 21,
+      "component": 42
+    },
+    "postRebootFourViewersActualUDP": true,
+    "postRebootThreeCanvasesChanged": true,
+    "idleThreeViewersSameEpochSeconds": 182.4,
+    "originalDocumentsPreserved": 6,
+    "lossCounters": [
+      {
+        "chain": "input",
+        "counters": [
+          {
+            "packets": 160,
+            "bytes": 22177
+          }
+        ]
+      },
+      {
+        "chain": "output",
+        "counters": [
+          {
+            "packets": 6,
+            "bytes": 1943
+          }
+        ]
+      }
+    ]
+  },
+  "evidenceSHA256": {
+    "transport-results.json": "039a17c5fb4312f540e7c2a798ea9378249ab6b3d42dcb42c480fbee3db050dc",
+    "grant-results.json": "2c16ec82d47cd60f6e4c3a95adf60104dfce7f4f4f773822084c63c73fe254f7",
+    "stun-active.json": "3a0350da644a78de021d1ea7fa4e61dcc818a15a73b39b2ea5ad0c9ce8c147e4",
+    "stun-retired.json": "abb72435fafb07bee490825bb01564b242697265e7e93da086607af1b7cde83b",
+    "privacy-results.json": "7ad845b37f26ded42a2d235f40fdddfaf1a40b392c8a06a81ef464c3fb41dea7",
+    "expiry-results.json": "90a4ddfb5b434b86b6bd7426d9e01e548ad10bbfd5356a2bcb35dce6814cb35a",
+    "pool-results.json": "6b23e1ed4ba160371a308a39d3a5a6d90d548ba54c04062ca0f4447213d2cec0",
+    "input-results.json": "d00757bf7723ecd2a28c298e8d8b38c373d01ae93160a7ff362be97f5a552e64",
+    "text-wss-results.json": "6fb2867ff278afd67626d3f41988e17984afd2448a8a5a0dc1c6c705a9368c02",
+    "text-results.json": "6fb2867ff278afd67626d3f41988e17984afd2448a8a5a0dc1c6c705a9368c02",
+    "proxy-results.json": "8f1c90e0cdbf26e0946f060debd1182481d6c37df6c5a0c4e38a31f1f4da7a45",
+    "loss-repeat-results.json": "90ed23841fdd7f7c8162b509f9cd60863a96d1587f24ebadb5dd8866cba218cd",
+    "loss-counters.json": "223bee86ebf85c1dc8d33cb2fd79dac1e3e45ab4fc6c07447ba2e9a5316f3646",
+    "manager-results.json": "72cafe76b5dc623d408ae40d1240ce04579c5a740aacb07a94ac66aa769b824c",
+    "reuse-results.json": "4976555edd5e6d880125f30726b0aadd9007bf2c71bc754e5568e3f572aec191",
+    "reuse-replay-results.json": "f5dc3eb7f2fd20d8abd0ba8b06c924109ac8da23d5d9170f4785093d7ceb322d",
+    "final-file-integrity.json": "8baa7f868d89fd5ab3cc197d6560353f5d54221fb0f6d5c22125cb726a240482",
+    "final-idle-results.json": "9e3c4f3d4cca58060f2a63217215edf78377ea0c741ae9f42bd219c8298d465a",
+    "post-reboot-browser-results.json": "3994ad10aaf3ba401a53e6c78977dd27a5194f2163a88a0bf86c23687749f263",
+    "resource-review.json": "dbdc6a1548566d5224182271c4e82e8b2b2b076ef6c672e9a11ea5f00549a384",
+    "original-documents-final.json": "68b449cc98a7f965d48164381c21a3e92ea20c48a2d99dfc6630a87070244a11",
+    "edge-final-integrity.json": "3aa857da1bdb66bc9fce3d1071821f0a1520ad08ad815a3ee17f3bd53b641c34",
+    "target-cleanup.json": "f6602c86078c1955ae31243cc94f6b2a171dd5675abff1c197b36af6cbd64fdd",
+    "runtime-cleanup-final.json": "fadbcdfe7b6a31f5e965a799dba64c13d0c45eb9b4c93cc00aa1570522d85379",
+    "host-cleanup-final.json": "5ab3d5b5642287fd4ff11d3057ec5205904d42389e2ee65b7a7ac5e0b15b9391",
+    "local-cleanup.json": "f981b3ef4aafbe70ccc732716a89d4f3e7ab9fed5610b29adedcd42978ad1d48"
+  },
+  "qualificationNotes": [
+    "The Core and component artifacts remain unchanged across incremental edge protocol, heartbeat and framing fixes. Initial matrix observations are retained; final edge framing has live clipboard and reboot/reconnect regression.",
+    "20% loss and large-packet drops were applied in both directions; early scenario labels saying ingress/inbound are narrower than the applied rules.",
+    "An uncertain browser create timeout did not cancel server work; existing state was inspected and owned duplicate Apps stopped normally.",
+    "The reboot fixture initially waited for a running on-demand session; verification was corrected to server recovery followed by actual Viewer activation.",
+    "No physical IME claim follows from synthetic browser composition."
+  ],
+  "notQualified": [
+    "new-candidate eight-hour soak",
+    "host reboot",
+    "full public NAT/firewall/MTU matrix",
+    "IPv6 or TURN",
+    "production tenant authentication/quotas",
+    "Windows/macOS physical IME",
+    "rich/file clipboard",
+    "speaker/microphone",
+    "embedding-host integration",
+    "formal release"
+  ],
+  "resources": {
+    "seconds": 181.1,
+    "before": {
+      "processes": 25,
+      "pssMiB": 205.83,
+      "anonPssMiB": 101.84,
+      "rssMiB": 338.45,
+      "fds": 246,
+      "threads": 85
+    },
+    "after": {
+      "processes": 25,
+      "pssMiB": 215.0,
+      "anonPssMiB": 111.01,
+      "rssMiB": 347.62,
+      "fds": 246,
+      "threads": 85
+    },
+    "sameProcessIDs": true,
+    "claim": "short comparable idle observations only; no long-duration slope or leak-free claim",
+    "followupSamples": [
+      {
+        "elapsedSeconds": 0.0,
+        "pssMiB": 213.65,
+        "anonPssMiB": 109.67,
+        "rssMiB": 346.27,
+        "fds": 241,
+        "threads": 85,
+        "processes": 25
+      },
+      {
+        "elapsedSeconds": 30.9,
+        "pssMiB": 213.69,
+        "anonPssMiB": 109.7,
+        "rssMiB": 346.31,
+        "fds": 241,
+        "threads": 85,
+        "processes": 25
+      },
+      {
+        "elapsedSeconds": 61.8,
+        "pssMiB": 213.7,
+        "anonPssMiB": 109.72,
+        "rssMiB": 346.32,
+        "fds": 241,
+        "threads": 85,
+        "processes": 25
+      },
+      {
+        "elapsedSeconds": 92.7,
+        "pssMiB": 213.75,
+        "anonPssMiB": 109.76,
+        "rssMiB": 346.37,
+        "fds": 243,
+        "threads": 85,
+        "processes": 25
+      },
+      {
+        "elapsedSeconds": 124.1,
+        "pssMiB": 213.75,
+        "anonPssMiB": 109.77,
+        "rssMiB": 346.37,
+        "fds": 243,
+        "threads": 85,
+        "processes": 25
+      },
+      {
+        "elapsedSeconds": 155.4,
+        "pssMiB": 213.75,
+        "anonPssMiB": 109.77,
+        "rssMiB": 346.37,
+        "fds": 241,
+        "threads": 85,
+        "processes": 25
+      },
+      {
+        "elapsedSeconds": 186.3,
+        "pssMiB": 213.81,
+        "anonPssMiB": 109.82,
+        "rssMiB": 346.43,
+        "fds": 244,
+        "threads": 85,
+        "processes": 25
+      }
+    ],
+    "followupConclusion": "Short observed plateau after renewed screen activity; not an eight-hour leak or capacity qualification",
+    "failedReadSamples": 1,
+    "measurement": "aggregate selected runtime UID on target; PSS and anonymous PSS are proportional, RSS includes shared-page duplication",
+    "shortIdleBrowserCount": 4
+  },
+  "cleanup": {
+    "ownedAnonymousAppStopped": true,
+    "managedUATRetained": true,
+    "testHelpersRemoved": true,
+    "temporaryTestPackagesRemoved": true,
+    "testDocumentRetained": true,
+    "activeRuntimes": 1,
+    "runtimeManifests": 1,
+    "noFailedRuntime": true,
+    "testProcessesAbsent": true,
+    "managedUATReady": true,
+    "hopperHealthy": true,
+    "ownedPacketCapturesStopped": true,
+    "buildContainerStopped": true,
+    "isolatedBrowserProfileRemoved": true,
+    "ownedRemoteTabClosed": true
+  }
+}

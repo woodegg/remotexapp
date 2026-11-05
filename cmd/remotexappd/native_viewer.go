@@ -12,6 +12,10 @@ import (
 // handler. This allowlist prevents the upstream server's management API from
 // becoming part of the public Viewer surface.
 func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, item *instance, route string) {
+	if route == "native/grant" || route == "native/lease" || route == "native/revoke" {
+		m.serveNativeGrant(w, r, item, strings.TrimPrefix(route, "native/"))
+		return
+	}
 	if route == "native/prepare" {
 		m.prepareNativeViewer(w, r, item.ID)
 		return
@@ -43,18 +47,46 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 		return
 	}
 	var channel *viewerChannel
+	readOnly := false
 	if member == "websockify" {
 		if r.Method != http.MethodGet || !isWebSocket(r) {
 			writeError(w, http.StatusBadRequest, "WebSocket upgrade required")
 			return
 		}
+		var grant [32]byte
 		var err error
+		if isKasm(item) {
+			grant, err = m.claimNativeGrant(r, item)
+			if err != nil {
+				writeError(w, http.StatusForbidden, "native Viewer grant rejected")
+				return
+			}
+		}
+		if isKasm(item) {
+			defer func() {
+				m.mu.Lock()
+				defer m.mu.Unlock()
+				if g := m.nativeGrants[grant]; g != nil && g.channel == nil {
+					delete(m.nativeGrants, grant)
+				}
+			}()
+		}
 		channel, r, err = m.openViewerChannel(item.ID, true, r)
 		if err != nil {
 			writeError(w, http.StatusConflict, "Viewer channel unavailable: "+err.Error())
 			return
 		}
 		defer m.closeViewerChannel(channel)
+		if isKasm(item) {
+			if err := m.attachNativeGrant(grant, channel); err != nil {
+				writeError(w, http.StatusForbidden, "native Viewer grant retired")
+				return
+			}
+			m.mu.RLock()
+			g := m.nativeGrants[grant]
+			readOnly = g != nil && g.readOnly
+			m.mu.RUnlock()
+		}
 	} else if r.Method != http.MethodGet && r.Method != http.MethodHead {
 		methodNotAllowed(w, "GET, HEAD")
 		return
@@ -62,15 +94,32 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 		http.NotFound(w, r)
 		return
 	}
+	if channel != nil && readOnly {
+		m.serveReadOnlyNative(w, r, item, channel)
+		return
+	}
 	target := &url.URL{Scheme: "http", Host: item.GatewayAddr}
 	proxy := httputil.NewSingleHostReverseProxy(target)
 	director := proxy.Director
 	proxy.Director = func(request *http.Request) {
 		director(request)
+		if channel != nil {
+			// Terminate the Viewer credential here. The pinned Kasm HTTP parser
+			// requires a protocol header even for an ordinary binary stream.
+			request.Header.Set("Sec-WebSocket-Protocol", "binary")
+		}
 		request.URL.Path, request.URL.RawPath = "/"+member, ""
 	}
 	if channel != nil {
-		proxy.ModifyResponse = func(response *http.Response) error { return m.bindViewerChannel(channel, response) }
+		proxy.ModifyResponse = func(response *http.Response) error {
+			if err := m.bindViewerChannel(channel, response); err != nil {
+				return err
+			}
+			if response.StatusCode == http.StatusSwitchingProtocols {
+				response.Header.Set("Sec-WebSocket-Protocol", r.Header.Get("Sec-WebSocket-Protocol"))
+			}
+			return nil
+		}
 	}
 	proxy.ErrorHandler = func(writer http.ResponseWriter, _ *http.Request, _ error) {
 		writeError(writer, http.StatusBadGateway, "native display unavailable")

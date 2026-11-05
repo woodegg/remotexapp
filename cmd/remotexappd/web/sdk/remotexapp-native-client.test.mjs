@@ -5,12 +5,32 @@ import { RemoteXAppNativeClient } from './remotexapp-native-client.js';
 globalThis.CustomEvent ||= class extends Event { constructor(type,options) { super(type); this.detail = options?.detail; } };
 globalThis.location = new URL('https://viewer.example.test/remotexapps/app/kiosk.html');
 
-function fixture({ ready = true, frame = true, timeout = 200 } = {}) {
+function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, clipboardAutomatic = false, rich = false, componentRich = rich, statistics = false, udp = false, latency = false, udpLoss = false, controls = false, readOnly = false, reconnect = false } = {}) {
   const state = { id:'app', displayProvider:'kasm', displayComponentDigest:'a'.repeat(64), sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
+  if (udp) state.nativeTransport={available:true,grantRequired:true,policy:'prefer-udp'};
+  if (controls) state.nativeTransport={available:udp,grantRequired:true,policy:udp?'prefer-udp':'wss-only',readOnly:true};
+  state.effectivePolicy={display:{allowClientResize:true}};
+  const calls=[];
+  state.nativeClipboard = rich ? "rich-v1" : clipboard ? "text" : undefined;
   let display, reads = 0;
   class Display extends EventTarget {
-    constructor(container,url) {
-      super(); display = this; this.url = url; this.closed = 0;
+    static capabilities = {programmaticInput:controls,displayControls:controls,readOnly:controls,keyboardPolicy:true,clipboardText:true,clipboardAutomatic,clipboardRich:componentRich,clipboardMaxBytes:componentRich?2097152:65536,statistics,udp,latency,udpLoss};
+    counters = {receivedBytes:100, sentBytes:20, bufferedBytes:0, renderedFrames:2, width:1024, height:768};
+    getStats() { return this.counters; }
+    sendText(text) {this.sent.push(text);return {status:'submitted',count:[...text].length};}
+    sendKey(key,options) {this.sent.push({key,options});return {status:'submitted',count:1};}
+    configureDisplay(options) {this.settings=options;return options;}
+    flushResize() {return true;}
+    probes = 0;
+    measureLatency() {this.probes++;return true;}
+    sent = [];
+    sendClipboardText(text) { this.sent.push(text); }
+    sendClipboard(items) { this.sent.push(items); }
+    keyboardPolicy = {profile:"unknown",mode:"local",bindings:[]};
+    configureKeyboard(settings) { this.keyboardPolicy = settings;return true; }
+    configureTransport(value) {this.preferUDP=value;}
+    constructor(container,url,options) {
+      super(); display = this; this.url = url; this.options=options; this.closed = 0;
       queueMicrotask(() => { this.dispatchEvent(new Event('connect')); if (frame) this.dispatchEvent(new Event('frame')); });
     }
     disconnect() { this.closed++; this.dispatchEvent(new Event('disconnect')); }
@@ -20,13 +40,16 @@ function fixture({ ready = true, frame = true, timeout = 200 } = {}) {
     getInstance:async () => { reads++; return structuredClone(state); },
     request:async (path,options) => {
       assert.equal(options.body.sessionGeneration,3);
+      calls.push({path,options});
+      if(path.endsWith('/grant')) return {token:'b'.repeat(64),expiresInMs:90000,renewAfterMs:20000};
+      if(path.endsWith('/lease') || path.endsWith('/revoke')) return {status:'ok'};
       assert.equal(path,'/remotexapps/app/native/prepare');
       return structuredClone(state);
     },
   };
-  const viewer = new RemoteXAppNativeClient({ container:{ replaceChildren(){} }, manager, timeout });
+  const viewer = new RemoteXAppNativeClient({ container:{ replaceChildren(){} }, manager, timeout, readOnly, reconnect });
   viewer._loadDisplay = async () => ({ default:Display });
-  return { viewer,state,get display(){return display;},get reads(){return reads;} };
+  return { viewer,state,calls,get display(){return display;},get reads(){return reads;} };
 }
 
 test('native ready needs current App and painted frame; dispose owns only one attachment', async () => {
@@ -87,4 +110,280 @@ test('reconnect imports the exact new component instead of reusing a cached old 
   assert.notEqual(urls[0],urls[1]);
   assert.equal(new URL(urls[1]).searchParams.get('componentDigest'),f.state.displayComponentDigest);
   f.viewer.dispose();
+});
+
+function clipboardBrowser(t, values = {}) {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis,'navigator'), oldDocument=globalThis.document;
+  const browser={userActivation:{isActive:true},clipboard:{readText:async()=>'',writeText:async()=>{},...values}};
+  Object.defineProperty(globalThis,'navigator',{configurable:true,value:browser});
+  globalThis.document={hidden:false,hasFocus:()=>true};
+  t.after(()=>{if(descriptor)Object.defineProperty(globalThis,'navigator',descriptor);else delete globalThis.navigator;globalThis.document=oldDocument;});
+  return browser;
+}
+test('clipboard requires capability, consent, gesture and focus; empty read differs from clear', async t => {
+  let reads=0;const browser=clipboardBrowser(t,{readText:async()=>{reads++;return '';}});
+  const disabled=fixture();await disabled.viewer.connect('app');assert.throws(()=>disabled.viewer.enableClipboard(),{code:'unsupported'});disabled.viewer.dispose();
+  const f=fixture({clipboard:true});await f.viewer.connect('app');
+  await assert.rejects(f.viewer.copyClipboardToRemote(),{code:'clipboard-cancelled'});
+  f.viewer.enableClipboard();browser.userActivation.isActive=false;
+  await assert.rejects(f.viewer.copyClipboardToRemote(),{code:'clipboard-gesture'});assert.equal(reads,0);
+  browser.userActivation.isActive=true;document.hidden=true;
+  await assert.rejects(f.viewer.copyClipboardToRemote(),{code:'clipboard-focus'});assert.equal(reads,0);document.hidden=false;
+  assert.deepEqual(await f.viewer.copyClipboardToRemote(),{status:'empty-noop'});assert.deepEqual(f.display.sent,[]);
+  assert.deepEqual(await f.viewer.clearRemoteClipboard(),{status:'submitted'});assert.deepEqual(f.display.sent,['']);
+  f.viewer.dispose();
+});
+test('clipboard text is bounded, denial visible, and remote events never auto-write local data', async t => {
+  let text='中文🙂',writes=[];const browser=clipboardBrowser(t,{readText:async()=>text,writeText:async value=>{writes.push(value);}});
+  const f=fixture({clipboard:true});await f.viewer.connect('app');f.viewer.enableClipboard();
+  await f.viewer.copyClipboardToRemote();assert.deepEqual(f.display.sent,[text]);
+  text='x'.repeat(65537);await assert.rejects(f.viewer.copyClipboardToRemote(),{code:'clipboard-size'});
+  text='x\0y';await assert.rejects(f.viewer.copyClipboardToRemote(),{code:'clipboard-format'});
+  browser.clipboard.readText=async()=>{throw new DOMException('Denied','NotAllowedError');};
+  await assert.rejects(f.viewer.copyClipboardToRemote(),{code:'clipboard-denied'});
+  f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{text:'remote'}}));assert.deepEqual(writes,[]);
+  await f.viewer.copyClipboardToLocal();assert.deepEqual(writes,['remote']);
+  f.viewer.dispose();
+});
+test('late local reads and retired offers cannot cross reconnect or revocation', async t => {
+  let resolve;clipboardBrowser(t,{readText:()=>new Promise(r=>{resolve=r;})});
+  const f=fixture({clipboard:true});await f.viewer.connect('app');f.viewer.enableClipboard();
+  const old=f.display,pending=f.viewer.copyClipboardToRemote();
+  await assert.rejects(f.viewer.copyClipboardToRemote(),{code:'clipboard-busy'});
+  await f.viewer.reconnect();resolve('stale');await assert.rejects(pending,{code:'clipboard-cancelled'});
+  assert.equal(f.viewer.clipboardEnabled,false);assert.deepEqual(old.sent,[]);assert.deepEqual(f.display.sent,[]);
+  old.dispatchEvent(new CustomEvent('clipboard',{detail:{text:'stale'}}));
+  f.viewer.enableClipboard();await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-empty'});
+  const pendingRevoked=f.viewer.copyClipboardToRemote();f.viewer.enableClipboard(false);f.viewer.enableClipboard(true);resolve('stale again');
+  await assert.rejects(pendingRevoked,{code:'clipboard-cancelled'});assert.deepEqual(f.display.sent,[]);f.viewer.dispose();
+});
+test('a local write racing retirement reports uncertainty and is never replayed', async t => {
+  let resolve,writes=0;clipboardBrowser(t,{writeText:()=>{writes++;return new Promise(r=>{resolve=r;});}});
+  const f=fixture({clipboard:true});await f.viewer.connect('app');f.viewer.enableClipboard();
+  f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{text:'remote'}}));
+  const pending=f.viewer.copyClipboardToLocal();f.viewer.disconnect();resolve();
+  await assert.rejects(pending,{code:'clipboard-uncertain'});assert.equal(writes,1);f.viewer.dispose();
+});
+
+test('concurrent ID connects may follow one stopped-session activation with unchanged pins', async () => {
+  const f=fixture();f.state.sessionState='stopped';f.state.sessionGeneration=2;
+  let calls=0;
+  f.viewer.manager.request=async (_path,{body})=>{
+    calls++;
+    if(calls===1){assert.equal(body.sessionGeneration,2);f.state.sessionState='running';f.state.sessionGeneration=3;throw Object.assign(new Error('stale descriptor'),{status:409});}
+    assert.equal(body.sessionGeneration,3);return structuredClone(f.state);
+  };
+  await f.viewer.connect('app');assert.equal(calls,2);assert.equal(f.viewer.state,'ready');f.viewer.dispose();
+});
+test('activation retry cannot follow explicit descriptors, upgrades, recovery or repeated conflicts', async () => {
+  for(const scenario of ['descriptor','pin','core','policy','generation','running','repeat','cancel']){
+    const f=fixture();f.state.sessionState=scenario==='running'?'running':'stopped';f.state.sessionGeneration=2;
+    const descriptor=structuredClone(f.state);let calls=0;
+    f.viewer.manager.request=async()=>{
+      calls++;f.state.sessionState='running';f.state.sessionGeneration=scenario==='generation'?4:3;
+      if(scenario==='pin')f.state.displayComponentDigest='b'.repeat(64);
+      if(scenario==='core')f.state.versions={current:{core:{sha256:'changed'}}};
+      if(scenario==='policy')f.state.nativeClipboard='text';
+      if(scenario==='cancel')f.viewer.disconnect();
+      throw Object.assign(new Error('conflict'),{status:409});
+    };
+    await assert.rejects(f.viewer.connect(scenario==='descriptor'?descriptor:'app'));
+    assert.equal(calls,scenario==='repeat'?2:1,scenario);assert.equal(f.display,undefined);f.viewer.dispose();
+  }
+});
+
+
+test('native statistics expose only per-connection counters and never poll the Manager', async () => {
+  const f = fixture({statistics:true});
+  assert.equal(f.viewer.getStats().available,false);
+  await f.viewer.connect('app');
+  const reads=f.reads, first=f.viewer.getStats();
+  assert.equal(first.available,true);assert.equal(first.transport,'wss');
+  assert.equal(first.receivedBytes,100);assert.equal(first.renderedFrames,2);
+  f.display.counters.receivedBytes=120;f.display.counters.clipboard='private';
+  const next=f.viewer.getStats();assert.equal(next.receivedBytes,120);
+  assert.equal(first.receivedBytes,100);assert.equal(next.clipboard,undefined);
+  assert(next.observedAt>=first.observedAt);assert(next.connectedForMs>=first.connectedForMs);
+  assert.equal(f.reads,reads);
+  const old=f.display;await f.viewer.reconnect();
+  const fresh=f.viewer.getStats();assert(fresh.connectionEpoch>first.connectionEpoch);
+  assert.equal(fresh.receivedBytes,100);
+  old.counters.receivedBytes=999;old.dispatchEvent(new Event('disconnect'));
+  assert.equal(f.viewer.getStats().state,'ready');assert.equal(f.viewer.getStats().receivedBytes,100);
+  f.display.dispatchEvent(new Event('disconnect'));
+  assert.equal(f.viewer.getStats().available,false);assert.equal(f.viewer.getStats().transport,null);
+  assert.equal(f.viewer.getStats().code,'display-disconnected');
+  f.viewer.dispose();assert.equal(f.viewer.getStats().state,'disposed');
+});
+
+test('old components and malformed statistics report unavailable instead of fabricated zeroes', async () => {
+  const old=fixture();await old.viewer.connect('app');
+  assert.equal(old.viewer.getStats().available,false);assert.equal(old.viewer.getStats().receivedBytes,undefined);old.viewer.dispose();
+  const f=fixture({statistics:true});await f.viewer.connect('app');
+  for(const value of [null,{}, {...f.display.counters,sentBytes:-1}, {...f.display.counters,width:NaN}, {...f.display.counters,receivedBytes:Infinity}]){
+    f.display.counters=value;assert.equal(f.viewer.getStats().available,false);
+  }
+  f.viewer.dispose();
+});
+
+
+test('UDP uses a header grant, actual bytes/paint status, and per-Viewer preference',async()=>{
+  const f=fixture({udp:true,statistics:true});await f.viewer.connect('app');
+  assert.equal(f.viewer.capabilities.udp,true);
+  assert.equal(f.display.options.udp,true);
+  assert.deepEqual(f.display.options.protocols,['remotexapp-grant.'+'b'.repeat(64)]);
+  assert.equal(f.display.url.includes('b'.repeat(64)),false);
+  Object.assign(f.display.counters,{udpReceivedBytes:300,udpPackets:3,udpRectangles:0,screenTransport:'webrtc-udp',udpState:'udp'});
+  assert.equal(f.viewer.getStats().transport,'wss');
+  f.display.counters.udpRectangles=1;
+  assert.equal(f.viewer.getStats().transport,'webrtc-udp');
+  f.viewer.configureTransport(false);assert.equal(f.display.preferUDP,false);
+  f.viewer.dispose();assert.equal(f.calls.at(-1).path,'/remotexapps/app/native/revoke');
+});
+test('UDP renewal failure retires the display and does not renew a replacement',async t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const f=fixture({udp:true});await f.viewer.connect('app');
+  const old=f.display;
+  const request=f.viewer.manager.request;
+  f.viewer.manager.request=async(path,options)=>{if(path.endsWith('/lease'))throw Error('authorization lost');return request(path,options);};
+  t.mock.timers.tick(20000);
+  await new Promise(resolve=>queueMicrotask(resolve));await new Promise(resolve=>queueMicrotask(resolve));
+  assert.equal(f.viewer.state,'failed');assert.equal(old.closed,1);
+  assert.equal(f.viewer.getStats().code,'grant-expired');f.viewer.dispose();
+});
+
+test('RTT sampling is explicit, capability-gated, content-free and reset on reconnect', async () => {
+  const old=fixture({statistics:true});await old.viewer.connect('app');assert.equal(old.viewer.measureLatency(),false);old.viewer.dispose();
+  const f=fixture({statistics:true,udp:true,latency:true});assert.equal(f.viewer.measureLatency(),false);await f.viewer.connect('app');
+  Object.assign(f.display.counters,{udpReceivedBytes:5,udpPackets:1,udpRectangles:1,latency:{
+    wss:{state:'ready',rttMs:0,ageMs:2,token:'must-not-leak'},udp:{state:'stale',ageMs:12000,candidates:['must-not-leak']}}});
+  assert.deepEqual(f.viewer.getStats().latency,{wss:{state:'ready',rttMs:0,ageMs:2},udp:{state:'stale',ageMs:12000}});
+  assert.equal(f.display.probes,0);assert.equal(f.viewer.measureLatency(),true);assert.equal(f.display.probes,1);
+  for (const raw of [null,{state:'bad'},{state:'ready',rttMs:NaN,ageMs:0},{state:'ready',rttMs:1,ageMs:-1}]) {
+    f.display.counters.latency={wss:raw,udp:raw};assert.equal(f.viewer.getStats().latency.wss.state,'unavailable');
+  }
+  for (const state of ['waiting','pending','timeout','inactive','unavailable']) {
+    f.display.counters.latency={wss:{state,extra:'private'}};assert.deepEqual(f.viewer.getStats().latency.wss,{state});
+  }
+  await f.viewer.reconnect();assert.deepEqual(f.viewer.getStats().latency.wss,{state:'unavailable'});
+  f.viewer.disconnect();assert.equal(f.viewer.getStats().latency,undefined);assert.equal(f.viewer.measureLatency(),false);f.viewer.dispose();
+});
+
+test('UDP block loss validates counts, stays passive, gates old components and clears on reconnect', async () => {
+  const old=fixture({statistics:true,udp:true});await old.viewer.connect('app');
+  assert.equal(old.viewer.capabilities.udpLoss,false);assert.equal(old.viewer.getStats().udpLoss,undefined);old.viewer.dispose();
+  const f=fixture({statistics:true,udp:true,udpLoss:true});await f.viewer.connect('app');
+  const loss={state:'ready',scope:'display-blocks',windowMs:10000,settleMs:2000,
+    receivedBlocks:8,lostBlocks:2,expectedBlocks:10,ratio:999,ageMs:20,privateAddress:'must-not-escape'};
+  Object.assign(f.display.counters,{udpReceivedBytes:10,udpPackets:1,udpRectangles:1,udpLoss:loss});
+  const calls=f.calls.length,s=f.viewer.getStats().udpLoss;
+  assert.equal(s.ratio,.2);assert.equal(s.privateAddress,undefined);assert.equal(f.calls.length,calls);assert.equal(f.display.probes,0);
+  for(const bad of [{expectedBlocks:9},{lostBlocks:-1},{receivedBlocks:NaN},{ageMs:10000},{windowMs:20},{scope:'packets'},{state:'made-up'}]){
+    f.display.counters.udpLoss={...loss,...bad};assert.equal(f.viewer.getStats().udpLoss.state,'unavailable');
+  }
+  for(const state of ['waiting','stale','inactive','unavailable']){
+    f.display.counters.udpLoss={...loss,state};assert.deepEqual(f.viewer.getStats().udpLoss,{state});
+  }
+  f.viewer.disconnect();assert.equal(f.viewer.getStats().udpLoss,undefined);
+  await f.viewer.connect('app');assert.equal(f.viewer.getStats().udpLoss.state,'inactive');f.viewer.dispose();
+});
+
+
+test('public directional configuration, native paste callback and reset are connection-scoped',async t=>{
+  clipboardBrowser(t);
+  navigator.permissions={query:async()=>({state:'granted'})};
+  navigator.locks={request:async(name,options,fn)=>fn({})};
+  navigator.clipboard.readText=async()=> 'fresh paste';
+  const f=fixture({clipboard:true,clipboardAutomatic:true});await f.viewer.connect('app');t.after(()=>f.viewer.dispose());
+  await f.viewer.configureClipboard({toRemote:'auto',toLocal:'off'});
+  assert.equal(f.viewer.getClipboardState().effective.toRemote,'auto');
+  f.viewer.focus();assert.equal(await f.display.options.prepareClipboardPaste(),true);
+  assert.deepEqual(f.display.sent,['fresh paste']);
+  await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-disabled'});
+  const retired=f.display;await f.viewer.reconnect();
+  assert.deepEqual(f.viewer.getClipboardState().requested,{toRemote:'off',toLocal:'off'});
+  assert.throws(()=>retired.options.prepareClipboardPaste(),{name:'AbortError'});
+  f.viewer.enableClipboard();assert.equal(f.viewer.getClipboardState().requested.toRemote,'manual');
+  f.viewer.resetClipboard();assert.equal(f.viewer.clipboardEnabled,false);
+});
+
+test('manual calls respect another tab clipboard lock without starting a browser write',async t=>{
+  clipboardBrowser(t);navigator.locks={request:async(name,options,fn)=>fn(null)};
+  let writes=0;navigator.clipboard.writeText=async()=>{writes++;};
+  const f=fixture({clipboard:true});await f.viewer.connect('app');t.after(()=>f.viewer.dispose());f.viewer.enableClipboard();
+  f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{text:'remote'}}));
+  await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-busy'});assert.equal(writes,0);
+});
+
+
+test('rich capability is pinned; old descriptors retain their text limit even with a newer adapter',async t=>{
+  clipboardBrowser(t);
+  for(const [options,enabled,limit] of [[{rich:true},true,2097152],[{rich:true,componentRich:false},false,0],[{clipboard:true,componentRich:true},true,65536]]) {
+    const f=fixture(options);await f.viewer.connect('app');
+    assert.equal(f.viewer.capabilities.clipboard,enabled);assert.equal(f.viewer.capabilities.clipboardMaxBytes,limit);
+    assert.equal(f.viewer.capabilities.clipboardRich,options.rich===true&&options.componentRich!==false);
+    f.viewer.dispose();
+  }
+});
+test('rich native metadata contains size only and unsupported remote offers cannot replace it',async t=>{
+  clipboardBrowser(t);const f=fixture({rich:true});await f.viewer.connect('app');t.after(()=>f.viewer.dispose());f.viewer.enableClipboard();
+  const events=[];f.viewer.addEventListener('clipboardchange',e=>events.push(e.detail));
+  f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{items:[{type:'text/html',data:new TextEncoder().encode('<b>private payload</b>')}]}}));
+  assert.deepEqual(events.at(-1),{enabled:true,available:true,bytes:22});
+  assert.equal(JSON.stringify(events).includes('private'),false);
+  const count=events.length;f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{items:[{type:'text/uri-list',data:Uint8Array.of(97)}]}}));
+  assert.equal(events.length,count);
+  await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-format'});
+  assert.equal((await f.viewer.clearRemoteClipboard()).status,'submitted');assert.equal(f.display.sent.at(-1)[0].type,'text/plain');assert.equal(f.display.sent.at(-1)[0].data.length,0);
+});
+
+
+test('native input receipts identify the current target and reject cancellation and stale owners',async()=>{
+  const f=fixture({controls:true});await f.viewer.connect('app');
+  const receipt=f.viewer.sendText('中文😀',{requestId:'input-1'});
+  assert.deepEqual(receipt,{status:'submitted',count:3,instanceId:'app',sessionGeneration:3,connectionEpoch:f.viewer.getStats().connectionEpoch,requestId:'input-1'});
+  f.viewer.sendKey('ArrowLeft',{modifiers:['Control']});
+  assert.equal(f.display.sent.length,2);
+  const abort=new AbortController();abort.abort();
+  assert.throws(()=>f.viewer.sendText('cancel',{signal:abort.signal}),{name:'AbortError'});
+  assert.throws(()=>f.viewer.sendText('bad',{requestId:'contains spaces'}),TypeError);
+  assert.equal(f.display.sent.length,2);
+  f.viewer.disconnect();assert.throws(()=>f.viewer.sendText('late'),{code:'input-unavailable'});
+  f.viewer.dispose();
+});
+test('readonly is immutable and requires both the server grant and native capability',async()=>{
+  const f=fixture({controls:true,readOnly:true,clipboard:true});await f.viewer.connect('app');
+  assert.equal(f.calls.find(c=>c.path.endsWith('/grant')).options.body.readOnly,true);
+  assert.equal(f.display.options.readOnly,true);
+  assert.equal(f.viewer.capabilities.pointer,false);assert.equal(f.viewer.capabilities.clipboard,false);
+  assert.throws(()=>f.viewer.sendKey('Enter'),{code:'input-unavailable'});
+  assert.throws(()=>f.viewer.configureDisplay({resize:true}),{code:'unsupported'});
+  assert.throws(()=>{f.viewer.readOnly=false;},TypeError);f.viewer.dispose();
+  const unsupported=fixture({readOnly:true});await assert.rejects(unsupported.viewer.connect('app'),{code:'unsupported'});unsupported.viewer.dispose();
+});
+test('display configuration is capability-gated and restored on reconnect',async()=>{
+  const f=fixture({controls:true});await f.viewer.connect('app');
+  assert.deepEqual(f.viewer.configureDisplay({scale:false,resize:true}),{scale:false,resize:true});
+  assert.equal(f.viewer.flushResize(),true);
+  assert.throws(()=>f.viewer.configureDisplay({scale:1}),TypeError);
+  await f.viewer.reconnect();assert.deepEqual(f.display.settings,{scale:false,resize:true});
+  f.viewer.dispose();assert.equal(f.viewer.flushResize(),false);
+});
+test('runtime handle release cancels reconnect and never releases the shared handle itself',async()=>{
+  const f=fixture({reconnect:{maxAttempts:2,delays:[20]}});
+  const runtime=new EventTarget();Object.assign(runtime,{manager:f.viewer.manager,state:'tracking',instanceId:'app',sessionGeneration:3});
+  f.viewer.bindRuntime(runtime);await f.viewer.connect('app');
+  const old=f.display;old.dispatchEvent(new Event('disconnect'));
+  assert.equal(f.viewer.state,'reconnecting');
+  runtime.state='released';runtime.dispatchEvent(new Event('release'));
+  await new Promise(resolve=>setTimeout(resolve,35));
+  assert.equal(f.viewer.state,'disconnected');assert.equal(f.display,old);
+  await assert.rejects(f.viewer.connect('app'),{code:'stale-generation'});f.viewer.dispose();
+});
+test('real client retry fetches the current generation and reattaches once',async()=>{
+  const f=fixture({reconnect:{maxAttempts:2,delays:[1]}});await f.viewer.connect('app');
+  f.state.state='ready';const old=f.display;
+  const ready=new Promise(resolve=>f.viewer.addEventListener('reconnected',resolve,{once:true}));
+  old.dispatchEvent(new Event('disconnect'));await ready;
+  assert.equal(f.viewer.state,'ready');assert.notEqual(f.display,old);f.viewer.dispose();
 });

@@ -1,0 +1,371 @@
+{
+  "date": "2026-10-31",
+  "status": "automated-alpine-uat-passed-physical-uat-pending",
+  "issue": 34,
+  "pullRequest": 35,
+  "core": {
+    "version": "0.16.0-dev.3",
+    "commit": "49727b761da15a35881047d903d844191695bdcd",
+    "archiveSHA256": "41983903717a2b53e3054c77a9489ef00d9d82de7ad4b802acb3568fe72a8151",
+    "sourceCleanAtBuild": true,
+    "allFourEmbeddedVCSIdentitiesVerified": true,
+    "binaries": {
+      "remotexappd": {
+        "sha256": "b9ead1e11f48f11230dbbf14bc92a37e49e94e155c7adb318674a37aa5a22d63",
+        "interpreter": false,
+        "dynamicDependencies": []
+      },
+      "novnc-input": {
+        "sha256": "27410698f8560613fbcc55eaa75090b2794997b22512021e2cb1a6c961cd9fbb",
+        "interpreter": false,
+        "dynamicDependencies": []
+      },
+      "remotexapp-status": {
+        "sha256": "6b4496d96ddf0d9e6187a7f261102ca38fff69c6dc908ca9130f7fb2e8d98af2",
+        "interpreter": false,
+        "dynamicDependencies": []
+      },
+      "remotexapp-operator-helper": {
+        "sha256": "f8d0608fd2dc8cce56ee4379440124fb12846fd09fe0e8b5b5b0b2780487b470",
+        "interpreter": false,
+        "dynamicDependencies": []
+      }
+    }
+  },
+  "sdkVersion": "0.31.0-dev.3",
+  "component": {
+    "manifestSHA256": "406a4a9190e0f6ab7c6cd5e9cf92e318d239bbe6dc387d1ff31ee1aecdafd0bf",
+    "serverCommit": "17265facc40ab50db5740cdf0d12c61173edafc9",
+    "clientCommit": "475ecfa5356579ef222983c7ce4619a7576a3bce",
+    "binarySHA256": "c7305ac3fb415cb7555b4b9fd53d9f3f157f7cb0bf13a7a065a7ed9054c54773",
+    "clientSHA256": "84559ac2f7df3bb7c81b06c05fdac2376582f3a8e5e96d22913d697781825a3c",
+    "linkage": "native Alpine musl dynamic; all runtime dependencies resolved"
+  },
+  "apps": [
+    {
+      "id": "alpine-desktop",
+      "version": "1.0.0",
+      "contentSHA256": "10150bbf25ac1d136bbbd7189e13fb643dbf8ac50bba24dba96305be13b036d4",
+      "archiveSHA256": "0233470789d5720a01e3a213edbca35e418dabbab7dacd48a2dec6b7dc67ee51"
+    },
+    {
+      "id": "alpine-mousepad",
+      "version": "1.0.1",
+      "sourceCommit": "e7cdd6db87391a86685da95fab34a5c5e3987b3b",
+      "contentSHA256": "6c4325442f2ee7b14a401aea5115d255ced04f17b5ad7bd5ef3dacd2d2ec89ef",
+      "archiveSHA256": "b3ae0500328ccfe46baf2e81a772ab3f790f840c469997bf8649e6bd7fa311d7"
+    }
+  ],
+  "environment": {
+    "architecture": "amd64",
+    "buildAlpine": "3.24.2",
+    "targetAlpine": "3.24.3",
+    "go": "go1.27.3",
+    "targetLimits": {
+      "cpus": 1,
+      "memoryMiB": 1024
+    },
+    "lifecycle": "standalone cgroup v2, runit supervised by OpenRC",
+    "nonRootUID": 1000,
+    "buildToolchainInstalledOnTarget": false,
+    "automatedBrowser": "Chrome 149 dedicated headless Linux profile",
+    "publicBrowser": "Chrome 156 authenticated Linux profile",
+    "transport": "WSS"
+  },
+  "sourceChecks": {
+    "appliedComponentTests": 35,
+    "appliedComponentSkipped": 0,
+    "alpineStaticInputGoTests": "passed",
+    "coreCI": "https://github.com/woodegg/remotexapp/actions/runs/41227800467",
+    "appCI": "https://github.com/woodegg/remotexapp/actions/runs/41228358525",
+    "makeCheck": "passed"
+  },
+  "statsAssertions": {
+    "passed": 21,
+    "checks": [
+      "initial cards have no fabricated metrics",
+      "paired component supplies actual WSS counters",
+      "framebuffer resolution and uptime are available",
+      "payload totals match independent Chrome WebSocket events",
+      "real pointer, arrow and saved document readback pass",
+      "paint and input grow measured counters",
+      "rate and FPS use numeric live values",
+      "hidden panel stays connected independently",
+      "disconnect clears stale metrics while B stays ready",
+      "reconnect advances epoch",
+      "connection failure is explicit and isolated",
+      "explicit retry restores a healthy connection",
+      "hidden host pauses displayed samples",
+      "return to visible host resets rate baseline",
+      "close A releases only A and clears metrics",
+      "recreated iframe measures a fresh connection",
+      "missing Viewer cannot display a healthy status",
+      "no browser exceptions",
+      "no iframe input errors",
+      "sampling makes no HTTP requests",
+      "managed desktop is running with two independent stats snapshots"
+    ]
+  },
+  "textClipboardAssertions": [
+    {
+      "name": "local text -> native clipboard -> real App paste/save",
+      "status": "passed"
+    },
+    {
+      "name": "remote offer does not change local OS clipboard",
+      "status": "passed"
+    },
+    {
+      "name": "real App copy -> native offer -> explicit local readback",
+      "status": "passed"
+    },
+    {
+      "name": "empty local read preserves remote clipboard",
+      "status": "passed"
+    },
+    {
+      "name": "explicit clear prevents old text from pasting",
+      "status": "passed"
+    },
+    {
+      "name": "64 KiB UTF-8 boundary real server readback",
+      "status": "passed"
+    },
+    {
+      "name": "64 KiB real App copy -> local boundary readback",
+      "status": "passed"
+    },
+    {
+      "name": "64 KiB+1 rejected before remote mutation",
+      "status": "passed"
+    },
+    {
+      "name": "browser permission denied gives explicit failure",
+      "status": "passed"
+    },
+    {
+      "name": "offer received while disabled is not cached on re-enable",
+      "status": "passed"
+    },
+    {
+      "name": "four OS shortcut profiles suppress terminal Space, ordinary Ctrl+A/S preserved",
+      "status": "passed"
+    },
+    {
+      "name": "ten outside/inside focus cycles with synthetic composition and file readback",
+      "status": "passed"
+    },
+    {
+      "name": "two Viewers have independent consent and disconnect",
+      "status": "passed"
+    },
+    {
+      "name": "reconnect resets consent",
+      "status": "passed"
+    }
+  ],
+  "malformedWireAssertions": [
+    {
+      "name": "oversize header before payload",
+      "status": "passed"
+    },
+    {
+      "name": "invalid UTF-8",
+      "status": "passed"
+    },
+    {
+      "name": "embedded NUL",
+      "status": "passed"
+    },
+    {
+      "name": "HTML representation",
+      "status": "passed"
+    },
+    {
+      "name": "multiple representations",
+      "status": "passed"
+    }
+  ],
+  "resizeNegotiation": [
+    {
+      "name": "resize waits for delayed initial capabilities and Viewer paints",
+      "status": "passed"
+    },
+    {
+      "name": "negotiated lack of resize support still rejected",
+      "status": "passed"
+    },
+    {
+      "name": "omitted SetEncodings uses default capabilities on first update request",
+      "status": "passed"
+    }
+  ],
+  "pointerScenarios": [
+    {
+      "label": "standalone",
+      "remoteMotion": true,
+      "buttons": [
+        1,
+        2,
+        3,
+        8,
+        9
+      ],
+      "clickCommand": true,
+      "doubleClickSelection": true,
+      "dragSelection": true,
+      "arrowsAndEditingKeys": true,
+      "targetFocus": true,
+      "wheel": true,
+      "browserExceptions": 0
+    },
+    {
+      "label": "iframe-A",
+      "remoteMotion": true,
+      "buttons": [
+        1,
+        2,
+        3,
+        8,
+        9
+      ],
+      "clickCommand": true,
+      "doubleClickSelection": true,
+      "dragSelection": true,
+      "arrowsAndEditingKeys": true,
+      "targetFocus": true,
+      "wheel": true,
+      "browserExceptions": 0
+    },
+    {
+      "label": "iframe-B",
+      "remoteMotion": true,
+      "buttons": [
+        1,
+        2,
+        3,
+        8,
+        9
+      ],
+      "clickCommand": true,
+      "doubleClickSelection": true,
+      "dragSelection": true,
+      "arrowsAndEditingKeys": true,
+      "targetFocus": true,
+      "wheel": true,
+      "browserExceptions": 0
+    },
+    {
+      "label": "iframe-A-after-hide-show",
+      "remoteMotion": true,
+      "buttons": [
+        1,
+        2,
+        3,
+        8,
+        9
+      ],
+      "clickCommand": true,
+      "doubleClickSelection": true,
+      "dragSelection": true,
+      "arrowsAndEditingKeys": true,
+      "targetFocus": true,
+      "wheel": true,
+      "browserExceptions": 0
+    },
+    {
+      "label": "iframe-A-after-reconnect",
+      "remoteMotion": true,
+      "buttons": [
+        1,
+        2,
+        3,
+        8,
+        9
+      ],
+      "clickCommand": true,
+      "doubleClickSelection": true,
+      "dragSelection": true,
+      "arrowsAndEditingKeys": true,
+      "targetFocus": true,
+      "wheel": true,
+      "browserExceptions": 0
+    }
+  ],
+  "managedDesktopAssertions": {
+    "clickFocusTwoWindows": true,
+    "fourArrowKeys": true,
+    "savedFileReadback": true,
+    "unselectedWindowUnchanged": true,
+    "browserExceptions": 0
+  },
+  "lifecycle": {
+    "passed": 2,
+    "checks": [
+      "SIGKILL Manager restart adopts exact component PIDs, start identities, pins and session generation; account bus preserved",
+      "three actual App launch/stop cycles remove all owned cgroup leaves without affecting desktop or account bus"
+    ],
+    "coreCommit": "49727b761da15a35881047d903d844191695bdcd",
+    "componentDigest": "406a4a9190e0f6ab7c6cd5e9cf92e318d239bbe6dc387d1ff31ee1aecdafd0bf",
+    "nonRootUID": 1000,
+    "desktopGeneration": 1
+  },
+  "reboot": {
+    "containerRestarted": true,
+    "managerReadyAtBoot": true,
+    "accountBusReadyAtBoot": true,
+    "delegatedCgroupOwner": 1000,
+    "privateRuntimeDirectory": true,
+    "savedDocumentsPreserved": true,
+    "baselineXvfbRemovedFromBoot": true,
+    "desktopReconnect": "passed: two real WSS Viewers; session running; expected Core/component"
+  },
+  "artifactVerification": {
+    "coreFilesVerified": 65,
+    "allCoreFilesMatchManifest": true,
+    "componentFilesVerified": 35,
+    "allComponentFilesMatchManifest": true
+  },
+  "publicIngress": {
+    "authenticatedEditorTwoViewers": true,
+    "authenticatedDesktopTwoViewers": true,
+    "expectedCoreAndComponent": true,
+    "nonblankPaintInspected": true,
+    "browserExceptions": 0,
+    "anonymousRootAPIForgedIdentityWebSocketDenied": true,
+    "accessPolicyPreserved": true,
+    "oldHostnameRouteRemoved": true,
+    "unrelatedRoutesAndSharedConnectorsPreserved": true,
+    "recheckedAfterOldIngressStoppedAndTemporaryForwardRemoved": true
+  },
+  "harnessCorrections": [
+    {
+      "problem": "The desktop stats check could accept the previous editor while managed launch was still asynchronous.",
+      "correction": "Wait for both Viewer URLs to change, then require the new runtime session to be running."
+    },
+    {
+      "problem": "A fixed clipboard delay on a WAN could re-enable consent before the disabled-period offer arrived.",
+      "correction": "Observe actual clipboard event delivery while consent is off, then re-enable; no product consent change."
+    }
+  ],
+  "limitations": [
+    "Physical OS IME, native shortcut behavior and human UAT on the new target remain pending. CDP composition and synthetic key events do not establish physical OS behavior.",
+    "No UDP, speaker/microphone, rich clipboard, host-application integration or long-duration soak was qualified by this deployment.",
+    "Only the four Core executables are static. Kasm, shell, X11 applications, D-Bus and graphical libraries remain target dependencies.",
+    "The public fixture shares one authorized UAT identity; it is not multi-tenant production authentication.",
+    "This standalone Alpine run does not requalify systemd or prior-Core rollback; historical experiments retain their own scope.",
+    "The candidate remains a development UAT build, not a formal release or full D2 acceptance. Later evidence/test commits do not change the recorded Core/App artifact identities."
+  ],
+  "cleanup": {
+    "ownedBrowserStopped": true,
+    "ownedProbeEndedAtContainerRestart": true,
+    "temporaryTkPackagesRemoved": true,
+    "baselineXvfbStoppedAndBootDisabled": true,
+    "temporaryIncusProxyRemoved": true,
+    "localSSHForwardAndTLSBridgeStopped": true,
+    "dedicatedBuildContainerStopped": true,
+    "oldLocalIngressStopped": true,
+    "previousLocalManagerAndDataPreserved": true,
+    "newManagedDesktopRetainedForUAT": true
+  }
+}

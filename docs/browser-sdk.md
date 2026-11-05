@@ -52,6 +52,80 @@ source pins and rollback restrictions. No Kasm credentials are delivered to
 the host SDK. The existing Manager/trusted-ingress single-account authorization
 model applies; this adapter does not add a separate multi-tenant ACL system.
 
+## Experimental native audio (D3, SDK 0.31.0-dev.4)
+
+Use the separate `RemoteXAppAudio` export for speaker/microphone interests;
+`RemoteXAppNativeClient` continues to own only the Viewer. See the
+[native audio SDK example and contract](native-audio.md#sdk-use) for explicit
+per-session switches, cross-tab ownership and disposal. Audio interests do not
+attach Viewers or renew App keepalive. The owner accepted the current standalone
+audio UAT on 2026-11-01; see the [scoped acceptance record](../tests/native-audio/qualification-7926949.md#owner-uat-acceptance--2026-11-01).
+An embedding host must still verify its own workspace and login hooks.
+
+## Native connection statistics (development SDK 0.31.0-dev.3)
+
+`viewer.getStats()` returns a read-only snapshot with `schemaVersion:1`,
+`state`, `code`, `connectionEpoch`, monotonic `observedAt` (milliseconds),
+`transport` (`wss` or `ws-loopback`, null when disconnected), and
+`connectedForMs` since Viewer readiness. `available:true` additionally supplies
+`receivedBytes`, `sentBytes`, `bufferedBytes`, `renderedFrames`, `width`, `height`.
+Older components without `capabilities.statistics` return `available:false`;
+missing metrics must not be presented as zero. The method starts no timers or
+network requests and contains no application, clipboard or credential content.
+
+Bytes count WebSocket application payload, including protocol/input traffic,
+excluding TLS/IP framing and browser-managed Ping/Pong. Sent bytes mean accepted
+by the local socket, not remote acknowledgement; `bufferedBytes` is the browser
+socket's pending send queue. Frames count completed paint callbacks containing
+rectangles, not the server's configured frame rate or monitor refresh rate.
+Dimensions are the remote framebuffer, not the CSS-scaled canvas. The optional
+UDP component also reports separate UDP byte/packet/rectangle counters,
+`controlTransport`, `udpState` and actual screen `transport` (`webrtc-udp` only
+after UDP rectangles have been painted).
+
+Components declaring `capabilities.latency` support explicit
+`viewer.measureLatency()`. It starts at most one bounded sample per five seconds;
+`getStats()` remains passive. Read `getStats().latency.wss` and `.udp` for a
+`state` and, when `ready`, `rttMs` and `ageMs`. Other states are `waiting`,
+`pending`, `timeout`, `stale`, `inactive` and `unavailable`; missing data is not
+zero. A real zero RTT remains valid. Disconnect/reconnect clears old results.
+
+WebSocket RTT uses a correlated RFB Fence request/response over the existing
+socket to the native server, including the trusted edge and any Tunnel path.
+UDP RTT reads the selected ICE pair's `currentRoundTripTime` in seconds and
+converts it to milliseconds; it measures STUN connectivity/consent checks, as
+defined by [WebRTC Stats](https://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-currentroundtriptime).
+Repeated reads of the same response count do not refresh the sample. Values
+older than ten seconds are hidden as stale; pending probes time out after five
+seconds. Only numeric RTT/age and bounded states leave the adapter, never raw
+ICE candidates, SDP or addresses. These are distinct protocol RTT measurements,
+not ICMP ping or end-to-end input-to-paint latency.
+
+Hosts derive rates from counter deltas divided by elapsed `observedAt` time;
+reset baselines on epoch change, iframe reload or counter rollback. Pause sampling
+when the host document is hidden and reset the baseline on return. Disconnection
+clears displayed live metrics. The native kiosk exposes the same snapshot as
+`iframe.contentWindow.remoteXAppViewerStats()` to same-origin hosts only, without
+Viewer controls or additional cross-origin messaging. The UAT harness samples
+once per second with one shared timer, stops when no Viewers remain and tracks
+A/B independently. Hiding only A's panel leaves its connection active.
+The native Viewer page explicitly samples RTT every five seconds while visible;
+it pauses active sampling when its document is hidden and clears live displays
+on disconnect. SDK construction and passive stats reads do not start sampling.
+
+Components declaring `capabilities.udpLoss` expose `getStats().udpLoss`. Its
+`state` is `waiting`, `ready`, `stale`, `inactive` or `unavailable`. Ready data
+has `scope: 'display-blocks'`, `receivedBlocks`, `lostBlocks`, `expectedBlocks`,
+`ratio` (0–1), `ageMs`, `windowMs: 10000` and `settleMs: 2000`. The ratio is
+`lostBlocks / expectedBlocks`, with ten one-second buckets of finalized blocks.
+A sender block ID identifies an application message; it is not an IP packet
+or necessarily a rendered frame. Unique fragments complete a block. Missing
+IDs and incomplete blocks get two seconds for reordering before counting as
+lost. Leading/trailing wholly unseen loss is unobservable. Tracking overflow,
+large sequence gaps or inconsistent headers suppress the affected window.
+Idle data expires; a new UDP negotiation resets counts. Reading this snapshot
+does not generate probes, change decoder retention or renew App activity.
+
 ## Optional runtime keepalive (SDK 0.29)
 
 For a windowed host application, see the [host application migration guide](host-runtime-coordinator-migration.md)
@@ -594,3 +668,97 @@ expedited, but live/unknown processes remain protected. The built-in Console
 displays the same projection and uses this SDK method. Clients should refresh
 instance identity before reconnecting after automatic recovery; old transport
 channels and generation-qualified descriptors/offers are retired.
+
+### Native input/clipboard checkpoint (development SDK 0.31.0-dev.2)
+
+The [native automatic clipboard requirement](native-clipboard-integration.md)
+in Issue #50 adds experimental directional modes in development SDK
+0.31.0-dev.5. Its exact-artifact qualification and human UAT remain pending.
+The explicit methods below remain available with default-off consent.
+
+Issue #32 adds `configureKeyboard({profile, mode, bindings})`, `keyboardPolicy`,
+`focus()` and `blur()`. Profiles: `windows`, `mac`, `gnome`, `fcitx`, `unknown`,
+`custom`. Detection uses the browser OS; Linux starts unknown. Policy changes
+while keys/composition/buttons are active return `{applied:false}` and take
+effect at neutral state. Observe `keyboardpolicychange`. Hosts must not depend
+on Kasm internals.
+
+With the text component and Manager `-native-clipboard`, capabilities advertise
+`clipboard:true` and `clipboardMaxBytes:65536`. Use `enableClipboard(true)` from
+a consent control, then invoke these methods directly from focused user actions:
+
+- `copyClipboardToRemote()` reads plain text. Empty returns `empty-noop`;
+  otherwise `submitted`. It does not paste or claim App acknowledgement.
+- `copyClipboardToLocal()` writes the latest remote text offer received after
+  enabling. Copy text in the remote App first. Result: `copied-to-local`.
+- `clearRemoteClipboard()` submits empty text without reading locally.
+
+`clipboardchange` contains only enabled/available/byte-count metadata. There
+is no automatic browser clipboard access. Disabling/disconnecting/replacing
+the Viewer invalidates pending reads and clears offers. Reconnect requires
+new consent. An already-started browser write may finish despite retirement;
+`clipboard-uncertain` reports this boundary. Other codes distinguish
+`clipboard-denied`, `-gesture`, `-focus`, `-busy`, `-size`, `-format`, `-empty`,
+`-cancelled` and `-timeout`. Never replay an uncertain action automatically.
+
+Rich formats/files, read-only role authorization and programmatic text remain
+unsupported. host application's legacy prompt/offer and text-ACK consumers must adapt to
+these capabilities/results; the native client is not the legacy client with a
+new renderer. Real host application window/business validation remains a separate gate.
+
+For concurrent native Viewers, ID-based initial connect may retry one prepare
+conflict if another Viewer just activated the same stopped session at the next
+generation with unchanged component/Core/clipboard policy. Explicit descriptor
+connections and upgrades/recovery remain fenced; no input is replayed.
+
+### Native automatic text clipboard (development SDK 0.31.0-dev.5)
+
+Use a component advertising `clipboardAutomatic`; older paired components
+remain manual-only. From an explicit user action, call
+`await viewer.configureClipboard({toRemote:'auto', toLocal:'auto'})`, then
+`await viewer.requestClipboardPermission()` if the state requires permission.
+Both directions independently accept `off`, `manual` and `auto`. Listen to
+`clipboardstatechange` or call `getClipboardState()` for requested/effective
+modes, permission states, active target and content-free operation status.
+Permission denial or unsupported observation falls back to manual operation.
+
+The host calls `focus()` for its selected Viewer and `blur()` when hiding or
+switching away. Container focus events also select that Viewer. No automatic
+browser access occurs without a focused visible target. Activation acquires a
+fresh baseline; a normal paste shortcut reads/submits local text before native
+paste keys are released. An empty read suppresses that paste without clearing
+the remote clipboard. Remote notifications never activate a Viewer. Conflicts
+require an explicit existing manual transfer action. Submission is not an App
+paste acknowledgment. Automatic mode uses the reliable native clipboard path
+regardless of display WSS/UDP; audio switches do not select clipboard targets.
+
+Call `resetClipboard()` on an authenticated scope change and disconnect the
+Viewer on logout or runtime replacement. Reconnect resets consent. Disposal
+removes observers and timers. Retired writes can report `clipboard-uncertain`;
+do not automatically replay them. Clipboard payloads are not present in state
+snapshots, counters or UAT exports. Plain UTF-8 up to 64 KiB is the only format;
+HTML, images and files are not enabled. See the
+[requirements and qualification boundaries](native-clipboard-integration.md).
+
+### Native rich clipboard (development SDK 0.31.0-dev.6)
+
+Issue #55 / PR #56 extends new `rich-v1` runtime descriptors and immutable
+`kasm-wss-clipboard-v2` / `kasm-udp-clipboard-v2` components to `text/plain`,
+`text/html` and `image/png`, with a 2 MiB aggregate content limit per clipboard
+transaction. `getClipboardState().formats` reports the actual browser/component
+intersection; `maxBytes` reports the aggregate limit. The same directional
+configuration and manual methods apply. Old `text` runtime pins keep their
+64 KiB text contract. Missing rich browser APIs expose text-only manual fallback.
+Files, folders, URI-list selections, RTF and custom MIME types are excluded.
+
+HTML remains data and is never rendered by the SDK. A remote-to-local browser
+write may sanitize HTML or re-encode PNG; synchronization reads back the actual
+browser representation to prevent a feedback loop. A successful native send
+still does not prove the remote application pasted the content. Consent, active
+Viewer selection, cross-tab serialization, conflict handling, no inactive replay
+and retirement fences from the text integration remain in force.
+
+Both transports use the same reliable native clipboard control path. Rich data
+does not change UDP ports or audio routing. This is development source; exact
+artifact qualification and consolidated human UAT remain pending. See the
+[rich clipboard contract](native-rich-clipboard.md).

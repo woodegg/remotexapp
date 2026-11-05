@@ -4606,3 +4606,680 @@ The completed bounded D1 automation is recorded in
 real Apps, both lifecycle backends, actual container reboot, generation
 retirement, prior-Core rollback and owned cleanup. PR #31 / Issue #30 retain
 the review and merge boundary; D2–D5 qualification is not implied.
+
+## 2026-10-28 — Native input and explicit text clipboard checkpoint
+
+The owner requested continuing until human testing is required after D1 merge.
+Issue #32 selects keyboard policy and bounded text/plain clipboard for the next
+D2 UAT. Remaining rich formats, programmatic text and actual host application workflows
+retain their separate qualification gates; this is not full D2 acceptance.
+
+Browser-OS routing remains inside the pinned component. SDK configuration,
+focus and blur are supported adapter methods. Linux starts unknown and requires
+an explicit profile/custom binding. Physical OS IME/shortcut acceptance cannot
+be inferred from synthetic CDP events or historical PoC UAT.
+
+The separately pinned `kasm-wss-text-v1` component supports text clipboard.
+Manager `-native-clipboard` defaults off; enabled policy is snapshotted with the
+runtime and included in its identity. Old components cannot adopt text policy;
+old schema-4 records with no policy keep clipboard off. The server validates
+one text/plain representation, UTF-8 and 64 KiB before allocation/mutation,
+and filters outgoing formats/sizes. The browser parser is transactional and
+bounded. Malformed wire data closes that Viewer. This corrects the upstream
+size check, which happened only after allocating the payload.
+
+Per-Viewer browser consent defaults off on reconnect. Every OS clipboard action
+requires a focused user gesture. No focus polling, background overwrite or
+legacy clipboard bridge runs. Empty reads are no-op; Clear is explicit. Both
+Viewer epoch and a separate consent revision fence pending reads, including
+disable/re-enable in one generation. An already-started browser write cannot be
+cancelled; retirement/timeout reports uncertainty and never replays it. Native
+submission is not an App readback acknowledgement. Status contains no text.
+
+HTML/PNG/RTF/files, passive synchronization, read-only role grants and
+programmatic text with target/ack semantics remain unsupported. The existing
+selected-UID/trusted-ingress model applies; browser consent is not server
+authorization. Real host application business acceptance remains distinct from a host harness.
+
+Live D2 inspection found upstream INFO logging of dynamically mapped Unicode
+keysyms. Patch 0009 removes that content-bearing success log and makes ordinary
+mapping errors content-free; explicit debug diagnostics remain a private,
+authorized activity. The new component has its own digest.
+
+Simultaneous Viewers selecting a stopped on-attach session exposed a benign
+prepare conflict after the first Viewer advanced its generation. ID-based
+initial connect may re-read and retry exactly once only when the same runtime
+is now running at generation +1, with unchanged provider, component, clipboard
+policy and Core digest. Explicit descriptors, already-running recovery, changed
+pins/policy and second conflicts remain rejected. No user input or pending
+clipboard action is replayed. This narrows initial connection behavior without
+weakening the Manager's generation checks.
+
+## 2026-10-31 — Native pointer initialization and input evidence correction
+
+Physical UAT reported unusable pointer control and arrow keys. A separate
+synthetic document reproduced browser exceptions on pointer events: the native
+adapter omitted the mouse-button mapping normally installed by Kasm's full UI.
+The adapter must initialize DOM-to-X11 left/middle/right/back/forward mappings
+before input starts. This is owned by the pinned component, without importing
+the full upstream UI or changing native input ownership.
+
+Earlier click-then-type checks observed browser focus and saved text, but did
+not prove remote pointer delivery. Those historical assertions are insufficient
+for pointer acceptance. The new gate requires remote coordinates/button events,
+actual caret or desktop focus, navigation-key readback, and no browser exceptions
+in standalone and embedded Viewers. Arrow-key transport passed an isolated
+editor reproduction; desktop focus must also be validated after pointer repair.
+The original UAT candidate remains unaccepted and is superseded by a new
+component digest after verification. Existing populated sessions keep their
+original pins until a controlled replacement; input is never replayed.
+
+The new live pointer matrix also exposed a separate multi-Viewer paint failure:
+captured native payloads contained truncated JPEGs before browser decoding. The
+upstream shared encoding cache had a comparator that violated strict weak
+ordering and replacement kept an old key's length while changing its allocation.
+Patch 0015-server uses lexicographic rectangle/codec keys and atomically replaces
+the stored length/allocation, freeing the previous allocation. Clearing and
+destruction own the remaining allocations. Applied-source tests reject the old
+ordering and stale-length behavior and check permutations, growing/shrinking
+replacement and ownership with sanitizers. This refines KNA-001's actual-paint
+gate; a successful socket or a single painted Viewer is insufficient. The fix
+does not enable new codecs, UDP or automatic input replay.
+
+The same live matrix exposed a separate initial-connection race: one Viewer
+resized while a joining Viewer had received ServerInit but had not sent
+SetEncodings. The server interpreted unknown resize capability as a refusal.
+Patch 0016-server retains the ServerInit dimensions until the first capability
+message, then publishes the current size using the negotiated capability.
+A first framebuffer request also completes this window for clients that omit
+SetEncodings and use RFB defaults. Actual lack of resize support remains a
+refusal; no user input is queued or replayed. A real browser test delays the
+capability packet, resizes through another Viewer, and checks positive and
+unsupported/omitted-capability outcomes. This extends KNA-001's connection gate.
+
+
+## 2026-10-31 — Read-only native Viewer connection statistics
+
+KNA-005 now includes a local snapshot contract for actual connection evidence.
+The pinned component owns cumulative WebSocket payload counters and existing
+paint callbacks; the SDK whitelists numeric counters and adds connection state,
+actual transport and an epoch. No payload contents, browser clipboard access,
+server polling or perpetual sampling loop are introduced. Unsupported older
+components remain connectable and explicitly report unavailable metrics.
+
+The same-origin native kiosk offers a read-only snapshot function for embedding
+hosts. The UAT page derives rates with one visible-page timer and independent
+Viewer baselines. Disconnect, reload, epoch change and counter rollback invalidate
+old rates. A hidden panel is distinct from a disconnected Viewer. This adds no
+UDP behavior or server-wide traffic claims; source bytes and actual painted
+updates are deliberately distinct from wire bandwidth and configured FPS.
+
+## 2026-10-31 — Separate static Core portability from native graphical dependencies
+
+Issue [#34](https://github.com/woodegg/remotexapp/issues/34) extends RUN-007 with
+an experimental Alpine candidate. Static Core binaries and standalone process
+ownership are separate claims: verify ELF dependencies for the former and
+actual cgroup placement, adoption and cleanup for the latter. Keep the existing
+non-root UID, immutable component/App pins and lifecycle invariants unchanged.
+Kasm is rebuilt for musl as a separate component; system graphical libraries
+remain explicit target dependencies. The default Ubuntu build stays intact.
+
+Use distinct Openbox test App Packages and an edge-restricted disposable UAT
+proxy. This does not replace shipped App definitions or add production ingress
+authentication. A tunnel move preserves the existing Access policy and changes
+only the requested hostname; shared connectors and unrelated apps are retained.
+See the [Alpine experiment](../tests/kasm-native/ALPINE.md) for build boundaries
+and qualification gates. No deployment or release acceptance follows from
+this design entry alone.
+
+
+## 2026-10-31 — Select bounded native IPv4 UDP UAT
+
+The owner approved implementation and live tests of [Issue #36](https://github.com/woodegg/remotexapp/issues/36).
+The [bounded contract](native-udp-uat.md) supplements the earlier D1 WSS boundary:
+keep WSS complete, add deployment-owned non-NAT endpoint slots, a separately
+pinned UDP component, trusted pre-container filtering, and one-use Viewer grants
+with 90-second expiry and 20-second authenticated renewals. Retire both channels
+on control loss or generation change. Preserve old WSS artifacts and App data.
+
+For slot reuse, the authenticated negotiation and old component termination are
+the authority boundary: residual host proxy tuple routing grants no access.
+Verify late old credentials/datagrams cannot reach a new display identity and
+retain reservations when termination/ownership is unknown. This refines the
+architecture's proxy-mapping cleanup prerequisite for static infrastructure proxies
+without giving Manager a privileged host-control API. It requires explicit live
+reuse/replay evidence; no production or unrestricted-public-UDP acceptance follows.
+
+
+## 2026-10-31 — Keep idle UAT control channels alive
+
+Live testing of Issue #36 observed idle WebSocket disconnects while App processes
+remained healthy. Authenticated HTTP grant renewals do not exercise that socket.
+Add a separate trusted-edge Ping/Pong owner (20-second ping, 60-second pong
+deadline), retired with the bridge. Browser-native replies remain independent
+of JavaScript background scheduling. Do not forward these control frames to
+the App or count them as user activity. Record the initial disconnects and the
+subsequent idle/fault observations separately; this mitigation does not assert
+a proven root cause for every upstream network closure.
+
+
+## 2026-10-31 — Preserve native stream framing after edge validation
+
+Issue #36 live clipboard qualification exposed the pinned native decoder's
+continuation-frame incompatibility. Complete-message validation remains mandatory
+before forwarding any input message. The trusted edge now sends the validated
+stream in independent binary messages of at most 16 KiB, with a matching upstream
+write buffer so the WebSocket library does not emit continuation frames. This
+also stays below the native decoder's 65535-byte frame limit. A raw-frame bridge
+regression verifies the complete 64 KiB clipboard and subsequent control bytes,
+rather than relying on a WebSocket receiver that silently rejoins fragments.
+
+
+## 2026-10-31 — Add explicit per-Viewer latency diagnostics
+
+The owner requested UDP and WebSocket ping on UAT (Issue #36). Extend the
+existing passive statistics contract with a separate explicit sampling method.
+WebSocket probes use correlated native RFB Fence echo over the current connection
+to Kasm; UDP samples use the current selected ICE pair's STUN RTT. Do not label
+these ICMP ping or input-to-paint latency, and do not substitute HTTP timing.
+
+Allow at most one sample per five seconds and one outstanding request per
+mechanism. Five-second timeouts, ten-second freshness, peer identity and Viewer
+epoch retirement prevent hung or delayed work from publishing misleading values.
+Known late Fence echoes are ignored without disconnecting a healthy Viewer;
+unrelated Fence responses retain the native parser's rejection behavior.
+Expose numeric RTT/age and bounded status only. The UAT/native page initiates
+sampling only while visible; SDK construction and getStats remain passive.
+Native Fence processing does not update user-activity timestamps or App leases.
+The pinned server binary can be reused, but the changed client belongs in a new
+immutable component manifest; never edit an installed component in place.
+
+## 2026-11-01 — Observe UDP display-block loss without changing the transport
+
+KNA-005 gains a passive per-Viewer delivery-loss estimate using the existing
+32-bit block ID and fragment index/count. This extends the latency diagnostics
+accepted on 2026-10-31; it does not change keyboard/audio routing or native wire
+format. A block is one sender UDP application message, not an IP packet or frame.
+
+Count a block received when all unique fragments arrive. A sequence gap or
+incomplete block becomes lost after a two-second reorder allowance; later data
+does not reverse that decision. Handle modular ID wrap and ignore duplicates.
+Project counts over ten one-second buckets; an idle stream becomes stale after
+ten seconds. Initial leading loss and wholly unseen trailing loss are unknown.
+Large sequence jumps, inconsistent metadata or observation capacity overflow
+make the affected ten-second window unavailable. Never infer a zero or 100%
+network-packet loss rate from the absence of samples.
+
+Keep at most 512 incomplete/absent blocks and 8192 fragment bits per block.
+Diagnostics retain no payload, send no traffic and do not alter reassembly,
+paint or fallback policy. Snapshot reads only project state, including expired
+pending blocks; they create no timers and do not renew activity. A new UDP
+assembler/negotiation or explicit close resets the observation. SDK output is
+capability-gated and validates its content-free counters. UAT labels the unit
+and denominator explicitly instead of presenting this as IP packet loss.
+
+## 2026-11-01 — Architecture-specific native build qualification
+
+The owner requested the same development UAT on an ARM64 host. Reuse the
+pinned runtime sources and patches, but build distinct native artifacts and
+verify their ELF machine type. Core/component provenance records the target
+architecture; deployment receipts retain independent artifact hashes.
+
+A fresh Alpine ARM64 build reached the native ownership tests, then failed to
+link GCC's unavailable ASan/UBSan libraries. `KASM_TEST_CXX` now selects only the
+native test compiler, allowing Clang/compiler-rt while preserving the sanitizer
+and leak-detection flags. Record that compiler separately from the server's
+compiler. This extends KNA-010 qualification and the [Alpine build procedure](../tests/kasm-native/ALPINE.md);
+it does not change runtime transport, input or lifecycle behavior. An ARM64
+build alone does not imply target UAT or production acceptance.
+
+## 2026-11-01 — UAT workbench presentation and asset rollout
+
+The owner requested a more usable test surface with diagnostics visible during
+App interaction. The viewport now reserves space for the remote surface and a
+separately scrollable stats rail. Focus A/B and comparison modes retain the
+existing iframe nodes and connection epochs. Fullscreen includes the rail;
+local text/clipboard tools expand inside the workbench. No global keyboard
+shortcuts or new remote-input handlers are introduced. Counters, RTT and block
+loss retain the existing measurement and stale/unavailable semantics.
+
+Embedded Viewer styling hides duplicate header statistics only inside this UAT
+page; the standalone Viewer and pinned SDK/component remain unchanged. This
+presentation-only update is deployed as a separately hashed edge asset bundle,
+with the old SDK/component files and executable copied without modification.
+A second loopback edge listener permits the protected route to move while the
+preceding listener retains existing WebSocket clients. Runtime/App pins and
+saved documents are preserved; the prior listener/config remains available
+for rollback and later retirement after its clients disconnect.
+
+Observed cutover limitation: the US editor lost its last Viewers just after
+the tunnel route update and stopped after its one-minute vacant timeout.
+Retaining the old listener preserves rollback, but does not guarantee tunnel
+connection continuity. The [workbench record](../tests/kasm-native/UAT-WORKBENCH.md)
+retains this result; future cutovers must account for vacant-session cleanup.
+
+## 2026-11-01 — Return to D3 audio integration after bounded native UAT
+
+The owner abandoned the separate multi-container UDP Host Agent proposal
+(#42/#43/#44), then asked for the next step in the original plan including audio.
+[Issue #45](https://github.com/woodegg/remotexapp/issues/45) tracks D3 preparation
+and implementation acceptance. The [integration plan](native-audio-integration.md)
+records the actual merged D1/D2/Alpine/bounded-D4 status and preserves their
+artifact-specific limits. It does not revive the abandoned host automation or
+make it an audio dependency.
+
+The frozen audio PoC demonstrates bounded mux/SharedWorker ownership and known
+waveform routing across two UID/Pulse domains. Its fixed backend registry and
+coordinator namespace do not establish product session ACLs. Choose same-UID
+domain/lifecycle verification as the first implementation checkpoint, followed
+by Manager-owned registry and generation-qualified authorization, shared SDK
+audio interests, then combined product/browser/device and embedding-host qualification.
+Routing isolation within one UID is not a malicious-tenant boundary.
+
+Retain the accepted R3 connection rule: first enabled speaker/mic connects,
+all off releases, enabled silence stays connected. Domain readiness before App
+launch is a separate lifecycle/cost decision to measure. Do not infer finalized
+R4/R5 protocol, codec, lease or isolation choices from historical PoC UAT.
+This entry and preparation PR change no runtime capability, deployed service or
+release artifact; native audio remains unsupported until implemented and tested.
+
+
+## 2026-11-01 — Audio UAT preparation and local probe ownership
+
+Issue #47 extends the existing native workbench for AUD-002 preparation. A and
+B retain separate target descriptors so B can attach to the configured test
+desktop, or return to A, without recreating A. Choosing the desktop when A is
+already that runtime must report the same runtime. Target selection is serialized and API waits are bounded to 15 seconds. An
+explicit Viewer close/recreate fences late selection responses; it does not
+claim to stop an App already started by the Manager. Manager-observed identity and
+Viewer connection state are reported separately from future audio-domain identity.
+
+The local speaker/mic probes require explicit clicks. They run one at a time,
+never record/upload audio, mute local microphone monitoring, bound permission
+waiting to 15 seconds and capture to 30 seconds, and stop on panel close, page
+hide/retirement or device loss. Late permission/resume callbacks cannot resurrect
+capture; acquired tracks and AudioContexts are released. This short local probe
+policy does not supersede the future persistent audio-interest/workspace model.
+
+The current native SDK still advertises audio:false. No remote audio switches,
+connection counts or successful remote test results are synthesized. Exported
+JSON separates local manual observations and measured local levels from remote
+cases blocked on integration. The single HTML artifact remains compatible with
+the existing UAT ingress/edge; no extra asset routes or runtime changes are needed.
+See the [workbench procedure](../tests/kasm-native/UAT-WORKBENCH.md).
+
+
+## 2026-11-01 — D3 private audio domains and scoped PCM transport
+
+Issue #45 / PR #49 implement AUD-002 after the owner requested complete audio
+integration followed by one end-to-end UAT. This supersedes the preceding
+preparation entry's product-unavailable state only as each qualified artifact
+is delivered; it does not reinterpret earlier local checks as remote acceptance.
+
+An opt-in native runtime pins the audio protocol and durable schema 6. Its Core
+session supervisor prepares a private Pulse server before App launch and passes
+explicit PULSE configuration/runtime/state/cookie paths without changing HOME or
+the App's account bus. The domain loads only virtual speaker and microphone
+modules. Empty App audio preparation does not create a browser connection.
+Same-UID routing is not a malicious-tenant isolation boundary. Audio-only faults
+replace the domain ID at the same App endpoint with bounded retries; input and
+the App remain alive. Old runtime generations and audio domain IDs are fenced.
+
+The first protocol is PCM16LE, 48 kHz, 20 ms frames: stereo speaker, mono mic.
+Go stays statically buildable; Pulse tools remain explicit distribution runtime
+dependencies. No codec is imported. Non-silent payload costs 1.536 Mbit/s per
+speaker and 0.768 Mbit/s per shared mic, before framing/TLS. Exact digital silence
+uses a short marker while the enabled channel remains connected. Queues and
+stream counts are bounded; actual WAN delay/quality require measurement.
+
+A separate authenticated cookie epoch scopes one audio WSS. One-use connection
+and route grants bind authenticated principal, scope, runtime generation and
+private domain identity. HTTP leases expire after 30 seconds without renewal;
+audio traffic is not authorization renewal or App keepalive. SharedWorker
+coordinates per-session switches/references, one playback owner and one explicit
+microphone capture. Server arbitration permits one writer per target and visible
+explicit takeover. Owner loss or failure never silently reacquires a microphone.
+The trusted selected-UID service authorization model remains unchanged.
+
+Full protocol, failure, compatibility and verification limits are maintained in
+[native audio](native-audio.md). Historical PoC results are research inputs;
+product, target architecture, resource and physical-device checks remain distinct.
+
+
+### 2026-11-01 — Audio failure retirement and explicit controller recovery
+
+D3 fault qualification extends the [native audio contract](native-audio.md):
+worker liveness is independent of serialized permission/network operations.
+A ten-second active-page watchdog releases capture and retires an unresponsive
+controller, with a grace period after page suspension. Reconnect refreshes the
+server context before requesting a grant; a service/account epoch change retires
+old references. The UAT offers explicit controller recreation with audio off.
+These safeguards implement the accepted no-silent-microphone-reacquisition rule;
+they do not renew App lifecycle leases or change display UDP ownership.
+
+
+### 2026-11-01 — Reconcile audio after final server-side retirement
+
+Supersedes the incomplete cleanup trigger in the initial [native audio
+contract](native-audio.md), without changing its first/last-demand invariant
+(AUD-002). Full ARM64 lifecycle testing found that normal App retirement stopped
+all readers, writers and microphone capture but retained an empty WSS: the
+coordinator tick only synchronized when a desired route remained. It now also
+reconciles an existing connection, releasing it when the server has retired the
+last enabled route. A two-App regression checks that retiring the first App
+preserves the other route and retiring the last closes the channel.
+
+
+### 2026-11-01 — Match shared playback credits to bounded speaker queues
+
+Supersedes the fixed aggregate playback allowance in the initial
+[native audio contract](native-audio.md), retaining its bounded-memory invariant
+(AUD-002). Two enabled speakers previously shared eight credits even though each
+worklet stream has an eight-frame queue. [P17](../tests/performance/native-audio-burst/README.md)
+reproduces dropped ordinary bursts and selects eight credits per enabled speaker,
+with a 64-frame maximum and a shrinking allowance when routes turn off. Packet
+format, per-stream worklet queues, microphone credits and capture privacy remain
+unchanged. Partial WAN observations that exposed the issue do not qualify the
+repaired candidate; it requires its own artifact-bound resource run.
+
+
+### 2026-11-01 — Isolate unavailable audio routes from the shared channel
+
+The [native audio contract](native-audio.md) requires failure isolation between
+cooperative App domains (AUD-002). A deterministic regression found that a
+single route's HTTP 409 during domain recovery reached the shared connection's
+error handler, closing healthy routes and their microphone capture. Handle that
+specific unavailable-domain response within the affected route, revoke its old
+subscription, turn off its microphone target, and retry requested speaker
+recovery. Authentication errors and shared-channel failures still fence every
+route. Real-browser tests hold one domain unavailable while verifying the other
+domain's actual speaker and microphone readback over the unchanged connection.
+
+
+## 2026-11-01 — D3 standalone automated qualification, physical UAT pending
+
+[Candidate 7926949](../tests/native-audio/qualification-7926949.md) binds the
+AMD64/ARM64 builds, three dedicated standalone UATs, real waveform and App
+lifecycle/fault checks, natural thirty-minute resource observation and cleanup.
+Earlier aborted observations are retained as development findings, not passes.
+Local queue/underrun counters remain separate from packet loss and acoustic
+acceptance. The owner receives one complete physical end-to-end UAT after these
+automated gates. This does not change the accepted provider default, publish a
+release, qualify a merged commit or accept the actual embedding host adapter.
+
+
+## 2026-11-01 — Owner accepts the standalone audio UAT
+
+The owner reported the current audio UAT passed and requested continuing PR
+#49. [The candidate record](../tests/native-audio/qualification-7926949.md#owner-uat-acceptance--2026-11-01)
+records that human decision for source `7926949`, separately from the existing
+waveform/resource evidence. No runtime code, protocol, dependency or deployed
+artifact changes in this acceptance update. No per-case export or final
+device/browser/region matrix was supplied; those details are not inferred.
+
+This supersedes the preceding qualification entry's pending human-UAT status
+only for the current standalone integration. It does not establish an
+intermittent-sound root cause, broaden measured resource/acoustic guarantees,
+accept an actual embedding host or approve a release. The next gates are
+review/merge and qualification of the exact post-merge candidate. Native
+automatic clipboard requirements in Issue #50 / PR #51 remain independent.
+
+
+## 2026-11-01 — Refresh D3 delivery status after owner UAT
+
+The owner reported the current standalone audio UAT passed and requested
+continuing PR #49. Refresh the preparation document and release-plan status
+to distinguish the implemented `7926949` candidate from the original research
+checkpoints. Keep those historical steps and their evidence limits; do not
+repeat the original unsupported-product description as current candidate state.
+The design/workbench/implementation chain is #46, #48, #49. Review/merge, exact
+post-merge qualification, publication and actual embedding-host acceptance remain
+separate. This documentation-only update changes no deployed artifacts.
+
+## 2026-11-01 — Bound the full repeated-test package budget (#52)
+
+The Nightly `soak-check` used Go's implicit ten-minute timeout for all twenty
+repetitions of each package. Existing lifecycle fixtures deliberately wait for
+readiness failures and descendant-preservation windows; a passing supervisor
+package run at `9c97e80` took 48.389 seconds. The observed ten-minute package
+alarm therefore does not establish a deadlock. Supersede the implicit budget
+with an explicit `SOAK_TIMEOUT` default of twenty minutes, while preserving
+production timeouts, all test assertions, twenty repetitions, bounded fuzzing
+and the workflow's 35-minute limit. The [test process](development-quality-process.md#repeated-test-time-budget)
+records interpretation and override rules. Completion of the complete gate,
+including the separate clipboard finding, remains required by
+[Issue #52](https://github.com/woodegg/remotexapp/issues/52).
+
+## 2026-11-01 — Qualify clipboard clearing by current ownership (#52)
+
+The original Clipman clear regression assumed that a PNG-only offer stayed
+owned by the gateway. Hosted Ubuntu 26.04 with Clipman 1.6.6/libxfce4ui 4.20.2
+reproduced eighteen failures out of twenty attempts; each failure already had
+an external owner before `Clear`. The upstream image-persistence path in
+[`owner_change`](https://gitlab.xfce.org/xfce/libxfce4ui/-/blob/libxfce4ui-4.20.2/libxfce4ui/xfce-clipboard-manager.c)
+copies image-only representations and installs a GTK selection owner.
+
+Supersede the unconditional stale-replay guarantee in CLP-016's original
+wording with an ownership-qualified contract: install an empty tombstone when
+the gateway still owns the selection; preserve an external owner even when
+its bytes match the former gateway selection. Never infer deletion authority
+from content equality or purge external history. This clarifies the existing
+runtime behavior, which is unchanged.
+
+Use a rich PNG-plus-text selection to verify retained-ownership expiry,
+explicit clear, empty tombstone and text/image readback after gateway exit
+with a real Clipman. Separately verify deterministic takeover by an independent
+owner for both identical PNG content and new application text, including
+repeated clear and gateway exit. Keep all readback assertions; do not make the
+previous failure pass by accepting stale data in the retained-owner case.
+[Issue #52](https://github.com/woodegg/remotexapp/issues/52) and its PR retain
+exact source, environment, reproduction and final gate evidence.
+
+## 2026-11-01 — Register native automatic clipboard as a separate follow-on
+
+The owner requested adding Kasm native bidirectional automatic clipboard to
+RemoteXApp requirements. [Issue #50](https://github.com/woodegg/remotexapp/issues/50)
+and [KNC-001–008](native-clipboard-integration.md) separate this feature from the
+manual D2 checkpoint in Issue #32 and native audio in Issue #45 / PR #49.
+This entry selects requirements work; no runtime behavior or acceptance changes.
+
+The upstream full client offers seamless clipboard, but the embedded component
+disables it and the SDK requires explicit browser actions. Integration must
+reuse the native data path with supported consent, direction, active-target and
+lifecycle policy. It must not restore the legacy XFixes/offer bridge. Multiple
+Viewers/tabs require independent consent, no background local overwrite and no
+cross-session fan-out; audio ownership does not select the clipboard target.
+
+This is a prospective extension of the 2026-10-28 per-transfer-gesture rule for
+explicitly opted-in automatic mode after implementation and qualification.
+The original manual checkpoint and its evidence remain intact. Default-off,
+64 KiB plain-text bounds, explicit clear versus empty no-op, generation/consent
+fencing and uncertain-write handling remain. Rich formats and files require
+separate qualification. The current SDK documentation remains manual-only.
+
+A documentation-only PR records the requirement with `Refs #50`; it does not
+close implementation acceptance. A later implementation PR owns the native
+adapter/SDK, workbench and tests. Complete automation before consolidated human
+UAT, and distinguish actual embedding-host acceptance, immutable candidate
+qualification, publication and deployment. No App restart, UDP provisioning or
+audio deployment is required to register this requirement.
+
+## 2026-11-02 — Proceed with native automatic clipboard implementation
+
+The owner approved continuing the #50/#51 sequence after audio integration
+and the #52 reliability fixes were merged. Review and merge the requirements
+against current main, then use a separate implementation PR for KNC-001–008,
+including the existing UAT workbench. Complete automated qualification before
+one consolidated physical end-to-end UAT. This supersedes only the earlier
+requirements-only work selection; it does not imply feature acceptance,
+publication or actual embedding-host qualification. Preserve the independent
+consent, active-target, native-transport and lifecycle boundaries in
+[native clipboard integration](native-clipboard-integration.md).
+
+## 2026-11-02 — Select native clipboard consent and input ordering
+
+The #50 implementation uses independent off/manual/auto directions, public
+requested/effective state, explicit permission requests and one active Viewer.
+Automatic browser writes check fresh local state for conflicts; activation
+establishes a baseline without replaying inactive remote offers. A bounded native
+paste gate orders a fresh local read/submission before the paste keys and cancels
+stale input on lifecycle retirement. The native text wire remains unchanged;
+upstream browser access is delegated to the SDK policy instead of running two
+clipboard systems. See the [implementation contract](native-clipboard-integration.md).
+This records the implementation decision, not qualification or acceptance.
+
+## 2026-11-02 — Preserve remote selection during native clipboard paste
+
+Live #50 browser testing found that a fresh clipboard submission immediately
+before paste replaced X11 PRIMARY ownership: Kasm defaults `SetPrimary` to
+true. The remote editor lost its selected range, so paste inserted text instead
+of replacing the selection. Native launch now explicitly disables SetPrimary
+and SendPrimary; only CLIPBOARD crosses the browser boundary. Keep PRIMARY
+and remote middle-click selection local. The regression must verify selected
+text replacement by reading the saved remote document, not just clipboard
+submission or connection status. This supersedes the implicit native launcher
+default for PRIMARY; it does not alter the legacy provider.
+
+## 2026-11-02 — Require the UAT editor's window manager to be ready
+
+Native clipboard qualification exposed a pre-existing Alpine Mousepad fixture
+error: Openbox accepts `--config-file`, not `--config`. Package 1.0.2 corrects
+the option and checks the window manager before launching the editor. A visible
+unmanaged window must not satisfy the intended maximized-editor fixture setup.
+Install the new immutable package for new test Apps; preserve existing runtime
+pins and documents. This changes the test fixture, not production App packages.
+
+## 2026-11-02 — Avoid synchronous content-click grabs in the single-App fixture
+
+This supplements the preceding window-manager readiness decision. A single
+network batch containing pointer press/release and Ctrl+A exposed a second
+fixture issue: X11 key events retained Button1 despite the browser releasing it.
+Draining the Kasm input queue did not fix it; removing Openbox in an owned
+diagnostic did. Openbox's [content bindings](https://github.com/danakj/openbox/blob/master/openbox/mouse.c)
+use a synchronous pointer grab while its [grab implementation](https://github.com/danakj/openbox/blob/master/openbox/grab.c)
+leaves the keyboard asynchronous. An omitted mouse section inherits bindings.
+
+Alpine Mousepad package 1.0.3 explicitly clears these bindings with `<mouse/>`.
+Its single-App configuration retains window management and new-dialog focus;
+test batched real editor replacement and return from dialogs. Do not add sleeps
+to hide the race, weaken clipboard ownership, or claim this qualifies arbitrary
+desktop window-manager policies. The unsuccessful native patches are excluded;
+Core and the paired Kasm component remain unchanged. Install a new immutable
+App package and preserve existing Apps rather than modifying a pinned package.
+
+## 2026-11-02 — Select a separate native rich clipboard increment
+
+The owner requested every format supported by the pinned Kasm browser path,
+with a 2 MB limit and no file/directory copy. Issue #55 selects text/plain,
+text/html and image/png, with an explicit 2 MiB aggregate content limit per
+transaction. This prospectively supersedes KNC-005's initial text-only limit
+only for new rich-capable component pins; old Apps keep their existing contract.
+Preserve consent, focus ownership, conflict handling and generation fencing.
+Browser normalization and complete X11 selection transactions require new tests.
+Keep the new work in a separate Draft PR dependent on #54 so text qualification
+and rich implementation remain independently reviewable. See the
+[rich clipboard contract](native-rich-clipboard.md); no implementation, UAT,
+merge, deployment or release acceptance is established by this selection.
+
+## 2026-11-02 — Stage complete native rich clipboard transactions
+
+Issue #55 implementation selects new immutable `kasm-*-clipboard-v2` paired
+components and the `rich-v1` runtime descriptor. Core, gateway and SDK recognize
+the new pin; existing text-only Apps retain their old component and 64 KiB limit.
+Both directions validate all representations against a 2 MiB aggregate bound.
+The trusted edge buffers a whole bounded client transaction before forwarding.
+
+The X11 sender replaces time-based per-format aggregation with an owner-revision
+snapshot: a fresh private requestor window fences late responses, bounded INCR
+chunks support large selections, and a five-second deadline retires incomplete
+work. Publish only a complete validated snapshot; unsupported file selections,
+oversize or failed formats leave the destination unchanged. Text conversion uses
+explicit lengths and new PNG-only selections cannot inherit previous text targets.
+Browser readback after a rich write establishes the actual normalized baseline,
+preventing HTML sanitization or PNG re-encoding from creating a feedback loop.
+This is an implementation decision, not candidate or UAT acceptance.
+
+
+## 2026-11-03 — Native host workflow qualification
+
+The owner authorized [NHI-001–010](native-host-integration.md) and Issue #57
+through UAT readiness. This extends the native architecture with a public-SDK
+reference host that simulates downstream windows, workspaces, template calls
+and task/control handoff. Functional behavior and lifecycle ownership are the
+compatibility target; old SDK method shapes are not. Actual downstream code
+and deployment remain outside this train. The simulator and SDK evolve
+together, and its evidence cannot stand in for actual downstream acceptance.
+
+## 2026-11-03 — Explicit native ownership, input and read-only grants
+
+[NHI-002–005](native-host-integration.md) are implemented through a host service
+and per-window/task session ownership. Preparing an on-attach runtime precedes
+binding its positive generation; releasing one owner does not stop the App.
+Bounded reconnect may reattach only the same running component/generation,
+never activate a stopped App or replay input/actions. Optional stop generation
+is checked under the lifecycle lock before any shutdown/idle mutation.
+
+Native programmatic input shares Kasm's key transport and returns a submission
+receipt, not the old input bridge's acknowledgement. It rejects human input or
+IME/paste overlap and never uses clipboard as a fallback. Resize remains a
+template permission; hosts select one resize owner for a shared framebuffer.
+
+Core grants now cover WSS-only as well as UDP-capable native components. An
+immutable read-only grant selects a bounded server-side RFB filter: no exclusive
+client initialization, keyboard, pointer, clipboard or desktop resizing. Display
+negotiation, per-client video resolution limits, statistics and optional UDP are
+allowed. This protects the attachment, not a new account role or separate audio
+and Manager operations. Old Core/component pairs cannot silently downgrade a
+requested read-only attachment. The [migration guide](native-host-migration.md)
+records host changes and the remaining downstream responsibilities.
+
+## 2026-11-03 — Combined host qualification and explicit fixture scope
+
+[Native host qualification](../tests/kasm-native/NATIVE-HOST.md) exercises
+NHI-001–010 through public SDK operations on eight formal Ubuntu App templates
+and regional static Alpine candidates. Lifecycle evidence distinguishes Manager
+adoption from runtime replacement, retains populated failed sessions, honors an
+explicit veto, and verifies two actual reboots plus a scoped prior-Manager
+rollback. These results do not accept the downstream product or change the
+legacy default provider. Human acceptance remains one consolidated UAT.
+
+The complete-template fixture and regional transport fixtures have different
+catalogs and transport scope. Neither is presented as cross-distribution proof.
+The older standalone UAT page's App creation deadline is extended to 60 seconds,
+covering server/application startup budgets rather than the ordinary 15-second
+API deadline. This is fixture behavior; it does not extend server readiness
+budgets or replay a possibly completed launch.
+
+## 2026-11-03 — Route user-home catalog choices through managed registration
+
+An Openbox UAT report exposed an NHI-001 reference-host gap: the template form
+sent ordinary instance creation for `runMode=user-home`, correctly rejected by
+Core with HTTP 409. The earlier formal-template probe used `managedId` directly,
+so it did not cover this catalog-button path. The workbench now resolves the
+current registration and attaches its unique running target. A missing or
+ambiguous registration is explained; stopped or unhealthy registrations require
+explicit managed controls. This supersedes the workbench's indiscriminate
+catalog-create behavior without changing Core's HOME ownership or stop intent.
+
+## 2026-11-03 — Prepare the accepted native host integration for Core 0.16.0
+
+The owner accepted the reference-host UAT and authorized ordered merge and
+formal release in Issue #59. Core 0.16.0 / SDK 0.31.0 retain the existing default
+provider and runtime pins. The Core archive now carries native setup, ownership,
+audio/clipboard/UDP migration guides and the pinned component source recipe;
+it does not bundle or silently install Kasm/PulseAudio/application binaries.
+Exact post-merge archive checks and publication identities remain distinct from
+the earlier PR candidate and owner-reported functional UAT. Downstream deployment
+and automatic multi-container UDP orchestration remain separate work.
+
+## 2026-11-03 — Discard previous-Manager Viewer counts before restoration
+
+Release qualification found that the managed boot-recovery branch bypassed the
+attachment-count reset already performed during healthy adoption (RTM-007).
+A manifest saved while a Viewer was attached could then block an otherwise
+safe recovery as `viewer-attached`, although the new Manager owned no socket.
+Issue #62 extends that existing startup invariant to every manifest restoration
+branch. This does not grant authority to fence unregistered live channels:
+in-process ownership checks, retained retry deadlines/budgets, live-process
+protection and component pins are unchanged. A failing regression and the
+unchanged disposable-UID boot simulation cover the original failure boundary.

@@ -3,7 +3,8 @@ package main
 /*
 // The host has the libXtst runtime package but not its development symlink.
 // Link the installed soname directly so this POC needs no package install.
-#cgo LDFLAGS: -lX11 -l:libXtst.so.6 -l:libxdo.so.3
+#cgo !x11_static LDFLAGS: -lX11 -l:libXtst.so.6 -l:libxdo.so.3
+#cgo x11_static LDFLAGS: -static -lxdo -lXtst -lXinerama -lXext -lX11 -lxcb -lXau -lXdmcp -lxkbcommon -lm
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>

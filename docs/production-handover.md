@@ -6,11 +6,20 @@ Historical measurements below are scoped experiments, not the identity or
 health of a live installation. Private deployment diaries remain outside this
 public guide.
 
-The [Kasm native architecture proposal](kasm-native-architecture.md) describes
-a replacement and its migration/UDP/audio gates. Its bounded D1 WSS scope is
-implemented with [bounded automated evidence](../tests/kasm-native/README.md);
-later gates await review. The default
-architecture and accepted invariants below still apply.
+Core 0.16.0 includes the opt-in Kasm-native display, input, clipboard, audio and
+host SDK contracts. The owner accepted reference-host UAT on 2026-11-03 in
+[Issue #57](https://github.com/woodegg/remotexapp/issues/57). Exact post-merge
+qualification/publication is tracked in [Issue #59](https://github.com/woodegg/remotexapp/issues/59).
+See [setup and release boundaries](native-0.16.0-release.md), the
+[native migration guide](native-host-migration.md), [audio contract](native-audio.md)
+and [candidate evidence](../tests/kasm-native/NATIVE-HOST.md).
+
+TigerVNC/noVNC remains the default. The architecture and IBus/input invariants
+below describe that provider; the native provider uses its separately pinned
+Kasm pair and native input/clipboard path. Lifecycle, generation, identity and
+deployment ownership invariants apply to both. Actual downstream integration,
+additional platform matrices and automatic multi-container UDP orchestration
+remain outside this release qualification.
 
 ## Architecture and ownership
 
@@ -112,6 +121,7 @@ The authoritative register, result files and reproduction instructions are in
 | P14 session-owned input stack | Live vacant server unit fell from 16,887,808 B/18 tasks to 212,992 B/1 task; isolated and production XFCE/Mousepad/Edge passed Unicode, clipboard, resize/reconnect and exact cleanup | Live for all repository classes; see the dated result |
 | P15 remote resize scheduling | A 300 ms trailing run held `1000x613` through four viewport changes while scaling locally, then reached only `1100x740`; finite 400 ms max-wait advanced at 440.20 ms, flush and reconnect passed | Live in SDK 0.15; isolated E2E and human native-IME/resize UAT accepted 2026-08-29 |
 | P16 Core-owned input services | Matched median launch/restart +530/+543 ms, memory +4.18 MiB, one extra supervisor, unchanged service counts and bounded cleanup | [Measured gates passed](../tests/performance/core-session-services/README.md); Core 0.12 candidate, human UAT separate |
+| P17 native audio playback credits | Two-speaker synthetic burst: ten of ten frames delivered versus eight; per-stream queues remain bounded and the aggregate cap is 64 | [Deterministic selection accepted](../tests/performance/native-audio-burst/README.md); live WAN/resource and physical UAT evidence remain separate |
 
 For RFB queue changes repeat [P05](../tests/performance/rfb-queue/README.md).
 For cursor fan-out changes repeat [P11](../tests/performance/cursor-fanout/README.md).

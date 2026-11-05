@@ -1,0 +1,693 @@
+{
+  "schema": 1,
+  "scope": "native-automatic-text-clipboard-bounded-standalone",
+  "verifiedAt": "2026-11-02T09:03:07.933365+00:00",
+  "status": "automated-checks-passed-awaiting-physical-UAT",
+  "coreVersion": "0.16.0-dev.5",
+  "sdkVersion": "0.31.0-dev.5",
+  "coreAndEdgeArtifacts": [
+    {
+      "architecture": "amd64",
+      "sourceCommit": "76479e5ad098ff13d6c0fa754973336e73d354d0",
+      "coreArchiveSHA256": "06c11de304acf64646b3f16151e1ca2d78f912fee2cdf0df85ec545ee3e669fb",
+      "edgeArchiveSHA256": "0aa5aa568e95f0e7a99d7d2f4a152c2b6ad74708ffe0119cb9fb2ba47c4a4d1b"
+    },
+    {
+      "architecture": "arm64",
+      "sourceCommit": "76479e5ad098ff13d6c0fa754973336e73d354d0",
+      "coreArchiveSHA256": "2864ed44e939829f6abb1a0f1c47cf6269da5fa8d37cbeafbbb56a88c20a5df3",
+      "edgeArchiveSHA256": "63c966a5c0d3c7ad07ffc93a184693c111875c8d4aad6f5d3221e1ba77b437cf"
+    }
+  ],
+  "nativeComponents": [
+    {
+      "architecture": "amd64",
+      "source": "a427d647997aa3782203bf98c719f15f74b01f58",
+      "manifest": "0957b1998e37d258e14e45eda7d61266e461ff19124ad3f1425c2a9def01b857",
+      "archiveSHA256": "0dc0bc49cc72af75255bc68fe0fd875b289272bf38150e5ad4bbe6a26b85e76c",
+      "filesVerified": 47
+    },
+    {
+      "architecture": "arm64",
+      "source": "a427d647997aa3782203bf98c719f15f74b01f58",
+      "manifest": "4e57b0a813f531a42b456568b1b50cceb8513bc7fc787e546353a2b906471ecd",
+      "archiveSHA256": "e372b88ca9fcef01d9fb832e55519018b4501f51ebe514e9125322d17c96ee53",
+      "filesVerified": 47
+    }
+  ],
+  "artifactFileIntegrity": [
+    {
+      "architecture": "amd64",
+      "kind": "core",
+      "files": 24,
+      "verified": true
+    },
+    {
+      "architecture": "amd64",
+      "kind": "edge",
+      "files": 12,
+      "verified": true
+    },
+    {
+      "architecture": "arm64",
+      "kind": "core",
+      "files": 24,
+      "verified": true
+    },
+    {
+      "architecture": "arm64",
+      "kind": "edge",
+      "files": 12,
+      "verified": true
+    }
+  ],
+  "appPackage": {
+    "id": "alpine-mousepad",
+    "version": "1.0.3",
+    "sourceCommit": "0880f29c89c9791f9bac14142d6276b2577d8728",
+    "archiveSHA256": "b442d3f8fe664e525c6a7a620576bc49247d8dfb463236f6ca06db8dc7e27278",
+    "archiveMatchesSourceFiles": true
+  },
+  "browsers": {
+    "local": "Linux Chrome/149.0.7827.102",
+    "public": "Isolated Alpine Chromium/156.0.8078.79",
+    "permissions": "CDP overrides; real first-run prompts not qualified",
+    "microphone": "synthetic 880 Hz; no physical microphone"
+  },
+  "local": {
+    "standalone": {
+      "status": "pass",
+      "checks": 15,
+      "cases": [
+        {
+          "name": "default off performs no automatic browser clipboard access",
+          "status": "pass"
+        },
+        {
+          "name": "opted-in local Chinese multiline emoji reaches native clipboard and real editor save",
+          "status": "pass"
+        },
+        {
+          "name": "copy outside then return and paste synchronizes before native paste keys",
+          "status": "pass"
+        },
+        {
+          "name": "real remote editor copy automatically writes local text without a transfer click",
+          "status": "pass"
+        },
+        {
+          "name": "same-runtime second tab writes once; inactive tab does not echo or overwrite",
+          "status": "pass"
+        },
+        {
+          "name": "two different runtimes have independent consent and no background fan-out",
+          "status": "pass"
+        },
+        {
+          "name": "one-direction modes and empty local paste preserve the other clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "64 KiB UTF-8 roundtrip is exact; one byte oversize leaves remote unchanged",
+          "status": "pass"
+        },
+        {
+          "name": "simultaneous local and remote changes require an explicit source choice",
+          "status": "pass"
+        },
+        {
+          "name": "a write acknowledged after blur remains uncertain and is never replayed",
+          "status": "pass"
+        },
+        {
+          "name": "permission revocation gives visible manual fallback without automatic read prompts",
+          "status": "pass"
+        },
+        {
+          "name": "delayed read is retired by scope reset and cannot submit later",
+          "status": "pass"
+        },
+        {
+          "name": "disconnect and reconnect require new consent",
+          "status": "pass"
+        },
+        {
+          "name": "manual compatibility and explicit clear work after automatic reset",
+          "status": "pass"
+        },
+        {
+          "name": "no browser exceptions and no payloads in public clipboard snapshots",
+          "status": "pass"
+        }
+      ]
+    },
+    "embedded": {
+      "status": "pass",
+      "checks": 9,
+      "cases": [
+        {
+          "name": "served embedded viewers start with independent clipboard consent off",
+          "status": "pass"
+        },
+        {
+          "name": "workbench direction controls enable real native paste/readback",
+          "status": "pass"
+        },
+        {
+          "name": "real remote copy reaches local clipboard from embedded Viewer",
+          "status": "pass"
+        },
+        {
+          "name": "two same-page Viewers select one automatic clipboard target",
+          "status": "pass"
+        },
+        {
+          "name": "hiding a Viewer retires activity and does not copy in the background",
+          "status": "pass"
+        },
+        {
+          "name": "speaker and microphone controls do not select a clipboard target",
+          "status": "pass"
+        },
+        {
+          "name": "all audio off leaves clipboard and display usable",
+          "status": "pass"
+        },
+        {
+          "name": "stats and clipboard controls remain alongside the tested window",
+          "status": "pass"
+        },
+        {
+          "name": "manual UAT records stay unexecuted; no automated acceptance is fabricated",
+          "status": "pass"
+        }
+      ]
+    },
+    "batchedInputAndFocus": {
+      "status": "pass",
+      "checks": 24,
+      "cases": [
+        {
+          "iteration": 0,
+          "messages": 6,
+          "bytes": 70
+        },
+        {
+          "iteration": 1,
+          "messages": 7,
+          "bytes": 102
+        },
+        {
+          "iteration": 2,
+          "messages": 7,
+          "bytes": 102
+        },
+        {
+          "iteration": 3,
+          "messages": 7,
+          "bytes": 102
+        },
+        {
+          "iteration": 4,
+          "messages": 6,
+          "bytes": 70
+        },
+        {
+          "iteration": 5,
+          "messages": 6,
+          "bytes": 70
+        },
+        {
+          "iteration": 6,
+          "messages": 6,
+          "bytes": 70
+        },
+        {
+          "iteration": 7,
+          "messages": 7,
+          "bytes": 102
+        },
+        {
+          "iteration": 8,
+          "messages": 6,
+          "bytes": 70
+        },
+        {
+          "iteration": 9,
+          "messages": 7,
+          "bytes": 102
+        },
+        {
+          "iteration": 10,
+          "messages": 7,
+          "bytes": 103
+        },
+        {
+          "iteration": 11,
+          "messages": 7,
+          "bytes": 103
+        },
+        {
+          "iteration": 12,
+          "messages": 6,
+          "bytes": 70
+        },
+        {
+          "iteration": 13,
+          "messages": 7,
+          "bytes": 103
+        },
+        {
+          "iteration": 14,
+          "messages": 7,
+          "bytes": 124
+        },
+        {
+          "iteration": 15,
+          "messages": 6,
+          "bytes": 70
+        },
+        {
+          "iteration": 16,
+          "messages": 7,
+          "bytes": 103
+        },
+        {
+          "iteration": 17,
+          "messages": 7,
+          "bytes": 103
+        },
+        {
+          "iteration": 18,
+          "messages": 6,
+          "bytes": 70
+        },
+        {
+          "iteration": 19,
+          "messages": 7,
+          "bytes": 103
+        },
+        {
+          "name": "open-file dialog and return preserve editor focus",
+          "status": "pass"
+        },
+        {
+          "name": "save-as dialog and return preserve editor focus",
+          "status": "pass"
+        },
+        {
+          "name": "real remote context menu opens and dismisses without editing",
+          "status": "pass"
+        },
+        {
+          "name": "keyboard File menu opens and dismisses without editing",
+          "status": "pass"
+        }
+      ]
+    },
+    "manualAndSyntheticIME": {
+      "status": "pass",
+      "checks": 14,
+      "cases": [
+        {
+          "name": "local text -> native clipboard -> real App paste/save",
+          "status": "passed"
+        },
+        {
+          "name": "remote offer does not change local OS clipboard",
+          "status": "passed"
+        },
+        {
+          "name": "real App copy -> native offer -> explicit local readback",
+          "status": "passed"
+        },
+        {
+          "name": "empty local read preserves remote clipboard",
+          "status": "passed"
+        },
+        {
+          "name": "explicit clear prevents old text from pasting",
+          "status": "passed"
+        },
+        {
+          "name": "64 KiB UTF-8 boundary real server readback",
+          "status": "passed"
+        },
+        {
+          "name": "64 KiB real App copy -> local boundary readback",
+          "status": "passed"
+        },
+        {
+          "name": "64 KiB+1 rejected before remote mutation",
+          "status": "passed"
+        },
+        {
+          "name": "browser permission denied gives explicit failure",
+          "status": "passed"
+        },
+        {
+          "name": "offer received while disabled is not cached on re-enable",
+          "status": "passed"
+        },
+        {
+          "name": "four OS shortcut profiles suppress terminal Space, ordinary Ctrl+A/S preserved",
+          "status": "passed"
+        },
+        {
+          "name": "ten outside/inside focus cycles with synthetic composition and file readback",
+          "status": "passed"
+        },
+        {
+          "name": "two Viewers have independent consent and disconnect",
+          "status": "passed"
+        },
+        {
+          "name": "reconnect resets consent",
+          "status": "passed"
+        }
+      ]
+    }
+  },
+  "publicRegions": [
+    {
+      "region": "australia",
+      "source": "76479e5ad098ff13d6c0fa754973336e73d354d0",
+      "component": "0957b1998e37d258e14e45eda7d61266e461ff19124ad3f1425c2a9def01b857",
+      "app": "1.0.3",
+      "appSHA256": "b442d3f8fe664e525c6a7a620576bc49247d8dfb463236f6ca06db8dc7e27278",
+      "finalStats": [
+        {
+          "state": "ready",
+          "transport": "webrtc-udp",
+          "udpState": "udp",
+          "udpReason": null,
+          "udpBytes": 229890,
+          "udpRectangles": 615,
+          "frames": 121,
+          "preferUDP": true
+        },
+        {
+          "state": "ready",
+          "transport": "webrtc-udp",
+          "udpState": "udp",
+          "udpReason": null,
+          "udpBytes": 300370,
+          "udpRectangles": 1116,
+          "frames": 124,
+          "preferUDP": true
+        }
+      ],
+      "scope": "authenticated public native workbench; isolated Chromium and synthetic clipboard/audio",
+      "status": "pass",
+      "checks": [
+        {
+          "name": "authenticated public workbench uses the exact new Core/component/App",
+          "status": "pass"
+        },
+        {
+          "name": "public native Chinese multiline emoji paste and remote copy read back exactly",
+          "status": "pass"
+        },
+        {
+          "name": "established UDP paints real frames during clipboard use",
+          "status": "pass"
+        },
+        {
+          "name": "explicit WSS fallback preserves bidirectional clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "restoring UDP resumes frame traffic without restoring old clipboard content",
+          "status": "pass"
+        },
+        {
+          "name": "second embedded Viewer has independent opt-in and active ownership",
+          "status": "pass"
+        },
+        {
+          "name": "speaker and microphone coexist with automatic clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "real remote Pulse playback reaches the browser while clipboard stays usable",
+          "status": "pass"
+        },
+        {
+          "name": "all audio off retains the selected clipboard connection",
+          "status": "pass"
+        }
+      ],
+      "preservationAndCleanup": {
+        "region": "australia",
+        "originalDocuments": 10,
+        "originalDocumentsUnchanged": 10,
+        "originalNonManagerProcesses": 2,
+        "originalNonManagerProcessesStillPresent": 2,
+        "ownedFinalAppStopped": true,
+        "ownedFinalDocumentRemoved": true,
+        "attachedViewers": 0,
+        "activeApps": 1,
+        "failedApps": 0
+      }
+    },
+    {
+      "region": "china",
+      "source": "76479e5ad098ff13d6c0fa754973336e73d354d0",
+      "component": "0957b1998e37d258e14e45eda7d61266e461ff19124ad3f1425c2a9def01b857",
+      "app": "1.0.3",
+      "appSHA256": "b442d3f8fe664e525c6a7a620576bc49247d8dfb463236f6ca06db8dc7e27278",
+      "finalStats": [
+        {
+          "state": "ready",
+          "transport": "webrtc-udp",
+          "udpState": "udp",
+          "udpReason": null,
+          "udpBytes": 152714,
+          "udpRectangles": 427,
+          "frames": 89,
+          "preferUDP": true
+        },
+        {
+          "state": "ready",
+          "transport": "webrtc-udp",
+          "udpState": "udp",
+          "udpReason": null,
+          "udpBytes": 185445,
+          "udpRectangles": 654,
+          "frames": 89,
+          "preferUDP": true
+        }
+      ],
+      "scope": "authenticated public native workbench; isolated Chromium and synthetic clipboard/audio",
+      "status": "pass",
+      "checks": [
+        {
+          "name": "authenticated public workbench uses the exact new Core/component/App",
+          "status": "pass"
+        },
+        {
+          "name": "public native Chinese multiline emoji paste and remote copy read back exactly",
+          "status": "pass"
+        },
+        {
+          "name": "established UDP paints real frames during clipboard use",
+          "status": "pass"
+        },
+        {
+          "name": "explicit WSS fallback preserves bidirectional clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "restoring UDP resumes frame traffic without restoring old clipboard content",
+          "status": "pass"
+        },
+        {
+          "name": "second embedded Viewer has independent opt-in and active ownership",
+          "status": "pass"
+        },
+        {
+          "name": "speaker and microphone coexist with automatic clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "real remote Pulse playback reaches the browser while clipboard stays usable",
+          "status": "pass"
+        },
+        {
+          "name": "all audio off retains the selected clipboard connection",
+          "status": "pass"
+        }
+      ],
+      "preservationAndCleanup": {
+        "region": "china",
+        "originalDocuments": 3,
+        "originalDocumentsUnchanged": 3,
+        "originalNonManagerProcesses": 2,
+        "originalNonManagerProcessesStillPresent": 2,
+        "ownedFinalAppStopped": true,
+        "ownedFinalDocumentRemoved": true,
+        "attachedViewers": 0,
+        "activeApps": 1,
+        "failedApps": 0
+      }
+    },
+    {
+      "region": "us",
+      "source": "76479e5ad098ff13d6c0fa754973336e73d354d0",
+      "component": "4e57b0a813f531a42b456568b1b50cceb8513bc7fc787e546353a2b906471ecd",
+      "app": "1.0.3",
+      "appSHA256": "b442d3f8fe664e525c6a7a620576bc49247d8dfb463236f6ca06db8dc7e27278",
+      "finalStats": [
+        {
+          "state": "ready",
+          "transport": "webrtc-udp",
+          "udpState": "udp",
+          "udpReason": null,
+          "udpBytes": 113016,
+          "udpRectangles": 322,
+          "frames": 67,
+          "preferUDP": true
+        },
+        {
+          "state": "ready",
+          "transport": "webrtc-udp",
+          "udpState": "udp",
+          "udpReason": null,
+          "udpBytes": 142867,
+          "udpRectangles": 511,
+          "frames": 71,
+          "preferUDP": true
+        }
+      ],
+      "scope": "authenticated public native workbench; isolated Chromium and synthetic clipboard/audio",
+      "status": "pass",
+      "checks": [
+        {
+          "name": "authenticated public workbench uses the exact new Core/component/App",
+          "status": "pass"
+        },
+        {
+          "name": "public native Chinese multiline emoji paste and remote copy read back exactly",
+          "status": "pass"
+        },
+        {
+          "name": "established UDP paints real frames during clipboard use",
+          "status": "pass"
+        },
+        {
+          "name": "explicit WSS fallback preserves bidirectional clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "restoring UDP resumes frame traffic without restoring old clipboard content",
+          "status": "pass"
+        },
+        {
+          "name": "second embedded Viewer has independent opt-in and active ownership",
+          "status": "pass"
+        },
+        {
+          "name": "speaker and microphone coexist with automatic clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "real remote Pulse playback reaches the browser while clipboard stays usable",
+          "status": "pass"
+        },
+        {
+          "name": "all audio off retains the selected clipboard connection",
+          "status": "pass"
+        }
+      ],
+      "preservationAndCleanup": {
+        "region": "us",
+        "originalDocuments": 3,
+        "originalDocumentsUnchanged": 3,
+        "originalNonManagerProcesses": 2,
+        "originalNonManagerProcessesStillPresent": 2,
+        "ownedFinalAppStopped": true,
+        "ownedFinalDocumentRemoved": true,
+        "attachedViewers": 0,
+        "activeApps": 1,
+        "failedApps": 0
+      }
+    }
+  ],
+  "publicRapidSwitching": {
+    "region": "china",
+    "iterations": 40,
+    "status": "pass",
+    "source": "76479e5ad098ff13d6c0fa754973336e73d354d0",
+    "component": "0957b1998e37d258e14e45eda7d61266e461ff19124ad3f1425c2a9def01b857",
+    "app": "1.0.3"
+  },
+  "checks": {
+    "makeCheck": "pass",
+    "CI": {
+      "sourceCommit": "0880f29c89c9791f9bac14142d6276b2577d8728",
+      "status": "pass",
+      "url": "https://github.com/woodegg/remotexapp/actions/runs/41416060025"
+    },
+    "coreRaceCoverageAndVulnerabilityChecks": "see PR evidence for unchanged runtime source; no new dependency changes"
+  },
+  "testSourceSHA256": {
+    "browser-clipboard.mjs": "a16070953f6181d0b642fc8f3867f76a6c9deb56536ca350d3bb2d474689f589",
+    "browser-clipboard-workbench.mjs": "58b0c71f6ebdd56d3728f486c4bf77f0b13928fe3146e3f2c1ad0e006464e34c",
+    "browser-input-order.mjs": "57afe87969eae569849f3e0c6490fcf38679c3d21d569bb515210f552b2fa79c",
+    "browser-text.mjs": "310424c66d567eb800c920ec4b7441e376780f56c064f26ecd22c673a5f1ff63",
+    "browser-fixture.mjs": "a40c555271a08d41fa91c81c9e70cb56a10eb5b8626599511b85149f162a6336"
+  },
+  "privateHarnessSHA256": {
+    "public-check.mjs": "37cb56f9b4ee2b3eb67501043a1d1f79f6fee496cc8314ead1d3045c9464fcb6",
+    "public-fast-input-debug.mjs": "f389e0ec70a5e568ec1ce393c29f3613494ac56273b369019933545bd7de151e"
+  },
+  "privateEvidenceSHA256": {
+    "browser-final-103.log": "396a8c8ae9b2ab3622928fe0d6d000c3d928f39b4eef13aa58a388f5fce1f2a5",
+    "workbench-final-103.log": "34487edb17b9bd528cbdcdc502f0f09acd8250087a533c12415cb5c3dc8608cc",
+    "manual-ime-103.log": "66c3d14f1f10079db3eb79a689e56965229ea4fe22f453e2c7ac962f5175eb88",
+    "batch-final-3.log": "95878e6005224accf2eb0bab4ac91b8ebc1a6ad66b08f456f7d3da28ca2dada3",
+    "china-fast-final.log": "4f6259a4a202568465764b205bbdc1ba0b77e83571361f04e7eb0289afd95cbf",
+    "china-public-final-103.log": "c894fc6227ca2088bc30901c1e738619777552e8211cab7707d3ad967a6f167c",
+    "australia-public-final-103.log": "4cfa4dc05c083c4e12f4f8c5df98b5232e41b21a4ff05617a96a9a0211dc6007",
+    "us-public-final-103.log": "346099bd77751b55d447b31348f3c3f03603ddfff5b91e1352d01ece6a9bb24f",
+    "check-input-order.log": "8524381cef08f83802bcd89880d4cc1a038fca1ef5a45470ad2ef416a748cf07",
+    "batch-before.log": "46c09afaf22960936623787e7c2793cd5a09bb920aafee6217d9e4a52c4e7855",
+    "batch-preflush-record-2.log": "dc8e5b00e5b7f66ebb2cdaaac3733a2f30922e142021f3e09e4ffa539b07d020",
+    "batch-pointer-record.log": "ccfa763ada7432cff8c365ef1ea80e0b94755fbd5222d90fbeff93e553564710",
+    "batch-no-wm.log": "b26849735449895dc238c1561276db658f11fe8561194b800c189935dc8e5834",
+    "batch-explicit-mouse-record.log": "9dfaeceba397cfd7ffd6bdec57c8d276a3d74f552a8416de3477eaf8626b290b"
+  },
+  "cleanup": {
+    "local": {
+      "localAppsStopped": 0,
+      "remainingActiveApps": 0,
+      "ownedBrowserProcessesTerminated": 1,
+      "localBrowserProfileRemoved": true,
+      "localFixtureStopped": true,
+      "localBuilderRestoredStopped": true
+    },
+    "browser": {
+      "bootstrapTerminated": true,
+      "publicBrowserContainerStopped": true,
+      "authenticatedProfileRemoved": true,
+      "userBrowserUntouched": true
+    },
+    "armBuilder": {
+      "armBuilderRestoredStopped": true
+    },
+    "regionalUATRetained": true,
+    "regionalTemporaryAppsStoppedAndDocumentsRemoved": true,
+    "temporaryChinaProbeAndPackagesRemoved": true,
+    "originalUntrackedCaptureUntouched": true
+  },
+  "remaining": [
+    "physical OS IME and ordinary copy/paste from other applications",
+    "real first-run permission UI",
+    "physical hearing and microphone quality",
+    "other browser engines and untested OS/browser combinations",
+    "actual embedding-host/workspace integration",
+    "rich formats and file clipboard",
+    "long-duration soak and performance qualification",
+    "post-merge immutable release qualification"
+  ]
+}

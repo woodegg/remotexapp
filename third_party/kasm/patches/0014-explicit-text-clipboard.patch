@@ -1,0 +1,104 @@
+--- a/core/rfb.js
++++ b/core/rfb.js
+@@ -19,7 +19,7 @@
+ import Inflator from "./inflator.js";
+ import Deflator from "./deflator.js";
+ import Keyboard from "./input/keyboard.js";
+-import { readVideoEncoders } from "./remotexapp-server-messages.mjs";
++import { readVideoEncoders, readClipboardText } from "./remotexapp-server-messages.mjs";
+ import GestureHandler from "./input/gesturehandler.js";
+ import Cursor from "./util/cursor.js";
+ import Websock from "./websock.js";
+@@ -3579,85 +3579,13 @@
+     }
+ 
+     _handleBinaryClipboard() {
+-        Log.Debug("HandleBinaryClipboard");
+-
+-        if (this._sock.rQwait("Binary Clipboard header", 2, 1)) { return false; }
+-
+-        let num = this._sock.rQshift8(); // how many different mime types
+-        let mimes = [];
+-        let clipItemData = {};
+-        let buffByteLen = 2;
+-        let textdata = '';
+-        Log.Info(num + ' Clipboard items recieved.');
+-	    Log.Debug('Started clipbooard processing with Client sockjs buffer size ' + this._sock.rQlen);
+-
+-
+-
+-        for (let i = 0; i < num; i++) {
+-            if (this._sock.rQwait("Binary Clipboard op id", 4, buffByteLen)) { return false; }
+-            buffByteLen += 4;
+-            let clipid = this._sock.rQshift32();
+-
+-            if (this._sock.rQwait("Binary Clipboard mimelen", 1, buffByteLen)) { return false; }
+-            buffByteLen++;
+-            let mimelen = this._sock.rQshift8();
+-
+-            if (this._sock.rQwait("Binary Clipboard mime", Math.abs(mimelen), buffByteLen)) { return false; }
+-            buffByteLen+=mimelen;
+-            let mime = this._sock.rQshiftStr(mimelen);
+-
+-            if (this._sock.rQwait("Binary Clipboard data len", 4, buffByteLen)) { return false; }
+-            buffByteLen+=4;
+-            let len = this._sock.rQshift32();
+-
+-            if (this._sock.rQwait("Binary Clipboard data", Math.abs(len), buffByteLen)) { return false; }
+-            let data = this._sock.rQshiftBytes(len);
+-            buffByteLen+=len;
+-
+-            switch(mime) {
+-                case "image/png":
+-                case "text/html":
+-                case "text/plain":
+-                    mimes.push(mime);
+-
+-                        if (mime == "text/plain") {
+-                            textdata = new TextDecoder().decode(data);
+-
+-                            if ((textdata.length > 0) && "\0" === textdata.charAt(textdata.length - 1)) {
+-                                textdata = textdata.slice(0, -1);
+-                            }
+-
+-                            Log.Debug("Plain text clipboard recieved and placed in text element, size: " + textdata.length);
+-                            this.dispatchEvent(new CustomEvent(
+-                                "clipboard",
+-                                { detail: { text: textdata } })
+-                            );
+-                        }
+-
+-                    Log.Info("Processed binary clipboard (ID: " + clipid + ")  of MIME " + mime + " of length " + len);
+-
+-	            if (!this.clipboardBinary) { continue; }
+-
+-                    clipItemData[mime] = new Blob([data], { type: mime });
+-                    break;
+-                default:
+-                    Log.Debug('Mime type skipped: ' + mime);
+-                    break;
+-            }
+-        }
+-
+-        Log.Debug('Finished processing binary clipboard with client sockjs buffer size ' + this._sock.rQlen);
+-
+-        if (Object.keys(clipItemData).length > 0) {
+-            if (this.clipboardBinary) {
+-                if (this._mouseLastScreenIndex === 0) {
+-                    this._write_binary_clipboard(clipItemData, textdata)
+-                } else {
+-                    this._proxyRFBMessage('receivedClipboard', [ clipItemData, textdata ]);
+-                }
+-            }
+-        }
+-
++        let result;
++        try { result = readClipboardText(this._sock); }
++        catch (_) { return this._fail("Invalid native text clipboard message"); }
++        if (!result) return false;
++        if (result.text !== null && this.clipboardDown) {
++            this.dispatchEvent(new CustomEvent("clipboard", { detail:{text:result.text} }));
++        }
+         return true;
+     }
+ 

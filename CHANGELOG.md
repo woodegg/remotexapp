@@ -11,13 +11,163 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.16.0-dev.1`. Development only.
+No changes recorded.
 
-Develop the opt-in Core 0.16.0 Kasm WSS slice. The existing display provider
-remains the default; implementation qualification is tracked in Issue #30.
-Development identities are Core `0.16.0-dev.1` and SDK `0.31.0-dev.1`;
-these are not published or UAT-qualified releases.
+## 0.16.0 — 2026-11-03
 
+Target: `0.16.0`. SDK `0.31.0`.
+
+Adds the opt-in Kasm-native host integration, session audio, consented rich
+clipboard and optional screen UDP. The existing TigerVNC/noVNC provider remains
+the default. Native server/client components are separately built and pinned;
+the Core archive includes their source recipe and the host migration guides.
+Owner-reported reference-host UAT was accepted on 2026-11-03; exact post-merge
+publication qualification is tracked in Issue #59.
+
+- Fix managed boot recovery retaining a previous Manager's Viewer count (#62).
+  Startup discards the old connection count before restoring manifests, so an
+  otherwise eligible desktop is not permanently blocked by nonexistent
+  Viewers. Live ownership checks, recovery delay and component pins remain intact.
+
+- Fix user-home template launch in the host workbench: connect the unique running
+  managed target instead of sending an ordinary create request that returns 409.
+  Stopped, missing or ambiguous targets show explicit managed-state guidance;
+  catalog launch never starts or restarts a managed desktop implicitly.
+
+- Add the native host SDK and `/sdk/host.html` reference workbench (#57):
+  template launch/reuse, managed attachment, separate window/task ownership,
+  bounded generation-fenced reconnect, native text/shortcut submission,
+  display controls, server-filtered read-only attachments, audio/clipboard
+  controls and live statistics. Stop requests may now require an exact
+  generation. All native display sockets use renewable one-use grants,
+  including WSS-only components. See the [migration guide](docs/native-host-migration.md).
+  Accept the native `unsupported-provider` IBus absence reason when reading
+  generation-qualified App control descriptors.
+  Record [combined candidate qualification](tests/kasm-native/NATIVE-HOST.md)
+  and one consolidated human UAT checklist. Standalone UAT App launches allow
+  60 seconds for server/application startup; ordinary API requests remain bounded
+  separately. Automated results remain separate from human UAT acceptance.
+
+- Develop the native rich clipboard extension: plain text, HTML and
+  PNG with a 2 MiB aggregate transaction limit, retaining text-only pinned App
+  compatibility and excluding file/directory copy. Implementation and separate
+  qualification are tracked in #55; development source does not establish UAT acceptance.
+  Add a Writer HTML/PNG fixture and allow its workbench launch request to wait
+  through the longer application startup budget.
+
+- Make the single-App Alpine Mousepad UAT package explicitly omit Openbox's
+  default content-area mouse bindings (package 1.0.3). A synchronous click grab
+  could leave subsequent batched shortcuts with a stale mouse-button state.
+  Add a real browser batching and dialog-focus regression; existing App pins
+  and the native component remain unchanged.
+
+- Fix the Alpine Mousepad UAT package's Openbox option and require window
+  manager readiness before opening the editor. Publish it as package 1.0.2;
+  existing pinned Apps retain their package and documents.
+
+- Add experimental native automatic plain-text clipboard with independent
+  direction modes, explicit permission requests, focused-Viewer ownership,
+  conflict detection and lifecycle fencing. Keep default-off and manual APIs;
+  order paste keys after a fresh bounded native clipboard submission and keep
+  remote X11 PRIMARY selection local so paste preserves the selected range. Extend
+  the UAT workbench with controls, state and content-free acceptance records.
+  Exact artifact and consolidated human qualification are recorded in #50/#57.
+
+- Correct Clipman regression tests to distinguish clearing a gateway-owned
+  selection from preserving an external owner, including an identical PNG copy.
+  Document the existing ownership boundary; runtime clearing is unchanged.
+
+- Give the twenty-repeat Go reliability gate an explicit 20-minute package
+  budget; preserve lifecycle deadlines, repeat counts and the hosted job limit.
+
+- Record owner acceptance of the current standalone native audio UAT for
+  candidate `7926949` on 2026-11-01. Runtime artifacts are unchanged;
+  post-merge qualification and publication remain separate.
+
+- Clear an earlier UAT launch error after the audio test App B opens successfully.
+
+- Keep healthy audio routes and their microphone capture active while another
+  App’s private audio domain is temporarily unavailable. Authentication failure
+  still retires the entire shared channel.
+
+- Allocate bounded playback credits per enabled audio speaker so multiplexed
+  bursts do not compete for one stream’s allowance. Keep measured UAT audio
+  bandwidth visible across worklet updates that carry unchanged counters.
+
+- Release the shared audio connection when the server retires the final active
+  App, including vacancy shutdown; other Apps retain their audio routes.
+
+
+- Develop opt-in native session audio: private Pulse domains, generation-bound
+  audio authorization, one scoped WSS, per-session speaker/microphone controls
+  and cross-tab SDK coordination. Default audio is off. PCM16 48 kHz needs
+  external PulseAudio tools; Core remains statically buildable. Integration
+  qualification and physical end-to-end UAT are tracked in #45/#49. Device loss
+  during a pending route acknowledgment revokes that microphone writer without
+  stopping other audio or silently reopening capture. Detect lost audio workers,
+  refresh authorization on reconnect and expose explicit audio-controller recovery.
+
+- Extend the native UAT workbench with bounded local speaker/microphone checks,
+  same/different-runtime comparison and an exportable audio acceptance checklist.
+  Remote controls reflect actual subscriptions; exported manual cases remain
+  untested until the tester records an observation.
+
+- Redesign the native UAT workbench with persistent per-Viewer statistics,
+  focus/comparison layouts, fullscreen diagnostics and collapsible input tools.
+
+- Allow a separate native test compiler for Alpine ARM64 sanitizer checks;
+  record architecture and compiler provenance in development build artifacts.
+
+- Add per-Viewer UDP display-block loss estimates to UAT and the native Viewer.
+  Bound duplicate/reorder/sequence tracking, expose stale and unavailable data,
+  and distinguish receiver delivery loss from IP packet loss.
+
+- Show separate per-Viewer UDP ICE RTT and end-to-end WebSocket Fence RTT on
+  UAT and native Viewer pages. Explicit sampling is bounded to once per five
+  seconds, pauses on hidden pages, and marks timeout/stale/unavailable results.
+
+- Preserve the full 64 KiB native text clipboard through the trusted edge by
+  sending validated streams as bounded independent binary WebSocket messages.
+
+- Keep idle UAT WebSockets alive through the trusted edge with native Ping/Pong;
+  retire unresponsive peers without treating heartbeats as App activity.
+
+- Develop optional native IPv4 screen UDP with deployment-owned proxy slots,
+  Viewer authorization/expiry, trusted address filtering and WSS fallback;
+  qualify the bounded standalone UAT slice separately from publication.
+
+- Add an experimental Alpine static Core build recipe and lightweight Openbox
+  UAT fixtures for the existing standalone lifecycle backend. Keep Kasm as a
+  separately pinned Alpine-native component with declared dynamic dependencies.
+  Resolve the persistent server anchor through the system PATH so Alpine's
+  `/bin/sleep` works, and retain verified clean Git identity in static binaries.
+  The isolated Openbox editor fixture fills its remote desktop so embedded
+  Viewers open on the document rather than unused desktop space.
+
+- Show per-Viewer connection state, actual transport, payload rates, painted-frame
+  rate, resolution, uptime and traffic totals on the UAT page. Add read-only
+  native SDK statistics with epoch fencing and no background network polling.
+
+- Defer native resize notification until initial client capability negotiation
+  finishes, so another Viewer's resize cannot disconnect a joining Viewer early.
+
+- Fix the native server encoding cache's ordering and replacement ownership so
+  multiple Viewers do not receive JPEG payloads with stale lengths; add applied
+  source cache tests with address, undefined-behavior and leak checks.
+
+The following checkpoints introduced the native provider, lifecycle and input
+contracts; their individual experimental records retain their original scope.
+
+- Initialize the native adapter's mouse button map without the upstream UI.
+  Missing initialization previously threw on pointer events, preventing remote
+  movement, clicks and window focus despite successful keyboard text tests.
+- Avoid logging typed Unicode mappings in ordinary native server logs.
+- Allow concurrent ID-based Viewer startup to follow one stopped-session
+  activation with unchanged pins; explicit descriptors and upgrades remain fenced.
+- Add supported native keyboard profiles and opt-in explicit text clipboard.
+  The paired text component bounds/validates data before allocation/mutation.
+  Per-Viewer consent revisions and generation fencing reject late reads after
+  revocation/reconnect. Empty reads are no-op; clear is explicit.
 - Preserve user-home applications after unexpected Driver/supervisor loss.
   Systemd uses `ExitType=cgroup` (systemd 250 or newer); supervision does not
   interpret Driver loss as permission to kill surviving editors. Explicit stop
@@ -34,8 +184,8 @@ these are not published or UAT-qualified releases.
   bridge. Kasm component installation is separate from the ordinary release.
 - Add authenticated, generation-bound native Viewer routes and a minimal
   native SDK adapter. Readiness requires App readiness and actual painting;
-  disconnect/dispose release only the owned Viewer. Native clipboard, audio,
-  programmatic text and UDP are not advertised by this slice.
+  disconnect/dispose release only the owned Viewer. The initial D1 component keeps clipboard off; D2 text requires its separate
+  pin and explicit selection. Audio, programmatic text and UDP stay unsupported.
 
 - Propose a native Kasm architecture from the frozen research baseline, with
   explicit keep/adapt/replace decisions, SDK and host integration contracts,

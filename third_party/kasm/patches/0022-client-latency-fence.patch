@@ -1,0 +1,7 @@
+--- a/core/rfb.js
++++ b/core/rfb.js
+@@ -3681,3 +3681,4 @@
+         if (!(flags & (1<<31))) {
++            if (this._remoteXAppFenceResponse?.(payload, flags)) return true;
+             return this._fail("Unexpected fence response");
+         }

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"github.com/woodegg/remotexapp/internal/sessionaudio"
 	"io"
 	"os"
 	"path/filepath"
@@ -15,6 +16,7 @@ type sessionServiceIdentity struct {
 	StartTime string `json:"startTime"`
 }
 type sessionServicesRecord struct {
+	Audio         *sessionaudio.Record              `json:"audio,omitempty"`
 	InputProvider string                            `json:"inputProvider,omitempty"`
 	SchemaVersion int                               `json:"schemaVersion"`
 	DeadlineMS    int64                             `json:"deadlineMs"`
@@ -51,6 +53,9 @@ func (m *manager) readSessionServices(item *instance) (*sessionServicesRecord, e
 	}
 	if isKasm(item) && v.InputProvider != "native" || !isKasm(item) && v.InputProvider != "" {
 		return nil, errors.New("session input provider differs from pinned runtime")
+	}
+	if v.Audio != nil && (item.Components.NativeAudio == "" || v.Audio.Protocol != item.Components.NativeAudio || v.Audio.Generation != item.SessionGeneration) {
+		return nil, errors.New("audio domain differs from pinned runtime")
 	}
 	var extra any
 	if d.Decode(&extra) != io.EOF {

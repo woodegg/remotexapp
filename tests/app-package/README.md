@@ -8,6 +8,11 @@ cancellation/process cleanup and Manager adoption. Set
 `REMOTEXAPP_SHIPPED_E2E_RELEASE_ROOT` to test extracted candidate bytes.
 The exact-candidate gate runs it automatically. It never attaches to or stops
 deployed user runtimes. Portable API/SDK/Console tests also run in `make check`.
+Firefox can assign new context IDs after each BiDi session ends. The live
+action test therefore marks the original documents and verifies those markers,
+their URLs, the new URL and the exact tab count across control sessions. Edge
+retains its CDP target-ID check. Neither path accepts an acknowledgement alone
+as evidence of navigation or preservation of the original tabs.
 
 Unit tests cover schema, ownership, permissions, archive safety, digest,
 activation, rollback, resources, bounded status and dependency failures.

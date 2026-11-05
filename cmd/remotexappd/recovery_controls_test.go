@@ -111,12 +111,17 @@ func TestNativeRecoveryFencesBothViewers(t *testing.T) {
 	}))
 	defer upstream.Close()
 	item.GatewayAddr = strings.TrimPrefix(upstream.URL, "http://")
-	server := httptest.NewServer(http.HandlerFunc(m.serveInstanceRoute))
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r = r.WithContext(context.WithValue(r.Context(), requestIdentityKey{}, "alice"))
+		m.serveInstanceRoute(w, r)
+	}))
 	defer server.Close()
 	var sockets []*websocket.Conn
 	for i := 0; i < 2; i++ {
+		grant := issueGrant(t, m, item, nativeGrantRequest{SessionGeneration: item.SessionGeneration, ComponentDigest: pin.SHA256, ViewerID: "recovery-viewer", ConnectionEpoch: int64(i + 1)})
 		u := "ws" + strings.TrimPrefix(server.URL, "http") + "/remotexapps/" + item.ID + "/native/websockify?sessionGeneration=" + strconv.FormatInt(item.SessionGeneration, 10) + "&componentDigest=" + pin.SHA256
-		c, _, err := websocket.DefaultDialer.Dial(u, nil)
+		dialer := websocket.Dialer{Subprotocols: []string{nativeGrantProtocol + grant.Token}}
+		c, _, err := dialer.Dial(u, nil)
 		if err != nil {
 			t.Fatal(err)
 		}

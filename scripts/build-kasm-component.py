@@ -2,12 +2,14 @@
 """Build the experimental WSS component from checked archives in a fresh directory.
 
 This never installs services or changes the running provider. Build dependencies
-must already exist on an Ubuntu 24.04 amd64 build host.
+must already exist on an Ubuntu 24.04 amd64 or Alpine 3.24 build host.
+Alpine ARM64 sanitizer tests require KASM_TEST_CXX=clang++ and compiler-rt.
 """
 import argparse
 import hashlib
 import json
 import os
+import platform as host_platform
 from pathlib import Path
 import shutil
 import subprocess
@@ -47,17 +49,22 @@ def extract(source, destination):
             archive.extract(member, destination, filter='data')
 
 
-def build(inputs, work):
+def selected_patches(transport):
+    return [p for p in sorted((COMPONENT / 'patches').glob('*.patch')) if transport == 'udp' or 'optional-udp' not in p.name]
+
+
+def build(inputs, work, platform='ubuntu', transport='wss'):
     work.mkdir(parents=True, exist_ok=False)
     server, client = work / 'server', work / 'client'
     extract(inputs / 'server.tar.gz', server)
     extract(inputs / 'client.tar.gz', client)
     extract(inputs / 'xorg.tar.xz', server / 'unix/xserver')
-    for patch in sorted((COMPONENT / 'patches').glob('*.patch')):
-        target = server if patch.name.startswith('000') else client
+    for patch in selected_patches(transport):
+        target = server if patch.name.startswith('000') or '-server-' in patch.name else client
         run(['patch', '--batch', '-p1', '-i', str(patch)], target)
+    cmake_options = ['-DCMAKE_POLICY_VERSION_MINIMUM=3.5', '-DENABLE_PAM=OFF'] if platform == 'alpine' else []
     run(['cmake', '.', '-DBUILD_VIEWER=OFF', '-DENABLE_GNUTLS=OFF',
-         '-DCMAKE_BUILD_TYPE=RelWithDebInfo'], server)
+         '-DCMAKE_BUILD_TYPE=RelWithDebInfo', *cmake_options], server)
     run(['make', '-j4'], server)
     xorg = server / 'unix/xserver'
     run(['patch', '--batch', '-p1', '-i', str(server / 'unix/xserver21.patch')], xorg)
@@ -69,23 +76,32 @@ def build(inputs, work):
          '--with-default-font-path=/usr/share/fonts/X11/misc,built-ins',
          '--without-dtrace', '--with-sha1=libcrypto', '--with-xkb-bin-directory=/usr/bin',
          '--with-xkb-output=/var/lib/xkb', '--with-xkb-path=/usr/share/X11/xkb'], xorg)
-    run(['make', '-j4'], xorg)
+    # Only the standalone Xvnc binary is shipped. Alpine's static codec
+    # archives are not PIC and cannot build the unused Xorg loadable module.
+    module_options = ['libvnc_la_LTLIBRARIES='] if platform == 'alpine' else []
+    run(['make', '-j4', *module_options], xorg)
     deps = work / 'dependencies'
     deps.mkdir()
     for name in ['package.json', 'package-lock.json']:
         shutil.copyfile(COMPONENT / name, deps / name)
     run(['npm', 'ci', '--ignore-scripts', '--no-audit', '--no-fund'], deps)
     shutil.copyfile(COMPONENT / 'client-entry.js', client / 'remotexapp-entry.js')
+    shutil.copyfile(COMPONENT / 'clipboard-payload.mjs', client / 'core/clipboard-payload.mjs')
     shutil.copyfile(COMPONENT / 'server-messages.mjs', client / 'core/remotexapp-server-messages.mjs')
-    run(['node', '--test', str(COMPONENT / 'tests/server-messages.test.mjs')], client,
-        env=dict(os.environ, KASM_CLIENT_SOURCE=str(client)))
+    shutil.copyfile(COMPONENT / 'udp.mjs', client / 'core/remotexapp-udp.mjs')
+    shutil.copyfile(COMPONENT / 'latency.mjs', client / 'core/remotexapp-latency.mjs')
+    shutil.copyfile(COMPONENT / 'clipboard-input.mjs', client / 'core/remotexapp-clipboard-input.mjs')
+    shutil.copyfile(COMPONENT / 'native-input.mjs', client / 'core/remotexapp-native-input.mjs')
+    run(['node', '--test', *[str(p) for p in sorted((COMPONENT / 'tests').glob('*.test.mjs'))]], client,
+        env=dict(os.environ, KASM_CLIENT_SOURCE=str(client), KASM_SERVER_SOURCE=str(server), KASM_TRANSPORT=transport))
     env = dict(os.environ, NODE_PATH=str(deps / 'node_modules'))
     run([str(deps / 'node_modules/.bin/esbuild'), 'remotexapp-entry.js', '--bundle',
+         '--define:REMOTEXAPP_UDP=' + ('true' if transport == 'udp' else 'false'),
          '--format=esm', '--target=es2022', '--loader:.bin=dataurl',
          '--outfile=' + str(work / 'client.js')], client, env=env)
 
 
-def package(inputs, work, output):
+def package(inputs, work, output, platform='ubuntu', transport='wss'):
     output.mkdir(parents=True, exist_ok=False)
     def copy(source, name):
         target = output / name
@@ -96,12 +112,20 @@ def package(inputs, work, output):
     (output / 'bin/Xkasmvnc').chmod(0o755)
     run(['strip', '--strip-debug', str(output / 'bin/Xkasmvnc')], work)
     copy(work / 'client.js', 'web/client.js')
+    copy(COMPONENT / 'clipboard-payload.mjs', 'sources/clipboard-payload.mjs')
     copy(COMPONENT / 'server-messages.mjs', 'sources/server-messages.mjs')
-    copy(COMPONENT / 'tests/server-messages.test.mjs', 'sources/tests/server-messages.test.mjs')
+    copy(COMPONENT / 'udp.mjs', 'sources/udp.mjs')
+    copy(COMPONENT / 'latency.mjs', 'sources/latency.mjs')
+    copy(COMPONENT / 'clipboard-input.mjs', 'sources/clipboard-input.mjs')
+    copy(COMPONENT / 'native-input.mjs', 'sources/native-input.mjs')
+    for test in sorted((COMPONENT / 'tests').glob('*')):
+        if test.suffix not in ('.mjs', '.cpp'):
+            continue
+        copy(test, 'sources/tests/' + test.name)
     copy(work / 'server/LICENSE.TXT', 'LICENSE.server.txt')
     copy(work / 'client/LICENSE.txt', 'LICENSE.client.txt')
     packages = {}
-    for name, pkg in LIBRARIES.items():
+    for name, pkg in (LIBRARIES.items() if platform == 'ubuntu' else []):
         copy(Path('/usr/lib/x86_64-linux-gnu') / name, 'lib/' + name)
         copy(Path('/usr/share/doc') / pkg / 'copyright', 'notices/' + pkg + '.txt')
         packages[pkg] = subprocess.check_output(['dpkg-query', '-W', '-f=${Version}', pkg], text=True)
@@ -112,18 +136,26 @@ def package(inputs, work, output):
         copy(COMPONENT / name, 'sources/build/' + name)
     copy(Path(__file__), 'sources/build/build-kasm-component.py')
     patches = {}
-    for patch in sorted((COMPONENT / 'patches').glob('*.patch')):
+    for patch in selected_patches(transport):
         copy(patch, 'sources/patches/' + patch.name)
         patches[patch.name] = digest(patch)
-    source = {'status':'experimental-d1-not-a-release', 'serverCommit':SERVER, 'clientCommit':CLIENT,
+    if platform == 'alpine':
+        packages = subprocess.check_output(['apk', 'info', '-v'], text=True).splitlines()
+    source = {'status':'experimental-native-rich-clipboard-not-a-release', 'serverCommit':SERVER, 'clientCommit':CLIENT,
+              'platform':platform, 'architecture':host_platform.machine(),
+              'linkage':'dynamic; target runtime libraries required',
               'archives':INPUTS, 'patches':patches, 'runtimeLibraryPackages':packages,
               'clientDependencies':{'pako':'2.1.0'}, 'clientBuilder':{'esbuild':'0.20.1'},
-              'scope':'WSS only; no UDP, QOI workers, audio or clipboard qualification',
+              'transport':transport,
+              'nativeTestCompiler':{
+                  'command':os.environ.get('KASM_TEST_CXX', 'c++'),
+                  'version':subprocess.check_output([os.environ.get('KASM_TEST_CXX', 'c++'), '--version'], text=True).splitlines()[0]},
+              'scope':'Bounded native text/HTML/PNG clipboard; optional UDP=' + str(transport == 'udp') + '; integration qualification required; no file/folder transfer',
               'tools':{name:subprocess.check_output([name,'--version'],text=True).splitlines()[0]
                        for name in ['c++','cmake','node','npm']}}
     (output / 'SOURCE.json').write_text(json.dumps(source, indent=2)+'\n')
     files = {str(p.relative_to(output)):digest(p) for p in sorted(output.rglob('*')) if p.is_file()}
-    manifest = {'schemaVersion':1, 'protocol':'kasm-wss-v1', 'serverCommit':SERVER,
+    manifest = {'schemaVersion':1, 'protocol':'kasm-udp-clipboard-v2' if transport == 'udp' else 'kasm-wss-clipboard-v2', 'serverCommit':SERVER,
                 'clientCommit':CLIENT, 'binary':'bin/Xkasmvnc', 'client':'web/client.js', 'files':files}
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
     print('Kasm component manifest SHA256:', digest(output / 'manifest.json'))
@@ -134,6 +166,8 @@ def main():
     parser.add_argument('--inputs', required=True, type=Path)
     parser.add_argument('--work', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--platform', choices=['ubuntu', 'alpine'], default='ubuntu')
+    parser.add_argument('--transport', choices=['wss', 'udp'], default='wss')
     args = parser.parse_args()
     inputs, work, output = (p.resolve() for p in [args.inputs,args.work,args.output])
     for name, expected in INPUTS.items():
@@ -141,8 +175,8 @@ def main():
             raise SystemExit('Source archive checksum mismatch: ' + name)
     if output.exists() or work.exists():
         raise SystemExit('Work and output directories must be new')
-    build(inputs,work)
-    package(inputs,work,output)
+    build(inputs,work,args.platform,args.transport)
+    package(inputs,work,output,args.platform,args.transport)
 
 
 if __name__ == '__main__':

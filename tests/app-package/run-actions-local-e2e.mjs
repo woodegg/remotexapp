@@ -26,11 +26,22 @@ async function rpc(endpoint){
  return {close:()=>ws.close(),call:(method,params={})=>new Promise((resolve,reject)=>{const id=++seq,timer=setTimeout(()=>{pending.delete(id);reject(Error('RPC timeout '+method))},10000);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params}))})};
 }
 async function activate(id){const s=new WebSocket(base.replace('http:','ws:')+'/remotexapps/'+id+'/rfb-compat');await new Promise((r,j)=>{s.addEventListener('open',r,{once:true});s.addEventListener('error',j,{once:true})});s.close();return wait(async()=>{const x=await manager.getInstance(id);if(x.state==='failed'||x.applicationStatus?.state==='error')throw Error(JSON.stringify(x));return x.applicationStatus?.state==='ready'&&x;});}
-async function tabs(info){
+async function tabs(info,markOriginals=false){
  const firefox=info.application.protocol==='webdriver-bidi';
  const endpoint=firefox?info.application.endpoints.webSocketUrl:(await(await fetch(info.application.endpoints.versionUrl)).json()).webSocketDebuggerUrl;
  const control=await rpc(endpoint);
- try{if(firefox){await control.call('session.new',{capabilities:{}});try{return(await control.call('browsingContext.getTree')).contexts.map(x=>({id:x.context,url:x.url}));}finally{await control.call('session.end');}}
+ try{if(firefox){await control.call('session.new',{capabilities:{}});try{
+  // Firefox can reassign context IDs when a BiDi session ends. Keep a marker
+  // in each original document to prove that openUrl preserved the actual tabs.
+  const result=[];
+  for(const context of (await control.call('browsingContext.getTree')).contexts){
+   const expression=markOriginals?`globalThis.__remoteXAppActionSentinel=${JSON.stringify('original-'+Date.now()+'-'+Math.random())}`:'globalThis.__remoteXAppActionSentinel';
+   const value=await control.call('script.evaluate',{expression,target:{context:context.context},awaitPromise:false});
+   assert.equal(value.type,'success');
+   result.push({id:context.context,url:context.url,marker:value.result.value});
+  }
+  return result;
+ }finally{await control.call('session.end');}}
  return(await control.call('Target.getTargets')).targetInfos.filter(x=>x.type==='page').map(x=>({id:x.targetId,url:x.url}));}finally{control.close();}
 }
 try{
@@ -58,15 +69,19 @@ try{
  for(const templateId of ['edge','firefox-esr']){
   let x=await manager.createInstance({templateId});created.push(x.id);
   const idle=await manager.getActions(x.id);assert.equal(idle.ready,false);assert(idle.actions.openUrl);assert(!JSON.stringify(idle).includes('open-url.py'));
-  x=await activate(x.id);const original=x,info=await manager.getConnections(x.id),before=await tabs(info);
+  x=await activate(x.id);const original=x,info=await manager.getConnections(x.id),before=await tabs(info,true),firefox=info.application.protocol==='webdriver-bidi';
   assert(before.length>0);assert.equal((await manager.createInstance({templateId,parameters:{startUrl:'https://example.test/ignored'}})).id,x.id);
   for(const url of ['file:///etc/passwd','javascript:alert(1)','data:text/html,hi','https://example.test/\n'])await assert.rejects(manager.invokeAction(x.id,'openUrl',{url},{sessionGeneration:x.sessionGeneration}),e=>e.status===400);
   await assert.rejects(manager.invokeAction(x.id,'openUrl',{url:base},{sessionGeneration:x.sessionGeneration+1}),e=>e.status===409);
   await assert.rejects(manager.invokeAction(x.id,'openUrl',{url:base,disposition:'replace'},{sessionGeneration:x.sessionGeneration}),e=>e.status===400);
   const requested=base+'/healthz?app='+templateId;
   const result=await manager.invokeAction(x.id,'openUrl',{url:requested},{sessionGeneration:x.sessionGeneration});assert.equal(result.result.url,requested);
-  await wait(async()=>{const all=await tabs(info);return all.find(t=>t.id===result.result.tabId&&t.url===requested)});
-  const after=await tabs(info);for(const tab of before)assert(after.find(t=>t.id===tab.id),'original tab removed');assert.equal(after.length,before.length+1);
+  assert.equal(typeof result.result.tabId,'string');assert(result.result.tabId.length>0);
+  await wait(async()=>{const all=await tabs(info);return all.find(t=>t.url===requested&&(firefox?!t.marker:t.id===result.result.tabId))});
+  const after=await tabs(info);for(const tab of before){
+   if(firefox)assert(tab.marker,'original document marker missing');
+   assert(after.find(t=>firefox?t.marker===tab.marker&&t.url===tab.url:t.id===tab.id),'original tab or document removed');
+  }assert.equal(after.length,before.length+1);
   if(templateId==='firefox-esr'){
    const owner=await rpc(info.application.endpoints.webSocketUrl);try{await owner.call('session.new',{capabilities:{}});await assert.rejects(manager.invokeAction(x.id,'openUrl',{url:base},{sessionGeneration:x.sessionGeneration}),e=>e.status===409&&e.body.code==='control-busy');assert((await owner.call('browsingContext.getTree')).contexts.length>0);await owner.call('session.end');}finally{owner.close()}
    const again=await manager.invokeAction(x.id,'openUrl',{url:base+'/readyz'},{sessionGeneration:x.sessionGeneration});assert(again.result.tabId);checks.push('Firefox-owned-BiDi-session-not-stolen-and-released');

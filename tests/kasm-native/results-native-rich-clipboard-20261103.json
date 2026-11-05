@@ -1,0 +1,1219 @@
+{
+  "schema": 1,
+  "scope": "native-rich-clipboard-development-candidate",
+  "verifiedAt": "2026-11-03T02:49:24.751145+00:00",
+  "status": "automated-runs-recorded-open-observations-and-physical-UAT-pending",
+  "coreVersion": "0.16.0-dev.6",
+  "sdkVersion": "0.31.0-dev.6",
+  "formats": [
+    "text/plain",
+    "text/html",
+    "image/png"
+  ],
+  "aggregateMaxBytes": 2097152,
+  "coreAndEdgeArtifacts": [
+    {
+      "architecture": "amd64",
+      "sourceCommit": "b1c4385fdb869a3155b6ef437e1aa8d6405e757f",
+      "coreArchiveSHA256": "5bddfb0247d31fd9c4aff909bc7b8c25812b90e6e6cae41fad8fe945195b6668",
+      "edgeArchiveSHA256": "8cbc43a58687a89782c71f94a3f27b1c0064f3a6f778ecd8867aefb932ed89bd"
+    },
+    {
+      "architecture": "arm64",
+      "sourceCommit": "b1c4385fdb869a3155b6ef437e1aa8d6405e757f",
+      "coreArchiveSHA256": "4dea2d05ba9c67d0d2c9498abf20fecd6df1517427b8f5080773293601c1c946",
+      "edgeArchiveSHA256": "b69a906c13db0f79751e03ec3ff1c7b368bb213b82ef1e35041a5fbd21db72a4"
+    }
+  ],
+  "nativeComponents": [
+    {
+      "architecture": "amd64",
+      "source": "cc9f4a6877053d45884265a7ecaa88533cf2e127",
+      "manifest": "60beb60b65e6bb3741cd7226767b0c80bf521f0eecb9cf6d65fa086501c4c3c5",
+      "archiveSHA256": "a86469e1cd0b11299c159ccf865d822aeb47c7d698824f12812e31b964028cc7"
+    },
+    {
+      "architecture": "arm64",
+      "source": "cc9f4a6877053d45884265a7ecaa88533cf2e127",
+      "manifest": "891c88da75ee0657be155ba25a8a650e14a41e9db37d10fa92bf8e8a2ac56d45",
+      "archiveSHA256": "95250792ce38e8e1ed476891d402cd701610404378094dc2f574506e92d9be1f"
+    }
+  ],
+  "artifactFileIntegrity": [
+    {
+      "architecture": "amd64",
+      "kind": "core",
+      "files": 22,
+      "verified": true
+    },
+    {
+      "architecture": "amd64",
+      "kind": "edge",
+      "files": 12,
+      "verified": true
+    },
+    {
+      "architecture": "amd64",
+      "kind": "native-component",
+      "files": 52,
+      "verified": true
+    },
+    {
+      "architecture": "arm64",
+      "kind": "core",
+      "files": 22,
+      "verified": true
+    },
+    {
+      "architecture": "arm64",
+      "kind": "edge",
+      "files": 12,
+      "verified": true
+    },
+    {
+      "architecture": "arm64",
+      "kind": "native-component",
+      "files": 52,
+      "verified": true
+    },
+    {
+      "kind": "writer-app",
+      "version": "1.0.0",
+      "archiveMatchesSourceFiles": true,
+      "sha256": "5331dc22a6589f4a5ba629c9a7ed253595ffb7d92ea1cd3ba33ac8fdc02cfd8e"
+    }
+  ],
+  "browsers": {
+    "local": "Linux Chrome/149.0.7827.102",
+    "public": "Isolated Alpine Chromium/156.0.8078.79",
+    "permissions": "CDP overrides; physical permission prompts not qualified",
+    "microphone": "synthetic 880 Hz; no physical microphone"
+  },
+  "workbenchPage": {
+    "sourceCommit": "24155a29deade6c82884f4e07081e6ba31639d2b",
+    "files": {
+      "uat.html": "05cdc29f3e91ad78abaa79150965bd5f90a6cf93b7f64a1d959e5aec4aaaf93a"
+    },
+    "kind": "test-workbench-page-only",
+    "binarySourceUnchanged": "b1c4385fdb869a3155b6ef437e1aa8d6405e757f",
+    "archive": "uat-page-24155a29dead.tar.gz",
+    "archiveSHA256": "cc428ffa87dd9c587c0c22b6a1d8b2b06b979f033cca9c28d9c1113bb9ad12ef"
+  },
+  "workbenchStartupRegression": {
+    "old": {
+      "region": "australia",
+      "expected": "old-timeout",
+      "status": "pass",
+      "injectedDispatchDelayMs": 18000,
+      "errors": [
+        {
+          "name": "TimeoutError",
+          "elapsedMs": 15000.099999904633
+        }
+      ],
+      "readyViewers": 0,
+      "ownedWriterStopped": false
+    },
+    "corrected": [
+      {
+        "region": "australia",
+        "expected": "new-success",
+        "status": "pass",
+        "injectedDispatchDelayMs": 18000,
+        "errors": [],
+        "readyViewers": 2,
+        "ownedWriterStopped": true
+      },
+      {
+        "region": "china",
+        "expected": "new-success",
+        "status": "pass",
+        "injectedDispatchDelayMs": 18000,
+        "errors": [],
+        "readyViewers": 2,
+        "ownedWriterStopped": true
+      },
+      {
+        "region": "us",
+        "expected": "new-success",
+        "status": "pass",
+        "injectedDispatchDelayMs": 18000,
+        "errors": [],
+        "readyViewers": 2,
+        "ownedWriterStopped": true
+      }
+    ]
+  },
+  "appPackages": {
+    "writer": {
+      "version": "1.0.0",
+      "sourceCommit": "cc9f4a6877053d45884265a7ecaa88533cf2e127",
+      "archiveSHA256": "5331dc22a6589f4a5ba629c9a7ed253595ffb7d92ea1cd3ba33ac8fdc02cfd8e",
+      "sourceFilesVerified": true
+    },
+    "mousepad": {
+      "version": "1.0.3",
+      "unchanged": true
+    },
+    "audio": {
+      "version": "1.0.1",
+      "unchanged": true
+    }
+  },
+  "local": {
+    "rich": {
+      "status": "pass",
+      "checks": 16,
+      "cases": [
+        {
+          "name": "real Writer HTML paste and copy preserve text and bold in both directions",
+          "status": "passed"
+        },
+        {
+          "name": "real Writer PNG paste and copy preserve dimensions and pixels in both directions",
+          "status": "passed"
+        },
+        {
+          "name": "one remote item retains all three representations",
+          "status": "passed"
+        },
+        {
+          "name": "delayed representation commits atomically",
+          "status": "passed"
+        },
+        {
+          "name": "browser HTML normalization does not echo to X11",
+          "status": "passed"
+        },
+        {
+          "name": "remote exact 2 MiB INCR succeeds",
+          "status": "passed"
+        },
+        {
+          "name": "aggregate oversize preserves browser destination",
+          "status": "passed"
+        },
+        {
+          "name": "timeout and late response preserve browser destination",
+          "status": "passed"
+        },
+        {
+          "name": "failed later representation cannot publish partial text",
+          "status": "passed"
+        },
+        {
+          "name": "embedded NUL in legacy STRING cannot truncate and publish text",
+          "status": "passed"
+        },
+        {
+          "name": "file-manager URI selection is excluded",
+          "status": "passed"
+        },
+        {
+          "name": "replacement owner cannot mix or replay stale representations",
+          "status": "passed"
+        },
+        {
+          "name": "browser exact 2 MiB succeeds",
+          "status": "passed"
+        },
+        {
+          "name": "browser one-byte oversize preserves remote destination",
+          "status": "passed"
+        },
+        {
+          "name": "empty upload is a no-op",
+          "status": "passed"
+        },
+        {
+          "name": "explicit clear replaces owned remote selection",
+          "status": "passed"
+        }
+      ],
+      "display": {
+        "state": "ready",
+        "transport": "ws-loopback",
+        "frames": 95
+      }
+    },
+    "lifecycle": {
+      "status": "pass",
+      "checks": 7,
+      "cases": [
+        {
+          "name": "automatic rich submission reaches native selection",
+          "status": "pass"
+        },
+        {
+          "name": "same-runtime second tab owns rich synchronization without background fan-out",
+          "status": "pass"
+        },
+        {
+          "name": "different runtime gets only its focused rich transaction",
+          "status": "pass"
+        },
+        {
+          "name": "returning focus establishes baseline without replaying another runtime payload",
+          "status": "pass"
+        },
+        {
+          "name": "outside Viewer focus does not automatically change remote rich selection",
+          "status": "pass"
+        },
+        {
+          "name": "explicit paste choice after return transfers current rich item",
+          "status": "pass"
+        },
+        {
+          "name": "reset revokes both rich directions",
+          "status": "pass"
+        }
+      ]
+    },
+    "oldTextPin": {
+      "status": "pass",
+      "checks": 15,
+      "cases": [
+        {
+          "name": "default off performs no automatic browser clipboard access",
+          "status": "pass"
+        },
+        {
+          "name": "opted-in local Chinese multiline emoji reaches native clipboard and real editor save",
+          "status": "pass"
+        },
+        {
+          "name": "copy outside then return and paste synchronizes before native paste keys",
+          "status": "pass"
+        },
+        {
+          "name": "real remote editor copy automatically writes local text without a transfer click",
+          "status": "pass"
+        },
+        {
+          "name": "same-runtime second tab writes once; inactive tab does not echo or overwrite",
+          "status": "pass"
+        },
+        {
+          "name": "two different runtimes have independent consent and no background fan-out",
+          "status": "pass"
+        },
+        {
+          "name": "one-direction modes and empty local paste preserve the other clipboard",
+          "status": "pass"
+        },
+        {
+          "name": "64 KiB UTF-8 roundtrip is exact; one byte oversize leaves remote unchanged",
+          "status": "pass"
+        },
+        {
+          "name": "simultaneous local and remote changes require an explicit source choice",
+          "status": "pass"
+        },
+        {
+          "name": "a write acknowledged after blur remains uncertain and is never replayed",
+          "status": "pass"
+        },
+        {
+          "name": "permission revocation gives visible manual fallback without automatic read prompts",
+          "status": "pass"
+        },
+        {
+          "name": "delayed read is retired by scope reset and cannot submit later",
+          "status": "pass"
+        },
+        {
+          "name": "disconnect and reconnect require new consent",
+          "status": "pass"
+        },
+        {
+          "name": "manual compatibility and explicit clear work after automatic reset",
+          "status": "pass"
+        },
+        {
+          "name": "no browser exceptions and no payloads in public clipboard snapshots",
+          "status": "pass"
+        }
+      ]
+    },
+    "oldTextManifest": "0957b1998e37d258e14e45eda7d61266e461ff19124ad3f1425c2a9def01b857",
+    "oldTextMaxBytes": 65536
+  },
+  "public": {
+    "australia": {
+      "architecture": "amd64",
+      "regression": {
+        "status": "pass",
+        "checks": 9,
+        "cases": [
+          {
+            "name": "authenticated public workbench uses the exact new Core/component/App",
+            "status": "pass"
+          },
+          {
+            "name": "public native Chinese multiline emoji paste and remote copy read back exactly",
+            "status": "pass"
+          },
+          {
+            "name": "established UDP paints real frames during clipboard use",
+            "status": "pass"
+          },
+          {
+            "name": "explicit WSS fallback preserves bidirectional clipboard",
+            "status": "pass"
+          },
+          {
+            "name": "restoring UDP resumes frame traffic without restoring old clipboard content",
+            "status": "pass"
+          },
+          {
+            "name": "second embedded Viewer has independent opt-in and active ownership",
+            "status": "pass"
+          },
+          {
+            "name": "speaker and microphone coexist with automatic clipboard",
+            "status": "pass"
+          },
+          {
+            "name": "real remote Pulse playback reaches the browser while clipboard stays usable",
+            "status": "pass"
+          },
+          {
+            "name": "all audio off retains the selected clipboard connection",
+            "status": "pass"
+          }
+        ]
+      },
+      "rich": {
+        "status": "pass",
+        "checks": 16,
+        "cases": [
+          {
+            "name": "real Writer HTML paste and copy preserve text and bold in both directions",
+            "status": "passed"
+          },
+          {
+            "name": "real Writer PNG paste and copy preserve dimensions and pixels in both directions",
+            "status": "passed"
+          },
+          {
+            "name": "one remote item retains all three representations",
+            "status": "passed"
+          },
+          {
+            "name": "delayed representation commits atomically",
+            "status": "passed"
+          },
+          {
+            "name": "browser HTML normalization does not echo to X11",
+            "status": "passed"
+          },
+          {
+            "name": "remote exact 2 MiB INCR succeeds",
+            "status": "passed"
+          },
+          {
+            "name": "aggregate oversize preserves browser destination",
+            "status": "passed"
+          },
+          {
+            "name": "timeout and late response preserve browser destination",
+            "status": "passed"
+          },
+          {
+            "name": "failed later representation cannot publish partial text",
+            "status": "passed"
+          },
+          {
+            "name": "embedded NUL in legacy STRING cannot truncate and publish text",
+            "status": "passed"
+          },
+          {
+            "name": "file-manager URI selection is excluded",
+            "status": "passed"
+          },
+          {
+            "name": "replacement owner cannot mix or replay stale representations",
+            "status": "passed"
+          },
+          {
+            "name": "browser exact 2 MiB succeeds",
+            "status": "passed"
+          },
+          {
+            "name": "browser one-byte oversize preserves remote destination",
+            "status": "passed"
+          },
+          {
+            "name": "empty upload is a no-op",
+            "status": "passed"
+          },
+          {
+            "name": "explicit clear replaces owned remote selection",
+            "status": "passed"
+          }
+        ],
+        "display": {
+          "state": "ready",
+          "transport": "webrtc-udp",
+          "udpBytes": 120776,
+          "frames": 48
+        }
+      },
+      "wss": {
+        "status": "pass",
+        "checks": 2,
+        "cases": [
+          {
+            "name": "real Writer HTML paste and copy preserve text and bold in both directions",
+            "status": "passed"
+          },
+          {
+            "name": "real Writer PNG paste and copy preserve dimensions and pixels in both directions",
+            "status": "passed"
+          }
+        ],
+        "display": {
+          "state": "ready",
+          "transport": "wss",
+          "udpBytes": 195514,
+          "frames": 236
+        }
+      },
+      "lifecycle": {
+        "status": "pass",
+        "checks": 7,
+        "cases": [
+          {
+            "name": "automatic rich submission reaches native selection",
+            "status": "pass"
+          },
+          {
+            "name": "same-runtime second tab owns rich synchronization without background fan-out",
+            "status": "pass"
+          },
+          {
+            "name": "different runtime gets only its focused rich transaction",
+            "status": "pass"
+          },
+          {
+            "name": "returning focus establishes baseline without replaying another runtime payload",
+            "status": "pass"
+          },
+          {
+            "name": "outside Viewer focus does not automatically change remote rich selection",
+            "status": "pass"
+          },
+          {
+            "name": "explicit paste choice after return transfers current rich item",
+            "status": "pass"
+          },
+          {
+            "name": "reset revokes both rich directions",
+            "status": "pass"
+          }
+        ]
+      },
+      "deployed": {
+        "sourceCommit": "b1c4385fdb869a3155b6ef437e1aa8d6405e757f",
+        "componentManifest": "60beb60b65e6bb3741cd7226767b0c80bf521f0eecb9cf6d65fa086501c4c3c5",
+        "newWriterPackage": "1.0.0",
+        "oldAppsPreservedAtActivation": true,
+        "oldDocumentsPreservedAtActivation": true
+      }
+    },
+    "china": {
+      "architecture": "amd64",
+      "regression": {
+        "status": "pass",
+        "checks": 9,
+        "cases": [
+          {
+            "name": "authenticated public workbench uses the exact new Core/component/App",
+            "status": "pass"
+          },
+          {
+            "name": "public native Chinese multiline emoji paste and remote copy read back exactly",
+            "status": "pass"
+          },
+          {
+            "name": "established UDP paints real frames during clipboard use",
+            "status": "pass"
+          },
+          {
+            "name": "explicit WSS fallback preserves bidirectional clipboard",
+            "status": "pass"
+          },
+          {
+            "name": "restoring UDP resumes frame traffic without restoring old clipboard content",
+            "status": "pass"
+          },
+          {
+            "name": "second embedded Viewer has independent opt-in and active ownership",
+            "status": "pass"
+          },
+          {
+            "name": "speaker and microphone coexist with automatic clipboard",
+            "status": "pass"
+          },
+          {
+            "name": "real remote Pulse playback reaches the browser while clipboard stays usable",
+            "status": "pass"
+          },
+          {
+            "name": "all audio off retains the selected clipboard connection",
+            "status": "pass"
+          }
+        ]
+      },
+      "rich": {
+        "status": "pass",
+        "checks": 16,
+        "cases": [
+          {
+            "name": "real Writer HTML paste and copy preserve text and bold in both directions",
+            "status": "passed"
+          },
+          {
+            "name": "real Writer PNG paste and copy preserve dimensions and pixels in both directions",
+            "status": "passed"
+          },
+          {
+            "name": "one remote item retains all three representations",
+            "status": "passed"
+          },
+          {
+            "name": "delayed representation commits atomically",
+            "status": "passed"
+          },
+          {
+            "name": "browser HTML normalization does not echo to X11",
+            "status": "passed"
+          },
+          {
+            "name": "remote exact 2 MiB INCR succeeds",
+            "status": "passed"
+          },
+          {
+            "name": "aggregate oversize preserves browser destination",
+            "status": "passed"
+          },
+          {
+            "name": "timeout and late response preserve browser destination",
+            "status": "passed"
+          },
+          {
+            "name": "failed later representation cannot publish partial text",
+            "status": "passed"
+          },
+          {
+            "name": "embedded NUL in legacy STRING cannot truncate and publish text",
+            "status": "passed"
+          },
+          {
+            "name": "file-manager URI selection is excluded",
+            "status": "passed"
+          },
+          {
+            "name": "replacement owner cannot mix or replay stale representations",
+            "status": "passed"
+          },
+          {
+            "name": "browser exact 2 MiB succeeds",
+            "status": "passed"
+          },
+          {
+            "name": "browser one-byte oversize preserves remote destination",
+            "status": "passed"
+          },
+          {
+            "name": "empty upload is a no-op",
+            "status": "passed"
+          },
+          {
+            "name": "explicit clear replaces owned remote selection",
+            "status": "passed"
+          }
+        ],
+        "display": {
+          "state": "ready",
+          "transport": "webrtc-udp",
+          "udpBytes": 371498,
+          "frames": 247
+        }
+      },
+      "wss": {
+        "status": "pass",
+        "checks": 2,
+        "cases": [
+          {
+            "name": "real Writer HTML paste and copy preserve text and bold in both directions",
+            "status": "passed"
+          },
+          {
+            "name": "real Writer PNG paste and copy preserve dimensions and pixels in both directions",
+            "status": "passed"
+          }
+        ],
+        "display": {
+          "state": "ready",
+          "transport": "wss",
+          "udpBytes": 442456,
+          "frames": 434
+        }
+      },
+      "lifecycle": {
+        "status": "pass",
+        "checks": 7,
+        "cases": [
+          {
+            "name": "automatic rich submission reaches native selection",
+            "status": "pass"
+          },
+          {
+            "name": "same-runtime second tab owns rich synchronization without background fan-out",
+            "status": "pass"
+          },
+          {
+            "name": "different runtime gets only its focused rich transaction",
+            "status": "pass"
+          },
+          {
+            "name": "returning focus establishes baseline without replaying another runtime payload",
+            "status": "pass"
+          },
+          {
+            "name": "outside Viewer focus does not automatically change remote rich selection",
+            "status": "pass"
+          },
+          {
+            "name": "explicit paste choice after return transfers current rich item",
+            "status": "pass"
+          },
+          {
+            "name": "reset revokes both rich directions",
+            "status": "pass"
+          }
+        ]
+      },
+      "deployed": {
+        "sourceCommit": "b1c4385fdb869a3155b6ef437e1aa8d6405e757f",
+        "componentManifest": "60beb60b65e6bb3741cd7226767b0c80bf521f0eecb9cf6d65fa086501c4c3c5",
+        "newWriterPackage": "1.0.0",
+        "oldAppsPreservedAtActivation": true,
+        "oldDocumentsPreservedAtActivation": true
+      }
+    },
+    "us": {
+      "architecture": "arm64",
+      "regression": {
+        "status": "pass",
+        "checks": 9,
+        "cases": [
+          {
+            "name": "authenticated public workbench uses the exact new Core/component/App",
+            "status": "pass"
+          },
+          {
+            "name": "public native Chinese multiline emoji paste and remote copy read back exactly",
+            "status": "pass"
+          },
+          {
+            "name": "established UDP paints real frames during clipboard use",
+            "status": "pass"
+          },
+          {
+            "name": "explicit WSS fallback preserves bidirectional clipboard",
+            "status": "pass"
+          },
+          {
+            "name": "restoring UDP resumes frame traffic without restoring old clipboard content",
+            "status": "pass"
+          },
+          {
+            "name": "second embedded Viewer has independent opt-in and active ownership",
+            "status": "pass"
+          },
+          {
+            "name": "speaker and microphone coexist with automatic clipboard",
+            "status": "pass"
+          },
+          {
+            "name": "real remote Pulse playback reaches the browser while clipboard stays usable",
+            "status": "pass"
+          },
+          {
+            "name": "all audio off retains the selected clipboard connection",
+            "status": "pass"
+          }
+        ]
+      },
+      "rich": {
+        "status": "pass",
+        "checks": 16,
+        "cases": [
+          {
+            "name": "real Writer HTML paste and copy preserve text and bold in both directions",
+            "status": "passed"
+          },
+          {
+            "name": "real Writer PNG paste and copy preserve dimensions and pixels in both directions",
+            "status": "passed"
+          },
+          {
+            "name": "one remote item retains all three representations",
+            "status": "passed"
+          },
+          {
+            "name": "delayed representation commits atomically",
+            "status": "passed"
+          },
+          {
+            "name": "browser HTML normalization does not echo to X11",
+            "status": "passed"
+          },
+          {
+            "name": "remote exact 2 MiB INCR succeeds",
+            "status": "passed"
+          },
+          {
+            "name": "aggregate oversize preserves browser destination",
+            "status": "passed"
+          },
+          {
+            "name": "timeout and late response preserve browser destination",
+            "status": "passed"
+          },
+          {
+            "name": "failed later representation cannot publish partial text",
+            "status": "passed"
+          },
+          {
+            "name": "embedded NUL in legacy STRING cannot truncate and publish text",
+            "status": "passed"
+          },
+          {
+            "name": "file-manager URI selection is excluded",
+            "status": "passed"
+          },
+          {
+            "name": "replacement owner cannot mix or replay stale representations",
+            "status": "passed"
+          },
+          {
+            "name": "browser exact 2 MiB succeeds",
+            "status": "passed"
+          },
+          {
+            "name": "browser one-byte oversize preserves remote destination",
+            "status": "passed"
+          },
+          {
+            "name": "empty upload is a no-op",
+            "status": "passed"
+          },
+          {
+            "name": "explicit clear replaces owned remote selection",
+            "status": "passed"
+          }
+        ],
+        "display": {
+          "state": "ready",
+          "transport": "webrtc-udp",
+          "udpBytes": 96579,
+          "frames": 40
+        }
+      },
+      "wss": {
+        "status": "pass",
+        "checks": 2,
+        "cases": [
+          {
+            "name": "real Writer HTML paste and copy preserve text and bold in both directions",
+            "status": "passed"
+          },
+          {
+            "name": "real Writer PNG paste and copy preserve dimensions and pixels in both directions",
+            "status": "passed"
+          }
+        ],
+        "display": {
+          "state": "ready",
+          "transport": "wss",
+          "udpBytes": 167328,
+          "frames": 159
+        }
+      },
+      "lifecycle": {
+        "status": "pass",
+        "checks": 7,
+        "cases": [
+          {
+            "name": "automatic rich submission reaches native selection",
+            "status": "pass"
+          },
+          {
+            "name": "same-runtime second tab owns rich synchronization without background fan-out",
+            "status": "pass"
+          },
+          {
+            "name": "different runtime gets only its focused rich transaction",
+            "status": "pass"
+          },
+          {
+            "name": "returning focus establishes baseline without replaying another runtime payload",
+            "status": "pass"
+          },
+          {
+            "name": "outside Viewer focus does not automatically change remote rich selection",
+            "status": "pass"
+          },
+          {
+            "name": "explicit paste choice after return transfers current rich item",
+            "status": "pass"
+          },
+          {
+            "name": "reset revokes both rich directions",
+            "status": "pass"
+          }
+        ]
+      },
+      "deployed": {
+        "sourceCommit": "b1c4385fdb869a3155b6ef437e1aa8d6405e757f",
+        "componentManifest": "891c88da75ee0657be155ba25a8a650e14a41e9db37d10fa92bf8e8a2ac56d45",
+        "newWriterPackage": "1.0.0",
+        "oldAppsPreservedAtActivation": true,
+        "oldDocumentsPreservedAtActivation": true
+      }
+    }
+  },
+  "usRepeatedFreshAppCycles": {
+    "cycles": 3,
+    "firstCycle": "public.us.rich and public.us.wss",
+    "additionalCycles": [
+      {
+        "udp": {
+          "status": "pass",
+          "checks": 2,
+          "cases": [
+            {
+              "name": "real Writer HTML paste and copy preserve text and bold in both directions",
+              "status": "passed"
+            },
+            {
+              "name": "real Writer PNG paste and copy preserve dimensions and pixels in both directions",
+              "status": "passed"
+            }
+          ],
+          "display": {
+            "state": "ready",
+            "transport": "webrtc-udp",
+            "udpBytes": 107772,
+            "frames": 42
+          }
+        },
+        "wss": {
+          "status": "pass",
+          "checks": 2,
+          "cases": [
+            {
+              "name": "real Writer HTML paste and copy preserve text and bold in both directions",
+              "status": "passed"
+            },
+            {
+              "name": "real Writer PNG paste and copy preserve dimensions and pixels in both directions",
+              "status": "passed"
+            }
+          ],
+          "display": {
+            "state": "ready",
+            "transport": "wss",
+            "udpBytes": 165390,
+            "frames": 77
+          }
+        }
+      },
+      {
+        "udp": {
+          "status": "pass",
+          "checks": 2,
+          "cases": [
+            {
+              "name": "real Writer HTML paste and copy preserve text and bold in both directions",
+              "status": "passed"
+            },
+            {
+              "name": "real Writer PNG paste and copy preserve dimensions and pixels in both directions",
+              "status": "passed"
+            }
+          ],
+          "display": {
+            "state": "ready",
+            "transport": "webrtc-udp",
+            "udpBytes": 107627,
+            "frames": 44
+          }
+        },
+        "wss": {
+          "status": "pass",
+          "checks": 2,
+          "cases": [
+            {
+              "name": "real Writer HTML paste and copy preserve text and bold in both directions",
+              "status": "passed"
+            },
+            {
+              "name": "real Writer PNG paste and copy preserve dimensions and pixels in both directions",
+              "status": "passed"
+            }
+          ],
+          "display": {
+            "state": "ready",
+            "transport": "wss",
+            "udpBytes": 168392,
+            "frames": 80
+          }
+        }
+      }
+    ],
+    "proxyReset": {
+      "proxyRecreated": 42002,
+      "configurationUnchanged": true,
+      "otherProxyUnchanged": true,
+      "containerRestarted": false
+    },
+    "postCycles": {
+      "sockets": [
+        {
+          "port": 42001,
+          "recvQ": 0,
+          "sendQ": 0
+        },
+        {
+          "port": 42002,
+          "recvQ": 0,
+          "sendQ": 0
+        }
+      ],
+      "diagnosticCaptureSHA256": "6b45eaba9d53865f439c3208a75d732744055d9dd44627b053959ee3ac90d985",
+      "ownedCaptureRemoved": true
+    }
+  },
+  "openObservations": [
+    {
+      "id": "us-udp-proxy",
+      "status": "recovered-by-identical-proxy-recreation",
+      "observation": "Queued datagrams and failed ICE; three subsequent fresh Writer UDP/WSS cycles passed; internal proxy cause and automatic recovery not proven."
+    },
+    {
+      "id": "us-wss-html-format",
+      "status": "trigger-not-established",
+      "observation": "One real Writer HTML readback lost bold while retaining text; fresh Viewer, same Viewer, explicit clear and fresh App repetitions passed without runtime change; not a verified fix."
+    }
+  ],
+  "harnessCorrections": [
+    "Create a fresh Writer document before repeat paste checks and wait for a real remote copy notification.",
+    "Wait for actual native receipt of a 2 MiB upload, not a fixed WAN sleep.",
+    "Observe every delayed browser clipboard write instead of assuming remote fixture RPC returns before a one-second delay."
+  ],
+  "cleanup": {
+    "regions": {
+      "australia": {
+        "originalRunningAppPinsAndGenerationsPreserved": true,
+        "originalNonManagerProcessesPreserved": true,
+        "originalDocumentsPreserved": true,
+        "testAppsStopped": true,
+        "attachedViewers": 0,
+        "extraDocuments": 0,
+        "pageOnlyRefreshPreservedAllProcesses": true
+      },
+      "china": {
+        "originalRunningAppPinsAndGenerationsPreserved": true,
+        "originalNonManagerProcessesPreserved": true,
+        "originalDocumentsPreserved": true,
+        "testAppsStopped": true,
+        "attachedViewers": 0,
+        "extraDocuments": 0,
+        "pageOnlyRefreshPreservedAllProcesses": true
+      },
+      "us": {
+        "originalRunningAppPinsAndGenerationsPreserved": true,
+        "originalNonManagerProcessesPreserved": true,
+        "originalDocumentsPreserved": true,
+        "testAppsStopped": true,
+        "attachedViewers": 0,
+        "extraDocuments": 0,
+        "pageOnlyRefreshPreservedAllProcesses": true
+      }
+    },
+    "fixtures": {
+      "localTestAppsStopped": true,
+      "ownedLocalBrowserTerminated": true,
+      "ownedLocalBrowserProfileRemoved": true,
+      "ownedPublicBrowserProfileRemoved": true,
+      "ownedPublicBrowserAndFixtureStopped": true,
+      "originalLocalFixtureStayedStopped": true,
+      "buildersStopped": true,
+      "diagnosticBuilderSourceRestored": true,
+      "userBrowserClipboardAndMicrophoneUnused": true
+    },
+    "merged": false,
+    "released": false,
+    "projectUATRetainedForHumanTesting": true
+  },
+  "verification": {
+    "makeCheck": "pass",
+    "race": "pass",
+    "coverage": "pass",
+    "vulnerabilityScan": "no vulnerable call paths found",
+    "appliedNativeASanUBSan": "pass",
+    "freshNativeBuildTests": {
+      "amd64": {
+        "passed": 63,
+        "skipped": 0
+      },
+      "arm64": {
+        "passed": 63,
+        "skipped": 0
+      }
+    }
+  },
+  "remaining": [
+    "Open HTML-format observation and UDP forwarding recovery limits",
+    "Physical consolidated UAT",
+    "Actual embedding host/workspace integration",
+    "Other OS/browser combinations",
+    "Long-duration rich clipboard soak",
+    "Exact post-merge release qualification"
+  ],
+  "privateEvidenceDigests": [
+    {
+      "name": "check-evidence-final.log",
+      "sha256": "3d6f68c4f96a4540256090a39584ed054f06edfb39fd0884fb437e03d76db013"
+    },
+    {
+      "name": "coverage-final.log",
+      "sha256": "84abec3b58e808525c16a5b1bc70bbc709ab6a6d3cf4cc5ca0396adfa1dbc00b"
+    },
+    {
+      "name": "race-final.log",
+      "sha256": "0db7ed0a6c1fb9992b4973378f116cad77971123d31df1f4dd4548306dc3ce05"
+    },
+    {
+      "name": "vuln-final.log",
+      "sha256": "a32d5c22712dfd83ab1cf823a127d0b72e1b9a8049571c2ff1d598b3484b5216"
+    },
+    {
+      "name": "old-pin-suite.log",
+      "sha256": "396a8c8ae9b2ab3622928fe0d6d000c3d928f39b4eef13aa58a388f5fce1f2a5"
+    },
+    {
+      "name": "australia-rich-setup-final.log",
+      "sha256": "6efea17192ebbe36862036a679f56ae267e68bde51142d4fe1b77ff9a5c8e5c7"
+    },
+    {
+      "name": "australia-rich-setup-retry.log",
+      "sha256": "b873f4cb9492748b3cc634334faafe57bae582983a78797e809bed429fb13680"
+    },
+    {
+      "name": "us-rich-wss.log",
+      "sha256": "db50d3aed08a750d26f29a32d37c16e561e90546d23f38ca45e0ba9a6293a62b"
+    },
+    {
+      "name": "us-rich-wss-retry.log",
+      "sha256": "99350514f14c924293fd0d7c61219797f452bb3b37dc64db96a5e04766a81e0b"
+    },
+    {
+      "name": "us-clear-wss.log",
+      "sha256": "52ded7e9bdffb537a86a85a6cba3570cc77f60ed68961ef3467f1a3d2abeeedb"
+    },
+    {
+      "name": "us-cycle-1.log",
+      "sha256": "92633477929b042dcb38ea67aed0640425c385fe2f674c39d3bd483a825a0075"
+    },
+    {
+      "name": "us-cycle-2.log",
+      "sha256": "bb8a812a5db23ec601ebd287fd12a40b2ad235af52086c61fb57355afbcb514c"
+    },
+    {
+      "name": "us-cycle-3.log",
+      "sha256": "3fe01aba59f125f03a7a4bf1cd34bae3caa347e0a406f9ad98f1906917c9ae9d"
+    },
+    {
+      "name": "china-rich-evidence/rich-first-delay-attempt.json",
+      "sha256": "39f3e87927b4ce5a792ff8fbbd4364df2f21e0b66f739dd8da6abbfefd1bd6ef"
+    },
+    {
+      "name": "us-rich-evidence/rich-wss-first-attempt.json",
+      "sha256": "5202ee80f7237672ab285fbeaaee55450f8f25677aad361ad5d316ff3ee7830d"
+    },
+    {
+      "name": "australia-old-timeout.log",
+      "sha256": "a913221ce8c0accb380a7911777bf3bc9f15e672db34bb6239ec008a64a2304d"
+    },
+    {
+      "name": "australia-new-success.log",
+      "sha256": "72a83bdf0d4bc709e946caa74fdbf506e82bff353a25c6960c7818864a4e12e2"
+    },
+    {
+      "name": "china-new-success.log",
+      "sha256": "72a83bdf0d4bc709e946caa74fdbf506e82bff353a25c6960c7818864a4e12e2"
+    },
+    {
+      "name": "us-new-success.log",
+      "sha256": "72a83bdf0d4bc709e946caa74fdbf506e82bff353a25c6960c7818864a4e12e2"
+    },
+    {
+      "name": "australia-public-final.log",
+      "sha256": "d0577f1fe863bac1f23c720699b8f01336a1f3f117f8a05ed0b86f550d014170"
+    },
+    {
+      "name": "australia-rich-final.log",
+      "sha256": "c5d90ae4f8e3351175a56c6cfb5174ac890288c8fd29eb8b6b014db4b7b5c95f"
+    },
+    {
+      "name": "australia-rich-wss.log",
+      "sha256": "a458220a8779ffadfdc42571cdf5cfba6f7173d154c5d2fc92b8272683d89852"
+    },
+    {
+      "name": "australia-rich-lifecycle.log",
+      "sha256": "1f5e57e2f7156d1b1eb15c35ab49fee90663d69ba18d8a64f890ad86f286806f"
+    },
+    {
+      "name": "china-public-final.log",
+      "sha256": "0312adadf79d740ae1e079e89aa52abecd27595d5785a258087c600a52c1b685"
+    },
+    {
+      "name": "china-rich-final.log",
+      "sha256": "c5d90ae4f8e3351175a56c6cfb5174ac890288c8fd29eb8b6b014db4b7b5c95f"
+    },
+    {
+      "name": "china-rich-wss.log",
+      "sha256": "a458220a8779ffadfdc42571cdf5cfba6f7173d154c5d2fc92b8272683d89852"
+    },
+    {
+      "name": "china-rich-lifecycle.log",
+      "sha256": "1f5e57e2f7156d1b1eb15c35ab49fee90663d69ba18d8a64f890ad86f286806f"
+    },
+    {
+      "name": "us-public-final.log",
+      "sha256": "e9ae9111050137a3f5b041b227b413800aefbd6033705ec5f0a8ff49909b2789"
+    },
+    {
+      "name": "us-rich-final.log",
+      "sha256": "0f275f3d8438e1685180e7e9d920178f8e92c6bbf2aab138350c790ceb60857b"
+    },
+    {
+      "name": "us-rich-wss.log",
+      "sha256": "db50d3aed08a750d26f29a32d37c16e561e90546d23f38ca45e0ba9a6293a62b"
+    },
+    {
+      "name": "us-rich-lifecycle.log",
+      "sha256": "1f5e57e2f7156d1b1eb15c35ab49fee90663d69ba18d8a64f890ad86f286806f"
+    },
+    {
+      "name": "check-publication.log",
+      "sha256": "f9531eb658f3adeb0876892be7a576a4ab73d76a759d647a7ee3db1c38c5219d"
+    }
+  ]
+}

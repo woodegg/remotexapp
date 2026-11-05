@@ -7,14 +7,16 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type viewerChannel struct {
-	runtimeID  string
-	generation int64
-	rfb        bool
-	cancel     context.CancelFunc
-	body       io.Closer
+	nativeGrantKey [32]byte
+	runtimeID      string
+	generation     int64
+	rfb            bool
+	cancel         context.CancelFunc
+	body           io.Closer
 }
 
 func isWebSocket(r *http.Request) bool {
@@ -85,6 +87,13 @@ func (m *manager) bindViewerChannel(channel *viewerChannel, response *http.Respo
 		response.Body.Close()
 		return errors.New("Viewer generation retired before upgrade")
 	}
+	if channel.nativeGrantKey != ([32]byte{}) {
+		g := m.nativeGrants[channel.nativeGrantKey]
+		if g == nil || g.channel != channel || !time.Now().Before(g.expires) {
+			response.Body.Close()
+			return errors.New("native Viewer grant retired before upgrade")
+		}
+	}
 	channel.body = response.Body
 	return nil
 }
@@ -95,6 +104,7 @@ func (m *manager) closeViewerChannel(channel *viewerChannel) {
 	m.mu.Lock()
 	_, owned := m.viewerChannels[channel]
 	delete(m.viewerChannels, channel)
+	m.retireNativeGrantLocked(channel)
 	item := m.instances[channel.runtimeID]
 	current := item != nil && item.SessionGeneration == channel.generation
 	m.mu.Unlock()
@@ -125,11 +135,13 @@ func (m *manager) fenceViewerChannels(item *instance) error {
 	if !m.canFenceViewerChannels(item) {
 		return errors.New("Viewer ownership is uncertain")
 	}
+	m.fenceAudio(item.ID, item.SessionGeneration)
 	m.mu.Lock()
 	var retired []*viewerChannel
 	for channel := range m.viewerChannels {
 		if channel.runtimeID == item.ID && channel.generation <= item.SessionGeneration {
 			retired = append(retired, channel)
+			m.retireNativeGrantLocked(channel)
 			delete(m.viewerChannels, channel)
 		}
 	}

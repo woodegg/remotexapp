@@ -1,0 +1,49 @@
+--- a/core/websock.js
++++ b/core/websock.js
+@@ -50,6 +50,8 @@
+ export default class Websock {
+     constructor() {
+         this._websocket = null;  // WebSocket or RTCDataChannel object
++        this._receivedBytes = 0;
++        this._sentBytes = 0;
+ 
+         this._rQi = 0;           // Receive queue index
+         this._rQlen = 0;         // Next write position in the receive queue
+@@ -68,6 +70,12 @@
+             close: () => {},
+             error: () => {}
+         };
++    }
++
++    // Cumulative payload counters only: no payload retention or sampling timer.
++    get trafficStats() {
++        return { receivedBytes: this._receivedBytes, sentBytes: this._sentBytes,
++                 bufferedBytes: this._websocket?.bufferedAmount || 0 };
+     }
+ 
+     // Getters and Setters
+@@ -170,6 +178,7 @@
+     flush() {
+         if (this._sQlen > 0 && ReadyStates.OPEN.indexOf(this._websocket.readyState) >= 0) {
+             this._websocket.send(this._encodeMessage());
++            this._sentBytes += this._sQlen;
+             this._sQlen = 0;
+         }
+     }
+@@ -199,6 +208,8 @@
+     }
+ 
+     init() {
++        this._receivedBytes = 0;
++        this._sentBytes = 0;
+         this._allocateBuffers();
+         this._rQi = 0;
+         this._websocket = null;
+@@ -335,6 +346,7 @@
+     }
+ 
+     _recvMessage(e) {
++        this._receivedBytes += e.data.byteLength;
+         this._DecodeMessage(e.data);
+         if (this.rQlen > 0) {
+             this._eventHandlers.message();

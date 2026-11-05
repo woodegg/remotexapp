@@ -437,5 +437,12 @@
       "finding": "An earlier full test run hit an existing resize debounce assertion under load.",
       "resolution": "Subsequent full make check and the exact Core CI gate passed; no test was disabled."
     }
+  ],
+  "corrections": [
+    {
+      "date": "2026-10-31",
+      "record": "results-d2-input-20261031.json",
+      "scope": "Earlier click-then-type evidence did not prove remote pointer delivery; pointer acceptance is superseded. Original D2 candidate failed physical UAT."
+    }
   ]
 }

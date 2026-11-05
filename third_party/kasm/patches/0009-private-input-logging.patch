@@ -1,0 +1,26 @@
+--- a/unix/xserver/hw/vnc/Input.c
++++ b/unix/xserver/hw/vnc/Input.c
+@@ -587,12 +587,11 @@
+ 	if (keycode == 0) {
+ 		keycode = vncAddKeysym(keysym, state, needFree, freeKeys);
+ 		if (keycode == 0) {
+-			LOG_ERROR("Failure adding new keysym 0x%x", keysym);
++			LOG_ERROR("Failure adding keyboard mapping");
+ 			return;
+ 		}
+ 
+-		LOG_INFO("Added unknown keysym 0x%x to keycode %d",
+-		         keysym, keycode);
++		/* Do not record typed Unicode/codepoints in ordinary session logs. */
+ 
+ 		/*
+ 		 * The state given to addKeysym() is just a hint and
+@@ -601,7 +600,7 @@
+ 		 */
+ 		keycode = vncKeysymToKeycode(keysym, state, &new_state);
+ 		if (keycode == 0) {
+-			LOG_ERROR("Newly added keysym 0x%x cannot be generated", keysym);
++			LOG_ERROR("New keyboard mapping cannot be generated");
+ 			return;
+ 		}
+ 	}

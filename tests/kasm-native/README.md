@@ -1,4 +1,40 @@
-# D1 native WSS qualification
+# Native Kasm qualification
+
+The [native host qualification](NATIVE-HOST.md) covers the public host SDK,
+eight formal App workflows, window/task ownership, combined channels, recovery,
+reboot and scoped rollback. Use its [single UAT checklist](NATIVE-HOST-UAT.md)
+for the current host candidate; earlier checkpoint acceptance remains scoped.
+
+The [native rich clipboard checkpoint](NATIVE-RICH-CLIPBOARD.md) extends the
+text baseline to HTML/PNG and a 2 MiB aggregate bound. It records three-region
+candidate checks, old-pin compatibility and open observations, with one
+[combined physical UAT checklist](NATIVE-RICH-CLIPBOARD-UAT.md).
+
+The [native automatic clipboard checkpoint](NATIVE-CLIPBOARD.md) records exact
+candidate artifacts, standalone/public browser checks and the remaining
+[consolidated human UAT](NATIVE-CLIPBOARD-UAT.md).
+
+The [UDP loss checkpoint](UDP-LOSS.md) defines the per-Viewer display-block
+estimate, its measurement limits and controlled receive-side loss checks.
+
+The [per-Viewer latency checkpoint](LATENCY.md) records separate UDP and
+WebSocket RTT diagnostics, two-region live checks and their exact candidate pins.
+
+**2026-10-31 correction:** the earlier D1/D2 click-then-type checks did not prove
+remote pointer delivery. Physical UAT found missing pointer initialization, and
+the expanded matrix also found a multi-Viewer encoding-cache defect. The original
+D2 candidate is UAT-failed. See [the corrective checkpoint](D2-UAT.md#2026-10-31-input-correction)
+for replacement evidence and the remaining physical UAT gate.
+
+The next bounded input/clipboard checkpoint is recorded in
+[D2 automated evidence and physical UAT instructions](D2-UAT.md). It does not
+change the D1 scope or imply full D2 acceptance.
+
+The [Alpine static Core / standalone UAT checkpoint](ALPINE.md#2026-10-31-qualification)
+records the separate native-musl build, live browser/lifecycle matrix and
+authenticated edge-route migration. Physical UAT remains pending on that target.
+
+## D1 native WSS qualification
 
 D1 exercises an opt-in paired Kasm component through the Manager and native
 SDK. The default remains TigerVNC. Implementation acceptance is Issue #30;
@@ -164,3 +200,9 @@ state to the prior Core or permit concurrent document/profile writers.
 Keep raw protocol data, input/document contents, profiles, credentials, full
 process records and private addresses out of public evidence. Summaries should
 contain identities/digests, assertions, failures and explicit limitations.
+
+## Optional UDP standalone experiment
+
+The later [bounded UDP UAT record](UDP.md) identifies separate artifacts and
+live fault/lifecycle evidence for Issue #36. It does not expand the acceptance
+scope of the earlier WSS checkpoints above.

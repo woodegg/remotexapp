@@ -5,7 +5,7 @@ client SDK for bringing desktops, browsers, editors and office apps into your
 own product.
 
 [Get a release](https://github.com/woodegg/remotexapp/releases) ·
-[Embed an app](#embed-an-app) · [Try it locally](#development-launch) ·
+[Embed an app](#embed-with-the-native-sdk) · [Try it locally](#development-launch) ·
 [Integration guide](docs/integration-guide.md)
 
 ```text
@@ -39,11 +39,37 @@ JavaScript, then add the lifecycle and application actions your solution needs.
 You can also package another X11 app without rebuilding the Manager.
 
 The experience is Citrix-style desktop and application delivery, with a
-programmable integration surface for developers. RemoteXApp uses TigerVNC and
-noVNC; it is not compatible with Citrix ICA/HDX. Bring your own Linux host,
-authentication and tenant isolation. Audio integration is still work in progress.
+programmable integration surface for developers. The default provider uses
+TigerVNC/noVNC. Core 0.16.0 also offers an opt-in Kasm-native path with a host SDK,
+shared speaker/microphone transport, automatic text/HTML/PNG clipboard and
+optional screen UDP. Bring your own Linux host, authentication and tenant
+isolation; Citrix ICA/HDX is not supported. See the [0.16.0 setup and migration
+boundaries](docs/native-0.16.0-release.md).
 
-## Embed an app
+## Embed with the native SDK
+
+For a Manager configured with a verified Kasm component, launch an App and attach
+its Viewer through one session handle:
+
+```js
+import { RemoteXAppHost } from '/sdk/index.js';
+
+const host = new RemoteXAppHost({ baseURL: '', scope: 'my-login' });
+const session = await host.open({ templateId: 'mousepad' });
+const viewer = await session.attach(document.querySelector('#app'));
+// Attach resolves after application readiness and a painted frame.
+// On window close: await session.release();
+```
+
+Use `/sdk/host.html` to explore templates, windows, workspaces and live statistics.
+Audio and automatic clipboard require explicit opt-in. A `user-home` desktop
+uses `host.open({managedId})` after a separate explicit Start decision. Follow the
+[native host migration guide](docs/native-host-migration.md) for file mapping,
+shared Apps, permissions, logout and the distinction between release and stop.
+The native server/client pair is separately installed; the Core archive includes
+its pinned build recipe, not the native binary or operating-system dependencies.
+
+## Embed with the default provider
 
 With a configured Manager and the Mousepad App installed, serve your page behind
 the same authenticated origin and import the SDK that the Manager serves:
@@ -75,11 +101,15 @@ and opt-in clipboard synchronization. The SDK ships with the service at
 - **Bring your local IME to remote apps.** Compose Chinese, Japanese and other
   text with your familiar local input method instead of switching to a remote
   input-method UI. This goes beyond forwarding individual keyboard events:
-  browser IME composition and Unicode text use the IBus integration;
+  the default provider uses IBus for composition and Unicode text;
+  the native provider uses its Kasm input path;
   ordinary ASCII keys and shortcuts use RFB.
   Text injection does not overwrite the clipboard. Password fields and other
   direct-keyboard-only controls need keyboard input, not `sendText()`.
-- **Clipboard that follows your workflow.** With prompt sync enabled,
+- **Clipboard that follows your workflow.** Native integration supports plain
+  text, HTML and PNG with a 2 MiB aggregate limit, consented automatic directions
+  and manual fallback. Files/folders are excluded. On the default provider,
+  with prompt sync enabled,
   RemoteXApp automatically detects clipboard changes and offers synchronization
   directly in the viewer, with content type, size and previews before approval.
   No separate clipboard panel or manually copying text through an intermediate
@@ -114,9 +144,8 @@ and opt-in clipboard synchronization. The SDK ships with the service at
   but proxy/tunnel restarts can still disconnect them; configure authentication
   and WebSocket forwarding correctly.
 
-RemoteXApp builds on TigerVNC and noVNC; it does not replace their display
-transport. Its focus is integrating interactive application runtimes into
-developer products. See the [research-backed positioning](docs/project-positioning.md)
+RemoteXApp integrates managed application runtimes with either the default
+TigerVNC/noVNC provider or an explicitly selected Kasm-native component. See the [research-backed positioning](docs/project-positioning.md)
 for the comparison with noVNC and Xpra, and the
 [current component versions](docs/current-state.md) for release identity.
 
@@ -134,7 +163,7 @@ for the comparison with noVNC and Xpra, and the
        ~~                          ~~
 
        We deliver apps, not screenshots.
-       Clipboard included. Audio loading... (WIP)
+       Clipboard included. Native audio available.
 ```
 
 | App Package | Typical use | Integration |

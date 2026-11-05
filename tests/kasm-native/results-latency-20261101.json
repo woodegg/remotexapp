@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "dateUTC": "2026-11-01",
+  "issue": 36,
+  "scope": "Per-Viewer latency diagnostics on two project-owned Alpine UAT fixtures",
+  "status": "bounded-automated-latency-checks-passed",
+  "artifacts": {
+    "core": {
+      "sourceCommit": "4bdc54a2cae633adcaffae719f3545397b6b058e",
+      "archiveSHA256": "3cbadcdca9e9e2695a259ab8dfdcb94171bf0e1d8e9b3c13c3d446a4b97ff565"
+    },
+    "edge": {
+      "sourceCommit": "4bdc54a2cae633adcaffae719f3545397b6b058e",
+      "archiveSHA256": "0beafffaf211fd67628712d10e16594f2519302b0ed3093dd7e18a77f5060911"
+    },
+    "component": {
+      "sourceCommit": "4bdc54a2cae633adcaffae719f3545397b6b058e",
+      "archiveSHA256": "1636a1e2a429481f1b94b4a617ea011b0c1a634bafc652fdc47e3de988038128",
+      "manifestSHA256": "fbf9280720f5b8fb5aa60f2b1cf8fd58141e6565785894e2f2361639587c0902"
+    }
+  },
+  "build": {
+    "staticCoreExecutables": 4,
+    "nativeServerBinaryUnchanged": true,
+    "componentTestsPassed": 48,
+    "focusedTestsPassed": 24,
+    "makeCheckPassed": true,
+    "coverageCheckPassed": true,
+    "ci": "https://github.com/woodegg/remotexapp/actions/runs/41255171785"
+  },
+  "browser": "Chrome 149.0.7827.102, dedicated Linux profile",
+  "regions": {
+    "australia": {
+      "viewers": 2,
+      "displays": 1,
+      "checks": {
+        "bothViewersFiniteRTT": true,
+        "actualSelectedICEPair": true,
+        "independentTransportSwitch": true,
+        "disconnectClears": true,
+        "reconnectFreshEpoch": true,
+        "hiddenPageStopsFenceProbes": true,
+        "uiCards": true,
+        "viewerHeaders": true,
+        "realFenceRequests": 27,
+        "javascriptExceptions": 0
+      },
+      "sampleRTTms": [
+        {
+          "websocket": 353.8,
+          "udpICE": 203
+        },
+        {
+          "websocket": 239.6,
+          "udpICE": 203
+        }
+      ],
+      "verification": {
+        "filesVerified": {
+          "core": 21,
+          "component": 45
+        },
+        "activeRuntimes": 1,
+        "failedRuntimes": 0,
+        "attachedClients": 0,
+        "documentsUnchanged": true,
+        "edgeAssetsVerified": 10,
+        "originAndBackendUnchanged": true,
+        "ownedAnimationStopped": true
+      },
+      "privateBrowserEvidenceSHA256": "16bf417563c34f13c0be21998f086b5f62f31c9c67252327af23bb9d18618161"
+    },
+    "china": {
+      "viewers": 2,
+      "displays": 1,
+      "checks": {
+        "bothViewersFiniteRTT": true,
+        "actualSelectedICEPair": true,
+        "independentTransportSwitch": true,
+        "disconnectClears": true,
+        "reconnectFreshEpoch": true,
+        "hiddenPageStopsFenceProbes": true,
+        "uiCards": true,
+        "viewerHeaders": true,
+        "realFenceRequests": 11,
+        "javascriptExceptions": 0
+      },
+      "sampleRTTms": [
+        {
+          "websocket": 273,
+          "udpICE": 204
+        },
+        {
+          "websocket": 273.6,
+          "udpICE": 221
+        }
+      ],
+      "verification": {
+        "filesVerified": {
+          "core": 21,
+          "component": 45
+        },
+        "activeRuntimes": 1,
+        "failedRuntimes": 0,
+        "attachedClients": 0,
+        "documentsUnchanged": true,
+        "edgeAssetsVerified": 8,
+        "originAndBackendUnchanged": true,
+        "ownedAnimationStopped": true
+      },
+      "privateBrowserEvidenceSHA256": "2ba0fd2d1d14c4198658b73cca0449421856e0b49cd7e607c5e5f14bf45b409e"
+    }
+  },
+  "cleanup": {
+    "ownedPagesClosed": true,
+    "ownedBrowserStopped": true,
+    "scopedCookieProfileRemoved": true,
+    "userBrowserTabsPreserved": true,
+    "localBuilderStopped": true
+  },
+  "unverified": [
+    "physical Windows/macOS input",
+    "Firefox/Safari/Edge-specific UI behavior",
+    "new long-duration soak",
+    "full previous UDP fault matrix on this new client pin",
+    "audio and file clipboard",
+    "production release qualification"
+  ],
+  "retainedFailure": {
+    "sourceCommit": "4cfcad1faacd58370f4525c840f79c989e4a8ea5",
+    "componentManifestSHA256": "d67f9ee9ece7d8a6683babf2e7cc4ab364f225b4c762f03ae6341a285e295b68",
+    "symptom": "Browser Illegal invocation left probes pending",
+    "rootCause": "Assigning Window timer functions as probe methods supplied an invalid receiver; Node-only injected timer tests did not reproduce Web IDL receiver checks",
+    "resolution": "Use closures for native timers; add browser receiver regression and verify both real UAT routes",
+    "firstBrowserFailureSHA256": "5a27787c1b8604dadc672a3c714fd543189ec16a08456918b1ff18d61056c52a"
+  }
+}

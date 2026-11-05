@@ -79,6 +79,9 @@ type sessionRecovery struct {
 // control fields remain on instance only so pre-App-Package runtime manifests
 // can be adopted; they must never leak into the V1 public API.
 type publicInstanceView struct {
+	NativeTransport        *nativeTransportView         `json:"nativeTransport,omitempty"`
+	NativeAudio            string                       `json:"nativeAudio,omitempty"`
+	NativeClipboard        string                       `json:"nativeClipboard,omitempty"`
 	DisplayProvider        string                       `json:"displayProvider"`
 	DisplayComponentDigest string                       `json:"displayComponentDigest,omitempty"`
 	Recovery               *publicRecovery              `json:"recovery,omitempty"`
@@ -155,13 +158,18 @@ type createRequest struct {
 }
 
 type runtimeComponents struct {
-	DisplayProvider string          `json:"displayProvider,omitempty"`
-	Kasm            *kasmbundle.Pin `json:"kasm,omitempty"`
-	Identity        *coreIdentity   `json:"identity,omitempty"`
-	GatewayBinary   string          `json:"gatewayBinary"`
-	StatusBinary    string          `json:"statusBinary"`
-	UnicodeEngine   string          `json:"unicodeEngine"`
-	CoreDriverDir   string          `json:"coreDriverDir,omitempty"`
+	NativeAudio          string          `json:"nativeAudio,omitempty"`
+	NativeUDP            bool            `json:"nativeUDP,omitempty"`
+	UDPEndpoint          *udpLease       `json:"udpEndpoint,omitempty"`
+	UDPUnavailableReason string          `json:"udpUnavailableReason,omitempty"`
+	NativeClipboard      string          `json:"nativeClipboard,omitempty"`
+	DisplayProvider      string          `json:"displayProvider,omitempty"`
+	Kasm                 *kasmbundle.Pin `json:"kasm,omitempty"`
+	Identity             *coreIdentity   `json:"identity,omitempty"`
+	GatewayBinary        string          `json:"gatewayBinary"`
+	StatusBinary         string          `json:"statusBinary"`
+	UnicodeEngine        string          `json:"unicodeEngine"`
+	CoreDriverDir        string          `json:"coreDriverDir,omitempty"`
 }
 
 type shutdownStatus struct {
@@ -179,7 +187,8 @@ type shutdownStatus struct {
 }
 
 type stopRequest struct {
-	Force bool `json:"force,omitempty"`
+	Force             bool   `json:"force,omitempty"`
+	SessionGeneration *int64 `json:"sessionGeneration,omitempty"`
 }
 
 type restartRequest struct {
@@ -254,6 +263,9 @@ type managedPatchRequest struct {
 }
 
 type manager struct {
+	audioOnce       sync.Once
+	audio           *audioService
+	nativeGrants    map[[32]byte]*nativeGrant
 	viewerChannels  map[*viewerChannel]struct{}
 	cfg             config
 	bootID          string

@@ -945,6 +945,7 @@ func TestAdoptBlockedRuntimePreservesShutdownAndRestoresObserver(t *testing.T) {
 }
 
 func TestCleanSessionExitPersistsToRuntimeManifest(t *testing.T) {
+	installSystemctlStub(t, true)
 	stateDir := t.TempDir()
 	item := testRuntimeManifest(t, stateDir, "mousepad-exit1234567", "")
 	item.SessionState = "running"

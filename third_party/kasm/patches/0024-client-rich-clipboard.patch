@@ -1,0 +1,29 @@
+diff --git a/core/rfb.js b/core/rfb.js
+index 7051639..19aa88b 100644
+--- a/core/rfb.js
++++ b/core/rfb.js
+@@ -20,7 +20,7 @@ import Display from "./display.js";
+ import Inflator from "./inflator.js";
+ import Deflator from "./deflator.js";
+ import Keyboard from "./input/keyboard.js";
+-import { readVideoEncoders, readClipboardText } from "./remotexapp-server-messages.mjs";
++import { readVideoEncoders, readClipboard } from "./remotexapp-server-messages.mjs";
+ import GestureHandler from "./input/gesturehandler.js";
+ import Cursor from "./util/cursor.js";
+ import Websock from "./websock.js";
+@@ -3592,11 +3592,11 @@ export default class RFB extends EventTargetMixin {
+ 
+     _handleBinaryClipboard() {
+         let result;
+-        try { result = readClipboardText(this._sock); }
+-        catch (_) { return this._fail("Invalid native text clipboard message"); }
++        try { result = readClipboard(this._sock); }
++        catch (_) { return this._fail("Invalid native clipboard message"); }
+         if (!result) return false;
+-        if (result.text !== null && this.clipboardDown) {
+-            this.dispatchEvent(new CustomEvent("clipboard", { detail:{text:result.text} }));
++        if (result.items !== null && this.clipboardDown) {
++            this.dispatchEvent(new CustomEvent("clipboard", { detail:{items:result.items} }));
+         }
+         return true;
+     }

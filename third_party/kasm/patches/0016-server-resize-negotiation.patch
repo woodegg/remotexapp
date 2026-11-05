@@ -1,0 +1,69 @@
+--- a/common/rfb/VNCSConnectionST.h
++++ b/common/rfb/VNCSConnectionST.h
+@@ -247,6 +247,7 @@
+     virtual void queryConnection(const char* userName);
+     virtual void clientInit(bool shared);
+     virtual void setPixelFormat(const PixelFormat& pf);
++    void setEncodings(int count, const rdr::S32* encodings) override;
+     virtual void pointerEvent(const Point& pos, int buttonMask, const bool skipClick, const bool skipRelease, int scrollX, int scrollY);
+     virtual void directMouseEvent(int dx, int dy, int buttonMask, int scrollX, int scrollY);
+     virtual void keyEvent(rdr::U32 keysym, rdr::U32 keycode, bool down);
+@@ -309,6 +310,7 @@
+     bool reverseConnection;
+ 
+     bool inProcessMessages;
++    bool encodingsReceived;
+ 
+     bool pendingSyncFence, syncFence;
+     rdr::U32 fenceFlags;
+--- a/common/rfb/VNCSConnectionST.cxx
++++ b/common/rfb/VNCSConnectionST.cxx
+@@ -61,7 +61,7 @@
+ VNCSConnectionST::VNCSConnectionST(VNCServerST* server_, network::Socket *s, const video_encoders::EncoderProbe &encoder_probe,
+                                    bool reverse)
+   : pendingUdpID(0), sock(s), reverseConnection(reverse),
+-    inProcessMessages(false),
++    inProcessMessages(false), encodingsReceived(false),
+     pendingSyncFence(false), syncFence(false), fenceFlags(0),
+     fenceDataLen(0), fenceData(nullptr), congestionTimer(this),
+     losslessTimer(this), kbdLogTimer(this), binclipTimer(this),
+@@ -282,6 +282,9 @@
+ {
+   try {
+     if (!authenticated()) return;
++    // ServerInit has been sent, but resize capabilities may not have arrived.
++    // Keep its old dimensions until SetEncodings, then publish the latest size.
++    if (state() == RFBSTATE_NORMAL && !encodingsReceived) return;
+     if (cp.width && cp.height && (server->pb->width() != cp.width ||
+                                   server->pb->height() != cp.height))
+     {
+@@ -767,6 +770,14 @@
+   }
+ }
+ 
++void VNCSConnectionST::setEncodings(int count, const rdr::S32* encodings)
++{
++  const bool first = !encodingsReceived;
++  SConnection::setEncodings(count, encodings);
++  encodingsReceived = true;
++  if (first) pixelBufferChange();
++}
++
+ void VNCSConnectionST::setPixelFormat(const PixelFormat& pf)
+ {
+   SConnection::setPixelFormat(pf);
+@@ -1008,6 +1019,14 @@
+ 
+   if (!(accessRights & AccessView)) return;
+ 
++  // RFB permits clients to omit SetEncodings and use raw/default capabilities.
++  // Their first update request ends the initial negotiation window as well.
++  if (!encodingsReceived) {
++    encodingsReceived = true;
++    pixelBufferChange();
++    if (state() == RFBSTATE_CLOSING) return;
++  }
++
+   SConnection::framebufferUpdateRequest(r, incremental);
+ 
+   // Check that the client isn't sending crappy requests

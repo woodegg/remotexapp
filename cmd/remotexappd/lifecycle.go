@@ -103,6 +103,10 @@ func (m *manager) createLocked(request createRequest) (*instance, error) {
 	} else if !runtimeRef.MatchString(id) {
 		return nil, errors.New("restored runtime id must be a safe lowercase reference")
 	}
+	if err := m.assignUDPEndpoint(id, &components, request.PinnedComponents.GatewayBinary != ""); err != nil {
+		return nil, err
+	}
+
 	runtimeDir := filepath.Join(m.cfg.stateDir, "instances", id)
 	socketName := id
 	if len(socketName) > 12 {
@@ -828,6 +832,9 @@ func (m *manager) startSession(id string) (sessionErr error) {
 	args = append(args, appSystemdEnvironmentArgs(item, class)...)
 	if isKasm(item) {
 		args = append(args, "--setenv=REMOTEXAPP_INPUT_PROVIDER=native")
+		if item.Components.NativeAudio != "" {
+			args = append(args, "--setenv=REMOTEXAPP_NATIVE_AUDIO="+item.Components.NativeAudio)
+		}
 	}
 	if class.RunMode == "user-home" {
 		// Main-process loss must not make systemd kill surviving editors before
@@ -987,6 +994,7 @@ func (m *manager) stopSession(id string, options stopOptions) error {
 // retired. In standalone mode an empty cgroup still consumes the delegated
 // descendant quota, so merely publishing SessionState=stopped is insufficient.
 func (m *manager) cleanupSessionComponent(item *instance) error {
+	m.fenceAudio(item.ID, item.SessionGeneration)
 	if item.SessionUnit != "" {
 		output, err := m.stopComponent(item.SessionUnit)
 		if err != nil && !strings.Contains(output, "not loaded") {
@@ -1173,6 +1181,13 @@ func (m *manager) stopVacant(id string, timer *time.Timer, expected *instance, g
 func (m *manager) stop(item *instance, options stopOptions) error {
 	m.lifecycleMu.Lock()
 	defer m.lifecycleMu.Unlock()
+	if options.ExpectedGeneration != nil {
+		current := m.get(item.ID)
+		if current == nil || current.SessionGeneration != *options.ExpectedGeneration {
+			return errStopGeneration
+		}
+		*item = *current
+	}
 	return m.stopInstanceLocked(item, options)
 }
 

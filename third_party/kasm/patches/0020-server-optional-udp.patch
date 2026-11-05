@@ -1,0 +1,52 @@
+--- a/common/network/TcpSocket.cxx
++++ b/common/network/TcpSocket.cxx
+@@ -719,7 +719,12 @@
+   pthread_t tid;
+   pthread_create(&tid, NULL, start_server, NULL);
+ 
+-  // RemoteXApp D1 is WSS-only: no UDP listener or discovery worker.
++  // A deployment-owned slot is required; WSS-only runs create no UDP worker.
++  if (rfb::Server::udpPort > 0) {
++    uint16_t *nport = (uint16_t *) calloc(1, sizeof(uint16_t));
++    *nport = rfb::Server::udpPort;
++    pthread_create(&tid, NULL, udpserver, nport);
++  }
+ 
+ }
+ 
+--- a/common/rfb/SMsgReader.cxx
++++ b/common/rfb/SMsgReader.cxx
+@@ -362,7 +362,14 @@
+ 
+ void SMsgReader::readUpgradeToUdp()
+ {
+-  throw Exception("UDP is unavailable in the WSS-only component");
++  char buf[4096], resp[4096];
++  rdr::U16 len = is->readU16();
++  if (len >= sizeof(buf)) throw Exception("UDP offer exceeds limit");
++  if (!len) { handler->udpDowngrade(false); return; }
++  is->readBytes(buf, len);
++  buf[len] = '\0';
++  const uint64_t clientID = wuGotHttp(buf, len, resp);
++  handler->udpUpgrade(resp, clientID);
+ }
+ 
+ void SMsgReader::readSubscribeUnixRelay()
+--- a/common/network/webudp/WuNetwork.cpp
++++ b/common/network/webudp/WuNetwork.cpp
+@@ -41,13 +41,12 @@
+     return -1;
+   }
+ 
+-  int enable = 1;
+-  setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
+ 
+   struct sockaddr_in addr;
+   addr.sin_family = AF_INET;
+   addr.sin_port = htons(port);
+-  addr.sin_addr.s_addr = INADDR_ANY;
++  // Only the non-NAT deployment proxy may deliver packets into this namespace.
++  addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+ 
+   if (bind(sfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_in)) == 0)
+     return sfd;

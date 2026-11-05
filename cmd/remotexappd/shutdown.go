@@ -31,11 +31,14 @@ func (b *shutdownOutput) Write(p []byte) (int, error) {
 }
 
 type stopOptions struct {
-	Reason          string
-	Scope           string
-	Force           bool
-	PreserveRuntime bool
+	Reason             string
+	Scope              string
+	Force              bool
+	PreserveRuntime    bool
+	ExpectedGeneration *int64
 }
+
+var errStopGeneration = errors.New("stale stop session generation")
 
 type shutdownBlockedError struct {
 	Outcome string

@@ -18,6 +18,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/woodegg/remotexapp/internal/sessionaudio"
 	"github.com/woodegg/remotexapp/internal/sessionstartup"
 	"golang.org/x/sys/unix"
 )
@@ -28,6 +29,7 @@ type serviceIdentity struct {
 }
 
 type serviceRecord struct {
+	Audio         *sessionaudio.Record       `json:"audio,omitempty"`
 	InputProvider string                     `json:"inputProvider,omitempty"`
 	DeadlineMS    int64                      `json:"deadlineMs"`
 	SchemaVersion int                        `json:"schemaVersion"`
@@ -48,6 +50,7 @@ type serviceChild struct {
 }
 
 type sessionSupervisor struct {
+	audio                                                  *sessionaudio.Domain
 	runtime, socketRuntime, publicPath, schemaPath, driver string
 	generation                                             int64
 	env                                                    []string
@@ -90,6 +93,10 @@ func processIdentity(pid int) (serviceIdentity, error) {
 }
 
 func (s *sessionSupervisor) publish(state, failure string) error {
+	if s.audio != nil {
+		snapshot := s.audio.Record
+		s.record.Audio = &snapshot
+	}
 	s.record.State, s.record.Failure = state, failure
 	b, err := json.Marshal(s.record)
 	if err != nil {
@@ -226,6 +233,9 @@ func (s *sessionSupervisor) cleanup() {
 		}
 		s.stop(name)
 	}
+	if s.audio != nil {
+		s.audio.Close()
+	}
 	for path, original := range s.endpoints {
 		if current, err := os.Lstat(path); err == nil && os.SameFile(original, current) {
 			_ = os.Remove(path)
@@ -317,6 +327,18 @@ func (s *sessionSupervisor) startServices(ctx context.Context) error {
 		return err
 	}
 	if s.record.InputProvider == "native" {
+		if os.Getenv("REMOTEXAPP_NATIVE_AUDIO") == sessionaudio.Protocol {
+			domain, err := sessionaudio.Prepare(s.socketRuntime, s.generation, s.env)
+			if err != nil {
+				return fmt.Errorf("prepare private audio environment: %w", err)
+			}
+			s.audio = domain
+			s.env = sessionaudio.Environment(domain.Record, s.env)
+			// Audio readiness is independent of input/App readiness. The stable private
+			// endpoint and autospawn=no prevent fallback to the account's global mixer.
+			_ = domain.Start(ctx)
+			return s.publish("starting", "")
+		}
 		return nil
 	}
 	if err := s.startupStage("IBus startup"); err != nil {
@@ -367,6 +389,10 @@ func superviseSession(driver string) error {
 		return errors.New("core-v1 session services contract required")
 	}
 	inputProvider := os.Getenv("REMOTEXAPP_INPUT_PROVIDER")
+	audioProtocol := os.Getenv("REMOTEXAPP_NATIVE_AUDIO")
+	if audioProtocol != "" && (audioProtocol != sessionaudio.Protocol || inputProvider != "native") {
+		return errors.New("invalid native audio protocol")
+	}
 	if inputProvider != "" && inputProvider != "native" {
 		return errors.New("unsupported session input provider")
 	}
@@ -465,6 +491,12 @@ func superviseSession(driver string) error {
 }
 
 func (s *sessionSupervisor) observe(lifetime context.Context) error {
+	var audioTick <-chan time.Time
+	if s.audio != nil {
+		timer := time.NewTicker(time.Second)
+		defer timer.Stop()
+		audioTick = timer.C
+	}
 	var borrowedBusCheck <-chan time.Time
 	if s.record.BorrowedBus {
 		ticker := time.NewTicker(30 * time.Second)
@@ -482,6 +514,12 @@ func (s *sessionSupervisor) observe(lifetime context.Context) error {
 		select {
 		case <-lifetime.Done():
 			return s.publish("stopped", "")
+		case <-audioTick:
+			if s.audio.Poll(lifetime) {
+				if err := s.publish(s.record.State, s.record.Failure); err != nil {
+					return err
+				}
+			}
 		case <-s.children["driver"].done:
 			// Losing the user-home Driver is not authorization to destroy its
 			// surviving applications. Only an explicit stop or a current-generation

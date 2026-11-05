@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 1,
+  "recordedOn": "2026-11-03",
+  "status": "regression-fixed-automated-checks-passed",
+  "humanAcceptance": "not-evaluated",
+  "workbenchSourceCommit": "899a71f44d577afa6b911eb119401d64caccaba6",
+  "coreArtifactSourceCommit": "4490361c699242bb88b74bc6daf861d6dffbbc4e",
+  "rootCause": "Template form submitted ordinary instance creation for user-home; Core correctly requires managed identity. Earlier desktop probes bypassed the catalog button.",
+  "workbenchAssets": {
+    "host-workbench.mjs": "ea7b09b70cb92200ba81021a1b68b261a621605c776c735b63d7ef384a14b67e",
+    "host-workbench-model.mjs": "35ba4b6927ea6c6e5e53d1f5ee79bd153fda550e01e29936481c91532b664e25"
+  },
+  "local": {
+    "browser": "Chrome 149.0.7827.102",
+    "result": {
+      "status": "passed",
+      "checks": [
+        {
+          "name": "synthetic stopped response explains explicit Start without creating or changing real desired state",
+          "status": "passed"
+        },
+        {
+          "name": "synthetic missing and ambiguous registrations require explicit configuration or selection",
+          "status": "passed"
+        },
+        {
+          "name": "catalog button reads fresh managed state and paints two attachments of one generation without ordinary creation or desired-state mutation",
+          "status": "passed"
+        }
+      ],
+      "humanAcceptance": "not-evaluated"
+    },
+    "evidenceSHA256": "85098ca595eedbe2034f89b5275d0f76ecac6ad6c7a6f4fb4317b7aea4d2a027",
+    "negativeStates": "Stopped, missing and multiple registrations are synthetic page-local HTTP responses. The actual running desktop was attached without changing desired state."
+  },
+  "public": [
+    {
+      "region": "australia",
+      "status": "passed",
+      "assetsVerified": true,
+      "catalogButton": true,
+      "twoViewersSameGeneration": true,
+      "actualPaint": true,
+      "stats": {
+        "transport": "wss",
+        "renderedFrames": 2
+      },
+      "ordinaryCreationRequests": 0,
+      "managedStateMutations": 0,
+      "humanAcceptance": "not-evaluated",
+      "evidenceSHA256": "16574bd9de75b5b409b31b7961200516a05b62201a4f42a3dcad102d56e02715",
+      "preservation": {
+        "region": "australia",
+        "liveAppGenerationsPreserved": true,
+        "managedIntentAndGenerationPreserved": true,
+        "documentHashesUnchanged": true,
+        "viewersBefore": 0,
+        "viewersAfter": 0,
+        "ownedDesktopViewersRemaining": 0,
+        "oldEdgeRunning": true,
+        "newEdgeRunning": true
+      },
+      "anonymousStatus": 302,
+      "accessRedirect": true
+    },
+    {
+      "region": "china",
+      "status": "passed",
+      "assetsVerified": true,
+      "catalogButton": true,
+      "twoViewersSameGeneration": true,
+      "actualPaint": true,
+      "stats": {
+        "transport": "wss",
+        "renderedFrames": 2
+      },
+      "ordinaryCreationRequests": 0,
+      "managedStateMutations": 0,
+      "humanAcceptance": "not-evaluated",
+      "evidenceSHA256": "3676c1810e56bd6d01aa27cd598babee568a9fb172d6df32415dd8994c609383",
+      "preservation": {
+        "region": "china",
+        "liveAppGenerationsPreserved": true,
+        "managedIntentAndGenerationPreserved": true,
+        "documentHashesUnchanged": true,
+        "viewersBefore": 1,
+        "viewersAfter": 1,
+        "ownedDesktopViewersRemaining": 0,
+        "oldEdgeRunning": true,
+        "newEdgeRunning": true
+      },
+      "anonymousStatus": 302,
+      "accessRedirect": true
+    },
+    {
+      "region": "us",
+      "status": "passed",
+      "assetsVerified": true,
+      "catalogButton": true,
+      "twoViewersSameGeneration": true,
+      "actualPaint": true,
+      "stats": {
+        "transport": "wss",
+        "renderedFrames": 1
+      },
+      "ordinaryCreationRequests": 0,
+      "managedStateMutations": 0,
+      "humanAcceptance": "not-evaluated",
+      "evidenceSHA256": "d88a105f360f92173f823b035bf69936ae61d368b4fee474acb16b5e068bbdf9",
+      "preservation": {
+        "region": "us",
+        "liveAppGenerationsPreserved": true,
+        "managedIntentAndGenerationPreserved": true,
+        "documentHashesUnchanged": true,
+        "viewersBefore": 0,
+        "viewersAfter": 0,
+        "ownedDesktopViewersRemaining": 0,
+        "oldEdgeRunning": true,
+        "newEdgeRunning": true
+      },
+      "anonymousStatus": 302,
+      "accessRedirect": true
+    },
+    {
+      "region": "full",
+      "status": "passed",
+      "assetsVerified": true,
+      "catalogButton": true,
+      "twoViewersSameGeneration": true,
+      "actualPaint": true,
+      "stats": {
+        "transport": "wss",
+        "renderedFrames": 2
+      },
+      "ordinaryCreationRequests": 0,
+      "managedStateMutations": 0,
+      "humanAcceptance": "not-evaluated",
+      "evidenceSHA256": "e3d0bbf4944d9f9cc28dc25cc39fad2ca17a01137c802e3ab937b1e36e3f65ed",
+      "preservation": {
+        "region": "full",
+        "managedIntentAndGenerationPreserved": true,
+        "viewerCountsUnchanged": true
+      },
+      "anonymousStatus": 302,
+      "accessRedirect": true
+    }
+  ],
+  "deployment": {
+    "regions": "New edge listeners with retained prior asset/component pins; two workbench modules replaced.",
+    "fullCatalog": "Verified existing edge artifact fronts the existing full-catalog ingress with the same native component pin and updated workbench modules.",
+    "coreRestarted": false,
+    "desktopRestarted": false,
+    "oldIngressesRetained": true,
+    "accessVerificationRetained": true,
+    "udpForwardingChanged": false,
+    "ownedBrowsersCleaned": true
+  },
+  "checks": {
+    "modelTests": "passed (4 tests)",
+    "makeCheck": "passed",
+    "makeCheckLogSHA256": "9f9db7f80a22e8406e038e07086c6c823fbfe549d1d84292dab153b108cf2c75",
+    "ci": "https://github.com/woodegg/remotexapp/actions/runs/41602348612",
+    "ciStatus": "passed"
+  },
+  "attemptNotes": [
+    "First local regression probe refused to start because it expected a stopped desktop but found a running one. It made no changes; revised probe uses synthetic negative responses and preserves the actual running desktop.",
+    "Initial public probe reached both painted Viewers but failed its overbroad HTTP-error assertion on favicon.ico 404. Narrowed assertion to application routes; all four final probes passed."
+  ],
+  "limits": [
+    "Public regression attachments used WSS. This record does not requalify UDP, audio, clipboard, reboot, physical input or downstream WAOS integration.",
+    "All public probes depend on current Cloudflare Access login and live infrastructure.",
+    "No merge or release; previous UAT findings and evidence remain separately recorded."
+  ],
+  "probeSHA256": "9b8f40660c0e6ba5447d562b19030803a15f45ff66671f2e3c48843a582323bb"
+}

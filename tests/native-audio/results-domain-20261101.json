@@ -1,0 +1,248 @@
+{
+  "schema": 1,
+  "scope": "same-uid-synthetic-pulse-routing",
+  "platform": "Linux x86_64",
+  "pulse": "pulseaudio 16.1",
+  "sameNonRootUID": true,
+  "sampleRate": 48000,
+  "nullSinkNoRewinds": true,
+  "signalAmplitude": 6000,
+  "minimumExpectedAmplitude": 3000,
+  "maximumRelativeCrossTone": 0.005,
+  "maximumInactiveAmplitude": 10,
+  "cases": [
+    {
+      "case": "all-four-routes",
+      "readbacks": [
+        {
+          "domain": "a-generation-1",
+          "route": "speaker",
+          "expectedHz": 440,
+          "toneAmplitudes": {
+            "440": 5999.338,
+            "660": 0.001,
+            "880": 0.0,
+            "1100": 0.0
+          }
+        },
+        {
+          "domain": "a-generation-1",
+          "route": "mic",
+          "expectedHz": 880,
+          "toneAmplitudes": {
+            "440": 0.001,
+            "660": 0.002,
+            "880": 5999.308,
+            "1100": 0.001
+          }
+        },
+        {
+          "domain": "b-generation-1",
+          "route": "speaker",
+          "expectedHz": 660,
+          "toneAmplitudes": {
+            "440": 0.0,
+            "660": 5999.35,
+            "880": 0.0,
+            "1100": 0.0
+          }
+        },
+        {
+          "domain": "b-generation-1",
+          "route": "mic",
+          "expectedHz": 1100,
+          "toneAmplitudes": {
+            "440": 0.001,
+            "660": 0.0,
+            "880": 0.001,
+            "1100": 5999.313
+          }
+        }
+      ]
+    },
+    {
+      "case": "only-b-speaker-a-mic",
+      "readbacks": [
+        {
+          "domain": "a-generation-1",
+          "route": "speaker",
+          "expectedHz": null,
+          "toneAmplitudes": {
+            "440": 0.0,
+            "660": 0.0,
+            "880": 0.0,
+            "1100": 0.0
+          }
+        },
+        {
+          "domain": "a-generation-1",
+          "route": "mic",
+          "expectedHz": 880,
+          "toneAmplitudes": {
+            "440": 0.001,
+            "660": 0.001,
+            "880": 5999.308,
+            "1100": 0.001
+          }
+        },
+        {
+          "domain": "b-generation-1",
+          "route": "speaker",
+          "expectedHz": 660,
+          "toneAmplitudes": {
+            "440": 0.0,
+            "660": 5999.35,
+            "880": 0.0,
+            "1100": 0.0
+          }
+        },
+        {
+          "domain": "b-generation-1",
+          "route": "mic",
+          "expectedHz": null,
+          "toneAmplitudes": {
+            "440": 0.0,
+            "660": 0.0,
+            "880": 0.0,
+            "1100": 0.0
+          }
+        }
+      ]
+    },
+    {
+      "case": "b-survives-a-stop",
+      "readbacks": [
+        {
+          "domain": "b-generation-1",
+          "route": "speaker",
+          "expectedHz": 660,
+          "toneAmplitudes": {
+            "440": 0.0,
+            "660": 5999.35,
+            "880": 0.0,
+            "1100": 0.0
+          }
+        },
+        {
+          "domain": "b-generation-1",
+          "route": "mic",
+          "expectedHz": 1100,
+          "toneAmplitudes": {
+            "440": 0.002,
+            "660": 0.0,
+            "880": 0.001,
+            "1100": 5999.313
+          }
+        }
+      ]
+    },
+    {
+      "case": "new-generation-old-endpoint-rejected",
+      "readbacks": [
+        {
+          "domain": "a-generation-2",
+          "route": "speaker",
+          "expectedHz": 440,
+          "toneAmplitudes": {
+            "440": 5999.338,
+            "660": 0.001,
+            "880": 0.0,
+            "1100": 0.001
+          }
+        },
+        {
+          "domain": "a-generation-2",
+          "route": "mic",
+          "expectedHz": 880,
+          "toneAmplitudes": {
+            "440": 0.001,
+            "660": 0.002,
+            "880": 5999.308,
+            "1100": 0.001
+          }
+        },
+        {
+          "domain": "b-generation-1",
+          "route": "speaker",
+          "expectedHz": 660,
+          "toneAmplitudes": {
+            "440": 0.0,
+            "660": 5999.35,
+            "880": 0.0,
+            "1100": 0.0
+          }
+        },
+        {
+          "domain": "b-generation-1",
+          "route": "mic",
+          "expectedHz": 1100,
+          "toneAmplitudes": {
+            "440": 0.001,
+            "660": 0.0,
+            "880": 0.001,
+            "1100": 5999.313
+          }
+        }
+      ]
+    },
+    {
+      "case": "b-survives-a-crash",
+      "readbacks": [
+        {
+          "domain": "b-generation-1",
+          "route": "speaker",
+          "expectedHz": 660,
+          "toneAmplitudes": {
+            "440": 0.0,
+            "660": 5999.35,
+            "880": 0.0,
+            "1100": 0.0
+          }
+        },
+        {
+          "domain": "b-generation-1",
+          "route": "mic",
+          "expectedHz": 1100,
+          "toneAmplitudes": {
+            "440": 0.002,
+            "660": 0.0,
+            "880": 0.001,
+            "1100": 5999.313
+          }
+        }
+      ]
+    }
+  ],
+  "initialIdleResources": {
+    "a": {
+      "memoryKiB": {
+        "Rss": 8184,
+        "Pss": 2406,
+        "Pss_Anon": 1072
+      },
+      "fdCount": 16
+    },
+    "b": {
+      "memoryKiB": {
+        "Rss": 8120,
+        "Pss": 2413,
+        "Pss_Anon": 1072
+      },
+      "fdCount": 16
+    }
+  },
+  "cleanup": {
+    "ownedProcessesReaped": true,
+    "temporarySocketsAndFilesRemoved": true,
+    "accountAudioProcessesAndConfigPreserved": true
+  },
+  "notQualified": [
+    "Manager/SDK integration",
+    "physical audio devices",
+    "browser/WAN quality",
+    "malicious same-UID security isolation",
+    "long-duration resource trend"
+  ],
+  "measuredAt": "2026-11-01",
+  "harnessSHA256": "e9d9651bf7fc4f6408d2474e27353c4249f5e28200c8129219e2a79d331106e8"
+}

@@ -43,6 +43,23 @@ Go supports only its two newest major releases; review
    Ubuntu/X11 host, also run `make live-e2e`; include user-home mode only in a
    dedicated disposable account. Record Human UAT after automated gates pass.
 
+## Repeated-test time budget
+
+`make soak-check` retains 20 shuffled Go and Node repetitions. Go's timeout
+covers all repetitions of a package in one process. The supervisor tests
+intentionally exercise readiness deadlines and descendant-preservation windows;
+one passing package run at `9c97e80` took 48.389 seconds. Twenty such runs need
+about 968 seconds, beyond the implicit 600-second default. The recorded Nightly
+failure and investigation are tracked in [#52](https://github.com/woodegg/remotexapp/issues/52).
+
+Use the explicit, bounded `SOAK_TIMEOUT=20m` default for the Go package repeat
+command. This changes the aggregate test budget, not production deadlines,
+fixture assertions, per-case waits, repeat count or the 35-minute hosted job
+limit. Override it explicitly when investigating a different repeat count;
+do not treat a timeout increase as evidence that a hang is fixed. Retain the
+shuffle seed and completed test results, and require the subsequent Node and
+fuzz gates to finish before claiming Nightly success.
+
 ## Build Once and Promote
 
 Dispatch the `Release candidate` workflow for the reviewed commit. It produces

@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.31.0-dev.1';
+export const SDK_VERSION: '0.31.0';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -69,7 +69,9 @@ export interface RemoteXAppRecovery {
 }
 
 export interface RemoteXAppInstance {
-  displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string;
+  displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string; nativeClipboard?:'text'|'rich-v1';
+  nativeAudio?:'pcm-s16le-48k-v1';
+  nativeTransport?:{policy:'wss-only'|'prefer-udp';available:boolean;grantRequired:boolean;readOnly?:boolean;reason?:string};
   recovery?:RemoteXAppRecovery;
   versions?:RemoteXAppRuntimeVersions; upgrade?:RemoteXAppUpgradeStatus;
 	id:string; classId:string; templateId:string; driverVersion:string; managedInstanceId?:string; profileRef:string;
@@ -134,12 +136,55 @@ export interface RemoteXAppClipboardSnapshot {
 export class RemoteXAppAPIError extends Error { status:number; body:unknown; }
 
 export class RemoteXAppNativeError extends Error { code:string; }
+export interface NativeKeyboardPolicy {profile:'unknown'|'windows'|'mac'|'gnome'|'fcitx'|'custom';mode?:'local'|'remote';bindings?:string[];}
+export type RemoteXAppNativeStats = {
+  schemaVersion:1; state:'disconnected'|'connecting'|'reconnecting'|'ready'|'failed'|'disposed';
+  code:string|null; connectionEpoch:number; observedAt:number;
+  transport:'wss'|'ws-loopback'|'webrtc-udp'|null; connectedForMs:number|null;
+} & ({available:false} | {
+  available:true; receivedBytes:number; sentBytes:number; bufferedBytes:number;
+  renderedFrames:number; width:number; height:number;
+  controlTransport?:'wss'|'ws-loopback'; udpReceivedBytes?:number;udpPackets?:number;udpRectangles?:number;udpState?:string;udpReason?:string|null;
+  latency?:{wss:NativeLatencySample;udp:NativeLatencySample};
+  udpLoss?:{state:'waiting'|'ready'|'stale'|'inactive'|'unavailable';scope?:'display-blocks';windowMs?:10000;settleMs?:2000;receivedBlocks?:number;lostBlocks?:number;expectedBlocks?:number;ratio?:number;ageMs?:number};
+});
+export interface NativeLatencySample {state:'waiting'|'pending'|'ready'|'timeout'|'stale'|'inactive'|'unavailable';rttMs?:number;ageMs?:number;}
+export type NativeClipboardMode = 'off'|'manual'|'auto';
+export interface NativeClipboardState {
+  requested:{toRemote:NativeClipboardMode;toLocal:NativeClipboardMode};
+  effective:{toRemote:NativeClipboardMode;toLocal:NativeClipboardMode};
+  permissions:{read:string;write:string}; active:boolean; phase:string;
+  formats:string[]; maxBytes:number; automaticSupported:boolean;
+}
 export class RemoteXAppNativeClient extends EventTarget {
-  constructor(options:{container:HTMLElement;manager?:RemoteXAppManager;timeout?:number});
-  readonly state:'disconnected'|'connecting'|'ready'|'failed'|'disposed';
+  constructor(options:RemoteXNativeViewerOptions);
+  readonly readOnly:boolean;
+  readonly runtime?:RemoteXRuntimeHandle;
+  bindRuntime(runtime:RemoteXRuntimeHandle):void;
+  readonly state:'disconnected'|'connecting'|'reconnecting'|'ready'|'failed'|'disposed';
   readonly instance?:RemoteXAppInstance;
-  readonly capabilities:{readonly display:'kasm-wss-v1';readonly pointer:true;readonly keyboard:true;
-    readonly clipboard:false;readonly programmaticText:false;readonly audio:false;readonly udp:false};
+  readonly capabilities:{readonly display:'kasm-wss-v1';readonly pointer:boolean;readonly keyboard:boolean;
+    readonly clipboard:boolean;readonly clipboardAutomatic?:boolean;readonly clipboardRich?:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly statistics:boolean;readonly programmaticText:boolean;readonly programmaticKeys?:boolean;readonly displayControls?:boolean;readonly remoteResize?:boolean;readonly readOnly?:boolean;readonly latency?:boolean;readonly udpLoss?:boolean;readonly audio:false;readonly udp:boolean};
+  readonly keyboardPolicy:NativeKeyboardPolicy|null;
+  readonly clipboardEnabled:boolean;
+  getStats():RemoteXAppNativeStats;
+  measureLatency():boolean;
+  sendText(text:string,options?:NativeInputOptions):NativeInputReceipt;
+  sendKey(key:string,options?:NativeInputOptions & {modifiers?:Array<'Control'|'Shift'|'Alt'|'Meta'>}):NativeInputReceipt;
+  configureDisplay(options?:{scale?:boolean;resize?:boolean}):{scale:boolean;resize:boolean};
+  flushResize():boolean;
+  configureTransport(preferUDP:boolean):void;
+  configureKeyboard(settings:NativeKeyboardPolicy):{applied:boolean};
+  focus():void;
+  blur():void;
+  enableClipboard(enabled?:boolean):void;
+  configureClipboard(options:{toRemote:NativeClipboardMode;toLocal:NativeClipboardMode}):Promise<NativeClipboardState>;
+  getClipboardState():NativeClipboardState;
+  requestClipboardPermission():Promise<NativeClipboardState>;
+  resetClipboard():void;
+  copyClipboardToRemote():Promise<{status:'submitted'|'empty-noop'}>;
+  copyClipboardToLocal():Promise<{status:'copied-to-local'}>;
+  clearRemoteClipboard():Promise<{status:'submitted'}>;
   connect(instance?:string|RemoteXAppInstance):Promise<RemoteXAppInstance>;
   reconnect():Promise<RemoteXAppInstance>;
   disconnect():void;
@@ -201,6 +246,7 @@ export class RemoteXAppManager extends EventTarget {
 	getTemplate(templateId:string,options?:{refresh?:boolean;signal?:AbortSignal}):Promise<RemoteXAppClass|null>;
   listInstances(options?:{classId?:string;states?:string|string[];signal?:AbortSignal}):Promise<RemoteXAppInstance[]>;
   getInstance(instanceId:string,options?:{signal?:AbortSignal}):Promise<RemoteXAppInstance>;
+  prepareNativeInstance(instance:RemoteXAppInstance,options?:{signal?:AbortSignal}):Promise<RemoteXAppInstance>;
   renewIdleLease(instanceId:string,options:{sessionGeneration:number;signal?:AbortSignal}):Promise<RemoteXIdleLease>;
   getConnections(instanceId:string,options?:{sessionGeneration?:number;signal?:AbortSignal}):Promise<RemoteXConnections>;
 	getApplicationStatus(instanceId:string,options?:{signal?:AbortSignal}):Promise<RemoteXApplicationStatus>;
@@ -209,7 +255,7 @@ export class RemoteXAppManager extends EventTarget {
 	createInstance(options:{templateId?:string;classId?:string;profileRef?:string;parameters?:Record<string,unknown>;overrides?:RemoteXAppOverrides;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
 	launch(options:{templateId?:string;classId?:string;profileRef?:string;parameters?:Record<string,unknown>;overrides?:RemoteXAppOverrides;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
   attachInstance(instanceId:string,options?:{signal?:AbortSignal}):Promise<{viewerUrl:string}>;
-	stopInstance(instanceId:string,options?:{force?:boolean;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
+	stopInstance(instanceId:string,options?:{force?:boolean;sessionGeneration?:number;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
 	restartInstance(instanceId:string,options:{sessionGeneration:number;force?:boolean;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
   getRuntimeVersions(instanceId:string,options?:{signal?:AbortSignal}):Promise<{versions:RemoteXAppRuntimeVersions;upgrade:RemoteXAppUpgradeStatus|null}>;
   upgradeAndRestartInstance(instanceId:string,options:RemoteXAppUpgradeOptions):Promise<RemoteXAppInstance>;
@@ -311,5 +357,75 @@ export interface RemoteXConnections {
   };
   application?:{protocol:string;[key:string]:unknown};
   unavailable?:string[];
-  unavailableReasons?:{ibus?:'metadata-missing'|'not-enabled'|'not-running'};
+  unavailableReasons?:{ibus?:'metadata-missing'|'not-enabled'|'not-running'|'unsupported-provider'};
+}
+
+/** Audio references do not attach a Viewer or renew runtime keepalive. */
+export interface RemoteXAudioRouteState {
+  runtime:string;generation:number;slot:number;refs:number;domain:string|null;
+  speaker:boolean;mic:boolean;actualSpeaker:boolean;actualMic:boolean;reason:string;
+}
+export interface RemoteXAudioSnapshot {
+  connection:'idle'|'connected'|'failed';protocol?:string|null;connectionId?:string|null;
+  speakerOwner:boolean;micOwner:boolean;playbackBlocked?:boolean;reason?:string;
+  routes:RemoteXAudioRouteState[];receivedBytes?:number;sentBytes?:number;droppedFrames?:number;
+  playback?:{underrunBlocks:number;droppedFrames:number;peak:number;queuedFrames:number};
+  microphone?:{level:number;droppedFrames:number};
+}
+export interface RemoteXAudioInterest {
+  readonly runtime:string;readonly generation:number;readonly ref:string;readonly released:boolean;
+  /** Enable from a browser user gesture; the switch is shared by this session's tabs. */
+  setSpeaker(enabled:boolean):Promise<RemoteXAudioRouteState>;
+  /** Permission and ownership are explicit. Fault recovery never reopens capture. */
+  setMicrophone(enabled:boolean,options?:{takeover?:boolean}):Promise<RemoteXAudioRouteState>;
+  release():Promise<void>;
+}
+export class RemoteXAppAudio extends EventTarget {
+  constructor(options?:{baseURL?:string;environment?:typeof globalThis;
+    microphoneProcessing?:{echoCancellation:boolean;noiseSuppression:boolean;autoGainControl:boolean}});
+  readonly ready:Promise<{protocol:'pcm-s16le-48k-v1'}>;
+  readonly stats:RemoteXAudioSnapshot;
+  /** Requires an already-prepared audio-capable runtime generation. */
+  acquire(instance:Pick<RemoteXAppInstance,'id'|'sessionGeneration'>):Promise<RemoteXAudioInterest>;
+  /** Revokes the current audio login epoch and retires all its interests. */
+  logout():Promise<void>;
+  dispose():void;
+}
+
+
+export interface NativeInputOptions {requestId?:string;signal?:AbortSignal;}
+/** Submitted to the native wire; not application readback or a replayable ACK. */
+export interface NativeInputReceipt {
+  status:'submitted';count:number;instanceId:string;sessionGeneration:number;connectionEpoch:number;requestId?:string;
+}
+export interface RemoteXNativeViewerOptions {
+  container:HTMLElement;manager?:RemoteXAppManager;runtime?:RemoteXRuntimeHandle;timeout?:number;
+  keyboardPolicy?:NativeKeyboardPolicy;preferUDP?:boolean;readOnly?:boolean;
+  reconnect?:boolean|{maxAttempts?:number;delays?:number[]};
+}
+export type RemoteXHostOpenOptions = ({templateId:string;instanceId?:never;managedId?:never;parameters?:Record<string,unknown>;profileRef?:string;overrides?:RemoteXAppOverrides} |
+  {instanceId:string;templateId?:never;managedId?:never} | {managedId:string;templateId?:never;instanceId?:never}) & {keepAlive?:boolean;signal?:AbortSignal};
+/** One host login/server; windows and tasks retain separate session ownership. */
+export class RemoteXAppHost extends EventTarget {
+  constructor(options:{baseURL?:string;manager?:RemoteXAppManager;scope:string;crossTabs?:boolean});
+  readonly manager:RemoteXAppManager;readonly coordinator:RemoteXAppCoordinator;readonly closed:boolean;
+  templates(options?:{refresh?:boolean;signal?:AbortSignal}):Promise<RemoteXAppClass[]>;
+  open(options:RemoteXHostOpenOptions):Promise<RemoteXAppSession>;
+  diagnostics():RemoteXCoordinatorDiagnostics;
+  getAudioState():RemoteXAudioSnapshot;
+  logout():Promise<void>;
+  dispose(options?:{logout?:boolean}):Promise<void>;
+}
+export class RemoteXAppSession extends EventTarget {
+  readonly id:string;readonly generation:number;readonly instance:Readonly<RemoteXAppInstance>;
+  readonly state:'active'|'invalidated'|'released';readonly handle:RemoteXRuntimeHandle;
+  attach(container:HTMLElement,options?:Omit<RemoteXNativeViewerOptions,'container'|'manager'|'runtime'>):Promise<RemoteXAppNativeClient>;
+  setKeepAlive(enabled:boolean):void;
+  actions(options?:{signal?:AbortSignal}):Promise<RemoteXActions>;
+  invoke(action:string,parameters?:Record<string,unknown>,options?:{signal?:AbortSignal}):Promise<RemoteXActionResult>;
+  connections(options?:{signal?:AbortSignal}):Promise<RemoteXConnections>;
+  audio():Promise<RemoteXAudioInterest>;
+  stop(options?:{force?:boolean;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
+  /** Release this owner only; never stops a shared App. */
+  release():Promise<void>;
 }

@@ -1,0 +1,294 @@
+{
+  "date": "2026-10-31",
+  "status": "automated-regression-passed-physical-uat-pending",
+  "issue": 32,
+  "pullRequest": 33,
+  "componentSourceCommit": "039274ad382eb8a9d97a8b602555fed4f9af8a0e",
+  "replacesUATCandidate": "d9373b47ecf5d230deecdc2be0bbcbe028f50d3ed2bf582138d3a065ad234798",
+  "reason": "Missing native pointer initialization and multi-Viewer encoding-cache defects",
+  "core": {
+    "version": "0.16.0-dev.2",
+    "commit": "71e5fbeadcf1507cce9f29172400f0ab66ebef41",
+    "sha256": "393ade830c3e87fe84c33b5397830d570e0809b90a083d705424f11b61851ade"
+  },
+  "sdkVersion": "0.31.0-dev.2",
+  "binaries": {
+    "remotexappd": "21e7eab4419888b8f8400691e6d123d2c6cb9ccf8831564ad5a084b6ab646ef4",
+    "novnc-input": "ad6918065520017a32017d0eae4b812bd2a2550c77017d59452e2f686a1b35ad",
+    "remotexapp-status": "1ab70510aa2db04450266cc9d21eeb6a97c01501fb042b3dc590cfdf2f19634c"
+  },
+  "sourceChecks": {
+    "makeCheck": "passed",
+    "ci": "https://github.com/woodegg/remotexapp/actions/runs/41169819892",
+    "cacheAppliedSourceSanitizers": "passed",
+    "oldCacheOrderingRegression": "failed-as-expected",
+    "oldCacheReplacementRegression": "failed-as-expected",
+    "oldResizeNegotiationRegression": "failed-as-expected"
+  },
+  "defects": [
+    {
+      "name": "native mouse mapping omitted",
+      "evidence": "Old component throws on real pointer events; corrected mapping delivers coordinates and button transitions."
+    },
+    {
+      "name": "shared encoding cache ordering and stale replacement length",
+      "evidence": "Native wire contains truncated JPEG; old source violates ordering and retains stale length. Applied-source repair passes sanitizer checks."
+    },
+    {
+      "name": "resize during initial capability negotiation",
+      "evidence": "Delayed SetEncodings plus another Viewer resize disconnects the old server; replacement waits, while explicit or default lack of resize support remains rejected."
+    }
+  ],
+  "limitations": [
+    "Physical OS IME, native shortcuts, browser permissions and the authenticated public Access session require human UAT.",
+    "This is not full D2 acceptance, a release, audio/UDP qualification, or actual host-application integration.",
+    "Core/SDK binaries are unchanged; the paired native component is rebuilt and identified separately.",
+    "This corrective live run uses the standalone backend. Historical two-backend adoption/default-provider evidence is linked, not represented as rerun for this component."
+  ],
+  "component": {
+    "manifestSHA256": "7ab098d8bebde1df6532185bf3c718c77bf0593f4f207fe42dd60d011e8f4164",
+    "protocol": "kasm-wss-text-v1",
+    "serverCommit": "17265facc40ab50db5740cdf0d12c61173edafc9",
+    "clientCommit": "475ecfa5356579ef222983c7ce4619a7576a3bce",
+    "binarySHA256": "0792cfaebbaaac0f09310f22324195a6193418653754b444c56610da9e78e12f",
+    "clientSHA256": "9b1038fe25c267df5fdec3727b0137240325217bcb33ef51fff5397d387ee483"
+  },
+  "buildMethod": "Clean pinned-source reconstruction for pointer/cache fixes, followed by incremental server rebuild for patch 0016; immutable output repackaged with all source archives, patches, recipe and notices. Patch application and source/manifest hashes verified.",
+  "componentTests": {
+    "passed": 34,
+    "skipped": 0
+  },
+  "pointerScenarios": [
+    {
+      "label": "standalone",
+      "remoteMotion": true,
+      "buttons": [
+        1,
+        2,
+        3,
+        8,
+        9
+      ],
+      "clickCommand": true,
+      "doubleClickSelection": true,
+      "dragSelection": true,
+      "arrowsAndEditingKeys": true,
+      "targetFocus": true,
+      "wheel": true,
+      "browserExceptions": 0
+    },
+    {
+      "label": "iframe-A",
+      "remoteMotion": true,
+      "buttons": [
+        1,
+        2,
+        3,
+        8,
+        9
+      ],
+      "clickCommand": true,
+      "doubleClickSelection": true,
+      "dragSelection": true,
+      "arrowsAndEditingKeys": true,
+      "targetFocus": true,
+      "wheel": true,
+      "browserExceptions": 0
+    },
+    {
+      "label": "iframe-B",
+      "remoteMotion": true,
+      "buttons": [
+        1,
+        2,
+        3,
+        8,
+        9
+      ],
+      "clickCommand": true,
+      "doubleClickSelection": true,
+      "dragSelection": true,
+      "arrowsAndEditingKeys": true,
+      "targetFocus": true,
+      "wheel": true,
+      "browserExceptions": 0
+    },
+    {
+      "label": "iframe-A-after-hide-show",
+      "remoteMotion": true,
+      "buttons": [
+        1,
+        2,
+        3,
+        8,
+        9
+      ],
+      "clickCommand": true,
+      "doubleClickSelection": true,
+      "dragSelection": true,
+      "arrowsAndEditingKeys": true,
+      "targetFocus": true,
+      "wheel": true,
+      "browserExceptions": 0
+    },
+    {
+      "label": "iframe-A-after-reconnect",
+      "remoteMotion": true,
+      "buttons": [
+        1,
+        2,
+        3,
+        8,
+        9
+      ],
+      "clickCommand": true,
+      "doubleClickSelection": true,
+      "dragSelection": true,
+      "arrowsAndEditingKeys": true,
+      "targetFocus": true,
+      "wheel": true,
+      "browserExceptions": 0
+    }
+  ],
+  "resizeNegotiation": [
+    {
+      "name": "resize waits for delayed initial capabilities and Viewer paints",
+      "status": "passed"
+    },
+    {
+      "name": "negotiated lack of resize support still rejected",
+      "status": "passed"
+    },
+    {
+      "name": "omitted SetEncodings uses default capabilities on first update request",
+      "status": "passed"
+    }
+  ],
+  "environment": {
+    "os": "Ubuntu 24.04 amd64 disposable container",
+    "browser": "Chrome 149.0.7827.102 dedicated Linux headless profile",
+    "backend": "standalone in a host-systemd delegated cgroup",
+    "transport": "WSS through authenticated loopback fixture ingress",
+    "apps": [
+      "Mousepad 4.0.1",
+      "XFCE user-home desktop 3.0.1"
+    ]
+  },
+  "textBrowserAssertions": [
+    {
+      "name": "local text -> native clipboard -> real App paste/save",
+      "status": "passed"
+    },
+    {
+      "name": "remote offer does not change local OS clipboard",
+      "status": "passed"
+    },
+    {
+      "name": "real App copy -> native offer -> explicit local readback",
+      "status": "passed"
+    },
+    {
+      "name": "empty local read preserves remote clipboard",
+      "status": "passed"
+    },
+    {
+      "name": "explicit clear prevents old text from pasting",
+      "status": "passed"
+    },
+    {
+      "name": "64 KiB UTF-8 boundary real server readback",
+      "status": "passed"
+    },
+    {
+      "name": "64 KiB real App copy -> local boundary readback",
+      "status": "passed"
+    },
+    {
+      "name": "64 KiB+1 rejected before remote mutation",
+      "status": "passed"
+    },
+    {
+      "name": "browser permission denied gives explicit failure",
+      "status": "passed"
+    },
+    {
+      "name": "disabled-period offer is not cached on re-enable",
+      "status": "passed"
+    },
+    {
+      "name": "four OS shortcut profiles suppress terminal Space, ordinary Ctrl+A/S preserved",
+      "status": "passed"
+    },
+    {
+      "name": "ten outside/inside focus cycles with synthetic composition and file readback",
+      "status": "passed"
+    },
+    {
+      "name": "two Viewers have independent consent and disconnect",
+      "status": "passed"
+    },
+    {
+      "name": "reconnect resets consent",
+      "status": "passed"
+    }
+  ],
+  "malformedWireAssertions": [
+    {
+      "name": "oversize header before payload",
+      "status": "passed"
+    },
+    {
+      "name": "invalid UTF-8",
+      "status": "passed"
+    },
+    {
+      "name": "embedded NUL",
+      "status": "passed"
+    },
+    {
+      "name": "HTML representation",
+      "status": "passed"
+    },
+    {
+      "name": "multiple representations",
+      "status": "passed"
+    }
+  ],
+  "managedDesktopAssertions": {
+    "clickFocusTwoWindows": true,
+    "fourArrowKeys": true,
+    "savedFileReadback": true,
+    "unselectedWindowUnchanged": true,
+    "browserExceptions": 0
+  },
+  "uatHostAssertions": {
+    "homepage": true,
+    "mousepadTwoViewers": true,
+    "pointerAndArrowSavedReadbackBothViewers": true,
+    "managedDesktopTwoViewers": true,
+    "expectedComponent": true,
+    "browserExceptions": 0
+  },
+  "cleanup": {
+    "dedicatedBrowserStopped": true,
+    "ownedInputProbeStopped": true,
+    "ownedRegressionAppStopped": true,
+    "fixedUATManagerAndIngressRetained": true,
+    "originalPopulatedDesktopRetained": true
+  },
+  "artifactVerification": {
+    "manifestAndEveryPackagedMemberVerifiedBeforeInstall": true,
+    "installedManifestVerified": true,
+    "runningServerBinariesVerified": true,
+    "sourceAdapterRecipeAndPatchHashesMatch": true
+  },
+  "uatHandoff": {
+    "environment": "project-owned disposable fixture",
+    "newComponentSelected": true,
+    "accessGateRetained": true,
+    "anonymousRootAndAPIRequireLogin": true,
+    "forgedIdentityHeaderDoesNotBypassAccess": true,
+    "authenticatedPublicBrowser": "pending-human-uat",
+    "originalPopulatedRuntimePreserved": true
+  }
+}

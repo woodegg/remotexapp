@@ -1,0 +1,486 @@
+{
+  "schemaVersion": 1,
+  "dateUTC": "2026-11-01",
+  "issue": 36,
+  "scope": "Per-Viewer UDP display-block loss diagnostics on two project-owned Alpine UAT fixtures",
+  "status": "bounded-automated-block-loss-checks-passed",
+  "measurement": {
+    "unit": "display-blocks",
+    "windowMs": 10000,
+    "bucketMs": 1000,
+    "reorderAllowanceMs": 2000,
+    "ratio": "lostBlocks / (receivedBlocks + lostBlocks)",
+    "isIPPacketLoss": false,
+    "extraProbeMessages": 0,
+    "unobservable": [
+      "loss before the first observed block ID",
+      "wholly unseen trailing loss"
+    ],
+    "pendingBlockLimit": 512
+  },
+  "artifacts": {
+    "core": {
+      "sourceCommit": "51555cdba0a127cf0cf13ae2230189eb92b6bc34",
+      "archiveSHA256": "22a06689586849d838f0fa76bdd84b4f735b6a1b2be2820d11e931ef60eb34dd"
+    },
+    "edge": {
+      "sourceCommit": "51555cdba0a127cf0cf13ae2230189eb92b6bc34",
+      "archiveSHA256": "554d3fc31c133cb214c51e97ebc254dcb67ae9df4b0b0f061a6f459cdeffd956"
+    },
+    "component": {
+      "sourceCommit": "51555cdba0a127cf0cf13ae2230189eb92b6bc34",
+      "archiveSHA256": "b9e6bff68a1872e19360ccb5fa7715520305c77a13870a372d7c6d2089d44f68",
+      "manifestSHA256": "42a08c90bc19add9eefb95691c16935b6369f70bc88d98655040f9dc57db9068"
+    }
+  },
+  "build": {
+    "staticCoreExecutables": 4,
+    "nativeServerBinaryUnchanged": true,
+    "componentTestsPassed": 55,
+    "focusedTestsPassed": 27,
+    "makeCheckPassed": true,
+    "coverageCheckPassed": true,
+    "ci": "https://github.com/woodegg/remotexapp/actions/runs/41257185266"
+  },
+  "browser": "Chrome 149.0.7827.102, dedicated Linux profile",
+  "regions": {
+    "australia": {
+      "viewers": 2,
+      "displays": 1,
+      "checks": {
+        "baselineLoss": [
+          0,
+          0
+        ],
+        "finiteRTT": true,
+        "rtcObservation": [
+          {
+            "rttMs": 206,
+            "responsesReceived": 10,
+            "state": "succeeded"
+          },
+          {
+            "rttMs": 205,
+            "responsesReceived": 9,
+            "state": "succeeded"
+          }
+        ],
+        "actualSelectedICEPair": true,
+        "paintDuringLoss": true,
+        "uiCards": true,
+        "viewerHeaders": true,
+        "realFaultDrops": 211,
+        "faultCleanup": true,
+        "recoveredLoss": [
+          0,
+          0
+        ],
+        "independentTransportSwitch": true,
+        "disconnectClears": true,
+        "reconnectFreshEpoch": true,
+        "hiddenPageStopsFenceProbes": true,
+        "idleShowsStale": true,
+        "javascriptExceptions": 0,
+        "realFenceRequests": 28
+      },
+      "fault": {
+        "location": "owned-browser-host-input",
+        "configuredDatagramDrop": 0.2,
+        "automaticExpirySeconds": 40,
+        "droppedDatagrams": 211,
+        "removed": true,
+        "guardUnchanged": true
+      },
+      "blockLossSamples": {
+        "baseline-healthy-traffic": [
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 288,
+            "lostBlocks": 0,
+            "expectedBlocks": 288,
+            "ratio": 0,
+            "ageMs": 20.800000190734863
+          },
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 288,
+            "lostBlocks": 0,
+            "expectedBlocks": 288,
+            "ratio": 0,
+            "ageMs": 25.5
+          }
+        ],
+        "controlled-receiver-datagram-loss": [
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 205,
+            "lostBlocks": 82,
+            "expectedBlocks": 287,
+            "ratio": 0.2857142857142857,
+            "ageMs": 158.20000004768372
+          },
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 215,
+            "lostBlocks": 72,
+            "expectedBlocks": 287,
+            "ratio": 0.2508710801393728,
+            "ageMs": 154.5
+          }
+        ],
+        "recovered-healthy-traffic": [
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 282,
+            "lostBlocks": 0,
+            "expectedBlocks": 282,
+            "ratio": 0,
+            "ageMs": 158.59999990463257
+          },
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 282,
+            "lostBlocks": 0,
+            "expectedBlocks": 282,
+            "ratio": 0,
+            "ageMs": 172.40000009536743
+          }
+        ],
+        "viewer-a-wss-only": [
+          {
+            "state": "inactive"
+          },
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 288,
+            "lostBlocks": 0,
+            "expectedBlocks": 288,
+            "ratio": 0,
+            "ageMs": 5.099999904632568
+          }
+        ],
+        "viewer-a-disconnected": [
+          null,
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 282,
+            "lostBlocks": 0,
+            "expectedBlocks": 282,
+            "ratio": 0,
+            "ageMs": 92.20000004768372
+          }
+        ],
+        "viewer-a-reconnected": [
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 54,
+            "lostBlocks": 0,
+            "expectedBlocks": 54,
+            "ratio": 0,
+            "ageMs": 197.90000009536743
+          },
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 276,
+            "lostBlocks": 0,
+            "expectedBlocks": 276,
+            "ratio": 0,
+            "ageMs": 196
+          }
+        ],
+        "idle-stale": [
+          {
+            "state": "stale"
+          },
+          {
+            "state": "stale"
+          }
+        ]
+      },
+      "verification": {
+        "filesVerified": {
+          "core": 21,
+          "component": 45
+        },
+        "activeRuntimes": 1,
+        "failedRuntimes": 0,
+        "attachedClients": 0,
+        "documentsUnchanged": true,
+        "edgeAssetsVerified": 11,
+        "originAndBackendUnchanged": true,
+        "ownedAnimationStopped": true,
+        "ownedFaultRemoved": true
+      },
+      "privateBrowserEvidenceSHA256": "47fa9a8b9bd34876e7dcaaedf526866f9e41d695e86c382c5898c0fb5407c7d6"
+    },
+    "china": {
+      "viewers": 2,
+      "displays": 1,
+      "checks": {
+        "baselineLoss": [
+          0.06338028169014084,
+          0.010638297872340425
+        ],
+        "finiteRTT": true,
+        "rtcObservation": [
+          {
+            "rttMs": 221,
+            "responsesReceived": 9,
+            "state": "succeeded"
+          },
+          {
+            "rttMs": 221,
+            "responsesReceived": 9,
+            "state": "succeeded"
+          }
+        ],
+        "actualSelectedICEPair": true,
+        "paintDuringLoss": true,
+        "uiCards": true,
+        "viewerHeaders": true,
+        "realFaultDrops": 240,
+        "faultCleanup": true,
+        "recoveredLoss": [
+          0.07446808510638298,
+          0.006920415224913495
+        ],
+        "independentTransportSwitch": true,
+        "disconnectClears": true,
+        "reconnectFreshEpoch": true,
+        "hiddenPageStopsFenceProbes": true,
+        "idleShowsStale": true,
+        "javascriptExceptions": 0,
+        "realFenceRequests": 28
+      },
+      "fault": {
+        "location": "owned-browser-host-input",
+        "configuredDatagramDrop": 0.2,
+        "automaticExpirySeconds": 40,
+        "droppedDatagrams": 240,
+        "removed": true,
+        "guardUnchanged": true
+      },
+      "blockLossSamples": {
+        "baseline-healthy-traffic": [
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 266,
+            "lostBlocks": 18,
+            "expectedBlocks": 284,
+            "ratio": 0.06338028169014084,
+            "ageMs": 94
+          },
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 279,
+            "lostBlocks": 3,
+            "expectedBlocks": 282,
+            "ratio": 0.010638297872340425,
+            "ageMs": 95.5
+          }
+        ],
+        "controlled-receiver-datagram-loss": [
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 196,
+            "lostBlocks": 89,
+            "expectedBlocks": 285,
+            "ratio": 0.312280701754386,
+            "ageMs": 138.5
+          },
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 197,
+            "lostBlocks": 82,
+            "expectedBlocks": 279,
+            "ratio": 0.2939068100358423,
+            "ageMs": 144.60000014305115
+          }
+        ],
+        "recovered-healthy-traffic": [
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 261,
+            "lostBlocks": 21,
+            "expectedBlocks": 282,
+            "ratio": 0.07446808510638298,
+            "ageMs": 34.09999990463257
+          },
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 287,
+            "lostBlocks": 2,
+            "expectedBlocks": 289,
+            "ratio": 0.006920415224913495,
+            "ageMs": 41
+          }
+        ],
+        "viewer-a-wss-only": [
+          {
+            "state": "inactive"
+          },
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 287,
+            "lostBlocks": 2,
+            "expectedBlocks": 289,
+            "ratio": 0.006920415224913495,
+            "ageMs": 46.700000047683716
+          }
+        ],
+        "viewer-a-disconnected": [
+          null,
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 287,
+            "lostBlocks": 1,
+            "expectedBlocks": 288,
+            "ratio": 0.003472222222222222,
+            "ageMs": 85.40000009536743
+          }
+        ],
+        "viewer-a-reconnected": [
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 78,
+            "lostBlocks": 0,
+            "expectedBlocks": 78,
+            "ratio": 0,
+            "ageMs": 108.60000014305115
+          },
+          {
+            "state": "ready",
+            "scope": "display-blocks",
+            "windowMs": 10000,
+            "settleMs": 2000,
+            "receivedBlocks": 274,
+            "lostBlocks": 2,
+            "expectedBlocks": 276,
+            "ratio": 0.007246376811594203,
+            "ageMs": 108.90000009536743
+          }
+        ],
+        "idle-stale": [
+          {
+            "state": "stale"
+          },
+          {
+            "state": "stale"
+          }
+        ]
+      },
+      "verification": {
+        "filesVerified": {
+          "core": 21,
+          "component": 45
+        },
+        "activeRuntimes": 1,
+        "failedRuntimes": 0,
+        "attachedClients": 0,
+        "documentsUnchanged": true,
+        "edgeAssetsVerified": 9,
+        "originAndBackendUnchanged": true,
+        "ownedAnimationStopped": true,
+        "ownedFaultRemoved": true
+      },
+      "privateBrowserEvidenceSHA256": "ad464ce9a39fb1d3f25f26d5b4de727d1efd4d544bc696b7f441073f01dac765"
+    }
+  },
+  "unverified": [
+    "physical OS input and other browser engines",
+    "new long-duration soak",
+    "full preceding UDP fault/input/reboot matrix on this client pin",
+    "audio and file clipboard",
+    "embedding-host integration",
+    "production release qualification"
+  ],
+  "cleanup": {
+    "ownedPagesClosed": true,
+    "ownedBrowserStopped": true,
+    "scopedCookieProfileRemoved": true,
+    "userBrowserTabsPreserved": true,
+    "localBuilderStopped": true,
+    "ownedFaultRulesRemoved": true
+  },
+  "retainedAttempts": [
+    {
+      "kind": "initial-selected-ICE-observation",
+      "outcome": "single immediate ICE assertion failed; the original script did not retain the raw selected-pair sample, so its precise cause is unconfirmed",
+      "evidenceSHA256": "c089f88c8ad892ac3a42ac3556f0b502049099c42c8156462ecc82a86cffec4c"
+    },
+    {
+      "kind": "sender-output-firewall-loss",
+      "outcome": "4 drops observed, both Viewers fell back to WSS; not accepted as block-loss display qualification; owned rule removed and source policy unchanged",
+      "evidenceSHA256": "8ee215d9af49613238097119fc0edc5527ae9a1fce1bb625f6b0a0effed9282e",
+      "faultEvidenceSHA256": "a441017ddc72eca8382396137bbea21cbebaa7206097ac613a332a6c670fc119"
+    },
+    {
+      "kind": "RTT-sampling-window",
+      "outcome": "previously-ready UDP RTT became unavailable during a fixed baseline wait; harness now waits for current valid samples and a current succeeded selected pair before capture",
+      "evidenceSHA256": "50b1e3434534f7d12471b2f8fc99afe85ae97368b00a13012a9996c284c23b8e"
+    },
+    {
+      "kind": "receiver-rule-used-NAT-candidate-port",
+      "outcome": "zero matched drops, so no pass claimed; selected prflx candidate ports were NAT mappings; use verified dedicated-browser socket ports for the local input rule",
+      "evidenceSHA256": "eec8e01ea434ad9651c0a6a706bd8481377f02812dfe8f35fb47a703d7546581",
+      "faultEvidenceSHA256": "333d9517f6d093540e9da7470c88611034092aaa1dee94745daa08d44b2affdc"
+    }
+  ]
+}

@@ -1,3 +1,6 @@
 # Verified public SHA-256 of third_party/kasm/patches/0004-private-authenticated-udp.patch.
 # Only this historical checksum finding is exempt; all other findings stay active.
 a67c09908269618e8078b16248f8cd46b51ede7f:tests/kasm-native/results-20261028.json:generic-api-key:51
+# Verified SHA-256 of access-results.json: only anonymousHTTPSRequiresAccess=true
+# and statusCode=302. This exact historical evidence checksum is not a credential.
+e7563c7ab24eb1817bda0a402fe55205024baf96:tests/kasm-native/results-udp-china-20261031.json:generic-api-key:214

@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-31",
+  "status": "automated-stats-passed-physical-uat-pending",
+  "issue": 32,
+  "pullRequest": 33,
+  "sourceCommit": "3445e061fe57e94c262ff87167a3dc4be46975a6",
+  "core": {
+    "version": "0.16.0-dev.3",
+    "commit": "3445e061fe57e94c262ff87167a3dc4be46975a6",
+    "sha256": "383032b2d2912139b7a146247c452a4e3cf770b6dc996d759c962d7800f13384"
+  },
+  "sdkVersion": "0.31.0-dev.3",
+  "binaries": {
+    "remotexappd": "691ca378275de86f3359779c29a500ef74d4407b4a1cb36a1028caaf9336413f",
+    "novnc-input": "fc759b5af20c55e50ae7a48d4ffb6b0c1b1fdb29ebcad42553147cf2bb1414a4",
+    "remotexapp-status": "dbaa6e3971fc1f37650ed9c8902e27ba96cec5d8044afcf5a46a9f1847b4efbd",
+    "remotexapp-operator-helper": "3250d916fc6257ae55bea5f97de8faa059f47c95390adefe72640b1cb78c4cae"
+  },
+  "component": {
+    "manifestSHA256": "0a7e2611e763df49eec985ac44e396704b7d5946e1800e4738798465bf04320f",
+    "binarySHA256": "0792cfaebbaaac0f09310f22324195a6193418653754b444c56610da9e78e12f",
+    "clientSHA256": "84559ac2f7df3bb7c81b06c05fdac2376582f3a8e5e96d22913d697781825a3c"
+  },
+  "buildMethod": "New Core build from the stated clean commit; incremental client rebuild on the preceding qualified server build, then new immutable paired output containing all pinned archives, patches, recipe and notices. Server binary unchanged from the pointer/resize correction. Installed files and running descriptor identities verified.",
+  "sourceChecks": {
+    "makeCheck": "passed",
+    "nativeSDKTests": 13,
+    "appliedComponentTests": 35,
+    "appliedComponentSkipped": 0,
+    "coverageCheck": "passed",
+    "vulnerabilityCheck": "passed-no-findings"
+  },
+  "browser": {
+    "product": "Chromium 149",
+    "transport": "WSS",
+    "backend": "systemd",
+    "assertions": {
+      "passed": 21,
+      "checks": [
+        "initial cards have no fabricated metrics",
+        "paired component supplies actual WSS counters",
+        "framebuffer resolution and uptime are available",
+        "payload totals match independent Chrome WebSocket events",
+        "real pointer, arrow and saved document readback pass",
+        "paint and input grow measured counters",
+        "rate and FPS use numeric live values",
+        "hidden panel stays connected independently",
+        "disconnect clears stale metrics while B stays ready",
+        "reconnect advances epoch",
+        "connection failure is explicit and isolated",
+        "explicit retry restores a healthy connection",
+        "hidden host pauses displayed samples",
+        "return to visible host resets rate baseline",
+        "close A releases only A and clears metrics",
+        "recreated iframe measures a fresh connection",
+        "missing Viewer cannot display a healthy status",
+        "no browser exceptions",
+        "no iframe input errors",
+        "sampling makes no HTTP requests",
+        "managed desktop supports two independent stats snapshots"
+      ]
+    },
+    "mobileLayout390px": "no horizontal overflow; stacked cards",
+    "visibilityTest": "Synthetic document visibility event; interval pause and fresh baseline verified in the actual host page."
+  },
+  "ingress": {
+    "projectOwnedDisposableFixture": true,
+    "authenticationPreserved": true,
+    "anonymousRootAndAPIDenied": true,
+    "forgedIdentityDenied": true
+  },
+  "cleanup": {
+    "ownedMousepadStopped": true,
+    "populatedExistingDesktopsPreserved": true,
+    "newManagedDesktopRetainedForUAT": true,
+    "automationBrowserStopped": true
+  },
+  "limitations": [
+    "Authenticated public browser, physical OS IME and system shortcuts still require human UAT.",
+    "This change measures per-connection payload and painted updates, not network capacity, wire overhead, latency, packet loss or configured FPS.",
+    "No UDP, audio, production deployment, actual host business integration or full D2 acceptance is implied.",
+    "Historical two-backend and pointer/cache/resize matrices remain separately scoped; this stats test used systemd and real pointer/arrow file readback.",
+    "The running candidate is exactly sourceCommit. The subsequent TypeScript declaration/version correction and evidence documentation do not replace its tested binary identity; no release qualification is claimed."
+  ]
+}

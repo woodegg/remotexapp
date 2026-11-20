@@ -18,8 +18,8 @@ assert.match(homedir(), /^\/var\/tmp\/remotexapp-svc-matrix\.[^/]+\/home$/);
 const allApps = ['mousepad', 'libreoffice', 'kate', 'kwrite', 'firefox-esr', 'edge', 'xfce-user-desktop'];
 const selected = process.argv[3] === 'all' ? allApps : process.argv[3].split(',');
 assert(selected.length && selected.every(x => allApps.includes(x)));
-const mode = process.argv[4] || 'main'; assert(['main', 'interaction', 'transport', 'managed-transport', 'borrowed-bus', 'shutdown-outcomes', 'liveness-observation'].includes(mode));
-if (['borrowed-bus', 'liveness-observation'].includes(mode)) assert.deepEqual(selected, ['xfce-user-desktop']);
+const mode = process.argv[4] || 'main'; assert(['main', 'interaction', 'transport', 'managed-transport', 'borrowed-bus', 'shutdown-outcomes', 'liveness-observation', 'supervisor-preservation'].includes(mode));
+if (['borrowed-bus', 'liveness-observation', 'supervisor-preservation'].includes(mode)) assert.deepEqual(selected, ['xfce-user-desktop']);
 const port = 21996, base = `http://127.0.0.1:${port}`;
 const state = join(work, 'state'), apps = join(work, 'apps'), enabled = join(work, 'enabled');
 const oldCommon = join(work, 'old-common'), currentCommon = join(root, 'drivers/common');
@@ -179,6 +179,50 @@ async function ready(id) {
     if (x.sessionState === 'failed' || x.state === 'failed') throw Error(`App failed: ${JSON.stringify(x)}`);
     return x.sessionState === 'running' && x.applicationStatus?.state === 'ready' && x;
   }, 'application not ready', 60000);
+}
+async function managedSupervisorPreservation(app, accountBus) {
+  // User-home units use ExitType=cgroup: losing the supervisor must not kill
+  // a still-live desktop. Private-bus App cleanup has a different contract.
+  assert.equal(manifests.get(app).runMode, 'user-home');
+  for (const offline of [false, true]) {
+    currentPhase = offline ? 'managed-supervisor-loss-offline' : 'managed-supervisor-loss';
+    const x = await newRuntime(app), before = await record(x.id);
+    const pidPath = join(state, 'instances', x.id, manifests.get(app).session.readinessPid);
+    const pid = Number((await readFile(pidPath, 'utf8')).trim());
+    const stat = await readFile(`/proc/${pid}/stat`, 'utf8');
+    const canonical = {pid, startTime:stat.slice(stat.lastIndexOf(')') + 1).trim().split(/\s+/)[19]};
+    const survivors = [canonical, before.driver].filter(Boolean);
+    if (offline) await stopManager('SIGKILL');
+    await killOwned(before.supervisor);
+    await wait(async () => !(await alive(before.supervisor)), 'supervisor did not exit');
+    await delay(1000);
+    console.log(JSON.stringify({diagnostic:'user-home-supervisor-loss', offline,
+      canonicalAlive:await alive(canonical), driverAlive:await alive(before.driver),
+      services:Object.fromEntries(await Promise.all(Object.entries(before.services).map(async ([name, identity]) => [name, await alive(identity)])))}));
+    assert((await Promise.all(survivors.map(alive))).every(Boolean), 'live user-home App was killed with supervisor');
+    if (offline) await startManager();
+    for (const stage of ['observed', 'Manager-adopted']) {
+      if (stage === 'Manager-adopted') { await stopManager('SIGKILL'); await startManager(); }
+      const current = await api.getInstance(x.id);
+      assert.equal(current.sessionState, 'running');
+      assert.equal(current.sessionGeneration, before.generation);
+      assert.deepEqual(identities(await record(x.id)), identities(before), 'supervisor or services silently replaced');
+      assert(!(await alive(before.supervisor)));
+      assert((await Promise.all(survivors.map(alive))).every(Boolean));
+      assert.equal(await busID(), accountBus);
+      // IBus can itself exit after its parent is killed. The App must survive;
+      // descriptors must reflect that loss instead of claiming a working bus.
+      await probe(x.id, `${offline ? 'offline-' : ''}managed-supervisor-${stage}`, true, {
+        fault:await alive(before.services.ibus) ? undefined : 'ibus',
+      });
+      await checkpoint(`${offline ? 'offline-' : ''}managed-supervisor-loss-${stage}-preserves-live-desktop`, {
+        frame:await frameProbe(x.id, before.generation), generationUnchanged:true,
+      });
+    }
+    await stop(x.id); await cleaned(before);
+    assert(!(await alive(canonical)));
+    await checkpoint(`${offline ? 'offline-' : ''}managed-supervisor-loss-explicit-stop-cleans-owned-processes`);
+  }
 }
 async function attach(id) {
   const ws = new WebSocket(base.replace('http:', 'ws:') + `/remotexapps/${id}/rfb-compat`);
@@ -653,6 +697,7 @@ exec /usr/bin/systemctl "$@"
     currentApp = app; currentPhase = 'starting';
     try {
     if (mode === 'liveness-observation') { await livenessObservationMatrix(accountBus); continue; }
+    if (mode === 'supervisor-preservation') { await startManager(); await managedSupervisorPreservation(app, accountBus); continue; }
     if (mode === 'borrowed-bus') { await borrowedBusMatrix(accountBus); continue; }
     if (mode === 'shutdown-outcomes') { await shutdownOutcomes(app, accountBus); continue; }
     if (mode === 'interaction') { await interactionMatrix(app, accountBus); continue; }
@@ -718,6 +763,9 @@ exec /usr/bin/systemctl "$@"
       await stop(id); await cleaned(before);
       await checkpoint('dbus-loss-cleanup', {observedSessionState: after.sessionState});
     }
+    if (manifests.get(app).runMode === 'user-home') {
+      await managedSupervisorPreservation(app, accountBus);
+    } else {
     currentPhase = 'supervisor-loss'; x = await newRuntime(app); id = x.id;
     const before = await record(id); await killOwned(before.supervisor);
     await wait(async () => (await api.getInstance(id)).sessionState === 'failed', 'supervisor loss not observed');
@@ -745,6 +793,7 @@ exec /usr/bin/systemctl "$@"
     await checkpoint('offline-supervisor-failure-no-relaunch-by-Manager-or-Viewer');
     await replace(id); await probe(id, 'explicit-recovery-after-offline-failure', true);
     await stop(id);
+    }
     assert.equal(await busID(), accountBus, 'borrowed account bus was replaced');
     currentPhase = 'final-cleanup';
     const active = (await api.listInstances()).filter(x => x.state !== 'stopped'); assert.deepEqual(active, []);

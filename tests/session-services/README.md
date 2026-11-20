@@ -21,6 +21,8 @@ bash tests/session-services/run-state-matrix.sh /absolute/extracted/release all 
 bash tests/session-services/run-state-matrix.sh /absolute/extracted/release xfce-user-desktop borrowed-bus
 # Failed liveness query without killing the App/display; real full-frame checks:
 bash tests/session-services/run-state-matrix.sh /absolute/extracted/release xfce-user-desktop liveness-observation
+# Supervisor loss must preserve a live user-home desktop, online and offline:
+bash tests/session-services/run-state-matrix.sh /absolute/extracted/release xfce-user-desktop supervisor-preservation
 # Narrow harness check before the full run:
 bash tests/session-services/run-state-matrix.sh /absolute/extracted/release mousepad
 ```
@@ -81,8 +83,8 @@ exact-archive suites remain required.
 | IBus/engine loss | No App restart; degraded API behavior; Manager-crash adoption; explicit restart restores services |
 | Blocked shutdown | Real App/services remain alive; injected refusing hook; API fences; Manager crash retains host force deadline |
 | Private D-Bus loss | Distinguish App self-exit from surviving App; no silent bus replacement; cleanup/recovery |
-| Supervisor loss | Complete owned cleanup; truthful failed-state APIs; Manager restart cannot resurrect stale identities |
-| Offline failure | Kill supervisor while Manager is offline; preserve failure/generation; Viewer reconnect cannot relaunch; explicit restart recovers |
+| Supervisor loss | Private-bus Apps: complete owned cleanup and truthful failed-state APIs. User-home desktop: `ExitType=cgroup` preserves the canonical App and surviving services; full frames and unchanged identities/generation before and after Manager adoption; explicit stop cleans up |
+| Offline failure | Private-bus Apps retain failure/generation without Viewer relaunch. A still-live user-home desktop is adopted without replacing its dead supervisor or its surviving processes |
 | Borrowed bus | User bus identity unchanged throughout; never kill the build user's account bus |
 
 Every stable-state row records HTTP status outcomes for the applicable APIs.

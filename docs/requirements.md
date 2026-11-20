@@ -13,10 +13,10 @@ Issue [#70](https://github.com/woodegg/remotexapp/issues/70) tracks the
 [design](native-recovery-experience.md) and
 [fault qualification](../tests/kasm-native/RECOVERY-EXPERIENCE.md).
 The owner selected simpler client integration and comprehensive fault injection.
-The extension is implemented in development SDK 0.32.0-dev.1, its matching Core
-and the new immutable native component, with [bounded local qualification](../tests/kasm-native/RECOVERY-EXPERIENCE-20261120.md).
-Human UAT remains pending; earlier NHI acceptance and #69 lease tests do not
-qualify it. NHI-003/007/010 retain their
+Core 0.16.1 and SDK 0.32.0 carry the extension with a new immutable native
+component. [Bounded local development qualification](../tests/kasm-native/RECOVERY-EXPERIENCE-20261120.md)
+records the tested development pair. The release qualification binds acceptance
+to the exact archive. NHI-003/007/010 retain their
 accepted safety semantics and gain these presentation/adaptation requirements.
 
 | ID | Contract | Required evidence |

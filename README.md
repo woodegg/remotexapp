@@ -48,7 +48,7 @@ boundaries](docs/native-0.16.0-release.md).
 
 **Adapting an existing 0.15 host?** Start with the
 [0.15 → 0.16 migration guide](docs/native-host-migration.md). It distinguishes
-published SDK 0.31.0 from the recovery development pair (SDK 0.32.0-dev.1),
+the 0.16.0 baseline (SDK 0.31.0) from the 0.16.1 recovery target (SDK 0.32.0),
 explains the simpler `mount()`/`release()` integration and lists the matched
 Core/component, existing-runtime upgrade and downstream acceptance requirements.
 

@@ -11,15 +11,20 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+## 0.16.1
+
+Target: `0.16.1`. SDK `0.32.0`.
+
 - Document the native recovery experience extension (#70): an SDK-owned view
   and recovery panel, scoped actions and confirmation, minimal embedding-host
   responsibilities, and a comprehensive fault-injection acceptance matrix.
-  SDK 0.32.0-dev.1 adds `host.mount()`, one state/action model, the default
+  SDK 0.32.0 adds `host.mount()`, one state/action model, the default
   recovery panel and `/sdk/recovery.html` reference UI. Preserve low-level attach
   readiness and add cancellation of pending attachment.
   [Local fault qualification](tests/kasm-native/RECOVERY-EXPERIENCE-20261120.md)
-  records recovery/refusal, real App readback and resource cleanup; human UAT
-  and publication remain separate.
+  records recovery, protective refusal, App readback and resource cleanup for
+  the development build. See [release qualification #72](https://github.com/woodegg/remotexapp/issues/72)
+  for the exact archive.
   Fault injection also found a close/reattach listener race and browser-level
   replay of a create POST after response loss. Cancel late listener registration
   and add bounded, persisted launch-intent duplicate suppression for host launches.

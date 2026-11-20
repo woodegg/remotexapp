@@ -23,10 +23,10 @@ owns one window's session and Viewer and returns a stable view binding even
 when a connection attempt fails. Existing `host.open()` / `session.attach()`
 retain their current contracts, including attach resolving only after readiness
 and paint. A high-level view's existence is never a readiness receipt.
-This entry is absent from SDK 0.31.0/0.31.1. SDK 0.32.0-dev.1 contains the
-development implementation with its matching Core. Human UAT remains separate
-from automated qualification. `view.settled` means the first attempt finished, possibly in attention;
-only the state/readiness projection establishes a usable attachment.
+The recovery entry is available with Core 0.16.1 / SDK 0.32.0.
+`view.settled` means the first attempt finished, possibly in attention. A usable
+attachment is indicated by `getState().displayReady`. See the [migration guide](native-host-migration.md)
+for the paired component and release qualification boundary.
 
 ```js
 const host = new RemoteXAppHost({baseURL: '/rx', scope: loginScope});
@@ -61,7 +61,7 @@ existing generation, so `host.open({templateId})` now generates one random
 reserves a hash of the authenticated principal and intent on disk before launch.
 A duplicate returns HTTP 409 `launch-uncertain`, without launching again or
 returning an attachment. The view shows uncertainty and offers inspection.
-This requires the matching development Core; an older strict API rejects the
+This requires the matching Core; an older strict API rejects the
 new field instead of silently dropping protection. Low-level callers can supply
 the same optional field; unkeyed legacy creates retain their existing behavior.
 

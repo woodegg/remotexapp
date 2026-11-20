@@ -5,8 +5,8 @@ For **Core 0.15 → 0.16 native host adaptation**, start with the
 Coordinator-level integration used by the legacy provider and lower-level
 callers. Native `RemoteXAppHost` already owns its Coordinator; do not add another
 Coordinator or copy legacy input/recovery orchestration into each native window.
-The linked guide distinguishes the published SDK from the recovery development
-pair and documents native audio/clipboard ownership.
+The linked guide distinguishes the 0.16.0 baseline from the 0.16.1 recovery
+target and documents native audio/clipboard ownership.
 
 This guide covers IDL-001–004, RTC-001–004 and RTC-007. The optional
 Coordinator is shipped in SDK 0.29.1; use the release-matched SDK from your

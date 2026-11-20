@@ -15,11 +15,10 @@ for separately pinned runtime components and deployment requirements.
 
 **Choose the [exact SDK/Core/component target](native-host-migration.md#choose-the-exact-migration-target)
 before implementing the adapter.** Published 0.16.0 uses SDK 0.31.0 and
-`open()`/`attach()`. The recovery development pair uses SDK 0.32.0-dev.1 with
-`host.mount()`/`view.release()` and SDK-owned recovery actions. It requires a
-matching Core and new native component; local automation passed while human
-UAT/publication remain pending. Existing runtime pins require a separate guarded
-upgrade. The migration guide records what the host retains, replaces and removes.
+`open()`/`attach()`. Core 0.16.1 uses SDK 0.32.0 with
+`host.mount()`/`view.release()` and SDK-owned recovery actions. Use the
+matching native component and verify the release qualification. Existing
+runtime pins require a separate guarded upgrade. The migration guide records what the host retains, replaces and removes.
 
 The Coordinator-only integration below remains available for the default provider.
 

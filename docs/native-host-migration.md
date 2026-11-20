@@ -11,22 +11,24 @@ host to Kasm or change the default TigerVNC/noVNC provider.
 
 ## Choose the exact migration target
 
-**Published 0.16.0 and the current recovery development build have different
-SDK contracts. The Core version string alone does not identify the pairing.**
+**Core 0.16.0 pairs with SDK 0.31.0. Core 0.16.1 pairs with SDK 0.32.0 and
+adds the SDK recovery panel.** Match the artifact and native component to the
+SDK contract you integrate.
 
 | Target | Integration entry | Recovery and qualification boundary |
 | --- | --- | --- |
 | Core 0.15 legacy provider | Release-matched `RemoteXAppManager`, optional Coordinator and `RemoteXAppClient` | Existing TigerVNC/noVNC integration; native features require an explicit migration |
 | Published Core 0.16.0 / SDK 0.31.0 | `RemoteXAppHost.open()` → `session.attach()` | Native host baseline; November 3 reference-host UAT is scoped to this baseline; `host.mount()` is absent |
-| Recovery development pair, SDK 0.32.0-dev.1 | `host.mount()` → SDK-owned panel/model → `view.release()` | Includes the 0.31.1 lease-renewal recovery fix and the #70 recovery extension; bounded local automation passed, consolidated human UAT and publication remain pending |
+| Core 0.16.1 / SDK 0.32.0 | `host.mount()` → SDK-owned panel/model → `view.release()` | Includes the 0.31.1 lease-renewal fix and the #70 recovery extension. Consult the exact release qualification before deployment |
 
-For the recovery development target, record the **Core commit/archive hash,
+For the 0.16.1 recovery target, record the **Core commit/archive hash,
 SDK version and asset hashes, native component manifest hash and App pins**.
 The [November 20 qualification](../tests/kasm-native/RECOVERY-EXPERIENCE-20261120.md)
 identifies Core source `89697ec597435330b02880770fc4c4f8252b7f4d` and component
 manifest `12fd950b5b31c3c710471f61006ac90ce085d657fbc3b04824fcdda584646804`.
-Those are local development evidence, not a new published 0.16.0 artifact or
-instructions to install a branch build in production.
+That record covers SDK 0.32.0-dev.1 on the development Core. Verify the formal
+archive checksum and see [0.16.1 release qualification](https://github.com/woodegg/remotexapp/issues/72)
+for the exact release candidate and acceptance evidence.
 
 **The recovery target requires all three changes together:**
 
@@ -116,7 +118,7 @@ remains the ordinary App creation API and cannot create user-home desktops.
 
 ## Workflow changes for the recovery target
 
-The table uses the SDK 0.32.0-dev.1 View entry. On the published 0.31.0 baseline,
+The table uses the SDK 0.32.0 View entry. On the published 0.31.0 baseline,
 retain the lower-level `open()`/`attach()` adapter until its replacement is
 qualified. Capability detection must not silently mix SDK builds or providers.
 

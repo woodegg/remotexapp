@@ -3,7 +3,9 @@
 Issue [#70](https://github.com/woodegg/remotexapp/issues/70) owns this design,
 reference implementation and fault qualification. The owner requested a simpler
 client contract and actual fault injection on 2026-11-20. This document defines
-the intended contract; it is not implementation, human UAT or release evidence.
+the implemented development contract; measured qualification is recorded in
+[the fault matrix](../tests/kasm-native/RECOVERY-EXPERIENCE.md). It is not human
+UAT or release acceptance.
 The current low-level APIs remain supported. The liveness and lease corrections
 in PRs #66/#69 are prerequisites, not proof that this new experience works.
 
@@ -16,14 +18,14 @@ recovery enums, reconstruct restart requests or decide whether processes are saf
 to terminate. Custom styling consumes the same public model/actions as the
 default panel; it must not introduce a second recovery state machine.
 
-The proposed high-level entry is `host.mount(container, target, options)`. It
+The high-level entry is `host.mount(container, target, options)`. It
 owns one window's session and Viewer and returns a stable view binding even
 when a connection attempt fails. Existing `host.open()` / `session.attach()`
 retain their current contracts, including attach resolving only after readiness
 and paint. A high-level view's existence is never a readiness receipt.
 This entry is absent from SDK 0.31.0/0.31.1. SDK 0.32.0-dev.1 contains the
-development implementation; its new fault qualification and human UAT are still
-pending. `view.settled` means the first attempt finished, possibly in attention;
+development implementation with its matching Core. Human UAT remains separate
+from automated qualification. `view.settled` means the first attempt finished, possibly in attention;
 only the state/readiness projection establishes a usable attachment.
 
 ```js
@@ -34,6 +36,15 @@ view.addEventListener('change', () => updateWindowBadge(view.getState()));
 // On actual window close; hiding a workspace retains the view.
 await view.release();
 ```
+
+`view` is a `RemoteXAppView`. Read `view.session` / `view.viewer` only when
+present; an initial failure may have neither. Handle its `request` event for
+`authenticate` and `help` using the host's existing login/operator routes.
+Authentication changes dispose the old host and create a new login scope.
+For custom presentation use `{panel: false}`, render `getState()`, and call
+`run(action.id)`, `confirm(confirmation.id)` or `cancelConfirmation()`.
+Do not persist action IDs across snapshots. `closed` and `release()` concern
+this window; they do not stop the shared App.
 
 The host still chooses templates/parameters, maps documents through its trusted
 backend, explains normal App shutdown and owns authentication. Mounting cannot
@@ -53,6 +64,13 @@ returning an attachment. The view shows uncertainty and offers inspection.
 This requires the matching development Core; an older strict API rejects the
 new field instead of silently dropping protection. Low-level callers can supply
 the same optional field; unkeyed legacy creates retain their existing behavior.
+
+Full Viewer retirement also depends on the native component. Patch 0025 closes
+its internal control/display BroadcastChannels and removes window listeners,
+which otherwise retain detached
+canvases and listeners after `release()`. Use a newly qualified component pin;
+an SDK-only update cannot change the old component's cleanup. Existing runtime
+pins remain unchanged until the deployment owner performs an explicit upgrade.
 
 Reservations survive Manager restart, contain no request parameters or identity
 text, expire after 24 hours and are capped at 8,192 per Manager. Cleanup of
@@ -124,6 +142,8 @@ Unavailable actions are omitted with an understandable reason. In particular,
 the current restart API accepts `ready`/`server-ready` runtimes; it is not a
 universal repair for `failed` or unresolved transitions. A populated/unknown
 managed failure remains protected. Current recheck cannot bypass that protection.
+An unfinished, blocked or failed upgrade prevents restart; a completed upgrade
+history entry alone does not. Confirmation still rechecks current admission.
 Component hot repair, borrowed-user-bus restart, and container/host reboot are
 not ordinary client actions and are not added by this design.
 
@@ -163,8 +183,8 @@ an old host into a different principal's session.
 
 ## Reference host and migration
 
-First implement this contract in the SDK and project-owned UAT simulation,
-without editing or deploying downstream host. Use the default panel in ordinary windows
+The SDK and project-owned `/sdk/recovery.html` UAT simulation implement this
+contract without editing or deploying a downstream host. Use the default panel in ordinary windows
 and a custom-renderer example consuming exactly the same model/actions. Keep
 transport/frame statistics visible and preserve focus/IME behavior. Recovery
 controls are keyboard accessible, announce state changes without stealing

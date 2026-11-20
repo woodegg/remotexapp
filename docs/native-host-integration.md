@@ -23,10 +23,10 @@ preparation are separate from normal host operations. Actual downstream
 acceptance remains separate from this reference host's qualification.
 
 The [recovery experience design](native-recovery-experience.md), Issue #70,
-adds a proposed high-level window binding and shared recovery panel. It retains
+adds a development high-level window binding and shared recovery panel. It retains
 the low-level contracts below while moving recovery orchestration out of each
 embedding client. Its [fault matrix](../tests/kasm-native/RECOVERY-EXPERIENCE.md)
-requires new evidence; earlier host acceptance does not qualify this extension.
+records its separate qualification; earlier host acceptance does not qualify this extension.
 
 ## Stable requirements
 

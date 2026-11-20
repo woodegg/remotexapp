@@ -21,6 +21,10 @@ implementation; move them to a version section when publishing a release.
   Fault injection also found a close/reattach listener race and browser-level
   replay of a create POST after response loss. Cancel late listener registration
   and add bounded, persisted launch-intent duplicate suppression for host launches.
+  Completed upgrade history no longer hides an otherwise admitted restart.
+  Repeated-window resource inspection also found retained Kasm BroadcastChannels;
+  patch 0025 closes owned control/display channels during retirement. This repair
+  requires a new immutable native component, not only an SDK/Core update.
 
 - SDK 0.31.1: recover native Viewers after transient lease-renewal network or
   service failures (#68). Retire the old channel/grant and use the configured

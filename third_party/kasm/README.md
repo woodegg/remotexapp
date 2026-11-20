@@ -24,6 +24,14 @@ qualified RemoteXApp distribution. The default provider remains TigerVNC.
 Server and browser client form one separately installed, manifest-pinned pair.
 Do not update files inside an installed component directory.
 
+Patch 0025 closes per-Viewer control/display BroadcastChannels, removes global
+window listeners and cancels gesture/resize timers during retirement.
+Previously those channels retained disconnected RFB objects, detached canvases
+and listeners even after the SDK released all handles. The repeated-window
+[recovery qualification](../../tests/kasm-native/RECOVERY-EXPERIENCE.md) checks
+actual browser DOM/listener counts after collection. Existing component pins
+remain immutable; this fix needs a newly built and selected component.
+
 Source inputs:
 
 | Input | Immutable source |
@@ -38,6 +46,23 @@ archives from `https://codeload.github.com/kasmtech/KasmVNC/tar.gz/COMMIT` and
 `https://codeload.github.com/kasmtech/noVNC/tar.gz/COMMIT`, naming them
 `server.tar.gz` and `client.tar.gz`; name the Xorg archive `xorg.tar.xz`.
 Do not substitute a tag archive: different archive root names change its hash.
+
+For a client-only change, `scripts/rebuild-kasm-client.py` can reuse the binary
+and libraries from an explicitly SHA-256-pinned parent component. It verifies
+every parent manifest member and source archive, rejects changed server patches,
+reconstructs the client in a fresh directory, runs applied-client tests and
+emits a new complete component manifest. `SOURCE.json` records the parent,
+unchanged server hash and client build tools; server recompilation is explicitly
+false. Keep that provenance and all corresponding sources/notices. For example:
+
+```sh
+python3 scripts/rebuild-kasm-client.py --parent /var/tmp/verified-component \
+  --parent-sha256 "$parent_manifest_sha256" \
+  --work /var/tmp/client-build-new --output /var/tmp/component-new
+```
+
+This never changes the parent or a running service. Server changes still require
+the full recipe below; browser integration must qualify the resulting new pair.
 
 On a disposable Ubuntu 24.04 amd64 build host with the Kasm/Xorg build
 dependencies, GCC 13, CMake, autotools, Node/npm and binutils installed:

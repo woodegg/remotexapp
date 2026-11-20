@@ -5,11 +5,28 @@ It describes the reference workbench and the changes an embedding host must
 make. It is not evidence that the downstream application has been changed or
 accepted. Legacy SDK names and events are not compatibility requirements.
 
-The [recovery experience extension](native-recovery-experience.md) proposes an
+The [recovery experience extension](native-recovery-experience.md) adds an
 SDK-owned view/panel so embedding hosts no longer combine the detailed recovery
-APIs themselves. Until that extension is implemented and qualified, the current
-APIs below remain the available integration. The reference UAT/Console will
-validate the new flow before downstream adaptation; no downstream host changes are claimed.
+APIs themselves. SDK 0.32.0-dev.1 and its matching development Core provide
+`host.mount(container, target)`; use the [fault matrix](../tests/kasm-native/RECOVERY-EXPERIENCE.md)
+to assess its measured scope. The lower-level APIs below remain supported.
+The reference UAT/Console validates this flow before downstream adaptation;
+no downstream host changes or human acceptance are claimed.
+
+For ordinary windows, replace the host's open/attach/recovery-dialog sequence
+with `mount`, observe its five-state model, and call `view.release()` when the
+window closes. Keep hidden workspace views alive. Retain separate `open()`
+handles for background tasks. Connect `request` events to existing login/help
+routes. Template selection, remote file mapping and normal App stop policy
+remain host responsibilities. A successful `view.settled` wait alone does not
+mean ready: check `getState().displayReady`.
+
+Native host template launches now include a `launchIntent`. The matching Core
+reserves it before side effects, so browser transport retries cannot create
+duplicate Apps within its bounded retention window. Deploy the SDK and Core
+together; an older strict Core rejects the new field. See the
+[reservation contract](native-recovery-experience.md#launch-response-loss-and-transport-retries)
+for storage, retention, capacity and uncertain-outcome handling.
 
 ## Ownership and initialization
 

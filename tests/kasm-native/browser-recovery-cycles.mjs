@@ -20,6 +20,9 @@ try{
   for(let n=0;n<20;n++)await cycle();
   await delay(2000);await b.call('HeapProfiler.collectGarbage');after=await sample();
   assert.deepEqual(after.owners,before.owners);
+  assert.equal(after.dom.documents,before.dom.documents);
+  assert.equal(after.dom.jsEventListeners,before.dom.jsEventListeners,'released Viewers retain event listeners');
+  assert(after.dom.nodes<=before.dom.nodes+5,'released Viewers retain DOM nodes');
   checks.push({name:'twenty painted mount/release cycles return to one explicit background owner and zero Viewer DOM/audio',result:'passed'});
   await b.evaluate('h.logout()');await delay(300);
   assert.deepEqual(await b.evaluate('[h.views.size,h.sessions.size,h.diagnostics().localHandles]'),[0,0,0]);

@@ -5413,3 +5413,24 @@ Storage failure rejects launch. Unkeyed legacy calls keep their existing
 semantics. See [the contract](native-recovery-experience.md#launch-response-loss-and-transport-retries).
 The qualification matrix must count SDK calls, wire attempts and successful
 lifecycle effects separately, and check reservation survival across restart.
+
+## 2026-11-20 — Qualify component retirement beyond SDK owner counters
+
+The #70 repetition experiment returned SDK View/handle counters to their
+baseline, yet twenty released Viewers retained 300 DOM nodes and 240 listeners
+after diagnostic GC. Clearing console records did not change this. Heap
+retainers identified a native BroadcastChannel message listener retaining the
+retired RFB and its display/input DOM. This supersedes the interpretation that
+zero SDK owners alone proves full Viewer cleanup (REX-009).
+
+Patch 0025 closes each RFB control channel and the display's owned broadcast and
+screen channels during disconnect/dispose, removes omitted global blur/mouseover
+listeners and cancels gesture/resize timers. The channels-only probe still failed
+the DOM/listener gate; a second heap snapshot identified Window listeners as
+an independent retainer. Other Viewers keep their channels;
+repeated cleanup is safe. A new immutable component is required; never change
+files under an existing pin or claim that a Manager/SDK-only update repairs it.
+Client-only reconstruction may reuse a hash-verified parent server when all
+server source archives/patches are identical, retaining parent provenance and
+explicitly recording that the server was not recompiled. Qualify actual paint,
+input, isolation, reconnect, UDP and repeated resource release on the new pair.

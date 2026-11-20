@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "issue": 65,
+  "scope": "isolated local systemd/TigerVNC managed XFCE liveness observation; no end-user input",
+  "baselineRuntimeCommit": "7103963483c27a760f4281e69b471f11be063619",
+  "baselineTestCommit": "99eb1c94593c08fe0a85ad9f1be7cd2bcf187488",
+  "correctedSource": "development worktree implementation in PR #66; not an immutable release candidate",
+  "injection": "one exact-session is-active command returns exit 1; real App and display are not stopped",
+  "runs": [
+    {
+      "label": "baseline",
+      "toolchain": "go1.27.3",
+      "startedAt": "2026-11-20T07:42:34.095Z",
+      "finishedAt": "2026-11-20T07:43:16.908Z",
+      "harnessResult": "failed",
+      "interpretation": "expected regression failure",
+      "managerSHA256": "cdbb89c65f3b84012e69090d615e7ed58580fda11a7e0f2eb6e5a4fa1029f440",
+      "afterFault": {
+        "sessionState": "failed",
+        "generationUnchanged": true,
+        "allOriginalServicesAlive": true,
+        "allComponentPIDsUnchanged": true
+      },
+      "frames": [
+        {
+          "scenario": "live-desktop-before-observation-fault",
+          "result": "passed",
+          "frame": {
+            "width": 1280,
+            "height": 720,
+            "pixels": 921600,
+            "rectangles": 18,
+            "inputMessages": 0
+          }
+        }
+      ],
+      "cleanup": {
+        "temporaryAccountAbsent": true,
+        "temporaryUIDProcessesAbsent": true,
+        "temporaryHomeAbsent": true
+      }
+    },
+    {
+      "label": "corrected-go1.27.3",
+      "toolchain": "go1.27.3",
+      "startedAt": "2026-11-20T07:53:38.926Z",
+      "finishedAt": "2026-11-20T07:54:25.932Z",
+      "harnessResult": "passed",
+      "interpretation": "local regression passed",
+      "managerSHA256": "d7eef2cff5f43be139a8989896c5274618100ecd4f4dfa1e8b5bbf31ad13e47b",
+      "afterFault": {
+        "sessionState": "running",
+        "generationUnchanged": true,
+        "allOriginalServicesAlive": true,
+        "allComponentPIDsUnchanged": true
+      },
+      "frames": [
+        {
+          "scenario": "live-desktop-before-observation-fault",
+          "result": "passed",
+          "frame": {
+            "width": 1280,
+            "height": 720,
+            "pixels": 921600,
+            "rectangles": 18,
+            "inputMessages": 0
+          }
+        },
+        {
+          "scenario": "query-error-retains-live-desktop-and-Viewer",
+          "result": "passed",
+          "frame": {
+            "width": 1280,
+            "height": 720,
+            "pixels": 921600,
+            "rectangles": 18,
+            "inputMessages": 0
+          }
+        },
+        {
+          "scenario": "Manager-restart-adopts-original-session-after-query-error",
+          "result": "passed",
+          "frame": {
+            "width": 1280,
+            "height": 720,
+            "pixels": 921600,
+            "rectangles": 18,
+            "inputMessages": 0
+          }
+        }
+      ],
+      "cleanup": {
+        "temporaryAccountAbsent": true,
+        "temporaryUIDProcessesAbsent": true,
+        "temporaryHomeAbsent": true
+      }
+    }
+  ],
+  "limitations": [
+    "Original incident query outcome was not logged; this proves a reproducible mechanism, not its historical trigger.",
+    "Shared RFB full-frame receipt is automated protocol validation, not visual inspection or keyboard/clipboard/IME UAT.",
+    "App fixture uses declared wrappers and display relocation; not exact-archive qualification.",
+    "Real standalone/native-provider and cross-boot qualification remain separate.",
+    "Go 1.27.3 fails the current vulnerability gate on both baseline and corrected source; this record does not establish release readiness."
+  ]
+}

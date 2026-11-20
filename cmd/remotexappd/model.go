@@ -8,6 +8,10 @@ import (
 )
 
 type instance struct {
+	unitObservationIssue    string
+	processObservationIssue string
+	observationGeneration   int64
+
 	ID                  string                       `json:"id"`
 	ClassID             string                       `json:"classId"`
 	TemplateID          string                       `json:"templateId"`

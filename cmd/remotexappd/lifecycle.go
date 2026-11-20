@@ -1360,15 +1360,22 @@ func (m *manager) monitorSession(id string, generation int64, pidPath string, ex
 		if item == nil || item.SessionGeneration != generation || (item.SessionState != "running" && item.SessionState != "shutdown-blocked") {
 			return
 		}
-		pid, err := readCanonicalPID(pidPath)
-		if err == nil && pid == expectedPID {
-			identity, identityErr := m.inspectCanonicalProcess(m.canonicalProcRoot(), pid, item.SessionUnit)
-			if identityErr == nil && identity == expected {
-				continue
-			}
+		observed := m.observeSessionReadiness(item, pidPath, expectedPID, expected)
+		if observed.state == sessionUncertain && expectedPID == 0 {
+			observed = m.observeRecordedSession(item)
+		}
+		m.reportSessionObservation(item, "process", observed.uncertainty())
+		if observed.state == sessionUncertain {
+			continue
+		}
+		if observed.state == sessionAlive {
+			expectedPID, expected = observed.pid, observed.identity
+			continue
 		}
 		m.queueSessionRuntimeEvent(sessionRuntimeEvent{
 			InstanceID: id, Generation: generation, Reason: "readiness process exited",
+			ReadinessMonitor: true,
+			ExpectedPID:      expectedPID, ExpectedIdentity: expected,
 		})
 		return
 	}
@@ -1506,17 +1513,16 @@ func (m *manager) observeSession(item *instance, generation int64) {
 	class := m.specFor(item)
 	if m.sessionEvents != nil {
 		pidPath := filepath.Join(item.Runtime, class.Session.ReadinessPID)
-		pid, err := readCanonicalPID(pidPath)
-		identity := canonicalProcessIdentity{}
-		if err == nil {
-			identity, err = m.inspectCanonicalProcess(m.canonicalProcRoot(), pid, item.SessionUnit)
-		}
-		if err != nil {
+		observed := m.observeSessionReadiness(item, pidPath, 0, canonicalProcessIdentity{})
+		m.reportSessionObservation(item, "process", observed.uncertainty())
+		if observed.state == sessionExited {
 			// Restoration installs watches before starting the event consumer.
 			// A broken session must not block startup if its event channel fills.
-			go m.queueSessionRuntimeEvent(sessionRuntimeEvent{InstanceID: item.ID, Generation: generation, Reason: "readiness process unavailable"})
+			go m.queueSessionRuntimeEvent(sessionRuntimeEvent{InstanceID: item.ID, Generation: generation, Reason: "readiness process unavailable", ReadinessMonitor: true})
 		} else {
-			go m.monitorSession(item.ID, generation, pidPath, pid, identity)
+			// An unreadable marker/ownership probe keeps polling. It must not
+			// become an irreversible App failure at Manager restoration.
+			go m.monitorSession(item.ID, generation, pidPath, observed.pid, observed.identity)
 		}
 	}
 	if m.sessionObserver != nil {
@@ -1544,6 +1550,28 @@ func (m *manager) queueSessionRuntimeEvent(event sessionRuntimeEvent) {
 func (m *manager) reconcileSessionEvents() {
 	for event := range m.sessionEvents {
 		m.lifecycleMu.Lock()
+		item := m.get(event.InstanceID)
+		if item == nil || item.SessionGeneration != event.Generation ||
+			(item.SessionState != "running" && item.SessionState != "shutdown-blocked") {
+			m.lifecycleMu.Unlock()
+			continue
+		}
+		// Notification errors and delayed cgroup events are observations, not
+		// permission to retire a live canonical App. Recheck under the lifecycle
+		// lock, retaining the polling watch if it supplied the terminal event.
+		observed := m.observeCanonicalSession(item, event.ExpectedPID, event.ExpectedIdentity)
+		if observed.state == sessionUncertain && event.ExpectedPID == 0 {
+			observed = m.observeRecordedSession(item)
+		}
+		m.reportSessionObservation(item, "process", observed.uncertainty())
+		if observed.state != sessionExited {
+			if event.ReadinessMonitor {
+				pidPath := filepath.Join(item.Runtime, m.specFor(item).Session.ReadinessPID)
+				go m.monitorSession(item.ID, item.SessionGeneration, pidPath, event.ExpectedPID, event.ExpectedIdentity)
+			}
+			m.lifecycleMu.Unlock()
+			continue
+		}
 		reason := event.Reason
 		if reason == "" {
 			reason = "session unit exited"

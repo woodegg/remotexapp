@@ -5283,3 +5283,37 @@ branch. This does not grant authority to fence unregistered live channels:
 in-process ownership checks, retained retry deadlines/budgets, live-process
 protection and component pins are unchanged. A failing regression and the
 unchanged disposable-UID boot simulation cover the original failure boundary.
+
+## 2026-11-20 — Separate unavailable session observation from confirmed exit
+
+Issue [#65](https://github.com/woodegg/remotexapp/issues/65) corrects the
+observation boundary of MSR-001/004. A disposable real XFCE session reproduced
+the defect: one failed `systemctl --user is-active` query made the Manager
+record a terminal failure although the original App, VNC and gateway remained
+alive. This demonstrates a failure mechanism; it does not establish the exact
+trigger of any earlier incident whose query result was not recorded.
+
+Classify observations as alive, exited or uncertain. A verified canonical
+process is stronger liveness evidence than an unsuccessful unit query.
+Unavailable readiness/process/ownership evidence preserves the running session
+and is retried. Polling keeps its original PID/start-time identity; queued exit
+notifications are rechecked under the lifecycle lock and polling resumes if
+the recheck cannot confirm exit. Positive process exit still enters the
+existing graceful/descendant-protection path. An empty component can establish
+exit only with corroborating inactive-unit evidence when readiness is missing.
+
+Restoration, duplicate selection and upgrade/boot recovery must preserve an
+uncertain session instead of authorizing resource retirement. Uncertainty is
+not successful readiness or upgrade completion. This supersedes only the
+binary observation interpretation in the October managed-recovery decisions;
+the October 28 surviving-descendant guard, stop/veto/upgrade fences and durable
+retry budgets remain authoritative. Historical failed states are not silently
+relabelled running: their cause and any surviving application require the
+existing guarded recovery process.
+
+Diagnostics record static reason changes per scope and generation, including
+observation recovery, rather than logging every 500 ms poll. They are ephemeral;
+the persisted schema, SDK and provider selection are unchanged. See the
+[local reproduction protocol](../tests/session-services/README.md#session-liveness-observation-fault)
+for the failing baseline and same-session full-frame checks. Source validation
+does not imply human UAT, release qualification or sandbox deployment.

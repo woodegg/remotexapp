@@ -19,6 +19,8 @@ bash tests/session-services/run-state-matrix.sh /absolute/extracted/release edge
 bash tests/session-services/run-state-matrix.sh /absolute/extracted/release all shutdown-outcomes
 # Temporarily pause/resume only the disposable account bus (not the build user's):
 bash tests/session-services/run-state-matrix.sh /absolute/extracted/release xfce-user-desktop borrowed-bus
+# Failed liveness query without killing the App/display; real full-frame checks:
+bash tests/session-services/run-state-matrix.sh /absolute/extracted/release xfce-user-desktop liveness-observation
 # Narrow harness check before the full run:
 bash tests/session-services/run-state-matrix.sh /absolute/extracted/release mousepad
 ```
@@ -28,6 +30,36 @@ The wrapper creates a disposable UID/HOME/account bus and Manager on loopback
 The build user's desktop, local 1991/2992, sandboxes and existing account buses
 are not fault-injection targets. Suites run serially because X display numbers
 are host-global even with different UIDs/Manager ports.
+
+## Session liveness observation fault
+
+The `liveness-observation` mode reproduces #65 using a real, managed
+`xfce-user-desktop` in the disposable account. A Manager-only PATH wrapper
+fails exactly one `systemctl --user is-active --quiet SESSION_UNIT` call;
+all other commands use the host executable. The managed safety interval is
+30 seconds, and the test verifies the fault was actually consumed.
+
+Before the fault, after it, and after a Manager-only restart, a shared RFB
+client requests a complete raw framebuffer and counts its received pixels.
+It sends no keyboard/pointer input. Assertions retain the original service
+identities, component PIDs, App generation and borrowed account-bus identity.
+The mode uses the common test App wrappers and display relocation above; it
+is not an exact-release-archive or browser-IME qualification.
+
+The baseline from `7103963483c27a760f4281e69b471f11be063619` reproduced the
+false failure on 2026-11-20 (test-only commit `99eb1c94593c`): a complete
+1280 x 720 frame before the fault, all original services/PIDs still alive
+afterward, but Manager session state `failed`. The regression must fail on
+that baseline. See [the sanitized result](results-liveness-observation-20261120.json)
+for the corrected build's matching checks and the validation limits.
+
+Keep raw logs, process identities and local artifact paths private. The wrapper
+prints the retained evidence location and terminates/removes only its temporary
+account after either a pass or failure. Verify that cleanup separately; a test
+assertion passing does not establish cleanup. Portable tests additionally cover
+query timeout, unreadable/malformed process data, delayed events, PID reuse,
+uncertain restoration and standalone component emptiness. Real standalone,
+native-provider, cross-boot and end-user UAT remain separate qualification.
 
 The actual shipped App scripts run behind declared **test-only** startup and
 shutdown barriers. Package patch versions and an inert Core helper marker

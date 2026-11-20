@@ -104,7 +104,7 @@ func (m *manager) prepareBootRecovery(record *runtimeManifestRecord) (bool, erro
 		(item.Upgrade != nil && item.Upgrade.Status.Phase != "completed") {
 		return false, nil
 	}
-	if m.recordedSessionAlive(item) {
+	if m.recordedSessionMayBeAlive(item) {
 		return false, nil // Boot metadata never authorizes replacing a live App.
 	}
 	id, err := readRuntimeBoot(item)

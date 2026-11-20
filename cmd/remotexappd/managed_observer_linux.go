@@ -22,10 +22,13 @@ type managedRuntimeEvent struct {
 }
 
 type sessionRuntimeEvent struct {
-	InstanceID string
-	Generation int64
-	Unit       string
-	Reason     string
+	ReadinessMonitor bool
+	ExpectedPID      int
+	ExpectedIdentity canonicalProcessIdentity
+	InstanceID       string
+	Generation       int64
+	Unit             string
+	Reason           string
 }
 
 type managedRuntimeObserver interface {

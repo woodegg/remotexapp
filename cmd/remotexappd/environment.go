@@ -209,6 +209,8 @@ func confirmCanonicalProcess(procRoot string, pid int, unit string, expected can
 	return nil
 }
 
+var errCanonicalProcessExited = errors.New("process has exited")
+
 func canonicalProcess(procRoot string, pid int) (canonicalProcessIdentity, error) {
 	info, err := os.Stat(procPath(procRoot, pid, ""))
 	if err != nil {
@@ -232,7 +234,7 @@ func canonicalProcess(procRoot string, pid int) (canonicalProcessIdentity, error
 		return canonicalProcessIdentity{}, errors.New("process stat has no start time")
 	}
 	if fields[0] == "Z" || fields[0] == "X" {
-		return canonicalProcessIdentity{}, errors.New("process has exited")
+		return canonicalProcessIdentity{}, errCanonicalProcessExited
 	}
 	if _, err := strconv.ParseUint(fields[19], 10, 64); err != nil {
 		return canonicalProcessIdentity{}, errors.New("invalid process start time")

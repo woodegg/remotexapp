@@ -436,7 +436,11 @@ func (m *manager) bindManagedRuntimeManifests(records []runtimeManifestRecord) (
 func (m *manager) selectManagedRuntimeManifest(managed *managedInstance, records []runtimeManifestRecord, indexes []int) (int, error) {
 	live := make([]int, 0, len(indexes))
 	for _, index := range indexes {
-		if m.recordedSessionAlive(&records[index].Runtime) {
+		observation := m.observeRecordedSession(&records[index].Runtime)
+		if observation.state == sessionUncertain {
+			return 0, fmt.Errorf("managed instance %s has an unverified application runtime", managed.ID)
+		}
+		if observation.state == sessionAlive {
 			live = append(live, index)
 		}
 	}
@@ -546,9 +550,9 @@ func (m *manager) restoreRuntimeManifests(records []runtimeManifestRecord) {
 				m.adoptRuntimeManifest(item)
 				log.Printf("runtime %s adopted with locked template %s driver %s", item.ID, item.TemplateID, item.DriverVersion)
 				continue
-			} else if m.recordedSessionAlive(item) {
-				// A transport or helper fault must not silently destroy a live
-				// application that may hold unsaved work. Preserve the locked
+			} else if m.recordedSessionMayBeAlive(item) {
+				// A transport, helper or observation fault must not destroy a live
+				// or unverified application with possible unsaved work. Preserve the locked
 				// session and let normal managed reconciliation or an explicit
 				// operator stop apply the graceful-shutdown policy.
 				m.adoptRuntimeManifest(item)
@@ -560,7 +564,7 @@ func (m *manager) restoreRuntimeManifests(records []runtimeManifestRecord) {
 					m.mu.Unlock()
 					m.persistRuntimeTransition(m.get(item.ID), "restart-live-session-preserved")
 				}
-				log.Printf("runtime %s preserved because its locked application session is alive; adoption health: %v", item.ID, err)
+				log.Printf("runtime %s preserved because its locked application session is live or unverified; adoption health: %v", item.ID, err)
 				continue
 			} else if item.State == "server-ready" && (item.SessionState == "running" || item.SessionState == "shutdown-blocked") {
 				// The App can exit while the Manager is offline. Reconcile the
@@ -808,21 +812,7 @@ func userUnitActive(unit string) bool {
 }
 
 func (m *manager) recordedSessionAlive(item *instance) bool {
-	if m.runtimeSessionAliveCheck != nil {
-		return m.runtimeSessionAliveCheck(item)
-	}
-	if item == nil || (item.SessionState != "running" && item.SessionState != "shutdown-blocked") {
-		return false
-	}
-	if !m.componentActive(item.SessionUnit) {
-		return false
-	}
-	pid, err := readCanonicalPID(filepath.Join(item.Runtime, item.Spec.Session.ReadinessPID))
-	if err != nil || !pidFileAlive(filepath.Join(item.Runtime, item.Spec.Session.ReadinessPID)) {
-		return false
-	}
-	_, err = m.inspectCanonicalProcess(m.canonicalProcRoot(), pid, item.SessionUnit)
-	return err == nil
+	return m.observeRecordedSession(item).state == sessionAlive
 }
 
 func (m *manager) adoptRuntimeManifest(item *instance) {

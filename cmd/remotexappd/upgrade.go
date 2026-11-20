@@ -527,7 +527,7 @@ func (m *manager) restoreUpgrade(record *runtimeManifestRecord) bool {
 	}
 	m.storeRuntime(item)
 	if u.Status.Phase == "blocked" || u.Status.Phase == "failed" {
-		if m.recordedSessionAlive(item) {
+		if m.recordedSessionMayBeAlive(item) {
 			m.adoptRuntimeManifest(item)
 		}
 		return true
@@ -551,12 +551,16 @@ func (m *manager) restoreUpgrade(record *runtimeManifestRecord) bool {
 			}
 			return true
 		}
+		if m.recordedSessionMayBeAlive(item) {
+			m.adoptRuntimeManifest(item)
+			return true // Preserve uncertainty without claiming upgrade completion.
+		}
 	}
 	if _, err := m.continueUpgrade(item); err != nil {
 		log.Printf("runtime %s upgrade recovery: %v", item.ID, err)
 		// Preflight or shutdown can fail while the old application survives.
 		// Startup must still restore its exit observation and host policy timers.
-		if current := m.get(item.ID); m.recordedSessionAlive(current) {
+		if current := m.get(item.ID); m.recordedSessionMayBeAlive(current) {
 			m.adoptRuntimeManifest(current)
 		}
 	}

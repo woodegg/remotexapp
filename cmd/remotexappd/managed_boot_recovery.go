@@ -73,7 +73,7 @@ func (m *manager) managedBootRejection(item *instance) string {
 	if item.SessionGeneration >= 1<<53-1 {
 		return string(recoveryGeneration)
 	}
-	if m.recordedSessionAlive(item) || m.sessionComponentPopulated(item.SessionUnit) {
+	if m.recordedSessionMayBeAlive(item) || m.sessionComponentPopulated(item.SessionUnit) {
 		return string(recoveryProcesses)
 	}
 	if item.AttachedClients != 0 && !m.canFenceViewerChannels(item) {

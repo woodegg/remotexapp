@@ -8,6 +8,7 @@ const running = x => x?.sessionState === 'running' && ['ready','server-ready'].i
   !['error','exited','stopped'].includes(x.applicationStatus?.state) && (!x.shutdown || x.shutdown.state === 'cancelled');
 const identity = x => JSON.stringify([x.id,x.createdAt,x.templateId,x.profileRef,x.managedInstanceId,
   x.displayProvider,x.displayComponentDigest,x.versions?.current]);
+const unfinishedUpgrade = x => !!x?.upgrade && x.upgrade.phase !== 'completed';
 const codeOf = e => (e?.status || e?.cause?.status) === 401 ? 'authentication-required' : (e?.status || e?.cause?.status) === 403 ? 'permission-denied' :
   (e?.status || e?.cause?.status) === 404 ? 'target-unavailable' :
   (e?.status || e?.cause?.status) === 409 ? 'operation-refused' : /^[a-z][a-z0-9-]{0,63}$/.test(e?.code || '') ? e.code : 'connection-unavailable';
@@ -55,7 +56,7 @@ export class RemoteXAppView extends EventTarget {
     if (this._eligible() && running(x) && (!this._managed || this._managed.desiredState === 'running')) {
       if (x.sessionGeneration === this.session?.generation && this.session.state === 'active') a.push('retry');
       else if (this._anchor.createdAt && x.sessionGeneration >= this.session?.generation) a.push('reattach');
-      if (this._capabilities?.runtimeRestart && this._anchor.createdAt && !x.upgrade) a.push('restart');
+      if (this._capabilities?.runtimeRestart && this._anchor.createdAt && !unfinishedUpgrade(x)) a.push('restart');
     }
     if (this._eligible() && x.recovery && this._managed?.desiredState === 'running') a.push('recheck');
     return [...a,'help'];
@@ -180,7 +181,7 @@ export class RemoteXAppView extends EventTarget {
       }
       if (!running(actual) || this._managed && this._managed.desiredState !== 'running') throw fail('runtime-unavailable');
       if (action.kind === 'restart') {
-        if (!this._capabilities?.runtimeRestart || actual.upgrade || !this._anchor.createdAt) throw fail('restart-unavailable');
+        if (!this._capabilities?.runtimeRestart || unfinishedUpgrade(actual) || !this._anchor.createdAt) throw fail('restart-unavailable');
         this._confirmation = {id:crypto.randomUUID(),expiresAt:Date.now()+60000,generation:actual.sessionGeneration};
         this._phase = 'attention'; this._reason = 'restart-confirmation'; return;
       }
@@ -209,7 +210,7 @@ export class RemoteXAppView extends EventTarget {
     }
     await this._perform('restart',async signal => {
       const actual = await this._fresh(signal);
-      if (!actual || actual.sessionGeneration !== confirmation.generation || !running(actual) || actual.upgrade ||
+      if (!actual || actual.sessionGeneration !== confirmation.generation || !running(actual) || unfinishedUpgrade(actual) ||
           !this._capabilities?.runtimeRestart || this._managed && this._managed.desiredState !== 'running') throw fail('stale-confirmation');
       this.viewer?.disconnect();
       let result;

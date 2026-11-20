@@ -111,6 +111,14 @@ test('restart requires confirmation and does not include force or upgrade',async
   assert.equal(calls[0][2].sessionGeneration,3);assert.equal(calls[0][2].force,undefined);
   assert.equal(f.view.session.generation,4);assert.equal(f.view.getState().state,'ready');
 });
+for(const phase of ['stopping','launching','blocked','failed','completed'])test(`upgrade phase ${phase} admits only the completed history to ordinary restart`,async t=>{
+  const f=await fixture(t);f.actual.upgrade={phase};f.fault();await f.refresh();
+  assert.equal(f.view.getState().actions.some(a=>a.kind==='restart'),phase==='completed');
+  if(phase==='completed'){
+    await f.view.run(f.action('restart'));await f.view.confirm(f.view.getState().confirmation.id);
+    assert.equal(f.view.getState().displayReady,true);
+  }else assert(!f.calls.some(c=>c[0]==='restart'));
+});
 test('cancelled, consumed and expired confirmations cannot restart',async t=>{
   const f=await fixture(t);f.fault();await f.refresh();await f.view.run(f.action('restart'));const old=f.view.getState().confirmation.id;
   f.view.cancelConfirmation();await assert.rejects(f.view.confirm(old),{code:'stale-confirmation'});

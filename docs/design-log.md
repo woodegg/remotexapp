@@ -5331,3 +5331,8 @@ historical release records and the existing Go language directive. Rebuild
 and rerun the affected live experiment plus portable, race, coverage and
 source/binary vulnerability gates. No dependency-module upgrade, publication
 or downstream deployment is implied by this toolchain correction.
+
+Go 1.27.4 rejects the dynamic gateway's old `-l:SONAME` cgo flags. Use normal
+`-lXtst -lxdo` names and declare their development packages on build/CI hosts;
+do not weaken cgo's flag validation with an allow-list override. Runtime
+library requirements and the existing Alpine static linker flags are unchanged.

@@ -31,7 +31,7 @@ jobs:
       - name: Install native and web build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes libx11-dev libxtst-dev libxdo3 ripgrep \
+          sudo apt-get install --yes libx11-dev libxtst-dev libxdo-dev ripgrep \
             xvfb xclip dbus-x11 xfce4-clipman
           npm install --global esbuild@0.20.1
       - name: Run repeat and fuzz gates

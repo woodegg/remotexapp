@@ -1,6 +1,7 @@
 // Explicit live faults against the project-owned disposable host fixture only.
 // Usage: node browser-host-faults.mjs /absolute/fixture.json MODE
-// MODE: manager-crash | short-outage | lease-outage
+// MODE: manager-crash | short-outage | lease-outage | lease-503 | lease-timeout
+//       lease-401 | lease-403 | lease-409 | lease-exhausted | lease-cancelled
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import {readFileSync, writeFileSync, mkdtempSync, rmSync} from 'node:fs';
@@ -15,13 +16,25 @@ assert.match(original.container, /^remotexapp-host-[a-z0-9-]+$/);
 assert.equal(original.user, 'rxhost');
 assert(original.evidenceDirectory.startsWith('/tmp/remotexapp-host-'));
 const mode = process.argv[3];
-assert(['manager-crash', 'short-outage', 'lease-outage'].includes(mode));
+assert(['manager-crash','short-outage','lease-outage','lease-503','lease-timeout',
+  'lease-401','lease-403','lease-409','lease-exhausted','lease-cancelled'].includes(mode));
 const upstream = new URL(original.ingressURL);
 assert.equal(upstream.hostname, '127.0.0.1');
-let outage = false;
+let outage = false, injectLease = false, leaseFaultSeenAt;
+const requests = {lease:0,grant:0,prepare:0}, heldResponses = new Set();
 const sockets = new Set();
 const options = r => ({hostname:upstream.hostname, port:upstream.port, path:r.url, method:r.method, headers:r.headers});
 const server = http.createServer((req, res) => {
+  const action = req.url.split('?')[0].split('/').at(-1);
+  if (Object.hasOwn(requests, action)) requests[action]++;
+  if (injectLease && action === 'lease') {
+    injectLease = false; leaseFaultSeenAt = Date.now(); req.resume();
+    if (mode === 'lease-timeout') {
+      heldResponses.add(res); res.on('close', () => heldResponses.delete(res)); return;
+    }
+    res.writeHead(Number(mode.slice('lease-'.length)), {'Content-Type':'application/json'});
+    res.end(JSON.stringify({error:'test-only lease failure'})); return;
+  }
   if (outage) { res.writeHead(503); res.end(); return; }
   const q = http.request(options(req), r => { res.writeHead(r.statusCode, r.headers); r.pipe(res); });
   q.on('error', () => { res.writeHead(502); res.end(); }); req.pipe(q);
@@ -83,13 +96,40 @@ try {
     outage = true; for (const socket of sockets) socket.destroy();
     await wait(() => b.evaluate("v.getStats().state!=='ready'"), 10000);
     await delay(3000); outage = false; resumed = Date.now();
+  } else if (['lease-503','lease-timeout','lease-401','lease-403','lease-409'].includes(mode)) {
+    injectLease = true;
+    await wait(() => leaseFaultSeenAt, 30000);
+    resumed = leaseFaultSeenAt;
+    if (['lease-401','lease-403','lease-409'].includes(mode)) {
+      await wait(() => b.evaluate("v.getStats().state==='failed' && v.getStats().code==='grant-expired'"), 10000);
+      const grants = requests.grant;
+      await delay(3000);
+      assert.equal(requests.grant, grants); assert.equal(grants, 1);
+      assert.equal(await b.evaluate("v.getStats().state"), 'failed');
+      checks.push({name:'explicit lease rejection stops retry without a new grant',result:'passed',status:Number(mode.slice(6))});
+      // Only an explicit test action may reconnect after the terminal rejection.
+      await b.evaluate('v.reconnect()');
+    }
   } else {
     // Chrome can leave an existing WebSocket open while blocking HTTP. Waiting
     // across lease renewal exercises that separate failure path deliberately.
     await b.call('Network.emulateNetworkConditions', {offline:true,latency:0,downloadThroughput:0,uploadThroughput:0}); offline = true;
     await wait(() => b.evaluate("v.getStats().state!=='ready'"), 30000);
+    if (mode === 'lease-exhausted') {
+      await wait(() => b.evaluate("v.getStats().code==='reconnect-exhausted'"), 45000);
+      checks.push({name:'continued outage exhausts the finite reconnect budget',result:'passed'});
+    }
+    if (mode === 'lease-cancelled') await b.evaluate('v.disconnect()');
     await b.call('Network.emulateNetworkConditions', {offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1}); offline = false;
     resumed = Date.now();
+    if (['lease-exhausted','lease-cancelled'].includes(mode)) {
+      const grants = requests.grant;
+      await delay(3000);
+      assert.equal(await b.evaluate('v.getStats().state'), 'disconnected');
+      assert.equal(requests.grant, grants);
+      checks.push({name:'network restoration does not override exhaustion or explicit disconnect',result:'passed'});
+      await b.evaluate('v.reconnect()');
+    }
   }
   await wait(() => b.evaluate(`v.getStats().state==='ready' && v.getStats().connectionEpoch>${epoch} && v.getStats().renderedFrames>0`), 30000);
   recoveryMs = Date.now() - resumed;
@@ -98,7 +138,13 @@ try {
   assert.equal(remote(['cat',file]), 'saved before faults 中文');
   await b.evaluate("v.sendKey('End');v.sendText(' after recovery');v.sendKey('s',{modifiers:['Control']})");
   await wait(() => remote(['cat',file]) === 'saved before faults 中文 after recovery');
-  checks.push({name:'automatic recovery, unchanged generation/services, real paint and fresh saved input',result:'passed',recoveryMs});
+  const manual = ['lease-401','lease-403','lease-409','lease-exhausted','lease-cancelled'].includes(mode);
+  assert(requests.grant >= 2, 'recovery requires a fresh authenticated grant');
+  if (mode === 'lease-timeout') {
+    assert(recoveryMs >= 9000 && recoveryMs < 20000, 'lease deadline must bound a hanging request');
+    assert.equal(heldResponses.size, 0, 'timed-out renewal request was not released');
+  }
+  checks.push({name:(manual ? 'explicit recovery after protected stop' : 'automatic recovery')+', unchanged generation/services, real paint and fresh saved input',result:'passed',recoveryMs});
 } catch (e) {
   failure = e.message;
   checks.push({name:'automatic recovery',result:'failed',error:e.message,
@@ -114,7 +160,8 @@ try {
   }
   console.error(e.stack);
 } finally {
-  outage = false;
+  outage = false; injectLease = false;
+  for (const response of heldResponses) response.destroy();
   if (offline) await b.call('Network.emulateNetworkConditions', {offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
   owned ??= await b.evaluate('window.s?.id').catch(() => undefined);
   await b.evaluate('window.h?.dispose()').catch(() => {});
@@ -126,6 +173,6 @@ try {
   }
   rmSync(temp, {recursive:true});
   writeFileSync(join(original.evidenceDirectory, 'fault-'+mode+'.json'), JSON.stringify({mode,startedAt,
-    completedAt:new Date().toISOString(),result:failure?'failed':'passed',checks}, null, 2));
+    completedAt:new Date().toISOString(),result:failure?'failed':'passed',requests,checks}, null, 2));
 }
 if (failure) process.exitCode = 1;

@@ -1,6 +1,6 @@
 import { RemoteXAppManager } from './remotexapp-manager.js';
 import { NativeClipboard } from './native-clipboard.js';
-import { NativeReconnect } from './native-reconnect.js';
+import { NativeReconnect, retryable } from './native-reconnect.js';
 import {readClipboard, writeClipboard, sendClipboard, validateClipboard} from './native-clipboard-data.js';
 
 export class RemoteXAppNativeError extends Error {
@@ -205,13 +205,16 @@ export class RemoteXAppNativeClient extends EventTarget {
         const renew = async () => {
           if (epoch !== this._epoch || !this._grant) return;
           try {
-            await this.manager.request(`${base}/lease`, {method:'POST', body:this._grant.request, signal});
+            await this.manager.request(`${base}/lease`, {method:'POST', body:this._grant.request,
+              signal:AbortSignal.any([signal, AbortSignal.timeout(10000)])});
             current();
             this._grantTimer = setTimeout(renew, grant.renewAfterMs);
-          } catch {
+          } catch (cause) {
             if (epoch !== this._epoch) return;
-            this._closeConnection();
-            this._state('failed', {code:'grant-expired'});
+            // Losing the HTTP renewal path does not establish authorization
+            // loss. Retire this channel; retries must obtain a fresh grant.
+            const code = retryable(cause) ? 'lease-unavailable' : 'grant-expired';
+            this._connectionLost(new RemoteXAppNativeError(code, 'Native Viewer lease renewal failed', {cause}));
           }
         };
         if (epoch === this._epoch) this._grantTimer = setTimeout(renew, grant.renewAfterMs);
@@ -262,12 +265,7 @@ export class RemoteXAppNativeClient extends EventTarget {
       current();
       display.addEventListener('disconnect', () => {
         if (epoch !== this._epoch) return;
-        const expected = this.instance;
-        this._closeConnection(false);
-        const closedEpoch = this._epoch;
-        this._state('disconnected', { code:'display-disconnected' });
-        if (closedEpoch === this._epoch && !this._disposed && (!this.runtime || this.runtime.state === 'tracking'))
-          this._reconnect.begin(expected, new RemoteXAppNativeError('display-disconnected', 'Display disconnected'));
+        this._connectionLost(new RemoteXAppNativeError('display-disconnected', 'Display disconnected'));
       }, { once:true });
       if (this._displaySettings.resize !== null && this.capabilities.displayControls) display.configureDisplay(this._displaySettings);
       this._transport = socketURL.protocol === 'wss:' ? 'wss' : 'ws-loopback';
@@ -284,6 +282,17 @@ export class RemoteXAppNativeClient extends EventTarget {
       }
       throw cause;
     } finally { clearTimeout(timer); parentSignal?.removeEventListener('abort', cancelParent); }
+  }
+
+  _connectionLost(error) {
+    const expected = this.instance, recoverable = retryable(error);
+    this._closeConnection(false);
+    const closedEpoch = this._epoch;
+    this._state(recoverable ? 'disconnected' : 'failed', {code:error.code});
+    // State listeners can synchronously disconnect, replace or dispose this
+    // Viewer. A late callback must not undo that decision or renew old grants.
+    if (recoverable && closedEpoch === this._epoch && !this._disposed && (!this.runtime || this.runtime.state === 'tracking'))
+      this._reconnect.begin(expected, error);
   }
 
   /** Read-only, per-connection counters. No timer, traffic or content logging. */

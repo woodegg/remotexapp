@@ -11,6 +11,13 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- SDK 0.31.1: recover native Viewers after transient lease-renewal network or
+  service failures (#68). Retire the old channel/grant and use the configured
+  bounded reconnect policy with a fresh authenticated grant for the same
+  running generation. Bound renewal HTTP requests to ten seconds. Explicit
+  authorization/generation rejection, cancellation and exhausted retry budgets
+  remain terminal; no input replay or implicit clipboard/audio consent.
+
 - Pin builds, CI and candidate verification to Go 1.27.4 to clear the existing
   standard-library vulnerability GO-2026-6859 (#67). Requalification of release
   artifacts remains separate from source checks.

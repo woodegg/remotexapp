@@ -164,3 +164,29 @@ its writable documents directory and `remotexapp-host.service` with systemd
 The scripts do not manually restart/reconnect to make an assertion pass. They
 stop only their created App and close their owned browser/connector afterward.
 Raw results contain runtime details and belong in private evidence storage.
+
+## Lease recovery regression modes — SDK 0.31.1
+
+Issue [#68](https://github.com/woodegg/remotexapp/issues/68) uses the same owned
+fixture and script. The earlier SDK 0.31.0 failure above remains historical
+evidence. Rerun `manager-crash`, `short-outage` and `lease-outage` against the
+new immutable artifact; only real new-epoch paint and fresh saved input count
+as recovered. Additional modes exercise the HTTP renewal boundary:
+
+- `lease-503` and `lease-timeout`: the owned loopback connector returns one
+  synthetic 503 or holds one renewal response. Require fresh-grant recovery;
+  timeout recovery must fall between 9 and 20 seconds after the held request,
+  and its aborted request must be released.
+- `lease-401`, `lease-403`, `lease-409`: synthetic lease rejection must leave
+  the Viewer failed without another grant. A separate explicit reconnect checks
+  usability after removing the injected rejection; it is not automatic recovery.
+- `lease-exhausted`: keep browser networking offline through the configured
+  retry budget. Restoring it must not restart retries. An explicit reconnect
+  must then work without changing the App generation or losing saved text.
+- `lease-cancelled`: explicitly disconnect during lease recovery. Network return
+  must leave it disconnected; only the subsequent explicit action may reconnect.
+
+These HTTP responses are fixture injections, not production identity-provider
+or server authorization changes. Server grant rejection, revocation and
+principal/generation fencing retain their separate API tests. Run all modes
+serially on the disposable target and retain each original result.

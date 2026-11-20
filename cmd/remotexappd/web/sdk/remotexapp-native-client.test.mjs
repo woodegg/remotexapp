@@ -272,12 +272,169 @@ test('lease network failure reconnects with a new grant and unchanged App identi
   assert.equal(f.calls.filter(c => c.path.endsWith('/revoke')).length, 1);
 });
 
+const settleLease = () => new Promise(resolve => setImmediate(resolve));
+async function leaseFailure(t, cause, reconnect = {maxAttempts:2,delays:[1]}) {
+  t.mock.timers.enable({apis:['setTimeout']});
+  const f = fixture({udp:true, controls:true, clipboard:true, reconnect});
+  t.after(() => f.viewer.dispose());
+  f.state.state = 'ready';
+  const request = f.viewer.manager.request;
+  f.viewer.manager.request = async (path, options) => {
+    if (path.endsWith('/lease')) throw cause;
+    return request(path, options);
+  };
+  await f.viewer.connect('app');
+  f.old = f.display;
+  return f;
+}
+
+test('transient lease service errors use bounded reconnect', async t => {
+  for (const status of [0,429,500,502,503,504]) await t.test(String(status), async t => {
+    const f = await leaseFailure(t, Object.assign(Error('temporarily unavailable'), {status}));
+    t.mock.timers.tick(20000); await settleLease();
+    assert.equal(f.viewer.state, 'reconnecting');
+    t.mock.timers.tick(1); await settleLease();
+    assert.equal(f.viewer.state, 'ready');
+    assert.equal(f.old.closed, 1);
+    assert.equal(f.calls.filter(c => c.path.endsWith('/grant')).length, 2);
+  });
+});
+
+test('lease authorization, revocation and generation rejection never obtain another grant', async t => {
+  for (const status of [400,401,403,404,409,422]) await t.test(String(status), async t => {
+    const f = await leaseFailure(t, Object.assign(Error('rejected'), {status}));
+    t.mock.timers.tick(20000); await settleLease();
+    assert.equal(f.viewer.state, 'failed');
+    assert.equal(f.viewer.getStats().code, 'grant-expired');
+    t.mock.timers.tick(60000); await settleLease();
+    assert.equal(f.old.closed, 1);
+    assert.equal(f.calls.filter(c => c.path.endsWith('/grant')).length, 1);
+    assert.equal(f.viewer._reconnect.timer, null);
+  });
+});
+
+test('lease recovery rechecks authentication and generation before requesting a fresh grant', async t => {
+  for (const condition of ['unauthorized','forbidden','generation','component','stopped','veto']) await t.test(condition, async t => {
+    const f = await leaseFailure(t, new TypeError('offline'));
+    const events = [];
+    f.viewer.addEventListener('reconnectstopped', e => events.push(e.detail));
+    t.mock.timers.tick(20000); await settleLease();
+    if (condition === 'unauthorized' || condition === 'forbidden')
+      f.viewer.manager.getInstance = async () => { throw Object.assign(Error('denied'), {status:condition === 'unauthorized' ? 401 : 403}); };
+    if (condition === 'generation') f.state.sessionGeneration++;
+    if (condition === 'component') f.state.displayComponentDigest = 'c'.repeat(64);
+    if (condition === 'stopped') f.state.sessionState = 'stopped';
+    if (condition === 'veto') f.state.shutdown = {state:'blocked'};
+    t.mock.timers.tick(1); await settleLease();
+    t.mock.timers.tick(60000); await settleLease();
+    assert.equal(events.length, 1);
+    assert.equal(f.viewer.state, 'disconnected');
+    assert.equal(f.calls.filter(c => c.path.endsWith('/grant')).length, 1);
+  });
+});
+
+test('lease recovery exhausts its budget and explicit reconnect starts a fresh connection', async t => {
+  const f = await leaseFailure(t, new TypeError('offline'));
+  const read = f.viewer.manager.getInstance, events = [];
+  let attempts = 0;
+  f.viewer.addEventListener('reconnectexhausted', e => events.push(e.detail));
+  f.viewer.manager.getInstance = async () => { attempts++; throw new TypeError('offline'); };
+  t.mock.timers.tick(20000); await settleLease();
+  for (let i = 0; i < 2; i++) { t.mock.timers.tick(1); await settleLease(); }
+  t.mock.timers.tick(60000); await settleLease();
+  assert.equal(attempts, 2);
+  assert.equal(events.length, 1);
+  assert.equal(f.viewer.getStats().code, 'reconnect-exhausted');
+  assert.equal(f.viewer._reconnect.timer, null);
+  f.viewer.manager.getInstance = read;
+  await f.viewer.reconnect();
+  assert.equal(f.viewer.state, 'ready');
+  assert.equal(f.calls.filter(c => c.path.endsWith('/grant')).length, 2);
+});
+
+test('lease transport failure respects disabled automatic reconnect', async t => {
+  const f = await leaseFailure(t, new TypeError('offline'), false);
+  t.mock.timers.tick(20000); await settleLease();
+  assert.equal(f.viewer.state, 'disconnected');
+  assert.equal(f.viewer.getStats().code, 'lease-unavailable');
+  t.mock.timers.tick(60000); await settleLease();
+  assert.equal(f.calls.filter(c => c.path.endsWith('/grant')).length, 1);
+  await f.viewer.reconnect(); assert.equal(f.viewer.state, 'ready');
+});
+
+test('disconnect, dispose and runtime release cancel a pending lease reconnect', async t => {
+  for (const action of ['disconnect','dispose','release','state-listener']) await t.test(action, async t => {
+    const f = await leaseFailure(t, new TypeError('offline'));
+    const runtime = new EventTarget();
+    Object.assign(runtime, {manager:f.viewer.manager,state:'tracking',instanceId:'app',sessionGeneration:3});
+    f.viewer.bindRuntime(runtime);
+    if (action === 'state-listener') f.viewer.addEventListener('statechange', e => {
+      if (e.detail.code === 'lease-unavailable') f.viewer.disconnect();
+    });
+    t.mock.timers.tick(20000); await settleLease();
+    if (action === 'disconnect' || action === 'dispose') f.viewer[action]();
+    if (action === 'release') { runtime.state = 'released'; runtime.dispatchEvent(new Event('release')); }
+    t.mock.timers.tick(60000); await settleLease();
+    assert.equal(f.calls.filter(c => c.path.endsWith('/grant')).length, 1);
+    assert.equal(f.viewer._reconnect.timer, null);
+    assert.equal(f.viewer._grantTimer, null);
+  });
+});
+
+test('late lease rejection cannot retire a manually replaced Viewer', async t => {
+  const f = await leaseFailure(t, new TypeError('offline'));
+  const request = f.viewer.manager.request;
+  let reject;
+  f.viewer.manager.request = (path, options) => path.endsWith('/lease')
+    ? new Promise((resolve, fail) => { reject = fail; }) : request(path, options);
+  t.mock.timers.tick(20000); await settleLease();
+  assert.equal(typeof reject, 'function');
+  await f.viewer.reconnect();
+  const replacement = f.display, epoch = f.viewer.getStats().connectionEpoch;
+  reject(new TypeError('late network error')); await settleLease();
+  assert.equal(f.viewer.state, 'ready'); assert.equal(f.display, replacement);
+  assert.equal(f.viewer.getStats().connectionEpoch, epoch);
+  assert.equal(replacement.closed, 0);
+});
+
+test('lease HTTP request has a ten-second deadline and timeout enters reconnect', async t => {
+  const f = await leaseFailure(t, new TypeError('offline'));
+  const deadline = new AbortController();
+  t.mock.method(AbortSignal, 'timeout', ms => { assert.equal(ms, 10000); return deadline.signal; });
+  const request = f.viewer.manager.request;
+  let signal;
+  f.viewer.manager.request = (path, options) => {
+    if (!path.endsWith('/lease')) return request(path, options);
+    signal = options.signal;
+    return new Promise((resolve, reject) => signal.addEventListener('abort', () => reject(signal.reason), {once:true}));
+  };
+  t.mock.timers.tick(20000); await settleLease();
+  assert.equal(signal.aborted, false);
+  deadline.abort(new DOMException('Lease request timed out', 'TimeoutError')); await settleLease();
+  assert.equal(signal.aborted, true);
+  assert.equal(f.viewer.state, 'reconnecting'); assert.equal(f.old.closed, 1);
+});
+
+test('one Viewer lease failure leaves a second Viewer ready and clears clipboard consent', async t => {
+  const f = await leaseFailure(t, new TypeError('offline'));
+  const other = fixture({udp:true, controls:true}); t.after(() => other.viewer.dispose());
+  await other.viewer.connect('app');
+  f.viewer.enableClipboard(true);
+  t.mock.timers.tick(20000); await settleLease();
+  assert.equal(f.viewer.clipboardEnabled, false);
+  assert.equal(other.viewer.state, 'ready'); assert.equal(other.display.closed, 0);
+  other.viewer.sendText('other remains usable');
+  t.mock.timers.tick(1); await settleLease();
+  assert.equal(f.viewer.state, 'ready'); assert.equal(f.viewer.clipboardEnabled, false);
+  assert.deepEqual(f.display.sent, []);
+});
+
 test('UDP renewal failure retires the display and does not renew a replacement',async t=>{
   t.mock.timers.enable({apis:['setTimeout']});
   const f=fixture({udp:true});await f.viewer.connect('app');
   const old=f.display;
   const request=f.viewer.manager.request;
-  f.viewer.manager.request=async(path,options)=>{if(path.endsWith('/lease'))throw Error('authorization lost');return request(path,options);};
+  f.viewer.manager.request=async(path,options)=>{if(path.endsWith('/lease'))throw Object.assign(Error('authorization lost'), {status:403});return request(path,options);};
   t.mock.timers.tick(20000);
   await new Promise(resolve=>queueMicrotask(resolve));await new Promise(resolve=>queueMicrotask(resolve));
   assert.equal(f.viewer.state,'failed');assert.equal(old.closed,1);

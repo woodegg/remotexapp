@@ -2,6 +2,7 @@ import {RemoteXAppManager} from './remotexapp-manager.js';
 import {RemoteXAppCoordinator} from './remotexapp-coordinator.js';
 import {RemoteXAppNativeClient, RemoteXAppNativeError} from './remotexapp-native-client.js';
 import {RemoteXAppAudio} from './remotexapp-audio.js';
+import {RemoteXAppView} from './native-recovery-view.js';
 
 const fail = (code, message = code) => new RemoteXAppNativeError(code, message);
 const event = (target, name, detail) => target.dispatchEvent(new CustomEvent(name, {detail}));
@@ -13,6 +14,7 @@ export class RemoteXAppHost extends EventTarget {
     this.manager = manager;
     this.coordinator = new RemoteXAppCoordinator({manager, scope, crossTabs});
     this.sessions = new Set();
+    this.views = new Set();
     this.closed = false;
     this._abort = new AbortController();
     this._audio = null;
@@ -30,6 +32,14 @@ export class RemoteXAppHost extends EventTarget {
   getAudioState() { return this._audio?.stats || {connection:'idle',speakerOwner:false,micOwner:false,routes:[]}; }
   _current() { if (this.closed) throw fail('disposed', 'Host has been disposed'); }
   templates(options) { this._current(); return this.manager.listTemplates(options); }
+
+  /** Stable window binding with SDK-owned recovery; existence does not imply readiness. */
+  mount(container, target, options) {
+    this._current();
+    const view = new RemoteXAppView(this, container, target, options);
+    if (!view.closed) this.views.add(view);
+    return view;
+  }
 
   /** Explicit user/task intent. Observing an existing stopped managed App never starts it. */
   async open({templateId, instanceId, managedId, parameters, profileRef, overrides, keepAlive = false, signal} = {}) {
@@ -106,6 +116,7 @@ export class RemoteXAppHost extends EventTarget {
   async dispose({logout = false} = {}) {
     if (this.closed) return;
     this.closed = true; this._abort.abort(fail('disposed'));
+    await Promise.allSettled([...this.views].map(view => view.release()));
     await Promise.allSettled([...this.sessions].map(session => session.release()));
     this.coordinator.destroy();
     try { if (logout) await this._audio?.logout(); }
@@ -141,15 +152,21 @@ export class RemoteXAppSession extends EventTarget {
   setKeepAlive(enabled) { this._current(); this.handle.setKeepAlive(enabled); }
   async attach(container, options = {}) {
     this._current();
-    const viewer = this.host._viewer({...options,container,manager:this.manager,runtime:this.handle,reconnect:options.reconnect ?? true});
+    const {signal, ...settings} = options;
+    const active = this._signal(signal);
+    active.throwIfAborted();
+    const viewer = this.host._viewer({...settings,container,manager:this.manager,runtime:this.handle,reconnect:options.reconnect ?? true});
     this.viewers.add(viewer);
     const disposed = e => {
       if (e.detail.state !== 'disposed') return;
       this.viewers.delete(viewer); viewer.removeEventListener('statechange', disposed);
     };
     viewer.addEventListener('statechange', disposed);
-    try { await viewer.connect(this.instance); this._current(); return viewer; }
+    const cancel = () => viewer.dispose();
+    active.addEventListener('abort',cancel,{once:true});
+    try { await viewer.connect(this.instance); active.throwIfAborted(); this._current(); return viewer; }
     catch(error) { viewer.dispose(); throw error; }
+    finally { active.removeEventListener('abort',cancel); }
   }
   async actions({signal} = {}) {
     const value = await this.manager.getActions(this.id, {signal:this._signal(signal)});

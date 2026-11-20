@@ -14,7 +14,10 @@ implementation; move them to a version section when publishing a release.
 - Document the native recovery experience extension (#70): an SDK-owned view
   and recovery panel, scoped actions and confirmation, minimal embedding-host
   responsibilities, and a comprehensive fault-injection acceptance matrix.
-  This design entry does not claim the new API or its qualification is complete.
+  SDK 0.32.0-dev.1 adds `host.mount()`, one state/action model, the default
+  recovery panel and `/sdk/recovery.html` reference UI. Preserve low-level attach
+  readiness and add cancellation of pending attachment. Qualification remains
+  pending; this is not a new release or human acceptance claim.
 
 - SDK 0.31.1: recover native Viewers after transient lease-renewal network or
   service failures (#68). Retire the old channel/grant and use the configured

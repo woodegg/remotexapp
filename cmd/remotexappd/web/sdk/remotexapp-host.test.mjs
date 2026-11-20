@@ -118,3 +118,18 @@ test('failed Viewer attach cleans its attachment but retains the host handle',as
   await assert.rejects(s.attach({}),/no first frame/);
   assert.equal(viewers[0].state,'disposed');assert.equal(s.viewers.size,0);assert.equal(s.handle.state,'tracking');
 });
+test('cancelled attach disposes its pending Viewer and rejects late completion',async t=>{
+  const {host,viewers}=fixture(t),s=await host.open({instanceId:'app-123'}),create=host._viewer;
+  let resolve;host._viewer=options=>{const v=create(options);v.connect=()=>new Promise(r=>{resolve=r;});return v;};
+  const abort=new AbortController(),pending=s.attach({},{signal:abort.signal});abort.abort();
+  assert.equal(viewers[0].state,'disposed');assert.equal(s.viewers.size,0);resolve();
+  await assert.rejects(pending,{name:'AbortError'});assert.equal(s.handle.state,'tracking');
+});
+test('mount uses one window handle and logout disposes its view without stopping the App',async t=>{
+  const {host,calls}=fixture(t);
+  const doc={createElement:()=>({ownerDocument:doc,style:{},dataset:{},setAttribute(){},append(){},replaceChildren(){},contains(){return false;},remove(){}})};
+  const view=host.mount(doc.createElement(),{instanceId:'app-123'},{panel:false});
+  await view.settled;assert.equal(view.getState().state,'ready');assert.equal(host.views.size,1);assert.equal(host.diagnostics().localHandles,1);
+  await host.logout();assert.equal(view.getState().state,'closed');assert.equal(host.views.size,0);assert.equal(host.diagnostics().localHandles,0);
+  assert(!calls.some(c=>c[0]==='stop'));
+});

@@ -62,7 +62,8 @@ export class NativeReconnect {
         } catch (cause) {
           if (!current()) return;
           if (!retryable(cause)) {
-            this.cancel(); this.event('reconnectstopped', {attempts:attempt, code:cause.code || 'reconnect-rejected'});
+            this.cancel(); this.event('reconnectstopped', {attempts:attempt, code:cause.code || 'reconnect-rejected',
+              ...((cause.status || cause.cause?.status) ? {httpStatus:cause.status || cause.cause.status} : {})});
           } else schedule();
         }
       }, delayMs);

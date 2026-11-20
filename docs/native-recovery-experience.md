@@ -21,8 +21,10 @@ owns one window's session and Viewer and returns a stable view binding even
 when a connection attempt fails. Existing `host.open()` / `session.attach()`
 retain their current contracts, including attach resolving only after readiness
 and paint. A high-level view's existence is never a readiness receipt.
-This entry is not present in SDK 0.31.0/0.31.1; examples below are the design
-target until implementation and qualification are recorded.
+This entry is absent from SDK 0.31.0/0.31.1. SDK 0.32.0-dev.1 contains the
+development implementation; its new fault qualification and human UAT are still
+pending. `view.settled` means the first attempt finished, possibly in attention;
+only the state/readiness projection establishes a usable attachment.
 
 ```js
 const host = new RemoteXAppHost({baseURL: '/rx', scope: loginScope});

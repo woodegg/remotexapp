@@ -240,6 +240,38 @@ test('UDP uses a header grant, actual bytes/paint status, and per-Viewer prefere
   f.viewer.configureTransport(false);assert.equal(f.display.preferUDP,false);
   f.viewer.dispose();assert.equal(f.calls.at(-1).path,'/remotexapps/app/native/revoke');
 });
+test('lease network failure reconnects with a new grant and unchanged App identity', async t => {
+  t.mock.timers.enable({apis:['setTimeout']});
+  const f = fixture({udp:true, controls:true, reconnect:{maxAttempts:2,delays:[1]}});
+  t.after(() => f.viewer.dispose());
+  f.state.state = 'ready';
+  const request = f.viewer.manager.request;
+  let grants = 0;
+  f.viewer.manager.request = async (path, options) => {
+    if (path.endsWith('/lease')) throw new TypeError('Failed to fetch');
+    const value = await request(path, options);
+    return path.endsWith('/grant') ? {...value, token:(grants++ ? 'c' : 'b').repeat(64)} : value;
+  };
+  await f.viewer.connect('app');
+  const old = f.display, epoch = f.viewer.getStats().connectionEpoch;
+  f.viewer.sendText('do not replay');
+  t.mock.timers.tick(20000);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(old.closed, 1);
+  assert.equal(f.viewer.state, 'reconnecting');
+  assert.throws(() => f.viewer.sendText('offline'), {code:'input-unavailable'});
+  t.mock.timers.tick(1);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.viewer.state, 'ready');
+  assert.equal(f.viewer.instance.sessionGeneration, 3);
+  assert(f.viewer.getStats().connectionEpoch > epoch);
+  assert.equal(grants, 2);
+  assert.deepEqual(f.display.options.protocols, ['remotexapp-grant.'+'c'.repeat(64)]);
+  assert.deepEqual(f.display.sent, []);
+  assert.equal(f.calls.filter(c => c.path.endsWith('/prepare')).length, 2);
+  assert.equal(f.calls.filter(c => c.path.endsWith('/revoke')).length, 1);
+});
+
 test('UDP renewal failure retires the display and does not renew a replacement',async t=>{
   t.mock.timers.enable({apis:['setTimeout']});
   const f=fixture({udp:true});await f.viewer.connect('app');

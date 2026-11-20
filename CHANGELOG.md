@@ -11,6 +11,11 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Document the native recovery experience extension (#70): an SDK-owned view
+  and recovery panel, scoped actions and confirmation, minimal embedding-host
+  responsibilities, and a comprehensive fault-injection acceptance matrix.
+  This design entry does not claim the new API or its qualification is complete.
+
 - SDK 0.31.1: recover native Viewers after transient lease-renewal network or
   service failures (#68). Retire the old channel/grant and use the configured
   bounded reconnect policy with a fresh authenticated grant for the same

@@ -5,6 +5,12 @@ It describes the reference workbench and the changes an embedding host must
 make. It is not evidence that the downstream application has been changed or
 accepted. Legacy SDK names and events are not compatibility requirements.
 
+The [recovery experience extension](native-recovery-experience.md) proposes an
+SDK-owned view/panel so embedding hosts no longer combine the detailed recovery
+APIs themselves. Until that extension is implemented and qualified, the current
+APIs below remain the available integration. The reference UAT/Console will
+validate the new flow before downstream adaptation; no downstream host changes are claimed.
+
 ## Ownership and initialization
 
 Create one `RemoteXAppHost` per authenticated login/server. Its `scope` is a

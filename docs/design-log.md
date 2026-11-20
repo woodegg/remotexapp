@@ -5368,3 +5368,33 @@ case, short connection outage, Manager crash, fresh frame/input/file readback,
 and deterministic auth/cancellation/stale-generation/budget tests. Earlier
 failed evidence is retained. No physical-device UAT, release publication or
 sandbox deployment follows from these checks alone.
+
+## 2026-11-20 — Simplify recovery ownership and require fault qualification
+
+The owner requested simpler client adaptation, updated design documentation,
+then comprehensive fault injection to establish whether the design works.
+[Issue #70](https://github.com/woodegg/remotexapp/issues/70) owns REX-001–007 and
+[the recovery experience contract](native-recovery-experience.md). This selects
+an extension for implementation and validation, not an already shipped API.
+
+A stable high-level window binding and SDK-owned panel will project current
+state/actions; ordinary hosts keep container/window, launch-target and login
+responsibilities. The SDK retains bounded connection recovery and observation;
+the Manager retains authoritative lifecycle/permission/ownership checks.
+NHI-003 same-generation retry, NHI-002 ownership, MSR blockers/cooldowns and
+SVC borrowed-bus protection remain unchanged. Recheck is not forced recovery.
+
+This extends the presentation/adaptation parts of NHI-007/010 and the migration
+guide instead of replacing their accepted lifecycle contracts. Existing
+low-level APIs remain available. Replacement binding needs an explicit action
+or the verified result of that view's confirmed restart. A stable view may own
+a new Session handle; a generation-bound Session never mutates into a new one.
+Retry cannot turn into restart, a stale confirmation cannot retarget, and an
+uncertain lifecycle response must not be replayed. Component hot repair is not
+made available by a new button.
+
+The SDK and project-owned UAT/Console simulator must exercise the new contract
+before actual downstream host adaptation. The [fault matrix](../tests/kasm-native/RECOVERY-EXPERIENCE.md)
+separates recovery, protected refusal, degraded preservation and untested
+scope, including multi-Tab races, second faults and UI/readback/resource checks.
+Prior lease and broad system tests remain their original artifact's evidence.

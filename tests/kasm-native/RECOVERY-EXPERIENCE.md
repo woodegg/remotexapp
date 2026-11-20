@@ -48,6 +48,7 @@ restore limits/rules; retain failed attempts and incomplete cleanup.
 | REX-F19 | Release/logout during restart, lost response | Local cleanup, uncertain server outcome, no undo/force/replay/rebind; unit and response-drop connector |
 | REX-F20 | Default/custom UI, keyboard, IME focus, hidden workspace, stats | Same actions/outcomes, no focus stealing, responsive UI; browser/visual review; physical IME separate |
 | REX-F21 | Repeated cycles, then all windows released | Bounded handles/listeners/timers/transports; zero owned resources; unit counters and measured browser repetition |
+| REX-F22 | Create response headers lost, concurrent/restarted Manager replay, intent storage failure/expiry/capacity | One SDK call can produce multiple wire requests; one successful create within the reservation window, explicit uncertainty and no guessed reattach |
 
 Each variation records `automatic-recovery`, `explicit-recovery`,
 `protected-stop`, `degraded-preservation`, `unsupported`, or `not-tested`, plus

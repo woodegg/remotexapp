@@ -25,7 +25,8 @@ accepted safety semantics and gain these presentation/adaptation requirements.
 | REX-004 | Disruptive restart needs single-use, expiring, exact-target confirmation and fresh admission. No force escalation; ambiguous responses are not replayed. | Confirmation cancel/expiry, multi-Tab race, veto and lost-response injection |
 | REX-005 | Replacement binding is explicit or follows this view's verified confirmed restart. Retire old handles/input/consent/audio authority; never guess a target or change pins implicitly. | Changed-generation/identity tests, real reattach/readback and permission/isolation gates |
 | REX-006 | Native unsupported IBus and intentionally disabled features are not faults. Expose truthful partial degradation without claiming unavailable component hot repair. | Provider capability matrix; legacy helper/bus/gateway preservation versus repair |
-| REX-007 | Validate through the SDK and reference UAT/Console before downstream downstream host work. Fault results distinguish automatic recovery, explicit repair, protection and untested scope. | Full fault matrix with exact artifact, real frame/input/data, independent runtime and cleanup evidence; one later consolidated human UAT |
+| REX-007 | Validate through the SDK and reference UAT/Console before downstream host work. Fault results distinguish automatic recovery, explicit repair, protection and untested scope. | Full fault matrix with exact artifact, real frame/input/data, independent runtime and cleanup evidence; one later consolidated human UAT |
+| REX-008 | Suppress browser transport replays of keyed launches with an identity-scoped disk reservation before side effects; bounded retention/capacity, fail closed on storage failure, explicit uncertainty on duplicate. | Lost response headers, one SDK call versus multiple HTTP attempts, Manager restart, concurrent duplicates, identity isolation, capacity/storage/expiry negatives |
 
 ### Accepted native host baseline
 

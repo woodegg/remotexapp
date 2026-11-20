@@ -5398,3 +5398,18 @@ before actual downstream host adaptation. The [fault matrix](../tests/kasm-nativ
 separates recovery, protected refusal, degraded preservation and untested
 scope, including multi-Tab races, second faults and UI/readback/resource checks.
 Prior lease and broad system tests remain their original artifact's evidence.
+
+## 2026-11-20 — Fence transport replay of native host launches
+
+Fault injection for [Issue #70](https://github.com/woodegg/remotexapp/issues/70)
+found that a single SDK fetch can cause multiple wire POSTs when the browser
+receives no response headers. This supersedes any interpretation of the earlier
+recovery decision that an SDK no-retry policy alone prevents duplicate launch.
+Generation fencing already rejects replayed restarts; new launches need their
+own intent reservation. REX-008 adds a principal-scoped, hashed disk reservation
+before side effects, 24-hour retention and a capacity limit of 8,192. Duplicates
+report uncertainty; they do not replay results, relaunch or silently reattach.
+Storage failure rejects launch. Unkeyed legacy calls keep their existing
+semantics. See [the contract](native-recovery-experience.md#launch-response-loss-and-transport-retries).
+The qualification matrix must count SDK calls, wire attempts and successful
+lifecycle effects separately, and check reservation survival across restart.

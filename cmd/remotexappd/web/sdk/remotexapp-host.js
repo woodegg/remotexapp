@@ -60,7 +60,7 @@ export class RemoteXAppHost extends EventTarget {
         instance = await this.manager.getInstance(managed.runtimeInstanceId, {signal:active});
         if (instance.managedInstanceId !== managedId) throw fail('invalid-descriptor');
       } else if (instanceId) instance = await this.manager.getInstance(instanceId, {signal:active});
-      else instance = await this.manager.createInstance({templateId,parameters,profileRef,overrides,signal:active});
+      else instance = await this.manager.createInstance({templateId,parameters,profileRef,overrides,launchIntent:crypto.randomUUID(),signal:active});
       check();
       if ((instanceId && instance.id !== instanceId) || (templateId && instance.templateId !== templateId) ||
           instance.displayProvider !== 'kasm' || !/^[a-f0-9]{64}$/.test(instance.displayComponentDigest || '') ||

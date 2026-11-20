@@ -18,6 +18,9 @@ implementation; move them to a version section when publishing a release.
   recovery panel and `/sdk/recovery.html` reference UI. Preserve low-level attach
   readiness and add cancellation of pending attachment. Qualification remains
   pending; this is not a new release or human acceptance claim.
+  Fault injection also found a close/reattach listener race and browser-level
+  replay of a create POST after response loss. Cancel late listener registration
+  and add bounded, persisted launch-intent duplicate suppression for host launches.
 
 - SDK 0.31.1: recover native Viewers after transient lease-renewal network or
   service failures (#68). Retire the old channel/grant and use the configured

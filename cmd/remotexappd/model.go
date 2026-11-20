@@ -145,6 +145,7 @@ type effectiveDisplayPolicy struct {
 }
 
 type createRequest struct {
+	LaunchIntent      string                  `json:"launchIntent,omitempty"`
 	Recovery          *managedSessionRecovery `json:"-"`
 	Upgrade           *runtimeUpgrade         `json:"-"`
 	ClassID           string                  `json:"classId,omitempty"`

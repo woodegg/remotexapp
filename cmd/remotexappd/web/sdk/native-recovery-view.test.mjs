@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {getEventListeners} from 'node:events';
 import {RemoteXAppView} from './native-recovery-view.js';
 
 globalThis.CustomEvent ||= class extends Event {constructor(name,options){super(name);this.detail=options?.detail;}};
@@ -49,6 +50,11 @@ test('initial uncertain create is not replayable from recovery actions',async t=
   const f=await fixture(t,{target:{templateId:'mousepad'},openError:Error('socket reset')});
   assert.equal(f.view.getState().reason,'launch-uncertain');assert.equal(f.calls.length,1);
   await f.refresh();assert(!f.view.getState().actions.some(a=>a.kind==='retry'));assert.equal(f.calls.length,1);
+});
+test('server launch duplicate suppression stays uncertain instead of replaying',async t=>{
+  const f=await fixture(t,{target:{templateId:'mousepad'},openError:Object.assign(Error('launch-uncertain'),{status:409,body:{code:'launch-uncertain'}})});
+  assert.equal(f.view.getState().reason,'launch-uncertain');await f.refresh();
+  assert(!f.view.getState().actions.some(a=>a.kind==='retry'));assert.equal(f.calls.length,1);
 });
 test('initial read-only failure preserves explicit retry without relaunch',async t=>{
   const f=await fixture(t,{openError:Error('offline')});
@@ -178,4 +184,14 @@ test('generation change and release during restart confirmation keep the mutatio
   const id=f.view.getState().confirmation.id,pending=deferred();f.manager.getInstance=()=>pending.promise;
   const work=f.view.confirm(id);await f.view.release();pending.resolve(structuredClone(f.actual));
   await assert.rejects(work);assert(!f.calls.some(c=>c[0]==='restart'));
+});
+test('release while retiring a prior generation leaves no listeners on the replacement',async t=>{
+  const f=await fixture(t),pending=deferred();f.actual.sessionGeneration++;f.invalidate();await f.refresh();
+  const old=f.view.session;old.release=()=>pending.promise;
+  const work=f.view.run(f.action('reattach'));await tick();
+  const replacement=f.view.session;assert.notEqual(replacement,old);
+  await f.view.release();pending.resolve();await assert.rejects(work);
+  assert.equal(getEventListeners(replacement,'invalidated').length,0);
+  assert.equal(getEventListeners(replacement.handle,'statechange').length,0);
+  assert.equal(replacement.state,'released');assert.equal(f.view.getState().state,'closed');
 });

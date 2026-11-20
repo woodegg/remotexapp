@@ -7,6 +7,10 @@ $('#version').textContent=`SDK ${SDK_VERSION}`;
 const notify=text=>{$('#notice').textContent=text;};
 const perform=fn=>Promise.resolve().then(fn).catch(e=>notify(`操作未完成：${e.code || e.status || 'unavailable'}`));
 const labels={retry:'重试连接',refresh:'刷新状态',recheck:'重新检查恢复',reattach:'连接已恢复的应用',restart:'重启应用…',authenticate:'重新登录',help:'诊断信息'};
+function renderStats(record,advance=false){
+  const s=record.view.viewer?.getStats(),rate=rateSnapshot(record.previous,s);if(advance)record.previous=s;
+  record.stats.textContent=s?`${s.transport || '—'} · ${s.state} · ${s.available?s.width+' × '+s.height:'—'} · FPS ${rate?rate.fps.toFixed(1):'—'} · ↓ ${rate?rate.download.toFixed(1):'—'} kbps`:'尚未获得画面统计';
+}
 function button(text,fn){const n=node('button',text);n.type='button';n.addEventListener('click',()=>perform(fn));return n;}
 // Only presentation: action admission, target validation and confirmation live in SDK.
 function customPanel(parent,view,snapshot){
@@ -28,7 +32,7 @@ async function open(target){
     button('隐藏 / 显示画面',()=>{display.hidden=!display.hidden;if(display.hidden)view.viewer?.blur();}),
     button('断开此 Viewer',()=>view.viewer?.disconnect()),
     button('关闭窗口',async()=>{await view.release();views.delete(record);card.remove();}));
-  const update=()=>{const snapshot=view.getState();badge.textContent=snapshot.state;if(custom)customPanel(controls,view,snapshot);};
+  const update=()=>{const snapshot=view.getState();badge.textContent=snapshot.state;renderStats(record);if(custom)customPanel(controls,view,snapshot);};
   view.addEventListener('change',update);view.addEventListener('attached',()=>{record.previous=null;});
   view.addEventListener('request',e=>notify(e.detail.kind==='authenticate'?'请通过宿主的正常登录入口重新登录，再打开窗口。':'请使用管理员 Console 检查；本页不会操作系统服务。'));
   update();return view;
@@ -46,8 +50,7 @@ $('#refresh').addEventListener('click',()=>perform(refresh));
 $('#logout').addEventListener('click',()=>perform(async()=>{await host.logout();views.clear();$('#views').replaceChildren();notify('本页引用已释放；重新加载可继续。');}));
 const timer=setInterval(()=>{
   if(document.hidden || host.closed)return;
-  for(const r of views){const s=r.view.viewer?.getStats(),rate=rateSnapshot(r.previous,s);r.previous=s;
-    r.stats.textContent=s?`${s.transport || '—'} · ${s.state} · ${s.available?s.width+' × '+s.height:'—'} · FPS ${rate?rate.fps.toFixed(1):'—'} · ↓ ${rate?rate.download.toFixed(1):'—'} kbps`:'尚未获得画面统计';}
+  for(const r of views)renderStats(r,true);
 },1000);
 addEventListener('pagehide',()=>{clearInterval(timer);host.dispose().catch(()=>{});},{once:true});
 Object.defineProperty(window,'remoteXAppRecoveryWorkbench',{value:{snapshot:()=>[...views].map(r=>r.view.getState())}});

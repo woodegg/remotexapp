@@ -40,6 +40,29 @@ backend, explains normal App shutdown and owns authentication. Mounting cannot
 make a local browser path a remote file or infer which managed desktop to use.
 No recovery operation automatically repeats an uncertain create/openUrl/save.
 
+### Launch response loss and transport retries
+
+Fault injection found that a browser can resend a POST when the connection
+closes before response headers, even though the SDK called `fetch` once.
+Generation-qualified restart rejects those stale replays. A new launch has no
+existing generation, so `host.open({templateId})` now generates one random
+`launchIntent` per call and includes it in the create body. The matching Core
+reserves a hash of the authenticated principal and intent on disk before launch.
+A duplicate returns HTTP 409 `launch-uncertain`, without launching again or
+returning an attachment. The view shows uncertainty and offers inspection.
+This requires the matching development Core; an older strict API rejects the
+new field instead of silently dropping protection. Low-level callers can supply
+the same optional field; unkeyed legacy creates retain their existing behavior.
+
+Reservations survive Manager restart, contain no request parameters or identity
+text, expire after 24 hours and are capped at 8,192 per Manager. Cleanup of
+expired reservations occurs on a new keyed request; capacity or storage failure
+rejects launch before side effects. This bounds automatic transport replay
+protection, not indefinite exactly-once execution. It is not a retry instruction,
+result cache or automatic adoption of an uncertain launch. Do not delete this
+state directory during an active request. A failed launch also consumes its
+intent; a new explicit user launch receives a new intent.
+
 ## Ownership and authority
 
 | Layer | Responsibility | Must not do |

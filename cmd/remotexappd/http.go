@@ -244,8 +244,12 @@ func (m *manager) serveInstances(w http.ResponseWriter, r *http.Request) {
 			writeError(w, http.StatusBadRequest, "invalid JSON: "+err.Error())
 			return
 		}
-		item, err := m.create(request)
+		item, err := m.createWithLaunchIntent(request, grantIdentity(r))
 		if err != nil {
+			if intentError, ok := err.(*launchIntentError); ok {
+				writeJSON(w, intentError.status, map[string]string{"error": intentError.Error(), "code": intentError.code})
+				return
+			}
 			writeError(w, http.StatusConflict, err.Error())
 			return
 		}

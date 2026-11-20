@@ -105,7 +105,7 @@ export class RemoteXAppView extends EventTarget {
     try { session = await this.host.open({...this.target,signal}); }
     catch (error) {
       // A timed-out create may already exist. Never replay its launch intent.
-      if (this.target.templateId && !error.status) throw fail('launch-uncertain');
+      if (this.target.templateId && (!error.status || error.body?.code === 'launch-uncertain')) throw fail('launch-uncertain');
       throw error;
     }
     await this._adopt(session, signal);
@@ -117,6 +117,9 @@ export class RemoteXAppView extends EventTarget {
     for (const remove of this._listeners.splice(0)) remove();
     this.viewer = null; this.session = session; this._anchor ||= session.instance; this._observed = session.instance;
     if (previous && previous !== session) await previous.release();
+    // release() can run while the old generation is retiring. Do not recreate
+    // listeners or an attachment on a window which has already relinquished it.
+    if (signal.aborted || this.closed) { await session.release(); throw fail('view-closed'); }
     this._listen(session,'invalidated',() => {
       this._observed = null; this._confirmation = null; this._phase = 'attention'; this._reason = 'runtime-invalidated'; this._publish();
     });

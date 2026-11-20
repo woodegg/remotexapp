@@ -35,6 +35,9 @@ test('templates and launch parameters use public Manager operations',async t=>{
   const s=await host.open({templateId:'editor',parameters:{filePath:'/documents/demo.txt'},profileRef:'test'});
   assert.equal(s.id,'app-123');assert.equal(s.generation,3);
   assert.deepEqual(calls[0][1].parameters,{filePath:'/documents/demo.txt'});
+  assert.match(calls[0][1].launchIntent,/^[a-f0-9-]{36}$/);
+  await host.open({templateId:'editor'});
+  assert.notEqual(calls[0][1].launchIntent,calls[1][1].launchIntent);
   assert.equal(s.handle.keepAlive,false);
   await assert.rejects(host.open({}),TypeError);
   await assert.rejects(host.open({templateId:'editor',instanceId:'app-123'}),TypeError);

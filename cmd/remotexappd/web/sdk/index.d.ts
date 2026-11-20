@@ -252,7 +252,7 @@ export class RemoteXAppManager extends EventTarget {
 	getApplicationStatus(instanceId:string,options?:{signal?:AbortSignal}):Promise<RemoteXApplicationStatus>;
 	getApplicationEnvironment(instanceId:string,options:{sessionGeneration:number;signal?:AbortSignal}):Promise<RemoteXApplicationEnvironment>;
 	waitForApplicationState(instanceId:string,states:string|string[],options?:{generation?:number;timeout?:number;interval?:number;signal?:AbortSignal}):Promise<RemoteXApplicationStatus>;
-	createInstance(options:{templateId?:string;classId?:string;profileRef?:string;parameters?:Record<string,unknown>;overrides?:RemoteXAppOverrides;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
+	createInstance(options:{templateId?:string;classId?:string;profileRef?:string;parameters?:Record<string,unknown>;overrides?:RemoteXAppOverrides;launchIntent?:string;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
 	launch(options:{templateId?:string;classId?:string;profileRef?:string;parameters?:Record<string,unknown>;overrides?:RemoteXAppOverrides;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
   attachInstance(instanceId:string,options?:{signal?:AbortSignal}):Promise<{viewerUrl:string}>;
 	stopInstance(instanceId:string,options?:{force?:boolean;sessionGeneration?:number;signal?:AbortSignal}):Promise<RemoteXAppInstance>;

@@ -11,6 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Pin builds, CI and candidate verification to Go 1.27.4 to clear the existing
+  standard-library vulnerability GO-2026-6859 (#67). Requalification of release
+  artifacts remains separate from source checks.
+
 - Preserve live managed sessions when systemd queries fail or process
   observations are temporarily unavailable (#65). Retry uncertain observations
   without changing the App generation, disabling its clipboard or retiring its

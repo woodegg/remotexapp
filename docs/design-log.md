@@ -5317,3 +5317,17 @@ the persisted schema, SDK and provider selection are unchanged. See the
 [local reproduction protocol](../tests/session-services/README.md#session-liveness-observation-fault)
 for the failing baseline and same-session full-frame checks. Source validation
 does not imply human UAT, release qualification or sandbox deployment.
+
+## 2026-11-20 — Pin Go 1.27.4 after a failing baseline vulnerability gate
+
+Validation of #65 found GO-2026-6859 in the pinned Go 1.27.3 standard library.
+The scan also fails on unchanged main, so this is a pre-existing security gate
+failure, not an effect of the observation correction. Issue
+[#67](https://github.com/woodegg/remotexapp/issues/67) supersedes the October 21
+build pin with Go 1.27.4, the patched 1.27 version listed in the
+[Go vulnerability record](https://pkg.go.dev/vuln/GO-2026-6859). Align CI,
+current instructions, Alpine builds and candidate evidence verification; retain
+historical release records and the existing Go language directive. Rebuild
+and rerun the affected live experiment plus portable, race, coverage and
+source/binary vulnerability gates. No dependency-module upgrade, publication
+or downstream deployment is implied by this toolchain correction.

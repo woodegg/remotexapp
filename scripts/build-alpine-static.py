@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build four static Core binaries on Alpine; Kasm is a separate component.
 
-Requires Go 1.27.3, build-base, Python, pkgconf, X11 development/static packages
+Requires Go 1.27.4, build-base, Python, pkgconf, X11 development/static packages
 and the three checksum-pinned source archives below. Never installs services.
 """
 import argparse
@@ -45,8 +45,8 @@ def main():
         parser.error('source-commit must be a full verified source commit')
     if not Path('/etc/alpine-release').is_file():
         parser.error('run in the dedicated Alpine build environment')
-    if subprocess.check_output(['go', 'env', 'GOVERSION'], text=True).strip() != 'go1.27.3':
-        parser.error('Go 1.27.3 required')
+    if subprocess.check_output(['go', 'env', 'GOVERSION'], text=True).strip() != 'go1.27.4':
+        parser.error('Go 1.27.4 required')
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     epoch = int(subprocess.check_output(['git', 'log', '-1', '--format=%ct'], cwd=ROOT, text=True))
     if revision != args.source_commit or epoch != args.source_epoch:
@@ -101,7 +101,7 @@ def main():
                 'alpine': Path('/etc/alpine-release').read_text().strip(),
                 'architecture': platform.machine(),
                 'goArchitecture': subprocess.check_output(['go', 'env', 'GOARCH'], text=True).strip(),
-                'toolchain': 'go1.27.3', 'sources': INPUTS, 'binaries': records,
+                'toolchain': 'go1.27.4', 'sources': INPUTS, 'binaries': records,
                 'buildPackages': subprocess.check_output(['apk', 'info', '-v'], text=True).splitlines()}
     (output / 'static-build.json').write_text(json.dumps(manifest, indent=2) + '\n')
     print('Verified four static ELF binaries')

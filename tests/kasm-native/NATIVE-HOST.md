@@ -190,3 +190,10 @@ These HTTP responses are fixture injections, not production identity-provider
 or server authorization changes. Server grant rejection, revocation and
 principal/generation fencing retain their separate API tests. Run all modes
 serially on the disposable target and retain each original result.
+
+The [2026-11-20 SDK 0.31.1 qualification](LEASE-RECOVERY-20261120.md) records
+all ten modes passing, the eight full native host suites, input checks and
+deployed local UAT/edge regression on its immutable artifact. Supply
+`expectedSDKVersion` in the private fixture config to assert the served SDK
+identity; every fault result also records the observed version. The earlier
+SDK 0.31.0 failure remains separate historical evidence.

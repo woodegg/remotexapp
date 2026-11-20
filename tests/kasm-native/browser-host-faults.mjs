@@ -65,7 +65,7 @@ const {api, remote, open, wait, delay} = await import('./host-browser.mjs');
 const b = await open('http://127.0.0.1:'+server.address().port+'/rx/sdk/host.html');
 const file = '/home/rxhost/documents/fault-'+mode+'-'+Date.now()+'.txt';
 const checks = [], startedAt = new Date().toISOString();
-let owned, failure, before, services, offline = false, recoveryMs;
+let owned, failure, before, services, observedSDKVersion, offline = false, recoveryMs;
 const user = args => remote(['runuser','-u','rxhost','--','env','XDG_RUNTIME_DIR=/run/user/1004',
   'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1004/bus', ...args]);
 const managerPID = () => user(['systemctl','--user','show','remotexapp-host.service','-p','MainPID','--value']).trim();
@@ -73,6 +73,8 @@ try {
   remote(['runuser','-u','rxhost','--','python3','-c',
     'from pathlib import Path;import sys;Path(sys.argv[1]).touch(exist_ok=False)', file]);
   await wait(() => b.evaluate("!!window.remoteXAppHostWorkbench && document.querySelector('#template')?.options.length>0"));
+  observedSDKVersion = await b.evaluate("import('./index.js').then(s=>s.SDK_VERSION)");
+  if (original.expectedSDKVersion) assert.equal(observedSDKVersion, original.expectedSDKVersion);
   await b.call('Network.enable');
   await b.evaluate(`(async()=>{
     const sdk=await import('./index.js');
@@ -173,6 +175,6 @@ try {
   }
   rmSync(temp, {recursive:true});
   writeFileSync(join(original.evidenceDirectory, 'fault-'+mode+'.json'), JSON.stringify({mode,startedAt,
-    completedAt:new Date().toISOString(),result:failure?'failed':'passed',requests,checks}, null, 2));
+    completedAt:new Date().toISOString(),result:failure?'failed':'passed',sdkVersion:observedSDKVersion,requests,checks}, null, 2));
 }
 if (failure) process.exitCode = 1;

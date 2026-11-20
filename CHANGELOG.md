@@ -28,6 +28,9 @@ implementation; move them to a version section when publishing a release.
   patch 0025 closes owned control/display channels and removes global listeners
   during retirement. This repair
   requires a new immutable native component, not only an SDK/Core update.
+  Expand the [0.15 → 0.16 migration guide](docs/native-host-migration.md) with
+  explicit published/development SDK targets, host adaptation and staged
+  component/runtime/edge rollout responsibilities.
 
 - SDK 0.31.1: recover native Viewers after transient lease-renewal network or
   service failures (#68). Retire the old channel/grant and use the configured

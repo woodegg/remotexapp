@@ -1,0 +1,460 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "pr69-native-lease-recovery-20261120",
+  "commit": "708fbea2c665528b32e98b5db1da1a415b985288",
+  "startedAt": "2026-11-20T13:23:49.816432Z",
+  "completedAt": "2026-11-20T13:35:58.177712Z",
+  "result": "passed",
+  "interpretation": "Reconnect-enabled native host lease recovery and scoped local regression pass. Earlier failed SDK 0.31.0 evidence remains unchanged. Not universal self-healing, human UAT, merge or release qualification.",
+  "toolchain": {
+    "go": "go1.27.4",
+    "node": "22.22.3",
+    "chrome": "149.0.7827.102",
+    "sdk": "0.31.1"
+  },
+  "environment": {
+    "kind": "local-disposable",
+    "name": "Ubuntu AMD64 systemd, project-owned Kasm host and deployed legacy/native UAT"
+  },
+  "artifact": {
+    "name": "remotexapp-0.16.0-linux-amd64.tar.gz",
+    "sha256": "ea554b58a4f85c6842d864a5e603b5e52a05eea78ad3b1fa4c77e318fbeb2ab5"
+  },
+  "nativeComponentManifestSHA256": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3",
+  "scenarios": [
+    {
+      "id": "lease-401",
+      "result": "passed",
+      "sdkVersion": "0.31.1",
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2
+      },
+      "checks": [
+        {
+          "name": "explicit lease rejection stops retry without a new grant",
+          "result": "passed",
+          "status": 401
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 3304
+        }
+      ],
+      "rawSHA256": "a9b50506688f12207b6df39bb31dd632fe966f7a273b8a9b9faa5fcf17e4a802"
+    },
+    {
+      "id": "lease-403",
+      "result": "passed",
+      "sdkVersion": "0.31.1",
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2
+      },
+      "checks": [
+        {
+          "name": "explicit lease rejection stops retry without a new grant",
+          "result": "passed",
+          "status": 403
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 3268
+        }
+      ],
+      "rawSHA256": "23959b8867b5294a005ea4c52f018ce5993403690d85502fc73d380621315830"
+    },
+    {
+      "id": "lease-409",
+      "result": "passed",
+      "sdkVersion": "0.31.1",
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2
+      },
+      "checks": [
+        {
+          "name": "explicit lease rejection stops retry without a new grant",
+          "result": "passed",
+          "status": 409
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 3240
+        }
+      ],
+      "rawSHA256": "92da0d431d6e61dd84121e654828f41784878a615a5254f28368885480987e19"
+    },
+    {
+      "id": "lease-503",
+      "result": "passed",
+      "sdkVersion": "0.31.1",
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2
+      },
+      "checks": [
+        {
+          "name": "automatic recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 1370
+        }
+      ],
+      "rawSHA256": "797f0f0550d3c333ed461ea86c40fbcf9f09237c3cd45b37c87f37dda28526d8"
+    },
+    {
+      "id": "lease-cancelled",
+      "result": "passed",
+      "sdkVersion": "0.31.1",
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2
+      },
+      "checks": [
+        {
+          "name": "network restoration does not override exhaustion or explicit disconnect",
+          "result": "passed"
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 3263
+        }
+      ],
+      "rawSHA256": "d827c1f8cfcd2cab49ce37a35f62cdce5995c2dfca7896d9bb55a36f7a449e9e"
+    },
+    {
+      "id": "lease-exhausted",
+      "result": "passed",
+      "sdkVersion": "0.31.1",
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2
+      },
+      "checks": [
+        {
+          "name": "continued outage exhausts the finite reconnect budget",
+          "result": "passed"
+        },
+        {
+          "name": "network restoration does not override exhaustion or explicit disconnect",
+          "result": "passed"
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 3266
+        }
+      ],
+      "rawSHA256": "a3014b700d7e49f355f385b1f10bb1b4c652a18a306d7167ac14aea5a14b604a"
+    },
+    {
+      "id": "lease-outage",
+      "result": "passed",
+      "sdkVersion": "0.31.1",
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2
+      },
+      "checks": [
+        {
+          "name": "automatic recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 1211
+        }
+      ],
+      "rawSHA256": "a5c7ed977524cded76f615fcc4c7ba830df9aacc1bd3112a12e70c98d534bac4"
+    },
+    {
+      "id": "lease-timeout",
+      "result": "passed",
+      "sdkVersion": "0.31.1",
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2
+      },
+      "checks": [
+        {
+          "name": "automatic recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 11300
+        }
+      ],
+      "rawSHA256": "4b06e7dc8db8db9add77c11576228e8a4b5fa781b7b678704ac2c4d58b76a108"
+    },
+    {
+      "id": "manager-crash",
+      "result": "passed",
+      "sdkVersion": "0.31.1",
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2
+      },
+      "checks": [
+        {
+          "name": "automatic recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 6485
+        }
+      ],
+      "rawSHA256": "56be901cb5f14e1a52b97c8d1cb9b524b8a7ffa6228a6f50db62e36245118732"
+    },
+    {
+      "id": "short-outage",
+      "result": "passed",
+      "sdkVersion": "0.31.1",
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2
+      },
+      "checks": [
+        {
+          "name": "automatic recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 304
+        }
+      ],
+      "rawSHA256": "44221b53c6edd63e9b63308f8e0020fcdb8b519ba54bf81b6914878984168198"
+    },
+    {
+      "id": "deterministic-native-client-reconnect",
+      "result": "passed",
+      "tests": 65
+    },
+    {
+      "id": "portable-checks",
+      "result": "passed",
+      "gates": [
+        "make check",
+        "make coverage-check",
+        "make vuln-check",
+        "make release-metadata-check",
+        "archive identity verification",
+        "four binary vulnerability scans"
+      ]
+    },
+    {
+      "id": "native-host-full",
+      "result": "passed",
+      "suites": [
+        {
+          "suite": "host-boot",
+          "checks": 2,
+          "rawSHA256": "504ba196d8e10152c6e4f06c1a37c571581ad086a24a1504889e440421054ad9"
+        },
+        {
+          "suite": "host-channels",
+          "checks": 11,
+          "rawSHA256": "be4bad80da16b27100dfc29b3cfcc57255e24e36327b6ad0a14551c6709945a2"
+        },
+        {
+          "suite": "host-lifecycle",
+          "checks": 8,
+          "rawSHA256": "0056ef0c1bf3bfc57815cd28ebebbb5db5b579fc5d2e6625a5d3ca9f72a587f6"
+        },
+        {
+          "suite": "host-managed-entry",
+          "checks": 3,
+          "rawSHA256": "85098ca595eedbe2034f89b5275d0f76ecac6ad6c7a6f4fb4317b7aea4d2a027"
+        },
+        {
+          "suite": "host-rollback",
+          "checks": 2,
+          "rawSHA256": "4dfac8b741d6621d1e37956a6b5a5000f55a6bf5641e9884369eeaa0d29ed24f"
+        },
+        {
+          "suite": "host-templates",
+          "checks": 8,
+          "rawSHA256": "0982dccb08642f2bda38ed73371fc7fb6998bd1d76c30cedb0d4013e9662cad1"
+        },
+        {
+          "suite": "host-veto",
+          "checks": 2,
+          "rawSHA256": "d7beb9e0ef2dfcca7c9a92cded8caebd59c067aa66fc5e699edd102438dd8f4b"
+        },
+        {
+          "suite": "host-workflows",
+          "checks": 8,
+          "rawSHA256": "aec5cebbfab0bc025ed1baa5d49860b4eae44d31588d5f3d303729b6c20f605f"
+        }
+      ],
+      "checks": 44
+    },
+    {
+      "id": "native-pointer-keyboard-input",
+      "result": "passed",
+      "groups": 3,
+      "physicalOSIME": false
+    },
+    {
+      "id": "deployed-legacy-viewer",
+      "result": "passed",
+      "checks": 6
+    },
+    {
+      "id": "deployed-native-edge-workflows-and-channels",
+      "result": "passed",
+      "checks": 19,
+      "servedAssetHashesVerified": 13
+    },
+    {
+      "id": "deployed-native-edge-lease-outage",
+      "result": "passed",
+      "sdkVersion": "0.31.1",
+      "checks": [
+        {
+          "name": "automatic recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 1211
+        }
+      ],
+      "scope": "trusted edge through local Host/Origin connector, not Cloudflare/TLS"
+    },
+    {
+      "id": "installed-artifact-hashes",
+      "result": "passed",
+      "executables": 4,
+      "installations": 2
+    },
+    {
+      "id": "cleanup-and-protected-display",
+      "result": "passed"
+    }
+  ],
+  "harness": {
+    "finalSourceSHA256": {
+      "tests/kasm-native/browser-host-faults.mjs": "cc1360b0ea80ad3834204ac131e0eda7a7ad01469b170588ca1c7f668096ed9e",
+      "tests/kasm-native/host-browser.mjs": "d39c9a1ce1bc4a9035c01e0d2ddffc6f198e9bdeb5949c578aafc2faeba2c80f",
+      "tests/kasm-native/browser-host-workflows.mjs": "1c51eb2cf2a9eb38f9a5ba57f2e8d3b39716d0a8d9e3154ba235f9e208fc5ead",
+      "tests/kasm-native/browser-host-channels.mjs": "f8b8c804ec1489e556fc31f599458d73fe8d1673e397883e34878f7f3eeba426",
+      "tests/native-audio/browser-cdp.mjs": "d2ee9a2222cc337d84254ca2a9e7e46a0684d0a2a15355e26d1687ce445cb50a",
+      "cmd/remotexappd/web/sdk/remotexapp-native-client.test.mjs": "dbb2ec6abc342a1a6cd170695ca29c160e09197f278570e294a1a40fe3d8602d",
+      "cmd/remotexappd/web/sdk/native-reconnect.test.mjs": "b1a186fda264b8a42dae61d3f38496788c9fe5c007470a01b17a26701719cd72"
+    },
+    "testOnlyChangesAfterArtifact": "served SDK version assertion and evidence; no product changes after 708fbea2c665",
+    "timestamps": "The interval covers live qualification; portable gates were completed before packaging."
+  },
+  "rawEvidenceManifestSHA256": "b3195287c48f68ef65f6c029d2ef20f126a9de23c7b302ae310e1de5ebc9938f",
+  "rawEvidenceSHA256": {
+    "draft-pr.json": "c65f8d2d57ac07d8720803df08884d7d8f48b83503c47652725c8f2461fb15be",
+    "artifact-identity.json": "421a2bfed89c684574258f4485cd172eddde82357ba4bcaf5ddedf873de83767",
+    "candidate-evidence.json": "6b2a5921af783b05a98c6e1fe9d9be7e26dc5b1f57f526e92bbf3c3f267241c4",
+    "remotexapp-host-liveness-native-20261120-deployment.json": "d1174804c07e2c32e4a29d9cd211e30a73c44cec371c7b4fda2d3007611216ed",
+    "live-progress.json": "d30a1d0eb7a2d1205973eb1f431acd0a33b73f83fea3f7180add66ecd28ca8b3",
+    "fault-lease-outage.json": "a5c7ed977524cded76f615fcc4c7ba830df9aacc1bd3112a12e70c98d534bac4",
+    "fault-manager-crash.json": "56be901cb5f14e1a52b97c8d1cb9b524b8a7ffa6228a6f50db62e36245118732",
+    "fault-short-outage.json": "44221b53c6edd63e9b63308f8e0020fcdb8b519ba54bf81b6914878984168198",
+    "fault-lease-503.json": "797f0f0550d3c333ed461ea86c40fbcf9f09237c3cd45b37c87f37dda28526d8",
+    "fault-lease-timeout.json": "4b06e7dc8db8db9add77c11576228e8a4b5fa781b7b678704ac2c4d58b76a108",
+    "fault-lease-401.json": "a9b50506688f12207b6df39bb31dd632fe966f7a273b8a9b9faa5fcf17e4a802",
+    "fault-lease-403.json": "23959b8867b5294a005ea4c52f018ce5993403690d85502fc73d380621315830",
+    "fault-lease-409.json": "92da0d431d6e61dd84121e654828f41784878a615a5254f28368885480987e19",
+    "fault-lease-exhausted.json": "a3014b700d7e49f355f385b1f10bb1b4c652a18a306d7167ac14aea5a14b604a",
+    "fault-lease-cancelled.json": "d827c1f8cfcd2cab49ce37a35f62cdce5995c2dfca7896d9bb55a36f7a449e9e",
+    "native-e2e-progress.json": "b96e18b19921ac6932bd6062ad12abc158d2a6e24dae2649a33b57e6ebf7e30d",
+    "local-test-before.json": "4bb5cc29bb84afa64554c7e153fc682f13318c242bf088ebcdd1961b5f795cba",
+    "local-test-deployment-attempt1.json": "e2fc2041562edf66dfeb58857d8cca14c39579f6a19480467ef9b2d4896216e8",
+    "local-test-before-attempt2.json": "4bb5cc29bb84afa64554c7e153fc682f13318c242bf088ebcdd1961b5f795cba",
+    "local-test-deployment.json": "20d9ee08b75be14db9c958ffef03b37e5901abb110ebf062bae5342f7488b063",
+    "native-input-result.json": "d8ca29d940b6a1df997112425d7e5d60711032afa353b9750a13d1090f8bda04",
+    "remotexapp-host-20261103-deployment.json": "2297e8f6e84e46692c8704eabaeb6e941493c6e77e3dc9905ffdeb93f985c756",
+    "deployed-legacy-result.json": "35067740e81db0e4472e74348dfd745c6ab74761828d550d983f12976a5768af",
+    "edge-deployment.json": "75892e82e095c1f77cdfb5d01601d5d5b630b4b5d9d50f3906336d60cca448e2",
+    "fixture-final-cleanup.json": "1ba23c70c4b9ddd1973c22354decd7f333d2063b01b0cb3c7de6b5fca6375184",
+    "deployed-native-result.json": "3c9ce0d465971ad61e2be6e03eb41fe4d74dd78b7ee262f0b3ea87e7b78a9282",
+    "final-local-check.json": "197ce7c74ae4c907e55f995c255e2e5bbc624872367d13faec73d48e6d9aa29e",
+    "browser-cleanup.json": "9a06ba476159b11ad5b989a44add6285464ba0c362934918959367c9415293a9",
+    "installed-binary-hashes.json": "d89cb815497636811670bcfcad651c40a46a6c8baa0ba2f8d2e894c25743e775",
+    "edge-activation-attempt1.json": "ae51ed17ccdf10fee398d5423458642bb2992e0e265bc066c655b5c1b6f780ce",
+    "native-browser-evidence/fault-lease-outage.json": "a5c7ed977524cded76f615fcc4c7ba830df9aacc1bd3112a12e70c98d534bac4",
+    "native-browser-evidence/fault-manager-crash.json": "56be901cb5f14e1a52b97c8d1cb9b524b8a7ffa6228a6f50db62e36245118732",
+    "native-browser-evidence/fault-short-outage.json": "44221b53c6edd63e9b63308f8e0020fcdb8b519ba54bf81b6914878984168198",
+    "native-browser-evidence/fault-lease-503.json": "797f0f0550d3c333ed461ea86c40fbcf9f09237c3cd45b37c87f37dda28526d8",
+    "native-browser-evidence/fault-lease-timeout.json": "4b06e7dc8db8db9add77c11576228e8a4b5fa781b7b678704ac2c4d58b76a108",
+    "native-browser-evidence/fault-lease-401.json": "a9b50506688f12207b6df39bb31dd632fe966f7a273b8a9b9faa5fcf17e4a802",
+    "native-browser-evidence/fault-lease-403.json": "23959b8867b5294a005ea4c52f018ce5993403690d85502fc73d380621315830",
+    "native-browser-evidence/fault-lease-409.json": "92da0d431d6e61dd84121e654828f41784878a615a5254f28368885480987e19",
+    "native-browser-evidence/fault-lease-exhausted.json": "a3014b700d7e49f355f385b1f10bb1b4c652a18a306d7167ac14aea5a14b604a",
+    "native-browser-evidence/fault-lease-cancelled.json": "d827c1f8cfcd2cab49ce37a35f62cdce5995c2dfca7896d9bb55a36f7a449e9e",
+    "native-browser-evidence/host-workflows.json": "aec5cebbfab0bc025ed1baa5d49860b4eae44d31588d5f3d303729b6c20f605f",
+    "native-browser-evidence/host-templates.json": "0982dccb08642f2bda38ed73371fc7fb6998bd1d76c30cedb0d4013e9662cad1",
+    "native-browser-evidence/host-channels.json": "be4bad80da16b27100dfc29b3cfcc57255e24e36327b6ad0a14551c6709945a2",
+    "native-browser-evidence/host-lifecycle.json": "0056ef0c1bf3bfc57815cd28ebebbb5db5b579fc5d2e6625a5d3ca9f72a587f6",
+    "native-browser-evidence/host-boot.json": "504ba196d8e10152c6e4f06c1a37c571581ad086a24a1504889e440421054ad9",
+    "native-browser-evidence/host-rollback.json": "4dfac8b741d6621d1e37956a6b5a5000f55a6bf5641e9884369eeaa0d29ed24f",
+    "native-browser-evidence/host-veto.json": "d7beb9e0ef2dfcca7c9a92cded8caebd59c067aa66fc5e699edd102438dd8f4b",
+    "native-browser-evidence/host-managed-entry.json": "85098ca595eedbe2034f89b5275d0f76ecac6ad6c7a6f4fb4317b7aea4d2a027",
+    "deployed-legacy-evidence/result.json": "2dc1f5ca0c8d0f5a6bfb9efdd3927a20631bc3e7e708b42799edbb7b3415789b",
+    "deployed-native-evidence/host-workflows.json": "aec5cebbfab0bc025ed1baa5d49860b4eae44d31588d5f3d303729b6c20f605f",
+    "deployed-native-evidence/host-channels.json": "be4bad80da16b27100dfc29b3cfcc57255e24e36327b6ad0a14551c6709945a2",
+    "deployed-native-evidence/fault-lease-outage.json": "d3585778b598e8889c63acc62fa03b0db792211c2ecc29b2e4c095a8cefcda65"
+  },
+  "retainedAttempts": [
+    {
+      "id": "baseline-regression",
+      "expected": "fail before product fix",
+      "rawSHA256": "3093bc0c694d39b83fe62fce9337e43134658833788551f8273a4d27ae087ad9"
+    },
+    {
+      "id": "local-test-deployment-attempt1",
+      "result": "failed",
+      "reason": "over-strict equality for stopped transient runtime inventory; rolled back"
+    },
+    {
+      "id": "edge-activation-attempt1",
+      "result": "failed",
+      "reason": "HTTP readiness race; rolled back; bounded readiness added to deployment helper"
+    }
+  ],
+  "cleanup": {
+    "ownedAppsAndViewersZero": true,
+    "ownedBrowsersAndLoopbackConnectorsClosed": true,
+    "twoFaultContainersStopped": true,
+    "localTestServicesRemainRunning": true,
+    "protectedOriginalManagerAndDisplayIdentitiesUnchanged": true,
+    "installedExecutableHashesMatchArtifact": true
+  },
+  "policyScope": {
+    "hostReconnectEnabled": true,
+    "directNativeClientDefaultReconnect": false,
+    "standaloneViewerPageDefaultReconnect": false
+  },
+  "knownManualRecovery": [
+    "IBus or Unicode-helper loss",
+    "borrowed account-bus outage",
+    "live App with failed gateway"
+  ],
+  "notQualified": [
+    "physical OS IMEs and audio devices",
+    "public Cloudflare/TLS/WAN/NAT",
+    "new UDP loss/MTU tests",
+    "fresh Alpine/ARM64",
+    "new long-duration soak",
+    "live disk-full/OOM/starvation",
+    "post-merge release qualification",
+    "human UAT acceptance"
+  ],
+  "relatedIssues": [
+    65,
+    68
+  ],
+  "relatedPullRequests": [
+    66,
+    69
+  ],
+  "priorEvidence": "managed-session-local-e2e-20261120.json"
+}

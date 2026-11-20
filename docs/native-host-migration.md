@@ -100,6 +100,22 @@ All new Core native connections use generation/component-qualified, renewable
 grants, including WSS-only components. Old Core builds lacking this capability
 cannot promise server-enforced read-only attachment. There is no silent downgrade.
 
+## Connection recovery
+
+SDK 0.31.1 applies the configured bounded native reconnect policy to transient
+lease-renewal failures as well as display disconnects. A renewal HTTP request
+has a ten-second deadline. Each retry obtains a fresh authenticated descriptor
+and grant for the same running App generation/component; it never reuses an
+expired token, restarts the App or replays input/actions. The server retains its
+20-second renewal schedule and 90-second grant lifetime.
+
+Explicit authorization/generation rejection stays terminal. Disconnect,
+dispose, logout or runtime release cancels recovery. After `reconnectexhausted`,
+show an explicit reconnect action. A direct `RemoteXAppNativeClient` keeps
+`reconnect:false` by default; `RemoteXAppHost` uses its configured reconnect
+policy. Clipboard consent resets on connection replacement; audio and mic
+ownership do not change as a side effect of display recovery.
+
 ## Audio, clipboard and transport
 
 An audio interest alone does not open transport. At least one session must

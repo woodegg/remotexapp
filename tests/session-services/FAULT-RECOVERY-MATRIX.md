@@ -7,6 +7,11 @@ recovery from preserved/degraded operation and operator recovery. See the
 completed gates and limits. Passing a preservation test does not establish
 automatic repair of the failed component.
 
+The later [SDK 0.31.1 lease-recovery qualification](../kasm-native/LEASE-RECOVERY-20261120.md)
+closes the demonstrated lease-renewal gap for reconnect-enabled host Viewers on
+its separately identified artifact. It does not relabel the earlier failed run
+or the remaining preservation/manual-repair cases as automatic recovery passes.
+
 Every injection must target a recorded process identity, an owned fixture or
 an explicitly disposable account. Recovery checks include real frames or
 saved-file/input readback, process/generation identity, cleanup and protection
@@ -20,7 +25,7 @@ of a second runtime. A healthy HTTP endpoint alone is insufficient.
 | Unit-query timeout, unreadable/malformed process observation, unavailable readiness marker | Treat uncertainty as uncertainty; do not retire a live or unverified App; recover observation when evidence returns | Focused Go tests; standalone readiness-marker experiment |
 | PID reuse, wrong UID/cgroup, changed canonical identity, delayed exit event | Reject stale identity and recheck under the lifecycle lock; never adopt or signal a recycled/foreign PID | Focused Go liveness/event/restoration tests |
 | Manager TERM/KILL during a healthy session | Deployment supervision restarts the Manager; compatible Apps keep their processes, pins and generation; Viewers reconnect | Seven-App matrix, native lifecycle, deployed-service checks and automatic systemd recovery probe |
-| Browser network outage or broken control connection | Leave ready state, retry within the configured budget, reconnect on return and redraw; do not replay input/actions | Separate short frontend outage and HTTP lease-outage probes; the lease-outage probe currently fails; deterministic retry/cancellation/exhaustion tests |
+| Browser network outage or broken control connection | Leave ready state, retry within the configured budget, reconnect on return and redraw; do not replay input/actions | SDK 0.31.0 lease-outage probe failed; the linked SDK 0.31.1 run passes network/503/timeout recovery and verifies terminal denials/cancellation/exhaustion |
 | Retired/expired Viewer grant, authorization loss | Close the affected control/display channels and retire consent; authentication failure must not be bypassed by retry | Native grant/wire/SDK tests; generation replacement in live lifecycle suite |
 | Empty failed managed desktop | Recreate in the background with the same identity/profile/pins and a new generation; old Viewer operations remain fenced | Live managed recovery after confirmed emptiness, with and without a Viewer |
 | Failed desktop with a surviving editor or uncertain component ownership | Block destructive replacement; explain the reason; re-evaluate when the component becomes empty | Native lifecycle survivor injection and Go recovery ownership tests |
@@ -41,12 +46,15 @@ of a second runtime. A healthy HTTP endpoint alone is insufficient.
 
 The current contracts are **not universal self-healing**:
 
-- A network failure during native Viewer lease renewal closes the display with
+- In the earlier SDK 0.31.0 artifact, a network failure during native Viewer lease renewal closes the display with
   `grant-expired` and does not automatically reconnect when the network returns.
   The current catch handles transport failure the same way as authorization
   rejection, even before the 90-second grant expiry. This is a demonstrated
   automatic-recovery failure, not a passing authorization-boundary test.
-  Tracked in [#68](https://github.com/woodegg/remotexapp/issues/68).
+  Tracked in [#68](https://github.com/woodegg/remotexapp/issues/68); the later
+  [SDK 0.31.1 experiment](../kasm-native/LEASE-RECOVERY-20261120.md) demonstrates
+  bounded fresh-grant recovery when the caller enables reconnect. Direct native
+  clients still default to reconnect disabled. Other gaps below remain open.
 - Input helper or borrowed-bus failures can require an explicit App restart.
   Rebuilding those services in place without losing the desktop needs a separate
   design and live verification of existing GTK/Qt input connections. A raw-key

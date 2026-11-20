@@ -5336,3 +5336,35 @@ Go 1.27.4 rejects the dynamic gateway's old `-l:SONAME` cgo flags. Use normal
 `-lXtst -lxdo` names and declare their development packages on build/CI hosts;
 do not weaken cgo's flag validation with an allow-list override. Runtime
 library requirements and the existing Alpine static linker flags are unchanged.
+
+## 2026-11-20 — Recover transient native Viewer lease failures
+
+Issue [#68](https://github.com/woodegg/remotexapp/issues/68) refines KNA-005/007
+without changing the server grant lifetime or trust boundary. The local fault
+campaign demonstrated that a failed HTTP renewal was reported as `grant-expired`
+and left the Viewer permanently failed even after authenticated requests worked
+again. The original 20-second renewal / 90-second grant lifetime stays intact.
+
+SDK 0.31.1 separates transient network/service errors from explicit terminal
+API rejection using the existing reconnect error policy. A ten-second HTTP
+deadline bounds each renewal. On recoverable loss, close the owned display,
+retire its grant and clear connection/clipboard state, then use the existing
+bounded reconnect controller if enabled. It must read current authenticated
+App state, retain the same generation/component, and prepare/acquire a fresh
+one-use grant. The old token is never reused or locally extended. This
+supersedes the all-errors-are-expiry interpretation of native lease failure;
+it does not loosen authorization, server expiry, stop/veto or runtime fences.
+
+HTTP 400/401/403/404/409/422 and terminal capability/identity failures retain
+the terminal path. Fresh authentication denial during retry stops recovery.
+Disconnect, dispose, runtime invalidation and synchronous state listeners fence
+pending/late work. Retry exhaustion requires an explicit new connection.
+Input/actions are never replayed; clipboard consent resets, and audio interests
+and microphone consent remain separately owned. Direct native clients still
+default to no automatic retry; the host's configured policy controls recovery.
+
+Qualification requires the previously failing real browser HTTP lease-outage
+case, short connection outage, Manager crash, fresh frame/input/file readback,
+and deterministic auth/cancellation/stale-generation/budget tests. Earlier
+failed evidence is retained. No physical-device UAT, release publication or
+sandbox deployment follows from these checks alone.

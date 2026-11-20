@@ -50,8 +50,11 @@ The baseline from `7103963483c27a760f4281e69b471f11be063619` reproduced the
 false failure on 2026-11-20 (test-only commit `99eb1c94593c`): a complete
 1280 x 720 frame before the fault, all original services/PIDs still alive
 afterward, but Manager session state `failed`. The regression must fail on
-that baseline. See [the sanitized result](results-liveness-observation-20261120.json)
-for the corrected build's matching checks and the validation limits.
+that baseline. See [the sanitized result](../evidence/v1/managed-session-liveness-20261120.json)
+for the corrected build's matching checks and the validation limits. The final
+run used Go 1.27.4 and clean commit `cec69fdfb2859f76f4c49d432b76475f8689852a`;
+its ELF hash and disposable-account cleanup checks are recorded separately
+from the earlier Go 1.27.3 reproduction.
 
 Keep raw logs, process identities and local artifact paths private. The wrapper
 prints the retained evidence location and terminates/removes only its temporary

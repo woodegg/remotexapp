@@ -1,0 +1,15 @@
+{
+  "experiment": "P18",
+  "primaryVariable": "native client channel/listener retirement",
+  "resultSHA256": "fedb87391f2cd8f7f59c1fe649ef7ac5f04abdb62716012f4f2b9686e15398f4",
+  "harness": "tests/kasm-native/browser-recovery-cycles.mjs",
+  "harnessSHA256": "8fafa6978642d0ff9409589becc9fad926c95841ae07885495c771149caff713",
+  "patch": "third_party/kasm/patches/0025-client-close-window-channels.patch",
+  "patchSHA256": "ad95ba814aaa88e474d4b93e1ed4c1684d290e455707c5829e345fd1157163fe",
+  "unchanged": [
+    "verified native server binary and libraries",
+    "explicit background ownership and real paint per cycle",
+    "existing isolated non-test Manager/display"
+  ],
+  "qualifiedScope": "short collected browser DOM/listener retirement; source/component identities and original failed probes retained in results"
+}

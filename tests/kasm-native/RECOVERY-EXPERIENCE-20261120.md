@@ -3,26 +3,31 @@
 Issue [#70](https://github.com/woodegg/remotexapp/issues/70), PR
 [#71](https://github.com/woodegg/remotexapp/pull/71), measured 2026-11-20.
 This qualifies a development SDK/Core pair through owned local fixtures.
-Qualification is still in progress: resource review rejected the initial pair
-below despite its functional passes. A corrected immutable native component
-must complete requalification before local UAT activation.
+The initial pair passed functional checks but failed resource review. The new
+pair below passed the repeated qualification and local UAT activation.
+[Machine-readable evidence](../evidence/v1/native-recovery-experience-20261120.json)
+binds results, retained failed attempts, cleanup and artifact hashes.
 Human UAT, downstream adoption, merge and formal release are separate gates.
 The [design](../../docs/native-recovery-experience.md) and
 [acceptance matrix](RECOVERY-EXPERIENCE.md) define the expected behavior.
 
 ## Identity and method
 
-Final development source: `6c5e5309a947ed2ce9a65a037ea2f20d9b131f92`;
+Final development source: `89697ec597435330b02880770fc4c4f8252b7f4d`;
 Core 0.16.0, SDK 0.32.0-dev.1, Go 1.27.4. The clean-source archive
 `remotexapp-0.16.0-linux-amd64.tar.gz` has SHA-256
-`4ed70d5abfdb574d9b27c205b17ed15f7b6c6485b4a15d629c4f5bace8a2480c`.
+`39ddeca74b56978d7e90b4cc1aa0d0436f8444916c800067ccb2985a1d628806`.
 Its development version does not replace the existing public 0.16.0 release.
 Subsequent documentation/test evidence commits do not change these bytes.
 
 Live fixtures use Ubuntu AMD64, systemd or runit with delegated cgroup v2,
-Node 22.22.3 and owned Chrome 149.0.7827.102. The unchanged native component
+Node 22.22.3 and owned Chrome 149.0.7827.102. The new native component
 manifest SHA-256 is
+`12fd950b5b31c3c710471f61006ac90ce085d657fbc3b04824fcdda584646804`.
+It reconstructs the client with patch 0025 while reusing the hash-verified server
+and libraries from parent
 `e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3`.
+The server was not recompiled; complete parent/source provenance is retained.
 Synthetic files and isolated browsers prevent faults affecting a real user's
 documents or desktop. The non-test Manager and original display are protected
 by PID/start-time comparisons.
@@ -57,8 +62,8 @@ stop is a successful safety check, not a claim that the failed component healed.
    window channels and removes the omitted global blur/mouseover listeners.
    A channels-only probe still failed; its heap snapshot identified the Window
    listener as the second independent root. The applied lifecycle test fails
-   before the patch and passes
-   after it, including sibling isolation and repeated disposal. Live repeated
+   before the patch and passes after it, including sibling isolation and
+   repeated disposal. Live repeated
    DOM/listener assertions now gate acceptance instead of owner counters alone.
 
 Reservations have a 24-hour retention window and an 8,192-entry capacity limit;
@@ -73,7 +78,12 @@ not indefinite exactly-once execution for arbitrary App actions.
 | Default/custom UI and managed panel | Final archive, 7 + 3 browser checks | Passed; two Tabs, three Viewers, two Apps, no focus stealing, retained data and controlled replacement |
 | Standalone/runit | Final archive, 3 browser checks | Passed; real paint, missing-marker preservation and Manager-only adoption |
 | Broad legacy lifecycle matrix | Earlier archive below, 375 checks across eight modes | Passed; unchanged backend source, separately identified evidence |
-| Native host regression, storage, repetition, UDP and local activation | Final archive | Qualification in progress; do not infer acceptance from earlier groups |
+| Native host regression | Final pair, eight suites / 44 checks | Passed; eight templates, channels, lifecycle, two real container reboots, rollback, veto and managed entry |
+| Pointer/raw keys and synthetic IME | Final pair, 3 groups | Passed; real saved-file readback, ten focus transitions and four shortcut policies |
+| Isolated storage faults | Final pair, 3 checks | Passed; full/read-only launch ledger rejects before create; restored ledger permits paint |
+| Window resource repetition | Final pair, 3 checks | Passed; two blocks of twenty painted mount/releases, then logout |
+| UDP transport regression | Final pair, 5 checks | Passed; three Viewers/two Apps, independent WebSocket selection, UDP return, exhausted pool and Manager restart |
+| Activated local native UAT and trusted edge | Same final pair, 27 checks plus 3 managed-upgrade checks | Passed; workflows, channels, recovery UI and lease outage; 15 served asset hashes verified |
 
 The broad matrix was rerun on clean source
 `4af8343a5fff3ed09b657b087834e8a765927764`, archive SHA-256
@@ -81,16 +91,18 @@ The broad matrix was rerun on clean source
 Its modes contain 240 main, 43 interaction, 42 transport, 6 managed-transport,
 28 shutdown-outcome, 3 borrowed-bus, 3 liveness-observation and 10
 supervisor-preservation checks. Between that source and the final archive,
-product changes affect only the native SDK's completed-upgrade admission and
-generated web assets; backend Go/drivers are unchanged. These 375 results are
-not relabeled as a final-archive run. Synthetic browser audio regression also
+product changes affect native SDK completed-upgrade admission, generated web
+assets and native client retirement/recipe; backend Go/drivers are unchanged.
+These 375 results are not relabeled as a final-archive run. Synthetic browser audio regression also
 passed on that earlier archive, with 36 checks.
 
 The final portable `make check` and coverage gates passed. The SDK suite has
 311 passing tests; SDK coverage is 89.87% lines, 83.32% branches and 83.83%
-functions. Six existing applied-Kasm-source checks are skipped by the portable
-runner when the external applied source tree is absent; this run does not claim
-a rebuilt Kasm component. Go race/source vulnerability gates passed on unchanged
+functions. Seven applied-Kasm-source checks are skipped by the portable
+runner when the external source tree is absent. The separate clean client build
+runs 69 component checks: 66 pass, including applied-client tests; three
+unchanged-server C++ source tests are skipped because the verified server is
+reused, not rebuilt. Go race/source vulnerability gates passed on unchanged
 backend source; all four final archive binaries passed vulnerability scanning.
 
 ### Recovery mode interpretation
@@ -132,11 +144,51 @@ from real process/browser injection.
 | F13–F14 | Real broad VNC/Driver/supervisor/gateway and legacy input/bus faults; live/unknown resources and borrowed buses are preserved, not hot-repaired |
 | F15 | Real repeated/chained recovery and deterministic stale callback fencing |
 | F16 | Native channel/audio regression plus generation/consent tests; physical devices and every recovery-panel-plus-active-mic combination are not newly qualified |
-| F17 | Pending final local UDP qualification; WAN loss, reordering and MTU remain separate |
+| F17 | Real local non-NAT UDP proxy, received bytes/paint and loopback WebSocket fallback; WAN loss, reordering and MTU remain separate |
 | F18–F19 | Real document-root rejection/readback and lost create/restart responses; release during an in-flight mutation is deterministic; arbitrary App actions do not acquire exactly-once semantics |
 | F20 | Real default/custom UI, fresh keyboard save, mobile viewport and focus preservation; physical OS IME behavior remains human UAT |
-| F21 | Pending final short resource repetition; no new long-duration soak claim |
-| F22 | Real create replay and crash across reservation; concurrency, identity separation, capacity and expiry are deterministic; live bounded storage qualification pending |
+| F21 | Forty real painted mount/releases in two measured blocks, collected DOM/listener equality and final logout; no new long-duration soak claim |
+| F22 | Real create replay and crash across reservation; concurrency, identity separation, capacity and expiry are deterministic; live full/read-only 4 KiB launch-ledger mount also passes; original ledger hashes restored |
+
+## Resource observations and cleanup
+
+The initial pair accumulated 300 DOM nodes and 240 listeners after twenty
+released Viewers. Closing only channels still accumulated 300 nodes and 220
+listeners; removing the remaining Window listeners cleared the retained DOM.
+The final pair records these short-run observations after diagnostic GC:
+
+[P18](../performance/native-viewer-retirement/README.md) retains the comparison,
+measurement manifest and failed intermediate component.
+
+| Sample | DOM nodes | Event listeners | JS heap |
+| --- | --- | --- | --- |
+| After warm-up | 97 | 26 | 1.732 MiB |
+| After 20 cycles | 97 | 26 | 2.318 MiB |
+| After 40 cycles | 97 | 26 | 2.376 MiB |
+
+All three samples retain only one explicit background task, zero Views/canvases
+and idle audio; logout then releases that final task. Heap samples include
+browser execution/compilation effects and are observations, not a long-term
+leak or performance guarantee. GC belongs to this short diagnostic experiment,
+not a claim that ordinary clients run forced collection.
+
+Owned Apps/Viewers and browsers are closed. The 4 KiB temporary mount, two UDP
+proxies and TEST-NET host address are removed; the original launch ledger is
+restored. The eight legacy matrix accounts are removed. Both disposable fault
+containers are stopped. The original non-test Manager/display's four process
+identities are unchanged. Local native UAT and its trusted edge retain the
+final pair; installed binary/component hashes and 15 served assets match.
+The empty local managed desktop kept its old pin during Manager deployment.
+It was then explicitly upgraded with fresh generation/revision guards, painted
+through the final component, and returned to its original idle state by normal
+XFCE logout; desired-running was preserved. This intentional test-runtime
+replacement is separate from the protected original display identities.
+The initial edge probe rejected the new component because its allowlist still
+contained only the old client; adding the hash-verified mapping fixed the probe.
+The served native client hash was also checked against its component manifest.
+Legacy local UAT is unchanged. No sandbox or regional environment was operated.
+The edge test uses an owned loopback Host/Origin connector; it does not qualify
+Cloudflare Access, public TLS or WAN behavior.
 
 ## Reproduction and human handoff
 
@@ -171,6 +223,13 @@ The screenshots contain owned synthetic Apps only:
 
 ## Retained attempts and exclusions
 
+The initial Core archive at `6c5e5309a947ed2ce9a65a037ea2f20d9b131f92`
+(SHA-256 `4ed70d5abfdb574d9b27c205b17ed15f7b6c6485b4a15d629c4f5bace8a2480c`)
+passed 24 fault modes and the full native functional regression, but failed
+resource review with its old component. It was not activated into local UAT.
+The channels-only component also failed; both heap snapshots and collected
+resource samples are retained.
+
 The listener-race baseline, duplicate-create baseline, and first lost-restart
 response attempt remain failed evidence. The initial restart oracle incorrectly
 equated one SDK request with one wire request and then assumed a generation
@@ -185,6 +244,8 @@ must still be observed. The first deployment inventory assertion rejected
 disappearance of fully stopped unmanaged entries and rolled back. A later
 old-artifact probe is retained as such, not labeled a failure of the new binary.
 One superseded archive was never activated or qualified.
+The first deployed managed-desktop probe raced navigation and imported a module
+from `about:blank`; waiting for the target page corrected that fixture error.
 
 Outside this qualification: physical OS IMEs/audio devices, real IdP/certificate
 expiry, public WAN/NAT/TLS behavior, packet loss/reordering/MTU, cgroup OOM/CPU

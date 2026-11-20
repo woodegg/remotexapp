@@ -5434,3 +5434,17 @@ Client-only reconstruction may reuse a hash-verified parent server when all
 server source archives/patches are identical, retaining parent provenance and
 explicitly recording that the server was not recompiled. Qualify actual paint,
 input, isolation, reconnect, UDP and repeated resource release on the new pair.
+
+## 2026-11-20 — Record bounded recovery qualification and local UAT handoff
+
+The [dated recovery results](../tests/kasm-native/RECOVERY-EXPERIENCE-20261120.md)
+qualify Core source `89697ec59743` with the new immutable native component.
+They supersede the initial pending qualification status, while preserving all
+failed attempts and separating automatic recovery from explicit action and
+protected refusal. [P18](../tests/performance/native-viewer-retirement/README.md)
+records the resource comparison and forty-cycle confirmation. The isolated
+fault resources are cleaned up and the pair is installed in project-owned local
+UAT. Existing runtime pins required a separate guarded upgrade of the empty
+test desktop; Manager restart alone did not change them. The original non-test
+Manager/display remained untouched. Human UAT, untested fault variants,
+downstream deployment and publication remain separate gates.

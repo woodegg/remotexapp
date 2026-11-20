@@ -1,0 +1,1398 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "pr71-native-recovery-experience-20261120",
+  "commit": "89697ec597435330b02880770fc4c4f8252b7f4d",
+  "startedAt": "2026-11-20T20:24:12.815316Z",
+  "completedAt": "2026-11-20T20:48:44.053699Z",
+  "result": "passed",
+  "interpretation": "Bounded local development qualification; automatic recovery, explicit recovery and protected refusal have separate oracles. Not universal repair, human UAT or publication.",
+  "toolchain": {
+    "go": "go1.27.4",
+    "node": "22.22.3",
+    "chrome": "149.0.7827.102",
+    "sdk": "0.32.0-dev.1"
+  },
+  "environment": {
+    "kind": "local-disposable",
+    "name": "Ubuntu AMD64 systemd/runit; owned native and legacy fixtures"
+  },
+  "artifact": {
+    "name": "remotexapp-0.16.0-linux-amd64.tar.gz",
+    "sha256": "39ddeca74b56978d7e90b4cc1aa0d0436f8444916c800067ccb2985a1d628806"
+  },
+  "nativeComponent": {
+    "manifestSHA256": "12fd950b5b31c3c710471f61006ac90ce085d657fbc3b04824fcdda584646804",
+    "parentManifestSHA256": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3",
+    "serverRecompiled": false,
+    "serverBinaryAndLibrariesUnchanged": true
+  },
+  "scenarios": [
+    {
+      "id": "recovery-lease-outage",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "connection recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 1215
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "9e1f3c5f3bea895f31de5591b453992ea4803d5f186cd040e7f89daa6b7e292c"
+    },
+    {
+      "id": "recovery-manager-crash",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "connection recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 4686
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "365fe239e52b9fe0b8c4b7d490dca453e377a6db5c704b85dac17b8e778b1ec4"
+    },
+    {
+      "id": "recovery-short-outage",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "connection recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 5243
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "1322e01d182b7c0135ed15f31690e2429b809cf917e847df81c89f52132cfd8b"
+    },
+    {
+      "id": "recovery-lease-503",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "connection recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 1393
+        }
+      ],
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "72f4b839a902ba0664323b363a62e7367ade2a0ab23b48a118625c566464ad3a"
+    },
+    {
+      "id": "recovery-lease-timeout",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "connection recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 11277
+        }
+      ],
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "06254e8656a54deda5c628aed369ab3cc3a46c2e598506ca780bc594cf1333b2"
+    },
+    {
+      "id": "recovery-lease-401",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "explicit lease rejection stops retry without a new grant",
+          "result": "passed",
+          "status": 401
+        },
+        {
+          "name": "authentication action delegates login to embedding host without retrying old credentials",
+          "result": "passed"
+        }
+      ],
+      "requests": {
+        "lease": 1,
+        "grant": 1,
+        "prepare": 1,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "ea814061f18ad79d2f9dae36a7db55ca22580bda49c4eded9825d86c7a86c6ee"
+    },
+    {
+      "id": "recovery-lease-403",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "explicit lease rejection stops retry without a new grant",
+          "result": "passed",
+          "status": 403
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 3571
+        }
+      ],
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "f0865506fab9d5405a811c8e46a0b123095286afc2cf40eab79b2ca0aac13183"
+    },
+    {
+      "id": "recovery-lease-409",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "explicit lease rejection stops retry without a new grant",
+          "result": "passed",
+          "status": 409
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 3603
+        }
+      ],
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "961c991ea002dbf77f8a3b3074d98964cc76780c8eff6672965ddfbac312ae6f"
+    },
+    {
+      "id": "recovery-lease-exhausted",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "continued outage exhausts the finite reconnect budget",
+          "result": "passed"
+        },
+        {
+          "name": "network restoration does not override exhaustion or explicit disconnect",
+          "result": "passed"
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 3312
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "769b2fa5763125cf2063eb7604177829b80a6ca93215c17334f2ab853912ffa0"
+    },
+    {
+      "id": "recovery-lease-cancelled",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "network restoration does not override exhaustion or explicit disconnect",
+          "result": "passed"
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 3327
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "d011e6539a0f6dc0e34ded6d98b2889b807e2b0892d60c95c6b423c3c6cf31b5"
+    },
+    {
+      "id": "recovery-restart",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "visible runtime-scoped confirmation does not itself restart",
+          "result": "passed"
+        },
+        {
+          "name": "confirmed restart binds exactly the newly verified generation",
+          "result": "passed"
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 2191
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 1
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        },
+        {
+          "action": "restart",
+          "status": 200
+        }
+      ],
+      "rawSHA256": "83f20980a8427cafb6a4233d36af99fcef5ad112c2adee3ca9cd32413be2246b"
+    },
+    {
+      "id": "recovery-restart-cancel",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "visible runtime-scoped confirmation does not itself restart",
+          "result": "passed"
+        },
+        {
+          "name": "cancel preserves original generation and Retry reconnects only its Viewer",
+          "result": "passed"
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 696
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "5e6c8a321200da0393da6f1d0a54a15a4debe5503aaaa6f8920710f6bf6d436b"
+    },
+    {
+      "id": "recovery-restart-refused",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "visible runtime-scoped confirmation does not itself restart",
+          "result": "passed"
+        },
+        {
+          "name": "HTTP 409 is shown without force or another restart",
+          "result": "passed"
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 900
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 1
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "16b8518bfc95a9eddc2a60817997f78cf283a7cd7fd3159ce2eae38241e65c17"
+    },
+    {
+      "id": "recovery-restart-response-loss",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "visible runtime-scoped confirmation does not itself restart",
+          "result": "passed"
+        },
+        {
+          "name": "one SDK restart survives lost response; generation fence rejects transport retries, explicit reattach recovers",
+          "result": "passed"
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 5218
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 5
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        },
+        {
+          "action": "restart",
+          "status": 200
+        },
+        {
+          "action": "restart",
+          "status": 409
+        },
+        {
+          "action": "restart",
+          "status": 409
+        },
+        {
+          "action": "restart",
+          "status": 409
+        },
+        {
+          "action": "restart",
+          "status": 409
+        }
+      ],
+      "rawSHA256": "5a4cd41b960d3079f855f9a0a0b28b9dd7a4062a871ae2f3c69c0392b2aa2ed7"
+    },
+    {
+      "id": "recovery-replacement",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "external generation replacement requires explicit reattachment",
+          "result": "passed"
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 4692
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "0a9d1d356103d27a810e4111f4ddcb60ae2281c299f3d83f7ddb1702cb9e176f"
+    },
+    {
+      "id": "recovery-release-backoff",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "release during reconnect cancels requests and removes the panel without revival",
+          "result": "passed"
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 1,
+        "prepare": 1,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "056a3a5d03ec8ca09107d2b523063997da649e8acb4da254f700bae52fc00f68"
+    },
+    {
+      "id": "recovery-cycles",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "five fault/reconnect cycles retain one View and one recovery panel",
+          "result": "passed"
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 16547
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 6,
+        "prepare": 6,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "d7b9457d38bb978f3039e35c4c1a91e9c7318c4eb1545235ad31a0d95011b1c4"
+    },
+    {
+      "id": "recovery-chained",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "Manager failure injected while display reconnection is already pending",
+          "result": "passed"
+        },
+        {
+          "name": "explicit recovery after protected stop, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 308
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "d994cdda194e0ebb3435f5e08097ea37f2ded6e47e8fa9931f6afdce0c3cdb15"
+    },
+    {
+      "id": "recovery-lease-429",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "connection recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 1393
+        }
+      ],
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "50f62c0d073d667e16622ab8384a705578b30f67e053e8235dee3053f6f91544"
+    },
+    {
+      "id": "recovery-lease-500",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "connection recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 1316
+        }
+      ],
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "50f752c7a8abbbd1d56fdfab44f889592e1155f1cc75d2db149627f4c4576e1d"
+    },
+    {
+      "id": "recovery-lease-502",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "connection recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 1309
+        }
+      ],
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "270702344494d1c4f36d4e1ed254e056bc80e87fb3bfdad59a78becd38a015f4"
+    },
+    {
+      "id": "recovery-lease-504",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "connection recovery, unchanged generation/services, real paint and fresh saved input",
+          "result": "passed",
+          "recoveryMs": 1313
+        }
+      ],
+      "requests": {
+        "lease": 1,
+        "grant": 2,
+        "prepare": 2,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        }
+      ],
+      "rawSHA256": "a44579a9cce59efcc39b89d3a0ec1f2ec40d7f09a5cfb7089254e7f13f48cdd9"
+    },
+    {
+      "id": "recovery-initial-create-response-loss",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "lost create response leaves uncertain launch without duplicate create or guessed attachment",
+          "result": "passed"
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 0,
+        "prepare": 0,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        },
+        {
+          "action": "instances",
+          "status": 409
+        }
+      ],
+      "rawSHA256": "7c30920653bee7165fc0f8e47117635c32aa95e9159316907a1f1bc25ec5b973"
+    },
+    {
+      "id": "recovery-initial-create-manager-crash",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "lost create response leaves uncertain launch without duplicate create or guessed attachment",
+          "result": "passed"
+        }
+      ],
+      "requests": {
+        "lease": 0,
+        "grant": 0,
+        "prepare": 0,
+        "restart": 0
+      },
+      "mutationResponses": [
+        {
+          "action": "instances",
+          "status": 201
+        },
+        {
+          "action": "instances",
+          "status": 409
+        }
+      ],
+      "rawSHA256": "0b7336df3255b2413ff1b5dc45408a1533fae00d78e3c88a06efca444091582b"
+    },
+    {
+      "id": "recovery-recovery-cycles",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "twenty painted mount/release cycles return to one explicit background owner and zero Viewer DOM/audio",
+          "result": "passed"
+        },
+        {
+          "name": "twenty additional cycles retain the same collected DOM/listener baseline",
+          "result": "passed"
+        },
+        {
+          "name": "logout releases the final owner and leaves no SDK-owned windows or handles",
+          "result": "passed"
+        }
+      ],
+      "rawSHA256": "970e01870e1526e5479505e22ebd55551e8728b0497c37a3f4a5295c8d109df8",
+      "samples": {
+        "before": {
+          "dom": {
+            "documents": 1,
+            "nodes": 97,
+            "jsEventListeners": 26
+          },
+          "heap": 1816036,
+          "owners": {
+            "views": 0,
+            "sessions": 1,
+            "handles": 1,
+            "canvases": 0,
+            "audio": "idle"
+          }
+        },
+        "after": {
+          "dom": {
+            "documents": 1,
+            "nodes": 97,
+            "jsEventListeners": 26
+          },
+          "heap": 2430244,
+          "owners": {
+            "views": 0,
+            "sessions": 1,
+            "handles": 1,
+            "canvases": 0,
+            "audio": "idle"
+          }
+        },
+        "afterRepeat": {
+          "dom": {
+            "documents": 1,
+            "nodes": 97,
+            "jsEventListeners": 26
+          },
+          "heap": 2491376,
+          "owners": {
+            "views": 0,
+            "sessions": 1,
+            "handles": 1,
+            "canvases": 0,
+            "audio": "idle"
+          }
+        }
+      }
+    },
+    {
+      "id": "recovery-recovery-managed",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "live editor blocks recovery; panel explains blocker and recheck neither kills nor resets budget",
+          "status": "passed"
+        },
+        {
+          "name": "empty failed desktop self-recovers with pinned components; explicit panel reattach paints new generation",
+          "status": "passed"
+        },
+        {
+          "name": "explicit managed stop is durable and observation cannot revive it",
+          "status": "passed"
+        }
+      ],
+      "rawSHA256": "0368683b4282ed8f49f5f03c05f1e39fdd4aa5db8550fe760f6bc7888e278ef8"
+    },
+    {
+      "id": "recovery-recovery-storage",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "live full launch-ledger storage rejects launch before any runtime or Viewer is created",
+          "result": "passed"
+        },
+        {
+          "name": "live read-only launch-ledger storage rejects launch before any runtime or Viewer is created",
+          "result": "passed"
+        },
+        {
+          "name": "restoring the untouched ledger permits a new explicit launch and real paint",
+          "result": "passed"
+        }
+      ],
+      "rawSHA256": "3880de10772c19eb9fc3c81f09a98cd64c5fbc12ba2937a6cd7012c0ca7693e5"
+    },
+    {
+      "id": "recovery-recovery-ui",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "three real Viewers across two tabs and two Apps paint through mount",
+          "result": "passed"
+        },
+        {
+          "name": "hide retains ownership; local disconnect leaves both peer Viewers ready and does not steal focus",
+          "result": "passed"
+        },
+        {
+          "name": "custom presentation uses the same confirmed action model; cancel leaves both generations unchanged",
+          "result": "passed"
+        },
+        {
+          "name": "one-tab HTTP/lease outage recovers without interrupting duplicate or unrelated App",
+          "result": "passed"
+        },
+        {
+          "name": "recovered default panel permits real keyboard input/save; unrelated document stays unchanged",
+          "result": "passed"
+        },
+        {
+          "name": "stats stay visible and attention controls fit a mobile viewport",
+          "result": "passed"
+        },
+        {
+          "name": "releasing both pages removes all view DOM and keeps Apps intact",
+          "result": "passed"
+        }
+      ],
+      "rawSHA256": "69bb41295336adf566a90b640263dac34bebd33626deef5dd2232dc057a67d50"
+    },
+    {
+      "id": "native-host-host-boot",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "actual reboot preserves managed intent HOME data and pins; fresh generation paints and rejects retired prepare",
+          "status": "passed"
+        },
+        {
+          "name": "second actual reboot respects explicit stop and preserves saved data",
+          "status": "passed"
+        }
+      ],
+      "rawSHA256": "504ba196d8e10152c6e4f06c1a37c571581ad086a24a1504889e440421054ad9"
+    },
+    {
+      "id": "native-host-host-channels",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "three host interests create no audio transport or device before explicit enable",
+          "status": "passed"
+        },
+        {
+          "name": "two real session speakers and three tabs share one channel and one measured playback graph",
+          "status": "passed"
+        },
+        {
+          "name": "same-session speaker switch is shared while the other session remains connected",
+          "status": "passed"
+        },
+        {
+          "name": "one synthetic microphone capture reaches only explicitly selected remote sessions",
+          "status": "passed"
+        },
+        {
+          "name": "display unload and restore preserve separately owned audio without reconnect",
+          "status": "passed"
+        },
+        {
+          "name": "last audio switch off releases the channel and every microphone track",
+          "status": "passed"
+        },
+        {
+          "name": "public host Viewer sends text HTML and PNG together to real X11 selection",
+          "status": "passed"
+        },
+        {
+          "name": "public host Viewer reads all remote representations back into browser clipboard",
+          "status": "passed"
+        },
+        {
+          "name": "exact 2 MiB succeeds and one-byte excess preserves remote selection",
+          "status": "passed"
+        },
+        {
+          "name": "focused tab owns automatic clipboard and another session receives no fan-out",
+          "status": "passed"
+        },
+        {
+          "name": "disposing all hosts releases display and audio interests without browser exceptions",
+          "status": "passed"
+        }
+      ],
+      "rawSHA256": "be4bad80da16b27100dfc29b3cfcc57255e24e36327b6ad0a14551c6709945a2"
+    },
+    {
+      "id": "native-host-host-lifecycle",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "native file save readback and independent document-root rejection",
+          "status": "passed"
+        },
+        {
+          "name": "Manager restart adopts identical App processes and pins; bounded Viewer reconnect resets consent and ends mic",
+          "status": "passed"
+        },
+        {
+          "name": "native remote resize converges and scale-only retains framebuffer size",
+          "status": "passed"
+        },
+        {
+          "name": "initially hidden attachment and reveal retain generation and real canvas paint",
+          "status": "passed"
+        },
+        {
+          "name": "explicit runtime replacement fences old Viewer input audio and generation-qualified stop",
+          "status": "passed"
+        },
+        {
+          "name": "unexpected managed Driver loss preserves live editor and blocks destructive replacement",
+          "status": "passed"
+        },
+        {
+          "name": "confirmed empty failed desktop self-recovers with pinned components and fresh painted generation",
+          "status": "passed"
+        },
+        {
+          "name": "explicit managed stop is durable and observation cannot revive it",
+          "status": "passed"
+        }
+      ],
+      "rawSHA256": "0056ef0c1bf3bfc57815cd28ebebbb5db5b579fc5d2e6625a5d3ca9f72a587f6"
+    },
+    {
+      "id": "native-host-host-managed-entry",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "synthetic stopped response explains explicit Start without creating or changing real desired state",
+          "status": "passed"
+        },
+        {
+          "name": "synthetic missing and ambiguous registrations require explicit configuration or selection",
+          "status": "passed"
+        },
+        {
+          "name": "catalog button reads fresh managed state and paints two attachments of one generation without ordinary creation or desired-state mutation",
+          "status": "passed"
+        }
+      ],
+      "rawSHA256": "85098ca595eedbe2034f89b5275d0f76ecac6ad6c7a6f4fb4317b7aea4d2a027"
+    },
+    {
+      "id": "native-host-host-rollback",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "previous Manager adopts current pinned App without changing processes generation or saved data",
+          "status": "passed"
+        },
+        {
+          "name": "restored candidate reattaches same pinned App and saves after scoped rollback",
+          "status": "passed"
+        }
+      ],
+      "rawSHA256": "4dfac8b741d6621d1e37956a6b5a5000f55a6bf5641e9884369eeaa0d29ed24f"
+    },
+    {
+      "id": "native-host-host-templates",
+      "result": "passed",
+      "checks": [
+        {
+          "template": "mousepad",
+          "status": "passed",
+          "protocol": "environment",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": false,
+          "controlReadback": true,
+          "pins": {
+            "core": "0a7a0bb14db934566bb2b93f20b4413e6f4b19b775c63c331d4773986768bb20",
+            "app": {
+              "id": "mousepad",
+              "version": "4.0.1",
+              "sha256": "a42c90f2313bb4e487fb07fdde1c12357c646a58bf100eaa38a127a44ce9a7d2"
+            },
+            "component": "12fd950b5b31c3c710471f61006ac90ce085d657fbc3b04824fcdda584646804"
+          }
+        },
+        {
+          "template": "kate",
+          "status": "passed",
+          "protocol": "dbus",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": false,
+          "controlReadback": true,
+          "pins": {
+            "core": "0a7a0bb14db934566bb2b93f20b4413e6f4b19b775c63c331d4773986768bb20",
+            "app": {
+              "id": "kate",
+              "version": "2.0.1",
+              "sha256": "14a36a0eb68f1446d4e8dfa628b4e0ae14de8fde8f5532616f5650f83869377b"
+            },
+            "component": "12fd950b5b31c3c710471f61006ac90ce085d657fbc3b04824fcdda584646804"
+          }
+        },
+        {
+          "template": "kwrite",
+          "status": "passed",
+          "protocol": "dbus",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": false,
+          "controlReadback": true,
+          "pins": {
+            "core": "0a7a0bb14db934566bb2b93f20b4413e6f4b19b775c63c331d4773986768bb20",
+            "app": {
+              "id": "kwrite",
+              "version": "2.0.1",
+              "sha256": "9ea2e48b642bf026edc936f3146da70687a6351ae2c4222a49c440b6e31c4a4c"
+            },
+            "component": "12fd950b5b31c3c710471f61006ac90ce085d657fbc3b04824fcdda584646804"
+          }
+        },
+        {
+          "template": "libreoffice",
+          "status": "passed",
+          "protocol": "libreoffice-uno",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": false,
+          "controlReadback": true,
+          "pins": {
+            "core": "0a7a0bb14db934566bb2b93f20b4413e6f4b19b775c63c331d4773986768bb20",
+            "app": {
+              "id": "libreoffice",
+              "version": "4.0.0",
+              "sha256": "758cd5d3d4e79843ef2c7b720d05dcf275241542e5ad51461b5227d090b74fd5"
+            },
+            "component": "12fd950b5b31c3c710471f61006ac90ce085d657fbc3b04824fcdda584646804"
+          }
+        },
+        {
+          "template": "edge",
+          "status": "passed",
+          "protocol": "cdp",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": true,
+          "controlReadback": true,
+          "pins": {
+            "core": "0a7a0bb14db934566bb2b93f20b4413e6f4b19b775c63c331d4773986768bb20",
+            "app": {
+              "id": "edge",
+              "version": "2.0.4",
+              "sha256": "17e3d0316899f189a5f0165c43d1551e7376bd80812d40d34547876d1ee78efe"
+            },
+            "component": "12fd950b5b31c3c710471f61006ac90ce085d657fbc3b04824fcdda584646804"
+          }
+        },
+        {
+          "template": "firefox-esr",
+          "status": "passed",
+          "protocol": "webdriver-bidi",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": true,
+          "controlReadback": true,
+          "pins": {
+            "core": "0a7a0bb14db934566bb2b93f20b4413e6f4b19b775c63c331d4773986768bb20",
+            "app": {
+              "id": "firefox-esr",
+              "version": "3.0.1",
+              "sha256": "1511de381178e2fc6124fc68e888204bf0a81ad6d3d42831e1f03fb0bfbf8b47"
+            },
+            "component": "12fd950b5b31c3c710471f61006ac90ce085d657fbc3b04824fcdda584646804"
+          }
+        },
+        {
+          "template": "lightview",
+          "status": "passed",
+          "protocol": "lightview-json-v1",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": true,
+          "controlReadback": true,
+          "pins": {
+            "core": "0a7a0bb14db934566bb2b93f20b4413e6f4b19b775c63c331d4773986768bb20",
+            "app": {
+              "id": "lightview",
+              "version": "1.0.13",
+              "sha256": "98d16a6c657177fbea346b2e19ee8602633c923ac65d395f6f45b67c4676b7ac"
+            },
+            "component": "12fd950b5b31c3c710471f61006ac90ce085d657fbc3b04824fcdda584646804"
+          }
+        },
+        {
+          "template": "xfce-user-desktop",
+          "status": "passed",
+          "protocol": "environment",
+          "currentGeneration": true,
+          "paint": true,
+          "sharedReuse": false,
+          "controlReadback": true,
+          "pins": {
+            "core": "0a7a0bb14db934566bb2b93f20b4413e6f4b19b775c63c331d4773986768bb20",
+            "app": {
+              "id": "xfce-user-desktop",
+              "version": "3.0.1",
+              "sha256": "d270ff4d18e637e06e3d8c1af6b9492612cd8973d1813a243808591467f51028"
+            },
+            "component": "12fd950b5b31c3c710471f61006ac90ce085d657fbc3b04824fcdda584646804"
+          }
+        }
+      ],
+      "rawSHA256": "05586fcd666f7255db531e9cd4cc58e8f5d9e0d20e7cec0dd16659a4a21c3a5e"
+    },
+    {
+      "id": "native-host-host-veto",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "public session stop honors explicit veto and retains the same live generation and display",
+          "status": "passed"
+        },
+        {
+          "name": "release does not turn a refused normal stop into a force stop",
+          "status": "passed"
+        }
+      ],
+      "rawSHA256": "d7beb9e0ef2dfcca7c9a92cded8caebd59c067aa66fc5e699edd102438dd8f4b"
+    },
+    {
+      "id": "native-host-host-workflows",
+      "result": "passed",
+      "checks": [
+        {
+          "name": "metadata-driven formal Mousepad launch, App readiness and actual paint",
+          "status": "passed"
+        },
+        {
+          "name": "public native text/shortcut submission with Unicode file readback",
+          "status": "passed"
+        },
+        {
+          "name": "duplicate Viewer and workspace switch retain independent display attachments",
+          "status": "passed"
+        },
+        {
+          "name": "unload/restore display retains runtime ownership and generation",
+          "status": "passed"
+        },
+        {
+          "name": "background task independently retains App after both windows close",
+          "status": "passed"
+        },
+        {
+          "name": "server-granted read-only Viewer paints and refuses programmatic input",
+          "status": "passed"
+        },
+        {
+          "name": "desktop/mobile workbench viewport and visible stats layout",
+          "status": "passed"
+        },
+        {
+          "name": "logout releases host ownership without treating it as App stop",
+          "status": "passed"
+        }
+      ],
+      "rawSHA256": "aec5cebbfab0bc025ed1baa5d49860b4eae44d31588d5f3d303729b6c20f605f"
+    },
+    {
+      "id": "native-input-result",
+      "result": "passed",
+      "checkCount": 3,
+      "rawSHA256": "d8ca29d940b6a1df997112425d7e5d60711032afa353b9750a13d1090f8bda04"
+    },
+    {
+      "id": "native-udp-result",
+      "result": "passed",
+      "checkCount": 5,
+      "rawSHA256": "0b7c7ebb1fad5b75a1dc7e378145894bcfb59267b036f2ea4505387131330aff"
+    },
+    {
+      "id": "standalone-result",
+      "result": "passed",
+      "checkCount": 3,
+      "rawSHA256": "b91775621eee1181fd5f6332c9b4de1d7c2ead1b9c2ed59c4795e0fa23be11b1"
+    },
+    {
+      "id": "deployed-native-result",
+      "result": "passed",
+      "checkCount": 27,
+      "rawSHA256": "bc001d3123ed817ecdc4f353da818bf090269074bbac745ee769ba099940a498"
+    },
+    {
+      "id": "deployed-managed-result",
+      "result": "passed",
+      "checkCount": 3,
+      "rawSHA256": "7791e59b6960734dfd68b552c5308cf7e8c3b70b1c240c2f81a90510d3507d26"
+    },
+    {
+      "id": "portable-checks",
+      "result": "passed",
+      "sdkTests": 311,
+      "sdkCoverage": {
+        "lines": 89.87,
+        "branches": 83.32,
+        "functions": 83.83
+      }
+    },
+    {
+      "id": "native-component-applied-tests",
+      "result": "passed",
+      "tests": 69,
+      "passed": 66,
+      "skipped": 3,
+      "skipScope": "unchanged server C++ applied-source tests; server reused"
+    },
+    {
+      "id": "cleanup-and-installed-hashes",
+      "result": "passed"
+    }
+  ],
+  "harnessSHA256": {
+    "browser-recovery-cycles.mjs": "8fafa6978642d0ff9409589becc9fad926c95841ae07885495c771149caff713",
+    "browser-recovery-faults.mjs": "e5399e237f7b8f812373f76736cca4979e4c3352cbfc984c7d04dcce4c4aef10",
+    "browser-recovery-managed.mjs": "55c28a6b778758f628100c50c6f1fdd7da04a4f1862809d22946bca502bb8188",
+    "browser-recovery-storage.mjs": "db2bcf5477c35ec92077889bafe3aab924af1e82ea1cfa944cea93fe59d993f3",
+    "browser-recovery-ui.mjs": "be6d0f790117cb2143b0341d790ba40307fb3bacab4ed93d8a8c335af86d9255"
+  },
+  "localDeployment": {
+    "explicitEmptyManagedRuntimeUpgrade": true,
+    "desiredRunningPreserved": true,
+    "returnedToIdleByNormalLogout": true,
+    "edgeNativeClientHashVerified": true
+  },
+  "separateLegacyRegression": {
+    "commit": "4af8343a5fff3ed09b657b087834e8a765927764",
+    "archiveSHA256": "775fc44a72401b2a19e8314671f9bf28a4a60ec86db56648f3d651c482893467",
+    "backendSourceUnchanged": true,
+    "checks": 375,
+    "suites": [
+      {
+        "mode": "matrix-borrowed-bus",
+        "checks": 3,
+        "rawSHA256": "f08a41e4445e168564f3faea0baa9a3a5d61065aae9447d75793819899c00f6c"
+      },
+      {
+        "mode": "matrix-interaction",
+        "checks": 43,
+        "rawSHA256": "bb2ab4dce280c85f0f57ab167e74f5714d9304e39b0438db120459c78a4b03b8"
+      },
+      {
+        "mode": "matrix-liveness-observation",
+        "checks": 3,
+        "rawSHA256": "30e81f9ee1b24297459609bfc4118b55c56a789ce920c4c5ed1e3e01937dba6f"
+      },
+      {
+        "mode": "matrix-main",
+        "checks": 240,
+        "rawSHA256": "63c14b7d805d6cafe5a76702db3d29f428a30c21dfad54eb7b6d5bb6be065845"
+      },
+      {
+        "mode": "matrix-managed-transport",
+        "checks": 6,
+        "rawSHA256": "4f4f95320ec6ca97a60251378028db96ee38b93d3bdda98cb89cfa857318b3b4"
+      },
+      {
+        "mode": "matrix-shutdown-outcomes",
+        "checks": 28,
+        "rawSHA256": "3c94600507d8dece6c8793f08cee41b46b510b2961c850fc11dca0d72d17c4d3"
+      },
+      {
+        "mode": "matrix-supervisor-preservation",
+        "checks": 10,
+        "rawSHA256": "31a2b1a70e8a96a7f4f914099d1b01ef6e225cbf53dfb46a163af1c55f1ccbd6"
+      },
+      {
+        "mode": "matrix-transport",
+        "checks": 42,
+        "rawSHA256": "63204dd131ba25efe1278ce523abd8c7c8a5d438ad297fb4a1b6d28929329ce1"
+      }
+    ]
+  },
+  "retainedAttempts": [
+    {
+      "id": "listener-registration-race",
+      "result": "failed",
+      "expected": "fails before fix"
+    },
+    {
+      "id": "unkeyed-browser-create-replay",
+      "result": "failed",
+      "observedApps": 5
+    },
+    {
+      "id": "initial-pair-resource-review",
+      "result": "failed",
+      "commit": "6c5e5309a947ed2ce9a65a037ea2f20d9b131f92",
+      "archiveSHA256": "4ed70d5abfdb574d9b27c205b17ed15f7b6c6485b4a15d629c4f5bace8a2480c",
+      "extraDOMNodes": 300,
+      "extraListeners": 240
+    },
+    {
+      "id": "channels-only-fix",
+      "result": "failed",
+      "extraDOMNodes": 300,
+      "extraListeners": 220
+    },
+    {
+      "id": "deployed-edge-old-component-allowlist",
+      "result": "failed",
+      "correction": "add new verified client mapping while preserving existing pinned component"
+    },
+    {
+      "id": "managed-verification-navigation-race",
+      "result": "failed",
+      "correction": "wait for the target page rather than about:blank before module import"
+    },
+    {
+      "id": "background-paint-oracle",
+      "result": "failed",
+      "correction": "foreground tested Tab before demanding interaction paint"
+    },
+    {
+      "id": "ephemeral-proc-enumeration",
+      "result": "failed",
+      "correction": "ignore ENOENT only and retain barrier-process assertions"
+    }
+  ],
+  "rawEvidenceManifestSHA256": "17e4250e39d86226d429d3c7265143258046dc105f9c548f880452b723bac117",
+  "cleanup": {
+    "result": "passed",
+    "checkedAt": "2026-11-20T20:47:57.401617+00:00",
+    "inventories": [
+      {
+        "environment": "native-fault",
+        "viewers": 0,
+        "runningApps": 0
+      },
+      {
+        "environment": "standalone-fault",
+        "viewers": 0,
+        "runningApps": 0
+      },
+      {
+        "environment": "local-native-uat",
+        "viewers": 0,
+        "runningApps": 0
+      }
+    ],
+    "temporaryMatrixAccounts": 0,
+    "temporaryStorageMountRemoved": true,
+    "temporaryUDPProxiesAndAddressRemoved": true,
+    "twoFaultContainersStopped": true,
+    "ownedBrowsersClosed": true,
+    "protectedOriginalIdentitiesUnchanged": 4,
+    "localNativeUATRemainsRunning": true
+  },
+  "notQualified": [
+    "physical OS IMEs/audio devices",
+    "public WAN/NAT/TLS and actual IdP/certificate expiry",
+    "packet loss/reordering/MTU",
+    "cgroup OOM/CPU starvation and whole-filesystem exhaustion",
+    "fresh Alpine/ARM64",
+    "new long-duration soak",
+    "downstream host adaptation",
+    "post-merge release and human UAT"
+  ],
+  "relatedIssues": [
+    65,
+    68,
+    70
+  ],
+  "relatedPullRequests": [
+    66,
+    69,
+    71
+  ]
+}

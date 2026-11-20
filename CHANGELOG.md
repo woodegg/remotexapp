@@ -16,14 +16,17 @@ implementation; move them to a version section when publishing a release.
   responsibilities, and a comprehensive fault-injection acceptance matrix.
   SDK 0.32.0-dev.1 adds `host.mount()`, one state/action model, the default
   recovery panel and `/sdk/recovery.html` reference UI. Preserve low-level attach
-  readiness and add cancellation of pending attachment. Qualification remains
-  pending; this is not a new release or human acceptance claim.
+  readiness and add cancellation of pending attachment.
+  [Local fault qualification](tests/kasm-native/RECOVERY-EXPERIENCE-20261120.md)
+  records recovery/refusal, real App readback and resource cleanup; human UAT
+  and publication remain separate.
   Fault injection also found a close/reattach listener race and browser-level
   replay of a create POST after response loss. Cancel late listener registration
   and add bounded, persisted launch-intent duplicate suppression for host launches.
   Completed upgrade history no longer hides an otherwise admitted restart.
   Repeated-window resource inspection also found retained Kasm BroadcastChannels;
-  patch 0025 closes owned control/display channels during retirement. This repair
+  patch 0025 closes owned control/display channels and removes global listeners
+  during retirement. This repair
   requires a new immutable native component, not only an SDK/Core update.
 
 - SDK 0.31.1: recover native Viewers after transient lease-renewal network or

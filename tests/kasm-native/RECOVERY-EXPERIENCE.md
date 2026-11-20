@@ -2,8 +2,11 @@
 
 This is the execution/acceptance matrix for
 [the recovery design](../../docs/native-recovery-experience.md), Issue #70.
-All new rows start **not run**. This plan does not convert #69's lower-level
-passes or earlier human UAT into acceptance of a new recovery interface.
+The [2026-11-20 results](RECOVERY-EXPERIENCE-20261120.md) and
+[machine-readable evidence](../evidence/v1/native-recovery-experience-20261120.json)
+record the executed coverage and remaining variants. A row is not automatically
+fully qualified because one variant passed. Earlier human UAT and #69's
+lower-level passes do not establish acceptance of this new interface.
 
 ## Common oracle
 
@@ -47,7 +50,7 @@ restore limits/rules; retain failed attempts and incomplete cleanup.
 | REX-F18 | Missing/offline document root, rejected path, uncertain action response | No automatic file/create/save replay, unrelated Apps retained; API and real file readback |
 | REX-F19 | Release/logout during restart, lost response | Local cleanup, uncertain server outcome, no undo/force/replay/rebind; unit and response-drop connector |
 | REX-F20 | Default/custom UI, keyboard, IME focus, hidden workspace, stats | Same actions/outcomes, no focus stealing, responsive UI; browser/visual review; physical IME separate |
-| REX-F21 | Repeated cycles, then all windows released | Bounded handles/listeners/timers/transports; zero owned resources; unit counters and measured browser repetition |
+| REX-F21 | Repeated cycles, then all windows released | Retired Viewer DOM/listeners return to baseline; any explicit background owner remains until logout; SDK counters plus collected browser resource measurements |
 | REX-F22 | Create response headers lost, concurrent/restarted Manager replay, intent storage failure/expiry/capacity | One SDK call can produce multiple wire requests; one successful create within the reservation window, explicit uncertainty and no guessed reattach |
 
 Each variation records `automatic-recovery`, `explicit-recovery`,

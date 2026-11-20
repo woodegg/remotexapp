@@ -122,6 +122,7 @@ The authoritative register, result files and reproduction instructions are in
 | P15 remote resize scheduling | A 300 ms trailing run held `1000x613` through four viewport changes while scaling locally, then reached only `1100x740`; finite 400 ms max-wait advanced at 440.20 ms, flush and reconnect passed | Live in SDK 0.15; isolated E2E and human native-IME/resize UAT accepted 2026-08-29 |
 | P16 Core-owned input services | Matched median launch/restart +530/+543 ms, memory +4.18 MiB, one extra supervisor, unchanged service counts and bounded cleanup | [Measured gates passed](../tests/performance/core-session-services/README.md); Core 0.12 candidate, human UAT separate |
 | P17 native audio playback credits | Two-speaker synthetic burst: ten of ten frames delivered versus eight; per-stream queues remain bounded and the aggregate cap is 64 | [Deterministic selection accepted](../tests/performance/native-audio-burst/README.md); live WAN/resource and physical UAT evidence remain separate |
+| P18 native Viewer retirement | Original +300 DOM/+240 listeners after twenty releases; repaired pair stays at 97 nodes/26 listeners over forty | [Short local resource gate passed](../tests/performance/native-viewer-retirement/README.md); new immutable component required, human UAT separate |
 
 For RFB queue changes repeat [P05](../tests/performance/rfb-queue/README.md).
 For cursor fan-out changes repeat [P11](../tests/performance/cursor-fanout/README.md).

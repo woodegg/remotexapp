@@ -4,3 +4,6 @@ a67c09908269618e8078b16248f8cd46b51ede7f:tests/kasm-native/results-20261028.json
 # Verified SHA-256 of access-results.json: only anonymousHTTPSRequiresAccess=true
 # and statusCode=302. This exact historical evidence checksum is not a credential.
 e7563c7ab24eb1817bda0a402fe55205024baf96:tests/kasm-native/results-udp-china-20261031.json:generic-api-key:214
+# Literal synthetic launch-intent fixture; no account, credential or authority.
+# Scope the exception to this one committed test line, not launch-intent scanning.
+4af8343a5fff3ed09b657b087834e8a765927764:cmd/remotexappd/launch_intent_test.go:generic-api-key:18

@@ -93,6 +93,7 @@ const action = async kind => {
 };
 const pass = name => checks.push({name,result:'passed'});
 try {
+  if(original.expectedCoreCommit)assert.equal((await api('/api/version')).commit,original.expectedCoreCommit);
   remote(['runuser','-u','rxhost','--','python3','-c',
     'from pathlib import Path;import sys;Path(sys.argv[1]).touch(exist_ok=False)', file]);
   await wait(() => b.evaluate("!!window.remoteXAppHostWorkbench && document.querySelector('#template')?.options.length>0"));

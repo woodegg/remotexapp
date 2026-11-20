@@ -1,0 +1,204 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "issue": 65,
+  "scope": "isolated local systemd/TigerVNC managed XFCE liveness observation; no end-user input",
+  "baselineRuntimeCommit": "7103963483c27a760f4281e69b471f11be063619",
+  "baselineTestCommit": "99eb1c94593c08fe0a85ad9f1be7cd2bcf187488",
+  "correctedSource": "Final Go 1.27.4 run uses the clean commit recorded here; earlier Go 1.27.3 run uses the same lifecycle implementation before committing it in 543433f7cdeb4d00a98e03c2e3a223881bd9f48c. This is not an immutable release candidate.",
+  "injection": "one exact-session is-active command returns exit 1; real App and display are not stopped",
+  "runs": [
+    {
+      "label": "baseline",
+      "toolchain": "go1.27.3",
+      "startedAt": "2026-11-20T07:42:34.095Z",
+      "finishedAt": "2026-11-20T07:43:16.908Z",
+      "harnessResult": "failed",
+      "interpretation": "expected regression failure",
+      "managerSHA256": "cdbb89c65f3b84012e69090d615e7ed58580fda11a7e0f2eb6e5a4fa1029f440",
+      "afterFault": {
+        "sessionState": "failed",
+        "generationUnchanged": true,
+        "allOriginalServicesAlive": true,
+        "allComponentPIDsUnchanged": true
+      },
+      "frames": [
+        {
+          "scenario": "live-desktop-before-observation-fault",
+          "result": "passed",
+          "frame": {
+            "width": 1280,
+            "height": 720,
+            "pixels": 921600,
+            "rectangles": 18,
+            "inputMessages": 0
+          }
+        }
+      ],
+      "cleanup": {
+        "temporaryAccountAbsent": true,
+        "temporaryUIDProcessesAbsent": true,
+        "temporaryHomeAbsent": true
+      }
+    },
+    {
+      "label": "corrected-go1.27.3",
+      "toolchain": "go1.27.3",
+      "startedAt": "2026-11-20T07:53:38.926Z",
+      "finishedAt": "2026-11-20T07:54:25.932Z",
+      "harnessResult": "passed",
+      "interpretation": "local regression passed",
+      "managerSHA256": "d7eef2cff5f43be139a8989896c5274618100ecd4f4dfa1e8b5bbf31ad13e47b",
+      "afterFault": {
+        "sessionState": "running",
+        "generationUnchanged": true,
+        "allOriginalServicesAlive": true,
+        "allComponentPIDsUnchanged": true
+      },
+      "frames": [
+        {
+          "scenario": "live-desktop-before-observation-fault",
+          "result": "passed",
+          "frame": {
+            "width": 1280,
+            "height": 720,
+            "pixels": 921600,
+            "rectangles": 18,
+            "inputMessages": 0
+          }
+        },
+        {
+          "scenario": "query-error-retains-live-desktop-and-Viewer",
+          "result": "passed",
+          "frame": {
+            "width": 1280,
+            "height": 720,
+            "pixels": 921600,
+            "rectangles": 18,
+            "inputMessages": 0
+          }
+        },
+        {
+          "scenario": "Manager-restart-adopts-original-session-after-query-error",
+          "result": "passed",
+          "frame": {
+            "width": 1280,
+            "height": 720,
+            "pixels": 921600,
+            "rectangles": 18,
+            "inputMessages": 0
+          }
+        }
+      ],
+      "cleanup": {
+        "temporaryAccountAbsent": true,
+        "temporaryUIDProcessesAbsent": true,
+        "temporaryHomeAbsent": true
+      }
+    },
+    {
+      "label": "corrected-go1.27.4",
+      "toolchain": "go1.27.4",
+      "commit": "cec69fdfb2859f76f4c49d432b76475f8689852a",
+      "buildModified": false,
+      "startedAt": "2026-11-20T08:00:15.553Z",
+      "finishedAt": "2026-11-20T08:01:09.112Z",
+      "harnessResult": "passed",
+      "managerSHA256": "0a4fa59d4cd50241f22db2b9f887b6738a0d831d7a9c33a8e99c400d8557da61",
+      "afterFault": {
+        "sessionState": "running",
+        "generationUnchanged": true,
+        "allOriginalServicesAlive": true,
+        "allComponentPIDsUnchanged": true
+      },
+      "frames": [
+        {
+          "scenario": "live-desktop-before-observation-fault",
+          "result": "passed",
+          "frame": {
+            "width": 1280,
+            "height": 720,
+            "pixels": 921600,
+            "rectangles": 18,
+            "inputMessages": 0
+          }
+        },
+        {
+          "scenario": "query-error-retains-live-desktop-and-Viewer",
+          "result": "passed",
+          "frame": {
+            "width": 1280,
+            "height": 720,
+            "pixels": 921600,
+            "rectangles": 18,
+            "inputMessages": 0
+          }
+        },
+        {
+          "scenario": "Manager-restart-adopts-original-session-after-query-error",
+          "result": "passed",
+          "frame": {
+            "width": 1280,
+            "height": 720,
+            "pixels": 921600,
+            "rectangles": 18,
+            "inputMessages": 0
+          }
+        }
+      ],
+      "cleanup": {
+        "temporaryAccountAbsent": true,
+        "temporaryUIDProcessesAbsent": true,
+        "temporaryHomeAbsent": true
+      }
+    }
+  ],
+  "limitations": [
+    "Original incident query outcome was not logged; this proves a reproducible mechanism, not its historical trigger.",
+    "Shared RFB full-frame receipt is automated protocol validation, not visual inspection or keyboard/clipboard/IME UAT.",
+    "App fixture uses declared wrappers and display relocation; not exact-archive qualification.",
+    "Real standalone/native-provider and cross-boot qualification remain separate.",
+    "The baseline Go 1.27.3 security failure is independent of the reproduced lifecycle defect; Go 1.27.4 was separately pinned to clear it. This integration record does not establish release readiness."
+  ],
+  "kind": "integration",
+  "runId": "managed-session-liveness-20261120",
+  "commit": "cec69fdfb2859f76f4c49d432b76475f8689852a",
+  "startedAt": "2026-11-20T07:42:34.095Z",
+  "completedAt": "2026-11-20T08:01:09.112Z",
+  "result": "passed",
+  "toolchain": {
+    "go": "go1.27.4",
+    "node": "v22.22.3"
+  },
+  "environment": {
+    "kind": "isolated-local-systemd-x11",
+    "name": "disposable-managed-xfce",
+    "provider": "legacy TigerVNC"
+  },
+  "scenarios": [
+    {
+      "id": "baseline-reproduces-false-failure",
+      "result": "passed",
+      "expected": "baseline harness fails while original processes remain alive"
+    },
+    {
+      "id": "live-desktop-before-observation-fault",
+      "result": "passed"
+    },
+    {
+      "id": "query-error-retains-live-desktop-and-Viewer",
+      "result": "passed"
+    },
+    {
+      "id": "Manager-restart-adopts-original-session-after-query-error",
+      "result": "passed"
+    },
+    {
+      "id": "temporary-account-process-and-home-cleanup",
+      "result": "passed"
+    }
+  ],
+  "artifact": {
+    "name": "remotexappd-local-development-linux-amd64",
+    "sha256": "0a4fa59d4cd50241f22db2b9f887b6738a0d831d7a9c33a8e99c400d8557da61"
+  }
+}

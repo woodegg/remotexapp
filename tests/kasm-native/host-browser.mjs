@@ -33,7 +33,7 @@ export async function open(url){
   return {page,events,call,evaluate,close:async()=>{socket.close();await fetch(config.cdpURL+'/json/close/'+page.id);}};
 }
 export async function click(browser,selector){
-  const box=await browser.evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('control missing');e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()`);
+  const box=await browser.evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('control missing');e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();if(!r.width || !r.height || e.disabled)throw Error('control is hidden or disabled: '+${JSON.stringify(selector)});const x=r.x+r.width/2,y=r.y+r.height/2;if(!e.contains(document.elementFromPoint(x,y)))throw Error('control is obscured: '+${JSON.stringify(selector)});return {x,y}})()`);
   await browser.call('Input.dispatchMouseEvent',{type:'mousePressed',...box,button:'left',clickCount:1});
   await browser.call('Input.dispatchMouseEvent',{type:'mouseReleased',...box,button:'left',clickCount:1});
 }

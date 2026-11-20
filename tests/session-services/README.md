@@ -5,6 +5,12 @@ systemd user services, X11/TigerVNC, D-Bus/IBus, all selected real applications,
 Node 22 and passwordless sudo to create a locked temporary account. Never run
 them on a production gateway. Do not point them at an existing Manager.
 
+The [2026-11-20 local E2E record](LOCAL-E2E-20261120.md) binds the deployed
+artifact and completed checks. The [fault/recovery matrix](FAULT-RECOVERY-MATRIX.md)
+separates automatic recovery, safe degraded operation, manual recovery and
+unverified faults; a process surviving is not proof that its failed service
+recovered.
+
 ## Seven-App state matrix
 
 ```sh
@@ -19,6 +25,10 @@ bash tests/session-services/run-state-matrix.sh /absolute/extracted/release edge
 bash tests/session-services/run-state-matrix.sh /absolute/extracted/release all shutdown-outcomes
 # Temporarily pause/resume only the disposable account bus (not the build user's):
 bash tests/session-services/run-state-matrix.sh /absolute/extracted/release xfce-user-desktop borrowed-bus
+# Failed liveness query without killing the App/display; real full-frame checks:
+bash tests/session-services/run-state-matrix.sh /absolute/extracted/release xfce-user-desktop liveness-observation
+# Supervisor loss must preserve a live user-home desktop, online and offline:
+bash tests/session-services/run-state-matrix.sh /absolute/extracted/release xfce-user-desktop supervisor-preservation
 # Narrow harness check before the full run:
 bash tests/session-services/run-state-matrix.sh /absolute/extracted/release mousepad
 ```
@@ -28,6 +38,39 @@ The wrapper creates a disposable UID/HOME/account bus and Manager on loopback
 The build user's desktop, local 1991/2992, sandboxes and existing account buses
 are not fault-injection targets. Suites run serially because X display numbers
 are host-global even with different UIDs/Manager ports.
+
+## Session liveness observation fault
+
+The `liveness-observation` mode reproduces #65 using a real, managed
+`xfce-user-desktop` in the disposable account. A Manager-only PATH wrapper
+fails exactly one `systemctl --user is-active --quiet SESSION_UNIT` call;
+all other commands use the host executable. The managed safety interval is
+30 seconds, and the test verifies the fault was actually consumed.
+
+Before the fault, after it, and after a Manager-only restart, a shared RFB
+client requests a complete raw framebuffer and counts its received pixels.
+It sends no keyboard/pointer input. Assertions retain the original service
+identities, component PIDs, App generation and borrowed account-bus identity.
+The mode uses the common test App wrappers and display relocation above; it
+is not an exact-release-archive or browser-IME qualification.
+
+The baseline from `7103963483c27a760f4281e69b471f11be063619` reproduced the
+false failure on 2026-11-20 (test-only commit `99eb1c94593c`): a complete
+1280 x 720 frame before the fault, all original services/PIDs still alive
+afterward, but Manager session state `failed`. The regression must fail on
+that baseline. See [the sanitized result](../evidence/v1/managed-session-liveness-20261120.json)
+for the corrected build's matching checks and the validation limits. The final
+run used Go 1.27.4 and clean commit `cec69fdfb2859f76f4c49d432b76475f8689852a`;
+its ELF hash and disposable-account cleanup checks are recorded separately
+from the earlier Go 1.27.3 reproduction.
+
+Keep raw logs, process identities and local artifact paths private. The wrapper
+prints the retained evidence location and terminates/removes only its temporary
+account after either a pass or failure. Verify that cleanup separately; a test
+assertion passing does not establish cleanup. Portable tests additionally cover
+query timeout, unreadable/malformed process data, delayed events, PID reuse,
+uncertain restoration and standalone component emptiness. Real standalone,
+native-provider, cross-boot and end-user UAT remain separate qualification.
 
 The actual shipped App scripts run behind declared **test-only** startup and
 shutdown barriers. Package patch versions and an inert Core helper marker
@@ -46,8 +89,8 @@ exact-archive suites remain required.
 | IBus/engine loss | No App restart; degraded API behavior; Manager-crash adoption; explicit restart restores services |
 | Blocked shutdown | Real App/services remain alive; injected refusing hook; API fences; Manager crash retains host force deadline |
 | Private D-Bus loss | Distinguish App self-exit from surviving App; no silent bus replacement; cleanup/recovery |
-| Supervisor loss | Complete owned cleanup; truthful failed-state APIs; Manager restart cannot resurrect stale identities |
-| Offline failure | Kill supervisor while Manager is offline; preserve failure/generation; Viewer reconnect cannot relaunch; explicit restart recovers |
+| Supervisor loss | Private-bus Apps: complete owned cleanup and truthful failed-state APIs. User-home desktop: `ExitType=cgroup` preserves the canonical App and surviving services; full frames and unchanged identities/generation before and after Manager adoption; explicit stop cleans up |
+| Offline failure | Private-bus Apps retain failure/generation without Viewer relaunch. A still-live user-home desktop is adopted without replacing its dead supervisor or its surviving processes |
 | Borrowed bus | User bus identity unchanged throughout; never kill the build user's account bus |
 
 Every stable-state row records HTTP status outcomes for the applicable APIs.

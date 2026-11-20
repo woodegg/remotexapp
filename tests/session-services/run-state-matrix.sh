@@ -2,7 +2,7 @@
 set -euo pipefail
 # Live destructive tests, confined to a newly created, locked temporary UID.
 # No existing Manager, desktop, account bus, package selector or profile is used.
-release=$(readlink -f "${1:?usage: run-state-matrix.sh RELEASE_ROOT [template,...] [main|interaction|transport]}")
+release=$(readlink -f "${1:?usage: run-state-matrix.sh RELEASE_ROOT [template,...] [main|interaction|transport|managed-transport|borrowed-bus|shutdown-outcomes|liveness-observation|supervisor-preservation]}")
 project_root=$(cd "$(dirname "$0")/../.." && pwd)
 work=$(mktemp -d /var/tmp/remotexapp-svc-matrix.XXXXXX)
 account="rxm$(date +%s)$$"

@@ -18,8 +18,8 @@ assert.match(homedir(), /^\/var\/tmp\/remotexapp-svc-matrix\.[^/]+\/home$/);
 const allApps = ['mousepad', 'libreoffice', 'kate', 'kwrite', 'firefox-esr', 'edge', 'xfce-user-desktop'];
 const selected = process.argv[3] === 'all' ? allApps : process.argv[3].split(',');
 assert(selected.length && selected.every(x => allApps.includes(x)));
-const mode = process.argv[4] || 'main'; assert(['main', 'interaction', 'transport', 'managed-transport', 'borrowed-bus', 'shutdown-outcomes'].includes(mode));
-if (mode === 'borrowed-bus') assert.deepEqual(selected, ['xfce-user-desktop']);
+const mode = process.argv[4] || 'main'; assert(['main', 'interaction', 'transport', 'managed-transport', 'borrowed-bus', 'shutdown-outcomes', 'liveness-observation', 'supervisor-preservation'].includes(mode));
+if (['borrowed-bus', 'liveness-observation', 'supervisor-preservation'].includes(mode)) assert.deepEqual(selected, ['xfce-user-desktop']);
 const port = 21996, base = `http://127.0.0.1:${port}`;
 const state = join(work, 'state'), apps = join(work, 'apps'), enabled = join(work, 'enabled');
 const oldCommon = join(work, 'old-common'), currentCommon = join(root, 'drivers/common');
@@ -47,16 +47,24 @@ async function save(result, error) {
   await writeFile(join(work, 'result.json'), JSON.stringify({result, startedAt, updatedAt: new Date().toISOString(),
     root, uid, selected, mode, instrumentation: ['Driver pre-exec file barrier', 'shutdown hook refusal/file barrier',
       'test App patch versions for update selection', 'old Core helper content marker', 'XFCE fixed display relocation',
+      ...(mode === 'liveness-observation' ? ['one failed exact-session systemctl is-active query via Manager-only PATH wrapper', '30-second managed safety interval', 'read-only shared full-frame RFB probes'] : []),
       ...(mode === 'managed-transport' ? ['managed comparison uses stop-session vacancy policy'] : [])],
     results, ...(error ? {failure: {app: currentApp, phase: currentPhase, message: error.message, stack: error.stack}} : {})}, null, 2));
 }
 async function startManager(common = currentCommon) {
+  const observation = mode === 'liveness-observation';
   child = spawn(join(root, 'bin/remotexappd'), ['-listen', `127.0.0.1:${port}`, '-auth-mode', 'none',
     '-state-dir', state, '-class-config', join(work, 'legacy'), '-app-package-root', apps, '-apps-enabled', enabled,
     '-gateway-bin', join(root, 'bin/novnc-input'), '-status-bin', join(root, 'bin/remotexapp-status'),
     '-core-driver-dir', common, '-ibus-engine', join(root, 'components/remote-unicode-engine/engine.py'),
     '-expose-internals=true', '-shutdown-grace-timeout', '3s', '-shutdown-blocked-warning-after', '1s',
-    '-shutdown-force-after', '8s'], {stdio: ['ignore', 'ignore', 'pipe']});
+    '-shutdown-force-after', '8s', ...(observation ? ['-managed-safety-interval', '30s'] : [])], {
+    stdio: ['ignore', 'ignore', 'pipe'], env: {...process.env, ...(observation ? {
+      PATH: join(work, 'fault-bin') + ':' + process.env.PATH,
+      REMOTEXAPP_MATRIX_QUERY_FAULT: join(work, 'unit-query-fault'),
+      REMOTEXAPP_MATRIX_QUERY_SEEN: join(work, 'unit-query-seen'),
+    } : {})},
+  });
   child.stderr.on('data', b => { appendFile(join(work, 'manager.log'), b).catch(() => {}); });
   await wait(async () => {
     if (child.exitCode !== null || child.signalCode !== null) throw Error('Manager exited during startup');
@@ -98,12 +106,123 @@ async function busID() {
   return (await exec('gdbus', ['call', '--session', '--dest', 'org.freedesktop.DBus', '--object-path',
     '/org/freedesktop/DBus', '--method', 'org.freedesktop.DBus.GetId'], {timeout: 5000})).stdout;
 }
+
+// A shared RFB client reads a full raw framebuffer without input or clipboard
+// mutation. Pixels are counted and discarded, never written to an artifact.
+async function frameProbe(id, generation) {
+  const ws = new WebSocket(base.replace('http:', 'ws:') + `/remotexapps/${id}/rfb?sessionGeneration=${generation}`);
+  ws.binaryType = 'arraybuffer';
+  let buffer = Buffer.alloc(0), failure;
+  ws.addEventListener('message', e => { buffer = Buffer.concat([buffer, Buffer.from(e.data)]); });
+  ws.addEventListener('error', () => { failure = Error('RFB WebSocket error'); });
+  ws.addEventListener('close', () => { failure ||= Error('RFB WebSocket closed'); });
+  async function take(n) {
+    await wait(() => { if (failure) throw failure; return buffer.length >= n; }, 'RFB bytes not received', 10000);
+    const bytes = buffer.subarray(0, n); buffer = buffer.subarray(n); return bytes;
+  }
+  try {
+    assert.equal((await take(12)).toString(), 'RFB 003.008\n'); ws.send(Buffer.from('RFB 003.008\n'));
+    const count = (await take(1))[0]; assert(count > 0); assert((await take(count)).includes(1));
+    ws.send(Uint8Array.of(1)); assert.equal((await take(4)).readUInt32BE(), 0);
+    ws.send(Uint8Array.of(1)); // shared, never evict another Viewer
+    const init = await take(24), width = init.readUInt16BE(), height = init.readUInt16BE(2), bpp = init[4];
+    assert([16, 32].includes(bpp)); assert(init.readUInt32BE(20) < 8192); await take(init.readUInt32BE(20));
+    ws.send(Uint8Array.of(2, 0, 0, 1, 0, 0, 0, 0));
+    const request = Buffer.alloc(10); request[0] = 3; request.writeUInt16BE(width, 6); request.writeUInt16BE(height, 8); ws.send(request);
+    assert.equal((await take(1))[0], 0);
+    const rectangles = (await take(3)).readUInt16BE(1); let pixels = 0;
+    for (let n = 0; n < rectangles; n++) {
+      const rect = await take(12), w = rect.readUInt16BE(4), h = rect.readUInt16BE(6);
+      assert.equal(rect.readInt32BE(8), 0); assert(rect.readUInt16BE() + w <= width && rect.readUInt16BE(2) + h <= height);
+      await take(w * h * bpp / 8); pixels += w * h;
+    }
+    assert.equal(pixels, width * height);
+    return {width, height, pixels, rectangles, inputMessages: 0};
+  } finally { ws.close(); }
+}
+
+async function livenessObservationMatrix(accountBus) {
+  currentPhase = 'liveness-observation';
+  await startManager();
+  const x = await newRuntime('xfce-user-desktop'), before = await record(x.id);
+  detach(x.id);
+  const manifest = JSON.parse(await readFile(join(state, 'runtime-manifests', x.id + '.json'), 'utf8'));
+  const getUnitPID = async unit => Number((await exec('/usr/bin/systemctl', ['--user', 'show', unit, '-p', 'MainPID', '--value'])).stdout.trim());
+  const units = ['vncUnit', 'serverUnit', 'gatewayUnit', 'sessionUnit'];
+  const pids = Object.fromEntries(await Promise.all(units.map(async key => [key, await getUnitPID(manifest.runtime[key])])));
+  await checkpoint('live-desktop-before-observation-fault', {generation: x.sessionGeneration, display: x.display, pids,
+    frame: await frameProbe(x.id, x.sessionGeneration)});
+  await writeFile(join(work, 'unit-query-fault'), manifest.runtime.sessionUnit + '\n');
+  await wait(async () => { try { return (await readFile(join(work, 'unit-query-seen'), 'utf8')).includes('injected'); } catch { return false; } }, 'query fault was not exercised', 45000);
+  await delay(500);
+  const after = await api.getInstance(x.id);
+  const aliveAfter = await Promise.all(identities(before).map(alive));
+  const pidsAfter = Object.fromEntries(await Promise.all(units.map(async key => [key, await getUnitPID(manifest.runtime[key])])));
+  await writeFile(join(work, 'liveness-fault-observation.json'), JSON.stringify({
+    generation: after.sessionGeneration, sessionState: after.sessionState, recovery: after.recovery,
+    error: after.error, originalServicesAlive: aliveAfter, beforePIDs: pids, afterPIDs: pidsAfter,
+  }, null, 2));
+  assert(aliveAfter.every(Boolean)); assert.deepEqual(pidsAfter, pids);
+  assert.equal(after.sessionGeneration, x.sessionGeneration);
+  assert.equal(after.sessionState, 'running', 'query fault falsely killed the live desktop in Manager state');
+  await checkpoint('query-error-retains-live-desktop-and-Viewer', {pids: pidsAfter, frame: await frameProbe(x.id, x.sessionGeneration)});
+  await stopManager(); await startManager();
+  assert.equal((await ready(x.id)).sessionGeneration, before.generation);
+  assert((await Promise.all(identities(before).map(alive))).every(Boolean));
+  await checkpoint('Manager-restart-adopts-original-session-after-query-error', {frame: await frameProbe(x.id, before.generation)});
+  assert.equal(await busID(), accountBus);
+  await stop(x.id);
+}
 async function ready(id) {
   return wait(async () => {
     const x = await api.getInstance(id);
     if (x.sessionState === 'failed' || x.state === 'failed') throw Error(`App failed: ${JSON.stringify(x)}`);
     return x.sessionState === 'running' && x.applicationStatus?.state === 'ready' && x;
   }, 'application not ready', 60000);
+}
+async function managedSupervisorPreservation(app, accountBus) {
+  // User-home units use ExitType=cgroup: losing the supervisor must not kill
+  // a still-live desktop. Private-bus App cleanup has a different contract.
+  assert.equal(manifests.get(app).runMode, 'user-home');
+  for (const offline of [false, true]) {
+    currentPhase = offline ? 'managed-supervisor-loss-offline' : 'managed-supervisor-loss';
+    const x = await newRuntime(app), before = await record(x.id);
+    const pidPath = join(state, 'instances', x.id, manifests.get(app).session.readinessPid);
+    const pid = Number((await readFile(pidPath, 'utf8')).trim());
+    const stat = await readFile(`/proc/${pid}/stat`, 'utf8');
+    const canonical = {pid, startTime:stat.slice(stat.lastIndexOf(')') + 1).trim().split(/\s+/)[19]};
+    const survivors = [canonical, before.driver].filter(Boolean);
+    if (offline) await stopManager('SIGKILL');
+    await killOwned(before.supervisor);
+    await wait(async () => !(await alive(before.supervisor)), 'supervisor did not exit');
+    await delay(1000);
+    console.log(JSON.stringify({diagnostic:'user-home-supervisor-loss', offline,
+      canonicalAlive:await alive(canonical), driverAlive:await alive(before.driver),
+      services:Object.fromEntries(await Promise.all(Object.entries(before.services).map(async ([name, identity]) => [name, await alive(identity)])))}));
+    assert((await Promise.all(survivors.map(alive))).every(Boolean), 'live user-home App was killed with supervisor');
+    if (offline) await startManager();
+    for (const stage of ['observed', 'Manager-adopted']) {
+      if (stage === 'Manager-adopted') { await stopManager('SIGKILL'); await startManager(); }
+      const current = await api.getInstance(x.id);
+      assert.equal(current.sessionState, 'running');
+      assert.equal(current.sessionGeneration, before.generation);
+      assert.deepEqual(identities(await record(x.id)), identities(before), 'supervisor or services silently replaced');
+      assert(!(await alive(before.supervisor)));
+      assert((await Promise.all(survivors.map(alive))).every(Boolean));
+      assert.equal(await busID(), accountBus);
+      // IBus can itself exit after its parent is killed. The App must survive;
+      // descriptors must reflect that loss instead of claiming a working bus.
+      await probe(x.id, `${offline ? 'offline-' : ''}managed-supervisor-${stage}`, true, {
+        fault:await alive(before.services.ibus) ? undefined : 'ibus',
+      });
+      await checkpoint(`${offline ? 'offline-' : ''}managed-supervisor-loss-${stage}-preserves-live-desktop`, {
+        frame:await frameProbe(x.id, before.generation), generationUnchanged:true,
+      });
+    }
+    await stop(x.id); await cleaned(before);
+    assert(!(await alive(canonical)));
+    await checkpoint(`${offline ? 'offline-' : ''}managed-supervisor-loss-explicit-stop-cleans-owned-processes`);
+  }
 }
 async function attach(id) {
   const ws = new WebSocket(base.replace('http:', 'ws:') + `/remotexapps/${id}/rfb-compat`);
@@ -489,10 +608,20 @@ async function shutdownOutcomes(app, originalBus) {
     const restored = await api.getInstance(x.id);
     assert.equal(restored.shutdown.forceAt, blocked.shutdown.forceAt);
     assert.equal(restored.sessionGeneration, before.generation);
-    await wait(async () => (await api.getInstance(x.id)).state === 'stopped', 'host enforcement deadline lost', 15000);
+    // forceAt begins enforcement, not the end of systemd's separate stop
+    // timeout. Observe completion relative to the original persisted deadline
+    // and verify that host force, rather than a successful hook, stopped it.
+    const forceAt = Date.parse(blocked.shutdown.forceAt);
+    await wait(async () => (await api.getInstance(x.id)).state === 'stopped',
+      'host deadline enforcement did not finish bounded cleanup', Math.max(0, forceAt - Date.now()) + 15000);
+    const enforced = await api.getInstance(x.id);
+    assert.equal(enforced.shutdown?.forced, true, 'host force was not recorded');
+    assert.equal(enforced.shutdown.forceAt, blocked.shutdown.forceAt, 'force deadline changed during teardown');
+    const cleanupAfterDeadlineMs = Date.now() - forceAt;
+    assert(cleanupAfterDeadlineMs >= 0 && cleanupAfterDeadlineMs < 15000, 'forced cleanup outside its deadline budget');
     await cleaned(before);
     await probe(x.id, 'host-enforced-' + outcome, false);
-    await checkpoint('hook-' + outcome + '-services-preserved-Manager-crash-host-deadline-enforced');
+    await checkpoint('hook-' + outcome + '-services-preserved-Manager-crash-host-deadline-enforced', {cleanupAfterDeadlineMs});
   }
   assert.equal(await busID(), originalBus);
 }
@@ -554,6 +683,21 @@ async function transportMatrix(app, originalBus) {
 
 try {
   for (const p of [work, state, apps, enabled, join(work, 'legacy')]) await mkdir(p, {recursive: true});
+  if (mode === 'liveness-observation') {
+    await mkdir(join(work, 'fault-bin'));
+    await writeFile(join(work, 'fault-bin/systemctl'), `#!/bin/sh
+if [ -f "$REMOTEXAPP_MATRIX_QUERY_FAULT" ]; then
+  target=$(cat "$REMOTEXAPP_MATRIX_QUERY_FAULT")
+  if [ "$*" = "--user is-active --quiet $target" ]; then
+    rm "$REMOTEXAPP_MATRIX_QUERY_FAULT"
+    echo injected-query-error >> "$REMOTEXAPP_MATRIX_QUERY_SEEN"
+    echo 'Failed to connect to bus: injected observation failure' >&2
+    exit 1
+  fi
+fi
+exec /usr/bin/systemctl "$@"
+`, {mode: 0o755});
+  }
   let occupied = false; try { occupied = (await fetch(base + '/readyz')).ok; } catch {} assert(!occupied, 'test port occupied');
   await cp(currentCommon, oldCommon, {recursive: true});
   await writeFile(join(oldCommon, 'matrix-old-pin'), 'old new-architecture helper selection');
@@ -562,6 +706,8 @@ try {
   for (const app of selected) {
     currentApp = app; currentPhase = 'starting';
     try {
+    if (mode === 'liveness-observation') { await livenessObservationMatrix(accountBus); continue; }
+    if (mode === 'supervisor-preservation') { await startManager(); await managedSupervisorPreservation(app, accountBus); continue; }
     if (mode === 'borrowed-bus') { await borrowedBusMatrix(accountBus); continue; }
     if (mode === 'shutdown-outcomes') { await shutdownOutcomes(app, accountBus); continue; }
     if (mode === 'interaction') { await interactionMatrix(app, accountBus); continue; }
@@ -627,6 +773,9 @@ try {
       await stop(id); await cleaned(before);
       await checkpoint('dbus-loss-cleanup', {observedSessionState: after.sessionState});
     }
+    if (manifests.get(app).runMode === 'user-home') {
+      await managedSupervisorPreservation(app, accountBus);
+    } else {
     currentPhase = 'supervisor-loss'; x = await newRuntime(app); id = x.id;
     const before = await record(id); await killOwned(before.supervisor);
     await wait(async () => (await api.getInstance(id)).sessionState === 'failed', 'supervisor loss not observed');
@@ -654,6 +803,7 @@ try {
     await checkpoint('offline-supervisor-failure-no-relaunch-by-Manager-or-Viewer');
     await replace(id); await probe(id, 'explicit-recovery-after-offline-failure', true);
     await stop(id);
+    }
     assert.equal(await busID(), accountBus, 'borrowed account bus was replaced');
     currentPhase = 'final-cleanup';
     const active = (await api.listInstances()).filter(x => x.state !== 'stopped'); assert.deepEqual(active, []);

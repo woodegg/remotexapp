@@ -139,3 +139,28 @@ handoff. Merge, a post-merge immutable release candidate and publication remain
 separate decisions.
 
 ![Authenticated full-template host workbench with adjacent display statistics](native-host-workbench.png)
+
+## Local fault-injection regression — 2026-11-20
+
+See [the local run](../session-services/LOCAL-E2E-20261120.md) and
+[fault/recovery matrix](../session-services/FAULT-RECOVERY-MATRIX.md). These
+results do not replace the older regional or human acceptance records.
+
+`browser-host-faults.mjs <owned-fixture.json> <mode>` uses the existing local
+fixture contract, an isolated local Chrome and an ephemeral loopback connector.
+The fixture must use the `rxhost` account, UID 1004, the eight-App host catalog,
+its writable documents directory and `remotexapp-host.service` with systemd
+`Restart=on-failure`. Run modes sequentially on a disposable container:
+
+- `manager-crash`: SIGKILL only the Manager; require automatic service restart,
+  browser reconnection, unchanged App generation/processes and saved input.
+- `short-outage`: break the owned frontend connections and return HTTP 503 for
+  three seconds; require automatic reconnect and fresh saved input afterward.
+- `lease-outage`: block browser networking across the next lease renewal, then
+  restore it; require automatic reconnect. This exposes a known failure in the
+  current artifact ([#68](https://github.com/woodegg/remotexapp/issues/68)): a transport error is reported as `grant-expired` and retry
+  does not resume. A nonzero exit is a retained failed recovery test.
+
+The scripts do not manually restart/reconnect to make an assertion pass. They
+stop only their created App and close their owned browser/connector afterward.
+Raw results contain runtime details and belong in private evidence storage.

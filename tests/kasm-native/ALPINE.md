@@ -7,7 +7,7 @@ evidence that every Linux distribution is supported.
 ## Artifact boundaries
 
 `scripts/build-alpine-static.py` builds all four Core executables with Go
-1.27.3. The three pure-Go tools use `CGO_ENABLED=0`; the legacy input gateway
+1.27.4. The three pure-Go tools use `CGO_ENABLED=0`; the legacy input gateway
 uses musl and the explicit `x11_static` build tag. The default Ubuntu build
 keeps its existing linkage. Every output must have neither ELF `INTERP` nor
 `DT_NEEDED`; a failed check aborts packaging. The gateway remains in the Core
@@ -27,7 +27,7 @@ rich clipboard and production support remain outside this checkpoint.
 Use a separate Alpine 3.24 amd64 build container. Install the compiler,
 autotools, Python 3, binutils, Node/npm and the X11/Kasm development packages
 listed in `scripts/alpine-build-dependencies.txt` (one package per line).
-Do not install build tools on a small deployment host. Supply Go 1.27.3 and
+Do not install build tools on a small deployment host. Supply Go 1.27.4 and
 the three source archives named/checksummed in `build-alpine-static.py`:
 
 - `libXau-1.0.12.tar.xz` and `libXinerama-1.1.6.tar.xz` from the

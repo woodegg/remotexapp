@@ -436,7 +436,14 @@ func (m *manager) reconcileManagedLocked(id string, requested ...stopOptions) er
 			m.notifySessionRecovery()
 			return nil
 		}
-		if item.Runtime.SessionState == "running" && !m.recordedSessionAlive(item.Runtime) {
+		observation := sessionObservation{state: sessionAlive}
+		if item.Runtime.SessionState == "running" {
+			observation = m.observeRecordedSession(item.Runtime)
+			if observation.state == sessionUncertain {
+				return nil // Retry observation; uncertainty is not a terminal App event.
+			}
+		}
+		if item.Runtime.SessionState == "running" && observation.state == sessionExited {
 			// The VNC and session cgroup events can arrive in either order.
 			// Reconcile the terminal session before considering server recovery.
 			if !xDisplayReady(item.Runtime.Display, authorityPath(item.Runtime)) {
@@ -477,7 +484,7 @@ func (m *manager) reconcileManagedLocked(id string, requested ...stopOptions) er
 	if item.Runtime != nil {
 		// An unhealthy transport is not consent to close a live application.
 		// Likewise, an observed terminal failure is not a restart request.
-		if item.Runtime.SessionState != "shutdown-blocked" && m.recordedSessionAlive(item.Runtime) {
+		if item.Runtime.SessionState != "shutdown-blocked" && m.recordedSessionMayBeAlive(item.Runtime) {
 			item.ObservedState, item.Error = "failed", item.Runtime.Error
 			if item.Error == "" {
 				item.Error = "runtime requires explicit recovery; application preserved"

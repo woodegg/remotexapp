@@ -111,8 +111,11 @@ template even though other templates do not need a clipboard manager.
 
 ## Build/test only—not required on release runtime hosts
 
-Source builds require pinned Go 1.27.3, Node 22, esbuild 0.20.1 and native build
-headers/toolchain. Go modules are recorded in `go.mod` / `go.sum`.
+Source builds require pinned Go 1.27.4, Node 22, esbuild 0.20.1 and native build
+headers/toolchain. On Debian/Ubuntu the dynamic gateway build needs
+`libx11-dev`, `libxtst-dev` and `libxdo-dev` for standard linker names accepted
+by cgo. Runtime hosts still need only the corresponding runtime libraries.
+Go modules are recorded in `go.mod` / `go.sum`.
 Live validation additionally uses tools such as Xvfb, `xclip`, a test browser,
 and Playwright for the dedicated prompt UI check. These become required when
 running their respective tests; **production clipboard transfer does not use

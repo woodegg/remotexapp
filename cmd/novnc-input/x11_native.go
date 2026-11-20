@@ -1,9 +1,8 @@
 package main
 
 /*
-// The host has the libXtst runtime package but not its development symlink.
-// Link the installed soname directly so this POC needs no package install.
-#cgo !x11_static LDFLAGS: -lX11 -l:libXtst.so.6 -l:libxdo.so.3
+// Link development-library names accepted by the cgo linker flag validator.
+#cgo !x11_static LDFLAGS: -lX11 -lXtst -lxdo
 #cgo x11_static LDFLAGS: -static -lxdo -lXtst -lXinerama -lXext -lX11 -lxcb -lXau -lXdmcp -lxkbcommon -lm
 #include <stdlib.h>
 #include <string.h>
@@ -13,15 +12,13 @@ package main
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
-// libxtst runtime is installed on the test host, but its development header is
-// not. These are the stable public XTEST declarations we need.
+// Subset of the stable public XTEST declarations used by the input gateway.
 extern Bool XTestQueryExtension(Display*, int*, int*, int*, int*);
 extern int XTestFakeKeyEvent(Display*, unsigned int, Bool, unsigned long);
 extern int XTestFakeButtonEvent(Display*, unsigned int, Bool, unsigned long);
 extern int XTestFakeMotionEvent(Display*, int, int, int, unsigned long);
 
-// libxdo's stable entry points. The host ships the runtime library through
-// xdotool but not the development headers, so declare its opaque context here.
+// libxdo's stable entry points with an opaque context.
 typedef struct xdo Xdo;
 extern Xdo *xdo_new(const char *);
 extern void xdo_free(Xdo *);

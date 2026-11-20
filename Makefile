@@ -7,7 +7,7 @@ COVERAGE_DIR ?= dist/coverage
 SOAK_COUNT ?= 20
 SOAK_TIMEOUT ?= 20m
 FUZZ_TIME ?= 10s
-GO_TOOLCHAIN := go1.27.3
+GO_TOOLCHAIN := go1.27.4
 
 .PHONY: novnc-check web-assets build app-catalog check test test-race vet coverage-check soak-check fuzz-check integration-check live-e2e nightly-portable toolchain-check module-check vuln-check binary-vuln-check performance-docs-check sensitive-data-check public-docs-check evidence-check current-state-check workflow-check release-metadata-check release-check release-ci package-release install-user install-system deployment-check system-stage-test backend-build backend-test backend-test-race
 

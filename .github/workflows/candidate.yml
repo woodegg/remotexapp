@@ -24,7 +24,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: "1.27.3"
+          go-version: "1.27.4"
           cache: true
           cache-dependency-path: go.sum
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -33,7 +33,7 @@ jobs:
       - name: Install native and web build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes libx11-dev libxtst-dev libxdo3 ripgrep rsync \
+          sudo apt-get install --yes libx11-dev libxtst-dev libxdo-dev ripgrep rsync \
             xvfb xclip dbus-x11 xfce4-clipman
           npm install --global esbuild@0.20.1
       - name: Mark candidate start

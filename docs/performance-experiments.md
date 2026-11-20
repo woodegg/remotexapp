@@ -62,7 +62,9 @@ The current production-candidate URLs remain:
 | P16 | Core-owned session input supervision stays within bounded startup and resource overhead | Service ownership with unchanged Mousepad policies | **Accepted:** matched fresh/warm launches, cgroup resources and cleanup pass locked gates; human UAT is separate |
 | P17 | Per-speaker credits avoid competition between bounded audio queues | Aggregate playback credit allocation only | **Accepted:** deterministic two-speaker burst delivers ten of ten frames instead of eight; eight-slot aggregate remains capped at 64; WAN and physical quality are separate |
 
-P01 through P17 have recorded experiment outcomes. Start the next experiment only after defining a
+| P18 | Retiring native channels and global listeners releases detached Viewer DOM | Native client retirement | **Accepted:** baseline +300 nodes/+240 listeners becomes zero growth over forty cycles; short diagnostic observation only |
+
+P01 through P18 have recorded experiment outcomes. Start the next experiment only after defining a
 new isolated primary variable.
 
 ## P16: Core-owned session services
@@ -1081,3 +1083,20 @@ from each of two speakers previously lost two of ten frames before reaching
 worklet queues. The selected allocation delivers all ten, with a 16-frame cap
 for two speakers and a 64-frame cap for eight. This is an allocation result,
 not a claim that arbitrary WAN jitter or physical audio quality has passed.
+
+
+## P18: native Viewer retirement
+
+The [retirement experiment](../tests/performance/native-viewer-retirement/README.md)
+compares collected DOM/listener deltas across twenty painted mount/releases.
+The original component retained 300 nodes and 240 listeners. Closing channels
+alone still retained 300/220; closing channels and removing global listeners
+returned both counters to their within-run baseline. The final qualified pair
+repeated forty cycles with 97 nodes and 26 listeners at all three samples.
+Native server binaries/libraries are unchanged. Heap figures remain short-run
+observations, not a long-term slope or RSS claim. Real native input, clipboard,
+audio and UDP regressions are recorded in the linked recovery qualification.
+Owned Apps/browsers and fault containers were cleaned up; the original Manager
+on port 1991 and original display were not restarted. The accepted development
+pair remains in project-owned local UAT under the owner's deployment request.
+Human UAT, downstream integration and publication remain separate.

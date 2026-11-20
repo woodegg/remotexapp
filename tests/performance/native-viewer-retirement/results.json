@@ -1,0 +1,191 @@
+{
+  "experiment": "P18",
+  "outcome": "accepted",
+  "status": "Native Viewer retirement removes retained DOM/listeners in repeated local browser checks; short diagnostic GC observations only, human UAT and long-duration memory qualification separate.",
+  "measuredAt": "2026-11-20",
+  "primaryVariable": "native client channel/listener retirement",
+  "baselineCoreCommit": "6c5e5309a947ed2ce9a65a037ea2f20d9b131f92",
+  "baselineComponentManifestSHA256": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3",
+  "selectedComponentManifestSHA256": "12fd950b5b31c3c710471f61006ac90ce085d657fbc3b04824fcdda584646804",
+  "baseline": {
+    "rawSHA256": "5dc787626d317a466e273d6c2a7572f3164bdfc163aec905d3a25b8fd1d3ae82",
+    "harnessReportedResult": "passed",
+    "samples": {
+      "before": {
+        "dom": {
+          "documents": 1,
+          "nodes": 97,
+          "jsEventListeners": 29
+        },
+        "heap": 1785016,
+        "owners": {
+          "views": 0,
+          "sessions": 1,
+          "handles": 1,
+          "canvases": 0,
+          "audio": "idle"
+        }
+      },
+      "after": {
+        "dom": {
+          "documents": 1,
+          "nodes": 397,
+          "jsEventListeners": 269
+        },
+        "heap": 2948660,
+        "owners": {
+          "views": 0,
+          "sessions": 1,
+          "handles": 1,
+          "canvases": 0,
+          "audio": "idle"
+        }
+      }
+    },
+    "nodeDeltaAfter20": 300,
+    "listenerDeltaAfter20": 240
+  },
+  "channelsOnlyRejected": {
+    "rawSHA256": "05a3d9b0b2cc8297f62f6b95956071cddd627435d12d365e5000c0c0efe7c675",
+    "harnessReportedResult": "failed",
+    "samples": {
+      "before": {
+        "dom": {
+          "documents": 1,
+          "nodes": 79,
+          "jsEventListeners": 28
+        },
+        "heap": 1816616,
+        "owners": {
+          "views": 0,
+          "sessions": 1,
+          "handles": 1,
+          "canvases": 0,
+          "audio": "idle"
+        }
+      },
+      "after": {
+        "dom": {
+          "documents": 1,
+          "nodes": 379,
+          "jsEventListeners": 248
+        },
+        "heap": 2934036,
+        "owners": {
+          "views": 0,
+          "sessions": 1,
+          "handles": 1,
+          "canvases": 0,
+          "audio": "idle"
+        }
+      }
+    },
+    "nodeDeltaAfter20": 300,
+    "listenerDeltaAfter20": 220
+  },
+  "completeFixOnSameCore": {
+    "rawSHA256": "37431f57c3c1e5960ae470f22f68f4bd0f6374688a30f850b92dbba810fb34f0",
+    "harnessReportedResult": "passed",
+    "samples": {
+      "before": {
+        "dom": {
+          "documents": 1,
+          "nodes": 79,
+          "jsEventListeners": 26
+        },
+        "heap": 1779664,
+        "owners": {
+          "views": 0,
+          "sessions": 1,
+          "handles": 1,
+          "canvases": 0,
+          "audio": "idle"
+        }
+      },
+      "after": {
+        "dom": {
+          "documents": 1,
+          "nodes": 79,
+          "jsEventListeners": 26
+        },
+        "heap": 2423956,
+        "owners": {
+          "views": 0,
+          "sessions": 1,
+          "handles": 1,
+          "canvases": 0,
+          "audio": "idle"
+        }
+      }
+    },
+    "nodeDeltaAfter20": 0,
+    "listenerDeltaAfter20": 0
+  },
+  "finalPair": {
+    "rawSHA256": "970e01870e1526e5479505e22ebd55551e8728b0497c37a3f4a5295c8d109df8",
+    "harnessReportedResult": "passed",
+    "samples": {
+      "before": {
+        "dom": {
+          "documents": 1,
+          "nodes": 97,
+          "jsEventListeners": 26
+        },
+        "heap": 1816036,
+        "owners": {
+          "views": 0,
+          "sessions": 1,
+          "handles": 1,
+          "canvases": 0,
+          "audio": "idle"
+        }
+      },
+      "after": {
+        "dom": {
+          "documents": 1,
+          "nodes": 97,
+          "jsEventListeners": 26
+        },
+        "heap": 2430244,
+        "owners": {
+          "views": 0,
+          "sessions": 1,
+          "handles": 1,
+          "canvases": 0,
+          "audio": "idle"
+        }
+      },
+      "afterRepeat": {
+        "dom": {
+          "documents": 1,
+          "nodes": 97,
+          "jsEventListeners": 26
+        },
+        "heap": 2491376,
+        "owners": {
+          "views": 0,
+          "sessions": 1,
+          "handles": 1,
+          "canvases": 0,
+          "audio": "idle"
+        }
+      }
+    },
+    "nodeDeltaAfter20": 0,
+    "listenerDeltaAfter20": 0
+  },
+  "finalCoreCommit": "89697ec597435330b02880770fc4c4f8252b7f4d",
+  "scopeNotes": [
+    "Original harness passed only its ownership assertions; resource review rejected its growing DOM/listener counters.",
+    "Compare within-run deltas: page baseline node counts differ between probes.",
+    "The final harness adds resource assertions and a second 20-cycle block.",
+    "One explicit background task remains throughout collection; logout subsequently releases it.",
+    "No CPU/PSS/RSS, long-duration slope, physical-device or release acceptance claim."
+  ],
+  "cleanup": {
+    "ownedAppsAndBrowsersClosed": true,
+    "disposableFaultContainersStopped": true,
+    "originalManagerAndDisplayIdentitiesPreserved": true,
+    "projectLocalUATRetainedByAuthorization": true
+  }
+}

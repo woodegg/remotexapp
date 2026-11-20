@@ -1,5 +1,13 @@
 # Host application integration: runtime Coordinator and idle leases
 
+For **Core 0.15 → 0.16 native host adaptation**, start with the
+[native migration guide](native-host-migration.md). This page retains the
+Coordinator-level integration used by the legacy provider and lower-level
+callers. Native `RemoteXAppHost` already owns its Coordinator; do not add another
+Coordinator or copy legacy input/recovery orchestration into each native window.
+The linked guide distinguishes the 0.16.0 baseline from the 0.16.1 recovery
+target and documents native audio/clipboard ownership.
+
 This guide covers IDL-001–004, RTC-001–004 and RTC-007. The optional
 Coordinator is shipped in SDK 0.29.1; use the release-matched SDK from your
 Manager and check its capabilities. No particular host application's

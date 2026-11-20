@@ -5368,3 +5368,83 @@ case, short connection outage, Manager crash, fresh frame/input/file readback,
 and deterministic auth/cancellation/stale-generation/budget tests. Earlier
 failed evidence is retained. No physical-device UAT, release publication or
 sandbox deployment follows from these checks alone.
+
+## 2026-11-20 — Simplify recovery ownership and require fault qualification
+
+The owner requested simpler client adaptation, updated design documentation,
+then comprehensive fault injection to establish whether the design works.
+[Issue #70](https://github.com/woodegg/remotexapp/issues/70) owns REX-001–007 and
+[the recovery experience contract](native-recovery-experience.md). This selects
+an extension for implementation and validation, not an already shipped API.
+
+A stable high-level window binding and SDK-owned panel will project current
+state/actions; ordinary hosts keep container/window, launch-target and login
+responsibilities. The SDK retains bounded connection recovery and observation;
+the Manager retains authoritative lifecycle/permission/ownership checks.
+NHI-003 same-generation retry, NHI-002 ownership, MSR blockers/cooldowns and
+SVC borrowed-bus protection remain unchanged. Recheck is not forced recovery.
+
+This extends the presentation/adaptation parts of NHI-007/010 and the migration
+guide instead of replacing their accepted lifecycle contracts. Existing
+low-level APIs remain available. Replacement binding needs an explicit action
+or the verified result of that view's confirmed restart. A stable view may own
+a new Session handle; a generation-bound Session never mutates into a new one.
+Retry cannot turn into restart, a stale confirmation cannot retarget, and an
+uncertain lifecycle response must not be replayed. Component hot repair is not
+made available by a new button.
+
+The SDK and project-owned UAT/Console simulator must exercise the new contract
+before actual downstream host adaptation. The [fault matrix](../tests/kasm-native/RECOVERY-EXPERIENCE.md)
+separates recovery, protected refusal, degraded preservation and untested
+scope, including multi-Tab races, second faults and UI/readback/resource checks.
+Prior lease and broad system tests remain their original artifact's evidence.
+
+## 2026-11-20 — Fence transport replay of native host launches
+
+Fault injection for [Issue #70](https://github.com/woodegg/remotexapp/issues/70)
+found that a single SDK fetch can cause multiple wire POSTs when the browser
+receives no response headers. This supersedes any interpretation of the earlier
+recovery decision that an SDK no-retry policy alone prevents duplicate launch.
+Generation fencing already rejects replayed restarts; new launches need their
+own intent reservation. REX-008 adds a principal-scoped, hashed disk reservation
+before side effects, 24-hour retention and a capacity limit of 8,192. Duplicates
+report uncertainty; they do not replay results, relaunch or silently reattach.
+Storage failure rejects launch. Unkeyed legacy calls keep their existing
+semantics. See [the contract](native-recovery-experience.md#launch-response-loss-and-transport-retries).
+The qualification matrix must count SDK calls, wire attempts and successful
+lifecycle effects separately, and check reservation survival across restart.
+
+## 2026-11-20 — Qualify component retirement beyond SDK owner counters
+
+The #70 repetition experiment returned SDK View/handle counters to their
+baseline, yet twenty released Viewers retained 300 DOM nodes and 240 listeners
+after diagnostic GC. Clearing console records did not change this. Heap
+retainers identified a native BroadcastChannel message listener retaining the
+retired RFB and its display/input DOM. This supersedes the interpretation that
+zero SDK owners alone proves full Viewer cleanup (REX-009).
+
+Patch 0025 closes each RFB control channel and the display's owned broadcast and
+screen channels during disconnect/dispose, removes omitted global blur/mouseover
+listeners and cancels gesture/resize timers. The channels-only probe still failed
+the DOM/listener gate; a second heap snapshot identified Window listeners as
+an independent retainer. Other Viewers keep their channels;
+repeated cleanup is safe. A new immutable component is required; never change
+files under an existing pin or claim that a Manager/SDK-only update repairs it.
+Client-only reconstruction may reuse a hash-verified parent server when all
+server source archives/patches are identical, retaining parent provenance and
+explicitly recording that the server was not recompiled. Qualify actual paint,
+input, isolation, reconnect, UDP and repeated resource release on the new pair.
+
+## 2026-11-20 — Record bounded recovery qualification and local UAT handoff
+
+The [dated recovery results](../tests/kasm-native/RECOVERY-EXPERIENCE-20261120.md)
+qualify Core source `89697ec59743` with the new immutable native component.
+They supersede the initial pending qualification status, while preserving all
+failed attempts and separating automatic recovery from explicit action and
+protected refusal. [P18](../tests/performance/native-viewer-retirement/README.md)
+records the resource comparison and forty-cycle confirmation. The isolated
+fault resources are cleaned up and the pair is installed in project-owned local
+UAT. Existing runtime pins required a separate guarded upgrade of the empty
+test desktop; Manager restart alone did not change them. The original non-test
+Manager/display remained untouched. Human UAT, untested fault variants,
+downstream deployment and publication remain separate gates.

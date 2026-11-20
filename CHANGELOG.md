@@ -11,6 +11,32 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+## 0.16.1
+
+Target: `0.16.1`. SDK `0.32.0`.
+
+- Document the native recovery experience extension (#70): an SDK-owned view
+  and recovery panel, scoped actions and confirmation, minimal embedding-host
+  responsibilities, and a comprehensive fault-injection acceptance matrix.
+  SDK 0.32.0 adds `host.mount()`, one state/action model, the default
+  recovery panel and `/sdk/recovery.html` reference UI. Preserve low-level attach
+  readiness and add cancellation of pending attachment.
+  [Local fault qualification](tests/kasm-native/RECOVERY-EXPERIENCE-20261120.md)
+  records recovery, protective refusal, App readback and resource cleanup for
+  the development build. See [release qualification #72](https://github.com/woodegg/remotexapp/issues/72)
+  for the exact archive.
+  Fault injection also found a close/reattach listener race and browser-level
+  replay of a create POST after response loss. Cancel late listener registration
+  and add bounded, persisted launch-intent duplicate suppression for host launches.
+  Completed upgrade history no longer hides an otherwise admitted restart.
+  Repeated-window resource inspection also found retained Kasm BroadcastChannels;
+  patch 0025 closes owned control/display channels and removes global listeners
+  during retirement. This repair
+  requires a new immutable native component, not only an SDK/Core update.
+  Expand the [0.15 → 0.16 migration guide](docs/native-host-migration.md) with
+  explicit published/development SDK targets, host adaptation and staged
+  component/runtime/edge rollout responsibilities.
+
 - SDK 0.31.1: recover native Viewers after transient lease-renewal network or
   service failures (#68). Retire the old channel/grant and use the configured
   bounded reconnect policy with a fresh authenticated grant for the same

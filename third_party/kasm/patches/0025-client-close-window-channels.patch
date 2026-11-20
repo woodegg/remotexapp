@@ -1,0 +1,46 @@
+--- a/core/rfb.js
++++ b/core/rfb.js
+@@ -1497,6 +1497,9 @@
+         this._canvas.removeEventListener("focus", this._eventHandlers.handleFocusChange);
+         window.removeEventListener('resize', this._eventHandlers.windowResize);
+         window.removeEventListener('focus', this._eventHandlers.handleFocusChange);
++        window.removeEventListener('blur', this._eventHandlers.handleFocusChange);
++        window.removeEventListener('mouseover', this._eventHandlers.handleMouseOut);
++        this._canvas.removeEventListener('touchend', this._eventHandlers.updateHiddenKeyboard);
+         document.removeEventListener('visibilitychange', this._eventHandlers.handleVisibilityChange);
+ 
+         this._keyboard.ungrab();
+@@ -1522,9 +1525,16 @@
+                 throw e;
+             }
+         }
++        // Window channels retain bound RFB listeners after the DOM is removed.
++        this._controlChannel?.close();
++        this._controlChannel = null;
+         this._display.dispose();
+         clearTimeout(this._resizeTimeout);
+         clearTimeout(this._mouseMoveTimer);
++        clearTimeout(this._forceFullFrameUpdateTimeout);
++        clearInterval(this._watchForPinchAndZoom);
++        this._forceFullFrameUpdateTimeout = null;
++        this._watchForPinchAndZoom = null;
+         window.localStorage.removeItem('lastWindow')
+         Log.Debug("<< RFB.disconnect");
+     }
+--- a/core/display.js
++++ b/core/display.js
+@@ -684,6 +684,14 @@
+     */
+     dispose() {
+         this._disposed = true;
++        this._broadcastChannel?.close();
++        this._broadcastChannel = null;
++        for (const screen of this._screens) {
++            screen.channel?.close();
++            screen.channel = null;
++        }
++        this.registeredWindows.clear();
++        this.displayWindows.clear();
+         for (const name of ['_asyncFrameRequest', '_syncFrameRequest']) {
+             if (this[name] !== null) window.cancelAnimationFrame(this[name]);
+             this[name] = null;

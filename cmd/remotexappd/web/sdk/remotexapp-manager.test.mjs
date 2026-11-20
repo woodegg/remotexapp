@@ -37,6 +37,14 @@ function mockManager() {
   return { manager:new RemoteXAppManager({ baseURL:'http://manager.test/', fetchImpl }), calls };
 }
 
+test('explicit launch intent stays in one request body and invalid keys never reach fetch',async()=>{
+  const {manager,calls}=mockManager();
+  await manager.createInstance({templateId:'mousepad',launchIntent:'logical-launch-123456789'});
+  assert.equal(calls.length,1);assert.equal(JSON.parse(calls[0].options.body).launchIntent,'logical-launch-123456789');
+  assert.throws(()=>manager.createInstance({templateId:'mousepad',launchIntent:'short'}),TypeError);
+  assert.equal(calls.length,1);
+});
+
 test('infers a service base path from bundled and source SDK module URLs', () => {
   assert.equal(inferServiceBaseURL('https://example.test/tools/remotexapp/assets/sdk-HASH.js'), '/tools/remotexapp');
   assert.equal(inferServiceBaseURL('https://example.test/tools/remotexapp/sdk/remotexapp-manager.js'), '/tools/remotexapp');

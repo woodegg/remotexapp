@@ -46,8 +46,15 @@ optional screen UDP. Bring your own Linux host, authentication and tenant
 isolation; Citrix ICA/HDX is not supported. See the [0.16.0 setup and migration
 boundaries](docs/native-0.16.0-release.md).
 
+**Adapting an existing 0.15 host?** Start with the
+[0.15 → 0.16 migration guide](docs/native-host-migration.md). It distinguishes
+the 0.16.0 baseline (SDK 0.31.0) from the 0.16.1 recovery target (SDK 0.32.0),
+explains the simpler `mount()`/`release()` integration and lists the matched
+Core/component, existing-runtime upgrade and downstream acceptance requirements.
+
 ## Embed with the native SDK
 
+This example uses the published SDK 0.31.0 contract, which remains supported.
 For a Manager configured with a verified Kasm component, launch an App and attach
 its Viewer through one session handle:
 

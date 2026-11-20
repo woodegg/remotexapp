@@ -224,10 +224,14 @@ export class RemoteXAppManager extends EventTarget {
     }
   }
 
-  createInstance({ templateId, classId, profileRef, parameters, overrides, signal } = {}) {
+  createInstance({ templateId, classId, profileRef, parameters, overrides, launchIntent, signal } = {}) {
     const selectedTemplate = templateId || classId;
     if (!selectedTemplate) throw new TypeError('templateId is required');
     const body = { templateId: selectedTemplate };
+    if (launchIntent !== undefined) {
+      if (typeof launchIntent !== 'string' || !/^[a-zA-Z0-9_-]{16,128}$/.test(launchIntent)) throw new TypeError('Invalid launchIntent');
+      body.launchIntent = launchIntent;
+    }
     if (profileRef) body.profileRef = profileRef;
     if (parameters) body.parameters = parameters;
     if (overrides) body.overrides = overrides;

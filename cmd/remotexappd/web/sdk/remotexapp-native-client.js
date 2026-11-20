@@ -277,7 +277,7 @@ export class RemoteXAppNativeClient extends EventTarget {
       if (epoch === this._epoch) {
         this._closeConnection();
         const error = cause instanceof RemoteXAppNativeError ? cause : new RemoteXAppNativeError('connection-failed', 'Native Viewer connection failed', { cause });
-        this._state('failed', { code:error.code });
+        this._state('failed', { code:error.code, ...(error.cause?.status ? {httpStatus:error.cause.status} : {}) });
         throw error;
       }
       throw cause;
@@ -288,7 +288,7 @@ export class RemoteXAppNativeClient extends EventTarget {
     const expected = this.instance, recoverable = retryable(error);
     this._closeConnection(false);
     const closedEpoch = this._epoch;
-    this._state(recoverable ? 'disconnected' : 'failed', {code:error.code});
+    this._state(recoverable ? 'disconnected' : 'failed', {code:error.code, ...(error.cause?.status ? {httpStatus:error.cause.status} : {})});
     // State listeners can synchronously disconnect, replace or dispose this
     // Viewer. A late callback must not undo that decision or renew old grants.
     if (recoverable && closedEpoch === this._epoch && !this._disposed && (!this.runtime || this.runtime.state === 'tracking'))

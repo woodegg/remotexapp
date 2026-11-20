@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.31.1';
+export const SDK_VERSION: '0.32.0';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -252,7 +252,7 @@ export class RemoteXAppManager extends EventTarget {
 	getApplicationStatus(instanceId:string,options?:{signal?:AbortSignal}):Promise<RemoteXApplicationStatus>;
 	getApplicationEnvironment(instanceId:string,options:{sessionGeneration:number;signal?:AbortSignal}):Promise<RemoteXApplicationEnvironment>;
 	waitForApplicationState(instanceId:string,states:string|string[],options?:{generation?:number;timeout?:number;interval?:number;signal?:AbortSignal}):Promise<RemoteXApplicationStatus>;
-	createInstance(options:{templateId?:string;classId?:string;profileRef?:string;parameters?:Record<string,unknown>;overrides?:RemoteXAppOverrides;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
+	createInstance(options:{templateId?:string;classId?:string;profileRef?:string;parameters?:Record<string,unknown>;overrides?:RemoteXAppOverrides;launchIntent?:string;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
 	launch(options:{templateId?:string;classId?:string;profileRef?:string;parameters?:Record<string,unknown>;overrides?:RemoteXAppOverrides;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
   attachInstance(instanceId:string,options?:{signal?:AbortSignal}):Promise<{viewerUrl:string}>;
 	stopInstance(instanceId:string,options?:{force?:boolean;sessionGeneration?:number;signal?:AbortSignal}):Promise<RemoteXAppInstance>;
@@ -411,15 +411,35 @@ export class RemoteXAppHost extends EventTarget {
   readonly manager:RemoteXAppManager;readonly coordinator:RemoteXAppCoordinator;readonly closed:boolean;
   templates(options?:{refresh?:boolean;signal?:AbortSignal}):Promise<RemoteXAppClass[]>;
   open(options:RemoteXHostOpenOptions):Promise<RemoteXAppSession>;
+  mount(container:HTMLElement,target:RemoteXHostOpenOptions,options?:Omit<RemoteXNativeViewerOptions,'container'|'manager'|'runtime'> & {panel?:boolean}):RemoteXAppView;
   diagnostics():RemoteXCoordinatorDiagnostics;
   getAudioState():RemoteXAudioSnapshot;
   logout():Promise<void>;
   dispose(options?:{logout?:boolean}):Promise<void>;
 }
+export interface RemoteXRecoverySnapshot {
+  state:'connecting'|'ready'|'recovering'|'attention'|'closed';reason:string|null;
+  displayReady:boolean;busy:boolean;revision:number;instanceId:string|null;generation:number|null;
+  recovery:{phase:string;reason?:string}|null;
+  features:{clipboard:{phase:string;active:boolean;effective?:{toRemote:NativeClipboardMode;toLocal:NativeClipboardMode};permissions?:{read:string;write:string}};audio:{connection:string};input:{provider:'kasm-native'}};
+  confirmation:{id:string;expiresAt:number;kind:'restart';scope:'runtime';mayDiscardUnsavedWork:true}|null;
+  actions:Array<{id:string;kind:'retry'|'refresh'|'recheck'|'reattach'|'restart'|'authenticate'|'help';scope:'viewer'|'runtime'|'login'|'operator'}>;
+}
+/** Stable window binding; construction/settled are not App readiness receipts. */
+export class RemoteXAppView extends EventTarget {
+  readonly session:RemoteXAppSession|null;readonly viewer:RemoteXAppNativeClient|null;readonly closed:boolean;
+  /** First attempt settled, possibly in attention. Check state and displayReady. */
+  readonly settled:Promise<RemoteXRecoverySnapshot>;
+  getState():RemoteXRecoverySnapshot;
+  run(actionId:string):Promise<RemoteXRecoverySnapshot>;
+  confirm(confirmationId:string):Promise<RemoteXRecoverySnapshot>;
+  cancelConfirmation():void;
+  release():Promise<void>;
+}
 export class RemoteXAppSession extends EventTarget {
   readonly id:string;readonly generation:number;readonly instance:Readonly<RemoteXAppInstance>;
   readonly state:'active'|'invalidated'|'released';readonly handle:RemoteXRuntimeHandle;
-  attach(container:HTMLElement,options?:Omit<RemoteXNativeViewerOptions,'container'|'manager'|'runtime'>):Promise<RemoteXAppNativeClient>;
+  attach(container:HTMLElement,options?:Omit<RemoteXNativeViewerOptions,'container'|'manager'|'runtime'> & {signal?:AbortSignal}):Promise<RemoteXAppNativeClient>;
   setKeepAlive(enabled:boolean):void;
   actions(options?:{signal?:AbortSignal}):Promise<RemoteXActions>;
   invoke(action:string,parameters?:Record<string,unknown>,options?:{signal?:AbortSignal}):Promise<RemoteXActionResult>;

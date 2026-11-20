@@ -492,3 +492,15 @@ The current measured order and completion state is:
     local scaling during a burst, final-size convergence, immediate reconnect,
     input correctness, and cleanup. Port-1991 deployment E2E also passed;
     native-IME and resize-appearance UAT were accepted on 2026-08-29.
+
+
+## Native Viewer retirement observation, 2026-11-20
+
+[P18](../tests/performance/native-viewer-retirement/README.md) adds a separate
+browser baseline for the opt-in native provider. The original component retained
+300 DOM nodes and 240 listeners after twenty releases. The repaired immutable
+component, qualified with Core source `89697ec59743`, retained 97 nodes and 26
+listeners at warm-up, twenty and forty cycles. Collected JS heap was 1.732,
+2.318 and 2.376 MiB; these are short diagnostic samples, not a long-term leak
+slope or process-memory guarantee. One explicit background owner was held until
+final logout. This does not replace the historical TigerVNC server baseline.

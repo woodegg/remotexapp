@@ -1,5 +1,12 @@
 # Core 0.16.0 / SDK 0.31.0
 
+**This page describes the published 0.16.0 baseline.** Start a 0.15 → 0.16
+host adaptation with the [migration guide](native-host-migration.md#choose-the-exact-migration-target).
+The recovery panel and launch-intent replay protection belong to the Core
+0.16.1 / SDK 0.32.0 target described in the migration guide. That target uses
+a matching Core and a new immutable native component. The guide links to its
+development evidence and explains how to verify the exact release.
+
 This release adds the native host/session SDK, reference workbench, opt-in
 session audio, consented rich clipboard and optional IPv4 screen UDP. The
 default TigerVNC/noVNC provider and App Package ABI remain unchanged.

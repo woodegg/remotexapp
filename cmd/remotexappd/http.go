@@ -39,6 +39,7 @@ func (m *manager) handler() http.Handler {
 	mux.HandleFunc("/sdk/console.html", m.serveConsolePage)
 	mux.HandleFunc("/sdk/minimal.html", m.serveConsolePage)
 	mux.HandleFunc("/sdk/host.html", m.serveHostPage)
+	mux.HandleFunc("/sdk/recovery.html", m.serveHostPage)
 	mux.Handle("/sdk/", m.serveSDKFiles(http.StripPrefix("/sdk/", http.FileServer(http.FS(sdkRoot)))))
 	return m.secure(mux)
 }
@@ -146,7 +147,7 @@ func (m *manager) serveConsolePage(w http.ResponseWriter, r *http.Request) {
 
 func (m *manager) serveSDKFiles(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/sdk/host-workbench") {
+		if strings.HasPrefix(r.URL.Path, "/sdk/host-workbench") || r.URL.Path == "/sdk/host-recovery.mjs" {
 			w.Header().Set("Cache-Control", "no-cache")
 		}
 		next.ServeHTTP(w, r)
@@ -162,7 +163,11 @@ func (m *manager) serveHostPage(w http.ResponseWriter, r *http.Request) {
 		methodNotAllowed(w, "GET, HEAD")
 		return
 	}
-	page, err := sdkFiles.ReadFile("web/sdk/host.html")
+	name := "web/sdk/host.html"
+	if r.URL.Path == "/sdk/recovery.html" {
+		name = "web/sdk/recovery.html"
+	}
+	page, err := sdkFiles.ReadFile(name)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "host workbench unavailable")
 		return
@@ -239,8 +244,12 @@ func (m *manager) serveInstances(w http.ResponseWriter, r *http.Request) {
 			writeError(w, http.StatusBadRequest, "invalid JSON: "+err.Error())
 			return
 		}
-		item, err := m.create(request)
+		item, err := m.createWithLaunchIntent(request, grantIdentity(r))
 		if err != nil {
+			if intentError, ok := err.(*launchIntentError); ok {
+				writeJSON(w, intentError.status, map[string]string{"error": intentError.Error(), "code": intentError.code})
+				return
+			}
 			writeError(w, http.StatusConflict, err.Error())
 			return
 		}

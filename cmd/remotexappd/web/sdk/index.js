@@ -1,4 +1,4 @@
-export const SDK_VERSION = '0.31.1';
+export const SDK_VERSION = '0.32.0';
 export { RemoteXAppAPIError, RemoteXAppManager } from './remotexapp-manager.js';
 export { RemoteXAppCoordinator } from './remotexapp-coordinator.js';
 export { RemoteXAppClient } from './remotexapp-client.js';
@@ -8,3 +8,4 @@ export { RemoteXAppClipboard, RemoteXAppClipboardPrompts } from './remotexapp-cl
 
 export { RemoteXAppAudio } from './remotexapp-audio.js';
 export { RemoteXAppHost, RemoteXAppSession } from './remotexapp-host.js';
+export { RemoteXAppView } from './native-recovery-view.js';

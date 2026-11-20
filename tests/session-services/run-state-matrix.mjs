@@ -420,7 +420,9 @@ async function interruptedUpgrade(id, boundary, revision) {
       const match = line.match(/^\s*(\d+)\s+(\d+)\s+(.*)$/);
       if (!match || !ownedParents.has(Number(match[1])) || Number(match[1]) === child.pid) continue;
       const pid = Number(match[1]);
-      const b = await readFile(`/proc/${pid}/stat`, 'utf8');
+      let b;
+      try { b = await readFile(`/proc/${pid}/stat`, 'utf8'); }
+      catch (error) { if (error.code === 'ENOENT') continue; throw error; }
       shutdownChildren.push({pid, startTime: b.slice(b.lastIndexOf(')') + 1).trim().split(/\s+/)[19]});
     }
     assert(shutdownChildren.length, 'shutdown barrier process not observed');

@@ -777,6 +777,8 @@ func TestBuiltInWebSurfacesCanBeDisabledIndependently(t *testing.T) {
 			}
 			for path, want := range map[string]int{
 				"/":                                test.rootStatus,
+				"/sdk/host.html":                   test.rootStatus,
+				"/sdk/recovery.html":               test.rootStatus,
 				"/remotexapps/test-123/kiosk.html": test.kioskStatus,
 			} {
 				response := httptest.NewRecorder()

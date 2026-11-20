@@ -7,6 +7,32 @@
 
 ## Native host workflow integration
 
+### Recovery experience extension — selected 2026-11-20
+
+Issue [#70](https://github.com/woodegg/remotexapp/issues/70) tracks the
+[design](native-recovery-experience.md) and
+[fault qualification](../tests/kasm-native/RECOVERY-EXPERIENCE.md).
+The owner selected simpler client integration and comprehensive fault injection.
+Core 0.16.1 and SDK 0.32.0 carry the extension with a new immutable native
+component. [Bounded local development qualification](../tests/kasm-native/RECOVERY-EXPERIENCE-20261120.md)
+records the tested development pair. The release qualification binds acceptance
+to the exact archive. NHI-003/007/010 retain their
+accepted safety semantics and gain these presentation/adaptation requirements.
+
+| ID | Contract | Required evidence |
+| --- | --- | --- |
+| REX-001 | Give native hosts a stable high-level view binding, default recovery panel and one content-free state/action model. Existing low-level attach readiness/ownership remains unchanged. | Initial failure, readiness/paint, default/custom UI parity and minimal host integration |
+| REX-002 | Reuse bounded SDK reconnect and host observation; no duplicate retry loops, hidden leases, implicit activation/restart or uncertain input/action replay. | Exhaustion, cancellation, chained faults, hidden windows and resource bounds |
+| REX-003 | Offer only current scoped actions; refresh/recheck acceptance is not successful repair. Manager owns authoritative permission, generation, ownership and lifecycle admission. | Stale/duplicate/concurrent actions, failed targets, auth/stop/veto/cooldown negatives |
+| REX-004 | Disruptive restart needs single-use, expiring, exact-target confirmation and fresh admission. No force escalation; ambiguous responses are not replayed. | Confirmation cancel/expiry, multi-Tab race, veto and lost-response injection |
+| REX-005 | Replacement binding is explicit or follows this view's verified confirmed restart. Retire old handles/input/consent/audio authority; never guess a target or change pins implicitly. | Changed-generation/identity tests, real reattach/readback and permission/isolation gates |
+| REX-006 | Native unsupported IBus and intentionally disabled features are not faults. Expose truthful partial degradation without claiming unavailable component hot repair. | Provider capability matrix; legacy helper/bus/gateway preservation versus repair |
+| REX-007 | Validate through the SDK and reference UAT/Console before downstream host work. Fault results distinguish automatic recovery, explicit repair, protection and untested scope. | Full fault matrix with exact artifact, real frame/input/data, independent runtime and cleanup evidence; one later consolidated human UAT |
+| REX-008 | Suppress browser transport replays of keyed launches with an identity-scoped disk reservation before side effects; bounded retention/capacity, fail closed on storage failure, explicit uncertainty on duplicate. | Lost response headers, one SDK call versus multiple HTTP attempts, Manager restart, concurrent duplicates, identity isolation, capacity/storage/expiry negatives |
+| REX-009 | Retiring a native Viewer closes its component-owned window channels and releases detached display/input DOM without affecting sibling Viewers. SDK owner counts alone do not qualify cleanup. | Applied lifecycle baseline failure, heap-retainer analysis, repeated browser mount/release DOM/listener assertions and sibling-channel preservation; new immutable component identity |
+
+### Accepted native host baseline
+
 On 2026-11-03 the owner authorized implementation through a complete UAT
 handoff in [Issue #57](https://github.com/woodegg/remotexapp/issues/57).
 [NHI-001–010](native-host-integration.md#stable-requirements) define the native

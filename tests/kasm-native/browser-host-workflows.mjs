@@ -14,6 +14,10 @@ async function ready(count){await wait(async()=>{const s=await state();return s.
 const path='/home/rxhost/documents/host-'+Date.now()+'.txt';
 remote(['runuser','-u',config.user,'--','python3','-c','from pathlib import Path;import sys;Path(sys.argv[1]).write_text("")',path]);
 try {
+  // Exercise desktop controls before the explicit mobile layout check below.
+  // Headless Chrome's default width selects the compact layout, which hides
+  // the ownership panel and its background-task release button.
+  await b.call('Emulation.setDeviceMetricsOverride',{width:1600,height:1000,deviceScaleFactor:1,mobile:false});
   await wait(()=>b.evaluate("document.querySelector('#template')?.options.length===8"));
   assert.deepEqual((await api('/api/templates')).map(t=>t.id).sort(),['edge','firefox-esr','kate','kwrite','libreoffice','lightview','mousepad','xfce-user-desktop']);
   await b.evaluate(`document.querySelector('#template').value='mousepad';document.querySelector('#template').dispatchEvent(new Event('change'));document.querySelector('[data-parameter=filePath]').value=${JSON.stringify(path)}`);

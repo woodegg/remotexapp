@@ -5,6 +5,12 @@ systemd user services, X11/TigerVNC, D-Bus/IBus, all selected real applications,
 Node 22 and passwordless sudo to create a locked temporary account. Never run
 them on a production gateway. Do not point them at an existing Manager.
 
+The [2026-11-20 local E2E record](LOCAL-E2E-20261120.md) binds the deployed
+artifact and completed checks. The [fault/recovery matrix](FAULT-RECOVERY-MATRIX.md)
+separates automatic recovery, safe degraded operation, manual recovery and
+unverified faults; a process surviving is not proof that its failed service
+recovered.
+
 ## Seven-App state matrix
 
 ```sh

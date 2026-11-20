@@ -17,7 +17,20 @@ export async function page(browser,url) {
  let next=0;const pending=new Map(),errors=[];
  ws.onmessage=({data})=>{const m=JSON.parse(data);if(m.id){const p=pending.get(m.id);if(!p)return;pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(Error(m.error.message)):p.resolve(m.result);}else if(m.method==='Runtime.exceptionThrown')errors.push(m.params.exceptionDetails.exception?.description||m.params.exceptionDetails.text);};
  const call=(method,params={})=>new Promise((resolve,reject)=>{const id=++next;const timer=setTimeout(()=>{pending.delete(id);reject(Error(method+' timed out'));},30000);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params}));});
- const evaluate=async(expression,userGesture=false)=>{const result=await call('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true,replMode:true,userGesture});if(result.exceptionDetails)throw Error(result.exceptionDetails.exception?.description||result.exceptionDetails.text);return result.result.value;};
+ const evaluate=async(expression,userGesture=false)=>{
+  // REPL mode permits the top-level await used by audio scenarios, but Chrome
+  // can return an unawaited Promise for an async expression in that mode.
+  // Keep its remote handle until it has settled, then serialize its value.
+  let result=await call('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:false,replMode:true,userGesture});
+  const objectId=result.result?.objectId;
+  try {
+   if(result.exceptionDetails)throw Error(result.exceptionDetails.exception?.description||result.exceptionDetails.text);
+   if(objectId)result=await call(result.result.subtype==='promise'?'Runtime.awaitPromise':'Runtime.callFunctionOn',
+    result.result.subtype==='promise'?{promiseObjectId:objectId,returnByValue:true}:{objectId,functionDeclaration:'function(){return this;}',returnByValue:true});
+   if(result.exceptionDetails)throw Error(result.exceptionDetails.exception?.description||result.exceptionDetails.text);
+   return result.result.value;
+  } finally {if(objectId)await call('Runtime.releaseObject',{objectId});}
+ };
  await call('Runtime.enable');await call('Page.enable');
  await until(()=>evaluate('document.readyState === "complete" && location.href === '+JSON.stringify(new URL(url).href)));
  return {target,call,evaluate,errors,async close(){ws.close();await fetch(browser.base+'/json/close/'+target.id);}};

@@ -608,10 +608,20 @@ async function shutdownOutcomes(app, originalBus) {
     const restored = await api.getInstance(x.id);
     assert.equal(restored.shutdown.forceAt, blocked.shutdown.forceAt);
     assert.equal(restored.sessionGeneration, before.generation);
-    await wait(async () => (await api.getInstance(x.id)).state === 'stopped', 'host enforcement deadline lost', 15000);
+    // forceAt begins enforcement, not the end of systemd's separate stop
+    // timeout. Observe completion relative to the original persisted deadline
+    // and verify that host force, rather than a successful hook, stopped it.
+    const forceAt = Date.parse(blocked.shutdown.forceAt);
+    await wait(async () => (await api.getInstance(x.id)).state === 'stopped',
+      'host deadline enforcement did not finish bounded cleanup', Math.max(0, forceAt - Date.now()) + 15000);
+    const enforced = await api.getInstance(x.id);
+    assert.equal(enforced.shutdown?.forced, true, 'host force was not recorded');
+    assert.equal(enforced.shutdown.forceAt, blocked.shutdown.forceAt, 'force deadline changed during teardown');
+    const cleanupAfterDeadlineMs = Date.now() - forceAt;
+    assert(cleanupAfterDeadlineMs >= 0 && cleanupAfterDeadlineMs < 15000, 'forced cleanup outside its deadline budget');
     await cleaned(before);
     await probe(x.id, 'host-enforced-' + outcome, false);
-    await checkpoint('hook-' + outcome + '-services-preserved-Manager-crash-host-deadline-enforced');
+    await checkpoint('hook-' + outcome + '-services-preserved-Manager-crash-host-deadline-enforced', {cleanupAfterDeadlineMs});
   }
   assert.equal(await busID(), originalBus);
 }

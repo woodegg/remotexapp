@@ -1,0 +1,232 @@
+{
+  "schemaVersion": "remotexapp/evidence/v1",
+  "kind": "integration",
+  "runId": "pr66-local-e2e-20261120",
+  "commit": "c947fddf0cc94017c2f3bfc097ed77338026c781",
+  "startedAt": "2026-11-20T08:17:55.965136Z",
+  "completedAt": "2026-11-20T09:25:18.475245Z",
+  "result": "failed",
+  "interpretation": "Liveness correction and functional gates pass; broader automatic-recovery acceptance is blocked by the reproducible lease-outage defect. No release, merge or human acceptance inferred.",
+  "toolchain": {
+    "go": "go1.27.4",
+    "node": "22.22.3",
+    "chrome": "149.0.7827.102"
+  },
+  "environment": {
+    "kind": "local-disposable",
+    "name": "Ubuntu AMD64 systemd and standalone-runit; legacy and pinned native providers"
+  },
+  "artifact": {
+    "name": "remotexapp-0.16.0-linux-amd64.tar.gz",
+    "sha256": "6bd8fb69bbe7c0cc62d8b8a96065102b44a69fcbe84663d65bfb82ef2bd77e4d"
+  },
+  "nativeComponentManifestSHA256": "e3055aae24a0b325e22dee924d0b493b5a26c78799610da50d403668bd8e37b3",
+  "scenarios": [
+    {
+      "id": "legacy-exact-archive",
+      "result": "passed",
+      "suiteCount": 8
+    },
+    {
+      "id": "native-host",
+      "result": "passed",
+      "suiteCount": 8,
+      "checks": 44
+    },
+    {
+      "id": "deployed-legacy-viewer",
+      "result": "passed",
+      "checks": "real paint, Unicode/clipboard readback, Manager adoption and input-engine failure"
+    },
+    {
+      "id": "deployed-native-edge",
+      "result": "passed",
+      "checks": 19,
+      "servedAssetHashesVerified": 13
+    },
+    {
+      "id": "seven-app-state-fault-matrix",
+      "result": "passed",
+      "checkpoints": 375,
+      "modes": [
+        {
+          "mode": "borrowed-bus",
+          "checkpoints": 3,
+          "result": "passed",
+          "rawSHA256": "9ff7abe2d333979e09e7b02da2ef3723d1db5bf899dec73608c56200f398fede"
+        },
+        {
+          "mode": "interaction",
+          "checkpoints": 43,
+          "result": "passed",
+          "rawSHA256": "33de681d2057b83d77190184093583b6020cc52f93ff36cab817af2845630986"
+        },
+        {
+          "mode": "liveness-observation",
+          "checkpoints": 3,
+          "result": "passed",
+          "rawSHA256": "53f81bf5bbf3f327633f738a48079292ce720af770a62c07de2bc4b1595d4ac1"
+        },
+        {
+          "mode": "main",
+          "checkpoints": 240,
+          "result": "passed",
+          "rawSHA256": "67563818ff00f2bbb85341d366c77a1407e0df4733adebfbc34dc589316685e9"
+        },
+        {
+          "mode": "managed-transport",
+          "checkpoints": 6,
+          "result": "passed",
+          "rawSHA256": "0793af1523f308750bd4d44f362be6c47a7f650a064fd66b0bdef8461bbd8671"
+        },
+        {
+          "mode": "shutdown-outcomes",
+          "checkpoints": 28,
+          "result": "passed",
+          "rawSHA256": "9347ce87ab7c5c51f4c65ac4720b884dddaa58f9221e2a131cc16a59711f94f9"
+        },
+        {
+          "mode": "supervisor-preservation",
+          "checkpoints": 10,
+          "result": "passed",
+          "rawSHA256": "5e08e887fb97d5debf5e0d24873bcea44b644a4254ecddf28a88b2865c6dfc03"
+        },
+        {
+          "mode": "transport",
+          "checkpoints": 42,
+          "result": "passed",
+          "rawSHA256": "c6c77d6860db78b558afba19d029b14fa2d0d02bc8688cba631c6e27da433982"
+        }
+      ]
+    },
+    {
+      "id": "native-liveness-query-fault",
+      "result": "passed",
+      "checks": 2
+    },
+    {
+      "id": "native-local-udp",
+      "result": "passed",
+      "checks": 5,
+      "scope": "loopback HTTP control, temporary local TEST-NET UDP proxy, not WAN/TLS"
+    },
+    {
+      "id": "native-browser-input",
+      "result": "passed",
+      "groups": 3,
+      "physicalOSIME": false
+    },
+    {
+      "id": "standalone-runit",
+      "result": "passed",
+      "checks": 3,
+      "scope": "Ubuntu AMD64, delegated cgroup, qualified native pair; not Alpine"
+    },
+    {
+      "id": "cdp-evaluation-regression",
+      "result": "passed"
+    },
+    {
+      "id": "private-pulse-browser-audio",
+      "result": "passed",
+      "checks": 36,
+      "physicalDevices": false
+    },
+    {
+      "id": "automatic-manager-crash-recovery",
+      "result": "passed",
+      "recoveryMs": 4808
+    },
+    {
+      "id": "automatic-short-frontend-outage-recovery",
+      "result": "passed",
+      "outageMs": 3000,
+      "recoveryAfterReturnMs": 5304
+    },
+    {
+      "id": "automatic-lease-network-outage-recovery",
+      "result": "failed",
+      "observedCode": "grant-expired",
+      "networkRestored": true,
+      "authenticatedBrowserAPIStatus": 200,
+      "generationUnchanged": true,
+      "servicesUnchanged": true,
+      "issue": 68
+    },
+    {
+      "id": "final-cleanup-and-protected-display",
+      "result": "passed"
+    }
+  ],
+  "harness": {
+    "testOnlyCommits": [
+      "1a7de067a4bd2a793b6379d10946be714217e628",
+      "199574f6d231b72e3ccd9427a13ff9b004844560"
+    ],
+    "finalSourceSHA256": {
+      "tests/session-services/run-state-matrix.mjs": "3cb0a62df051c622239b37a6325eeabc38d607aa148034c4dea4c8fb350b9578",
+      "tests/session-services/run-state-matrix.sh": "51d8855dc5978536ed15677f9249677d21f8150393dd06995516774fc2ee6ea8",
+      "tests/kasm-native/host-browser.mjs": "d39c9a1ce1bc4a9035c01e0d2ddffc6f198e9bdeb5949c578aafc2faeba2c80f",
+      "tests/kasm-native/browser-host-workflows.mjs": "1c51eb2cf2a9eb38f9a5ba57f2e8d3b39716d0a8d9e3154ba235f9e208fc5ead",
+      "tests/kasm-native/browser-host-faults.mjs": "466a244b587ef819a8839b80978bbc32d64760aada61ded8d2779d496b83b360",
+      "tests/native-audio/browser-cdp.mjs": "d2ee9a2222cc337d84254ca2a9e7e46a0684d0a2a15355e26d1687ce445cb50a",
+      "tests/native-audio/browser-cdp-check.mjs": "a91433dbe5349f95074949baa4492a27539f936ec9e82f1cad34eec8fb39dc2c"
+    },
+    "note": "Product archive remains c947fddf; later commits change harnesses/evidence only. Main and extended modes used their recorded script revisions; final source hashes do not retroactively identify earlier executions."
+  },
+  "rawEvidenceSHA256": {
+    "legacy-e2e-progress.json": "63275b17c6f6adf56bf91681ad97bf5c0801a34d7b03c1b5e8622fa015d319e3",
+    "legacy-exact-archive.log": "a824962da74ef7c92924bcb236ba2a2aa770293dd0e61b5d6e79a3ca97e2e36a",
+    "native-e2e-progress.json": "4ee2b585822c2b5f510ec9799516244b5739c68df6f0f108d132f2506e1fc4ff",
+    "deployed-native-result.json": "b4defae80a502613d6b2f8c726210ed0fa4df4fc45cc3b57755ef6ca6c608394",
+    "native-liveness-result.json": "9d01dc072b842b2a0716679d35237406177d9ee3925b2c92faf64045483280ee",
+    "native-udp-result.json": "0b7c7ebb1fad5b75a1dc7e378145894bcfb59267b036f2ea4505387131330aff",
+    "native-input-result.json": "d8ca29d940b6a1df997112425d7e5d60711032afa353b9750a13d1090f8bda04",
+    "standalone-result.json": "b91775621eee1181fd5f6332c9b4de1d7c2ead1b9c2ed59c4795e0fa23be11b1",
+    "audio-browser-result.json": "dea4c5f05f7917832fbd9d848557735c7a542418954bfabbd117cfd6b019d20f",
+    "audio-browser-evidence/results.json": "8c38a13ff1cb0e53fd0de65b83bc1d81de13e52896a5a16a30c4bddf1785ab24",
+    "fault-manager-crash.json": "ee7f819830a754524cee850d2a61467dcab8eaef450e025ae792296a079b9d22",
+    "fault-short-outage.json": "1f99a61b4c114bafbeec024231fca4c1ee1512f2966eee0fe899e017250cc6f6",
+    "fault-lease-outage.json": "727e12d75a48bb817d6365d7a094bdcdaf20a8fd22d6d2ee161c3988735a1c67",
+    "matrix-main-retry-progress.json": "1b1e93791bd7caec85c947a0fb6fd1a8483ddef4f39e05f300d89e2a18f85f93",
+    "matrix-extended-retry-progress.json": "43bdfcdad66e507d08ae8255b2d023404586ab689c261fce6807553cef65e0d3",
+    "final-local-check.json": "8859d65dd94dcc426a98a3c24e7d115a82908a251bed25559449c631e494acd4",
+    "fixture-final-cleanup.json": "2414c1b5bc5ddf215e44bbc0a13be12e908f2f131a03daf0f514911b5839f3a0",
+    "matrix-cleanup-legacy.json": "f3bb3cf770457b4760ee2ad03e598b9c2d0a9f43d57606ab9f4a9fa4558689e0",
+    "matrix-cleanup-native.json": "4b4057b894af6cd93fa90e88a437d2146d167a719e92acfdb2a826c4bb5830e4",
+    "udp-cleanup.json": "90329ffec9fbe72a0d2567d332298aee8f6e9bd823c47688ae51b0960c39c015",
+    "make-check-final.log": "21ff465090ee4e0e813b74cc30ab3cfed75fca7ab9ad2e17c7ad8d839d6fd056",
+    "cdp-helper-regression.log": "ca1c2f5abdc64d2aac04dd6418356f2ec6a4c98a953e454fc4ea29b30658235d"
+  },
+  "cleanup": {
+    "testAccountsProcessesHomesAbsent": true,
+    "ownedBrowsersAndLoopbackConnectorsClosed": true,
+    "temporaryUDPAddressProxiesAndOverrideRemoved": true,
+    "twoFaultContainersStopped": true,
+    "regularLocalTestServicesRemainRunning": true,
+    "protectedOriginalManagerAndDisplayIdentitiesUnchanged": true
+  },
+  "knownManualRecovery": [
+    "IBus or Unicode-helper loss",
+    "borrowed account-bus outage",
+    "live App with failed gateway"
+  ],
+  "notQualified": [
+    "complete automatic self-recovery until issue 68 is fixed",
+    "physical OS IMEs and speaker/microphone quality",
+    "public Cloudflare/TLS/WAN/NAT paths",
+    "fresh Alpine and ARM64 qualification",
+    "new long-duration soak",
+    "live disk-full/read-only filesystem, cgroup OOM/starvation and sustained packet-loss/MTU faults"
+  ],
+  "retainedFailedAttempts": [
+    "legacy log capture loss rerun with pipes",
+    "hidden desktop controls in compact viewport",
+    "managed App readiness precondition",
+    "old supervisor-loss expectation contradicted user-home ExitType=cgroup",
+    "shutdown deadline versus component cleanup budget",
+    "Chrome REPL async Promise not awaited",
+    "pre-release standalone component rejected required grant",
+    "native lease outage reproduced and remains failed"
+  ]
+}

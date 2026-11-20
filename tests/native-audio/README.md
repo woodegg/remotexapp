@@ -52,6 +52,12 @@ fencing, runtime compatibility, shutdown, and the edge cookie boundary.
 `REMOTEXAPP_TEST_AUDIO_LIVE=1 go test ./internal/sessionaudio` also exercises
 real private Pulse recovery. SDK coordinator/worklet tests run with `make check`.
 
+Before changing the shared CDP helper, run
+`node tests/native-audio/browser-cdp-check.mjs` against the local Chrome. It
+checks both top-level await and async expression settlement, error propagation
+and value serialization. Chrome REPL mode can otherwise serialize a pending
+Promise as `{}` and let a scenario run before its setup finishes.
+
 For browser verification, start the test-only fixture in one terminal:
 
 ```sh

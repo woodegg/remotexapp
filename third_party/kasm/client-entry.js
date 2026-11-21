@@ -18,6 +18,7 @@ export default class NativeDisplay extends EventTarget {
   #clipboardInput;
   #nativeInput;
   #allowResize;
+  #firstFrameTimer;
   constructor(container, url, { resize = false, scale = true, readOnly = false, keyboardPolicy, clipboard = false, udp = false, turnServers = null, protocols = [], prepareClipboardPaste } = {}) {
     super();
     if (keyboardPolicy) normalizePolicy(keyboardPolicy);
@@ -83,10 +84,25 @@ export default class NativeDisplay extends EventTarget {
     for (const event of ['connect', 'frame', 'disconnect']) {
       rfb.addEventListener(event, () => {
         if (this.#rfb !== rfb) return;
-        if (event === 'frame') this.#renderedFrames++;
+        if (event === 'connect') this.#scheduleInitialRefresh(rfb, 3);
+        else {
+          if (event === 'frame') this.#renderedFrames++;
+          clearTimeout(this.#firstFrameTimer);
+        }
         this.dispatchEvent(new Event(event));
       });
     }
+  }
+
+  #scheduleInitialRefresh(rfb, attempts) {
+    if (this.#renderedFrames) return;
+    // An idle shared display can complete RFB setup without drawing its
+    // first rectangle. Request a bounded refresh while this Viewer owns it.
+    this.#firstFrameTimer = setTimeout(() => {
+      if (this.#rfb !== rfb || !rfb.isConnected || this.#renderedFrames) return;
+      rfb._requestFullRefresh();
+      if (attempts > 1) this.#scheduleInitialRefresh(rfb, attempts - 1);
+    }, 1000);
   }
 
   getStats() {
@@ -144,6 +160,7 @@ export default class NativeDisplay extends EventTarget {
     RFB.messages.sendBinaryClipboard(rfb._sock, payload.items.map(item => item.data), payload.items.map(item => item.type));
   }
   disconnect() {
+    clearTimeout(this.#firstFrameTimer);
     this.#clipboardInput.cancel();
     this.#latency.dispose();
     this.#rfb?.disconnect();

@@ -4,12 +4,16 @@ import {readFileSync} from 'node:fs';
 import {LatencyProbe} from '../latency.mjs';
 import {ClipboardInputGate} from '../clipboard-input.mjs';
 
-test('adapter passes the one-use grant through RFB WebSocket options, not video codecs',async()=>{
+test('adapter passes the one-use grant through RFB WebSocket options, not video codecs',async t=>{
   const originalDocument=globalThis.document;
   const calls=[], clipboardCalls=[];
+  t.mock.timers.enable({apis:['setTimeout']});
   globalThis.__adapterRFB=class extends EventTarget {
     static messages={sendBinaryClipboard:(_,data,mimes)=>clipboardCalls.push({data,mimes})};
-    constructor(target,input,url,options,videoCodecs){super();calls.push({url,options,videoCodecs});this._keyboard={};this._rfbConnectionState='connected';}
+    constructor(target,input,url,options,videoCodecs){super();calls.push({url,options,videoCodecs,rfb:this});this._keyboard={};this._rfbConnectionState='connected';}
+    isConnected=true;
+    refreshes=0;
+    _requestFullRefresh(){this.refreshes++;}
     disconnect(){}
   };
   globalThis.document={createElement:()=>({setAttribute(){},addEventListener(){},style:{},remove(){}})};
@@ -33,9 +37,26 @@ test('adapter passes the one-use grant through RFB WebSocket options, not video 
     assert.deepEqual(clipboardCalls[0].mimes,['text/plain','text/html']);
     assert.throws(()=>rich.sendClipboard([{type:'text/rtf',data:Uint8Array.of(97)}]));
     assert.throws(()=>rich.sendClipboardText('x'.repeat(2097153)));
+    const rfb=calls[0].rfb;
+    rfb.dispatchEvent(new Event('connect'));
+    t.mock.timers.tick(1000);
+    assert.equal(rfb.refreshes,1);
+    rfb.dispatchEvent(new Event('frame'));
+    t.mock.timers.tick(4000);
+    assert.equal(rfb.refreshes,1);
     assert.equal(clipboardCalls.length,1);rich.disconnect();
     assert.throws(()=>rich.sendClipboardText('retired'));
-    new Display(container,'wss://example.test/native').disconnect();
+    const noFrame=new Display(container,'wss://example.test/native');
+    const silent=calls[1].rfb;
+    silent.dispatchEvent(new Event('connect'));
+    for(let i=0;i<5;i++)t.mock.timers.tick(1000);
+    assert.equal(silent.refreshes,3);
+    noFrame.disconnect();
+    const cancelled=new Display(container,'wss://example.test/native');
+    calls[2].rfb.dispatchEvent(new Event('connect'));
+    cancelled.disconnect();
+    t.mock.timers.tick(4000);
+    assert.equal(calls[2].rfb.refreshes,0);
     assert.deepEqual(calls[0].options.wsProtocols,['remotexapp-grant.'+'a'.repeat(64)]);
     assert.deepEqual(calls[0].videoCodecs,[]);
     assert.deepEqual(calls[1].options.wsProtocols,['binary']);

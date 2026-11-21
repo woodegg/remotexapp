@@ -231,6 +231,9 @@ XFixes/offer 桥造成回弹。第一阶段只承诺候选实际验证的 text/H
 
 ## 7. UDP 与地址隐私 / UDP and address privacy
 
+本节记录原先的受限 UDP 设计。新部署的三种模式和自动分配规则见
+[WebRTC 传输模式](native-webrtc-routing.md)。
+
 ### 7.1 数据流及实际模式
 
 ```text

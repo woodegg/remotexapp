@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const source=process.env.KASM_SERVER_SOURCE;
-test('applied UDP socket is exclusive and loopback-only', {skip:!source || process.env.KASM_TRANSPORT!=='udp'},()=>{
+test('applied UDP socket is exclusive and bound to the selected interface', {skip:!source || process.env.KASM_TRANSPORT!=='udp'},()=>{
   const work=mkdtempSync(join(tmpdir(),'kasm-udp-socket-'));
   try {
     const binary=join(work,'socket-test');

@@ -45,13 +45,18 @@ The paired Viewer uses relay-only ICE for TURN, retains sanitized WSS signaling,
 and falls back to WSS when credentials, negotiations or UDP traffic fail.
 Renewal keeps credentials fresh for subsequent negotiations. Existing
 `transport: "webrtc-udp"` remains stable. Optional `webRTCPath` identifies
-`direct` or `turn` once UDP rectangles have painted.
+`direct` or `turn` once UDP rectangles have painted. The paired adapter requests up to three
+initial full refreshes when an idle shared display has completed RFB setup
+and has yet to paint. A ready Viewer still requires a real frame.
 
 ## Migration and rollback
 
 Retire runtimes using the previous manually configured UDP slots before
-running this version. Remove the `-udp-endpoints` flag and configure the
-desired mode and range. New routed leases use manifest schema 7.
+running this version. Capture the configuration of any managed registration that
+pins a legacy slot, then unregister it without purging its profile. Register
+it again under the new mode after the Manager starts. Remove the
+`-udp-endpoints` flag and configure the desired mode and range. New routed
+leases use manifest schema 7.
 Before rolling back to a pre-schema-7 Manager, orderly retire routed
 runtimes and verify cleanup. A transport mode change takes effect for newly
 created runtimes. Review endpoint reachability, selected ICE candidate,

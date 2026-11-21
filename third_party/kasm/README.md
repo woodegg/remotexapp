@@ -33,6 +33,13 @@ and listeners even after the SDK released all handles. The repeated-window
 actual browser DOM/listener counts after collection. Existing component pins
 remain immutable; this fix needs a newly built and selected component.
 
+Patch 0026 scopes mouse capture to its active canvas within a document.
+Viewers keep independent runtime module URLs and use the same document
+capture state. Capture is established before the input queue can defer
+delivery. Disconnect releases only the retiring canvas's capture. The
+fixed browser client ships in a new component manifest with the same
+server protocol and SDK surface.
+
 Source inputs:
 
 | Input | Immutable source |

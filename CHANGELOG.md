@@ -11,6 +11,13 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+Target: `0.17.1`. SDK `0.33.0`.
+
+- Fix native Kasm mouse capture when one page embeds Viewers for different
+  runtimes. Drag events stay with their capture owner, and a retiring Viewer
+  removes its capture resources. Select a new immutable Kasm component and
+  upgrade or recreate affected runtimes to use the fix ([#83](https://github.com/woodegg/remotexapp/issues/83)).
+
 ## 0.17.0
 
 Target: `0.17.0`. SDK `0.33.0`.

@@ -5501,3 +5501,20 @@ Kasm schema-5 and schema-6 snapshots whose previous Manager wrote
 sessions on WSS with their existing component and generation. Legacy
 configured UDP leases still require the
 [stopped-runtime migration](native-webrtc-routing.md#migration-and-rollback).
+
+## 2026-11-21 — Scope native mouse capture to its owning canvas
+
+[Issue #83](https://github.com/woodegg/remotexapp/issues/83) extends REX-009.
+Runtime-qualified module URLs preserve authorization and component pins.
+They can also evaluate the same Kasm client more than once in a document.
+The old component used one document capture target and overlay with separate
+module listeners and observers. The first module could therefore clear
+another module's target and leave callbacks holding stale state.
+
+Patch 0026 gives each document one active capture, tied to the canvas that
+started the gesture. Loading another module leaves that capture active.
+The browser captures the gesture before queuing RFB input. The last button
+release or owner disconnect retires the listener, observer and overlay.
+A sibling Viewer cannot release that ownership. The cursor uses the same
+owner when deciding where its fallback image belongs. Existing runtimes
+need a new immutable Kasm component through the normal rollout.

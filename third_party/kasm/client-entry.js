@@ -9,7 +9,7 @@ import { NativeInput } from './core/remotexapp-native-input.mjs';
 import keysyms from './core/input/keysymdef.js';
 
 export default class NativeDisplay extends EventTarget {
-  static capabilities = Object.freeze({programmaticInput:true, displayControls:true, readOnly:true, keyboardPolicy:true, clipboardText:true, clipboardAutomatic:true, clipboardRich:true, clipboardMaxBytes:MAX_RICH_CLIPBOARD_BYTES, statistics:true, latency:true, udpLoss:true, udp:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP});
+  static capabilities = Object.freeze({programmaticInput:true, displayControls:true, readOnly:true, keyboardPolicy:true, clipboardText:true, clipboardAutomatic:true, clipboardRich:true, clipboardMaxBytes:MAX_RICH_CLIPBOARD_BYTES, statistics:true, latency:true, udpLoss:true, turn:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP, udp:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP});
   #rfb;
   #input;
   #renderedFrames = 0;
@@ -18,7 +18,7 @@ export default class NativeDisplay extends EventTarget {
   #clipboardInput;
   #nativeInput;
   #allowResize;
-  constructor(container, url, { resize = false, scale = true, readOnly = false, keyboardPolicy, clipboard = false, udp = false, protocols = [], prepareClipboardPaste } = {}) {
+  constructor(container, url, { resize = false, scale = true, readOnly = false, keyboardPolicy, clipboard = false, udp = false, turnServers = null, protocols = [], prepareClipboardPaste } = {}) {
     super();
     if (keyboardPolicy) normalizePolicy(keyboardPolicy);
     this.#input = document.createElement('textarea');
@@ -60,6 +60,7 @@ export default class NativeDisplay extends EventTarget {
       [2,XVNC_BUTTONS.RIGHT_BUTTON], [3,XVNC_BUTTONS.BACK_BUTTON], [4,XVNC_BUTTONS.FORWARD_BUTTON]]) {
       rfb.mouseButtonMapper.set(button, mapped);
     }
+    rfb._remoteXAppTurn = turnServers;
     rfb.enableWebRTC = !!udp && NativeDisplay.capabilities.udp;
     rfb.addEventListener('transportchange', () => {
       this.#udpPaintBaseline = this.#renderedFrames;
@@ -116,6 +117,10 @@ export default class NativeDisplay extends EventTarget {
     if (!this.#allowResize || !this.#rfb?.resizeSession || !this.#rfb.isConnected) return false;
     this.#rfb._requestRemoteResize();
     return true;
+  }
+
+  configureTurnServers(servers) {
+    if (this.#rfb?._remoteXAppTurn) this.#rfb._remoteXAppTurn = servers;
   }
 
   configureTransport(preferUDP) {

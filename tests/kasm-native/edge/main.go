@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -33,10 +34,11 @@ type asset struct {
 	data   []byte
 }
 type configuration struct {
-	Origin     string           `json:"origin"`
-	Backend    string           `json:"backend"`
-	Assets     map[string]asset `json:"assets"`
-	Components map[string]asset `json:"components"`
+	Origin     string             `json:"origin"`
+	Backend    string             `json:"backend"`
+	Assets     map[string]asset   `json:"assets"`
+	Components map[string]asset   `json:"components"`
+	TURN       *turnConfiguration `json:"turn,omitempty"`
 }
 
 var nativeRoute = regexp.MustCompile(`^/rx/remotexapps/[a-zA-Z0-9_-]+/(kiosk\.html|native/(client\.js|websockify|prepare|grant|lease|revoke))$`)
@@ -52,6 +54,11 @@ func loadConfig(name string) (configuration, error) {
 	d.DisallowUnknownFields()
 	if err = d.Decode(&c); err != nil {
 		return c, err
+	}
+	if c.TURN != nil {
+		if err := c.TURN.load(); err != nil {
+			return c, err
+		}
 	}
 	for _, assets := range []map[string]asset{c.Assets, c.Components} {
 		for key, a := range assets {
@@ -115,6 +122,12 @@ func edgeHandler(c configuration) (http.Handler, error) {
 		r.Header.Set("Content-Type", "application/json")
 		r.Header.Set("Cache-Control", "no-store")
 		r.Header.Set("X-Content-Type-Options", "nosniff")
+		if c.TURN != nil && r.StatusCode == http.StatusOK && r.Request != nil && r.Request.Method == http.MethodPost {
+			if match := nativeRoute.FindStringSubmatch(r.Request.URL.Path); match != nil && (match[2] == "grant" || match[2] == "lease") {
+				token, _ := r.Request.Context().Value(turnLeaseToken{}).(string)
+				return c.TURN.enrich(r, token)
+			}
+		}
 		return nil
 	}, ErrorHandler: func(w http.ResponseWriter, _ *http.Request, _ error) {
 		http.Error(w, "private backend unavailable", 502)
@@ -171,6 +184,22 @@ func edgeHandler(c configuration) (http.Handler, error) {
 		}
 		if r.URL.Path == "/fixture-config" || strings.HasPrefix(r.URL.Path, "/rx/api/") || (match != nil && (match[2] == "prepare" || match[2] == "grant" || match[2] == "lease" || match[2] == "revoke")) {
 			r.Body = http.MaxBytesReader(w, r.Body, 1024*1024)
+			if c.TURN != nil && match != nil && match[2] == "lease" && r.Method == http.MethodPost {
+				body, err := io.ReadAll(io.LimitReader(r.Body, 4097))
+				if err != nil || len(body) > 4096 {
+					http.Error(w, "invalid Viewer lease", http.StatusBadRequest)
+					return
+				}
+				var request struct {
+					Token string `json:"token"`
+				}
+				if err := json.Unmarshal(body, &request); err != nil || !digestPattern.MatchString(request.Token) {
+					http.Error(w, "invalid Viewer lease", http.StatusBadRequest)
+					return
+				}
+				r = r.WithContext(context.WithValue(r.Context(), turnLeaseToken{}, request.Token))
+				r.Body = io.NopCloser(bytes.NewReader(body))
+			}
 			proxy.ServeHTTP(w, r)
 			return
 		}

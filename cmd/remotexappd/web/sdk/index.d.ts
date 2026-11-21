@@ -144,7 +144,7 @@ export type RemoteXAppNativeStats = {
 } & ({available:false} | {
   available:true; receivedBytes:number; sentBytes:number; bufferedBytes:number;
   renderedFrames:number; width:number; height:number;
-  controlTransport?:'wss'|'ws-loopback'; udpReceivedBytes?:number;udpPackets?:number;udpRectangles?:number;udpState?:string;udpReason?:string|null;
+  controlTransport?:'wss'|'ws-loopback'; webRTCPath?:'direct'|'turn'; udpReceivedBytes?:number;udpPackets?:number;udpRectangles?:number;udpState?:string;udpReason?:string|null;
   latency?:{wss:NativeLatencySample;udp:NativeLatencySample};
   udpLoss?:{state:'waiting'|'ready'|'stale'|'inactive'|'unavailable';scope?:'display-blocks';windowMs?:10000;settleMs?:2000;receivedBlocks?:number;lostBlocks?:number;expectedBlocks?:number;ratio?:number;ageMs?:number};
 });

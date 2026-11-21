@@ -16,8 +16,7 @@ import (
 )
 
 type config struct {
-	udpEndpointsFile     string
-	udpEndpoints         []udpEndpoint
+	webRTC               webRTCConfig
 	nativeUDPCapable     bool
 	nativeClipboard      bool
 	nativeRichClipboard  bool

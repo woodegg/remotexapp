@@ -52,7 +52,7 @@ func (cfg *config) configureDisplayProvider() error {
 		return errors.New("display-provider must be tigervnc or kasm")
 	}
 	if cfg.displayProvider == "tigervnc" {
-		if cfg.kasmBundle != "" || cfg.nativeClipboard || cfg.nativeAudio || cfg.udpEndpointsFile != "" {
+		if cfg.kasmBundle != "" || cfg.nativeClipboard || cfg.nativeAudio || cfg.webRTC != (webRTCConfig{}) {
 			return errors.New("Kasm bundle, native clipboard, native audio and UDP configuration require display-provider=kasm")
 		}
 		return nil
@@ -78,7 +78,7 @@ func (cfg *config) configureDisplayProvider() error {
 	cfg.kasmPin = &bundle.Pin
 	cfg.nativeUDPCapable = kasmbundle.SupportsUDP(bundle.Manifest.Protocol)
 	cfg.nativeRichClipboard = kasmbundle.SupportsRichClipboard(bundle.Manifest.Protocol)
-	return cfg.loadUDPEndpoints()
+	return cfg.webRTC.validate(bundle.Manifest.Protocol)
 }
 
 func validateDisplayComponents(c runtimeComponents, verify bool) error {
@@ -94,7 +94,7 @@ func validateDisplayComponents(c runtimeComponents, verify bool) error {
 		if c.NativeAudio != "" && c.NativeAudio != sessionaudio.Protocol {
 			return errors.New("invalid native audio protocol")
 		}
-		if !validUDPLease(c.UDPEndpoint) || (!c.NativeUDP && (c.UDPEndpoint != nil || c.UDPUnavailableReason != "")) || (c.UDPEndpoint != nil && c.UDPUnavailableReason != "") || (c.UDPUnavailableReason != "" && c.UDPUnavailableReason != "endpoint-pool-full" && c.UDPUnavailableReason != "endpoints-not-configured") {
+		if !validUDPLease(c.UDPEndpoint) || (!c.NativeUDP && (c.UDPEndpoint != nil || c.UDPUnavailableReason != "")) || (c.UDPEndpoint != nil && c.UDPUnavailableReason != "") || (c.UDPUnavailableReason != "" && c.UDPUnavailableReason != "endpoint-pool-full") {
 			return errors.New("invalid native UDP snapshot")
 		}
 		if (c.NativeClipboard != "" && c.NativeClipboard != "text" && c.NativeClipboard != "rich-v1") || c.Kasm == nil || !kasmbundle.ValidDigest(c.Kasm.SHA256) || !filepath.IsAbs(c.Kasm.Directory) || filepath.Clean(c.Kasm.Directory) != c.Kasm.Directory || c.UnicodeEngine != "" {
@@ -104,6 +104,9 @@ func validateDisplayComponents(c runtimeComponents, verify bool) error {
 			bundle, err := kasmbundle.Load(c.Kasm.Directory, c.Kasm.SHA256)
 			if err != nil {
 				return fmt.Errorf("locked Kasm bundle: %w", err)
+			}
+			if c.UDPEndpoint != nil && bundle.Manifest.Protocol != kasmbundle.RoutedUDPProtocol {
+				return errors.New("routed UDP requires the pinned routed Kasm component")
 			}
 			if c.NativeUDP != kasmbundle.SupportsUDP(bundle.Manifest.Protocol) {
 				return errors.New("native UDP capability differs from pinned component")
@@ -149,6 +152,7 @@ func kasmLaunchArgs(item *instance, class classConfig, port int, authority strin
 			}
 		}
 		args = append(args, "-udpPort", strconv.Itoa(lease.Port))
+		args = append(args, "-udpBindAddress", lease.Bind)
 	}
 	return args
 }

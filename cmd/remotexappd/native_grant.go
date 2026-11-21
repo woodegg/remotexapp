@@ -98,8 +98,12 @@ func (m *manager) serveNativeGrant(w http.ResponseWriter, r *http.Request, item 
 		key, _ := grantKey(token)
 		m.nativeGrants[key] = &nativeGrant{principal: grantIdentity(r), runtime: item.ID, generation: req.SessionGeneration,
 			component: req.ComponentDigest, viewer: req.ViewerID, epoch: req.ConnectionEpoch, readOnly: req.ReadOnly, expires: now.Add(nativeGrantLifetime)}
+		response := map[string]any{"token": token, "expiresInMs": nativeGrantLifetime.Milliseconds(), "renewAfterMs": 20000}
+		if lease := current.Components.UDPEndpoint; lease != nil && lease.Mode == "turn" {
+			response["webRTCMode"] = "turn"
+		}
 		m.mu.Unlock()
-		writeJSON(w, http.StatusOK, map[string]any{"token": token, "expiresInMs": nativeGrantLifetime.Milliseconds(), "renewAfterMs": 20000})
+		writeJSON(w, http.StatusOK, response)
 		return
 	}
 	key, valid := grantKey(req.Token)
@@ -128,6 +132,10 @@ func (m *manager) serveNativeGrant(w http.ResponseWriter, r *http.Request, item 
 		g.expires = now.Add(nativeGrantLifetime)
 		m.scheduleNativeGrantLocked(key, g)
 	}
+	response := map[string]any{"status": "ok", "expiresInMs": nativeGrantLifetime.Milliseconds()}
+	if action == "lease" && current.Components.UDPEndpoint != nil && current.Components.UDPEndpoint.Mode == "turn" {
+		response["webRTCMode"] = "turn"
+	}
 	m.mu.Unlock()
 	if cancel != nil {
 		cancel()
@@ -135,7 +143,7 @@ func (m *manager) serveNativeGrant(w http.ResponseWriter, r *http.Request, item 
 	if closeBody != nil {
 		_ = closeBody.Close()
 	}
-	writeJSON(w, http.StatusOK, map[string]any{"status": "ok", "expiresInMs": nativeGrantLifetime.Milliseconds()})
+	writeJSON(w, http.StatusOK, response)
 }
 
 // The grant travels in an upgrade header, never a URL. The downstream native

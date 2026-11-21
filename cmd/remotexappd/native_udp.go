@@ -1,34 +1,26 @@
 package main
 
 import (
-	"bytes"
 	"crypto/rand"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
-	"fmt"
-	"io"
 	"net"
 	"net/netip"
-	"os"
 	"strconv"
+	"strings"
 
 	"github.com/woodegg/remotexapp/internal/kasmbundle"
 )
 
 const nativeUDPManifestSchema = 5
-
-// An administrator preconfigures matching non-NAT proxies. This catalog is
-// declarative input only: Manager has no host/network administration API.
-type udpEndpoint struct {
-	Slot    string `json:"slot"`
-	Address string `json:"advertisedAddress"`
-	Port    int    `json:"port"`
-}
+const routedUDPManifestSchema = 7
 
 type udpLease struct {
-	udpEndpoint
-	Epoch string `json:"epoch"`
+	Address string `json:"advertisedAddress"`
+	Port    int    `json:"port"`
+	Epoch   string `json:"epoch"`
+	Mode    string `json:"mode"`
+	Bind    string `json:"bind"`
 }
 
 type nativeTransportView struct {
@@ -36,53 +28,67 @@ type nativeTransportView struct {
 	Available     bool   `json:"available"`
 	Reason        string `json:"reason,omitempty"`
 	GrantRequired bool   `json:"grantRequired"`
+	Mode          string `json:"mode,omitempty"`
 	ReadOnly      bool   `json:"readOnly"`
 }
 
-func validUDPEndpoint(e udpEndpoint) bool {
-	ip, err := netip.ParseAddr(e.Address)
-	return err == nil && ip.Is4() && ip.IsGlobalUnicast() && !ip.IsPrivate() &&
-		!ip.IsLoopback() && e.Address == ip.String() && safeRef.MatchString(e.Slot) && e.Port >= 1024 && e.Port <= 65535
+type webRTCConfig struct {
+	mode, bind, address, ports string
+	firstPort, lastPort        int
 }
 
-func (cfg *config) loadUDPEndpoints() error {
-	if cfg.udpEndpointsFile == "" {
+func specificIPv4(address string) bool {
+	ip, err := netip.ParseAddr(address)
+	return err == nil && ip.Is4() && (ip.IsGlobalUnicast() || ip.IsLoopback())
+}
+
+func (c *webRTCConfig) validate(protocol string) error {
+	if c.mode == "" || c.mode == "off" {
+		if c.bind != "" || c.address != "" || c.ports != "" {
+			return errors.New("WebRTC listener settings require direct or turn mode")
+		}
 		return nil
 	}
-	if !cfg.nativeUDPCapable {
-		return errors.New("udp-endpoints requires the pinned UDP-capable Kasm component")
+	if c.mode != "direct" && c.mode != "turn" {
+		return errors.New("webrtc-mode must be off, direct or turn")
 	}
-	f, err := os.Open(cfg.udpEndpointsFile)
-	if err != nil {
-		return err
+	if protocol != kasmbundle.RoutedUDPProtocol {
+		return errors.New("WebRTC modes require a routed-UDP Kasm component")
 	}
-	defer f.Close()
-	var catalog struct {
-		SchemaVersion int           `json:"schemaVersion"`
-		Endpoints     []udpEndpoint `json:"endpoints"`
+	low, high, ok := strings.Cut(c.ports, "-")
+	first, firstErr := strconv.Atoi(low)
+	last, lastErr := strconv.Atoi(high)
+	if !ok || firstErr != nil || lastErr != nil || first < 1024 || last > 65535 || last < first || last-first >= 1024 {
+		return errors.New("webrtc-ports must specify 1–1024 UDP ports between 1024 and 65535")
 	}
-	raw, err := io.ReadAll(io.LimitReader(f, 16385))
-	if err != nil || len(raw) > 16384 {
-		return errors.New("UDP endpoint catalog exceeds byte limit")
-	}
-	d := json.NewDecoder(bytes.NewReader(raw))
-	d.DisallowUnknownFields()
-	if err := d.Decode(&catalog); err != nil {
-		return fmt.Errorf("UDP endpoint catalog: %w", err)
-	}
-	var extra any
-	if d.Decode(&extra) != io.EOF || catalog.SchemaVersion != 1 || len(catalog.Endpoints) < 1 || len(catalog.Endpoints) > 64 {
-		return errors.New("invalid UDP endpoint catalog")
-	}
-	slots, ports := map[string]bool{}, map[int]bool{}
-	for _, e := range catalog.Endpoints {
-		if !validUDPEndpoint(e) || slots[e.Slot] || ports[e.Port] {
-			return errors.New("invalid or duplicate UDP endpoint")
+	if c.mode == "turn" {
+		if c.address != "" {
+			return errors.New("turn mode advertises its private bind address")
 		}
-		slots[e.Slot], ports[e.Port] = true, true
+		c.address = c.bind
+	} else if c.bind == "" {
+		c.bind = "127.0.0.1"
 	}
-	cfg.udpEndpoints = catalog.Endpoints
+	if !validRoutedEndpoint(c.mode, c.bind, c.address, first) {
+		return errors.New("invalid WebRTC bind or advertised address")
+	}
+	c.firstPort, c.lastPort = first, last
 	return nil
+}
+
+func validRoutedEndpoint(mode, bind, address string, port int) bool {
+	if !specificIPv4(bind) || port < 1024 || port > 65535 {
+		return false
+	}
+	switch mode {
+	case "direct":
+		ip, err := netip.ParseAddr(address)
+		return err == nil && ip.Is4() && ip.IsGlobalUnicast() && !ip.IsPrivate()
+	case "turn":
+		return address == bind && netip.MustParseAddr(bind).IsPrivate()
+	default:
+		return false
+	}
 }
 
 func validUDPLease(lease *udpLease) bool {
@@ -90,26 +96,16 @@ func validUDPLease(lease *udpLease) bool {
 		return true
 	}
 	b, err := hex.DecodeString(lease.Epoch)
-	return validUDPEndpoint(lease.udpEndpoint) && err == nil && len(b) == 16 && hex.EncodeToString(b) == lease.Epoch
-}
-
-func (m *manager) validateUDPCatalogLease(lease *udpLease) error {
-	if lease == nil {
-		return nil
-	}
-	for _, endpoint := range m.cfg.udpEndpoints {
-		if endpoint == lease.udpEndpoint {
-			return nil
-		}
-	}
-	return errors.New("locked UDP endpoint is absent or changed in the deployment catalog")
+	return err == nil && len(b) == 16 && hex.EncodeToString(b) == lease.Epoch &&
+		validRoutedEndpoint(lease.Mode, lease.Bind, lease.Address, lease.Port)
 }
 
 // lifecycleMu serializes assignment with creation/retirement. Durable records,
 // including failed or not-yet-restored records, reserve slots until verified
 // teardown removes the record. Persistent displays retain their slot on detach.
 func (m *manager) assignUDPEndpoint(id string, c *runtimeComponents, pinned bool) error {
-	if !c.NativeUDP {
+	policy := m.cfg.webRTC
+	if !c.NativeUDP || (!pinned && policy.firstPort == 0) {
 		return nil
 	}
 	used := map[int]string{}
@@ -146,26 +142,17 @@ func (m *manager) assignUDPEndpoint(id string, c *runtimeComponents, pinned bool
 	}
 	m.mu.RUnlock()
 	if pinned {
-		if err := m.validateUDPCatalogLease(c.UDPEndpoint); err != nil {
-			return err
-		}
 		if c.UDPEndpoint != nil && used[c.UDPEndpoint.Port] != "" && used[c.UDPEndpoint.Port] != id {
 			return errors.New("locked UDP endpoint is owned by another runtime")
 		}
 		return nil
 	}
-	c.UDPEndpoint = nil
-	c.UDPUnavailableReason = "endpoint-pool-full"
-	if len(m.cfg.udpEndpoints) == 0 {
-		c.UDPUnavailableReason = "endpoints-not-configured"
-	}
-	for _, e := range m.cfg.udpEndpoints {
-		if used[e.Port] != "" {
+	c.UDPEndpoint, c.UDPUnavailableReason = nil, "endpoint-pool-full"
+	for port := policy.firstPort; port <= policy.lastPort; port++ {
+		if used[port] != "" {
 			continue
 		}
-		// Check actual local ownership too; immediately close the probe. The
-		// selected UID is the trust boundary, not a defense against its peers.
-		probe, err := net.ListenPacket("udp4", net.JoinHostPort("127.0.0.1", strconv.Itoa(e.Port)))
+		probe, err := net.ListenPacket("udp4", net.JoinHostPort(policy.bind, strconv.Itoa(port)))
 		if err != nil {
 			continue
 		}
@@ -174,7 +161,7 @@ func (m *manager) assignUDPEndpoint(id string, c *runtimeComponents, pinned bool
 		if _, err := rand.Read(epoch[:]); err != nil {
 			return err
 		}
-		c.UDPEndpoint = &udpLease{udpEndpoint: e, Epoch: hex.EncodeToString(epoch[:])}
+		c.UDPEndpoint = &udpLease{Address: policy.address, Port: port, Epoch: hex.EncodeToString(epoch[:]), Mode: policy.mode, Bind: policy.bind}
 		c.UDPUnavailableReason = ""
 		break
 	}
@@ -189,6 +176,7 @@ func nativeTransport(item *instance) *nativeTransportView {
 	v.ReadOnly = true
 	if item.Components.UDPEndpoint != nil {
 		v.Policy, v.Available = "prefer-udp", true
+		v.Mode = item.Components.UDPEndpoint.Mode
 	}
 	return v
 }

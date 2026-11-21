@@ -100,7 +100,8 @@ function transport() {
   if (performance.now() - lastProbe >= 5000) {lastProbe=performance.now();viewer.measureLatency();}
   document.querySelector('#latency-detail').textContent=`UDP ping: ${ping(s.latency?.udp)} · WebSocket ping: ${ping(s.latency?.wss)}`;
   document.querySelector('#loss-detail').textContent=`UDP block loss (est.): ${loss(s.udpLoss)}`;
-  document.querySelector('#status').textContent=`Ready · ${(s.transport || 'wss').toUpperCase()}`;
+  const path = s.webRTCPath ? ' · ' + (s.webRTCPath === 'turn' ? 'TURN' : 'Direct') : '';
+  document.querySelector('#status').textContent=`Ready · ${(s.transport || 'wss').toUpperCase()}${path}`;
   document.querySelector('#transport-detail').textContent=viewer.capabilities.udp
     ? `Control: ${(s.controlTransport || 'wss').toUpperCase()} · UDP: ${s.udpState || 'waiting'} · ${s.udpReceivedBytes || 0} bytes`
     : viewer.instance?.nativeTransport?.reason || 'WSS component';

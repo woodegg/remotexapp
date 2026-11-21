@@ -62,7 +62,7 @@
 -                iceServers: [{
 -                    urls: ["stun:stun.l.google.com:19302"]
 -                }]
-+                iceServers: []
++                iceServers: this._remoteXAppTurn || [], iceTransportPolicy: this._remoteXAppTurn ? "relay" : "all"
              });
              let peer = this._udpPeer;
 -

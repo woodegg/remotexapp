@@ -1,10 +1,8 @@
 package main
 
 import (
-	"encoding/json"
+	"fmt"
 	"net"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -21,82 +19,86 @@ func freeUDP(t *testing.T) int {
 	defer c.Close()
 	return c.LocalAddr().(*net.UDPAddr).Port
 }
-func TestUDPCatalogStrictAndOptIn(t *testing.T) {
-	p := filepath.Join(t.TempDir(), "endpoints.json")
-	cfg := config{udpEndpointsFile: p, nativeUDPCapable: true}
-	valid := `{"schemaVersion":1,"endpoints":[{"slot":"one","advertisedAddress":"192.0.2.1","port":42001}]}`
-	for _, raw := range []string{`{}`, strings.ReplaceAll(valid, "192.0.2.1", "127.0.0.1"), strings.ReplaceAll(valid, "192.0.2.1", net.IPv4(10, 0, 0, 1).String()), strings.ReplaceAll(valid, "42001", "80"), strings.ReplaceAll(valid, "\"slot\"", "\"unknown\""), valid + "{}"} {
-		os.WriteFile(p, []byte(raw), 0600)
-		if cfg.loadUDPEndpoints() == nil {
-			t.Fatal("invalid catalog accepted")
+func TestRoutedUDPConfigAndAutomaticLease(t *testing.T) {
+	privateIP := net.IPv4(10, 0, 0, 1).String()
+	port := freeUDP(t)
+	spec := fmt.Sprintf("%d-%d", port, port)
+	for _, c := range []webRTCConfig{
+		{mode: "off", ports: spec},
+		{mode: "manual"},
+		{mode: "direct", address: privateIP, ports: spec},
+		{mode: "turn", bind: "127.0.0.1", ports: spec},
+		{mode: "turn", bind: privateIP, address: "192.0.2.4", ports: spec},
+		{mode: "direct", address: "192.0.2.4", ports: "1000-66000"},
+	} {
+		if err := c.validate(kasmbundle.RoutedUDPProtocol); err == nil {
+			t.Fatalf("invalid configuration accepted: %v", c)
 		}
 	}
-	os.WriteFile(p, []byte(valid), 0600)
-	if err := cfg.loadUDPEndpoints(); err != nil {
+	turn := webRTCConfig{mode: "turn", ports: spec, bind: privateIP}
+	if err := turn.validate(kasmbundle.RichUDPProtocol); err == nil {
+		t.Fatal("old component accepted routed UDP")
+	}
+	if err := turn.validate(kasmbundle.RoutedUDPProtocol); err != nil || turn.address != turn.bind {
+		t.Fatalf("TURN private endpoint rejected: %v", err)
+	}
+	direct := webRTCConfig{mode: "direct", address: "192.0.2.4", ports: spec}
+	if err := direct.validate(kasmbundle.RoutedUDPProtocol); err != nil {
 		t.Fatal(err)
 	}
-	cfg.nativeUDPCapable = false
-	if cfg.loadUDPEndpoints() == nil {
-		t.Fatal("legacy component accepted UDP")
+	m := &manager{cfg: config{webRTC: direct}, instances: map[string]*instance{}}
+	c := runtimeComponents{NativeUDP: true}
+	if err := m.assignUDPEndpoint("one", &c, false); err != nil || c.UDPEndpoint == nil || c.UDPEndpoint.Port != port ||
+		c.UDPEndpoint.Mode != "direct" || c.UDPEndpoint.Bind != "127.0.0.1" || !validUDPLease(c.UDPEndpoint) {
+		t.Fatalf("automatic direct endpoint unavailable: %v", err)
+	}
+	m.instances["one"] = &instance{ID: "one", State: "server-ready", Components: c}
+	next := runtimeComponents{NativeUDP: true}
+	if err := m.assignUDPEndpoint("two", &next, false); err != nil || next.UDPEndpoint != nil || next.UDPUnavailableReason != "endpoint-pool-full" {
+		t.Fatalf("port reservation not honored: %v", err)
+	}
+	m.instances["one"].State = "stopped"
+	if err := m.assignUDPEndpoint("two", &next, false); err != nil || next.UDPEndpoint == nil || next.UDPEndpoint.Epoch == c.UDPEndpoint.Epoch {
+		t.Fatalf("cleaned port not reassigned with fresh epoch: %v", err)
+	}
+	m.cfg.webRTC = webRTCConfig{mode: "off"}
+	off := runtimeComponents{NativeUDP: true}
+	if err := m.assignUDPEndpoint("three", &off, false); err != nil || off.UDPEndpoint != nil || off.UDPUnavailableReason != "" {
+		t.Fatalf("off mode used a UDP endpoint: %v", err)
 	}
 }
-func TestUDPOwnershipPoolAndRecovery(t *testing.T) {
-	e := udpEndpoint{"one", "192.0.2.1", freeUDP(t)}
-	m := &manager{cfg: config{udpEndpoints: []udpEndpoint{e}}, instances: map[string]*instance{}}
-	a := runtimeComponents{NativeUDP: true}
-	if err := m.assignUDPEndpoint("a", &a, false); err != nil || a.UDPEndpoint == nil || !validUDPLease(a.UDPEndpoint) {
-		t.Fatal("lease not allocated", err)
-	}
-	m.instances["a"] = &instance{ID: "a", State: "failed", Components: a}
-	b := runtimeComponents{NativeUDP: true}
-	if err := m.assignUDPEndpoint("b", &b, false); err != nil || b.UDPEndpoint != nil || b.UDPUnavailableReason != "endpoint-pool-full" {
-		t.Fatal("failed owner lost reservation", err)
-	}
-	copy := a
-	if err := m.assignUDPEndpoint("a", &copy, true); err != nil || *copy.UDPEndpoint != *a.UDPEndpoint {
-		t.Fatal("recovery changed locked endpoint")
-	}
-	if err := m.assignUDPEndpoint("b", &copy, true); err == nil {
-		t.Fatal("stolen locked endpoint")
-	}
-	m.instances["a"].State = "stopped"
-	if err := m.assignUDPEndpoint("b", &b, false); err != nil || b.UDPEndpoint == nil || b.UDPEndpoint.Epoch == a.UDPEndpoint.Epoch {
-		t.Fatal("verified removal did not allocate a new epoch")
-	}
-	m.cfg.udpEndpoints = nil
-	if m.validateUDPCatalogLease(a.UDPEndpoint) == nil {
-		t.Fatal("changed deployment catalog accepted")
-	}
-}
-func TestUDPManifestPinsSchemaAndDurableFailedOwner(t *testing.T) {
-	pin := testfixture.KasmProtocol(t, kasmbundle.UDPProtocol)
-	e := udpEndpoint{"one", "192.0.2.1", freeUDP(t)}
-	m := &manager{cfg: config{stateDir: t.TempDir(), udpEndpoints: []udpEndpoint{e}}, instances: map[string]*instance{}}
+
+func TestRoutedUDPManifestPinsPrivateBind(t *testing.T) {
+	privateIP := net.IPv4(10, 0, 0, 1).String()
+	pin := testfixture.KasmProtocol(t, kasmbundle.RoutedUDPProtocol)
+	m := &manager{cfg: config{stateDir: t.TempDir()}}
 	i := testRuntimeManifest(t, m.cfg.stateDir, "mousepad-0123456789ab", "")
 	i.Components.DisplayProvider = "kasm"
 	i.Components.Kasm = &pin
 	i.Components.UnicodeEngine = ""
 	i.Components.NativeUDP = true
-	i.Components.UDPEndpoint = &udpLease{e, strings.Repeat("a", 32)}
+	i.Components.UDPEndpoint = &udpLease{Address: privateIP, Port: 43001,
+		Epoch: strings.Repeat("a", 32), Mode: "turn", Bind: privateIP}
 	if err := m.persistRuntime(i); err != nil {
 		t.Fatal(err)
 	}
 	records, err := m.loadRuntimeManifests()
-	if err != nil || len(records) != 1 || records[0].SchemaVersion != 5 {
-		t.Fatal("UDP manifest not restored", err)
+	if err != nil || len(records) != 1 || records[0].SchemaVersion != routedUDPManifestSchema ||
+		*records[0].Components.UDPEndpoint != *i.Components.UDPEndpoint {
+		t.Fatalf("routed runtime not restored: %v", err)
 	}
-	c := runtimeComponents{NativeUDP: true}
-	if err := m.assignUDPEndpoint("other", &c, false); err != nil || c.UDPEndpoint != nil {
-		t.Fatal("durable owner ignored", err)
-	}
-	records[0].SchemaVersion = 4
-	data, _ := json.Marshal(records[0])
-	os.WriteFile(filepath.Join(m.runtimeManifestDir(), i.ID+".json"), data, 0600)
-	if _, err := m.loadRuntimeManifests(); err == nil {
-		t.Fatal("UDP accepted as schema4")
+	m.cfg.webRTC = webRTCConfig{mode: "direct", bind: "127.0.0.1", address: "192.0.2.4", firstPort: 43001, lastPort: 43001}
+	next := runtimeComponents{NativeUDP: true}
+	if err := m.assignUDPEndpoint("another", &next, false); err != nil || next.UDPEndpoint != nil ||
+		next.UDPUnavailableReason != "endpoint-pool-full" {
+		t.Fatalf("durable owner did not fence port reuse: %v", err)
 	}
 	args := strings.Join(kasmLaunchArgs(i, classConfig{}, 5901, "/tmp/auth"), " ")
-	if !strings.Contains(args, "-udpPort ") || !strings.Contains(args, "-publicIP 192.0.2.1") {
+	if !strings.Contains(args, "-udpPort 43001") || !strings.Contains(args, "-udpBindAddress "+privateIP) {
 		t.Fatal("endpoint not passed to native server")
+	}
+	records[0].SchemaVersion = nativeUDPManifestSchema
+	if err := m.validateRuntimeManifest("test", &records[0]); err == nil {
+		t.Fatal("routed endpoint accepted in legacy schema")
 	}
 }

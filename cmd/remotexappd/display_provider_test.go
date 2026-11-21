@@ -27,9 +27,26 @@ func TestKasmPrerequisitesFailClosed(t *testing.T) {
 	if err := cfg.configureDisplayProvider(); err != nil || cfg.kasmPin == nil || *cfg.kasmPin != pin {
 		t.Fatalf("paired selection: %v", err)
 	}
-	legacy := config{}
-	if err := legacy.configureDisplayProvider(); err != nil || legacy.displayProvider != "tigervnc" {
-		t.Fatal("default provider changed")
+	defaultConfig := config{vncLauncher: "direct", kasmBundle: pin.Directory}
+	if err := defaultConfig.configureDisplayProvider(); err != nil || defaultConfig.displayProvider != "kasm" {
+		t.Fatalf("default Kasm provider: %v", err)
+	}
+	manager := manager{cfg: defaultConfig}
+	components := manager.newRuntimeComponents()
+	if displayProvider(components) != "kasm" || components.Kasm == nil || *components.Kasm != pin {
+		t.Fatal("new runtimes did not pin the default Kasm bundle")
+	}
+
+	unconfigured := config{vncLauncher: "direct"}
+	if err := unconfigured.configureDisplayProvider(); err == nil || !strings.Contains(err.Error(), "REMOTEXAPP_KASM_BUNDLE") {
+		t.Fatalf("missing bundle must give a configuration error: %v", err)
+	}
+	legacy := config{displayProvider: "tigervnc"}
+	if err := legacy.configureDisplayProvider(); err != nil {
+		t.Fatalf("explicit TigerVNC was rejected: %v", err)
+	}
+	if displayProvider(runtimeComponents{}) != "tigervnc" {
+		t.Fatal("historical empty provider pins must retain TigerVNC")
 	}
 }
 

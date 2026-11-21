@@ -44,7 +44,7 @@ package and application license obligations.
 
 ## Optional experimental Kasm component
 
-The opt-in Kasm server/client pair is built and installed separately; it is not
+The Kasm server/client pair is built and installed separately; it is not
 included in the ordinary Core archive. Source pins, ordered modifications,
 source reconstruction and dependency notices are described in
 [`third_party/kasm/README.md`](third_party/kasm/README.md). Each component includes

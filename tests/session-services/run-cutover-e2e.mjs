@@ -18,7 +18,7 @@ async function wait(fn,label){for(let i=0;i<450;i++){const x=await fn();if(x)ret
 async function stop(){if(child&&child.exitCode===null&&child.signalCode===null)await new Promise(r=>{child.once('exit',r);child.kill('SIGTERM')})}
 async function start(core,catalog=core,expectFailure=false){
  const root=roots[core];let logs='';
- child=spawn(join(root,'bin/remotexappd'),['-listen','127.0.0.1:21997','-auth-mode','none','-state-dir',state,'-class-config',join(work,'legacy'),'-app-package-root',join(work,catalog,'apps'),'-apps-enabled',join(work,catalog,'enabled'),'-expose-internals=true',
+ child=spawn(join(root,'bin/remotexappd'),['-listen','127.0.0.1:21997','-auth-mode', 'none', '-display-provider', 'tigervnc','-state-dir',state,'-class-config',join(work,'legacy'),'-app-package-root',join(work,catalog,'apps'),'-apps-enabled',join(work,catalog,'enabled'),'-expose-internals=true',
  '-gateway-bin',join(root,'bin/novnc-input'),'-status-bin',join(root,'bin/remotexapp-status'),'-core-driver-dir',join(root,'drivers/common'),'-ibus-engine',join(root,'components/remote-unicode-engine/engine.py')],{env,stdio:['ignore','ignore','pipe']});
  child.stderr.on('data',b=>{logs+=b;process.stderr.write(b)});
  if(expectFailure){await wait(()=>child.exitCode!==null,'invalid stack did not fail');assert.notEqual(child.exitCode,0);return logs}

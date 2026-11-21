@@ -15,7 +15,7 @@ let child; const created=[]; const checks=[];
 const env={...process.env,XDG_RUNTIME_DIR:process.env.XDG_RUNTIME_DIR||'/run/user/1000',DBUS_SESSION_BUS_ADDRESS:process.env.DBUS_SESSION_BUS_ADDRESS||'unix:path=/run/user/1000/bus'};
 async function stopManager(){if(child&&child.exitCode===null){await new Promise((r,j)=>{const t=setTimeout(()=>j(Error('manager stop timed out')),15000);child.once('exit',()=>{clearTimeout(t);r()});child.kill('SIGTERM')});}}
 async function startManager(){
- child=spawn(join(root,'bin/remotexappd'),['-listen','127.0.0.1:21992','-auth-mode','none','-state-dir',state,'-class-config',legacy,
+ child=spawn(join(root,'bin/remotexappd'),['-listen','127.0.0.1:21992','-auth-mode', 'none', '-display-provider', 'tigervnc','-state-dir',state,'-class-config',legacy,
  '-app-package-root',apps,'-apps-enabled',enabled,'-connections-token-file',join(work,'token'),
  '-gateway-bin',join(root,'bin/novnc-input'),'-status-bin',join(root,'bin/remotexapp-status'),
  '-core-driver-dir',join(root,'drivers/common'),'-ibus-engine',join(root,'components/remote-unicode-engine/engine.py')],{env,stdio:['ignore','ignore','pipe']});

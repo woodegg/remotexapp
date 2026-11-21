@@ -66,6 +66,31 @@ copy subprocess output, private paths or environment contents. A failed runtime
 is retained for inspection and explicit recovery; a Manager restart is not a
 host reboot or an instruction to replay failed Apps automatically.
 
+## Choose the display provider
+
+Core 0.17 uses KasmVNC for new runtimes by default. Install a verified,
+versioned [Kasm server/client bundle](../third_party/kasm/README.md#manager-selection)
+before starting the Manager. Set `REMOTEXAPP_KASM_BUNDLE` to its absolute
+canonical directory in the service environment file. The default system
+environment is `/etc/remotexapp/remotexapp.env`. A central user override may
+use `/etc/remotexapp/users/USER.env`, and a local user installation uses
+`~/.config/remotexapp/remotexapp.env`. Foreground launchers can also pass
+`-kasm-bundle`. CLI flags take precedence over environment values.
+
+Before switching an existing installation to 0.17, either configure a
+Kasm bundle or explicitly set `REMOTEXAPP_DISPLAY_PROVIDER=tigervnc` and leave
+the Kasm settings unset. For a foreground legacy launch, use
+`-display-provider=tigervnc`. A missing or invalid Kasm bundle stops Manager
+startup with an error. The installers preserve existing operator configuration.
+
+The new default applies when a runtime is created. An existing runtime keeps
+its persisted provider and component pins on Manager adoption, ordinary
+restart and recovery. Keep the corresponding server and runtime dependencies
+installed as long as pinned instances need them. Moving an existing profile
+to another provider requires a deliberate stopped-runtime migration. Ordinary
+upgrade rejects a provider change. Preserve the previous Core, environment,
+components and state snapshot for rollback.
+
 ## Build and centrally install
 
 First use the [dependency guide](dependencies.md) to distinguish core must-haves,
@@ -75,7 +100,7 @@ missing OS packages must be installed separately. The abbreviated list below
 is not the complete dependency list for the shipped App catalog.
 
 These are **installed component requirements**, not a requirement to prestart
-a standalone desktop. RemoteXApp starts TigerVNC and the App driver starts its
+a standalone desktop. RemoteXApp starts the configured display server and the App driver starts its
 session; a conflicting standalone VNC service should remain stopped/disabled.
 Keep the systemd user manager and, for `user-home`, the existing user D-Bus
 available. See [component versus service readiness](dependencies.md#installed-components-are-not-pre-running-desktop-services).

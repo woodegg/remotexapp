@@ -86,7 +86,7 @@ try {
   assert(!occupied, 'temporary Manager port already in use');
   for (const path of [state, apps, enabled, join(work, 'legacy')]) await mkdir(path, {recursive: true});
   await install('4.0.0');
-  manager = spawn(join(root, 'bin/remotexappd'), ['-listen', '127.0.0.1:21997', '-auth-mode', 'none',
+  manager = spawn(join(root, 'bin/remotexappd'), ['-listen', '127.0.0.1:21997', '-auth-mode', 'none', '-display-provider', 'tigervnc',
     '-state-dir', state, '-class-config', join(work, 'legacy'), '-app-package-root', apps, '-apps-enabled', enabled,
     '-gateway-bin', join(root, 'bin/novnc-input'), '-status-bin', join(root, 'bin/remotexapp-status'),
     '-core-driver-dir', join(root, 'drivers/common'), '-ibus-engine', join(root, 'components/remote-unicode-engine/engine.py'), '-expose-internals=true'], {stdio: 'ignore'});

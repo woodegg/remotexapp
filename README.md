@@ -39,10 +39,10 @@ JavaScript, then add the lifecycle and application actions your solution needs.
 You can also package another X11 app without rebuilding the Manager.
 
 The experience is Citrix-style desktop and application delivery, with a
-programmable integration surface for developers. The default provider uses
-TigerVNC/noVNC. Core 0.16.0 also offers an opt-in Kasm-native path with a host SDK,
-shared speaker/microphone transport, automatic text/HTML/PNG clipboard and
-optional screen UDP. Bring your own Linux host, authentication and tenant
+programmable integration surface for developers. New runtimes use KasmVNC by
+default with a separately provisioned, verified server/client bundle. The host
+SDK provides shared speaker/microphone transport, automatic text/HTML/PNG
+clipboard and optional screen UDP. Bring your own Linux host, authentication and tenant
 isolation; Citrix ICA/HDX is not supported. See the [0.16.0 setup and migration
 boundaries](docs/native-0.16.0-release.md).
 
@@ -76,9 +76,9 @@ shared Apps, permissions, logout and the distinction between release and stop.
 The native server/client pair is separately installed; the Core archive includes
 its pinned build recipe, not the native binary or operating-system dependencies.
 
-## Embed with the default provider
+## Embed with TigerVNC/noVNC
 
-With a configured Manager and the Mousepad App installed, serve your page behind
+With an explicit TigerVNC Manager and the Mousepad App installed, serve your page behind
 the same authenticated origin and import the SDK that the Manager serves:
 
 ```html
@@ -228,9 +228,10 @@ environment-variable, or SDK aliases are shipped.
 
 ## Build and verify
 
-Before installing, read the [dependency guide](docs/dependencies.md). TigerVNC,
-D-Bus/IBus and the selected applications are host-installed dependencies; noVNC
-is bundled. The default full installer validates **all shipped Apps** and does
+Before installing, read the [dependency guide](docs/dependencies.md). Provision
+the [Kasm bundle](third_party/kasm/README.md#manager-selection), D-Bus and the
+selected applications on the host. TigerVNC and IBus support legacy runtimes;
+their noVNC client is bundled. The default full installer validates **all shipped Apps** and does
 not automatically install missing OS packages. Go/Node/build tools are needed
 on build hosts, not hosts using the release binaries.
 
@@ -291,10 +292,12 @@ vendored tree or generated bundles by hand.
 
 ## Development launch
 
-Loopback-only, without a reverse proxy:
+Loopback-only, without a reverse proxy. Set the absolute path to your verified
+Kasm bundle before launch:
 
 ```bash
 make app-catalog
+export REMOTEXAPP_KASM_BUNDLE=/opt/remotexapp-components/kasm-DIGEST
 bin/remotexappd \
   -listen 127.0.0.1:1991 \
   -auth-mode none \
@@ -306,6 +309,11 @@ bin/remotexappd \
   -gateway-bin bin/novnc-input \
   -status-bin bin/remotexapp-status
 ```
+
+For a TigerVNC development launch, omit the bundle and pass
+`-display-provider=tigervnc`. See the
+[deployment and upgrade instructions](docs/operations.md#choose-the-display-provider)
+for systemd configuration and existing runtime pins.
 
 Health and readiness are public at `/healthz` and `/readyz`. All other routes
 use trusted-header authentication by default. Never bind `auth-mode=none` to a

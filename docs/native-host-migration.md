@@ -6,8 +6,11 @@ make. It is not evidence that the downstream application has been changed or
 accepted. Legacy SDK names and events are not compatibility requirements.
 
 Preserve the host's functional workflows while adapting to native input,
-clipboard, audio and ownership. Upgrading Core does not itself switch a legacy
-host to Kasm or change the default TigerVNC/noVNC provider.
+clipboard, audio and ownership. Core 0.16 keeps the TigerVNC/noVNC default.
+Core 0.17 defaults new runtimes to KasmVNC. Before upgrading to 0.17, follow
+the [provider rollout instructions](operations.md#choose-the-display-provider)
+to supply a bundle or explicitly retain TigerVNC. Existing runtime pins are
+preserved in either case.
 
 ## Choose the exact migration target
 

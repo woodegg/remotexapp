@@ -87,7 +87,7 @@ test('operator console owns independent movable Viewer windows without coupling 
   assert.match(source, /data-viewer-window/);
   assert.match(source, /Connect in new window/);
   assert.match(source, /entry[.]client[.]focus\(\)/);
-  assert.match(source, /entry[.]client[.]destroy\(\)/);
+  assert.match(source, /entry[.]dispose\(\)/);
   assert.match(source, /Ctrl\+F6|event[.]key !== 'F6'/);
   assert.match(source, /resize:both/);
   assert.match(source, /installWindowDrag/);

@@ -60,6 +60,14 @@ go/no-go. The [2026-10-24 interpretation](kasmvnc-0.16.0-evaluation.md#2026-10-2
 distinguishes historical API compatibility constraints from preserved safety
 semantics. Accepted 0.15.0 runtime behavior is not superseded by this proposal.
 
+## Default KasmVNC provider
+
+| ID | Requirement | State | Qualification |
+| --- | --- | --- | --- |
+| DP-001 | Default new runtimes to KasmVNC. Require a verified immutable bundle and actionable startup failure for missing configuration. Allow service environment configuration and an explicit CLI override. Open the matching Viewer in the built-in Console. | In development | Default launch, component validation and explicit TigerVNC live checks in [Issue #76](https://github.com/woodegg/remotexapp/issues/76) |
+| DP-002 | Preserve existing provider and component pins on adoption, ordinary restart and recovery. Keep unsupported cross-provider runtime upgrade fenced. Leave clipboard, audio and UDP policy explicit. | In development | Pinned TigerVNC adoption under a Kasm Manager and native regression |
+| DP-003 | Qualify the exact candidate against the published LightView v0.1.13 Ubuntu 26.04 host archive and deploy to project-owned UAT. Record artifact and component identities. | In development | Ubuntu 26.04 Viewer and App integration, exact-candidate and UAT evidence |
+
 <a id="proposed-native-architecture--owner-review-pending"></a>
 
 ## Native architecture — staged implementation

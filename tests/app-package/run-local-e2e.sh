@@ -38,7 +38,7 @@ trap cleanup EXIT INT TERM
 
 start_manager() {
   "$manager" \
-    -listen "$listen" -auth-mode none \
+    -listen "$listen" -auth-mode none -display-provider tigervnc \
     -state-dir "$state" -class-config "$catalog" \
     -app-package-root "$packages" -apps-enabled "$enabled" \
     -gateway-bin "$gateway" -status-bin "$status_helper" \

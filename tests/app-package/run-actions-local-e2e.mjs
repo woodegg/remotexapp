@@ -14,7 +14,7 @@ const apps=join(work,'apps'),enabled=join(work,'enabled'),state=join(work,'state
 let child;
 async function stopManager(){if(child&&child.exitCode===null)await new Promise(r=>{child.once('exit',r);child.kill('SIGTERM')});}
 async function startManager(){
- child=spawn(join(root,'bin/remotexappd'),['-listen','127.0.0.1:21995','-auth-mode','none','-state-dir',state,'-class-config',legacy,'-app-package-root',apps,'-apps-enabled',enabled,'-gateway-bin',join(root,'bin/novnc-input'),'-status-bin',join(root,'bin/remotexapp-status'),'-core-driver-dir',join(root,'drivers/common'),'-ibus-engine',join(root,'components/remote-unicode-engine/engine.py')],{env,stdio:['ignore','ignore','pipe']});
+ child=spawn(join(root,'bin/remotexappd'),['-listen','127.0.0.1:21995','-auth-mode', 'none', '-display-provider', 'tigervnc','-state-dir',state,'-class-config',legacy,'-app-package-root',apps,'-apps-enabled',enabled,'-gateway-bin',join(root,'bin/novnc-input'),'-status-bin',join(root,'bin/remotexapp-status'),'-core-driver-dir',join(root,'drivers/common'),'-ibus-engine',join(root,'components/remote-unicode-engine/engine.py')],{env,stdio:['ignore','ignore','pipe']});
  child.stderr.on('data',x=>process.stderr.write(x));
  await wait(async()=>{if(child.exitCode!==null)throw Error('manager exited');try{return(await fetch(base+'/readyz')).ok}catch{return false}});
 }

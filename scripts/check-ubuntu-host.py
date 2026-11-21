@@ -14,7 +14,7 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parent.parent
-CORE_PACKAGES = "bash coreutils dbus dbus-user-session gir1.2-ibus-1.0 ibus libc-bin libpam-systemd libx11-6 libxtst6 libxdo3 python3 python3-gi systemd systemd-sysv tigervnc-standalone-server util-linux xauth xdotool"
+CORE_PACKAGES = "bash coreutils dbus dbus-user-session gir1.2-ibus-1.0 ibus libc-bin libpam-systemd libx11-6 libxtst6 libxdo3 python3 python3-gi systemd systemd-sysv tigervnc-standalone-server util-linux x11-utils xauth xdotool"
 APP_PACKAGES = {
     "edge": "jq matchbox-window-manager microsoft-edge-stable",
     "firefox-esr": "jq matchbox-window-manager firefox-esr ibus-gtk3",
@@ -26,10 +26,10 @@ APP_PACKAGES = {
     "lightview": "jq matchbox-window-manager ibus-gtk3 gstreamer1.0-plugins-bad gstreamer1.0-libav",
     "libreoffice": "jq matchbox-window-manager libreoffice libreoffice-gtk3 python3-uno psmisc findutils ibus-gtk3",
     "mousepad": "jq matchbox-window-manager mousepad ibus-gtk3",
-    "xfce-user-desktop": "xfce4 xfce4-clipman x11-utils procps ibus-gtk3",
+    "xfce-user-desktop": "xfce4 xfce4-clipman procps ibus-gtk3",
 }
 GTK3_COMMANDS = {"firefox-esr", "libreoffice", "lightview", "mousepad", "startxfce4"}
-CORE_COMMANDS = "systemctl systemd-run Xtigervnc xauth dbus-daemon dbus-send ibus ibus-daemon python3 xdotool"
+CORE_COMMANDS = "systemctl systemd-run Xtigervnc xauth dbus-daemon dbus-send ibus ibus-daemon python3 xdpyinfo xdotool"
 GI_PROBE = 'import gi; gi.require_version("IBus", "1.0"); from gi.repository import GLib, IBus'
 PIDFD_PROBE = '''import os, signal, subprocess, sys
 p = subprocess.Popen([sys.executable, "-I", "-c", "import sys; sys.stdin.buffer.read()"], stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

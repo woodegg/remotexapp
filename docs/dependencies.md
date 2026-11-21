@@ -10,7 +10,7 @@ Package installs its driver and manifest—not Firefox, LibreOffice, etc.
 | Dependency | Why it is required | Supplied by RemoteXApp? |
 |---|---|---|
 | Supported Linux host, systemd/user manager and non-root runtime account | Services, runtime units and lifecycle supervision | No; formal archives target Linux amd64, with Ubuntu/X11 validation |
-| TigerVNC (`Xtigervnc`) and `xauth` | Virtual display and X11 authorization | No |
+| TigerVNC (`Xtigervnc`), `xauth` and `xdpyinfo` (Ubuntu `x11-utils`) | Virtual display, X11 authorization and display readiness for TigerVNC and Kasm | No |
 | D-Bus (`dbus-daemon`, `dbus-send`), `ibus` / `ibus-daemon` | Core-owned session services and bounded protocol readiness | No |
 | Python 3, PyGObject (`gi`), GLib and IBus introspection bindings | Shipped Unicode input engine | Engine source is bundled; interpreter/bindings are not |
 | X11, XTest and libxdo runtime libraries; `xdotool` | Native X11 input and driver helpers | No |
@@ -85,6 +85,15 @@ capabilities the Driver consumes, including `engine_state` and
 `web_process_generation`: Ubuntu 26.04 QA passed with Lightview 0.1.10, while
 0.1.7 lacked those fields and failed readiness. Record the checksum and
 WebKitGTK identity of the approved host build; see `apps/lightview/README.md`.
+
+For Ubuntu 26.04 x86_64, select `lightview-0.1.13-ubuntu26.04-x86_64.tar.gz`
+and its SHA-256 file from the
+[LightView v0.1.13 release](https://github.com/woodegg/lightview/releases/tag/v0.1.13).
+Verify the checksum and follow the upstream install steps for that archive.
+The Ubuntu 24.04 binary uses a different runtime ABI. The RemoteXApp App
+Package is `lightview@1.0.13`. Run the Ubuntu host check below as the
+RemoteXApp runtime user, then open the App in a Viewer.
+
 A host missing the
 GStreamer bad/libav plugins can load YouTube while the player reports that it
 cannot play the selected video.

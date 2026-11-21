@@ -5,6 +5,15 @@
 > [current source versions](current-state.md). Host labels and runtime IDs in
 > historical examples are anonymized.
 
+## 2026-11-20 — Check the Core X11 readiness utility before launch
+
+On a minimal Ubuntu 26.04 host, both TigerVNC and Kasm started and listened while
+the Manager's authenticated X11 readiness check timed out. Core invokes
+`xdpyinfo`; the Ubuntu preparation list previously included its package,
+`x11-utils`, only for XFCE. Treat it as a Core dependency under U26-04 and
+check it in both lifecycle preflights. The authenticated X11 probe and display
+lifecycle stay the same.
+
 ## 2026-10-04 — Separate public engineering guidance from operational records
 
 Public guides describe current contracts and reproducible examples rather than

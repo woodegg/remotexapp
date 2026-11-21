@@ -19,11 +19,14 @@ const TextProtocol = "kasm-wss-text-v1"
 const UDPProtocol = "kasm-udp-text-v1"
 const RichProtocol = "kasm-wss-clipboard-v2"
 const RichUDPProtocol = "kasm-udp-clipboard-v2"
+const RoutedUDPProtocol = "kasm-routed-udp-clipboard-v2"
 
 func SupportsRichClipboard(protocol string) bool {
-	return protocol == RichProtocol || protocol == RichUDPProtocol
+	return protocol == RichProtocol || protocol == RichUDPProtocol || protocol == RoutedUDPProtocol
 }
-func SupportsUDP(protocol string) bool { return protocol == UDPProtocol || protocol == RichUDPProtocol }
+func SupportsUDP(protocol string) bool {
+	return protocol == UDPProtocol || protocol == RichUDPProtocol || protocol == RoutedUDPProtocol
+}
 
 const ServerCommit = "17265facc40ab50db5740cdf0d12c61173edafc9"
 const ClientCommit = "475ecfa5356579ef222983c7ce4619a7576a3bce"

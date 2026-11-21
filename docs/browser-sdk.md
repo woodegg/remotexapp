@@ -81,7 +81,10 @@ rectangles, not the server's configured frame rate or monitor refresh rate.
 Dimensions are the remote framebuffer, not the CSS-scaled canvas. The optional
 UDP component also reports separate UDP byte/packet/rectangle counters,
 `controlTransport`, `udpState` and actual screen `transport` (`webrtc-udp` only
-after UDP rectangles have been painted).
+after UDP rectangles have been painted). SDK 0.33.0 adds optional `webRTCPath`
+(`direct` or `turn`) while that connection paints over WebRTC. The current route
+is unavailable before UDP paint and after fallback to WSS. See
+[WebRTC routing modes](native-webrtc-routing.md) for the server configuration.
 
 Components declaring `capabilities.latency` support explicit
 `viewer.measureLatency()`. It starts at most one bounded sample per five seconds;

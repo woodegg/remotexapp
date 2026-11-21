@@ -1,5 +1,8 @@
 # Bounded native UDP UAT
 
+This is the historical manual-endpoint implementation. For new deployments,
+follow the [routed mode contract](native-webrtc-routing.md).
+
 Issue [#36](https://github.com/woodegg/remotexapp/issues/36) implements the owner's
 2026-10-31 approval of the bounded IPv4 D4 slice on the standalone Alpine test
 fixture. It builds on #34/#35 and the [UDP architecture](kasm-native-architecture.md#udp-design).

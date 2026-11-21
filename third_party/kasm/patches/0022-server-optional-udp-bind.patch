@@ -1,0 +1,96 @@
+--- a/common/network/Udp.cxx
++++ b/common/network/Udp.cxx
+@@ -43,6 +43,8 @@
+ static rfb::LogWriter vlog("WebUdp");
+ static std::atomic<WuHost *> host{nullptr};
+ 
++static rfb::StringParameter udpBindAddress("udpBindAddress", "Local IPv4 address for the Kasm UDP listener", "127.0.0.1");
++
+ rfb::IntParameter udpSize("udpSize", "UDP packet data size", 1296, 500, 1400);
+ 
+ extern settings_t settings;
+@@ -65,7 +67,7 @@
+ 		sleep(30);
+ 	}
+ 	WuHost *myhost = NULL;
+-	int ret = WuHostCreate(rfb::Server::publicIP, port, 16, &myhost);
++	int ret = WuHostCreate(rfb::Server::publicIP, udpBindAddress, port, 16, &myhost);
+ 	if (ret != WU_OK) {
+ 		vlog.error("Failed to create WebUDP host");
+ 		return NULL;
+--- a/common/network/webudp/WuNetwork.h
++++ b/common/network/webudp/WuNetwork.h
+@@ -6,4 +6,4 @@
+ 
+ void HexDump(const uint8_t* src, size_t len);
+ int MakeNonBlocking(int sfd);
+-int CreateSocket(uint16_t port);
++int CreateSocket(uint16_t port, const char* bindAddress);
+--- a/common/network/webudp/WuNetwork.cpp
++++ b/common/network/webudp/WuNetwork.cpp
+@@ -34,7 +34,7 @@
+   return 0;
+ }
+ 
+-int CreateSocket(uint16_t port) {
++int CreateSocket(uint16_t port, const char* bindAddress) {
+ 
+   int sfd = socket(AF_INET, SOCK_DGRAM, 0);
+   if (sfd == -1) {
+@@ -45,8 +45,13 @@
+   struct sockaddr_in addr;
+   addr.sin_family = AF_INET;
+   addr.sin_port = htons(port);
+-  // Only the non-NAT deployment proxy may deliver packets into this namespace.
+-  addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
++  if (inet_pton(AF_INET, bindAddress, &addr.sin_addr) != 1 ||
++      addr.sin_addr.s_addr == htonl(INADDR_ANY) ||
++      addr.sin_addr.s_addr == htonl(INADDR_BROADCAST) ||
++      IN_MULTICAST(ntohl(addr.sin_addr.s_addr))) {
++    close(sfd);
++    return -1;
++  }
+ 
+   if (bind(sfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_in)) == 0)
+     return sfd;
+--- a/common/network/webudp/WuHost.h
++++ b/common/network/webudp/WuHost.h
+@@ -8,7 +8,7 @@
+ 
+ typedef struct WuHost WuHost;
+ 
+-int32_t WuHostCreate(const char* hostAddr, uint16_t port, int32_t maxClients,
++int32_t WuHostCreate(const char* hostAddr, const char* bindAddress, uint16_t port, int32_t maxClients,
+                      WuHost** host);
+ void WuHostDestroy(WuHost* host);
+ /*
+--- a/common/network/webudp/WuHostEpoll.cpp
++++ b/common/network/webudp/WuHostEpoll.cpp
+@@ -118,7 +118,7 @@
+   return 0;
+ }
+ 
+-int32_t WuHostCreate(const char* hostAddr, uint16_t port, int32_t maxClients, WuHost** host) {
++int32_t WuHostCreate(const char* hostAddr, const char* bindAddress, uint16_t port, int32_t maxClients, WuHost** host) {
+   *host = NULL;
+ 
+   WuHost* ctx = (WuHost*)calloc(1, sizeof(WuHost));
+@@ -135,7 +135,7 @@
+     return status;
+   }
+ 
+-  ctx->udpfd = CreateSocket(port);
++  ctx->udpfd = CreateSocket(port, bindAddress);
+ 
+   if (ctx->udpfd == -1) {
+     WuHostDestroy(ctx);
+--- a/common/network/webudp/WuHostNull.cpp
++++ b/common/network/webudp/WuHostNull.cpp
+@@ -1,6 +1,6 @@
+ #include "WuHost.h"
+ 
+-int32_t WuHostCreate(const char*, const char*, int32_t, WuHost** host) {
++int32_t WuHostCreate(const char*, const char*, uint16_t, int32_t, WuHost** host) {
+   *host = NULL;
+   return WU_OK;
+ }

@@ -17,10 +17,13 @@ for separately pinned runtime components and deployment requirements.
 before implementing the adapter.** Published 0.16.0 uses SDK 0.31.0 and
 `open()`/`attach()`. Core 0.16.1 uses SDK 0.32.0 with
 `host.mount()`/`view.release()` and SDK-owned recovery actions. Use the
-matching native component and verify the release qualification. Existing
-runtime pins require a separate guarded upgrade. The migration guide records what the host retains, replaces and removes.
+matching native component and verify the release qualification. Core 0.17 uses
+SDK 0.33.0 with the same host and recovery APIs. It adds the observed
+`webRTCPath` statistic for [optional direct or TURN screen UDP](native-webrtc-routing.md).
+Existing runtime pins require a separate guarded upgrade. The migration guide
+records the host responsibilities and rollout steps.
 
-The Coordinator-only integration below remains available for the default provider.
+The Coordinator-only integration below describes the TigerVNC/noVNC path.
 
 ## Single-server runtime coordination
 

@@ -5,7 +5,7 @@ import { RemoteXAppNativeClient } from './remotexapp-native-client.js';
 globalThis.CustomEvent ||= class extends Event { constructor(type,options) { super(type); this.detail = options?.detail; } };
 globalThis.location = new URL('https://viewer.example.test/remotexapps/app/kiosk.html');
 
-function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, clipboardAutomatic = false, rich = false, componentRich = rich, statistics = false, udp = false, latency = false, udpLoss = false, controls = false, readOnly = false, reconnect = false } = {}) {
+function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, clipboardAutomatic = false, rich = false, componentRich = rich, statistics = false, udp = false, turn = false, latency = false, udpLoss = false, controls = false, readOnly = false, reconnect = false } = {}) {
   const state = { id:'app', displayProvider:'kasm', displayComponentDigest:'a'.repeat(64), sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
   if (udp) state.nativeTransport={available:true,grantRequired:true,policy:'prefer-udp'};
   if (controls) state.nativeTransport={available:udp,grantRequired:true,policy:udp?'prefer-udp':'wss-only',readOnly:true};
@@ -14,7 +14,7 @@ function fixture({ ready = true, frame = true, timeout = 200, clipboard = false,
   state.nativeClipboard = rich ? "rich-v1" : clipboard ? "text" : undefined;
   let display, reads = 0;
   class Display extends EventTarget {
-    static capabilities = {programmaticInput:controls,displayControls:controls,readOnly:controls,keyboardPolicy:true,clipboardText:true,clipboardAutomatic,clipboardRich:componentRich,clipboardMaxBytes:componentRich?2097152:65536,statistics,udp,latency,udpLoss};
+    static capabilities = {programmaticInput:controls,displayControls:controls,readOnly:controls,keyboardPolicy:true,clipboardText:true,clipboardAutomatic,clipboardRich:componentRich,clipboardMaxBytes:componentRich?2097152:65536,statistics,udp,turn,latency,udpLoss};
     counters = {receivedBytes:100, sentBytes:20, bufferedBytes:0, renderedFrames:2, width:1024, height:768};
     getStats() { return this.counters; }
     sendText(text) {this.sent.push(text);return {status:'submitted',count:[...text].length};}
@@ -239,6 +239,33 @@ test('UDP uses a header grant, actual bytes/paint status, and per-Viewer prefere
   assert.equal(f.viewer.getStats().transport,'webrtc-udp');
   f.viewer.configureTransport(false);assert.equal(f.display.preferUDP,false);
   f.viewer.dispose();assert.equal(f.calls.at(-1).path,'/remotexapps/app/native/revoke');
+});
+test('TURN requires authorized relay credentials and displays only painted UDP', async t => {
+  const credential = {urls:'turn:relay.example.test:3478?transport=udp',
+    username:'1850000000:'+'a'.repeat(24), credential:'b'.repeat(27)+'='};
+  for (const turn of [undefined, credential]) {
+    await t.test(turn ? 'authenticated relay' : 'WSS fallback without credentials', async () => {
+      const f=fixture({udp:true,turn:true,statistics:true});
+      f.state.nativeTransport.mode='turn';
+      const request=f.viewer.manager.request;
+      f.viewer.manager.request=async (...args) => {
+        const reply=await request(...args);
+        return args[0].endsWith('/grant') ? {...reply,turn} : reply;
+      };
+      try {
+        await f.viewer.connect('app');
+        assert.equal(f.display.options.udp,!!turn);
+        assert.deepEqual(f.display.options.turnServers,turn ? [turn] : null);
+        assert.equal(f.viewer.getStats().transport,'wss');
+        assert.equal(f.viewer.getStats().webRTCPath,undefined);
+        Object.assign(f.display.counters,{udpReceivedBytes:500,udpPackets:4,udpRectangles:3,screenTransport:'webrtc-udp'});
+        assert.equal(f.viewer.getStats().webRTCPath,turn ? 'turn' : undefined);
+        assert.equal(f.display.url.includes(credential.username),false);
+      } finally {
+        f.viewer.dispose();
+      }
+    });
+  }
 });
 test('lease network failure reconnects with a new grant and unchanged App identity', async t => {
   t.mock.timers.enable({apis:['setTimeout']});

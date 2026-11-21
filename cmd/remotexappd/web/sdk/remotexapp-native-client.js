@@ -43,6 +43,12 @@ function udpLossSample(raw) {
 }
 
 /** Native display attachment. Runtime/audio ownership is explicit and separate. */
+function validTurnServer(server) {
+  return server && typeof server.urls === 'string' && /^turn:[^\s/?#@]{1,253}:\d{1,5}(?:\?transport=udp)?$/.test(server.urls) &&
+    typeof server.username === 'string' && /^\d{1,12}:[a-f0-9]{24}$/.test(server.username) &&
+    typeof server.credential === 'string' && /^[A-Za-z0-9+/]{27}=$/.test(server.credential);
+}
+
 export class RemoteXAppNativeClient extends EventTarget {
   constructor({ container, runtime, manager = runtime?.manager || new RemoteXAppManager(), timeout = 90000, keyboardPolicy, preferUDP = true, reconnect = false, readOnly = false } = {}) {
     super();
@@ -181,7 +187,9 @@ export class RemoteXAppNativeClient extends EventTarget {
           throw new RemoteXAppNativeError('invalid-grant', 'Invalid native Viewer grant');
         this._grant = {base, request:{...request, token:grant.token}};
       }
-      const udp = features.udp === true && prepared.nativeTransport?.available === true;
+      const turn = prepared.nativeTransport?.mode === 'turn';
+      const turnServer = turn && features.turn === true && validTurnServer(grant?.turn) ? grant.turn : null;
+      const udp = features.udp === true && prepared.nativeTransport?.available === true && (!turn || !!turnServer);
       const rich = prepared.nativeClipboard === 'rich-v1' && features.clipboardRich === true && features.clipboardMaxBytes === 2097152;
       const clipboard = !this.readOnly && (rich || prepared.nativeClipboard === 'text' && features.clipboardText === true && Number.isSafeInteger(features.clipboardMaxBytes) && features.clipboardMaxBytes > 0);
       this.capabilities = Object.freeze({...this.capabilities,
@@ -197,7 +205,7 @@ export class RemoteXAppNativeClient extends EventTarget {
       const display = this._display = new NativeDisplay(this.container, socketURL.href, {
         resize:!this.readOnly && prepared.effectivePolicy?.display?.allowClientResize === true, scale:this._displaySettings.scale, readOnly:this.readOnly, clipboard, keyboardPolicy:this._keyboardPolicy,
         prepareClipboardPaste:() => { current(); return this._clipboardSync.paste(); },
-        udp:udp && this.preferUDP, protocols:grant ? [`remotexapp-grant.${grant.token}`] : [] });
+        udp:udp && this.preferUDP, turnServers:turnServer ? [turnServer] : null, protocols:grant ? [`remotexapp-grant.${grant.token}`] : [] });
       display.addEventListener('transportchange', () => {
         if (epoch === this._epoch) this.dispatchEvent(new CustomEvent('transportchange', {detail:this.getStats()}));
       });
@@ -205,9 +213,10 @@ export class RemoteXAppNativeClient extends EventTarget {
         const renew = async () => {
           if (epoch !== this._epoch || !this._grant) return;
           try {
-            await this.manager.request(`${base}/lease`, {method:'POST', body:this._grant.request,
+            const lease = await this.manager.request(`${base}/lease`, {method:'POST', body:this._grant.request,
               signal:AbortSignal.any([signal, AbortSignal.timeout(10000)])});
             current();
+            if (turnServer && validTurnServer(lease?.turn)) display.configureTurnServers?.([lease.turn]);
             this._grantTimer = setTimeout(renew, grant.renewAfterMs);
           } catch (cause) {
             if (epoch !== this._epoch) return;
@@ -308,12 +317,14 @@ export class RemoteXAppNativeClient extends EventTarget {
     if (!raw || keys.some(key => !Number.isSafeInteger(raw[key]) || raw[key] < 0)) return snapshot;
     const udpKeys = ['udpReceivedBytes','udpPackets','udpRectangles'];
     const udp = this.capabilities.udp && udpKeys.every(key => Number.isSafeInteger(raw[key]) && raw[key] >= 0);
+    const screenUDP = udp && raw.screenTransport === 'webrtc-udp' && raw.udpRectangles > 0;
     return {...snapshot, available:true, ...Object.fromEntries(keys.map(key => [key, raw[key]])),
       ...(this.capabilities.latency ? {latency:{wss:latencySample(raw.latency?.wss),
         udp:udp ? latencySample(raw.latency?.udp) : {state:'inactive'}}} : {}),
       ...(this.capabilities.udpLoss ? {udpLoss:udp ? udpLossSample(raw.udpLoss) : {state:'inactive'}} : {}),
       ...(udp ? {...Object.fromEntries(udpKeys.map(key => [key,raw[key]])),
-        transport:raw.screenTransport === 'webrtc-udp' && raw.udpRectangles > 0 ? 'webrtc-udp' : this._transport,
+        transport:screenUDP ? 'webrtc-udp' : this._transport,
+        ...(screenUDP ? {webRTCPath:this.instance?.nativeTransport?.mode === 'turn' ? 'turn' : 'direct'} : {}),
         controlTransport:this._transport, udpState:raw.udpState, udpReason:raw.udpReason} : {})};
   }
 

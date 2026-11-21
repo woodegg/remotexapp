@@ -5468,3 +5468,27 @@ UAT. Existing runtime pins required a separate guarded upgrade of the empty
 test desktop; Manager restart alone did not change them. The original non-test
 Manager/display remained untouched. Human UAT, untested fault variants,
 downstream deployment and publication remain separate gates.
+
+## 2026-11-21 — Allocate Kasm UDP listeners automatically and support TURN
+
+[Issue #78](https://github.com/woodegg/remotexapp/issues/78) extends the
+[Kasm UDP design](kasm-native-architecture.md#udp-design) with the
+[routed mode contract](native-webrtc-routing.md). New runtimes use off,
+direct, or TURN policy and an automatically assigned local listener.
+Direct may use a same-port range mapping. TURN keeps the session
+listener on a bounded private network and centralizes public relay
+ingress. The trusted edge signs short-lived TURN credentials after
+Viewer authorization. Retire manually configured UDP runtimes before
+switching the deployment. Schema 7 fences readers that lack the new
+routed lease contract. Actual UDP paint, authenticated fallback and
+multi-container independence are qualification gates.
+
+## 2026-11-21 — Discover the TURN backend address during runtime allocation
+
+The [routed mode contract](native-webrtc-routing.md#deployment-configuration)
+now discovers one eligible private IPv4 on active non-loopback interfaces,
+or limits discovery to the configured interface. An absent or ambiguous
+address leaves new sessions on WSS. Resolve again for each new lease so
+new runtimes observe address changes. Keep the selected address in each
+existing lease. Edge routing and relay peer authorization remain deployment
+inputs and must follow the workload address.

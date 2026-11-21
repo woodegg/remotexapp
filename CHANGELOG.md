@@ -16,8 +16,8 @@ Target: `0.16.2`. SDK `0.32.0`.
 - Include Ubuntu's `x11-utils` in Core host preparation and check for
   `xdpyinfo` at preflight. This prevents a missing X11 readiness utility from
   appearing as a display startup timeout with TigerVNC or Kasm.
-- Document how to provision the separately released LightView 0.1.13 host
-  runtime on Ubuntu 26.04 with the existing `lightview@1.0.13` App.
+- Document the Ubuntu 26.04 LightView host runtime requirements for the
+  existing `lightview@1.0.13` App.
 
 ## 0.16.1
 

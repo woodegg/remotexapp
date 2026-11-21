@@ -86,10 +86,10 @@ capabilities the Driver consumes, including `engine_state` and
 0.1.7 lacked those fields and failed readiness. Record the checksum and
 WebKitGTK identity of the approved host build; see `apps/lightview/README.md`.
 
-For Ubuntu 26.04 x86_64, use a LightView host archive explicitly built for
-Ubuntu 26.04. Download the archive and its matching SHA-256 file from the
-[LightView release](https://github.com/woodegg/lightview/releases/tag/v0.1.12),
-verify the checksum, and follow the upstream install steps for that archive.
+For Ubuntu 26.04 x86_64, select `lightview-0.1.13-ubuntu26.04-x86_64.tar.gz`
+and its SHA-256 file from the
+[LightView v0.1.13 release](https://github.com/woodegg/lightview/releases/tag/v0.1.13).
+Verify the checksum and follow the upstream install steps for that archive.
 The Ubuntu 24.04 binary uses a different runtime ABI. The RemoteXApp App
 Package is `lightview@1.0.13`. Run the Ubuntu host check below as the
 RemoteXApp runtime user, then open the App in a Viewer.

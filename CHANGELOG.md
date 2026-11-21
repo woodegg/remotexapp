@@ -11,6 +11,10 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Include Ubuntu's `x11-utils` in Core host preparation and check for
+  `xdpyinfo` at preflight. This prevents a missing X11 readiness utility from
+  appearing as a display startup timeout with TigerVNC or Kasm.
+
 ## 0.16.1
 
 Target: `0.16.1`. SDK `0.32.0`.

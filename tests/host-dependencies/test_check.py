@@ -32,6 +32,25 @@ class HostTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             host.load_manifests("mousepad,../unknown")
 
+    def test_x11_readiness_is_a_core_dependency(self):
+        for ubuntu in ("24.04", "26.04"):
+            with self.subTest(ubuntu=ubuntu):
+                self.assertIn("x11-utils", host.package_list([], ubuntu))
+                self.assertIn("x11-utils", host.package_list(host.load_manifests("lightview"), ubuntu))
+
+        def executable(command):
+            return None if command == "xdpyinfo" else "/fixture/exe"
+
+        with (
+            patch.object(host.shutil, "which", side_effect=executable),
+            patch.object(host, "python_probe", return_value=True),
+            patch.object(host, "run_probe", return_value=True),
+        ):
+            commands = {name: ok for name, ok, _ in host.check_host([])
+                        if name.startswith("command: ")}
+        self.assertEqual([name for name, ok in commands.items() if not ok],
+                         ["command: xdpyinfo"])
+
     def test_installed_catalog_including_custom_app(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

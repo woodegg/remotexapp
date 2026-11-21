@@ -10,7 +10,7 @@ Package installs its driver and manifest—not Firefox, LibreOffice, etc.
 | Dependency | Why it is required | Supplied by RemoteXApp? |
 |---|---|---|
 | Supported Linux host, systemd/user manager and non-root runtime account | Services, runtime units and lifecycle supervision | No; formal archives target Linux amd64, with Ubuntu/X11 validation |
-| TigerVNC (`Xtigervnc`) and `xauth` | Virtual display and X11 authorization | No |
+| TigerVNC (`Xtigervnc`), `xauth` and `xdpyinfo` (Ubuntu `x11-utils`) | Virtual display, X11 authorization and display readiness for TigerVNC and Kasm | No |
 | D-Bus (`dbus-daemon`, `dbus-send`), `ibus` / `ibus-daemon` | Core-owned session services and bounded protocol readiness | No |
 | Python 3, PyGObject (`gi`), GLib and IBus introspection bindings | Shipped Unicode input engine | Engine source is bundled; interpreter/bindings are not |
 | X11, XTest and libxdo runtime libraries; `xdotool` | Native X11 input and driver helpers | No |

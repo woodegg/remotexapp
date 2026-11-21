@@ -38,7 +38,7 @@ runtime_dir="/run/user/$(id -u)"
 [[ "$(stat -c %a "$runtime_dir")" == 700 ]] || { echo "user runtime directory must be mode 0700" >&2; exit 1; }
 [[ -S "$runtime_dir/bus" ]] || { echo "account D-Bus socket is unavailable" >&2; exit 1; }
 
-for command_name in Xtigervnc xauth dbus-daemon dbus-send ibus ibus-daemon python3 xdotool; do
+for command_name in Xtigervnc xauth dbus-daemon dbus-send ibus ibus-daemon python3 xdpyinfo xdotool; do
   command -v "$command_name" >/dev/null 2>&1 || { echo "missing $command_name" >&2; exit 1; }
 done
 DBUS_SESSION_BUS_ADDRESS="unix:path=$runtime_dir/bus" dbus-send --session --dest=org.freedesktop.DBus --type=method_call --print-reply / org.freedesktop.DBus.ListNames >/dev/null

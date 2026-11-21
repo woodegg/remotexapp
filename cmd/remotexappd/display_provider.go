@@ -94,7 +94,13 @@ func validateDisplayComponents(c runtimeComponents, verify bool) error {
 		if c.NativeAudio != "" && c.NativeAudio != sessionaudio.Protocol {
 			return errors.New("invalid native audio protocol")
 		}
-		if !validUDPLease(c.UDPEndpoint) || (!c.NativeUDP && (c.UDPEndpoint != nil || c.UDPUnavailableReason != "")) || (c.UDPEndpoint != nil && c.UDPUnavailableReason != "") || (c.UDPUnavailableReason != "" && c.UDPUnavailableReason != "endpoint-pool-full" && c.UDPUnavailableReason != udpInterfaceUnavailable) {
+		if !validUDPLease(c.UDPEndpoint) || (!c.NativeUDP && (c.UDPEndpoint != nil || c.UDPUnavailableReason != "")) || (c.UDPEndpoint != nil && c.UDPUnavailableReason != "") {
+			return errors.New("invalid native UDP snapshot")
+		}
+		switch c.UDPUnavailableReason {
+		case "", "endpoint-pool-full", udpInterfaceUnavailable, "endpoints-not-configured":
+			// Pre-routing Managers wrote endpoints-not-configured for WSS-only snapshots.
+		default:
 			return errors.New("invalid native UDP snapshot")
 		}
 		if (c.NativeClipboard != "" && c.NativeClipboard != "text" && c.NativeClipboard != "rich-v1") || c.Kasm == nil || !kasmbundle.ValidDigest(c.Kasm.SHA256) || !filepath.IsAbs(c.Kasm.Directory) || filepath.Clean(c.Kasm.Directory) != c.Kasm.Directory || c.UnicodeEngine != "" {

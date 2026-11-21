@@ -65,6 +65,10 @@ and has yet to paint. A ready Viewer still requires a real frame.
 
 ## Migration and rollback
 
+A Manager upgrade can adopt compatible WSS-only Kasm runtimes with no UDP
+lease, including legacy manifests reporting `endpoints-not-configured`.
+Those runtimes retain their component, generation and transport.
+
 Retire runtimes using the previous manually configured UDP slots before
 running this version. Capture the configuration of any managed registration that
 pins a legacy slot, then unregister it without purging its profile. Register

@@ -21,6 +21,8 @@ Target: `0.17.0`. SDK `0.33.0`.
   discovers a unique private interface address for new runtimes by default.
   The SDK exposes the observed route as `webRTCPath`. Replace legacy UDP
   endpoint catalogs using the [0.17 WebRTC migration](docs/native-webrtc-routing.md#migration-and-rollback).
+  Adopt existing WSS-only Kasm runtimes recorded with no legacy endpoint
+  catalog and preserve their component and session pins.
 
 - Use KasmVNC by default for new runtimes with an administrator-provisioned
   immutable Kasm bundle. Configure it with `REMOTEXAPP_KASM_BUNDLE` or

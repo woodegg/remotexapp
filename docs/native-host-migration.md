@@ -1,22 +1,27 @@
-# Core 0.15 → 0.16: embedding-host migration to the native SDK
+# Embedding-host migration to RemoteXApp 0.17
 
-This guide implements the scope in [NHI-001 through NHI-010](native-host-integration.md).
-It describes the reference workbench and the changes an embedding host must
-make. It is not evidence that the downstream application has been changed or
-accepted. Legacy SDK names and events are not compatibility requirements.
+Use this guide to move a host application from the Core 0.15 legacy SDK or a
+Core 0.16 native integration to **Core 0.17.0 and browser SDK 0.33.0**.
+The host retains file routing, template selection, window and workspace state,
+and user consent. The native SDK handles Viewer attachment and recovery.
+The [host requirements](native-host-integration.md) define the integration
+scope. Verify the workflows in the reference workbench and then in your own
+application.
 
-Preserve the host's functional workflows while adapting to native input,
-clipboard, audio and ownership. Core 0.16 keeps the TigerVNC/noVNC default.
-Core 0.17 defaults new runtimes to KasmVNC. Before upgrading to 0.17, follow
-the [provider rollout instructions](operations.md#choose-the-display-provider)
-to supply a bundle or explicitly retain TigerVNC. Existing runtime pins are
-preserved in either case.
+Core 0.17 defaults newly created runtimes to KasmVNC. Provision a verified
+server/client bundle before switching the Manager. To continue using TigerVNC
+for new runtimes, select it explicitly. Existing runtimes keep their provider
+and component pins. See the
+[provider rollout instructions](operations.md#choose-the-display-provider).
 
 ## Choose the exact migration target
 
-**Core 0.16.0 pairs with SDK 0.31.0. Core 0.16.1 pairs with SDK 0.32.0 and
-adds the SDK recovery panel.** Match the artifact and native component to the
-SDK contract you integrate.
+For Core 0.17, load SDK 0.33.0 from the matching Manager's authenticated
+`/sdk/index.js`, under its proxy prefix if one is configured. Record the
+Core commit and archive SHA-256, served SDK version, native component digest
+and enabled App Package versions. See the
+[0.17.0 qualification record](https://github.com/woodegg/remotexapp/issues/75)
+for the release artifact and its verification.
 
 | Target | Integration entry | Recovery and qualification boundary |
 | --- | --- | --- |
@@ -122,9 +127,10 @@ remains the ordinary App creation API and cannot create user-home desktops.
 
 ## Workflow changes for the recovery target
 
-The table uses the SDK 0.32.0 View entry. On the published 0.31.0 baseline,
-retain the lower-level `open()`/`attach()` adapter until its replacement is
-qualified. Capability detection must not silently mix SDK builds or providers.
+SDK 0.33.0 keeps the `host.mount()` window API introduced in SDK 0.32.0.
+Hosts upgrading from the 0.31.0 baseline can qualify that API alongside their
+existing `open()`/`attach()` adapter. Use the served SDK and the selected
+instance's actual provider when dispatching an attachment.
 
 | Existing host responsibility | Native integration | Retained contract / host change |
 | --- | --- | --- |
@@ -140,7 +146,7 @@ qualified. Capability detection must not silently mix SDK builds or providers.
 | Close-and-stop editor | Explicit stop through the current `view.session`, then `view.release()` | Keep the separate user decision and pinned shutdown policy. A stale generation cannot stop its replacement. Do not force automatically |
 | Text/shortcut injection | `viewer.sendText(text)` / `viewer.sendKey(key, {modifiers})` | Native key path, no clipboard fallback; validate receipt target and perform App readback when required |
 | Clipboard prompts | `configureClipboard`, `requestClipboardPermission`, manual directional actions | Replace legacy prompt/offer UI. Explain auto/manual/off, focus ownership, permissions and reset on reconnect |
-| Speaker/microphone | `await session.audio()`, then explicit interest switches inside browser gestures | Prepare interest before the user enables playback/capture. Shared server transport remains separate from display sockets |
+| Speaker/microphone | Prepare `session.audio()` when the current Session is ready. Call `setSpeaker()` or `setMicrophone()` from the user's click | The host can initialize in the background and expose a single click for either direction |
 | Agent control endpoints | `session.connections()` and a trusted local executor | CDP, BiDi, UNO and D-Bus stay distinct, loopback-only protocols. Revalidate generation before control |
 | Logout | `await host.logout()` | Release this host's windows/tasks and retire the authenticated audio login epoch |
 
@@ -236,6 +242,16 @@ Tabs of the same session share its desired route, with explicit playback/capture
 ownership. Removing a display does not remove its separately retained audio
 interest. Capture cannot silently restart after a failure.
 
+In an embedding host, obtain the audio interest in the background when the
+current Session becomes available. Keep both switches off by default and show
+a loading or retry state until the interest is ready. Invoke
+`interest.setSpeaker(enabled)` or `interest.setMicrophone(enabled)` directly
+from the corresponding user click. Preparing the interest leaves playback,
+capture and the audio WebSocket idle. The first enabled switch starts the
+shared connection. On generation change, discard the old interest, prepare
+the new Session's interest and require a fresh microphone action. A late
+preparation result for a closed window must be released.
+
 Native clipboard supports plain text, HTML and PNG within an aggregate 2 MiB.
 It excludes file/folder transfer. Automatic directions require explicit opt-in
 and browser permissions; only the active Viewer synchronizes. Empty local reads
@@ -256,6 +272,13 @@ are unavailable, never fabricated zeroes.
 
 ## Deployment-owner rollout and rollback
 
+On Ubuntu, install `x11-utils` so the Manager can use `xdpyinfo` for display
+readiness. For the LightView template on Ubuntu 26.04, provision the
+distribution-specific LightView v0.1.13 host binary and verify its checksum.
+The RemoteXApp App Package is `lightview@1.0.13`. See
+[host dependencies and LightView](dependencies.md#must-have-when-the-corresponding-app-is-installed)
+and [Ubuntu preparation](dependencies.md#ubuntu-2404--2604-preparation).
+
 1. Inventory Core/SDK/component/App identities and the actual provider, runtime
    generations, active Viewers, managed intent and document/profile owners.
    Snapshot compatible state and persistent data; retain the previous artifacts.
@@ -274,13 +297,25 @@ are unavailable, never fabricated zeroes.
    `targetRevision`, following the [upgrade API](runtime-upgrade-api.md).
    The recovery panel's ordinary Restart action is not this upgrade operation.
    Never calculate the next generation or automatically retry an uncertain POST.
-5. Treat TigerVNC → Kasm and WSS-only → UDP profile changes as stopped, scoped
-   migrations. Do not switch provider/network profile under a live writer.
-   WSS remains the functional baseline. With Core 0.17, retire old catalog
-   leases before switching to a routed UDP range. Provision the correct ingress,
-   relay and firewall rules for the selected mode. The Manager operates under
-   the existing non-root account. See the
-   [WebRTC rollout and rollback steps](native-webrtc-routing.md#migration-and-rollback).
+5. Migrate display providers one runtime at a time, after saving work and closing
+   its Viewers. Start with WSS and verify the actual instance reports
+   `displayProvider: "kasm"` and paints a fresh frame.
+
+   - **Ordinary Apps.** Stop the old runtime and wait for it to stop. Open the
+     same template with the original parameters. Retain its `profileRef`
+     wherever the App uses a persistent profile.
+   - **Managed desktops.** Retain the registration, `managedId`, Unix user and
+     HOME. Set the registered desktop's desired state to `stopped` using the
+     Console or managed-instance API. Wait for an observed `stopped` state
+     and completed runtime teardown, then set the desired state to `running`.
+     Resolve any unsaved-work or shutdown veto before proceeding.
+   - **Previous UDP deployments.** Compatible WSS Kasm runtimes with no UDP
+     lease can be adopted with the same pins and generation. Retire old
+     catalog-backed UDP runtimes before installing 0.17. A registration that
+     pins an old UDP slot needs the specific
+     [legacy-slot migration](native-webrtc-routing.md#migration-and-rollback).
+     For direct UDP or TURN, the deployment owner sets the selected listener
+     range, routing and firewall rules.
 6. Verify current pins, managed intent, fresh frames, input/file readback,
    consented clipboard/audio and cleanup through the reference pages, then the
    real embedding host. For rollback, stop affected native runtimes with a
@@ -306,7 +341,17 @@ acceptance. Exact candidate qualification and the consolidated UAT checklist
 are recorded in the [candidate evidence](../tests/kasm-native/NATIVE-HOST.md)
 and [single UAT checklist](../tests/kasm-native/NATIVE-HOST-UAT.md) for Issue #57.
 
-For the recovery target, also use `/sdk/recovery.html` under the same prefix.
+For Core 0.17, use both `/sdk/host.html` and `/sdk/recovery.html` under the same
+prefix. Verify the version and provider, discover templates through
+`GET /api/templates`, exercise ordinary App and managed-desktop opens, then
+check input, clipboard, audio with explicit consent, reconnect and window
+release. If the deployment enables WebRTC, confirm the expected
+`webRTCPath` after UDP paint and verify WSS fallback. Repeat the relevant
+workflow in the embedding application and record its result separately.
+The [0.17.0 qualification record](https://github.com/woodegg/remotexapp/issues/75)
+tracks the exact release artifact.
+
+For the earlier recovery qualification, use `/sdk/recovery.html` under the same prefix.
 The [November 20 results](../tests/kasm-native/RECOVERY-EXPERIENCE-20261120.md)
 record 24 fault modes, default/custom panels, multi-Viewer isolation, protected
 managed recovery and resource cleanup on the exact development pair. Earlier

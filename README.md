@@ -47,12 +47,11 @@ PNG clipboard sync. WSS works by default. For screen acceleration, enable
 allocate UDP ports. RemoteXApp targets Linux X11 and uses its own browser SDK
 and transport. You supply the host, authentication and tenant isolation.
 
-**Adapting an existing 0.15 host?** Start with the
-[0.15 → 0.16 migration guide](docs/native-host-migration.md). It distinguishes
-the 0.16.0 baseline (SDK 0.31.0) from the 0.16.1 recovery target (SDK 0.32.0),
-explains the simpler `mount()`/`release()` integration and lists the matched
-Core/component, existing-runtime upgrade and downstream acceptance requirements.
-For Core 0.17, check the [provider defaults](docs/operations.md#choose-the-display-provider)
+**Adapting an existing host?** Start with the
+[0.17 host migration guide](docs/native-host-migration.md). It maps the 0.15
+and 0.16 host workflows to SDK 0.33.0, including `mount()`/`release()`,
+audio controls, KasmVNC cutover and the downstream acceptance checklist.
+Check the [provider defaults](docs/operations.md#choose-the-display-provider)
 and the [UDP migration](docs/native-webrtc-routing.md#migration-and-rollback) before upgrading.
 
 ## Embed with the native SDK

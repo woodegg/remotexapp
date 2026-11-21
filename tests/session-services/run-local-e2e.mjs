@@ -20,7 +20,7 @@ let manager;
 
 async function wait(check,message,timeout=15000){const end=Date.now()+timeout;while(Date.now()<end){const value=await check();if(value)return value;await sleep(50)}throw Error(message)}
 async function startManager(){
-  manager=spawn(join(root,'bin/remotexappd'),['-listen','127.0.0.1:21995','-auth-mode','none','-state-dir',state,
+  manager=spawn(join(root,'bin/remotexappd'),['-listen','127.0.0.1:21995','-auth-mode', 'none', '-display-provider', 'tigervnc','-state-dir',state,
     '-class-config',legacy,'-app-package-root',apps,'-apps-enabled',enabled,'-expose-internals=true',
     '-gateway-bin',join(root,'bin/novnc-input'),'-status-bin',join(root,'bin/remotexapp-status'),
     '-core-driver-dir',join(root,'drivers/common'),'-ibus-engine',join(root,'components/remote-unicode-engine/engine.py'),

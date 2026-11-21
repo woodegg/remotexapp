@@ -11,8 +11,14 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.16.2`. SDK `0.32.0`.
+Target: `0.17.0`. SDK `0.32.0`.
 
+- Use KasmVNC by default for new runtimes with an administrator-provisioned
+  immutable Kasm bundle. Configure it with `REMOTEXAPP_KASM_BUNDLE` or
+  `-kasm-bundle`. Existing deployments can retain TigerVNC for new runtimes
+  by explicitly selecting it before upgrade. Persisted provider and component
+  pins remain authoritative for adoption, ordinary restart and recovery. The
+  built-in Console opens both Kasm and TigerVNC runtimes.
 - Include Ubuntu's `x11-utils` in Core host preparation and check for
   `xdpyinfo` at preflight. This prevents a missing X11 readiness utility from
   appearing as a display startup timeout with TigerVNC or Kasm.

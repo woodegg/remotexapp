@@ -9,7 +9,7 @@ const assetIndex = moduleURL.pathname.lastIndexOf('/assets/');
 const serviceBase = assetIndex >= 0 ? moduleURL.pathname.slice(0, assetIndex) : '';
 // Build injects the matching immutable SDK filename. Resolve beside this bundle
 // so a reverse-proxy prefix is preserved without consulting the mutable entry.
-const { RemoteXAppClient, RemoteXAppManager, RemoteXAppAPIError, RemoteXAppClipboardPrompts, RemoteXAppCoordinator, SDK_VERSION } = await import(new URL(__REMOTEXAPP_CONSOLE_SDK__, moduleURL).href);
+const { RemoteXAppClient, RemoteXAppNativeClient, RemoteXAppManager, RemoteXAppAPIError, RemoteXAppClipboardPrompts, RemoteXAppCoordinator, SDK_VERSION } = await import(new URL(__REMOTEXAPP_CONSOLE_SDK__, moduleURL).href);
 
 const path = location.pathname;
 const viewerMatch = path.match(/\/remotexapps\/([^/]+)\/kiosk[.]html$/);
@@ -53,6 +53,43 @@ function element(tag, attributes = {}, ...children) {
   }
   node.append(...children.filter(child => child !== undefined && child !== null));
   return node;
+}
+
+function installNativeClipboardControls(client, host, report) {
+  const enable = element('input', {type:'checkbox'});
+  const send = element('button', {type:'button', text:'Local → remote'});
+  const receive = element('button', {type:'button', text:'Remote → local'});
+  const update = () => {
+    enable.disabled = client.state !== 'ready' || !client.capabilities.clipboard;
+    enable.checked = client.clipboardEnabled;
+    send.disabled = receive.disabled = enable.disabled || !enable.checked;
+  };
+  enable.onchange = () => {
+    try {
+      client.focus();
+      client.enableClipboard(enable.checked);
+    } catch (error) {
+      report(error.message, true);
+      update();
+    }
+  };
+  send.onclick = () => {
+    client.focus();
+    client.copyClipboardToRemote()
+      .then(() => report('Local clipboard synchronized.'))
+      .catch(error => report(error.message, true));
+  };
+  receive.onclick = () => {
+    client.focus();
+    client.copyClipboardToLocal()
+      .then(() => report('Remote clipboard synchronized.'))
+      .catch(error => report(error.message, true));
+  };
+  host.append(element('label', {}, enable, document.createTextNode(' Enable clipboard')), send, receive,
+    element('a', {href:`${serviceBase}/sdk/host.html`, text:'Native workbench'}));
+  client.addEventListener('statechange', update);
+  client.addEventListener('clipboardchange', update);
+  update();
 }
 
 function installClipboardControls(client, host, screen, report) {
@@ -380,7 +417,7 @@ async function startConsole(consoleMode) {
     function closeViewer(entry) {
       if (!entry || !viewerWindows.delete(entry.id)) return;
       entry.prompts?.destroy();
-      entry.client.destroy();
+      entry.dispose();
       entry.node.remove();
       entry.task.remove();
       if (activeWindowID === entry.id) {
@@ -445,17 +482,30 @@ async function startConsole(consoleMode) {
       ui.windowTaskbar.append(task);
       ui.emptyWorkspace.hidden = true;
 
-      const client = new RemoteXAppClient({ manager, instance, container:screen, resize:'class', autoReconnect:true, diagnosticsEnabled:true });
-      const entry = { id, instance, node, task, client, prompts:null };
+      const native = instance.displayProvider === 'kasm';
+      const client = native
+        ? new RemoteXAppNativeClient({ manager, container:screen, reconnect:true })
+        : new RemoteXAppClient({ manager, instance, container:screen, resize:'class', autoReconnect:true, diagnosticsEnabled:true });
+      const connect = () => native ? client.connect(instance.id) : client.connect();
+      let diagnosticsTimer;
+      const entry = { id, instance, node, task, client, prompts:null, dispose() {
+        clearInterval(diagnosticsTimer);
+        if (native) client.dispose();
+        else client.destroy();
+      } };
       viewerWindows.set(id, entry);
       const report = (text, error = false) => {
         status.textContent = text;
         status.classList.toggle('error', error);
         if (error) message(`${label}: ${text}`, true);
       };
-      entry.prompts = installClipboardControls(client, clipboardHost, screen, report);
-      installConnectionMaskSwitch(client, clipboardHost);
-      installIdleLeaseSwitch(client, clipboardHost, report);
+      if (native) {
+        installNativeClipboardControls(client, clipboardHost, report);
+      } else {
+        entry.prompts = installClipboardControls(client, clipboardHost, screen, report);
+        installConnectionMaskSwitch(client, clipboardHost);
+        installIdleLeaseSwitch(client, clipboardHost, report);
+      }
       client.addEventListener('statechange', event => {
         state.textContent = event.detail.state;
         task.textContent = `${label} · ${event.detail.state}`;
@@ -467,14 +517,23 @@ async function startConsole(consoleMode) {
         if (!event.target.closest('button,select,input')) activateViewer(entry);
       }, true);
       installWindowDrag(entry, title);
-      reconnect.onclick = () => client.reconnect().catch(error => report(error.message, true));
+      reconnect.onclick = () => (native ? connect() : client.reconnect()).catch(error => report(error.message, true));
       disconnect.onclick = () => client.disconnect();
       diagnosticsToggle.onclick = async () => {
         const visible = diagnostics.hidden;
         diagnostics.hidden = !visible;
         diagnosticsToggle.setAttribute('aria-expanded', String(visible));
-        const snapshot = await client.setDiagnosticsEnabled(visible);
-        if (visible) diagnostics.textContent = JSON.stringify(snapshot, null, 2);
+        if (native) {
+          clearInterval(diagnosticsTimer);
+          if (visible) {
+            const sample = () => { diagnostics.textContent = JSON.stringify(client.getStats(), null, 2); };
+            sample();
+            diagnosticsTimer = setInterval(() => { if (!document.hidden) sample(); }, 1000);
+          }
+        } else {
+          const snapshot = await client.setDiagnosticsEnabled(visible);
+          if (visible) diagnostics.textContent = JSON.stringify(snapshot, null, 2);
+        }
       };
       stop.onclick = () => run('Runtime stop', async () => { await stopRuntime(instance); await refresh(); }).catch(() => {});
       minimize.onclick = () => {
@@ -486,7 +545,7 @@ async function startConsole(consoleMode) {
       close.onclick = () => closeViewer(entry);
       activateViewer(entry);
       try {
-        await client.connect();
+        await connect();
         report('Connected.');
         activateViewer(entry, { focus:true });
         await refresh();

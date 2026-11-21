@@ -14,9 +14,9 @@ See [setup and release boundaries](native-0.16.0-release.md), the
 [native migration guide](native-host-migration.md), [audio contract](native-audio.md)
 and [candidate evidence](../tests/kasm-native/NATIVE-HOST.md).
 
-TigerVNC/noVNC remains the default. The architecture and IBus/input invariants
-below describe that provider; the native provider uses its separately pinned
-Kasm pair and native input/clipboard path. Lifecycle, generation, identity and
+Core 0.17 defaults new runtimes to KasmVNC with a separately pinned server/client
+pair. The architecture and IBus/input notes below also describe the explicit
+TigerVNC/noVNC path. See the [provider rollout instructions](operations.md#choose-the-display-provider). Lifecycle, generation, identity and
 deployment ownership invariants apply to both. Actual downstream integration,
 additional platform matrices and automatic multi-container UDP orchestration
 remain outside this release qualification.
@@ -27,8 +27,8 @@ RemoteXApp manages Linux X11 applications through four boundaries:
 
 1. `remotexappd` validates the App catalog, allocates displays and ports, exposes
    authenticated APIs, and persists generation-qualified runtime state.
-2. TigerVNC supplies the X11 display and RFB transport; `novnc-input` supplies
-   the browser WebSocket gateway and native input/clipboard bridge.
+2. KasmVNC or TigerVNC supplies the X11 display. `novnc-input` supplies the
+   browser gateway. Legacy runtimes also use its IBus input/clipboard bridges.
 3. The pinned Core session supervisor owns generation-local D-Bus/IBus/Unicode
    services. A user-home session borrows the account bus and never stops it.
 4. Versioned App Packages own application launch, readiness, actions and

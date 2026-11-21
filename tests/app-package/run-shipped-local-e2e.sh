@@ -105,7 +105,7 @@ trap cleanup EXIT INT TERM
 
 start_manager() {
   "$manager" \
-    -listen "$listen" -auth-mode none -expose-internals=true \
+    -listen "$listen" -auth-mode none -display-provider tigervnc -expose-internals=true \
     -connections-token-file "$work/connections-token" \
     -state-dir "$state" -class-config "$legacy" \
     -app-package-root "$packages" -apps-enabled "$enabled" \

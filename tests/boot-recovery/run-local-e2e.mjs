@@ -27,7 +27,7 @@ async function stopManager() {
   if (manager && manager.exitCode === null && manager.signalCode === null) await new Promise(r => { manager.once('exit', r); manager.kill('SIGTERM'); });
 }
 async function startManager() {
-  manager = spawn(join(root, 'bin/remotexappd'), ['-listen', '127.0.0.1:21996', '-auth-mode', 'none', '-state-dir', state,
+  manager = spawn(join(root, 'bin/remotexappd'), ['-listen', '127.0.0.1:21996', '-auth-mode', 'none', '-display-provider', 'tigervnc', '-state-dir', state,
     '-document-roots', [offlineRoot, notDirectory, localRoot].join(':'),
     '-class-config', join(work, 'legacy'), '-app-package-root', apps, '-apps-enabled', enabled, '-expose-internals=true',
     '-gateway-bin', join(root, 'bin/novnc-input'), '-status-bin', join(root, 'bin/remotexapp-status'),

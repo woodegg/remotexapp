@@ -1,10 +1,10 @@
 # RemoteXApp browser SDK
 
-## Experimental native Viewer (D1)
+## Native Kasm Viewer
 
-The opt-in Kasm provider uses `RemoteXAppNativeClient`. It is a separate minimal
-adapter; the legacy `RemoteXAppClient` rejects Kasm descriptors. The default
-provider and existing SDK interfaces remain unchanged. D1 qualification is
+The Kasm provider uses `RemoteXAppNativeClient`. Use `RemoteXAppHost` for the
+host/session integration described below. `RemoteXAppClient` continues to
+serve the TigerVNC provider. Historical D1 qualification is
 tracked in [Issue #30](https://github.com/woodegg/remotexapp/issues/30).
 
 ```js

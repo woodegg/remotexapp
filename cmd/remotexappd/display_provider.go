@@ -11,6 +11,7 @@ import (
 	"github.com/woodegg/remotexapp/internal/sessionaudio"
 )
 
+const defaultDisplayProvider = "kasm"
 const nativeManifestSchema = 4
 const nativeAudioManifestSchema = 6
 
@@ -45,19 +46,22 @@ func (m *manager) newRuntimeComponents() runtimeComponents {
 
 func (cfg *config) configureDisplayProvider() error {
 	if cfg.displayProvider == "" {
-		cfg.displayProvider = "tigervnc"
+		cfg.displayProvider = defaultDisplayProvider
 	}
 	if cfg.displayProvider != "tigervnc" && cfg.displayProvider != "kasm" {
 		return errors.New("display-provider must be tigervnc or kasm")
 	}
 	if cfg.displayProvider == "tigervnc" {
 		if cfg.kasmBundle != "" || cfg.nativeClipboard || cfg.nativeAudio || cfg.udpEndpointsFile != "" {
-			return errors.New("kasm-bundle requires display-provider=kasm")
+			return errors.New("Kasm bundle, native clipboard, native audio and UDP configuration require display-provider=kasm")
 		}
 		return nil
 	}
 	if cfg.vncLauncher != "direct" {
 		return errors.New("Kasm requires the direct launcher")
+	}
+	if cfg.kasmBundle == "" {
+		return errors.New("KasmVNC requires a verified bundle via -kasm-bundle or REMOTEXAPP_KASM_BUNDLE; select -display-provider=tigervnc for a legacy deployment")
 	}
 	bundle, err := kasmbundle.Load(cfg.kasmBundle, "")
 	if err != nil {

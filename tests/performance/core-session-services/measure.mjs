@@ -23,7 +23,7 @@ async function start(label) {
   const root=roots[label], dir=join(work,label);
   for (const name of ['state','apps','enabled','legacy']) await mkdir(join(dir,name),{recursive:true});
   await exec(join(root,'scripts/install-shipped-apps.sh'),[join(root,'bin/remotexappd'),join(dir,'apps'),join(dir,'enabled')],{env});
-  manager=spawn(join(root,'bin/remotexappd'),['-listen','127.0.0.1:21996','-auth-mode','none','-state-dir',join(dir,'state'),
+  manager=spawn(join(root,'bin/remotexappd'),['-listen','127.0.0.1:21996','-auth-mode','none','-display-provider','tigervnc','-state-dir',join(dir,'state'),
     '-class-config',join(dir,'legacy'),'-app-package-root',join(dir,'apps'),'-apps-enabled',join(dir,'enabled'),'-expose-internals=true',
     '-gateway-bin',join(root,'bin/novnc-input'),'-status-bin',join(root,'bin/remotexapp-status'),
     '-core-driver-dir',join(root,'drivers/common'),'-ibus-engine',join(root,'components/remote-unicode-engine/engine.py')],{env,stdio:['ignore','ignore','pipe']});

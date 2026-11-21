@@ -55,7 +55,7 @@ async function setTestWebKitEnvironment() {
 
 async function startManager() {
   managerProcess = spawn(join(root, 'bin/remotexappd'), [
-    '-listen', '127.0.0.1:21996', '-auth-mode', 'none', '-expose-internals=true',
+    '-listen', '127.0.0.1:21996', '-auth-mode', 'none', '-display-provider', 'tigervnc', '-expose-internals=true',
     '-state-dir', state, '-class-config', classes, '-app-package-root', apps,
     '-apps-enabled', enabled, '-gateway-bin', join(root, 'bin/novnc-input'),
     '-status-bin', join(root, 'bin/remotexapp-status'), '-core-driver-dir', join(root, 'drivers/common'),

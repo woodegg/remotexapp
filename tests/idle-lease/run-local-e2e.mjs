@@ -23,7 +23,7 @@ async function wait(fn, label, timeout=45000) {
   throw Error(`timed out: ${label}`);
 }
 async function start() {
-  manager = spawn(join(root,'bin/remotexappd'), ['-listen','127.0.0.1:21997','-auth-mode','none','-state-dir',state,
+  manager = spawn(join(root,'bin/remotexappd'), ['-listen','127.0.0.1:21997','-auth-mode', 'none', '-display-provider', 'tigervnc','-state-dir',state,
     '-class-config',classes,'-app-package-root',apps,'-apps-enabled',enabled,'-expose-internals=true',
     '-gateway-bin',join(root,'bin/novnc-input'),'-status-bin',join(root,'bin/remotexapp-status'),
     '-core-driver-dir',join(root,'drivers/common'),'-ibus-engine',join(root,'components/remote-unicode-engine/engine.py'),

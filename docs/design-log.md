@@ -5,6 +5,17 @@
 > [current source versions](current-state.md). Host labels and runtime IDs in
 > historical examples are anonymized.
 
+## 2026-11-20 — Default new runtimes to KasmVNC
+
+[Issue #76](https://github.com/woodegg/remotexapp/issues/76) supersedes the
+0.16 default-provider decision for new runtimes. The Manager defaults to Kasm
+and validates an administrator-supplied immutable server/client bundle at
+startup. TigerVNC has an explicit selection. Persisted provider pins,
+cross-provider upgrade fences and consent requirements remain authoritative.
+Service environment values support normal installation and rollback without
+rewriting existing operator files. The release combines this deployment change
+with the Ubuntu 26.04 LightView v0.1.13 host adaptation.
+
 ## 2026-11-20 — Check the Core X11 readiness utility before launch
 
 On a minimal Ubuntu 26.04 host, both TigerVNC and Kasm started and listened while

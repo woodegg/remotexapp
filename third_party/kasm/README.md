@@ -20,8 +20,9 @@ unchanged by this client diagnostic extension. See the
 [SDK statistics contract](../../docs/browser-sdk.md#native-connection-statistics-development-sdk-0310-dev3).
 
 This directory is the D1 integration recipe, not an upstream release or a
-qualified RemoteXApp distribution. The default provider remains TigerVNC.
-Server and browser client form one separately installed, manifest-pinned pair.
+qualified RemoteXApp distribution. Core 0.17 selects KasmVNC for new runtimes
+by default. Server and browser client form one separately installed,
+manifest-pinned pair.
 Do not update files inside an installed component directory.
 
 Patch 0025 closes per-Viewer control/display BroadcastChannels, removes global
@@ -125,12 +126,15 @@ product qualification.
 
 ## Manager selection
 
-In a project-owned disposable environment, add these flags to the normal
-authenticated Manager launch with the direct launcher:
+Supply the bundle path to the Manager with the direct launcher:
 
 ```sh
--display-provider kasm -kasm-bundle /opt/remotexapp-components/kasm-DIGEST
+-kasm-bundle /opt/remotexapp-components/kasm-DIGEST
 ```
+
+In service configuration set `REMOTEXAPP_KASM_BUNDLE` to that path. Core 0.16
+also requires `-display-provider kasm`. Core 0.17 accepts explicit
+`-display-provider tigervnc` with the native settings unset.
 
 The path must be absolute and canonical, without symlinks or group/world
 writable files/directories. The Manager hashes the manifest and every member;

@@ -53,7 +53,7 @@ async function save(result, error) {
 }
 async function startManager(common = currentCommon) {
   const observation = mode === 'liveness-observation';
-  child = spawn(join(root, 'bin/remotexappd'), ['-listen', `127.0.0.1:${port}`, '-auth-mode', 'none',
+  child = spawn(join(root, 'bin/remotexappd'), ['-listen', `127.0.0.1:${port}`, '-auth-mode', 'none', '-display-provider', 'tigervnc',
     '-state-dir', state, '-class-config', join(work, 'legacy'), '-app-package-root', apps, '-apps-enabled', enabled,
     '-gateway-bin', join(root, 'bin/novnc-input'), '-status-bin', join(root, 'bin/remotexapp-status'),
     '-core-driver-dir', common, '-ibus-engine', join(root, 'components/remote-unicode-engine/engine.py'),

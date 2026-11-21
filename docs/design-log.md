@@ -5482,3 +5482,13 @@ Viewer authorization. Retire manually configured UDP runtimes before
 switching the deployment. Schema 7 fences readers that lack the new
 routed lease contract. Actual UDP paint, authenticated fallback and
 multi-container independence are qualification gates.
+
+## 2026-11-21 — Discover the TURN backend address during runtime allocation
+
+The [routed mode contract](native-webrtc-routing.md#deployment-configuration)
+now discovers one eligible private IPv4 on active non-loopback interfaces,
+or limits discovery to the configured interface. An absent or ambiguous
+address leaves new sessions on WSS. Resolve again for each new lease so
+new runtimes observe address changes. Keep the selected address in each
+existing lease. Edge routing and relay peer authorization remain deployment
+inputs and must follow the workload address.

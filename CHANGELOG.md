@@ -15,7 +15,8 @@ Target: `0.17.0`. SDK `0.32.0`.
 
 - Add optional direct and TURN-relayed WebRTC modes with automatic UDP port
   allocation from a range. WSS remains usable in every mode. The Viewer
-  reports the observed WebRTC path while existing runtimes keep their pins.
+  reports the observed WebRTC path while existing runtimes keep their pins. TURN
+  discovers a unique private interface address for new runtimes by default.
 
 - Use KasmVNC by default for new runtimes with an administrator-provisioned
   immutable Kasm bundle. Configure it with `REMOTEXAPP_KASM_BUNDLE` or

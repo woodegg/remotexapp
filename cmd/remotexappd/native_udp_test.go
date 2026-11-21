@@ -25,6 +25,9 @@ func TestRoutedUDPConfigAndAutomaticLease(t *testing.T) {
 	spec := fmt.Sprintf("%d-%d", port, port)
 	for _, c := range []webRTCConfig{
 		{mode: "off", ports: spec},
+		{mode: "off", interfaceName: "eth0"},
+		{mode: "turn", bind: privateIP, interfaceName: "eth0", ports: spec},
+		{mode: "turn", interfaceName: "not an interface", ports: spec},
 		{mode: "manual"},
 		{mode: "direct", address: privateIP, ports: spec},
 		{mode: "turn", bind: "127.0.0.1", ports: spec},
@@ -39,8 +42,11 @@ func TestRoutedUDPConfigAndAutomaticLease(t *testing.T) {
 	if err := turn.validate(kasmbundle.RichUDPProtocol); err == nil {
 		t.Fatal("old component accepted routed UDP")
 	}
-	if err := turn.validate(kasmbundle.RoutedUDPProtocol); err != nil || turn.address != turn.bind {
+	if err := turn.validate(kasmbundle.RoutedUDPProtocol); err != nil {
 		t.Fatalf("TURN private endpoint rejected: %v", err)
+	}
+	if bind, advertised := turn.endpointAddresses(); bind != privateIP || advertised != privateIP {
+		t.Fatal("explicit TURN address differs from the advertised address")
 	}
 	direct := webRTCConfig{mode: "direct", address: "192.0.2.4", ports: spec}
 	if err := direct.validate(kasmbundle.RoutedUDPProtocol); err != nil {
@@ -100,5 +106,44 @@ func TestRoutedUDPManifestPinsPrivateBind(t *testing.T) {
 	records[0].SchemaVersion = nativeUDPManifestSchema
 	if err := m.validateRuntimeManifest("test", &records[0]); err == nil {
 		t.Fatal("routed endpoint accepted in legacy schema")
+	}
+}
+
+func TestRoutedUDPSelectInterfaceBind(t *testing.T) {
+	private := net.IPv4(10, 0, 0, 1).To4()
+	otherPrivate := net.IPv4(10, 0, 0, 2).To4()
+	local := func(ip net.IP) net.Addr {
+		return &net.IPNet{IP: ip, Mask: net.CIDRMask(len(ip)*8, len(ip)*8)}
+	}
+	public := net.ParseIP("192.0.2.4").To4()
+	ignored := []net.Addr{local(net.IPv4(127, 0, 0, 1).To4()), local(net.ParseIP("2001:db8::1")), local(public)}
+	if got := selectWebRTCBind(append(ignored, local(private)), true); got != private.String() {
+		t.Fatalf("unique TURN IPv4 = %q", got)
+	}
+	if got := selectWebRTCBind(ignored, true); got != "" {
+		t.Fatalf("TURN selected an ineligible IPv4: %q", got)
+	}
+	if got := selectWebRTCBind([]net.Addr{local(private), local(otherPrivate)}, true); got != "" {
+		t.Fatalf("TURN selected an ambiguous IPv4: %q", got)
+	}
+	if got := selectWebRTCBind([]net.Addr{local(public)}, false); got != public.String() {
+		t.Fatalf("direct interface IPv4 = %q", got)
+	}
+}
+
+func TestRoutedUDPAutomaticTURNUnavailableFallsBack(t *testing.T) {
+	policy := webRTCConfig{mode: "turn", ports: "43001-43002"}
+	if err := policy.validate(kasmbundle.RoutedUDPProtocol); err != nil {
+		t.Fatalf("TURN without a hard-coded address must be valid: %v", err)
+	}
+	policy.interfaceName = "rx-no-such-if"
+	m := &manager{cfg: config{webRTC: policy}}
+	c := runtimeComponents{DisplayProvider: "kasm", NativeUDP: true}
+	if err := m.assignUDPEndpoint("instance", &c, false); err != nil || c.UDPEndpoint != nil ||
+		c.UDPUnavailableReason != udpInterfaceUnavailable {
+		t.Fatalf("unavailable interface should use WSS: %v", err)
+	}
+	if view := nativeTransport(&instance{Components: c}); view.Available || view.Policy != "wss-only" {
+		t.Fatalf("unexpected transport descriptor: %+v", view)
 	}
 }

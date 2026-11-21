@@ -18,8 +18,16 @@ back to WSS and reports `endpoint-pool-full`.
 | Mode | Address and routing |
 | --- | --- |
 | `off` | No UDP listener or Viewer ICE negotiation for new runtimes. |
-| `direct` | Set `-webrtc-address` to the externally reachable IPv4. Bind UDP to `-webrtc-bind`, loopback by default. For host-local ingress use the specific receiving interface address. For containers preconfigure one same-port range to the listener. Use non-NAT proxying without PROXY protocol when the backend must not see the browser source IP. |
-| `turn` | Set `-webrtc-bind` to the Kasm IPv4 on a restricted private network shared with the relay. coturn sends to that address directly. Containers with different private IPs may reuse the same port range. |
+| `direct` | Set `-webrtc-address` to the externally reachable IPv4. Bind UDP to `-webrtc-bind`, loopback by default. For host-local ingress select `-webrtc-interface NAME` or set the specific receiving IPv4. For containers preconfigure one same-port range to the listener. Use non-NAT proxying without PROXY protocol when the backend must not see the browser source IP. |
+| `turn` | By default, discover the unique private IPv4 on an active non-loopback interface when starting each runtime. With multiple interfaces use `-webrtc-interface NAME` to select the relay-facing network. The bind address is also advertised as the TURN peer. Containers with different private IPs may reuse the same port range. |
+
+Use `-webrtc-bind` for an explicit IPv4 when a selected interface has multiple
+eligible addresses. The explicit bind and interface options are mutually
+exclusive. When discovery finds no unique eligible address, the runtime starts
+on WSS and reports `interface-ipv4-unavailable`. Subsequent runtimes discover
+again. Active runtimes keep the address in their lease. Provisioning must keep
+the edge backend route, coturn peer rules and firewall aligned with the
+current container IP before starting a new runtime on a changed address.
 
 TURN's public listener and private relay range are independent of the Manager
 range. When the browser is the TURN client and all Kasm peers are on the relay

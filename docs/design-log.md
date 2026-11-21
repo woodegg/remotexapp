@@ -5492,3 +5492,12 @@ address leaves new sessions on WSS. Resolve again for each new lease so
 new runtimes observe address changes. Keep the selected address in each
 existing lease. Edge routing and relay peer authorization remain deployment
 inputs and must follow the workload address.
+
+## 2026-11-21 — Preserve WSS-only Kasm snapshots during routed UDP upgrades
+
+[Issue #80](https://github.com/woodegg/remotexapp/issues/80) preserves valid
+Kasm schema-5 and schema-6 snapshots whose previous Manager wrote
+`endpoints-not-configured` with no UDP lease. The new Manager adopts these
+sessions on WSS with their existing component and generation. Legacy
+configured UDP leases still require the
+[stopped-runtime migration](native-webrtc-routing.md#migration-and-rollback).

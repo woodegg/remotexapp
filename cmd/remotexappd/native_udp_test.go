@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/woodegg/remotexapp/internal/kasmbundle"
+	"github.com/woodegg/remotexapp/internal/sessionaudio"
 	"github.com/woodegg/remotexapp/internal/testfixture"
 )
 
@@ -106,6 +107,49 @@ func TestRoutedUDPManifestPinsPrivateBind(t *testing.T) {
 	records[0].SchemaVersion = nativeUDPManifestSchema
 	if err := m.validateRuntimeManifest("test", &records[0]); err == nil {
 		t.Fatal("routed endpoint accepted in legacy schema")
+	}
+}
+
+func TestLegacyNativeUDPFallbackManifestSurvivesRoutingUpgrade(t *testing.T) {
+	pin := testfixture.KasmProtocol(t, kasmbundle.RichUDPProtocol)
+	for name, schema := range map[string]int{"screen-only": nativeUDPManifestSchema, "with-audio": nativeAudioManifestSchema} {
+		t.Run(name, func(t *testing.T) {
+			m := &manager{cfg: config{stateDir: t.TempDir()}}
+			item := testRuntimeManifest(t, m.cfg.stateDir, "mousepad-0123456789ab", "")
+			item.Components.DisplayProvider = "kasm"
+			item.Components.Kasm = &pin
+			item.Components.UnicodeEngine = ""
+			item.Components.NativeUDP = true
+			item.Components.UDPUnavailableReason = "endpoints-not-configured"
+			if schema == nativeAudioManifestSchema {
+				item.Components.NativeAudio = sessionaudio.Protocol
+			}
+			if err := m.persistRuntime(item); err != nil {
+				t.Fatal(err)
+			}
+
+			records, err := m.loadRuntimeManifests()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(records) != 1 {
+				t.Fatalf("expected one manifest, got %d", len(records))
+			}
+			record := records[0]
+			if record.SchemaVersion != schema || *record.Components.Kasm != pin ||
+				record.Runtime.SessionGeneration != item.SessionGeneration {
+				t.Fatal("adoption changed the persisted runtime identity")
+			}
+			transport := nativeTransport(&record.Runtime)
+			if transport == nil || transport.Policy != "wss-only" || transport.Available ||
+				transport.Reason != "endpoints-not-configured" {
+				t.Fatalf("old WSS snapshot changed transport: %+v", transport)
+			}
+			record.Components.NativeUDP = false
+			if validateDisplayComponents(record.Components, false) == nil {
+				t.Fatal("legacy reason accepted without native UDP capability")
+			}
+		})
 	}
 }
 

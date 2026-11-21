@@ -22,7 +22,8 @@ SDK contract you integrate.
 | --- | --- | --- |
 | Core 0.15 legacy provider | Release-matched `RemoteXAppManager`, optional Coordinator and `RemoteXAppClient` | Existing TigerVNC/noVNC integration; native features require an explicit migration |
 | Published Core 0.16.0 / SDK 0.31.0 | `RemoteXAppHost.open()` → `session.attach()` | Native host baseline; November 3 reference-host UAT is scoped to this baseline; `host.mount()` is absent |
-| Core 0.16.1 / SDK 0.32.0 | `host.mount()` → SDK-owned panel/model → `view.release()` | Includes the 0.31.1 lease-renewal fix and the #70 recovery extension. Consult the exact release qualification before deployment |
+| Core 0.16.1 / SDK 0.32.0 | `host.mount()` → SDK-owned panel/model → `view.release()` | Includes the 0.31.1 lease-renewal fix and the #70 recovery extension |
+| Core 0.17.0 / SDK 0.33.0 | Same native entry points and recovery model | KasmVNC default for new runtimes. Optional direct and TURN screen acceleration. `webRTCPath` reports the route after UDP paint |
 
 For the 0.16.1 recovery target, record the **Core commit/archive hash,
 SDK version and asset hashes, native component manifest hash and App pins**.
@@ -242,8 +243,13 @@ preserve the remote clipboard, and conflicts remain visible rather than guessed.
 
 Optional UDP changes screen delivery. WSS still owns the display connection and
 control/input path; audio retains its independent multiplexed transport. The
-deployment owner supplies the existing endpoint catalog and host forwarding.
-This work does not introduce automatic multi-container UDP orchestration.
+0.16 deployment model uses an operator-supplied endpoint catalog and host
+forwarding. In 0.17 the [WebRTC routing modes](native-webrtc-routing.md)
+automatically allocate a listener from the Manager's configured range. TURN
+lets multiple containers on a shared private relay network reuse the same
+range. Relay deployment, peer access and host firewall rules remain the
+deployment owner's responsibility. SDK 0.33.0 exposes the observed
+`webRTCPath` of `direct` or `turn` only while actual UDP display is active.
 Display stats distinguish actual painted UDP from WSS, active RTT probes,
 bandwidth counters, paint FPS and scoped display-block loss. Missing/stale values
 are unavailable, never fabricated zeroes.
@@ -270,10 +276,11 @@ are unavailable, never fabricated zeroes.
    Never calculate the next generation or automatically retry an uncertain POST.
 5. Treat TigerVNC → Kasm and WSS-only → UDP profile changes as stopped, scoped
    migrations. Do not switch provider/network profile under a live writer.
-   WSS remains the functional baseline; optional UDP needs a bounded endpoint
-   catalog, host forwarding and applicable firewall rules supplied by the
-   deployment owner. Manager receives no container/firewall privileges. See
-   [UDP configuration and trust boundaries](native-udp-uat.md).
+   WSS remains the functional baseline. With Core 0.17, retire old catalog
+   leases before switching to a routed UDP range. Provision the correct ingress,
+   relay and firewall rules for the selected mode. The Manager operates under
+   the existing non-root account. See the
+   [WebRTC rollout and rollback steps](native-webrtc-routing.md#migration-and-rollback).
 6. Verify current pins, managed intent, fresh frames, input/file readback,
    consented clipboard/audio and cleanup through the reference pages, then the
    real embedding host. For rollback, stop affected native runtimes with a

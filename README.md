@@ -41,16 +41,19 @@ You can also package another X11 app without rebuilding the Manager.
 The experience is Citrix-style desktop and application delivery, with a
 programmable integration surface for developers. New runtimes use KasmVNC by
 default with a separately provisioned, verified server/client bundle. The host
-SDK provides shared speaker/microphone transport, automatic text/HTML/PNG
-clipboard and optional screen UDP. Bring your own Linux host, authentication and tenant
-isolation; Citrix ICA/HDX is not supported. See the [0.16.0 setup and migration
-boundaries](docs/native-0.16.0-release.md).
+SDK provides shared speaker/microphone transport and consented text, HTML and
+PNG clipboard sync. WSS works by default. For screen acceleration, enable
+[direct or TURN-relayed WebRTC](docs/native-webrtc-routing.md) and let the Manager
+allocate UDP ports. RemoteXApp targets Linux X11 and uses its own browser SDK
+and transport. You supply the host, authentication and tenant isolation.
 
 **Adapting an existing 0.15 host?** Start with the
 [0.15 → 0.16 migration guide](docs/native-host-migration.md). It distinguishes
 the 0.16.0 baseline (SDK 0.31.0) from the 0.16.1 recovery target (SDK 0.32.0),
 explains the simpler `mount()`/`release()` integration and lists the matched
 Core/component, existing-runtime upgrade and downstream acceptance requirements.
+For Core 0.17, check the [provider defaults](docs/operations.md#choose-the-display-provider)
+and the [UDP migration](docs/native-webrtc-routing.md#migration-and-rollback) before upgrading.
 
 ## Embed with the native SDK
 

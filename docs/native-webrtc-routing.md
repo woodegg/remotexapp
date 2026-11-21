@@ -32,8 +32,13 @@ current container IP before starting a new runtime on a changed address.
 TURN's public listener and private relay range are independent of the Manager
 range. When the browser is the TURN client and all Kasm peers are on the relay
 network, publish the TURN listener and allow the private relay range only on
-that network. If Kasm peers must reach public relay candidates, publish and
-map the relay port range one-to-one and configure coturn's external address.
+that network. For example, an edge can expose just `3478/udp` to browsers.
+The coturn relay interface and its `min-port`/`max-port` range then remain
+private, alongside the Manager's separate `-webrtc-ports` range. Kasm talks
+to the private relay as a peer. The browser gets its TURN URL from the same
+authenticated edge that serves Viewer grants. HTTPS and WSS keep their own
+ingress. If Kasm peers must reach public relay candidates, publish and map the
+relay port range one-to-one and configure coturn's external address.
 
 ## Authorization and observations
 
@@ -52,9 +57,10 @@ TURN allocations and their expiry.
 The paired Viewer uses relay-only ICE for TURN, retains sanitized WSS signaling,
 and falls back to WSS when credentials, negotiations or UDP traffic fail.
 Renewal keeps credentials fresh for subsequent negotiations. Existing
-`transport: "webrtc-udp"` remains stable. Optional `webRTCPath` identifies
-`direct` or `turn` once UDP rectangles have painted. The paired adapter requests up to three
-initial full refreshes when an idle shared display has completed RFB setup
+`transport: "webrtc-udp"` remains stable. SDK 0.33.0 adds optional
+`webRTCPath` for `direct` or `turn` once UDP rectangles have painted. The paired
+adapter requests up to three initial full refreshes when an idle shared display
+has completed RFB setup
 and has yet to paint. A ready Viewer still requires a real frame.
 
 ## Migration and rollback

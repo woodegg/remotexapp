@@ -91,6 +91,16 @@ to another provider requires a deliberate stopped-runtime migration. Ordinary
 upgrade rejects a provider change. Preserve the previous Core, environment,
 components and state snapshot for rollback.
 
+## Enable optional screen WebRTC
+
+The Manager command line selects the mode for new Kasm runtimes.
+`-webrtc-mode off` uses WSS alone and is the default. For direct UDP,
+set `-webrtc-mode direct`, `-webrtc-address PUBLIC_IPV4` and
+`-webrtc-ports FIRST-LAST`. For a relay, use `-webrtc-mode turn` and the
+same type of port range. The TURN URL and credential issuer belong to the
+authenticated edge configuration. See [WebRTC routing](native-webrtc-routing.md)
+for listener selection, firewall rules, legacy UDP migration and rollback.
+
 ## Build and centrally install
 
 First use the [dependency guide](dependencies.md) to distinguish core must-haves,

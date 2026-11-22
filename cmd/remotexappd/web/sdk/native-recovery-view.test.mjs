@@ -107,6 +107,10 @@ test('restart requires confirmation and does not include force or upgrade',async
   const f=await fixture(t);f.fault();await f.refresh();await f.view.run(f.action('restart'));
   assert.equal(f.calls.filter(c=>c[0]==='restart').length,0);
   const confirmation=f.view.getState().confirmation;assert.equal(confirmation.scope,'runtime');assert.equal(confirmation.mayDiscardUnsavedWork,true);
+  const snapshot = f.view.getState(), callsBeforeLocale = f.calls.length;
+  f.view.setPanelLocale('en');
+  assert.deepEqual(f.view.getState(), snapshot);
+  assert.equal(f.calls.length, callsBeforeLocale);
   await f.view.confirm(confirmation.id);const calls=f.calls.filter(c=>c[0]==='restart');assert.equal(calls.length,1);
   assert.equal(calls[0][2].sessionGeneration,3);assert.equal(calls[0][2].force,undefined);
   assert.equal(f.view.session.generation,4);assert.equal(f.view.getState().state,'ready');

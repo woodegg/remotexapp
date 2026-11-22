@@ -31,6 +31,12 @@ accepted safety semantics and gain these presentation/adaptation requirements.
 | REX-008 | Suppress browser transport replays of keyed launches with an identity-scoped disk reservation before side effects; bounded retention/capacity, fail closed on storage failure, explicit uncertainty on duplicate. | Lost response headers, one SDK call versus multiple HTTP attempts, Manager restart, concurrent duplicates, identity isolation, capacity/storage/expiry negatives |
 | REX-009 | Retiring a native Viewer closes its component-owned window channels and releases detached display/input DOM without affecting sibling Viewers. A document has one Kasm mouse-capture owner even if its Viewers import the component through different runtime URLs. Only the capture owner can release its browser capture. SDK owner counts alone do not qualify cleanup. | Browser tests for same- and different-runtime Viewers, late module import and disconnect during drag; applied lifecycle and repeated mount/release DOM/listener assertions; new immutable component identity |
 
+### Native panel appearance — selected 2026-11-22
+
+| ID | Contract | Required evidence |
+| --- | --- | --- |
+| REX-010 | Let an embedding host choose and update each SDK-owned connection and recovery panel's locale, font size and colors. Preserve the default and disabled panel modes, window independence, accessible controls, and all existing recovery authority and state. | Served-browser locale and theme switching across two Views, focus and confirmation preservation, narrow-pane and zoom checks, unchanged Viewer and request counts, and exact-candidate reference-host UAT. [Proposal and validation](recovery-panel-appearance-proposal.md) |
+
 ### Accepted native host baseline
 
 On 2026-11-03 the owner authorized implementation through a complete UAT

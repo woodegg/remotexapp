@@ -5,6 +5,16 @@
 > [current source versions](current-state.md). Host labels and runtime IDs in
 > historical examples are anonymized.
 
+## 2026-11-22 — Let the host supply native recovery panel appearance
+
+[REX-010](requirements.md#native-panel-appearance--selected-2026-11-22) gives
+each mounted native panel a host-selected locale and inherited theme values.
+The SDK renders the text, controls and warnings from the current recovery
+snapshot. A locale update changes the existing text nodes' content so it can
+preserve focus, the snapshot revision and the active confirmation. The Manager
+still authorizes lifecycle actions. See the
+[appearance contract](recovery-panel-appearance-proposal.md).
+
 ## 2026-11-20 — Default new runtimes to KasmVNC
 
 [Issue #76](https://github.com/woodegg/remotexapp/issues/76) supersedes the

@@ -5,12 +5,14 @@
   <title>RemoteXApp · Recovery workbench</title>
   <link rel="stylesheet" href="./host-workbench.css">
 </head>
-<body>
-  <header class="topbar"><a class="brand" href="./host.html">RemoteXApp · 主工作台</a><span id="version" class="muted"></span><span class="grow"></span><button id="refresh">刷新应用</button><button id="logout">释放本页窗口</button></header>
+<body class="recovery-workbench">
+  <header class="topbar"><a class="brand" href="./host.html">RemoteXApp · 主工作台</a><span id="version" class="muted">正在读取版本…</span><span class="grow"></span><button id="refresh">刷新应用</button><button id="logout">释放本页窗口</button></header>
   <main style="display:block;padding:20px;max-width:1600px;margin:auto">
     <h1>恢复体验 · Recovery</h1>
     <p class="muted">断线时保留窗口，由 SDK 显示可用操作。重试连接不会自动重启应用；重启必须先确认影响。</p>
-    <div class="window-toolbar"><select id="existing" aria-label="选择已有应用"></select><button id="attach">连接所选应用</button><button id="create">打开测试编辑器</button><label><input type="checkbox" id="custom"> 自定义恢复外观</label></div>
+    <div id="new-appearance" class="recovery-appearance" role="group" aria-label="新窗口的外观"></div>
+    <div class="window-toolbar"><select id="existing" aria-label="选择已有应用"></select><button id="attach">连接所选应用</button><button id="create">打开测试编辑器</button><label><input type="checkbox" id="custom"> 使用宿主自绘面板</label></div>
+    <p class="note">先选新窗口的语言、主题和字号，再打开测试编辑器。出图后可点「断开此 Viewer」查看面板，并在当前窗口切换外观。连接恢复后会继续显示原应用。</p>
     <p class="note">其他模板、声音和剪贴板的完整测试在主工作台。这里连接其已有实例，或打开一个新的 Mousepad。关闭窗口只释放本窗口，不会停止共享应用。</p>
     <p id="notice" role="status"></p><div id="views"></div>
   </main>

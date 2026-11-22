@@ -220,6 +220,13 @@ The five states are `connecting`, `ready`, `recovering`, `attention` and `closed
 Custom controls call the current `run(action.id)`, `confirm(confirmation.id)` and
 `cancelConfirmation()`; do not recreate action admission or persist action IDs.
 
+From SDK 0.34.0, pass the host's language as `panelLocale` when mounting and
+call `view.setPanelLocale?.(locale)` when the host language changes. Map the
+host's typography and palette to the SDK's recovery custom properties on the
+mount element or its ancestor. The connection panel updates in place.
+The reference `/sdk/recovery.html` page lets you choose these settings for each
+live window. See the [SDK appearance contract](browser-sdk.md#native-connection-and-recovery-panel-appearance).
+
 | Condition | SDK/Manager behavior | Embedding-host responsibility |
 | --- | --- | --- |
 | Transient display/renewal outage | Bounded same-generation reconnect with fresh authority | Display current state/stats; retain the window |

@@ -15,7 +15,7 @@ const codeOf = e => (e?.status || e?.cause?.status) === 401 ? 'authentication-re
 
 /** One window owner. Low-level Session and Viewer objects remain generation-bound. */
 export class RemoteXAppView extends EventTarget {
-  constructor(host, container, target, {panel = true, ...viewerOptions} = {}) {
+  constructor(host, container, target, {panel = true, panelLocale, ...viewerOptions} = {}) {
     super();
     if (!container?.ownerDocument?.createElement || typeof panel !== 'boolean') throw new TypeError('A DOM container and boolean panel are required');
     if (containers.has(container)) throw fail('container-in-use');
@@ -25,7 +25,7 @@ export class RemoteXAppView extends EventTarget {
     this.session = null; this.viewer = null; this.closed = false;
     this._abort = new AbortController(); this._phase = 'connecting'; this._reason = null;
     this._revision = 0; this._epoch = 0; this._listeners = []; this._confirmation = null;
-    this._ui = recoveryPanel(container, this, panel); this._container = container; containers.set(container,this); this._publish();
+    this._ui = recoveryPanel(container, this, panel, panelLocale); this._container = container; containers.set(container,this); this._publish();
     this._audioChange = () => this._publish(); this.host.addEventListener?.('audiochange',this._audioChange);
     if (target.signal) {
       this._externalAbort = () => { this.release(); };
@@ -37,6 +37,7 @@ export class RemoteXAppView extends EventTarget {
       .then(() => this.getState(), () => this.getState());
   }
   getState() { return structuredClone(this._snapshot); }
+  setPanelLocale(locale) { if (!this.closed) this._ui.setLocale(locale); }
   _listen(target, name, fn) {
     target.addEventListener(name, fn); this._listeners.push(() => target.removeEventListener(name, fn));
   }

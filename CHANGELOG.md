@@ -11,6 +11,13 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+Target: `0.17.3`. SDK `0.34.0`.
+
+- Let embedding hosts localize and theme the native connection and recovery
+  panel, including live language, font size and palette updates in each
+  mounted window. The reference recovery workbench exposes these settings for
+  live testing ([#89](https://github.com/woodegg/remotexapp/issues/89)).
+
 ## 0.17.2
 
 Target: `0.17.2`. SDK `0.33.0`.

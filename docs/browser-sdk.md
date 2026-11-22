@@ -52,6 +52,31 @@ source pins and rollback restrictions. No Kasm credentials are delivered to
 the host SDK. The existing Manager/trusted-ingress single-account authorization
 model applies; this adapter does not add a separate multi-tenant ACL system.
 
+## Native connection and recovery panel appearance
+
+SDK 0.34.0 accepts a locale for the default native panel:
+
+```js
+const view = host.mount(container, { instanceId }, { panelLocale: 'en' });
+view.setPanelLocale('zh-CN');
+```
+
+The selector accepts English and Simplified Chinese language tags. An omitted,
+unsupported or invalid locale displays the compatibility panel. Call
+`view.setPanelLocale()` to restore that default. `panel: false` leaves the host in
+charge of rendering the state and actions.
+
+Set the [recovery CSS custom properties](recovery-panel-appearance-proposal.md#theme-contract)
+on the mount container or an ancestor. For example, set
+`--remotexapp-recovery-background`, `--remotexapp-recovery-foreground` and
+`--remotexapp-recovery-font-size` to map the host subwindow's surface, text
+color and typography. Use valid CSS colors and font sizes, and choose a palette
+with readable text and focus contrast. Properties follow normal CSS inheritance.
+The locale setter and CSS updates act on the mounted panel and preserve current
+focus, action IDs and the restart confirmation. The host owns the window title
+and footer. The recovery controller and Manager own the existing action and
+authorization model.
+
 ## Experimental native audio (D3, SDK 0.31.0-dev.4)
 
 Use the separate `RemoteXAppAudio` export for speaker/microphone interests;

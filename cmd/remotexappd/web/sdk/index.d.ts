@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.33.0';
+export const SDK_VERSION: '0.34.0';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -411,7 +411,7 @@ export class RemoteXAppHost extends EventTarget {
   readonly manager:RemoteXAppManager;readonly coordinator:RemoteXAppCoordinator;readonly closed:boolean;
   templates(options?:{refresh?:boolean;signal?:AbortSignal}):Promise<RemoteXAppClass[]>;
   open(options:RemoteXHostOpenOptions):Promise<RemoteXAppSession>;
-  mount(container:HTMLElement,target:RemoteXHostOpenOptions,options?:Omit<RemoteXNativeViewerOptions,'container'|'manager'|'runtime'> & {panel?:boolean}):RemoteXAppView;
+  mount(container:HTMLElement,target:RemoteXHostOpenOptions,options?:Omit<RemoteXNativeViewerOptions,'container'|'manager'|'runtime'> & {panel?:boolean;panelLocale?:string}):RemoteXAppView;
   diagnostics():RemoteXCoordinatorDiagnostics;
   getAudioState():RemoteXAudioSnapshot;
   logout():Promise<void>;
@@ -431,6 +431,8 @@ export class RemoteXAppView extends EventTarget {
   /** First attempt settled, possibly in attention. Check state and displayReady. */
   readonly settled:Promise<RemoteXRecoverySnapshot>;
   getState():RemoteXRecoverySnapshot;
+  /** Set the default panel locale. Omit the locale to restore the compatibility display. */
+  setPanelLocale(locale?:string):void;
   run(actionId:string):Promise<RemoteXRecoverySnapshot>;
   confirm(confirmationId:string):Promise<RemoteXRecoverySnapshot>;
   cancelConfirmation():void;

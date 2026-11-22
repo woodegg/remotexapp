@@ -1,0 +1,73 @@
+--- a/core/rfb.js
++++ b/core/rfb.js
+@@ -189,6 +189,8 @@
+         // Timers
+         this._disconnTimer = null;      // disconnection timer
+         this._resizeTimeout = null;     // resize rate limiting
++        this._viewportObserver = null;
++        this._viewportFrame = null;
+         this._mouseMoveTimer = null;
+         this._udpUpgradeTimer = null;
+         this._udpHandshakeTimer = null;
+@@ -1412,8 +1414,10 @@
+         this._cursor.attach(this._canvas);
+         this._refreshCursor();
+
+-        // Monitor size changes of the screen
+-        // FIXME: Use ResizeObserver, or hidden overflow
++        // Observe the same viewport box used by Display.getScreenSize().
++        // Embedded layout changes only update the local viewport.
++        this._viewportObserver = new ResizeObserver(() => this._scheduleViewportLayout());
++        this._viewportObserver.observe(this._screen, { box: 'border-box' });
+         window.addEventListener('resize', this._eventHandlers.windowResize);
+
+         // Always grab focus on some kind of click event
+@@ -1497,6 +1501,12 @@
+         this._canvas.removeEventListener("touchstart", this._eventHandlers.focusCanvas);
+         this._canvas.removeEventListener("focus", this._eventHandlers.handleFocusChange);
+         window.removeEventListener('resize', this._eventHandlers.windowResize);
++        this._viewportObserver?.disconnect();
++        this._viewportObserver = null;
++        if (this._viewportFrame !== null) {
++            window.cancelAnimationFrame(this._viewportFrame);
++            this._viewportFrame = null;
++        }
+         window.removeEventListener('focus', this._eventHandlers.handleFocusChange);
+         window.removeEventListener('blur', this._eventHandlers.handleFocusChange);
+         window.removeEventListener('mouseover', this._eventHandlers.handleMouseOut);
+@@ -1615,14 +1625,23 @@
+             { detail: { name: this._fbName } }));
+     }
+
+-    _windowResize(event) {
+-        // If the window resized then our screen element might have
+-        // as well. Update the viewport dimensions.
+-        window.requestAnimationFrame(() => {
++    _scheduleViewportLayout() {
++        if (!this.isConnected || this._viewportFrame !== null) return;
++        this._viewportFrame = window.requestAnimationFrame(() => {
++            this._viewportFrame = null;
++            if (!this.isConnected || !this._screen.isConnected) return;
++            const { width, height } = this._screen.getBoundingClientRect();
++            // getScreenSize() rounds the viewport down to even pixels.
++            if (width < 2 || height < 2) return;
++
+             this._screenSize();
+             this._updateClip();
+             this._updateScale();
+         });
++    }
++
++    _windowResize(event) {
++        this._scheduleViewportLayout();
+
+         this.dispatchEvent(new CustomEvent("screenregistered", { }));
+
+@@ -1827,6 +1846,7 @@
+                 break;
+
+             case 'connected':
++                this._scheduleViewportLayout();
+                 this.dispatchEvent(new CustomEvent("connect", { detail: {} }));
+                 if (this._useUdp && this._udpPeer) {
+                     this._udpUpgradeTimer = setTimeout(() => {

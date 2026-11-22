@@ -41,6 +41,10 @@ continuity is required; legacy SDK method compatibility is not. The reference
 host simulates downstream behavior without modifying the downstream project.
 NHI-008 control discovery accepts native `unsupported-provider` IBus absence
 while retaining descriptor generation and consistency validation.
+NHI-005 requires native local scaling to follow the actual embedded viewport,
+including fixed and read-only displays. Local layout notifications must keep
+the framebuffer and remote resize authority intact. Disconnect retires pending
+layout work and its observer.
 NHI-001 catalog launch resolves a `user-home` template to its unique running
 managed registration. It must not call ordinary instance creation, guess among
 multiple registrations, or change a stopped registration's desired state.

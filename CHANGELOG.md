@@ -11,9 +11,17 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+## 0.17.2
+
+Target: `0.17.2`. SDK `0.33.0`.
+
 - Fit native Kasm Viewers to their embedded viewport when the host changes
   its size. Local fit preserves the framebuffer and remote resize policy
-  ([#86](https://github.com/woodegg/remotexapp/issues/86)).
+  ([#86](https://github.com/woodegg/remotexapp/issues/86)). Select the new
+  immutable Kasm component and upgrade or recreate affected runtimes to apply
+  the fix.
+
+## 0.17.1
 
 Target: `0.17.1`. SDK `0.33.0`.
 

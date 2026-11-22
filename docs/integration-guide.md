@@ -17,11 +17,14 @@ for separately pinned runtime components and deployment requirements.
 before implementing the adapter.** Published 0.16.0 uses SDK 0.31.0 and
 `open()`/`attach()`. Core 0.16.1 uses SDK 0.32.0 with
 `host.mount()`/`view.release()` and SDK-owned recovery actions. Use the
-matching native component and verify the release qualification. Core 0.17 uses
-SDK 0.33.0 with the same host and recovery APIs. It adds the observed
+matching native component and verify the release qualification. Core 0.17.0
+through 0.17.2 use SDK 0.33.0 with the same host and recovery APIs. That SDK adds the observed
 `webRTCPath` statistic for [optional direct or TURN screen UDP](native-webrtc-routing.md).
-Existing runtime pins require a separate guarded upgrade. The migration guide
-records the host responsibilities and rollout steps.
+Core 0.17.3 uses SDK 0.34.0 and supports
+[per-window recovery panel appearance](native-host-migration.md#adopt-the-native-panel-appearance)
+with the tested 0.17.2 Kasm component. Changing an existing runtime's component
+pin uses a separate guarded upgrade. The migration guide records the host
+responsibilities and rollout steps.
 
 The Coordinator-only integration below describes the TigerVNC/noVNC path.
 

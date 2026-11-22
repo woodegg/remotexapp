@@ -7,6 +7,32 @@ $('#version').textContent=`SDK ${SDK_VERSION}`;
 const notify=text=>{$('#notice').textContent=text;};
 const perform=fn=>Promise.resolve().then(fn).catch(e=>notify(`操作未完成：${e.code || e.status || 'unavailable'}`));
 const labels={retry:'重试连接',refresh:'刷新状态',recheck:'重新检查恢复',reattach:'连接已恢复的应用',restart:'重启应用…',authenticate:'重新登录',help:'诊断信息'};
+const appearanceFields = [
+  ['locale','面板语言',[['bilingual','默认'],['zh-CN','简体中文'],['en','English']]],
+  ['theme','面板主题',[['default','默认'],['light','浅色'],['dark','深色']]],
+  ['size','面板字号',[['default','默认'],['large','大'],['extra-large','特大']]],
+];
+const nextAppearance = {locale:'bilingual',theme:'default',size:'default'};
+function appearanceControls(parent, appearance, apply) {
+  for (const [key, text, choices] of appearanceFields) {
+    const label = node('label', text), select = node('select');
+    select.dataset.appearance = key;
+    for (const [value, name] of choices) select.append(new Option(name, value));
+    select.value = appearance[key];
+    select.addEventListener('change', () => {
+      appearance[key] = select.value;
+      apply();
+    });
+    label.append(select);
+    parent.append(label);
+  }
+}
+function applyAppearance(display, {theme, size}) {
+  display.dataset.panelTheme = theme;
+  display.dataset.panelSize = size;
+}
+appearanceControls($('#new-appearance'), nextAppearance, () => {});
+
 function renderStats(record,advance=false){
   const s=record.view.viewer?.getStats(),rate=rateSnapshot(record.previous,s);if(advance)record.previous=s;
   record.stats.textContent=s?`${s.transport || '—'} · ${s.state} · ${s.available?s.width+' × '+s.height:'—'} · FPS ${rate?rate.fps.toFixed(1):'—'} · ↓ ${rate?rate.download.toFixed(1):'—'} kbps`:'尚未获得画面统计';
@@ -20,25 +46,42 @@ function customPanel(parent,view,snapshot){
       button('取消',()=>view.cancelConfirmation()),button('确认重启',()=>view.confirm(snapshot.confirmation.id)));
   }else for(const action of snapshot.actions)parent.append(button(labels[action.kind],()=>view.run(action.id)));
 }
-async function open(target){
+async function open(target, appearance = {...nextAppearance}){
   const custom=$('#custom').checked,card=node('article'),toolbar=node('div'),display=node('div'),stats=node('output'),controls=node('div');
   card.style.cssText='border:1px solid #40536d;border-radius:12px;margin:18px 0;overflow:hidden;background:#172232';
   toolbar.className='window-toolbar';display.style.cssText='height:520px;min-height:320px';
   stats.style.cssText='display:block;padding:12px;font-variant-numeric:tabular-nums';controls.style.cssText='padding:12px;display:flex;gap:8px;flex-wrap:wrap';
   card.append(toolbar,stats,display,controls);$('#views').append(card);
-  const view=host.mount(display,target,{panel:!custom}),record={view,card,stats,previous:null};views.add(record);
+  if (!custom) {
+    display.className = 'recovery-display';
+    applyAppearance(display, appearance);
+  }
+  const view=host.mount(display,target,{panel:!custom,panelLocale:appearance.locale}),record={view,card,stats,previous:null};views.add(record);
   const badge=node('strong','连接中');toolbar.append(badge,
-    button('同一应用再开窗口',()=>{if(!view.session)throw Error('not-ready');return open({instanceId:view.session.id});}),
+    button('同一应用再开窗口',()=>{if(!view.session)throw Error('not-ready');return open({instanceId:view.session.id},{...appearance});}),
     button('隐藏 / 显示画面',()=>{display.hidden=!display.hidden;if(display.hidden)view.viewer?.blur();}),
     button('断开此 Viewer',()=>view.viewer?.disconnect()),
     button('关闭窗口',async()=>{await view.release();views.delete(record);card.remove();}));
+  if (!custom) {
+    const settings = node('div');
+    settings.className = 'recovery-appearance';
+    settings.setAttribute('role','group');
+    settings.setAttribute('aria-label','当前窗口的外观');
+    appearanceControls(settings, appearance, () => {
+      applyAppearance(display, appearance);
+      view.setPanelLocale(appearance.locale);
+    });
+    toolbar.after(settings);
+  }
   const update=()=>{const snapshot=view.getState();badge.textContent=snapshot.state;renderStats(record);if(custom)customPanel(controls,view,snapshot);};
   view.addEventListener('change',update);view.addEventListener('attached',()=>{record.previous=null;});
   view.addEventListener('request',e=>notify(e.detail.kind==='authenticate'?'请通过宿主的正常登录入口重新登录，再打开窗口。':'请使用管理员 Console 检查；本页不会操作系统服务。'));
   update();return view;
 }
 async function refresh(){
-  const entries=await host.manager.listInstances();$('#existing').replaceChildren();
+  const [entries, version] = await Promise.all([host.manager.listInstances(), host.manager.getVersion()]);
+  $('#version').textContent = `Core ${version.version} · SDK ${SDK_VERSION} · ${version.commit}`;
+  $('#existing').replaceChildren();
   for(const item of entries.filter(x=>x.displayProvider==='kasm')){
     const option=node('option',`${item.templateId} · ${item.id.slice(-8)} · ${item.sessionState}`);option.value=item.id;$('#existing').append(option);
   }

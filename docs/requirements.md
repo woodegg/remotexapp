@@ -31,7 +31,7 @@ accepted safety semantics and gain these presentation/adaptation requirements.
 | REX-008 | Suppress browser transport replays of keyed launches with an identity-scoped disk reservation before side effects; bounded retention/capacity, fail closed on storage failure, explicit uncertainty on duplicate. | Lost response headers, one SDK call versus multiple HTTP attempts, Manager restart, concurrent duplicates, identity isolation, capacity/storage/expiry negatives |
 | REX-009 | Retiring a native Viewer closes its component-owned window channels and releases detached display/input DOM without affecting sibling Viewers. A document has one Kasm mouse-capture owner even if its Viewers import the component through different runtime URLs. Only the capture owner can release its browser capture. SDK owner counts alone do not qualify cleanup. | Browser tests for same- and different-runtime Viewers, late module import and disconnect during drag; applied lifecycle and repeated mount/release DOM/listener assertions; new immutable component identity |
 
-### Proposed native panel appearance
+### Native panel appearance — selected 2026-11-22
 
 | ID | Contract | Required evidence |
 | --- | --- | --- |

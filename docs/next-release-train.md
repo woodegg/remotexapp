@@ -3,10 +3,10 @@
 Source identity is maintained in [current-state.md](current-state.md). Earlier
 candidate labels are historical. Deployment is owned by each target's operator.
 
-## Proposed Core 0.17.3 — native recovery panel appearance
+## Core 0.17.3 — native recovery panel appearance
 
 Starting from [Core 0.17.2](https://github.com/woodegg/remotexapp/releases/tag/v0.17.2)
-and SDK 0.33.0, propose a compatible Core 0.17.3 train with SDK 0.34.0. Let
+and SDK 0.33.0, the owner locked Core 0.17.3 with SDK 0.34.0 on 2026-11-22. Let
 embedding hosts choose the language, font size and colors of the SDK's native
 connection and recovery overlay. Existing hosts keep the current default
 presentation.
@@ -14,8 +14,8 @@ presentation.
 [Milestone 0.17.3](https://github.com/woodegg/remotexapp/milestone/7) and
 [Issue #89](https://github.com/woodegg/remotexapp/issues/89) track REX-010 and
 the [design and qualification gates](recovery-panel-appearance-proposal.md).
-The API and version targets are proposed. The design includes project-owned
-reference-host validation and an SDK handoff for downstream integration.
+The train includes project-owned reference-host validation and an SDK
+handoff for downstream integration.
 
 <a id="proposed-core-0160--kasmvnc-integration-evaluation"></a>
 

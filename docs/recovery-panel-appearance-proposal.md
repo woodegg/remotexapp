@@ -1,6 +1,6 @@
 # Native connection and recovery panel appearance
 
-Proposed for Core 0.17.3 and browser SDK 0.34.0. The implementation is tracked in
+Selected on 2026-11-22 for Core 0.17.3 and browser SDK 0.34.0. The implementation is tracked in
 [Issue #89](https://github.com/woodegg/remotexapp/issues/89).
 
 ## Scope
@@ -16,7 +16,7 @@ The host also owns surrounding window chrome, including the title and footer
 status line. The [existing recovery contract](native-recovery-experience.md)
 continues to define the state, action and confirmation behavior.
 
-## Proposed SDK contract
+## SDK contract
 
 - `host.mount(container, target, { panelLocale })` selects the language before
   the first connecting message. The initial catalogs are English
@@ -38,7 +38,7 @@ Language changes update only the panel presentation. They preserve keyboard
 focus, snapshot revision, action IDs and an open confirmation's ID and expiry.
 Ready and closed views hide the overlay.
 
-## Proposed theme contract
+## Theme contract
 
 Define CSS custom properties on the mount container or a host-owned ancestor.
 The panel reads them in its own styles, so normal CSS inheritance applies
@@ -46,15 +46,15 @@ system theme updates to live windows. Unspecified tokens use the current SDK
 defaults. The host sizes its own windows and manages display sizing through
 the existing display contract.
 
-| CSS custom property | Type and purpose |
-| --- | --- |
-| `--remotexapp-recovery-font-size` | CSS font size for panel copy and controls. Relative units let a host follow typography settings. |
-| `--remotexapp-recovery-background` | CSS color for the overlay surface. |
-| `--remotexapp-recovery-foreground` | CSS color for headings, messages and diagnostics. |
-| `--remotexapp-recovery-button-background` | CSS color for recovery controls. |
-| `--remotexapp-recovery-button-foreground` | CSS color for control labels. |
-| `--remotexapp-recovery-button-border` | CSS color for the control outline. |
-| `--remotexapp-recovery-focus-ring` | CSS color for the visible keyboard focus ring. |
+| CSS custom property | Purpose | Default |
+| --- | --- | --- |
+| `--remotexapp-recovery-font-size` | Font size for panel copy and controls. Relative units follow host typography settings. | `15px` |
+| `--remotexapp-recovery-background` | Overlay surface color. | `rgba(15,23,42,.96)` |
+| `--remotexapp-recovery-foreground` | Color of headings, messages and diagnostics. | `#e5edf6` |
+| `--remotexapp-recovery-button-background` | Recovery control fill color. | `#18394f` |
+| `--remotexapp-recovery-button-foreground` | Control label color. | `#fff` |
+| `--remotexapp-recovery-button-border` | Control border color. | `#5b789b` |
+| `--remotexapp-recovery-focus-ring` | Additional focus ring color. | Browser or host focus outline alone. |
 
 An embedding host can map these to its own design tokens. Each window may
 override its inherited tokens on its own container.

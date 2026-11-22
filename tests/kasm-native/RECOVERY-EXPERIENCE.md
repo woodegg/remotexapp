@@ -58,6 +58,17 @@ Each variation records `automatic-recovery`, `explicit-recovery`,
 pass/fail for that expected outcome. Do not sum these into an unconditional
 self-healing pass. Missing variations leave a row partially qualified.
 
+## Appearance qualification for REX-010
+
+Run `node tests/kasm-native/browser-recovery-appearance.mjs FIXTURE.json`
+with the existing [disposable browser fixture](NATIVE-HOST.md). Set the
+fixture's ingress URL to the candidate Manager's browser-visible base path.
+The suite delays its own launch and retry requests in Chrome to verify the
+connecting and recovering panels on real Viewers. It exercises independent
+window themes, contrast presets, confirmation identity, focus, narrow layout
+and cleanup. On the reference `/sdk/recovery.html` page, check the same
+settings manually at 200% browser zoom before accepting the exact candidate.
+
 ## Additional system experiments
 
 Disk-full/read-only storage, cgroup OOM/CPU starvation, packet loss/reordering/

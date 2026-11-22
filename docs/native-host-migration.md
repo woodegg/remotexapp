@@ -1,7 +1,9 @@
 # Embedding-host migration to RemoteXApp 0.17
 
 Use this guide to move a host application from the Core 0.15 legacy SDK or a
-Core 0.16 native integration to **Core 0.17.0 and browser SDK 0.33.0**.
+Core 0.16 native integration to the **Core 0.17 series**. For the
+Core 0.17.3 / SDK 0.34.0 appearance update, see
+[adopt the native panel appearance](#adopt-the-native-panel-appearance).
 The host retains file routing, template selection, window and workspace state,
 and user consent. The native SDK handles Viewer attachment and recovery.
 The [host requirements](native-host-integration.md) define the integration
@@ -16,8 +18,8 @@ and component pins. See the
 
 ## Choose the exact migration target
 
-For Core 0.17, load SDK 0.33.0 from the matching Manager's authenticated
-`/sdk/index.js`, under its proxy prefix if one is configured. Record the
+Load the SDK served by the matching Manager's authenticated `/sdk/index.js`,
+under its proxy prefix if one is configured. Record the
 Core commit and archive SHA-256, served SDK version, native component digest
 and enabled App Package versions. See the
 [0.17.0 qualification record](https://github.com/woodegg/remotexapp/issues/75)
@@ -29,6 +31,8 @@ for the release artifact and its verification.
 | Published Core 0.16.0 / SDK 0.31.0 | `RemoteXAppHost.open()` → `session.attach()` | Native host baseline; November 3 reference-host UAT is scoped to this baseline; `host.mount()` is absent |
 | Core 0.16.1 / SDK 0.32.0 | `host.mount()` → SDK-owned panel/model → `view.release()` | Includes the 0.31.1 lease-renewal fix and the #70 recovery extension |
 | Core 0.17.0 / SDK 0.33.0 | Same native entry points and recovery model | KasmVNC default for new runtimes. Optional direct and TURN screen acceleration. `webRTCPath` reports the route after UDP paint |
+| Core 0.17.2 / SDK 0.33.0 | Same native entry points and recovery model | The [0.17.2 KasmVNC component](https://github.com/woodegg/remotexapp/releases/tag/v0.17.2) includes independent mouse capture and local viewport fitting. Runtime component pins determine which client is served. |
+| Core 0.17.3 / SDK 0.34.0 | `host.mount()` with optional `panelLocale` and scoped CSS properties | Localizes and themes the SDK overlay. The 0.17.2 KasmVNC component is reused by the qualified pair. [Candidate and component identity](https://github.com/woodegg/remotexapp/issues/91) |
 
 For the 0.16.1 recovery target, record the **Core commit/archive hash,
 SDK version and asset hashes, native component manifest hash and App pins**.
@@ -220,13 +224,6 @@ The five states are `connecting`, `ready`, `recovering`, `attention` and `closed
 Custom controls call the current `run(action.id)`, `confirm(confirmation.id)` and
 `cancelConfirmation()`; do not recreate action admission or persist action IDs.
 
-From SDK 0.34.0, pass the host's language as `panelLocale` when mounting and
-call `view.setPanelLocale?.(locale)` when the host language changes. Map the
-host's typography and palette to the SDK's recovery custom properties on the
-mount element or its ancestor. The connection panel updates in place.
-The reference `/sdk/recovery.html` page lets you choose these settings for each
-live window. See the [SDK appearance contract](browser-sdk.md#native-connection-and-recovery-panel-appearance).
-
 | Condition | SDK/Manager behavior | Embedding-host responsibility |
 | --- | --- | --- |
 | Transient display/renewal outage | Bounded same-generation reconnect with fresh authority | Display current state/stats; retain the window |
@@ -240,6 +237,72 @@ Remove duplicated retry timers, grant renewal, legacy readiness inference and
 per-window repair state machines from the native adapter. Keep authentication,
 template/file mapping, window restoration and normal App stop policy. Neither
 the SDK nor a recovery button hot-repairs borrowed buses or ambiguous processes.
+
+## Adopt the native panel appearance
+
+For Core 0.17.3, load the served SDK 0.34.0 and keep the existing mounted-window
+adapter. Use the host's current language when opening a window. Subscribe each
+window to the host locale while its View is mounted. Apply the host's theme
+through CSS on the mount container or an ancestor.
+
+```js
+function mountRemoteWindow(container, target, appearance) {
+  container.classList.add('remote-window-display');
+  const view = host.mount(container, target, {
+    panelLocale: appearance.getLocale(),
+  });
+  const unsubscribe = appearance.subscribeLocale(locale => view.setPanelLocale?.(locale));
+
+  return {
+    view,
+    async close() {
+      unsubscribe();
+      await view.release();
+    },
+  };
+}
+```
+
+`appearance` stands for the host's preferences store. Bind `close()` to
+closing the window. A hidden workspace can retain its View and receive the
+same preferences as a visible window. Map CSS tokens on the mount container
+and let inherited values update when the host theme changes.
+
+```css
+.remote-window-display {
+  --remotexapp-recovery-font-size: var(--window-text-size, 15px);
+  --remotexapp-recovery-background: var(--window-surface, rgba(15, 23, 42, .96));
+  --remotexapp-recovery-foreground: var(--window-text, #e5edf6);
+}
+```
+
+Set the control fill, text, border and focus tokens if the host uses a
+different control palette. See the
+[SDK appearance contract](browser-sdk.md#native-connection-and-recovery-panel-appearance)
+and [the complete token list](recovery-panel-appearance-proposal.md#theme-contract).
+
+Use `en` or `zh-CN` for the first two language catalogs. Locale variants
+are normalized by the SDK. Omitting `panelLocale`, or clearing it with
+`view.setPanelLocale()`, restores the default display. The optional method call
+allows the same host adapter to load SDK 0.33.0. The host localizes its title,
+footer status line and other window chrome through its own UI. Hosts with
+`panel: false` own the panel copy and render the existing recovery snapshot.
+
+For this appearance update, the tested pair uses the published
+0.17.2 KasmVNC component. Stage Core 0.17.3 and its SDK assets, then verify the
+served version on a freshly loaded host page. Continue to use the 0.17.2
+component pin for compatible existing runtimes. Test UI rollback by disabling
+the host locale and theme mapping, then reload the host page with the default
+panel configuration.
+
+Start in `/sdk/recovery.html` under the authenticated Manager prefix. Choose a
+language, palette and font size before opening a test App, open a second
+Viewer, and give it a different appearance. Disconnect one Viewer, switch
+locale and theme on its panel, then retry and verify a fresh frame on the
+same generation. On a disposable App, open and cancel a restart confirmation.
+Check keyboard focus, large type, narrow panes and whether the warning remains
+readable at 200% browser zoom. Repeat the same checks in the embedding host
+and record that acceptance separately.
 
 ## Audio, clipboard and transport
 
@@ -289,8 +352,9 @@ and [Ubuntu preparation](dependencies.md#ubuntu-2404--2604-preparation).
 1. Inventory Core/SDK/component/App identities and the actual provider, runtime
    generations, active Viewers, managed intent and document/profile owners.
    Snapshot compatible state and persistent data; retain the previous artifacts.
-2. Stage the matched Core/SDK and new native component in separate immutable
-   directories. Preserve their manifests, hashes and corresponding source.
+2. Stage the matched Core/SDK and the selected native component in separate
+   immutable directories. Preserve their manifests, hashes and corresponding
+   source. For the 0.17.3 appearance update, reuse the verified 0.17.2 component.
    Do not overwrite an installed component or bypass a mismatch with cached
    browser files. Reload host documents after changing the served SDK.
 3. Update the authenticated proxy's SDK asset graph and, where it serves native

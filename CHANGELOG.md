@@ -11,6 +11,8 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+## 0.17.3
+
 Target: `0.17.3`. SDK `0.34.0`.
 
 - Let embedding hosts localize and theme the native connection and recovery

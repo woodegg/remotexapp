@@ -141,8 +141,20 @@ try {
   await select(page, viewSettings + '"locale"]', 'zh-CN');
   assert.equal((await appearance(page, 0)).text, '正在恢复');
   assert.deepEqual((await states(page))[0], recovering);
+  pausedBeforeRetry.add(held);
   await page.call('Fetch.continueRequest', {requestId:held});
   held = undefined;
+  await wait(async () => {
+    for (const event of page.events.filter(event => event.method === 'Fetch.requestPaused')) {
+      const requestId = event.params.requestId;
+      if (pausedBeforeRetry.has(requestId)) continue;
+      pausedBeforeRetry.add(requestId);
+      await page.call('Fetch.continueRequest', {requestId});
+    }
+    const view = (await states(page))[0];
+    assert(!(view.state === 'attention' && !view.busy), JSON.stringify({state:view.state,reason:view.reason}));
+    return view.displayReady;
+  });
   await page.call('Fetch.disable');
   await click(page, action(1, 'retry'));
   await ready(page, 2);
@@ -155,6 +167,7 @@ try {
 } catch (error) {
   failure = error;
   console.error(error.stack);
+  if (page) console.error(JSON.stringify((await states(page).catch(() => [])).map(({state,reason,displayReady,busy})=>({state,reason,displayReady,busy}))));
 } finally {
   if (page) {
     if (held) await page.call('Fetch.disable').catch(() => {});

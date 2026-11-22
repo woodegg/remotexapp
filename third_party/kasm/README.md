@@ -40,6 +40,11 @@ delivery. Disconnect releases only the retiring canvas's capture. The
 fixed browser client ships in a new component manifest with the same
 server protocol and SDK surface.
 
+Patch 0027 observes each Viewer's display viewport and fits its local canvas
+when an embedded host panel changes size. It batches layout per animation
+frame and releases its observer and scheduled work on disconnect. Remote
+framebuffer resize requests continue through the existing authorization path.
+
 Source inputs:
 
 | Input | Immutable source |

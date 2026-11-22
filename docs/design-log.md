@@ -5518,3 +5518,19 @@ release or owner disconnect retires the listener, observer and overlay.
 A sibling Viewer cannot release that ownership. The cursor uses the same
 owner when deciding where its fallback image belongs. Existing runtimes
 need a new immutable Kasm component through the normal rollout.
+
+## 2026-11-21 — Fit the Kasm canvas to its embedded viewport
+
+[Issue #86](https://github.com/woodegg/remotexapp/issues/86) extends NHI-005.
+The native Kasm client owns the measured viewport, canvas scaling and pointer
+coordinate conversion. Its ResizeObserver watches the viewport box measured by
+the renderer. Both viewport and browser-window resize notifications share one
+local layout frame per Viewer. The frame skips detached and zero-size boxes.
+Connection setup schedules the initial fit. Disconnect cancels the observer and
+any pending frame.
+
+A viewport observation performs clipping and scaling only. Browser-window
+resize retains its screen registration and existing remote resize path. The
+public configuration and explicit remote flush keep their current capability
+and policy checks. A new component includes the fix. Host integrations continue
+to use the existing SDK entry points.

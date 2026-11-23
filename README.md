@@ -49,8 +49,10 @@ and transport. You supply the host, authentication and tenant isolation.
 
 **Adapting an existing host?** Start with the
 [0.17 host migration guide](docs/native-host-migration.md). It maps the 0.15
-and 0.16 host workflows to SDK 0.33.0, including `mount()`/`release()`,
-audio controls, KasmVNC cutover and the downstream acceptance checklist.
+and 0.16 host workflows to the release-matched SDK, including
+`mount()`/`release()`, audio controls, KasmVNC cutover and downstream
+acceptance. SDK 0.34.0 adds
+[native panel localization and theming](docs/native-host-migration.md#adopt-the-native-panel-appearance).
 Check the [provider defaults](docs/operations.md#choose-the-display-provider)
 and the [UDP migration](docs/native-webrtc-routing.md#migration-and-rollback) before upgrading.
 

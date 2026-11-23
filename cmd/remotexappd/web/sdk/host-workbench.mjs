@@ -186,10 +186,11 @@ function update(w){
   const audio=host.getAudioState(),route=audio.routes?.find(r=>r.runtime===w.session.id && r.generation===w.session.generation);
   if(!w.speakerToggle.disabled)w.speakerToggle.checked=!!route?.speaker;
   if(!w.micToggle.disabled)w.micToggle.checked=!!route?.mic;
-  const audioHint=audio.playbackBlocked?'点击恢复声音 · Resume playback':
+  const playbackBlocked=route?.speaker && audio.playbackBlocked;
+  const audioHint=playbackBlocked?'点击恢复声音 · Resume playback':
     route?.reason==='speaker-action-required' || audio.connection==='failed'?'重新开启音频 · Enable audio again':
-    audio.connection==='recovering'?'正在恢复音频 · Recovering audio':'';
-  w.resumeAudio.hidden=!w.audio || w.audio.released || !audio.playbackBlocked;
+    route?.speaker && audio.connection==='recovering'?'正在恢复音频 · Recovering audio':'';
+  w.resumeAudio.hidden=!w.audio || w.audio.released || !playbackBlocked;
   w.audioState.textContent=`${audioHint || audio.connection} · 播放 ${route?.actualSpeaker?'开':'关'} · 麦克风 ${route?.actualMic?'开':'关'}${route?.reason?` · ${route.reason}`:''}`;
 }
 $('#template').addEventListener('change',templateSelected);

@@ -177,14 +177,16 @@ export class RemoteXAppNativeClient extends EventTarget {
       const features = NativeDisplay.capabilities || {};
       if (this.readOnly && (prepared.nativeTransport?.readOnly !== true || features.readOnly !== true))
         throw new RemoteXAppNativeError('unsupported', 'Server-enforced read-only attachment is unavailable');
-      let grant;
+      let grant, expiresAt;
       if (prepared.nativeTransport?.grantRequired) {
         const request = {sessionGeneration:prepared.sessionGeneration, componentDigest:prepared.displayComponentDigest,
           viewerId:this._viewerId, connectionEpoch:epoch, ...(this.readOnly ? {readOnly:true} : {})};
+        const issuedAfter = Date.now();
         grant = await this.manager.request(`${base}/grant`, {method:'POST', body:request, signal});
         current();
         if (!/^[a-f0-9]{64}$/.test(grant?.token || '') || grant.renewAfterMs !== 20000 || grant.expiresInMs !== 90000)
           throw new RemoteXAppNativeError('invalid-grant', 'Invalid native Viewer grant');
+        expiresAt = issuedAfter + grant.expiresInMs;
         this._grant = {base, request:{...request, token:grant.token}};
       }
       const turn = prepared.nativeTransport?.mode === 'turn';
@@ -210,23 +212,35 @@ export class RemoteXAppNativeClient extends EventTarget {
         if (epoch === this._epoch) this.dispatchEvent(new CustomEvent('transportchange', {detail:this.getStats()}));
       });
       if (grant) display.addEventListener('connect', () => {
+        const delays = [1000,2000];
+        let failures = 0;
+        const schedule = delay => { this._grantTimer = setTimeout(renew,delay); };
         const renew = async () => {
           if (epoch !== this._epoch || !this._grant) return;
+          const started = Date.now(), timeout = Math.min(10000,expiresAt-started);
           try {
+            if (timeout < 1) throw new DOMException('Native Viewer lease window ended','TimeoutError');
             const lease = await this.manager.request(`${base}/lease`, {method:'POST', body:this._grant.request,
-              signal:AbortSignal.any([signal, AbortSignal.timeout(10000)])});
+              signal:AbortSignal.any([signal, AbortSignal.timeout(timeout)])});
             current();
+            // Count from request start to stay on the conservative side of the
+            // server's new lease, including when the browser resumed late.
+            expiresAt = started+grant.expiresInMs; failures = 0;
             if (turnServer && validTurnServer(lease?.turn)) display.configureTurnServers?.([lease.turn]);
-            this._grantTimer = setTimeout(renew, grant.renewAfterMs);
+            schedule(Math.max(0,Math.min(grant.renewAfterMs,expiresAt-Date.now())));
           } catch (cause) {
             if (epoch !== this._epoch) return;
-            // Losing the HTTP renewal path does not establish authorization
-            // loss. Retire this channel; retries must obtain a fresh grant.
-            const code = retryable(cause) ? 'lease-unavailable' : 'grant-expired';
+            const temporary = retryable(cause);
+            const delay = delays[failures++];
+            if (temporary && delay !== undefined && Date.now()+delay < expiresAt) {
+              schedule(delay);
+              return;
+            }
+            const code = temporary ? 'lease-unavailable' : 'grant-expired';
             this._connectionLost(new RemoteXAppNativeError(code, 'Native Viewer lease renewal failed', {cause}));
           }
         };
-        if (epoch === this._epoch) this._grantTimer = setTimeout(renew, grant.renewAfterMs);
+        if (epoch === this._epoch) schedule(Math.max(0,Math.min(grant.renewAfterMs,expiresAt-Date.now())));
       }, {once:true});
       display.addEventListener('clipboard', event => {
         if (epoch !== this._epoch || !this.clipboardEnabled || !clipboard) return;
@@ -279,6 +293,10 @@ export class RemoteXAppNativeClient extends EventTarget {
       if (this._displaySettings.resize !== null && this.capabilities.displayControls) display.configureDisplay(this._displaySettings);
       this._transport = socketURL.protocol === 'wss:' ? 'wss' : 'ws-loopback';
       this._connectedAt = performance.now();
+      if (this._lastDisconnect && this._lastDisconnect.recoveredAt == null) {
+        const recoveredAt = Date.now();
+        this._lastDisconnect = {...this._lastDisconnect,recoveredAt,durationMs:Math.max(0,recoveredAt-this._lastDisconnect.at)};
+      }
       this._state('ready', { generation:prepared.sessionGeneration, transport:this._transport });
       this.dispatchEvent(new CustomEvent('ready', { detail:{ instance:this.instance } }));
       return this.instance;
@@ -295,6 +313,7 @@ export class RemoteXAppNativeClient extends EventTarget {
 
   _connectionLost(error) {
     const expected = this.instance, recoverable = retryable(error);
+    this._lastDisconnect = {at:Date.now(),code:error.code,httpStatus:error.cause?.status || null};
     this._closeConnection(false);
     const closedEpoch = this._epoch;
     this._state(recoverable ? 'disconnected' : 'failed', {code:error.code, ...(error.cause?.status ? {httpStatus:error.cause.status} : {})});
@@ -310,6 +329,7 @@ export class RemoteXAppNativeClient extends EventTarget {
     const snapshot = {schemaVersion:1, state:this.state, code:this._stateCode || null,
       connectionEpoch:this._epoch, observedAt:now, available:false,
       transport:this._transport || null,
+      ...(this._lastDisconnect ? {lastDisconnect:{...this._lastDisconnect}} : {}),
       connectedForMs:this._connectedAt == null ? null : Math.max(0, now - this._connectedAt)};
     if (this.state !== 'ready' || !this.capabilities.statistics) return snapshot;
     const raw = this._display?.getStats?.();

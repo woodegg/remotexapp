@@ -282,8 +282,7 @@ test('lease network failure reconnects with a new grant and unchanged App identi
   await f.viewer.connect('app');
   const old = f.display, epoch = f.viewer.getStats().connectionEpoch;
   f.viewer.sendText('do not replay');
-  t.mock.timers.tick(20000);
-  await new Promise(resolve => setImmediate(resolve));
+  await exhaustRenewal(t);
   assert.equal(old.closed, 1);
   assert.equal(f.viewer.state, 'reconnecting');
   assert.throws(() => f.viewer.sendText('offline'), {code:'input-unavailable'});
@@ -293,6 +292,8 @@ test('lease network failure reconnects with a new grant and unchanged App identi
   assert.equal(f.viewer.instance.sessionGeneration, 3);
   assert(f.viewer.getStats().connectionEpoch > epoch);
   assert.equal(grants, 2);
+  assert.equal(f.viewer.getStats().lastDisconnect.code,'lease-unavailable');
+  assert.notEqual(f.viewer.getStats().lastDisconnect.recoveredAt,undefined);
   assert.deepEqual(f.display.options.protocols, ['remotexapp-grant.'+'c'.repeat(64)]);
   assert.deepEqual(f.display.sent, []);
   assert.equal(f.calls.filter(c => c.path.endsWith('/prepare')).length, 2);
@@ -300,6 +301,9 @@ test('lease network failure reconnects with a new grant and unchanged App identi
 });
 
 const settleLease = () => new Promise(resolve => setImmediate(resolve));
+async function exhaustRenewal(t) {
+  for (const delay of [20000,1000,2000]) { t.mock.timers.tick(delay); await settleLease(); }
+}
 async function leaseFailure(t, cause, reconnect = {maxAttempts:2,delays:[1]}) {
   t.mock.timers.enable({apis:['setTimeout']});
   const f = fixture({udp:true, controls:true, clipboard:true, reconnect});
@@ -318,13 +322,38 @@ async function leaseFailure(t, cause, reconnect = {maxAttempts:2,delays:[1]}) {
 test('transient lease service errors use bounded reconnect', async t => {
   for (const status of [0,429,500,502,503,504]) await t.test(String(status), async t => {
     const f = await leaseFailure(t, Object.assign(Error('temporarily unavailable'), {status}));
-    t.mock.timers.tick(20000); await settleLease();
+    await exhaustRenewal(t);
     assert.equal(f.viewer.state, 'reconnecting');
     t.mock.timers.tick(1); await settleLease();
     assert.equal(f.viewer.state, 'ready');
     assert.equal(f.old.closed, 1);
     assert.equal(f.calls.filter(c => c.path.endsWith('/grant')).length, 2);
   });
+});
+
+test('one transient renewal failure keeps the grant, Viewer epoch and clipboard consent', async t => {
+  t.mock.timers.enable({apis:['setTimeout']});
+  const f = fixture({reconnect:true,clipboard:true,udp:true});
+  t.after(()=>f.viewer.dispose());
+  const request=f.viewer.manager.request;
+  let renewals=0;
+  f.viewer.manager.request=async(path,options)=>{
+    if(path.endsWith('/lease')&&++renewals===1) throw Object.assign(Error('busy'),{status:503});
+    return request(path,options);
+  };
+  await f.viewer.connect('app');
+  const epoch=f.viewer.getStats().connectionEpoch;
+  const display=f.display;
+  f.viewer.enableClipboard(true);
+  t.mock.timers.tick(20000);await settleLease();
+  assert.equal(f.viewer.state,'ready');
+  assert.equal(renewals,1);
+  t.mock.timers.tick(1000);await settleLease();
+  assert.equal(renewals,2);
+  assert.equal(f.viewer.getStats().connectionEpoch,epoch);
+  assert.equal(f.viewer.getStats().lastDisconnect,undefined);
+  assert.equal(f.viewer.clipboardEnabled,true);
+  assert.equal(display.closed,0);
 });
 
 test('lease authorization, revocation and generation rejection never obtain another grant', async t => {
@@ -345,7 +374,7 @@ test('lease recovery rechecks authentication and generation before requesting a 
     const f = await leaseFailure(t, new TypeError('offline'));
     const events = [];
     f.viewer.addEventListener('reconnectstopped', e => events.push(e.detail));
-    t.mock.timers.tick(20000); await settleLease();
+    await exhaustRenewal(t);
     if (condition === 'unauthorized' || condition === 'forbidden')
       f.viewer.manager.getInstance = async () => { throw Object.assign(Error('denied'), {status:condition === 'unauthorized' ? 401 : 403}); };
     if (condition === 'generation') f.state.sessionGeneration++;
@@ -366,7 +395,7 @@ test('lease recovery exhausts its budget and explicit reconnect starts a fresh c
   let attempts = 0;
   f.viewer.addEventListener('reconnectexhausted', e => events.push(e.detail));
   f.viewer.manager.getInstance = async () => { attempts++; throw new TypeError('offline'); };
-  t.mock.timers.tick(20000); await settleLease();
+  await exhaustRenewal(t);
   for (let i = 0; i < 2; i++) { t.mock.timers.tick(1); await settleLease(); }
   t.mock.timers.tick(60000); await settleLease();
   assert.equal(attempts, 2);
@@ -381,7 +410,7 @@ test('lease recovery exhausts its budget and explicit reconnect starts a fresh c
 
 test('lease transport failure respects disabled automatic reconnect', async t => {
   const f = await leaseFailure(t, new TypeError('offline'), false);
-  t.mock.timers.tick(20000); await settleLease();
+  await exhaustRenewal(t);
   assert.equal(f.viewer.state, 'disconnected');
   assert.equal(f.viewer.getStats().code, 'lease-unavailable');
   t.mock.timers.tick(60000); await settleLease();
@@ -398,7 +427,7 @@ test('disconnect, dispose and runtime release cancel a pending lease reconnect',
     if (action === 'state-listener') f.viewer.addEventListener('statechange', e => {
       if (e.detail.code === 'lease-unavailable') f.viewer.disconnect();
     });
-    t.mock.timers.tick(20000); await settleLease();
+    await exhaustRenewal(t);
     if (action === 'disconnect' || action === 'dispose') f.viewer[action]();
     if (action === 'release') { runtime.state = 'released'; runtime.dispatchEvent(new Event('release')); }
     t.mock.timers.tick(60000); await settleLease();
@@ -424,7 +453,7 @@ test('late lease rejection cannot retire a manually replaced Viewer', async t =>
   assert.equal(replacement.closed, 0);
 });
 
-test('lease HTTP request has a ten-second deadline and timeout enters reconnect', async t => {
+test('lease HTTP request has a ten-second deadline and a timeout preserves a healthy Viewer during retry', async t => {
   const f = await leaseFailure(t, new TypeError('offline'));
   const deadline = new AbortController();
   t.mock.method(AbortSignal, 'timeout', ms => { assert.equal(ms, 10000); return deadline.signal; });
@@ -439,7 +468,7 @@ test('lease HTTP request has a ten-second deadline and timeout enters reconnect'
   assert.equal(signal.aborted, false);
   deadline.abort(new DOMException('Lease request timed out', 'TimeoutError')); await settleLease();
   assert.equal(signal.aborted, true);
-  assert.equal(f.viewer.state, 'reconnecting'); assert.equal(f.old.closed, 1);
+  assert.equal(f.viewer.state, 'ready'); assert.equal(f.old.closed, 0);
 });
 
 test('one Viewer lease failure leaves a second Viewer ready and clears clipboard consent', async t => {
@@ -447,7 +476,7 @@ test('one Viewer lease failure leaves a second Viewer ready and clears clipboard
   const other = fixture({udp:true, controls:true}); t.after(() => other.viewer.dispose());
   await other.viewer.connect('app');
   f.viewer.enableClipboard(true);
-  t.mock.timers.tick(20000); await settleLease();
+  await exhaustRenewal(t);
   assert.equal(f.viewer.clipboardEnabled, false);
   assert.equal(other.viewer.state, 'ready'); assert.equal(other.display.closed, 0);
   other.viewer.sendText('other remains usable');

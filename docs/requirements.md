@@ -155,8 +155,9 @@ authentication failure still fences every route.
 AUD-002 recovery ([#94](https://github.com/woodegg/remotexapp/issues/94)):
 A live session audio handle survives audio transport and worker interruption.
 Use fresh grants and the existing shared channel. Automatic speaker recovery
-requires proof of the same login and runtime generation. A lost worker can
-rebind on the next explicit action. Interrupted mic capture stays off.
+requires proof of the same login and runtime generation. Concurrent tabs
+reuse the same replacement worker, with active server ownership preserved.
+Interrupted mic capture stays off.
 Explicit stop, release and logout fence pending recovery. Verify actual PCM,
 shared ownership, username-only fallback, and late cancellation under faults.
 

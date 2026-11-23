@@ -5558,3 +5558,17 @@ unavailable proof, the user can authorize a new speaker action. Worker
 replacement starts with audio off and rebinds on a fresh action. Interrupted
 capture always loses its previous intent. Browser events prompt reconciliation
 and server leases bound loss detection when the browser cannot run.
+
+
+## 2026-11-23 — Preserve healthy channels and coordinate audio worker recovery
+
+This supersedes the worker-replacement portion of AUD-002's earlier recovery
+entry. Recover a requested speaker through a shared worker name after a
+verified same-login rebind. Select an alternate name under a browser lock
+only after an initialization timeout, and preserve the server's single
+connection owner while a replacement waits. Microphone recovery remains
+an explicit action. A temporary Viewer lease failure can retry the existing
+grant twice within its remaining window. Terminal replies and expiry fence
+the old channel. The Manager sends a 30-second browser-facing WebSocket Ping
+for native viewers, independent of App activity and HTTP authorization.
+Keep one recent reason and recovery duration per transport in SDK snapshots.

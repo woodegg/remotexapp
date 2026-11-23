@@ -12,6 +12,7 @@ function fixture(){
  }
  const env={crypto:webcrypto,location:{origin:'https://audio.test'},WebSocket:Socket,setInterval:()=>1,setTimeout,clearTimeout,fetch:async(url,options)=>{
   const body=JSON.parse(options.body),action=url.split('/').at(-1);f.http.push({action,body});
+  if(action==='grant'&&f.busy)return {ok:false,status:409,json:async()=>({error:'audio connection already owned'})};
   if(f.offline)throw TypeError('offline');
   if(f.holdContext && action==='context') await f.holdContext;
   if(action==='route'&&body.runtime===f.retiredRuntime)return {ok:false,status:410,json:async()=>({error:'audio runtime generation retired'})};
@@ -224,4 +225,31 @@ test('one unavailable domain does not disconnect another App or stop its microph
   f.denied=true;f.coordinator.lastRenew=0;f.coordinator._tick();await f.coordinator.serial;await turn();
   assert.equal(socket.readyState,3);assert.equal(f.coordinator.capture,null,'scope authentication failure still fences all capture');
  }finally{f.cleanup();}
+});
+
+
+test('audio ownership contention defers speaker without making a duplicate connection',async()=>{
+  const f=fixture();try {
+    const a=f.peer();await ready(a);await acquire(a,'a');
+    f.busy=true;
+    const pending=await a.request('speaker',{ref:'a',enabled:true});
+    assert.equal(pending.actualSpeaker,false);
+    assert.equal(a.state().connection,'recovering');
+    assert.equal(f.sockets.length,0);
+    f.busy=false;f.coordinator.retryAfter=0;a.send('wake');await f.coordinator.serial;
+    assert.equal(f.sockets.length,1);
+    assert.equal(a.state().routes[0].actualSpeaker,true);
+  }finally{f.cleanup();}
+});
+
+test('speaker restore requires the same login and respects a newer explicit cancellation',async()=>{
+  const f=fixture();try {
+    const a=f.peer();await ready(a);await acquire(a,'a');
+    const old=await a.request('restore-speaker',{ref:'a',login:'2'.repeat(64)});
+    assert.equal(old.speaker,false);
+    await a.request('speaker',{ref:'a',enabled:false});
+    const result=await a.request('restore-speaker',{ref:'a',login:f.login});
+    assert.equal(result.speaker,false);
+    assert.equal(f.sockets.length,0);
+  }finally{f.cleanup();}
 });

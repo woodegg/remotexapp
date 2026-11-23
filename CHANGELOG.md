@@ -17,6 +17,9 @@ Target: `0.17.4`. SDK `0.34.1`.
   ([#94](https://github.com/woodegg/remotexapp/issues/94)). Resume requested
   speakers after an interruption when the proxy proves login continuity.
   Require a new explicit microphone action after capture is interrupted.
+- Coordinate SharedWorker recovery across tabs. Retry a transient Viewer
+  renewal failure within its existing lease, preserve recent audio and
+  display disconnect diagnostics, and send native Viewer WebSocket Pings.
 
 ## 0.17.3
 

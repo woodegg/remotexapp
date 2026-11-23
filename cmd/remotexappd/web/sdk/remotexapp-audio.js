@@ -1,4 +1,6 @@
 const boundPort = Symbol();
+const resumeSpeaker = Symbol();
+const pendingSpeakerOff = Symbol();
 
 /** Independent audio interests: no Viewer attachment, App start or keepalive. */
 export class RemoteXAppAudio extends EventTarget {
@@ -9,7 +11,7 @@ export class RemoteXAppAudio extends EventTarget {
     if (base.origin !== environment.location.origin) throw Error('Audio requires a same-origin Manager');
     if (!environment.isSecureContext || !environment.SharedWorker || !environment.AudioContext || !environment.AudioWorkletNode) throw Error('Secure context, SharedWorker and AudioWorklet are required');
     this.base = base.href.replace(/\/$/,''); this.requests = new Map(); this.interests = new Map(); this.next = 0; this.captureEpoch = 0; this.activating = 0; this.closed = false;
-    this.workerSlot = 0;
+    this.workerKey = "remotexapp-audio-v3:"+this.base;
     this.stats = {connection:'idle',speakerOwner:false,micOwner:false,routes:[]};
     this._openWorker();
     this.watchdog = environment.setInterval(()=>{
@@ -19,7 +21,11 @@ export class RemoteXAppAudio extends EventTarget {
     },1000);
     this._pagehide = event => { if (event.persisted) this._suspend(); else this.dispose(); };
     this._suspend = () => { this._pauseCapture(); this._post({op:'suspend'}); };
-    this._wake = () => { if (this.env.document?.visibilityState !== 'hidden') this._post({op:'wake'}); };
+    this._wake = () => {
+      if (this.env.document?.visibilityState === 'hidden') return;
+      if (this.port) this._post({op:'wake'});
+      else if (this.interests.size) this._recoverWorker();
+    };
     environment.addEventListener('pagehide',this._pagehide);
     environment.addEventListener('pageshow',this._wake);
     environment.addEventListener('online',this._wake);
@@ -27,8 +33,14 @@ export class RemoteXAppAudio extends EventTarget {
     environment.document?.addEventListener('freeze',this._suspend);
     environment.document?.addEventListener('resume',this._wake);
   }
-  _openWorker() {
-    const worker = this.worker = new this.env.SharedWorker(this.base+'/sdk/audio-worker.js',{type:'module',name:'remotexapp-audio-v2:'+this.base+':'+this.workerSlot});
+  _workerGeneration() {
+    try {
+      const generation = Number(this.env.localStorage?.getItem(this.workerKey));
+      return Number.isSafeInteger(generation) && generation >= 0 ? generation : 0;
+    } catch { return 0; }
+  }
+  _openWorker(generation = this._workerGeneration()) {
+    const worker = this.worker = new this.env.SharedWorker(this.base+'/sdk/audio-worker.js',{type:'module',name:this.workerKey+':'+generation});
     const port = this.port = worker.port;
     port.onmessage = event => { if (this.port === port) this._message(event.data); };
     port.start();
@@ -49,24 +61,60 @@ export class RemoteXAppAudio extends EventTarget {
         else interest[boundPort] = port;
       }
       this._post({op:'playback-ready',ready:this.context?.state==='running' && !!this.playback});
+      if (current?.login && previous?.login === current.login) {
+        for (const interest of this.interests.values()) {
+          if (!interest[resumeSpeaker] || interest[pendingSpeakerOff]) continue;
+          interest[resumeSpeaker] = false;
+          void this._set(interest,'restore-speaker',{login:current.login}).catch(()=>{});
+        }
+      }
       return {protocol:contract.protocol};
     });
     this.ready.catch(()=>{ if (this.port === port) this._fail('audio-worker-init-failed'); });
   }
   async _ensureWorker() {
-    if (this.closed) return Promise.reject(Error('Audio controller disposed'));
-    if (!this.port) {
-      this.workerSlot ^= 1;
-      this._openWorker();
+    if (this.closed) throw Error('Audio controller disposed');
+    if (this.rebind) return this.rebind;
+    if (this.port) return this.ready;
+    const generation = this._workerGeneration();
+    const next = this.rebind = this._replaceWorker(generation);
+    try { return await next; } finally { if (this.rebind === next) this.rebind = null; }
+  }
+  async _replaceWorker(generation) {
+    // A terminated worker can be recreated under its original name by any
+    // page. Only an unanswered init warrants moving away from a live name.
+    this._openWorker(generation);
+    try { return await this.ready; } catch (error) {
+      if (error.code !== 'audio-worker-init-timeout' || !this.env.navigator?.locks || this.closed) throw error;
     }
+    const selected = await this.env.navigator.locks.request(this.workerKey, () => {
+      const current = this._workerGeneration();
+      if (current !== generation) return current;
+      this.env.localStorage.setItem(this.workerKey,String(generation+1));
+      return generation+1;
+    });
+    if (this.closed) throw Error('Audio controller disposed');
+    this._openWorker(selected);
     return this.ready;
+  }
+  _recoverWorker() {
+    void this._ensureWorker().catch(()=>{
+      if (this.closed || this.port || this.stats.connection !== 'recovering') return;
+      this.stats = {...this.stats,connection:'failed'};
+      this._emit();
+    });
   }
   _post(message,transfer) { this.port?.postMessage(message,transfer || []); }
   _request(op, values = {}) {
     if (!this.port) return Promise.reject(Error('Audio worker unavailable'));
     const request = String(++this.next);
     return new Promise((resolve,reject) => {
-      const timeout = this.env.setTimeout(()=>{this.requests.delete(request);reject(Error('Audio operation timed out'));},20000);
+      const timeout = this.env.setTimeout(()=>{
+        this.requests.delete(request);
+        const error = Error('Audio operation timed out');
+        if (op==='init') error.code = 'audio-worker-init-timeout';
+        reject(error);
+      },op==='init'?7000:20000);
       this.requests.set(request,{resolve,reject,timeout}); this._post({op,request,...values});
     });
   }
@@ -81,7 +129,12 @@ export class RemoteXAppAudio extends EventTarget {
       setSpeaker: enabled => {
         if (interest.released) return Promise.reject(Error('Audio interest released'));
         const revision = ++speakerRevision;
-        if (!enabled) return this._disable(interest,'speaker');
+        interest[resumeSpeaker] = false;
+        interest[pendingSpeakerOff] = !enabled;
+        if (!enabled) return this._disable(interest,'speaker').then(state=>{
+          if (revision === speakerRevision && !state?.speaker) interest[pendingSpeakerOff] = false;
+          return state;
+        });
         this.activating++;
         const preparing = this._preparePlayback();
         return Promise.all([preparing,this._ensureWorker()]).then(()=>{return revision === speakerRevision ? this._set(interest,'speaker',{enabled:true}) : this._inactive(interest);}).finally(()=>{this.activating--;});
@@ -106,6 +159,10 @@ export class RemoteXAppAudio extends EventTarget {
   }
   async _disable(interest,op) {
     if (this.port && this.port === interest[boundPort]) return this._set(interest,op,{enabled:false});
+    if (op==='speaker') {
+      await this._ensureWorker();
+      if (!interest.released) return this._set(interest,op,{enabled:false});
+    }
     return this._inactive(interest);
   }
   _inactive(interest) {
@@ -197,7 +254,20 @@ export class RemoteXAppAudio extends EventTarget {
     if (message.type === 'reset-playback') { this.playback?.port.postMessage({op:'reset'}); return; }
     if (message.type === 'binding') { this.binding = message.binding; return; }
     if (message.type === 'retired') this._retireInterests();
-    if (message.type === 'state') { this.stats = message; if (!this.activating && !this.requests.size && message.routes.every(r=>!r.speaker&&!r.mic) && !this.stream && this.context?.state === 'running') { this.playback?.port.postMessage({op:'reset'}); void this.context.suspend(); } this._emit(); }
+    if (message.type === 'state') {
+      let lastDisconnect = message.lastDisconnect;
+      if (this.stats.lastDisconnect && (!lastDisconnect || this.stats.lastDisconnect.at > lastDisconnect.at ||
+          (this.stats.lastDisconnect.at === lastDisconnect.at && this.stats.lastDisconnect.recoveredAt != null))) {
+        lastDisconnect = this.stats.lastDisconnect;
+      }
+      if (lastDisconnect && lastDisconnect.recoveredAt == null && message.routes.some(r=>r.actualSpeaker||r.actualMic)) {
+        const recoveredAt = Date.now();
+        lastDisconnect = {...lastDisconnect,recoveredAt,durationMs:Math.max(0,recoveredAt-lastDisconnect.at)};
+      }
+      this.stats = {...message,...(lastDisconnect ? {lastDisconnect} : {})};
+      if (!this.activating && !this.rebind && !this.requests.size && message.routes.every(r=>!r.speaker&&!r.mic) && !this.stream && this.context?.state === 'running') { this.playback?.port.postMessage({op:'reset'}); void this.context.suspend(); }
+      this._emit();
+    }
   }
   _retireInterests() {
     for (const interest of this.interests.values()) interest.released = true;
@@ -208,11 +278,22 @@ export class RemoteXAppAudio extends EventTarget {
   _emit() { this.dispatchEvent(new CustomEvent('statechange',{detail:{...this.stats,playback:this.playbackStats,microphone:this.captureStats}})); }
   _fail(reason) {
     if (!this.port) return;
+    let replay = false;
+    for (const interest of this.interests.values()) {
+      const route = this.stats.routes.find(r=>r.runtime===interest.runtime && r.generation===interest.generation);
+      if (route?.speaker && this.binding?.login && !interest[pendingSpeakerOff]) interest[resumeSpeaker] = true;
+      replay ||= !!interest[resumeSpeaker];
+    }
     this._pauseCapture();
     this.playback?.port.postMessage({op:'reset'});
     this._closeWorker(reason);
-    this.stats = {...this.stats,connection:'failed',connectionId:null,protocol:null,playbackBlocked:false,reason,micOwner:false,speakerOwner:false,routes:[]};
+    const replacing = replay && reason !== 'audio-worker-init-failed';
+    let lastDisconnect = this.stats.lastDisconnect;
+    if (!lastDisconnect || lastDisconnect.recoveredAt != null) lastDisconnect = {at:Date.now(),code:reason,httpStatus:null};
+    this.stats = {...this.stats,connection:replacing?'recovering':'failed',connectionId:null,protocol:null,
+      playbackBlocked:false,reason,micOwner:false,speakerOwner:false,routes:[],lastDisconnect};
     this._emit();
+    if (replacing) this._recoverWorker();
   }
   _closeWorker(reason) {
     this._post({op:'dispose'});

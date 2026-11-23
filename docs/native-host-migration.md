@@ -445,8 +445,15 @@ gestures. Remove host code that disposes and reacquires the entire audio
 controller for a Manager restart or worker failure. Render the desired
 `speaker` separately from `actualSpeaker`, and offer an explicit play action
 when `playbackBlocked` or `speaker-action-required` is reported. A failed
-worker channel can rebind on the next explicit action. Interrupted microphone
-capture stays off until the user enables it again.
+worker channel can rebind automatically for previously enabled speakers when
+the Manager proves login continuity. Offer an explicit action if the browser
+requires playback activation or the login lacks that proof. Interrupted
+microphone capture stays off until the user enables it again.
+
+Display and audio snapshots expose optional `lastDisconnect` records with a
+reason, timestamp, optional HTTP status and observed recovery time. Keep
+showing the latest record after recovery. A transient Viewer lease retry can
+preserve the original Viewer when it finishes within the granted lease.
 
 Enable automatic speaker recovery at the trusted reverse proxy only when it
 can supply a verified login-session identifier as described in the

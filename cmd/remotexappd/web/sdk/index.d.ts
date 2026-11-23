@@ -137,7 +137,11 @@ export class RemoteXAppAPIError extends Error { status:number; body:unknown; }
 
 export class RemoteXAppNativeError extends Error { code:string; }
 export interface NativeKeyboardPolicy {profile:'unknown'|'windows'|'mac'|'gnome'|'fcitx'|'custom';mode?:'local'|'remote';bindings?:string[];}
+export interface RemoteXAppDisconnect {
+  at:number;code:string;httpStatus:number|null;recoveredAt?:number;durationMs?:number;
+}
 export type RemoteXAppNativeStats = {
+  lastDisconnect?:RemoteXAppDisconnect;
   schemaVersion:1; state:'disconnected'|'connecting'|'reconnecting'|'ready'|'failed'|'disposed';
   code:string|null; connectionEpoch:number; observedAt:number;
   transport:'wss'|'ws-loopback'|'webrtc-udp'|null; connectedForMs:number|null;
@@ -366,6 +370,7 @@ export interface RemoteXAudioRouteState {
   speaker:boolean;mic:boolean;actualSpeaker:boolean;actualMic:boolean;reason:string;
 }
 export interface RemoteXAudioSnapshot {
+  lastDisconnect?:RemoteXAppDisconnect;
   connection:'idle'|'connected'|'recovering'|'failed';protocol?:string|null;connectionId?:string|null;
   speakerOwner:boolean;micOwner:boolean;playbackBlocked?:boolean;reason?:string;
   routes:RemoteXAudioRouteState[];receivedBytes?:number;sentBytes?:number;droppedFrames?:number;

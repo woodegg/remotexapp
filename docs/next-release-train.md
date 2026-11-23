@@ -12,6 +12,11 @@ loss or browser suspension. Reuse the existing shared channel and fresh route
 grants. Restore speaker automatically only when the Manager can verify login and
 runtime continuity. Interrupted microphone capture requires a new explicit action.
 
+Keep a healthy Viewer during bounded transient renewal retries within its
+server lease. Native Viewer Ping frames keep the browser transport active
+without extending that lease. Preserve the latest content-free reason in
+display and audio diagnostics after recovery.
+
 Qualify real playback, microphone fencing, overlapping tabs, worker failure,
 and user cancellation with fault injection in the local workbench. Formal
 publication requires separate exact post-merge qualification and human UAT

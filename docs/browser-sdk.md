@@ -162,6 +162,11 @@ before deciding whether to retain existing Viewers or bind new ones to handles.
 Keepalive defaults **off**. It delays the template's idle action without a
 Viewer connection; it does not launch an App, override Stop, or survive a
 runtime generation change. Status polling and WebSocket Ping do not renew it.
+Transient renewal errors retry twice within the confirmed lease window while
+the display socket remains healthy. Terminal authorization or generation
+errors immediately fence the Viewer. Native Viewer WebSocket Pings keep the
+browser-facing transport active independently. The latest disconnection and
+observed recovery time are included in Viewer statistics.
 
 For an existing connected Viewer:
 

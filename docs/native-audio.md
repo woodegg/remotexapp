@@ -65,8 +65,12 @@ enabled App also releases the WSS on the next coordinator reconciliation;
 retained references alone do not keep an empty audio connection open. Enabled silence retains the connection.
 An unresponsive SharedWorker has a ten-second active-page watchdog.
 Worker failure stops capture and playback and retains the live handle.
-The next explicit audio action can rebind that handle on a replacement worker
-with both switches initially off. A recovered browser page allows heartbeat
+Tabs rejoin the same named worker. If the existing worker fails to respond to
+initialization, browsers with Web Locks and writable origin storage can agree
+on one replacement name. The Manager grants at most one socket per audio scope.
+The SDK can restore requested speaker routes on a verified same-login rebind.
+A fresh page, retired login, or missing continuity proof requires an explicit
+speaker action. A disconnected microphone never reopens automatically. A recovered browser page allows heartbeat
 grace before its references can be retired. A page that stays unresponsive
 while the worker is running may lose its references and need an explicit action.
 Ordinary background visibility changes leave healthy audio alone.

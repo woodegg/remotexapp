@@ -435,3 +435,20 @@ managed selection, workspace/window/task ownership, recovery actions, logout,
 clipboard/audio consent and generation-qualified controls pass end to end.
 **Reference-page automation and the previous 0.16.0 UAT do not constitute
 acceptance of either this recovery extension or the downstream adapter.**
+
+
+## Adopt 0.17.4 audio recovery
+
+Use Core 0.17.4 with its served SDK 0.34.1. Keep the existing
+`session.audio()` handle and call the speaker and mic methods from user
+gestures. Remove host code that disposes and reacquires the entire audio
+controller for a Manager restart or worker failure. Render the desired
+`speaker` separately from `actualSpeaker`, and offer an explicit play action
+when `playbackBlocked` or `speaker-action-required` is reported. A failed
+worker channel can rebind on the next explicit action. Interrupted microphone
+capture stays off until the user enables it again.
+
+Enable automatic speaker recovery at the trusted reverse proxy only when it
+can supply a verified login-session identifier as described in the
+[audio contract](native-audio.md#authentication-and-protocol). Application
+window and Viewer integration use the same APIs.

@@ -50,6 +50,7 @@ type config struct {
 	failedStartGrace     time.Duration
 	authMode             string
 	identityHeader       string
+	audioLoginHeader     string
 	trustedProxies       string
 	allowInsecure        bool
 	connectionsTokenFile string

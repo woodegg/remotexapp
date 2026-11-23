@@ -153,7 +153,8 @@ async function open(options){
   audio.append(button('准备音频控制',async()=>{w.audio=await session.audio();update(w);}));
   w.speakerToggle=checkbox(audio,'远程播放 · Speaker',enabled=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setSpeaker(enabled);});
   w.micToggle=checkbox(audio,'麦克风 · Microphone',enabled=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setMicrophone(enabled);});
-  audio.append(button('接管麦克风',()=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setMicrophone(true,{takeover:true});}),w.audioState,
+  w.resumeAudio=button('恢复播放 · Resume playback',()=>w.audio?.setSpeaker(true));
+  audio.append(w.resumeAudio,button('接管麦克风',()=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setMicrophone(true,{takeover:true});}),w.audioState,
     node('p','先准备控制，再明确启用；仅持有引用不会打开音频通道。同一会话的开关在标签页间共享。','note'));
   const actions=section(inspector,'应用动作与控制 · Actions');
   const actionForm=node('div');actions.append(button('读取可用动作',async()=>{
@@ -185,7 +186,11 @@ function update(w){
   const audio=host.getAudioState(),route=audio.routes?.find(r=>r.runtime===w.session.id && r.generation===w.session.generation);
   if(!w.speakerToggle.disabled)w.speakerToggle.checked=!!route?.speaker;
   if(!w.micToggle.disabled)w.micToggle.checked=!!route?.mic;
-  w.audioState.textContent=`${audio.connection} · 播放 ${route?.actualSpeaker?'开':'关'} · 麦克风 ${route?.actualMic?'开':'关'}${route?.reason?` · ${route.reason}`:''}`;
+  const audioHint=audio.playbackBlocked?'点击恢复声音 · Resume playback':
+    route?.reason==='speaker-action-required' || audio.connection==='failed'?'重新开启音频 · Enable audio again':
+    audio.connection==='recovering'?'正在恢复音频 · Recovering audio':'';
+  w.resumeAudio.hidden=!w.audio || w.audio.released || !audio.playbackBlocked;
+  w.audioState.textContent=`${audioHint || audio.connection} · 播放 ${route?.actualSpeaker?'开':'关'} · 麦克风 ${route?.actualMic?'开':'关'}${route?.reason?` · ${route.reason}`:''}`;
 }
 $('#template').addEventListener('change',templateSelected);
 $('#launch').addEventListener('submit',event=>{event.preventDefault();perform('打开应用',async()=>{

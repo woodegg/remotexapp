@@ -4,7 +4,7 @@ import {webcrypto} from 'node:crypto';
 import {AudioCoordinator} from './audio-coordinator.js';
 const turn=()=>new Promise(resolve=>setImmediate(resolve));
 function fixture(){
- const f={sockets:[],http:[],scope:'a'.repeat(64),service:'b'.repeat(64),conflict:false,denied:false};
+ const f={sockets:[],http:[],scope:'a'.repeat(64),service:'b'.repeat(64),login:'1'.repeat(64),conflict:false,denied:false};
  class Socket {
   constructor(){this.readyState=1;this.bufferedAmount=0;this.sent=[];f.sockets.push(this);queueMicrotask(()=>this.onmessage?.({data:JSON.stringify({type:'connected',connection:'connection-'+f.sockets.length})}));}
   send(data){this.sent.push(data);if(typeof data!=='string')return;const c=JSON.parse(data);const respond=()=>this.onmessage?.({data:JSON.stringify(c.op==='unsubscribe'?{type:'ack',request:c.request,slot:c.slot}:{type:'state',request:c.request,slot:c.slot,speaker:c.speaker,mic:c.mic&&!f.conflict,reason:c.mic&&f.conflict?'mic-conflict':'',domain:'d'.repeat(32)})});if(f.holdMic&&c.mic)f.held={command:c,respond};else queueMicrotask(respond);}
@@ -12,9 +12,12 @@ function fixture(){
  }
  const env={crypto:webcrypto,location:{origin:'https://audio.test'},WebSocket:Socket,setInterval:()=>1,setTimeout,clearTimeout,fetch:async(url,options)=>{
   const body=JSON.parse(options.body),action=url.split('/').at(-1);f.http.push({action,body});
+  if(f.offline)throw TypeError('offline');
+  if(f.holdContext && action==='context') await f.holdContext;
+  if(action==='route'&&body.runtime===f.retiredRuntime)return {ok:false,status:410,json:async()=>({error:'audio runtime generation retired'})};
   if(f.denied)return {ok:false,status:403,json:async()=>({error:'auth rejected'})};
   if(action==='route'&&body.runtime===f.unavailableRuntime)return {ok:false,status:409,json:async()=>({error:'session audio unavailable'})};
-  const data=action==='context'?{service:f.service,scope:f.scope,protocol:'pcm-s16le-48k-v1'}:action==='route'?{token:'c'.repeat(64),domain:'d'.repeat(32)}:action==='grant'?{token:'c'.repeat(64)}:{ok:true};
+  const data=action==='context'?{service:f.service,scope:f.scope,login:f.login,protocol:'pcm-s16le-48k-v1'}:action==='route'?{token:'c'.repeat(64),domain:'d'.repeat(32)}:action==='grant'?{token:'c'.repeat(64)}:{ok:true};
   return {ok:true,json:async()=>data};
  }};
  f.coordinator=new AudioCoordinator(env);
@@ -115,14 +118,57 @@ test('a device ending immediately after permission cannot create a microphone ro
 });
 
 
-test('reconnect refreshes service epoch and retires stale references before granting routes',async()=>{
+test('Manager restart recovers two tabs through one new socket and fences old capture',async()=>{
+ const f=fixture();try{
+  const a=f.peer(),b=f.peer();await ready(a);await ready(b);await acquire(a,'a');await acquire(b,'b');
+  await a.request('speaker',{ref:'a',enabled:true});await a.request('microphone',{ref:'a',enabled:true});
+  f.service='f'.repeat(64);f.scope='e'.repeat(64);f.coordinator.lastRenew=0;
+  a.send('wake');b.send('wake');await f.coordinator.serial;
+  assert.equal(f.sockets.length,2);assert.equal(f.sockets[0].readyState,3);
+  assert.equal(a.state().routes[0].actualSpeaker,true);assert.equal(b.state().routes[0].refs,2);
+  assert.equal(b.state().routes[0].actualMic,false);
+  assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
+  assert.ok(!a.messages.some(m=>m.type==='retired'));
+  await a.request('speaker',{ref:'a',enabled:false});assert.equal(f.sockets[1].readyState,3);
+ }finally{f.cleanup();}
+});
+
+test('a username-only deployment requires a click after loss and preserves the old control',async()=>{
+ const f=fixture();f.login='';
+ try{
+  const a=f.peer();await ready(a);await acquire(a,'a');await a.request('speaker',{ref:'a',enabled:true});
+  f.sockets[0].close();await turn();f.service='f'.repeat(64);f.scope='e'.repeat(64);
+  f.coordinator.retryAfter=0;a.send('wake');await f.coordinator.serial;
+  assert.equal(f.sockets.length,1);assert.equal(a.state().routes[0].reason,'speaker-action-required');
+  await a.request('speaker',{ref:'a',enabled:true});
+  assert.equal(f.sockets.length,2);assert.equal(a.state().routes[0].actualSpeaker,true);
+ }finally{f.cleanup();}
+});
+
+test('a different login and a stale runtime generation cannot reuse old speaker intent',async()=>{
  const f=fixture();try{
   const a=f.peer();await ready(a);await acquire(a,'a');await a.request('speaker',{ref:'a',enabled:true});
-  f.sockets[0].close();await turn();f.service='f'.repeat(64);f.coordinator.retryAfter=0;
-  f.coordinator._tick();await f.coordinator.serial;
-  assert.equal(f.coordinator.routes.size,0);assert.equal(f.coordinator.capture,null);assert.equal(f.sockets.length,1);
-  assert.ok(a.messages.some(m=>m.type==='retired'));
-  await acquire(a,'new');await a.request('speaker',{ref:'new',enabled:true});assert.equal(f.sockets.length,2);assert.equal(a.state().routes[0].actualSpeaker,true);
+  f.sockets[0].close();await turn();f.service='f'.repeat(64);f.login='2'.repeat(64);f.scope='e'.repeat(64);
+  f.coordinator.retryAfter=0;a.send('wake');await f.coordinator.serial;
+  assert.equal(f.sockets.length,1);assert.ok(a.messages.some(m=>m.type==='retired'));
+  await assert.rejects(a.request('speaker',{ref:'a',enabled:true}),/retired/);
+  await acquire(a,'stale','app');f.retiredRuntime='app';
+  const route=await a.request('speaker',{ref:'stale',enabled:true});
+  assert.equal(route.reason,'generation-retired');assert.equal(route.speaker,false);
+  assert.equal(f.sockets[1].readyState,3);
+ }finally{f.cleanup();}
+});
+
+test('a late context response cannot undo Speaker off during recovery',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a');
+  let resume;f.holdContext=new Promise(resolve=>{resume=resolve;});
+  const enabling=a.request('speaker',{ref:'a',enabled:true});
+  await turn();
+  const disabling=a.request('speaker',{ref:'a',enabled:false});
+  resume();
+  await Promise.all([enabling,disabling]);
+  assert.equal(f.sockets.length,0);assert.equal(a.state().routes[0].speaker,false);
  }finally{f.cleanup();}
 });
 

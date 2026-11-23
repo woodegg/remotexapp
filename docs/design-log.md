@@ -5544,3 +5544,17 @@ resize retains its screen registration and existing remote resize path. The
 public configuration and explicit remote flush keep their current capability
 and policy checks. A new component includes the fix. Host integrations continue
 to use the existing SDK entry points.
+
+
+## 2026-11-23 — Reconcile native audio after interruption
+
+[Issue #94](https://github.com/woodegg/remotexapp/issues/94) refines AUD-002.
+Keep the SDK interest with the live page and runtime generation. Recover
+transport via the existing shared worker, new Manager grants and current
+generation validation. The authenticated reverse proxy can prove login
+continuity independently of short-lived audio scopes. A new login, explicit
+logout, retired generation or released interest fences old intent. With
+unavailable proof, the user can authorize a new speaker action. Worker
+replacement starts with audio off and rebinds on a fresh action. Interrupted
+capture always loses its previous intent. Browser events prompt reconciliation
+and server leases bound loss detection when the browser cannot run.

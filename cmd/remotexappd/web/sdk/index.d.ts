@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.34.0';
+export const SDK_VERSION: '0.34.1';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -366,7 +366,7 @@ export interface RemoteXAudioRouteState {
   speaker:boolean;mic:boolean;actualSpeaker:boolean;actualMic:boolean;reason:string;
 }
 export interface RemoteXAudioSnapshot {
-  connection:'idle'|'connected'|'failed';protocol?:string|null;connectionId?:string|null;
+  connection:'idle'|'connected'|'recovering'|'failed';protocol?:string|null;connectionId?:string|null;
   speakerOwner:boolean;micOwner:boolean;playbackBlocked?:boolean;reason?:string;
   routes:RemoteXAudioRouteState[];receivedBytes?:number;sentBytes?:number;droppedFrames?:number;
   playback?:{underrunBlocks:number;droppedFrames:number;peak:number;queuedFrames:number};

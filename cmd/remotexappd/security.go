@@ -11,6 +11,7 @@ import (
 )
 
 type requestIdentityKey struct{}
+type audioLoginKey struct{}
 
 func (m *manager) secure(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +40,14 @@ func (m *manager) secure(handler http.Handler) http.Handler {
 				writeError(w, http.StatusUnauthorized, "authenticated identity required")
 				return
 			}
-			r = r.WithContext(context.WithValue(r.Context(), requestIdentityKey{}, identity))
+			ctx := context.WithValue(r.Context(), requestIdentityKey{}, identity)
+			if m.cfg.authMode == "trusted-header" && m.cfg.audioLoginHeader != "" {
+				values := r.Header.Values(m.cfg.audioLoginHeader)
+				if len(values) == 1 && len(values[0]) >= 16 && validRequestID(values[0]) {
+					ctx = context.WithValue(ctx, audioLoginKey{}, values[0])
+				}
+			}
+			r = r.WithContext(ctx)
 		}
 		handler.ServeHTTP(w, r)
 	})

@@ -63,15 +63,21 @@ App. The first enabled speaker/mic opens one WSS; additional sessions reuse it.
 All off releases the WSS and capture. Server-side retirement of the last
 enabled App also releases the WSS on the next coordinator reconciliation;
 retained references alone do not keep an empty audio connection open. Enabled silence retains the connection.
-An unresponsive SharedWorker is detected by a ten-second active-page watchdog;
-worker failure stops capture, closes the local audio graph and retires the
-controller. Resuming a browser-suspended page allows a fresh heartbeat grace
-period. Worker heartbeats do not wait behind permission prompts or HTTP calls.
-A restarted Manager changes the service epoch: old interests are retired before
-any fresh route grant. The UAT's **Reconnect audio** action creates a fresh
-controller and references with both switches off; enabling audio remains an
-explicit action. Network recovery within the same epoch may restore requested
-speakers but never reopens microphone capture.
+An unresponsive SharedWorker has a ten-second active-page watchdog.
+Worker failure stops capture and playback and retains the live handle.
+The next explicit audio action can rebind that handle on a replacement worker
+with both switches initially off. A recovered browser page allows heartbeat
+grace before its references can be retired. A page that stays unresponsive
+while the worker is running may lose its references and need an explicit action.
+Ordinary background visibility changes leave healthy audio alone.
+
+A restarted Manager changes its service epoch. The worker obtains fresh
+connection and route grants for previously requested speakers when the
+authenticated login and runtime generation can be verified. Without that
+proof, use an explicit speaker action. Transport loss and observed page
+suspension stop interrupted microphone capture, which is never replayed.
+Page unload releases its interests. The same live page can reconcile after
+suspension or a back/forward-cache return. A fresh page starts with audio off.
 
 Browsers lacking a secure context, SharedWorker or AudioWorklet fail explicitly;
 there is no fallback that silently duplicates playback or channels.
@@ -88,7 +94,7 @@ speakerButton.onclick = () => interest.setSpeaker(true);
 micButton.onclick = () => interest.setMicrophone(true);
 // Explicit release when this host no longer retains the session audio.
 releaseButton.onclick = () => interest.release();
-// The SDK also disposes automatically on pagehide.
+// The SDK also disposes on page unload.
 closeAudioButton.onclick = () => audio.dispose();
 ```
 
@@ -112,7 +118,18 @@ Fresh authenticated HTTP renewal is required within 30 seconds, normally every
 10 seconds. Audio packets and Ping/Pong do not renew authorization. Explicit SDK
 logout revokes the epoch. Out-of-band identity-provider logout is observed when
 authentication/renewal fails; it is not claimed to revoke an already upgraded
-socket instantaneously. Server restart changes the service epoch. The existing
+socket instantaneously. Server restart changes the service epoch. For automatic speaker recovery,
+configure `-audio-login-header NAME` with `-auth-mode trusted-header`. The
+trusted reverse proxy must strip client-supplied values and set exactly one
+opaque, non-secret session identifier derived from its verified login. Use a
+fresh high-entropy identifier for each login, stable across requests and
+Manager restarts. The value must be 16–128 ASCII letters, digits, dots, dashes
+or underscores. A username or a bearer credential cannot serve this role.
+The Manager returns an opaque binding to the SDK and checks the current
+login on scope, grant and renewal requests. A username-only installation
+remains usable and asks for another explicit speaker action after interruption.
+
+The existing
 selected-UID Manager access model remains the authority for its App catalog;
 this feature does not introduce a new multi-tenant ACL model.
 

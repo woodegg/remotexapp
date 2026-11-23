@@ -3,7 +3,7 @@
 export class AudioCoordinator {
   constructor(env = globalThis) {
     this.env = env; this.ports = new Map(); this.routes = new Map(); this.pending = new Map(); this.serial = Promise.resolve(); this.client = env.crypto.randomUUID();
-    this.connection = null; this.socket = null; this.capture = null; this.player = null; this.next = 0; this.epoch = 0; this.sequence = 0; this.received = 0; this.sent = 0; this.dropped = 0; this.reason = '';
+    this.connection = null; this.socket = null; this.capture = null; this.player = null; this.next = 0; this.epoch = 0; this.sequence = 0; this.received = 0; this.sent = 0; this.dropped = 0; this.reason = ''; this.lastTick = Date.now();
     this.timer = env.setInterval(()=>this._tick(),1000);
   }
   add(port) {
@@ -14,8 +14,22 @@ export class AudioCoordinator {
   _enqueue(fn) { const result = this.serial.then(fn); this.serial = result.catch(()=>{}); return result; }
   receive(peer,data) {
     if (!this.ports.has(peer.port) || !data || typeof data.op !== 'string') return;
+    if (this.capture?.peer === peer && Date.now()-peer.seen > 5000) {
+      this._stopCapture('microphone-owner-suspended');
+    }
     peer.seen = Date.now();
     if (data.op === 'pong') return;
+    if (data.op === 'wake') { this._tick(); return; }
+    if (data.op === 'suspend' && this.capture?.peer === peer) this._stopCapture('microphone-owner-suspended');
+    const ref = peer.refs.get(data.ref);
+    if (ref && data.op === 'release' && ref.route.refs.size === 1) {
+      ref.route.speakerRevision = (ref.route.speakerRevision || 0)+1;
+      this._muteSpeaker(ref.route);
+    }
+    if (ref && data.op === 'speaker') {
+      data.revision = ref.route.speakerRevision = (ref.route.speakerRevision || 0)+1;
+      if (!data.enabled) this._muteSpeaker(ref.route);
+    }
     if (data.op === 'playback-credit') { peer.credits = Math.min(peer.creditLimit,peer.credits+1); return; }
     if (data.op === 'microphone-frame') { this._mic(peer,data); return; }
     if (data.op === 'capture-ready' || data.op === 'capture-failed') {
@@ -35,15 +49,53 @@ export class AudioCoordinator {
   }
   async _api(action,body = {}) {
     const response = await this.env.fetch(this.base+'/api/audio/'+action,{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(5000)});
-    const data = await response.json(); if (!response.ok) { const error = Error(data.error || 'Audio API unavailable'); error.status = response.status; throw error; } return data;
+    if (!response.ok) {
+      const data = await response.json().catch(()=>({}));
+      throw Object.assign(Error(data.error || 'Audio API unavailable'),{status:response.status});
+    }
+    return response.json();
   }
   async _context() {
-    const context = await this._api('context');
-    if (context.protocol !== 'pcm-s16le-48k-v1' || !/^[a-f0-9]{64}$/.test(context.scope || '') || !/^[a-f0-9]{64}$/.test(context.service || '')) throw Error('Unsupported audio contract');
-    if (this.context && (context.scope !== this.context.scope || context.service !== this.context.service)) {
-      this._retire('account-or-service-epoch-changed'); this.context = context; throw Error('Audio epoch changed; acquire current session interests again');
+    let context;
+    try { context = await this._api('context'); }
+    catch (error) {
+      if (error.status === 401 || error.status === 403) { this.context = null; this._retire('audio-login-required'); }
+      throw error;
     }
-    this.context = context; return context;
+    if (context.protocol !== 'pcm-s16le-48k-v1' || !/^[a-f0-9]{64}$/.test(context.scope || '') || !/^[a-f0-9]{64}$/.test(context.service || '') || (context.login && !/^[a-f0-9]{64}$/.test(context.login))) throw Error('Unsupported audio contract');
+    const previous = this.context;
+    this.context = context;
+    if (previous && (context.scope !== previous.scope || context.service !== previous.service)) {
+      if (context.service === previous.service || (previous.login && context.login && previous.login !== context.login)) {
+        this._retire('audio-login-changed');
+        throw Error('Audio login epoch changed; acquire current session interests again');
+      }
+      this._interrupt('audio-service-restarted',!!context.login && context.login === previous.login);
+    }
+    if (!previous || previous.scope !== context.scope || previous.service !== context.service) {
+      for (const peer of this.ports.values()) this._send(peer,{type:'binding',binding:this._binding()});
+    }
+    return context;
+  }
+  _binding() {
+    const {scope,service,login} = this.context;
+    return {scope,service,login};
+  }
+  _muteSpeaker(route,reason = '') {
+    route.speaker = false;
+    route.reason = reason;
+    if (this.player) this._send(this.player,{type:'remove-playback',slot:route.slot});
+  }
+  _interrupt(reason,continuous = !!this.context?.login || !this.connection) {
+    this._disconnect(reason);
+    this._stopCapture(reason);
+    if (!continuous) {
+      for (const route of this.routes.values()) {
+        if (route.speaker) this._muteSpeaker(route,'speaker-action-required');
+      }
+    }
+    this.reason = reason;
+    this._broadcast();
   }
   _body(extra = {}) { return {scope:this.context.scope,client:this.client,connection:this.connection,...extra}; }
   _retire(reason) {
@@ -56,13 +108,14 @@ export class AudioCoordinator {
       const base = new URL(data.base);
       if (base.origin !== this.env.location.origin || base.search || base.hash || base.username || base.password) throw Error('Invalid audio service origin');
       if (this.base && this.base !== data.base) throw Error('Audio service scope differs');
-      this.base = data.base; if (!this.context) await this._context(); this._broadcast(); return {protocol:this.context.protocol};
+      this.base = data.base; if (!this.context) await this._context(); this._broadcast(); return {protocol:this.context.protocol,binding:this._binding()};
     }
     if (data.op === 'dispose') return this._remove(peer);
-    if (!this.context) throw Error('Audio controller not initialized');
-    if (data.op === 'logout') { const body = this._body(); this._retire('logout'); await this._api('logout',body); this.context = null; return; }
+    if (data.op === 'suspend') { if (this.connection) await this._sync(); return; }
+    if (data.op === 'logout') { if (!this.context) return; const body = this._body(); this._retire('logout'); await this._api('logout',body); this.context = null; return; }
     if (data.op === 'playback-ready') { peer.ready = !!data.ready; this._selectPlayer(); this._broadcast(); return; }
     if (data.op === 'acquire') {
+      if (!this.context) await this._context();
       if (!/^[a-zA-Z0-9_.-]{1,128}$/.test(data.runtime || '') || !Number.isSafeInteger(data.generation) || data.generation < 1 || typeof data.ref !== 'string' || data.ref.length > 64 || peer.refs.has(data.ref)) throw Error('Invalid audio interest');
       const key = data.runtime+':'+data.generation;
       let route = this.routes.get(key);
@@ -76,12 +129,18 @@ export class AudioCoordinator {
     const ref = peer.refs.get(data.ref); if (!ref) throw Error('Audio interest is retired');
     const route = ref.route;
     if (data.op === 'release') { peer.refs.delete(data.ref); route.refs.delete(ref); if (!route.refs.size) { route.speaker = route.mic = false; await this._syncRoute(route); this.routes.delete(route.key); } await this._sync(); return; }
+    if (route.retired) return this._routeState(route);
     if (data.op === 'speaker') {
-      await this._context(); route.speaker = !!data.enabled; route.reason = ''; this._selectPlayer(); await this._sync(); return this._routeState(route);
+      if (data.enabled) {
+        await this._context();
+        if (data.revision !== route.speakerRevision || !peer.refs.has(ref.id)) return this._routeState(route);
+        route.speaker = true; route.reason = ''; this._selectPlayer();
+      }
+      await this._sync(); return this._routeState(route);
     }
     if (data.op === 'microphone') {
-      await this._context();
       if (data.enabled) {
+        await this._context();
         const capture = await this._ensureCapture(peer);
         if (!capture || this.capture !== capture || !capture.ready) throw Error('microphone-ended-before-routing');
         route.mic = true; route.takeover = !!data.takeover; route.reason = '';
@@ -94,7 +153,7 @@ export class AudioCoordinator {
   _routeState(r) { return {runtime:r.runtime,generation:r.generation,slot:r.slot,speaker:r.speaker,mic:r.mic,actualSpeaker:r.actualSpeaker,actualMic:r.actualMic,reason:r.reason,refs:r.refs.size,domain:r.domain || null}; }
   _broadcast() {
     const routes = [...this.routes.values()].map(r=>this._routeState(r));
-    for (const peer of this.ports.values()) this._send(peer,{type:'state',connection:this.socket?.readyState === 1 ? 'connected' : 'idle',protocol:this.connection?'WSS / PCM16 48 kHz':null,playbackBlocked:routes.some(r=>r.speaker)&&!this.player,connectionId:this.connection,speakerOwner:this.player===peer,micOwner:this.capture?.peer===peer,reason:this.reason,routes,receivedBytes:this.received,sentBytes:this.sent,droppedFrames:this.dropped});
+    for (const peer of this.ports.values()) this._send(peer,{type:'state',connection:this.connection ? 'connected' : routes.some(r=>r.speaker) ? 'recovering' : 'idle',protocol:this.connection?'WSS / PCM16 48 kHz':null,playbackBlocked:routes.some(r=>r.speaker)&&!this.player,connectionId:this.connection,speakerOwner:this.player===peer,micOwner:this.capture?.peer===peer,reason:this.reason,routes,receivedBytes:this.received,sentBytes:this.sent,droppedFrames:this.dropped});
   }
   _selectPlayer() {
     const count = [...this.routes.values()].filter(r=>r.speaker).length;
@@ -128,6 +187,7 @@ export class AudioCoordinator {
   async _connect() {
     if (this.connection && this.socket?.readyState===1) return;
     await this._context();
+    if (![...this.routes.values()].some(r=>r.speaker||r.mic)) return;
     const grant = await this._api('grant',this._body());
     if (!/^[a-f0-9]{64}$/.test(grant.token || '')) throw Error('Invalid audio grant');
     const url = new URL(this.base+'/api/audio/ws'); url.protocol = url.protocol==='https:'?'wss:':'ws:';
@@ -142,7 +202,7 @@ export class AudioCoordinator {
         if (message.type==='connected') { this.env.clearTimeout(timeout); this.connection = message.connection; this.lastRenew = Date.now(); this.reason = ''; resolve(); this._broadcast(); return; }
         this._serverMessage(message);
       };
-      socket.onclose = ()=>{this.env.clearTimeout(timeout);reject(Error('Audio connection closed'));if (epoch===this.epoch) {this._disconnect('network-disconnected');this._stopCapture('network-disconnected');this.retryAfter = Date.now()+1000;this._broadcast();}};
+      socket.onclose = ()=>{this.env.clearTimeout(timeout);reject(Error('Audio connection closed'));if (epoch===this.epoch) {this._interrupt('network-disconnected');this.retryAfter = Date.now()+1000;}};
       socket.onerror = ()=>{};
     });
   }
@@ -164,11 +224,11 @@ export class AudioCoordinator {
   _serverMessage(message) {
     const route = [...this.routes.values()].find(r=>r.slot===message.slot);
     if (route && message.type==='state') {
-      route.actualSpeaker = !!message.speaker; route.actualMic = !!message.mic;
+      route.actualSpeaker = !!message.speaker && route.speaker; route.actualMic = !!message.mic;
       if (message.domain) route.domain = message.domain;
       if (message.reason && message.reason!=='reconfigured' && message.reason!=='disabled') {
         route.reason = message.reason; route.applied = '';
-        if (['domain-retired','generation-retired'].includes(message.reason)) { route.mic = false; if (message.reason==='generation-retired') route.speaker = false; }
+        if (['domain-retired','generation-retired'].includes(message.reason)) { route.mic = false; if (message.reason==='generation-retired') { route.speaker = false; route.retired = true; } }
         if (message.reason.startsWith('mic-')) route.mic = false;
         if (message.reason==='speaker-ended') route.speaker = false;
       }
@@ -191,6 +251,12 @@ export class AudioCoordinator {
     let grant;
     try { grant = await this._api('route',this._body({runtime:route.runtime,generation:route.generation})); }
     catch (error) {
+      if (error.status === 410) {
+        this._muteSpeaker(route,'generation-retired');
+        route.retired = true;
+        route.mic = false; route.actualSpeaker = route.actualMic = false; route.applied = '';
+        this._releaseCaptureIfUnused(); return;
+      }
       if (error.status!==409) throw error;
       // An unavailable App domain is local to this route. Authentication and
       // shared-transport failures still propagate to the connection fence.
@@ -198,6 +264,7 @@ export class AudioCoordinator {
       if (route.applied) await this._control({op:'unsubscribe',slot:route.slot});
       route.applied = ''; this._releaseCaptureIfUnused(); return;
     }
+    if (!route.speaker && !route.mic) return this._syncRoute(route);
     const state = await this._control({op:'subscribe',slot:route.slot,token:grant.token,speaker:route.speaker,mic:route.mic,takeover:!!route.takeover});
     route.takeover = false; route.domain = grant.domain;
     if (route.reason==='session-audio-unavailable') route.reason = '';
@@ -212,6 +279,7 @@ export class AudioCoordinator {
     const wanted = [...this.routes.values()].some(r=>r.speaker||r.mic);
     if (!wanted) { this._disconnect('all-audio-disabled'); this._releaseCaptureIfUnused(); this._selectPlayer(); this._broadcast(); return; }
     await this._connect();
+    if (!this.connection) return;
     for (const route of this.routes.values()) await this._syncRoute(route);
     this._releaseCaptureIfUnused(); this._selectPlayer(); this._broadcast();
     if (![...this.routes.values()].some(r=>r.speaker||r.mic)) this._disconnect('no-authorized-audio-targets');
@@ -245,21 +313,31 @@ export class AudioCoordinator {
   }
   _tick() {
     if (!this.base) return;
+    const now = Date.now();
+    if (now-this.lastTick > 5000) {
+      this.pruneAfter = now+5000;
+      if (this.capture) this._stopCapture('microphone-owner-suspended');
+    }
+    this.lastTick = now;
     // Heartbeats must not wait behind permission prompts or network requests.
     for (const peer of this.ports.values()) this._send(peer,{type:'ping'});
     if (this.tickPending) return;
     this.tickPending = true;
     this._enqueue(async()=>{
-      for (const peer of this.ports.values()) { if (Date.now()-peer.seen>75000) await this._remove(peer); }
+      for (const peer of this.ports.values()) {
+        if (this.capture?.peer === peer && Date.now()-peer.seen > 5000) this._stopCapture('microphone-owner-suspended');
+        if (Date.now() >= (this.pruneAfter || 0) && Date.now()-peer.seen>75000) await this._remove(peer);
+      }
       if (this.connection && Date.now()-this.lastRenew>=10000) {
-        await this._context(); await this._api('renew',this._body()); this.lastRenew = Date.now();
+        await this._context();
+        if (this.connection) { await this._api('renew',this._body()); this.lastRenew = Date.now(); }
       }
       // Server-side retirement can clear the last desired route without a UI command.
       // Reconcile an existing connection too, so an empty channel is released.
       if (Date.now()>=(this.retryAfter || 0) && (this.connection || [...this.routes.values()].some(r=>r.speaker||r.mic))) await this._sync();
       this._broadcast();
     }).catch(error=>{
-      this.reason = error.message; this._disconnect('audio-lease-or-route-failed'); this._stopCapture('audio-lease-or-route-failed');
+      this._interrupt(error.message || 'audio-lease-or-route-failed');
       this.retryAfter = Date.now()+5000; this._broadcast();
     }).finally(()=>{this.tickPending = false;});
   }

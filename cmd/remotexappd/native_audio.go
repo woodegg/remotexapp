@@ -22,10 +22,12 @@ const audioMaxRoutes = 8
 const audioMaxScopes = 64
 const audioGrantPrefix = "remotexapp-audio."
 
+var errAudioGenerationRetired = errors.New("audio runtime generation retired")
+
 type audioScope struct {
-	id, principal, client string
-	seen                  time.Time
-	connection            *audioConnection
+	id, principal, login, client string
+	seen                         time.Time
+	connection                   *audioConnection
 }
 type audioGrant struct {
 	scope      *audioScope
@@ -98,7 +100,10 @@ func (m *manager) resolveAudioDomain(id string, generation int64) (sessionaudio.
 	m.lifecycleMu.Lock()
 	defer m.lifecycleMu.Unlock()
 	item := m.get(id)
-	if item == nil || !isKasm(item) || item.Components.NativeAudio != sessionaudio.Protocol || item.SessionGeneration != generation || item.SessionState != "running" || (item.State != "ready" && item.State != "server-ready") {
+	if item == nil || item.SessionGeneration != generation {
+		return sessionaudio.Record{}, errAudioGenerationRetired
+	}
+	if !isKasm(item) || item.Components.NativeAudio != sessionaudio.Protocol || item.SessionState != "running" || (item.State != "ready" && item.State != "server-ready") {
 		return sessionaudio.Record{}, errors.New("session audio unavailable")
 	}
 	services, err := m.readSessionServices(item)
@@ -123,6 +128,17 @@ func (m *manager) serveAudio(w http.ResponseWriter, r *http.Request) {
 	m.audioService().serve(w, r)
 }
 
+// Correlation only. The trusted proxy authenticates the request and the audio
+// cookie and one-use grants still authorize access to the channel.
+func (a *audioService) loginBinding(r *http.Request) string {
+	login, _ := r.Context().Value(audioLoginKey{}).(string)
+	if login == "" {
+		return ""
+	}
+	binding := sha256.Sum256([]byte(a.cookie + "\x00" + login + "\x00" + grantIdentity(r)))
+	return hex.EncodeToString(binding[:])
+}
+
 func (a *audioService) scopeLocked(r *http.Request) *audioScope {
 	cookie, err := r.Cookie(a.cookie)
 	if err != nil {
@@ -133,7 +149,7 @@ func (a *audioService) scopeLocked(r *http.Request) *audioScope {
 		return nil
 	}
 	scope := a.scopes[key]
-	if scope == nil || scope.principal != grantIdentity(r) {
+	if scope == nil || scope.principal != grantIdentity(r) || scope.login != a.loginBinding(r) {
 		return nil
 	}
 	return scope
@@ -183,6 +199,10 @@ func (a *audioService) serve(w http.ResponseWriter, r *http.Request) {
 	if action == "route" {
 		var err error
 		record, err = a.resolve(req.Runtime, req.Generation)
+		if errors.Is(err, errAudioGenerationRetired) {
+			writeError(w, http.StatusGone, err.Error())
+			return
+		}
 		if err != nil {
 			writeError(w, 409, "session audio unavailable")
 			return
@@ -214,12 +234,12 @@ func (a *audioService) serve(w http.ResponseWriter, r *http.Request) {
 			}
 			token := audioToken()
 			key, _ := grantKey(token)
-			scope = &audioScope{id: audioToken(), principal: grantIdentity(r), seen: time.Now()}
+			scope = &audioScope{id: audioToken(), principal: grantIdentity(r), login: a.loginBinding(r), seen: time.Now()}
 			a.scopes[key] = scope
 			http.SetCookie(w, &http.Cookie{Name: a.cookie, Value: token, Path: "/", HttpOnly: true, Secure: r.TLS != nil || strings.EqualFold(r.Header.Get("X-Forwarded-Proto"), "https"), SameSite: http.SameSiteStrictMode})
 		}
 		scope.seen = time.Now()
-		writeJSON(w, 200, map[string]any{"service": a.id, "scope": scope.id, "protocol": sessionaudio.Protocol, "maxRoutes": audioMaxRoutes, "renewAfterMs": 10000, "expiresInMs": audioLease.Milliseconds()})
+		writeJSON(w, 200, map[string]any{"service": a.id, "scope": scope.id, "login": scope.login, "protocol": sessionaudio.Protocol, "maxRoutes": audioMaxRoutes, "renewAfterMs": 10000, "expiresInMs": audioLease.Milliseconds()})
 		return
 	}
 	if scope == nil || req.Scope != scope.id {

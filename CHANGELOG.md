@@ -11,6 +11,13 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+Target: `0.17.4`. SDK `0.34.1`.
+
+- Keep native audio controls usable after Manager and SharedWorker failure
+  ([#94](https://github.com/woodegg/remotexapp/issues/94)). Resume requested
+  speakers after an interruption when the proxy proves login continuity.
+  Require a new explicit microphone action after capture is interrupted.
+
 ## 0.17.3
 
 Target: `0.17.3`. SDK `0.34.0`.

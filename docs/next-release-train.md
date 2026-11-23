@@ -3,6 +3,19 @@
 Source identity is maintained in [current-state.md](current-state.md). Earlier
 candidate labels are historical. Deployment is owned by each target's operator.
 
+## Core 0.17.4 — native audio recovery
+
+[Milestone 0.17.4](https://github.com/woodegg/remotexapp/milestone/8) targets
+Core 0.17.4 and SDK 0.34.1. [Issue #94](https://github.com/woodegg/remotexapp/issues/94)
+owns stable audio controls and recovery after a Manager restart, audio transport
+loss or browser suspension. Reuse the existing shared channel and fresh route
+grants. Restore speaker automatically only when the Manager can verify login and
+runtime continuity. Interrupted microphone capture requires a new explicit action.
+
+Qualify real playback, microphone fencing, overlapping tabs, worker failure,
+and user cancellation with fault injection in the local workbench. Formal
+publication requires separate exact post-merge qualification and human UAT.
+
 ## Core 0.17.3 — native recovery panel appearance
 
 Starting from [Core 0.17.2](https://github.com/woodegg/remotexapp/releases/tag/v0.17.2)

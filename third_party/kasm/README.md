@@ -3,7 +3,7 @@
 The default recipe remains WSS. The explicitly selected `--transport udp`
 development profile adds patches 0020/0021, authenticated native UDP negotiation,
 loopback-only UDP sockets, bounded client reassembly and measured transport
-counters. It now emits `kasm-udp-clipboard-v2`; it requires Core's bounded endpoint and
+counters. It now emits `kasm-routed-udp-clipboard-v3`; it requires Core's bounded endpoint and
 Viewer grant contract plus an outside-container trusted edge. See
 [bounded UDP UAT](../../docs/native-udp-uat.md). Neither profile alone qualifies browser integration, audio or QOI workers.
 Rich clipboard integration and its exact candidate tests are tracked in #55/#56.
@@ -186,8 +186,12 @@ remain manual-only. Qualification is tracked in #50 / #54.
 ## Rich clipboard development component
 
 Patches 0023/0024 extend new paired components to `text/plain`, `text/html` and
-`image/png`, using `kasm-wss-clipboard-v2` or `kasm-udp-clipboard-v2`.
-The aggregate content limit is 2 MiB; duplicate/unsupported representations and
+`image/png`. New builds use `kasm-wss-clipboard-v3` or
+`kasm-routed-udp-clipboard-v3`. The aggregate limit is 10 MiB on those
+component pairs and 2 MiB on existing clipboard-v2 pins.
+Patch 0028 also permits bounded inline PNG in a file-marked selection.
+File references and alternate text or HTML in that selection are omitted.
+At either limit, duplicate/unsupported representations and
 malformed text are rejected before destination mutation. The SDK owns browser
 access, consent and focus; the native adapter does not call clipboard browser APIs.
 Existing immutable text-only components and their 64 KiB contract remain valid.

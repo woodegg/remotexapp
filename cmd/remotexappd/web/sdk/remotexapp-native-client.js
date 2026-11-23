@@ -50,10 +50,14 @@ function validTurnServer(server) {
 }
 
 export class RemoteXAppNativeClient extends EventTarget {
-  constructor({ container, runtime, manager = runtime?.manager || new RemoteXAppManager(), timeout = 90000, keyboardPolicy, preferUDP = true, reconnect = false, readOnly = false } = {}) {
+  constructor({ container, runtime, manager = runtime?.manager || new RemoteXAppManager(), timeout = 90000, heartbeatIntervalMs = 15000, keyboardPolicy, preferUDP = true, reconnect = false, readOnly = false } = {}) {
     super();
     if (!container?.replaceChildren) throw new TypeError('container is required');
     if (!Number.isFinite(timeout) || timeout < 1 || timeout > 120000) throw new RangeError('invalid connection timeout');
+    if (!Number.isInteger(heartbeatIntervalMs) || heartbeatIntervalMs < 0 || heartbeatIntervalMs > 2147483647 ||
+        (heartbeatIntervalMs !== 0 && heartbeatIntervalMs < 5000))
+      throw new RangeError('heartbeatIntervalMs must be 0 or an integer from 5000 to 2147483647');
+    Object.defineProperty(this,'heartbeatIntervalMs',{value:heartbeatIntervalMs,enumerable:true});
     if (typeof readOnly !== 'boolean') throw new TypeError('readOnly must be boolean');
     Object.defineProperty(this,'readOnly',{value:readOnly,enumerable:true});
     this._displaySettings = {scale:true,resize:null};
@@ -76,7 +80,11 @@ export class RemoteXAppNativeClient extends EventTarget {
       connect:(instance, signal) => this._connect(instance, signal),
       event:(name, detail) => {
         if (name === 'reconnecting') this._state('reconnecting', detail);
-        if (name === 'reconnectexhausted' || name === 'reconnectstopped') this._state('disconnected', detail);
+        if (name === 'reconnectexhausted' || name === 'reconnectstopped') {
+          this._clipboardBinding = null;
+          this._clipboardSync.reset();
+          this._state('disconnected', detail);
+        }
         this.dispatchEvent(new CustomEvent(name, {detail}));
       }});
     if (runtime) this.bindRuntime(runtime);
@@ -119,10 +127,10 @@ export class RemoteXAppNativeClient extends EventTarget {
     return this._connect(instance);
   }
 
-  async _connect(instance, parentSignal) {
+  async _connect(instance, parentSignal, retainClipboard = !!parentSignal) {
     if (this._disposed) throw new RemoteXAppNativeError('disposed', 'Viewer has been disposed');
     if (!instance) throw new TypeError('instance is required');
-    this._closeConnection();
+    this._closeConnection(true, retainClipboard);
     const epoch = ++this._epoch;
     const controller = this._controller = new AbortController();
     const { signal } = controller;
@@ -192,7 +200,9 @@ export class RemoteXAppNativeClient extends EventTarget {
       const turn = prepared.nativeTransport?.mode === 'turn';
       const turnServer = turn && features.turn === true && validTurnServer(grant?.turn) ? grant.turn : null;
       const udp = features.udp === true && prepared.nativeTransport?.available === true && (!turn || !!turnServer);
-      const rich = prepared.nativeClipboard === 'rich-v1' && features.clipboardRich === true && features.clipboardMaxBytes === 2097152;
+      const richLimits = {'rich-v1':2 * 1024 * 1024, 'rich-v2':10 * 1024 * 1024};
+      const richLimit = richLimits[prepared.nativeClipboard];
+      const rich = !!richLimit && features.clipboardRich === true && features.clipboardMaxBytes === richLimit;
       const clipboard = !this.readOnly && (rich || prepared.nativeClipboard === 'text' && features.clipboardText === true && Number.isSafeInteger(features.clipboardMaxBytes) && features.clipboardMaxBytes > 0);
       this.capabilities = Object.freeze({...this.capabilities,
         pointer:!this.readOnly, keyboard:!this.readOnly, readOnly:this.readOnly,
@@ -201,7 +211,7 @@ export class RemoteXAppNativeClient extends EventTarget {
         displayControls:features.displayControls === true,
         remoteResize:!this.readOnly && features.displayControls === true && prepared.effectivePolicy?.display?.allowClientResize === true,
         keyboardPolicy:features.keyboardPolicy === true,
-        clipboard, clipboardRich:rich, clipboardAutomatic:clipboard && features.clipboardAutomatic === true, udp, clipboardMaxBytes:clipboard ? Math.min(features.clipboardMaxBytes, rich ? 2097152 : 65536) : 0, statistics:features.statistics === true,
+        clipboard, clipboardRich:rich, clipboardAutomatic:clipboard && features.clipboardAutomatic === true, udp, clipboardMaxBytes:clipboard ? Math.min(features.clipboardMaxBytes, rich ? richLimit : 65536) : 0, statistics:features.statistics === true,
         latency:features.latency === true && typeof NativeDisplay.prototype.measureLatency === 'function',
         udpLoss:udp && features.udpLoss === true});
       const display = this._display = new NativeDisplay(this.container, socketURL.href, {
@@ -297,13 +307,25 @@ export class RemoteXAppNativeClient extends EventTarget {
         const recoveredAt = Date.now();
         this._lastDisconnect = {...this._lastDisconnect,recoveredAt,durationMs:Math.max(0,recoveredAt-this._lastDisconnect.at)};
       }
+      const previousBinding = this._clipboardBinding;
+      const binding = clipboard && /^[a-f0-9]{64}$/.test(grant?.clipboardLogin || '')
+        ? JSON.stringify([prepared.id, prepared.sessionGeneration, prepared.displayComponentDigest, grant.clipboardLogin])
+        : null;
+      if (previousBinding && previousBinding !== binding) this._clipboardSync.reset();
+      this._clipboardBinding = binding;
+      this.clipboardEnabled = clipboard && Object.values(this._clipboardSync.requested).some(mode => mode !== 'off');
       this._state('ready', { generation:prepared.sessionGeneration, transport:this._transport });
+      if (epoch === this._epoch && this.clipboardEnabled && previousBinding && previousBinding === binding) {
+        this._clipboardChanged();
+        void this._clipboardSync.reconnect();
+      }
+      this._startHeartbeat(signal);
       this.dispatchEvent(new CustomEvent('ready', { detail:{ instance:this.instance } }));
       return this.instance;
     } catch (cause) {
       if (epoch === this._epoch) {
-        this._closeConnection();
         const error = cause instanceof RemoteXAppNativeError ? cause : new RemoteXAppNativeError('connection-failed', 'Native Viewer connection failed', { cause });
+        this._closeConnection(true, retainClipboard && retryable(error));
         this._state('failed', { code:error.code, ...(error.cause?.status ? {httpStatus:error.cause.status} : {}) });
         throw error;
       }
@@ -314,7 +336,7 @@ export class RemoteXAppNativeClient extends EventTarget {
   _connectionLost(error) {
     const expected = this.instance, recoverable = retryable(error);
     this._lastDisconnect = {at:Date.now(),code:error.code,httpStatus:error.cause?.status || null};
-    this._closeConnection(false);
+    this._closeConnection(false, recoverable);
     const closedEpoch = this._epoch;
     this._state(recoverable ? 'disconnected' : 'failed', {code:error.code, ...(error.cause?.status ? {httpStatus:error.cause.status} : {})});
     // State listeners can synchronously disconnect, replace or dispose this
@@ -374,6 +396,32 @@ export class RemoteXAppNativeClient extends EventTarget {
     return result;
   }
   flushResize() { return this.state === 'ready' && this.capabilities.remoteResize ? this._display.flushResize() : false; }
+
+  _startHeartbeat(signal) {
+    const interval = this.heartbeatIntervalMs;
+    if (!interval || !this.capabilities.latency || signal.aborted) return;
+    const document = this.container.ownerDocument;
+    const page = document?.defaultView;
+    let timer, due;
+    const schedule = () => {
+      due = performance.now() + interval;
+      timer = setTimeout(probe, interval);
+    };
+    const probe = () => {
+      if (signal.aborted) return;
+      clearTimeout(timer);
+      try { this.measureLatency(); } catch { /* The display owns connection-loss detection. */ }
+      if (!signal.aborted) schedule();
+    };
+    const wake = () => {
+      if (document?.visibilityState !== 'hidden' && performance.now() >= due) probe();
+    };
+    document?.addEventListener('visibilitychange', wake, {signal});
+    page?.addEventListener('pageshow', wake, {signal});
+    page?.addEventListener('online', wake, {signal});
+    signal.addEventListener('abort', () => clearTimeout(timer), {once:true});
+    schedule();
+  }
 
   /** Explicit bounded RTT sampling; getStats() remains passive. */
   measureLatency() {
@@ -478,15 +526,21 @@ export class RemoteXAppNativeClient extends EventTarget {
   copyClipboardToLocal() { return this._clipboardAction('download'); }
   clearRemoteClipboard() { return this._clipboardAction('clear'); }
 
-  reconnect() { return this.connect(this.instance?.id); }
+  reconnect() {
+    this._reconnect.cancel();
+    return this._connect(this.instance?.id, undefined, true);
+  }
 
   disconnect() {
     this._reconnect.cancel();
     this._closeConnection();
   }
 
-  _closeConnection(notify = true) {
-    this._clipboardSync.reset();
+  _closeConnection(notify = true, retainClipboard = false) {
+    const keep = retainClipboard && !!this._clipboardBinding &&
+      Object.values(this._clipboardSync.requested).some(mode => mode !== 'off');
+    if (!keep) this._clipboardBinding = null;
+    this._clipboardSync.reset(keep);
     ++this._epoch;
     clearTimeout(this._grantTimer);
     this._grantTimer = null;

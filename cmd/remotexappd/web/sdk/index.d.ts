@@ -69,7 +69,7 @@ export interface RemoteXAppRecovery {
 }
 
 export interface RemoteXAppInstance {
-  displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string; nativeClipboard?:'text'|'rich-v1';
+  displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string; nativeClipboard?:'text'|'rich-v1'|'rich-v2';
   nativeAudio?:'pcm-s16le-48k-v1';
   nativeTransport?:{policy:'wss-only'|'prefer-udp';available:boolean;grantRequired:boolean;readOnly?:boolean;reason?:string};
   recovery?:RemoteXAppRecovery;
@@ -163,6 +163,7 @@ export interface NativeClipboardState {
 export class RemoteXAppNativeClient extends EventTarget {
   constructor(options:RemoteXNativeViewerOptions);
   readonly readOnly:boolean;
+  readonly heartbeatIntervalMs:number;
   readonly runtime?:RemoteXRuntimeHandle;
   bindRuntime(runtime:RemoteXRuntimeHandle):void;
   readonly state:'disconnected'|'connecting'|'reconnecting'|'ready'|'failed'|'disposed';
@@ -406,6 +407,8 @@ export interface NativeInputReceipt {
 export interface RemoteXNativeViewerOptions {
   container:HTMLElement;manager?:RemoteXAppManager;runtime?:RemoteXRuntimeHandle;timeout?:number;
   keyboardPolicy?:NativeKeyboardPolicy;preferUDP?:boolean;readOnly?:boolean;
+  /** Native WSS Fence interval, default 15000. Zero disables periodic probes. */
+  heartbeatIntervalMs?:number;
   reconnect?:boolean|{maxAttempts?:number;delays?:number[]};
 }
 export type RemoteXHostOpenOptions = ({templateId:string;instanceId?:never;managedId?:never;parameters?:Record<string,unknown>;profileRef?:string;overrides?:RemoteXAppOverrides} |

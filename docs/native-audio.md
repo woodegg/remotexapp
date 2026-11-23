@@ -54,8 +54,8 @@ SharedWorker deduplicates same-session switches across tabs and chooses a single
 playback owner. A microphone is captured once and sent only to explicitly enabled
 targets. Each remote domain has one server-enforced writer. Another profile sees
 a conflict unless it explicitly requests takeover. A lost microphone owner,
-revoked permission or disconnected channel turns capture off; recovery never
-silently calls getUserMedia. Playback handoff requires a previously unlocked
+revoked permission or ended device stops capture. A transport-only outage can
+retain the live owner for up to 12 seconds with verified login continuity. Playback handoff requires a previously unlocked
 AudioContext; a page without a user gesture must report that limitation.
 
 No capture, AudioContext or audio WebSocket is created by merely launching an
@@ -70,7 +70,9 @@ initialization, browsers with Web Locks and writable origin storage can agree
 on one replacement name. The Manager grants at most one socket per audio scope.
 The SDK can restore requested speaker routes on a verified same-login rebind.
 A fresh page, retired login, or missing continuity proof requires an explicit
-speaker action. A disconnected microphone never reopens automatically. A recovered browser page allows heartbeat
+speaker action. A live microphone may resume only after a fresh route
+acknowledgement. Recovery never starts a new browser capture. A recovered
+browser page allows heartbeat
 grace before its references can be retired. A page that stays unresponsive
 while the worker is running may lose its references and need an explicit action.
 Ordinary background visibility changes leave healthy audio alone.
@@ -78,8 +80,9 @@ Ordinary background visibility changes leave healthy audio alone.
 A restarted Manager changes its service epoch. The worker obtains fresh
 connection and route grants for previously requested speakers when the
 authenticated login and runtime generation can be verified. Without that
-proof, use an explicit speaker action. Transport loss and observed page
-suspension stop interrupted microphone capture, which is never replayed.
+proof, use an explicit speaker action. Transport recovery pauses delivery
+and fences old capture frames. Worker replacement, page suspension and
+permission loss can end the live capture and require another action.
 Page unload releases its interests. The same live page can reconcile after
 suspension or a back/forward-cache return. A fresh page starts with audio off.
 

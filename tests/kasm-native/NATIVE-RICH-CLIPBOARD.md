@@ -95,3 +95,56 @@ RTF, arbitrary MIME, file/folder copy and drag-and-drop are excluded features.
 Keep #56 stacked on #54 until its dependency is merged. Merge, qualification of
 the exact post-merge candidate, immutable publication and downstream deployment
 remain separate steps. No release tag or acceptance is implied by this report.
+
+
+## 2026-11-23 local fault reproduction
+
+Core 0.17.3 (`2bf172d49e81`), SDK 0.34.0 and the pinned Kasm component
+served two disposable Mousepad Viewers over WSS to an isolated Chrome
+149.0.7827.102 profile. The existing `rich-selection.py` helper supplied
+synthetic selections on the real X11 servers. Chrome's actual system
+clipboard was used for reads and writes.
+
+| Case | Observed baseline |
+| ---- | ----------------- |
+| File-only selection, then file markers with an inline PNG | The file-only selection preserved the local sentinel. For the mixed selection, Kasm requested `TARGETS` but never requested `image/png`. A direct X11 read confirmed the 120-byte PNG was available, and Chrome received no Viewer offer. |
+| The same PNG without file markers | The SDK reported `copied-to-local`; the PNG read back from Chrome had the same decoded pixels. |
+| Browser PNG encoding expands beyond the transfer limit | The remote PNG had 1,520,454 bytes and reached Chrome. Its 4,561,677-byte clipboard readback had identical decoded pixels. The SDK reported `clipboard-uncertain` after writing the PNG. |
+| Short text after switching to the second Viewer | The second Viewer reported `clipboard-size` on focus. A new 27-byte X11 text offer reached that Viewer; the oversized image remained on the local clipboard. |
+| The short text with a plain local baseline | Replacing the local image with plain text and refocusing the second Viewer allowed a fresh remote offer to replace it. |
+| Same-generation Viewer reconnect | The connection epoch advanced and the runtime generation stayed the same. The SDK reset both requested clipboard directions to `off`. |
+
+These are reproductions of the existing behavior. They use synthetic clipboard
+data, separate App runtimes, and a dedicated browser profile. The
+[follow-on design and acceptance criteria](../../docs/native-rich-clipboard.md#clipboard-faults-and-recovery-follow-on)
+record the desired recovery behavior.
+
+
+## 10 MiB clipboard candidate
+
+The 0.17.4 development build and a new routed Kasm component ran over
+loopback TLS/WSS with Chrome 149 on Linux amd64. The Manager and SDK
+advertised a 10,485,760-byte aggregate clipboard limit. Existing 2 MiB
+rich and 64 KiB text capability pairs were covered by pin and SDK tests.
+
+- The full Writer WSS suite passed 17 cases. Writer copy and paste
+  preserved styled Unicode HTML and PNG pixels in both directions.
+  X11 INCR and browser uploads accepted the exact 10 MiB limit.
+  Excess content, delayed or failed representations, stale X11 ownership
+  and file-only selections preserved the destination. One mixed item
+  retained all three supported representations. A file-marked selection
+  supplied only inline PNG to the browser.
+- Seven live lifecycle cases covered two tabs of one runtime, an
+  independent runtime, blur and return, explicit source choice and reset.
+  A separate two-Viewer run confirmed that short Unicode local text reached
+  only the focused remote selection.
+- A 4,228,016-byte PNG read back from Chrome as 12,692,239 bytes with the
+  same decoded pixels. The SDK reported `copied-to-local`. The next
+  27-byte remote text offer from the second Viewer replaced that image
+  successfully.
+
+Same-generation reconnect still resets configured clipboard modes.
+Clipboard intent recovery remains KNC-011. The local matrix used
+synthetic clipboard fixtures and automated browser permissions. Actual
+permission prompts, other operating systems, the downstream embedding host
+and active WebRTC display transport remain separate qualification work.

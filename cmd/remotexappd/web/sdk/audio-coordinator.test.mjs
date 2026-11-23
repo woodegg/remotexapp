@@ -47,19 +47,30 @@ test('same-session references deduplicate switches, first/last interests own one
  }finally{f.cleanup();}
 });
 
-test('capture fans out explicit targets, denied writer stops capture, network loss never recaptures',async()=>{
+test('microphone routes recover a live capture and discard audio from the disconnected channel',async()=>{
  const f=fixture();try{
   const a=f.peer(),b=f.peer();await ready(a);await ready(b);await acquire(a,'a','app-a');await acquire(b,'b','app-b');
   await a.request('microphone',{ref:'a',enabled:true});await b.request('microphone',{ref:'b',enabled:true});
   assert.equal(a.messages.filter(m=>m.type==='capture').length,1);assert.equal(b.messages.filter(m=>m.type==='capture').length,0);
   const capture=f.coordinator.capture;const pcm=new Int16Array(960).fill(100).buffer;
-  a.send('microphone-frame',{token:capture.token,pcm});assert.equal(f.sockets[0].sent.filter(s=>s instanceof ArrayBuffer).length,1);
-  b.send('microphone-frame',{token:capture.token,pcm});assert.equal(f.sockets[0].sent.filter(s=>s instanceof ArrayBuffer).length,1);
+  a.send('microphone-frame',{token:capture.token,delivery:capture.delivery,pcm});assert.equal(f.sockets[0].sent.filter(s=>s instanceof ArrayBuffer).length,1);
+  b.send('microphone-frame',{token:capture.token,delivery:capture.delivery,pcm});assert.equal(f.sockets[0].sent.filter(s=>s instanceof ArrayBuffer).length,1);
   await a.request('microphone',{ref:'a',enabled:false});assert.ok(f.coordinator.capture);await b.request('microphone',{ref:'b',enabled:false});assert.equal(f.coordinator.capture,null);
   f.conflict=true;const result=await b.request('microphone',{ref:'b',enabled:true});assert.equal(result.reason,'mic-conflict');assert.equal(f.coordinator.capture,null);
-  f.conflict=false;await a.request('microphone',{ref:'a',enabled:true});const count=a.messages.filter(m=>m.type==='capture').length;
-  f.sockets.at(-1).close();await turn();assert.equal(f.coordinator.capture,null);assert.equal(a.state().routes.some(r=>r.mic),false);
-  f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;assert.equal(a.messages.filter(m=>m.type==='capture').length,count);
+  f.conflict=false;await a.request('microphone',{ref:'a',enabled:true});
+  const live=f.coordinator.capture, oldDelivery=live.delivery, count=a.messages.filter(m=>m.type==='capture').length;
+  const oldSocket=f.sockets.at(-1);oldSocket.close();await turn();
+  assert.equal(f.coordinator.capture,live);assert.equal(live.delivery,null);
+  assert.equal(a.state().routes[0].mic,true);assert.equal(a.state().routes[0].actualMic,false);
+  f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;
+  assert.equal(a.messages.filter(m=>m.type==='capture').length,count);
+  assert.equal(a.state().routes[0].actualMic,true);assert.notEqual(live.delivery,oldDelivery);
+  const resumed=f.sockets.at(-1);
+  a.send('microphone-frame',{token:live.token,delivery:oldDelivery,pcm});
+  assert.equal(resumed.sent.filter(s=>s instanceof ArrayBuffer).length,0);
+  a.send('microphone-frame',{token:live.token,delivery:live.delivery,pcm});
+  assert.equal(resumed.sent.filter(s=>s instanceof ArrayBuffer).length,1);
+  assert.equal(a.state().routes[1].actualMic,false);
  }finally{f.cleanup();}
 });
 
@@ -81,8 +92,8 @@ test('speaker delivery is bounded by credits and capture respects websocket pres
   for(let i=0;i<100;i++)f.coordinator._speaker(packet);assert.equal(a.messages.filter(m=>m.type==='playback').length,8);assert.equal(f.coordinator.dropped,92);
   a.send('playback-credit');f.coordinator._speaker(packet);assert.equal(a.messages.filter(m=>m.type==='playback').length,9);
   await a.request('microphone',{ref:'a',enabled:true});const token=f.coordinator.capture.token;f.sockets.at(-1).bufferedAmount=10000;
-  const before=f.sockets.at(-1).sent.length;a.send('microphone-frame',{token,pcm:new ArrayBuffer(1920)});assert.equal(f.sockets.at(-1).sent.length,before);
-  f.sockets.at(-1).bufferedAmount=0;a.send('microphone-frame',{token,pcm:new ArrayBuffer(1920)});assert.equal(f.sockets.at(-1).sent.at(-1).byteLength,8);
+  const before=f.sockets.at(-1).sent.length;a.send('microphone-frame',{token,delivery:f.coordinator.capture.delivery,pcm:new ArrayBuffer(1920)});assert.equal(f.sockets.at(-1).sent.length,before);
+  f.sockets.at(-1).bufferedAmount=0;a.send('microphone-frame',{token,delivery:f.coordinator.capture.delivery,pcm:new ArrayBuffer(1920)});assert.equal(f.sockets.at(-1).sent.at(-1).byteLength,8);
   a.send('playback-ready',{ready:false});await f.coordinator.serial;assert.equal(a.state().playbackBlocked,true);
  }finally{f.cleanup();}
 });
@@ -119,7 +130,7 @@ test('a device ending immediately after permission cannot create a microphone ro
 });
 
 
-test('Manager restart recovers two tabs through one new socket and fences old capture',async()=>{
+test('Manager restart recovers enabled audio through one fresh socket under the verified login',async()=>{
  const f=fixture();try{
   const a=f.peer(),b=f.peer();await ready(a);await ready(b);await acquire(a,'a');await acquire(b,'b');
   await a.request('speaker',{ref:'a',enabled:true});await a.request('microphone',{ref:'a',enabled:true});
@@ -127,10 +138,11 @@ test('Manager restart recovers two tabs through one new socket and fences old ca
   a.send('wake');b.send('wake');await f.coordinator.serial;
   assert.equal(f.sockets.length,2);assert.equal(f.sockets[0].readyState,3);
   assert.equal(a.state().routes[0].actualSpeaker,true);assert.equal(b.state().routes[0].refs,2);
-  assert.equal(b.state().routes[0].actualMic,false);
+  assert.equal(b.state().routes[0].actualMic,true);
   assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
   assert.ok(!a.messages.some(m=>m.type==='retired'));
-  await a.request('speaker',{ref:'a',enabled:false});assert.equal(f.sockets[1].readyState,3);
+  await a.request('speaker',{ref:'a',enabled:false});assert.equal(f.sockets[1].readyState,1);
+  await a.request('microphone',{ref:'a',enabled:false});assert.equal(f.sockets[1].readyState,3);
  }finally{f.cleanup();}
 });
 
@@ -252,4 +264,21 @@ test('speaker restore requires the same login and respects a newer explicit canc
     assert.equal(result.speaker,false);
     assert.equal(f.sockets.length,0);
   }finally{f.cleanup();}
+});
+
+test('microphone recovery stops on owner loss, unverified login or expired time',async t=>{
+ for(const fault of ['owner gone','unknown login','window elapsed'])await t.test(fault,async sub=>{
+  sub.mock.timers.enable({apis:['setTimeout']});
+  const f=fixture();try{
+   const a=f.peer();
+   if(fault==='unknown login')f.login='';
+   await ready(a);await acquire(a,'a');await a.request('microphone',{ref:'a',enabled:true});
+   f.sockets[0].close();await turn();
+   if(fault==='owner gone'){a.send('dispose');await f.coordinator.serial;}
+   if(fault==='window elapsed')sub.mock.timers.tick(12000);
+   assert.equal(f.coordinator.capture,null);
+   assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
+   assert.ok(a.messages.some(m=>m.type==='stop-capture'));
+  }finally{f.cleanup();sub.mock.timers.reset();}
+ });
 });

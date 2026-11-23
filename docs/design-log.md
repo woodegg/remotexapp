@@ -5572,3 +5572,85 @@ grant twice within its remaining window. Terminal replies and expiry fence
 the old channel. The Manager sends a 30-second browser-facing WebSocket Ping
 for native viewers, independent of App activity and HTTP authorization.
 Keep one recent reason and recovery duration per transport in SDK snapshots.
+
+
+## 2026-11-23 — Schedule native Viewer Fence keepalive
+
+KNA-011 adds a browser SDK keepalive to the existing per-Viewer Fence
+echo. The Viewer attempts a probe every 15 seconds while its event loop
+runs and can configure the interval or opt out. Reuse the component's
+bounded correlation and rate limiter. Each connection owns its timer.
+On browser wake, try one overdue probe and schedule from that point.
+Measure without input injection, App activity or grant renewal. The
+prior visibility rule remains for host-driven diagnostics.
+
+A routed Edge experiment observed three TCP resets at a 30-second probe
+cadence, zero disconnects with 78 replies at a 15-second cadence, and
+seven EOF closes with automatic probing off. Each phase lasted 20 minutes.
+The off-phase closes followed roughly 125 seconds since the last incoming
+frame. Packet traces showed the public gateway closing toward the
+Manager first. This supports a shorter default and further qualification
+on the public path. It leaves the source of the TCP resets open.
+
+Keep the Manager's transport-level WebSocket Ping independent. Its
+public behavior and the SDK default need validation together on the
+exact release candidate.
+
+
+## 2026-11-23 — Proposed continuity for native integrations
+
+KNC-010–011 and AUD-003 describe the requested follow-on. Separate user
+intent from connection grants. The live SDK Viewer and audio interest keep
+the user's choice within a verified login and runtime generation. The Manager
+rechecks login, runtime generation and route ownership before binding a new
+channel. Clipboard focus pauses work, then acquires a fresh baseline; the
+latest transport, permission and actual activity belong in separate host
+status fields. Clipboard bytes and audio awaiting transport at the moment of
+interruption are retired.
+
+Reuse the shared audio channel and existing speaker recovery. A short audio
+transport interruption may resume an explicitly enabled live microphone
+track for its current owner after fresh route authorization. Ended capture,
+revoked permission, released ownership and changed login or runtime require
+an explicit action. This supersedes the blanket microphone re-enable rule
+for that short, verified recovery case once implemented and qualified.
+
+For file-marked X11 selections, permit only a supported inline PNG and omit
+file references and alternate text or HTML. Enforce the 2 MiB aggregate cap at
+transfer boundaries and use a separately bounded local comparison for browser
+clipboard normalization. Preserve genuine source conflicts. Real X11 and
+browser tests must exercise the mixed selection and the normalized PNG
+followed by a new text copy. See the
+[rich clipboard follow-on](native-rich-clipboard.md#clipboard-faults-and-recovery-follow-on).
+
+
+## 2026-11-23 — Pin the 10 MiB clipboard boundary to the component pair
+
+KNC-010 now selects 10 MiB of aggregate transmitted content. New Kasm build
+protocols advertise the larger bound. The Manager issues a matching runtime
+clipboard descriptor, and the SDK verifies the adapter agrees. Existing
+2 MiB rich and 64 KiB text pins keep their original transfer bounds. The
+new X11 snapshot may request inline PNG from a file-marked selection and
+keeps file references and alternate text or HTML out of the transport.
+
+Allow a browser readback up to a separate 32 MiB comparison budget. Keep only
+private per-representation digests if the item exceeds the transmission
+budget. A stable oversized baseline can accept a new remote copy. A changed
+local item facing a concurrent remote copy still requires a manual source
+choice. An oversized keyboard upload reports the size rejection and keeps
+the old remote clipboard.
+
+
+## 2026-11-23 — Lock and implement same-session integration recovery
+
+KNC-011 and AUD-003 keep user intent within the current Viewer or audio
+interest and the verified login. Native Viewer grants carry an opaque
+login binding and check it on claim and renewal. Matching runtime and
+component identity permits clipboard recovery after a fresh focus
+baseline. Keep browser permission checks and drop all previous offers.
+
+A live microphone has a 12-second transport recovery window. Clear its
+delivery identifier while the channel or target route is unavailable.
+The capture worklet discards partial old frames and uses a new identifier
+after the route acknowledgement. The browser retains the previously
+authorized track only while ownership and device state remain eligible.

@@ -1,3 +1,5 @@
+const microphoneRecoveryMs = 12000;
+
 // One coordinator per canonical Manager origin/base, browser storage partition
 // and worker protocol. A server-issued cookie binds the current login epoch.
 export class AudioCoordinator {
@@ -22,6 +24,7 @@ export class AudioCoordinator {
     if (data.op === 'wake') { this._tick(); return; }
     if (data.op === 'suspend' && this.capture?.peer === peer) this._stopCapture('microphone-owner-suspended');
     const ref = peer.refs.get(data.ref);
+    if (ref?.route.mic && ((data.op === 'microphone' && !data.enabled) || data.op === 'release')) this._captureDelivery(false);
     if (ref && data.op === 'release' && ref.route.refs.size === 1) {
       ref.route.speakerRevision = (ref.route.speakerRevision || 0)+1;
       this._muteSpeaker(ref.route);
@@ -73,7 +76,7 @@ export class AudioCoordinator {
         this._retire('audio-login-changed');
         throw Error('Audio login epoch changed; acquire current session interests again');
       }
-      this._interrupt('audio-service-restarted',!!context.login && context.login === previous.login);
+      this._interrupt('audio-service-restarted',!!context.login && context.login === previous.login,true);
     }
     return context;
   }
@@ -86,10 +89,17 @@ export class AudioCoordinator {
     route.reason = reason;
     if (this.player) this._send(this.player,{type:'remove-playback',slot:route.slot});
   }
-  _interrupt(reason,continuous = !!this.context?.login || !this.connection) {
+  _interrupt(reason,continuous = !!this.context?.login || !this.connection, allowCaptureRecovery = false) {
     if (this.connection || !this.lastDisconnect) this.lastDisconnect = {at:Date.now(),code:reason,httpStatus:null};
     this._disconnect(reason);
-    this._stopCapture(reason);
+    const capture = this.capture;
+    if (allowCaptureRecovery && continuous && this.context?.login && capture?.ready &&
+        this.ports.has(capture.peer.port) && Date.now()-capture.peer.seen <= 5000 &&
+        [...this.routes.values()].some(route=>route.mic)) {
+      if (!capture.recoveryTimer) capture.recoveryTimer = this.env.setTimeout(()=>{
+        if (this.capture === capture) this._stopCapture('microphone-recovery-expired');
+      },microphoneRecoveryMs);
+    } else this._stopCapture(reason);
     if (!continuous) {
       for (const route of this.routes.values()) {
         if (route.speaker) this._muteSpeaker(route,'speaker-action-required');
@@ -161,7 +171,7 @@ export class AudioCoordinator {
   _routeState(r) { return {runtime:r.runtime,generation:r.generation,slot:r.slot,speaker:r.speaker,mic:r.mic,actualSpeaker:r.actualSpeaker,actualMic:r.actualMic,reason:r.reason,refs:r.refs.size,domain:r.domain || null}; }
   _broadcast() {
     const routes = [...this.routes.values()].map(r=>this._routeState(r));
-    for (const peer of this.ports.values()) this._send(peer,{type:'state',connection:this.connection ? 'connected' : routes.some(r=>r.speaker) ? 'recovering' : 'idle',protocol:this.connection?'WSS / PCM16 48 kHz':null,playbackBlocked:routes.some(r=>r.speaker)&&!this.player,connectionId:this.connection,speakerOwner:this.player===peer,micOwner:this.capture?.peer===peer,reason:this.reason,lastDisconnect:this.lastDisconnect,routes,receivedBytes:this.received,sentBytes:this.sent,droppedFrames:this.dropped});
+    for (const peer of this.ports.values()) this._send(peer,{type:'state',connection:this.connection ? 'connected' : routes.some(r=>r.speaker||r.mic) ? 'recovering' : 'idle',protocol:this.connection?'WSS / PCM16 48 kHz':null,playbackBlocked:routes.some(r=>r.speaker)&&!this.player,connectionId:this.connection,speakerOwner:this.player===peer,micOwner:this.capture?.peer===peer,reason:this.reason,lastDisconnect:this.lastDisconnect,routes,receivedBytes:this.received,sentBytes:this.sent,droppedFrames:this.dropped});
   }
   _selectPlayer() {
     const count = [...this.routes.values()].filter(r=>r.speaker).length;
@@ -187,9 +197,25 @@ export class AudioCoordinator {
   }
   _stopCapture(reason) {
     const capture = this.capture; this.capture = null;
-    if (capture) { capture.reject?.(Error(reason)); this._send(capture.peer,{type:'stop-capture',reason}); }
+    if (capture) {
+      this.env.clearTimeout(capture.recoveryTimer);
+      capture.reject?.(Error(reason));
+      this._send(capture.peer,{type:'stop-capture',reason});
+    }
     for (const route of this.routes.values()) { if (route.mic) route.reason = reason; route.mic = false; }
     this._broadcast();
+  }
+  _captureDelivery(enabled) {
+    const capture = this.capture;
+    if (!capture?.ready) return;
+    const delivery = enabled ? capture.delivery || this.env.crypto.randomUUID() : null;
+    if (delivery === (capture.delivery || null)) return;
+    capture.delivery = delivery;
+    if (delivery) {
+      this.env.clearTimeout(capture.recoveryTimer);
+      capture.recoveryTimer = null;
+    }
+    this._send(capture.peer,{type:'capture-delivery',token:capture.token,delivery});
   }
   _releaseCaptureIfUnused() { if (![...this.routes.values()].some(r=>r.mic)) this._stopCapture('all-microphones-disabled'); }
   async _connect() {
@@ -203,7 +229,7 @@ export class AudioCoordinator {
       this.busySince ??= now;
       this.retryAfter = now+1000;
       this.reason = 'audio-connection-owned';
-      if (this.capture) this._stopCapture('audio-connection-owned');
+      if (this.capture && !this.capture.recoveryTimer) this._stopCapture('audio-connection-owned');
       if (now-this.busySince>=35000) {
         for (const route of this.routes.values()) if (route.speaker) this._muteSpeaker(route,'speaker-action-required');
       }
@@ -216,7 +242,7 @@ export class AudioCoordinator {
     const epoch = ++this.epoch;
     await new Promise((resolve,reject)=>{
       const socket = this.socket = new this.env.WebSocket(url.href,['remotexapp-audio.'+grant.token]); socket.binaryType = 'arraybuffer';
-      const timeout = this.env.setTimeout(()=>{socket.close();reject(Error('Audio connection timed out'));},5000);
+      const timeout = this.env.setTimeout(()=>{socket.close();reject(Object.assign(Error('Audio connection timed out'),{transport:true}));},5000);
       socket.onmessage = ({data})=>{
         if (epoch!==this.epoch) return;
         if (data instanceof ArrayBuffer) { this._speaker(data); return; }
@@ -224,11 +250,12 @@ export class AudioCoordinator {
         if (message.type==='connected') { this.env.clearTimeout(timeout); this.connection = message.connection; this.lastRenew = Date.now(); this.reason = ''; resolve(); this._broadcast(); return; }
         this._serverMessage(message);
       };
-      socket.onclose = ()=>{this.env.clearTimeout(timeout);reject(Error('Audio connection closed'));if (epoch===this.epoch) {this._interrupt('network-disconnected');this.retryAfter = Date.now()+1000;}};
+      socket.onclose = ()=>{this.env.clearTimeout(timeout);reject(Object.assign(Error('Audio connection closed'),{transport:true}));if (epoch===this.epoch) {this._interrupt('network-disconnected',undefined,true);this.retryAfter = Date.now()+1000;}};
       socket.onerror = ()=>{};
     });
   }
   _disconnect(reason) {
+    this._captureDelivery(false);
     ++this.epoch; const socket = this.socket; this.socket = null; this.connection = null;
     if (socket) { socket.onmessage = socket.onclose = socket.onerror = null; socket.close(); }
     for (const pending of this.pending.values()) { this.env.clearTimeout(pending.timeout); pending.reject(Error(reason)); } this.pending.clear();
@@ -265,11 +292,13 @@ export class AudioCoordinator {
   async _syncRoute(route) {
     if (!this.connection) { route.applied = ''; return; }
     if (!route.speaker && !route.mic) {
+      if (route.applied) this._captureDelivery(false);
       if (route.applied) await this._control({op:'unsubscribe',slot:route.slot});
       route.applied = ''; route.actualSpeaker = route.actualMic = false; return;
     }
     const key = this.connection+':'+route.speaker+':'+route.mic;
     if (route.applied === key) return;
+    if (route.mic || route.actualMic) this._captureDelivery(false);
     let grant;
     try { grant = await this._api('route',this._body({runtime:route.runtime,generation:route.generation})); }
     catch (error) {
@@ -308,7 +337,9 @@ export class AudioCoordinator {
       const recoveredAt = Date.now();
       this.lastDisconnect = {...this.lastDisconnect,recoveredAt,durationMs:Math.max(0,recoveredAt-this.lastDisconnect.at)};
     }
-    this._releaseCaptureIfUnused(); this._selectPlayer(); this._broadcast();
+    this._releaseCaptureIfUnused();
+    this._captureDelivery([...this.routes.values()].some(r=>r.mic && r.actualMic));
+    this._selectPlayer(); this._broadcast();
     if (![...this.routes.values()].some(r=>r.speaker||r.mic)) this._disconnect('no-authorized-audio-targets');
   }
   _speaker(data) {
@@ -325,7 +356,8 @@ export class AudioCoordinator {
   _mic(peer,message) {
     const capture = this.capture;
     this._send(peer,{type:'microphone-credit'});
-    if (capture?.peer!==peer || capture.token!==message.token || !capture.ready || !(message.pcm instanceof ArrayBuffer) || message.pcm.byteLength!==1920 || ![...this.routes.values()].some(r=>r.actualMic)) return;
+    if (capture?.peer!==peer || capture.token!==message.token || !capture.delivery || capture.delivery!==message.delivery ||
+        !(message.pcm instanceof ArrayBuffer) || message.pcm.byteLength!==1920 || ![...this.routes.values()].some(r=>r.mic && r.actualMic)) return;
     if (this.socket?.readyState!==1 || this.socket.bufferedAmount>3840) { this.dropped++; return; }
     const pcm = new Uint8Array(message.pcm); const silent = pcm.every(v=>v===0);
     const buffer = new ArrayBuffer(silent?8:1928); const view = new DataView(buffer);
@@ -364,7 +396,9 @@ export class AudioCoordinator {
       if (Date.now()>=(this.retryAfter || 0) && (this.connection || [...this.routes.values()].some(r=>r.speaker||r.mic))) await this._sync();
       this._broadcast();
     }).catch(error=>{
-      this._interrupt(error.message || 'audio-lease-or-route-failed');
+      const transient = error.transport === true || error.name === 'TimeoutError' ||
+        error instanceof TypeError || (error.status || 0) >= 500;
+      this._interrupt(error.message || 'audio-lease-or-route-failed',undefined,transient);
       this.retryAfter = Date.now()+5000; this._broadcast();
     }).finally(()=>{this.tickPending = false;});
   }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/hex"
 	"net"
 	"net/http"
@@ -12,6 +13,17 @@ import (
 
 type requestIdentityKey struct{}
 type audioLoginKey struct{}
+
+// The trusted proxy supplies a per-login identity. The resulting value
+// correlates grants within one Manager scope and never authorizes a request.
+func loginBinding(r *http.Request, scope string) string {
+	login, _ := r.Context().Value(audioLoginKey{}).(string)
+	if login == "" {
+		return ""
+	}
+	binding := sha256.Sum256([]byte(scope + "\x00" + login + "\x00" + grantIdentity(r)))
+	return hex.EncodeToString(binding[:])
+}
 
 func (m *manager) secure(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

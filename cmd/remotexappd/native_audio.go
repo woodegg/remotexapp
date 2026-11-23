@@ -131,12 +131,7 @@ func (m *manager) serveAudio(w http.ResponseWriter, r *http.Request) {
 // Correlation only. The trusted proxy authenticates the request and the audio
 // cookie and one-use grants still authorize access to the channel.
 func (a *audioService) loginBinding(r *http.Request) string {
-	login, _ := r.Context().Value(audioLoginKey{}).(string)
-	if login == "" {
-		return ""
-	}
-	binding := sha256.Sum256([]byte(a.cookie + "\x00" + login + "\x00" + grantIdentity(r)))
-	return hex.EncodeToString(binding[:])
+	return loginBinding(r, a.cookie)
 }
 
 func (a *audioService) scopeLocked(r *http.Request) *audioScope {

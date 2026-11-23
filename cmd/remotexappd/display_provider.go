@@ -26,6 +26,23 @@ func isKasm(item *instance) bool {
 	return item != nil && displayProvider(item.Components) == "kasm"
 }
 
+const nativeTextClipboardLimit = 64 * 1024
+const nativeRichClipboardLimit = 2 * 1024 * 1024
+const nativeLargeClipboardLimit = 10 * 1024 * 1024
+
+func clipboardProtocol(bundleProtocol string) string {
+	switch {
+	case kasmbundle.SupportsLargeClipboard(bundleProtocol):
+		return "rich-v2"
+	case kasmbundle.SupportsRichClipboard(bundleProtocol):
+		return "rich-v1"
+	case supportsNativeText(bundleProtocol):
+		return "text"
+	default:
+		return ""
+	}
+}
+
 func (m *manager) newRuntimeComponents() runtimeComponents {
 	c := runtimeComponents{GatewayBinary: m.cfg.gatewayBinary, StatusBinary: m.cfg.statusBinary, UnicodeEngine: m.cfg.engine, CoreDriverDir: m.cfg.coreDriverDir}
 	if m.cfg.displayProvider == "kasm" {
@@ -35,10 +52,7 @@ func (m *manager) newRuntimeComponents() runtimeComponents {
 			c.NativeAudio = sessionaudio.Protocol
 		}
 		if m.cfg.nativeClipboard {
-			c.NativeClipboard = "text"
-			if m.cfg.nativeRichClipboard {
-				c.NativeClipboard = "rich-v1"
-			}
+			c.NativeClipboard = m.cfg.nativeClipboardMode
 		}
 	}
 	return c
@@ -77,7 +91,7 @@ func (cfg *config) configureDisplayProvider() error {
 	}
 	cfg.kasmPin = &bundle.Pin
 	cfg.nativeUDPCapable = kasmbundle.SupportsUDP(bundle.Manifest.Protocol)
-	cfg.nativeRichClipboard = kasmbundle.SupportsRichClipboard(bundle.Manifest.Protocol)
+	cfg.nativeClipboardMode = clipboardProtocol(bundle.Manifest.Protocol)
 	return cfg.webRTC.validate(bundle.Manifest.Protocol)
 }
 
@@ -103,7 +117,7 @@ func validateDisplayComponents(c runtimeComponents, verify bool) error {
 		default:
 			return errors.New("invalid native UDP snapshot")
 		}
-		if (c.NativeClipboard != "" && c.NativeClipboard != "text" && c.NativeClipboard != "rich-v1") || c.Kasm == nil || !kasmbundle.ValidDigest(c.Kasm.SHA256) || !filepath.IsAbs(c.Kasm.Directory) || filepath.Clean(c.Kasm.Directory) != c.Kasm.Directory || c.UnicodeEngine != "" {
+		if (c.NativeClipboard != "" && c.NativeClipboard != "text" && c.NativeClipboard != "rich-v1" && c.NativeClipboard != "rich-v2") || c.Kasm == nil || !kasmbundle.ValidDigest(c.Kasm.SHA256) || !filepath.IsAbs(c.Kasm.Directory) || filepath.Clean(c.Kasm.Directory) != c.Kasm.Directory || c.UnicodeEngine != "" {
 			return errors.New("invalid Kasm component snapshot")
 		}
 		if verify {
@@ -111,14 +125,15 @@ func validateDisplayComponents(c runtimeComponents, verify bool) error {
 			if err != nil {
 				return fmt.Errorf("locked Kasm bundle: %w", err)
 			}
-			if c.UDPEndpoint != nil && bundle.Manifest.Protocol != kasmbundle.RoutedUDPProtocol {
+			if c.UDPEndpoint != nil && !kasmbundle.SupportsRoutedUDP(bundle.Manifest.Protocol) {
 				return errors.New("routed UDP requires the pinned routed Kasm component")
 			}
 			if c.NativeUDP != kasmbundle.SupportsUDP(bundle.Manifest.Protocol) {
 				return errors.New("native UDP capability differs from pinned component")
 			}
-			if c.NativeClipboard == "rich-v1" && !kasmbundle.SupportsRichClipboard(bundle.Manifest.Protocol) {
-				return errors.New("locked component does not support native rich clipboard")
+			if (c.NativeClipboard == "rich-v1" || c.NativeClipboard == "rich-v2") &&
+				c.NativeClipboard != clipboardProtocol(bundle.Manifest.Protocol) {
+				return errors.New("native rich clipboard capability differs from pinned component")
 			}
 			if c.NativeClipboard == "text" && !supportsNativeText(bundle.Manifest.Protocol) {
 				return errors.New("locked component does not support native text clipboard")
@@ -132,10 +147,14 @@ func validateDisplayComponents(c runtimeComponents, verify bool) error {
 
 func kasmLaunchArgs(item *instance, class classConfig, port int, authority string) []string {
 	root := item.Components.Kasm.Directory
-	accept, send, types := "65536", "65537", "text/plain"
-	if item.Components.NativeClipboard == "rich-v1" {
-		accept, send, types = "2097152", "2097153", "text/plain,text/html,image/png"
+	limit, types := nativeTextClipboardLimit, "text/plain"
+	switch item.Components.NativeClipboard {
+	case "rich-v1":
+		limit, types = nativeRichClipboardLimit, "text/plain,text/html,image/png"
+	case "rich-v2":
+		limit, types = nativeLargeClipboardLimit, "text/plain,text/html,image/png"
 	}
+	accept, send := strconv.Itoa(limit), strconv.Itoa(limit+1)
 	args := []string{
 		"--user", "--unit=" + strings.TrimSuffix(item.VNCUnit, ".service"), "--collect",
 		"--property=WorkingDirectory=" + item.Home, "--setenv=HOME=" + item.Home,

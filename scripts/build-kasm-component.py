@@ -155,7 +155,7 @@ def package(inputs, work, output, platform='ubuntu', transport='wss'):
                        for name in ['c++','cmake','node','npm']}}
     (output / 'SOURCE.json').write_text(json.dumps(source, indent=2)+'\n')
     files = {str(p.relative_to(output)):digest(p) for p in sorted(output.rglob('*')) if p.is_file()}
-    manifest = {'schemaVersion':1, 'protocol':'kasm-routed-udp-clipboard-v2' if transport == 'udp' else 'kasm-wss-clipboard-v2', 'serverCommit':SERVER,
+    manifest = {'schemaVersion':1, 'protocol':'kasm-routed-udp-clipboard-v3' if transport == 'udp' else 'kasm-wss-clipboard-v3', 'serverCommit':SERVER,
                 'clientCommit':CLIENT, 'binary':'bin/Xkasmvnc', 'client':'web/client.js', 'files':files}
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
     print('Kasm component manifest SHA256:', digest(output / 'manifest.json'))

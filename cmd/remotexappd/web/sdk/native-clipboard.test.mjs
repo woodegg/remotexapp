@@ -211,3 +211,31 @@ test('rich image normalization is reconciled; unavailable tab lock cannot write'
   f.io.lock=false;s.offer(image([5,6,7]));await s.sync();assert.equal(f.io.richWrites.length,1);
   f.io.lock=true;s.reset();s.offer(image([8,9]));assert.equal(f.io.richWrites.length,1);
 });
+
+test('an unchanged oversized local PNG can be replaced by a remote copy without an upload',async t=>{
+  const f=richFixture(t),c=f.client,s=c.clipboard;
+  const caps=c.capabilities;
+  caps.clipboardMaxBytes=10*1024*1024;
+  const large=new Uint8Array(caps.clipboardMaxBytes+1);
+  f.nav.clipboard.read=async()=>f.io.richWrites.length ? [
+    new ClipboardItem({'text/plain':new Blob(['fresh remote text'])}),
+  ] : [new ClipboardItem({'image/png':new Blob([large],{type:'image/png'})})];
+  await f.start(c);
+  assert.equal(s.phase,'watching');
+  await assert.rejects(s.paste(),{code:'clipboard-size'});
+  assert.equal(s.conflict,false);assert.deepEqual(c.sent,[]);
+  s.offer('fresh remote text');await s.sync();
+  assert.equal(s.phase,'copied-to-local');
+  assert.equal(payloadText(f.io.richWrites[0]),'fresh remote text');
+});
+
+test('a changed oversized image preserves the local clipboard even if its length matches',async t=>{
+  const f=richFixture(t),c=f.client,s=c.clipboard;
+  const large=new Uint8Array(c.capabilities.clipboardMaxBytes+1);
+  f.nav.clipboard.read=async()=>[new ClipboardItem({'image/png':new Blob([large],{type:'image/png'})})];
+  await f.start(c);
+  large[large.length-1]=1;
+  s.offer('conflicting remote text');await s.sync();
+  assert.equal(s.phase,'conflict');
+  assert.deepEqual(c.sent,[]);assert.deepEqual(f.io.richWrites,[]);
+});

@@ -11,7 +11,7 @@ export class RemoteXAppAudio extends EventTarget {
     if (base.origin !== environment.location.origin) throw Error('Audio requires a same-origin Manager');
     if (!environment.isSecureContext || !environment.SharedWorker || !environment.AudioContext || !environment.AudioWorkletNode) throw Error('Secure context, SharedWorker and AudioWorklet are required');
     this.base = base.href.replace(/\/$/,''); this.requests = new Map(); this.interests = new Map(); this.next = 0; this.captureEpoch = 0; this.activating = 0; this.closed = false;
-    this.workerKey = "remotexapp-audio-v3:"+this.base;
+    this.workerKey = "remotexapp-audio-v4:"+this.base;
     this.stats = {connection:'idle',speakerOwner:false,micOwner:false,routes:[]};
     this._openWorker();
     this.watchdog = environment.setInterval(()=>{
@@ -219,7 +219,7 @@ export class RemoteXAppAudio extends EventTarget {
       this.capture = new this.env.AudioWorkletNode(context,'remotexapp-capture-v1',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[1]});
       this.capture.port.onmessage = ({data}) => {
         if (epoch !== this.captureEpoch) return;
-        if (data.type === 'pcm') this._post({op:'microphone-frame',token,pcm:data.pcm},[data.pcm]);
+        if (data.type === 'pcm') this._post({op:'microphone-frame',token,delivery:data.delivery,pcm:data.pcm},[data.pcm]);
         if (data.type === 'stats') { this.captureStats = data; this._emit(); }
       };
       for (const track of stream.getTracks()) { track.onended = () => this._captureFailed('microphone-device-ended'); track.onmute = () => this._captureFailed('microphone-device-muted'); }
@@ -244,6 +244,15 @@ export class RemoteXAppAudio extends EventTarget {
     if (message.type === 'ping') { this._post({op:'pong'}); return; }
     if (message.type === 'capture') { void this._startCapture(message.token); return; }
     if (message.type === 'stop-capture') { this._stopCapture(); return; }
+    if (message.type === 'capture-delivery') {
+      if (this.captureToken !== message.token || !this.capture) return;
+      if (message.delivery && this.stream.getAudioTracks().some(track=>track.readyState!=='live' || track.muted)) {
+        this._captureFailed('microphone-device-unavailable');
+        return;
+      }
+      this.capture.port.postMessage({op:'delivery',delivery:message.delivery});
+      return;
+    }
     if (message.type === 'microphone-credit') { this.capture?.port.postMessage({op:'credit'}); return; }
     if (message.type === 'playback') {
       if (this.playback && this.context?.state === 'running') this.playback.port.postMessage({op:'frame',slot:message.slot,pcm:message.pcm},[message.pcm]);

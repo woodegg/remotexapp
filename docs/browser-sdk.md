@@ -139,7 +139,8 @@ once per second with one shared timer, stops when no Viewers remain and tracks
 A/B independently. Hiding only A's panel leaves its connection active.
 The native Viewer page explicitly samples RTT every five seconds while visible;
 it pauses active sampling when its document is hidden and clears live displays
-on disconnect. SDK construction and passive stats reads do not start sampling.
+on disconnect. The SDK starts its separate keepalive after Viewer readiness.
+Passive stats reads do not start sampling.
 
 Components declaring `capabilities.udpLoss` expose `getStats().udpLoss`. Its
 `state` is `waiting`, `ready`, `stale`, `inactive` or `unavailable`. Ready data
@@ -153,6 +154,34 @@ lost. Leading/trailing wholly unseen loss is unobservable. Tracking overflow,
 large sequence gaps or inconsistent headers suppress the affected window.
 Idle data expires; a new UDP negotiation resets counts. Reading this snapshot
 does not generate probes, change decoder retention or renew App activity.
+
+### Native Viewer heartbeat
+
+A ready Viewer with a Fence-capable Kasm component attempts an RFB Fence
+request over its existing WSS connection every 15 seconds by default. Set
+`heartbeatIntervalMs` per Viewer with `host.mount()`, `session.attach()`,
+or the `RemoteXAppNativeClient` constructor.
+
+```js
+const view = host.mount(viewport, {templateId: 'edge'}, {
+  heartbeatIntervalMs: 15000,
+});
+```
+
+Use `0` to disable automatic requests. The positive values are integer
+milliseconds from 5000 through 2147483647, the browser timer limit. An
+unsupported pinned component skips the automatic request. `measureLatency()`
+continues to share the component's sampling limit. `getStats()` reads the most
+recent sample without sending a request.
+
+The timer belongs to the current Viewer connection. A hidden tab with a
+running event loop can continue probing. On return to a visible page or
+while it is visible and goes online, the SDK tries one overdue heartbeat
+and starts a new interval. Browser throttling, freezing and machine sleep
+can delay requests. Disconnect or disposal cancels the timer.
+The heartbeat uses the display protocol's Fence echo. The Manager's
+WebSocket protocol Ping/Pong and HTTP grant renewal are separate mechanisms.
+Fence traffic leaves App idle policy and audio ownership independent.
 
 ## Optional runtime keepalive (SDK 0.29)
 
@@ -766,7 +795,10 @@ paste acknowledgment. Automatic mode uses the reliable native clipboard path
 regardless of display WSS/UDP; audio switches do not select clipboard targets.
 
 Call `resetClipboard()` on an authenticated scope change and disconnect the
-Viewer on logout or runtime replacement. Reconnect resets consent. Disposal
+Viewer on logout or runtime replacement. The SDK retains requested modes
+across an eligible same-Viewer reconnect when the Manager verifies login,
+component and runtime generation. It retires clipboard data on every
+connection replacement. Disposal
 removes observers and timers. Retired writes can report `clipboard-uncertain`;
 do not automatically replay them. Clipboard payloads are not present in state
 snapshots, counters or UAT exports. Plain UTF-8 up to 64 KiB is the only format;
@@ -777,7 +809,8 @@ HTML, images and files are not enabled. See the
 
 Issue #55 / PR #56 extends new `rich-v1` runtime descriptors and immutable
 `kasm-wss-clipboard-v2` / `kasm-udp-clipboard-v2` components to `text/plain`,
-`text/html` and `image/png`, with a 2 MiB aggregate content limit per clipboard
+`text/html` and `image/png`, with a 10 MiB aggregate content limit on new rich
+component pins and 2 MiB on previous rich pins. The limit applies per clipboard
 transaction. `getClipboardState().formats` reports the actual browser/component
 intersection; `maxBytes` reports the aggregate limit. The same directional
 configuration and manual methods apply. Old `text` runtime pins keep their

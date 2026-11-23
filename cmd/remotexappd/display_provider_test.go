@@ -8,6 +8,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/woodegg/remotexapp/internal/kasmbundle"
 	"github.com/woodegg/remotexapp/internal/testfixture"
 )
 
@@ -280,7 +281,7 @@ func TestNativeAudioPinRequiresSchemaSixAndCannotImplicitlyUpgrade(t *testing.T)
 
 func TestNativeRichClipboardPreservesPinnedTextCompatibility(t *testing.T) {
 	old := testfixture.KasmProtocol(t, "kasm-wss-text-v1")
-	for _, protocol := range []string{"kasm-wss-clipboard-v2", "kasm-udp-clipboard-v2"} {
+	for _, protocol := range []string{kasmbundle.RichProtocol, kasmbundle.RichUDPProtocol, kasmbundle.RoutedUDPProtocol, kasmbundle.LargeRichProtocol, kasmbundle.LargeRoutedUDPProtocol} {
 		pin := testfixture.KasmProtocol(t, protocol)
 		cfg := config{displayProvider: "kasm", vncLauncher: "direct", kasmBundle: pin.Directory, nativeClipboard: true}
 		if err := cfg.configureDisplayProvider(); err != nil {
@@ -288,17 +289,28 @@ func TestNativeRichClipboardPreservesPinnedTextCompatibility(t *testing.T) {
 		}
 		m := manager{cfg: cfg}
 		c := m.newRuntimeComponents()
-		if c.NativeClipboard != "rich-v1" || c.NativeUDP != strings.Contains(protocol, "-udp-") {
-			t.Fatal("wrong new pin capability")
+		mode, limit := "rich-v1", "2097152"
+		if strings.HasSuffix(protocol, "-v3") {
+			mode, limit = "rich-v2", "10485760"
+		}
+		if c.NativeClipboard != mode || c.NativeUDP != strings.Contains(protocol, "-udp-") {
+			t.Fatal("wrong new pin capability", protocol)
 		}
 		if err := validateDisplayComponents(c, true); err != nil {
 			t.Fatal(err)
 		}
 		args := strings.Join(kasmLaunchArgs(&instance{Components: c}, classConfig{}, 5903, "/tmp/auth"), " ")
-		for _, flag := range []string{"-DLP_ClipAcceptMax=2097152", "-DLP_ClipTypes=text/plain,text/html,image/png", "-SetPrimary=0"} {
+		for _, flag := range []string{"-DLP_ClipAcceptMax=" + limit, "-DLP_ClipTypes=text/plain,text/html,image/png", "-SetPrimary=0"} {
 			if !strings.Contains(args, flag) {
 				t.Fatal("missing rich bound", flag)
 			}
+		}
+		if mode == "rich-v2" {
+			c.NativeClipboard = "rich-v1"
+			if validateDisplayComponents(c, true) == nil {
+				t.Fatal("old rich bound accepted on the large component")
+			}
+			c.NativeClipboard = mode
 		}
 		c.Kasm = &old
 		c.NativeUDP = false

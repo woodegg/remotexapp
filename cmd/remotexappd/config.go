@@ -19,7 +19,7 @@ type config struct {
 	webRTC               webRTCConfig
 	nativeUDPCapable     bool
 	nativeClipboard      bool
-	nativeRichClipboard  bool
+	nativeClipboardMode  string
 	nativeAudio          bool
 	listen               string
 	stateDir             string

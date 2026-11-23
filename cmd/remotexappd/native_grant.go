@@ -17,13 +17,13 @@ const nativeGrantLimit = 128
 const nativeGrantProtocol = "remotexapp-grant."
 
 type nativeGrant struct {
-	principal, runtime, component, viewer string
-	generation, epoch                     int64
-	expires                               time.Time
-	claimed                               bool
-	readOnly                              bool
-	channel                               *viewerChannel
-	timer                                 *time.Timer
+	principal, login, runtime, component, viewer string
+	generation, epoch                            int64
+	expires                                      time.Time
+	claimed                                      bool
+	readOnly                                     bool
+	channel                                      *viewerChannel
+	timer                                        *time.Timer
 }
 
 type nativeGrantRequest struct {
@@ -38,6 +38,10 @@ type nativeGrantRequest struct {
 func grantIdentity(r *http.Request) string {
 	identity, _ := r.Context().Value(requestIdentityKey{}).(string)
 	return identity
+}
+
+func (m *manager) viewerLoginBinding(r *http.Request) string {
+	return loginBinding(r, "viewer\n"+m.cfg.stateDir+"\n"+m.cfg.listen)
 }
 
 func grantKey(token string) ([32]byte, bool) {
@@ -69,6 +73,7 @@ func (m *manager) serveNativeGrant(w http.ResponseWriter, r *http.Request, item 
 		return
 	}
 	now := time.Now()
+	login := m.viewerLoginBinding(r)
 	if action == "grant" {
 		if req.Token != "" {
 			m.mu.Unlock()
@@ -96,9 +101,12 @@ func (m *manager) serveNativeGrant(w http.ResponseWriter, r *http.Request, item 
 		}
 		token := hex.EncodeToString(random[:])
 		key, _ := grantKey(token)
-		m.nativeGrants[key] = &nativeGrant{principal: grantIdentity(r), runtime: item.ID, generation: req.SessionGeneration,
+		m.nativeGrants[key] = &nativeGrant{principal: grantIdentity(r), login: login, runtime: item.ID, generation: req.SessionGeneration,
 			component: req.ComponentDigest, viewer: req.ViewerID, epoch: req.ConnectionEpoch, readOnly: req.ReadOnly, expires: now.Add(nativeGrantLifetime)}
 		response := map[string]any{"token": token, "expiresInMs": nativeGrantLifetime.Milliseconds(), "renewAfterMs": 20000}
+		if login != "" && !req.ReadOnly && current.Components.NativeClipboard != "" {
+			response["clipboardLogin"] = login
+		}
 		if lease := current.Components.UDPEndpoint; lease != nil && lease.Mode == "turn" {
 			response["webRTCMode"] = "turn"
 		}
@@ -108,7 +116,7 @@ func (m *manager) serveNativeGrant(w http.ResponseWriter, r *http.Request, item 
 	}
 	key, valid := grantKey(req.Token)
 	g := m.nativeGrants[key]
-	if !valid || g == nil || !now.Before(g.expires) || g.principal != grantIdentity(r) || g.runtime != item.ID ||
+	if !valid || g == nil || !now.Before(g.expires) || g.principal != grantIdentity(r) || g.login != login || g.runtime != item.ID ||
 		g.generation != req.SessionGeneration || g.component != req.ComponentDigest || g.viewer != req.ViewerID || g.epoch != req.ConnectionEpoch || g.readOnly != req.ReadOnly {
 		m.mu.Unlock()
 		writeError(w, http.StatusForbidden, "native Viewer grant rejected")
@@ -158,7 +166,7 @@ func (m *manager) claimNativeGrant(r *http.Request, item *instance) ([32]byte, e
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	g := m.nativeGrants[key]
-	if !valid || g == nil || g.claimed || !time.Now().Before(g.expires) || g.principal != grantIdentity(r) ||
+	if !valid || g == nil || g.claimed || !time.Now().Before(g.expires) || g.principal != grantIdentity(r) || g.login != m.viewerLoginBinding(r) ||
 		g.runtime != item.ID || g.generation != item.SessionGeneration || item.Components.Kasm == nil || g.component != item.Components.Kasm.SHA256 {
 		return empty, errors.New("native Viewer grant rejected")
 	}

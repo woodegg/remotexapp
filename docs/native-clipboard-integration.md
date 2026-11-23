@@ -75,9 +75,10 @@ clipboard. Audio ownership or speaker/mic switches never select the target.
 Before applying asynchronous results, revalidate the target, Viewer connection,
 runtime generation, consent revision and authenticated scope. Disable, blur,
 hide, disconnect, disposal, generation replacement and logout/account change
-retire pending automatic work for the old target. Reconnect requires new
-consent. Do not replay old content when a target becomes active: establish
-fresh state. If both sides changed and the source cannot be determined, require
+retire pending automatic work for the old target. A verified login, Viewer
+identity and runtime generation can retain requested modes across transport
+replacement. Start with fresh clipboard state after focus. When continuity
+cannot be established, request explicit consent. If both sides changed and the source cannot be determined, require
 a visible manual direction choice rather than silently choosing a winner.
 
 A browser write started before retirement may finish despite cancellation.

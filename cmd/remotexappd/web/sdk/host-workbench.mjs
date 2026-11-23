@@ -146,10 +146,11 @@ async function open(options){
   const clip=section(inspector,'剪贴板 · Clipboard');const modes=[['off','关闭'],['manual','手动'],['auto','自动']];
   const applyClip=()=>viewerCall(w,v=>{v.focus();return v.configureClipboard({toRemote:toRemote.value,toLocal:toLocal.value});});
   const toRemote=select(clip,'本地 → 远端',modes,applyClip),toLocal=select(clip,'远端 → 本地',modes,applyClip);
+  w.clipModes={toRemote,toLocal};
   clip.append(button('授权自动剪贴板',()=>viewerCall(w,v=>{v.focus();return v.requestClipboardPermission();})),
     button('本地 → 远端',()=>viewerCall(w,v=>{v.focus();return v.copyClipboardToRemote();})),
     button('远端 → 本地',()=>viewerCall(w,v=>{v.focus();return v.copyClipboardToLocal();})));
-  w.clipState=node('output');clip.append(w.clipState,node('p','文本 / HTML / PNG，合计 2 MiB；不支持文件和文件夹。重连后重新启用。','note'));
+  w.clipState=node('output');clip.append(w.clipState,node('p','文本 / HTML / PNG，合计上限以当前组件为准。同一已验证登录的 Viewer 可恢复设置，失焦时暂停。','note'));
   const audio=section(inspector,'声音 · Speaker & microphone');w.audioState=node('output','未持有音频');
   audio.append(button('准备音频控制',async()=>{w.audio=await session.audio();update(w);}));
   w.speakerToggle=checkbox(audio,'远程播放 · Speaker',enabled=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setSpeaker(enabled);});
@@ -183,7 +184,14 @@ function update(w){
   for(const [id,value] of Object.entries({transport:stats?.transport || '—',fps:rate?rate.fps.toFixed(1):'—',download:rate?rate.download.toFixed(1):'—',upload:rate?rate.upload.toFixed(1):'—',
     wss:latencyText(stats?.latency?.wss),udp:latencyText(stats?.latency?.udp),loss:stats?.udpLoss?.state==='ready'?`${(stats.udpLoss.ratio*100).toFixed(2)}%`:'—',
     resolution:stats?.available?`${stats.width}×${stats.height}`:'—'}))w.metrics[id].textContent=value;
-  const clipboard=w.viewer?.getClipboardState();w.clipState.textContent=clipboard?`${clipboard.phase} · ${clipboard.effective.toRemote} / ${clipboard.effective.toLocal}`:'未连接';
+  const clipboard=w.viewer?.getClipboardState();
+  for(const [direction,control] of Object.entries(w.clipModes)) {
+    if(clipboard?.requested[direction] && control !== document.activeElement)control.value=clipboard.requested[direction];
+  }
+  const clipLimit=clipboard?.maxBytes >= 1024*1024 ? `${clipboard.maxBytes/(1024*1024)} MiB` : `${(clipboard?.maxBytes || 0)/1024} KiB`;
+  w.clipState.textContent=clipboard
+    ? `设置 ${clipboard.requested.toRemote} / ${clipboard.requested.toLocal} · ${clipboard.active ? '活动' : '暂停'} · ${clipboard.phase} · ${clipLimit}`
+    : '未连接';
   const describe=incident=>incident?[
     new Date(incident.at).toLocaleTimeString(),incident.code,incident.httpStatus,
     incident.durationMs==null?'恢复待确认':(incident.durationMs/1000).toFixed(2)+' s'
@@ -197,7 +205,7 @@ function update(w){
   const playbackBlocked=route?.speaker && audio.playbackBlocked;
   const audioHint=playbackBlocked?'点击恢复声音 · Resume playback':
     route?.reason==='speaker-action-required' || audio.connection==='failed'?'重新开启音频 · Enable audio again':
-    route?.speaker && audio.connection==='recovering'?'正在恢复音频 · Recovering audio':'';
+    (route?.speaker || route?.mic) && audio.connection==='recovering'?'正在恢复音频 · Recovering audio':'';
   w.resumeAudio.hidden=!w.audio || w.audio.released || !playbackBlocked;
   w.audioState.textContent=`${audioHint || audio.connection} · 播放 ${route?.actualSpeaker?'开':'关'} · 麦克风 ${route?.actualMic?'开':'关'}${route?.reason?` · ${route.reason}`:''}`;
   if(audio.lastDisconnect)w.audioState.textContent+=' · 最近音频断链 · '+describe(audio.lastDisconnect);

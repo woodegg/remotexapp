@@ -79,8 +79,9 @@ The browser cases cover two sessions, three tabs, one shared channel, actual
 multiple targets, profile conflicts and explicit takeover, permission denial,
 late permission cancellation, active permission revocation, domain replacement,
 playback-owner handoff, last-reference cleanup, and silent SharedWorker exit.
-Worker failure closes the capture track and playback context; a newly created
-controller starts with audio off and requires an explicit microphone action.
+Worker failure closes the capture track and resets playback. An explicit
+speaker action on the original audio interest rebinds the worker and restores
+real playback. A separate explicit microphone action restores real readback.
 Server retirement of the final enabled App must also close the shared channel.
 Holding one domain unavailable must preserve the other domain’s real speaker,
 microphone readback and connection; recovery never re-enables the failed mic target. Synthetic readback disables browser echo cancellation,

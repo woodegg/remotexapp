@@ -14,7 +14,8 @@ runtime continuity. Interrupted microphone capture requires a new explicit actio
 
 Qualify real playback, microphone fencing, overlapping tabs, worker failure,
 and user cancellation with fault injection in the local workbench. Formal
-publication requires separate exact post-merge qualification and human UAT.
+publication requires separate exact post-merge qualification and human UAT
+under [Issue #96](https://github.com/woodegg/remotexapp/issues/96).
 
 ## Core 0.17.3 — native recovery panel appearance
 

@@ -65,15 +65,15 @@ export class AudioCoordinator {
     if (context.protocol !== 'pcm-s16le-48k-v1' || !/^[a-f0-9]{64}$/.test(context.scope || '') || !/^[a-f0-9]{64}$/.test(context.service || '') || (context.login && !/^[a-f0-9]{64}$/.test(context.login))) throw Error('Unsupported audio contract');
     const previous = this.context;
     this.context = context;
+    if (!previous || previous.scope !== context.scope || previous.service !== context.service) {
+      for (const peer of this.ports.values()) this._send(peer,{type:'binding',binding:this._binding()});
+    }
     if (previous && (context.scope !== previous.scope || context.service !== previous.service)) {
       if (context.service === previous.service || (previous.login && context.login && previous.login !== context.login)) {
         this._retire('audio-login-changed');
         throw Error('Audio login epoch changed; acquire current session interests again');
       }
       this._interrupt('audio-service-restarted',!!context.login && context.login === previous.login);
-    }
-    if (!previous || previous.scope !== context.scope || previous.service !== context.service) {
-      for (const peer of this.ports.values()) this._send(peer,{type:'binding',binding:this._binding()});
     }
     return context;
   }

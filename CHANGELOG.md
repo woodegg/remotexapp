@@ -15,6 +15,8 @@ implementation; move them to a version section when publishing a release.
 
 SDK `0.34.1`.
 
+- Update Gorilla WebSocket to the upstream fix for [GO-2026-6278](https://pkg.go.dev/vuln/GO-2026-6278).
+
 - Keep native audio controls usable after Manager and SharedWorker failure
   ([#94](https://github.com/woodegg/remotexapp/issues/94)). Resume requested
   speakers after an interruption when the proxy proves login continuity.

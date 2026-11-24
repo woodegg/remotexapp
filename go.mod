@@ -13,7 +13,7 @@ require (
 )
 
 require (
-	golang.org/x/net v0.59.0 // indirect
+	golang.org/x/net v0.62.0 // indirect
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/telemetry v0.0.0-20260924152758-ed294f943157 // indirect
 	golang.org/x/tools v0.51.0 // indirect

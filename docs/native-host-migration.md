@@ -471,7 +471,9 @@ Render requested settings as the controls' values and use phase and activity
 to show paused, recovering and permission-required states. Keep using the
 same live Viewer across a transient interruption. When the Manager verifies
 the same login, component pin and session generation, the Viewer restores
-settings after focus and accepts only fresh offers. The trusted ingress uses
+settings after focus and accepts only fresh offers. On a 10 MiB component,
+make sure the reverse proxy and any native message filter accept that size
+plus protocol framing in both directions. The trusted ingress uses
 the existing `-audio-login-header` setting to provide verified per-login
 continuity for both clipboard and audio. An installation without the header
 requires fresh clipboard and microphone activation after channel loss.

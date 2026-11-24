@@ -249,7 +249,7 @@ func bridge(w http.ResponseWriter, r *http.Request, target *url.URL) {
 	}
 	defer client.Close()
 	client.SetReadLimit(nativewire.MaxBuffered)
-	up.SetReadLimit(8 * 1024 * 1024)
+	up.SetReadLimit(nativewire.MaxBuffered)
 	ctx, cancel := context.WithCancel(r.Context())
 	defer cancel()
 	heartbeatDone := browserHeartbeat(ctx, client, 20*time.Second, 60*time.Second)

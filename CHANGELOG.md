@@ -11,7 +11,9 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.17.4`. SDK `0.34.1`.
+## 0.17.4
+
+SDK `0.34.1`.
 
 - Keep native audio controls usable after Manager and SharedWorker failure
   ([#94](https://github.com/woodegg/remotexapp/issues/94)). Resume requested

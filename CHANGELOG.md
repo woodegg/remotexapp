@@ -23,6 +23,8 @@ Target: `0.17.5`. SDK `0.35.0`.
 - Continue automatic Host Viewer recovery after long outages using bounded
   retry bursts and a 30-second cooldown. Explicit finite retry policies retain
   their budgets. Explicit audio off succeeds locally during an outage.
+- Show requested speaker/microphone settings and required capture actions in
+  the built-in Host Workbench.
 - Use audio SharedWorker protocol v5 and document the SDK 0.35 adoption contract.
 
 ## 0.17.4

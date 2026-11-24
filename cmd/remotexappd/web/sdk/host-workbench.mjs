@@ -150,13 +150,13 @@ async function open(options){
   clip.append(button('授权自动剪贴板',()=>viewerCall(w,v=>{v.focus();return v.requestClipboardPermission();})),
     button('本地 → 远端',()=>viewerCall(w,v=>{v.focus();return v.copyClipboardToRemote();})),
     button('远端 → 本地',()=>viewerCall(w,v=>{v.focus();return v.copyClipboardToLocal();})));
-  w.clipState=node('output');clip.append(w.clipState,node('p','文本 / HTML / PNG，合计上限以当前组件为准。同一已验证登录的 Viewer 可恢复设置，失焦时暂停。','note'));
+  w.clipState=node('output');clip.append(w.clipState,node('p','文本 / HTML / PNG，合计上限以当前组件为准。同一运行时的 Viewer 可恢复设置，失焦时暂停。','note'));
   const audio=section(inspector,'声音 · Speaker & microphone');w.audioState=node('output','未持有音频');
   audio.append(button('准备音频控制',async()=>{w.audio=await session.audio();update(w);}));
   w.speakerToggle=checkbox(audio,'远程播放 · Speaker',enabled=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setSpeaker(enabled);});
   w.micToggle=checkbox(audio,'麦克风 · Microphone',enabled=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setMicrophone(enabled);});
   w.resumeAudio=button('恢复播放 · Resume playback',()=>w.audio?.setSpeaker(true));
-  audio.append(w.resumeAudio,button('接管麦克风',()=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setMicrophone(true,{takeover:true});}),w.audioState,
+  audio.append(w.resumeAudio,button('恢复 / 接管麦克风',()=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setMicrophone(true,{takeover:true});}),w.audioState,
     node('p','先准备控制，再明确启用；仅持有引用不会打开音频通道。同一会话的开关在标签页间共享。','note'));
   const actions=section(inspector,'应用动作与控制 · Actions');
   const actionForm=node('div');actions.append(button('读取可用动作',async()=>{
@@ -200,12 +200,13 @@ function update(w){
   w.displayDisconnect.hidden=!displayIssue;
   w.displayDisconnect.textContent=displayIssue && '最近画面断链 · '+displayIssue;
   const audio=host.getAudioState(),route=audio.routes?.find(r=>r.runtime===w.session.id && r.generation===w.session.generation);
-  if(!w.speakerToggle.disabled)w.speakerToggle.checked=!!route?.speaker;
-  if(!w.micToggle.disabled)w.micToggle.checked=!!route?.mic;
+  if(!w.speakerToggle.disabled)w.speakerToggle.checked=!!(route?.requested?.speaker ?? route?.speaker);
+  if(!w.micToggle.disabled)w.micToggle.checked=!!(route?.requested?.microphone ?? route?.mic);
   const playbackBlocked=route?.speaker && audio.playbackBlocked;
-  const audioHint=playbackBlocked?'点击恢复声音 · Resume playback':
+  const audioHint=route?.microphoneActionRequired?'点击恢复 / 接管麦克风 · Resume microphone':
+    playbackBlocked?'点击恢复声音 · Resume playback':
     route?.reason==='speaker-action-required' || audio.connection==='failed'?'重新开启音频 · Enable audio again':
-    (route?.speaker || route?.mic) && audio.connection==='recovering'?'正在恢复音频 · Recovering audio':'';
+    (route?.requested?.speaker || route?.requested?.microphone || route?.speaker || route?.mic) && audio.connection==='recovering'?'正在恢复音频 · Recovering audio':'';
   w.resumeAudio.hidden=!w.audio || w.audio.released || !playbackBlocked;
   w.audioState.textContent=`${audioHint || audio.connection} · 播放 ${route?.actualSpeaker?'开':'关'} · 麦克风 ${route?.actualMic?'开':'关'}${route?.reason?` · ${route.reason}`:''}`;
   if(audio.lastDisconnect)w.audioState.textContent+=' · 最近音频断链 · '+describe(audio.lastDisconnect);

@@ -16,6 +16,7 @@ implementation; move them to a version section when publishing a release.
 Target: `0.17.4`. SDK `0.34.1`.
 
 - Update Gorilla WebSocket to the upstream fix for [GO-2026-6278](https://pkg.go.dev/vuln/GO-2026-6278).
+  Update the associated Go networking module to `golang.org/x/net v0.62.0`.
 
 - Keep native audio controls usable after Manager and SharedWorker failure
   ([#94](https://github.com/woodegg/remotexapp/issues/94)). Resume requested

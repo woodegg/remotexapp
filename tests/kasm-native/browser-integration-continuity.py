@@ -277,11 +277,12 @@ def test():
         assert snap(p)['requests']==4
         emit('suspend-requires-action-keeps-intent',automaticCaptureRequests=0)
 
+        before_worker=snap(p)['audio']
         debug=browser.new_browser_cdp_session()
         workers=debug.send('Target.getTargets')['targetInfos']
         target=next(t['targetId'] for t in workers if t['type']=='shared_worker' and t['url']==origin+'/sdk/audio-worker.js')
         assert debug.send('Target.closeTarget',{'targetId':target})['success']
-        poll(p,'integrationUAT.host.getAudioState().routes[0]?.actualSpeaker',24000)
+        poll(p,'integrationUAT.host.getAudioState().routes[0]?.actualSpeaker && integrationUAT.host.getAudioState().connectionId!=='+json.dumps(before_worker),24000)
         assert p.evaluate('integrationUAT.host.getAudioState().routes[0].requested.microphone')
         assert not snap(p)['mic'] and snap(p)['requests']==4
         clip_roundtrip(p,context,runtime,'worker replacement preserves integrations')

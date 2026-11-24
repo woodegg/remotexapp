@@ -13,7 +13,7 @@ implementation; move them to a version section when publishing a release.
 
 ## 0.17.4
 
-SDK `0.34.1`.
+Target: `0.17.4`. SDK `0.34.1`.
 
 - Update Gorilla WebSocket to the upstream fix for [GO-2026-6278](https://pkg.go.dev/vuln/GO-2026-6278).
 

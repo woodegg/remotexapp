@@ -9,7 +9,7 @@ import (
 
 var ErrStream = errors.New("unsupported native client stream")
 
-const MaxClipboardBytes = 2 * 1024 * 1024
+const MaxClipboardBytes = 10 * 1024 * 1024
 const MaxBuffered = MaxClipboardBytes + 128*1024
 
 // ClientFilter accepts arbitrary WebSocket message boundaries. No byte of a

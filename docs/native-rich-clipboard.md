@@ -18,8 +18,10 @@ by RemoteXApp or inserted into its DOM. Browser clipboard sanitization and
 image encoding may change representation bytes; test meaningful paste/readback
 and reconcile the browser's actual value to prevent feedback loops.
 
-Use **2 MiB (2,097,152 bytes)** of aggregate content per transaction, in either
-direction. Count all representations, not each representation separately.
+The original rich component accepts **2 MiB (2,097,152 bytes)** of aggregate
+content per transaction. The new component accepts **10 MiB (10,485,760
+bytes)** in either direction. The Manager negotiates the limit with each
+runtime's immutable component pin. Count all representations, not each representation separately.
 Validate the complete transaction before changing clipboard ownership. Reject
 duplicate or unsupported MIME types, invalid framing/text and oversize content;
 do not silently fall back to one representation after a rejected rich item.
@@ -27,8 +29,10 @@ Bound parser buffers, allocation and retained state. Validate each layer:
 browser adapter, reliable native control stream, server and outgoing client parser.
 An X11 terminal text NUL is framing, not content; embedded NUL remains invalid.
 
-RTF, arbitrary custom MIME, file objects, URI-list/file-manager selections,
-directories, drag-and-drop and file upload/download remain excluded. A PNG
+RTF, arbitrary custom MIME, file objects, URI lists, directories, drag-and-drop
+and file upload/download remain excluded. A mixed X11 selection that advertises
+file markers can supply inline PNG through the new component. The component
+omits the selection's other representations. A PNG
 image copied as clipboard content is supported; copying a PNG file in a file
 manager is not a file-transfer feature. No new UDP ports or audio path changes.
 
@@ -91,7 +95,54 @@ fixtures require an explicitly named HTTPS origin, a project-owned disposable
 runtime and an isolated authenticated browser; permission overrides do not
 qualify physical prompts.
 
-The rich suite also accepts `--wss-roundtrip` to repeat real Writer HTML/PNG
-copy and paste with UDP explicitly disabled. Its normal public run requires
+The rich suite accepts `--wss-roundtrip` to repeat real Writer HTML/PNG copy
+and paste with UDP disabled. Use `--wss-full` for the complete clipboard
+matrix over WSS, including the negotiated byte limit and mixed selections. Its normal public run requires
 actual UDP display bytes and painted frames. Every run creates a fresh Writer
 document and resets consent; run suites serially within one browser profile.
+
+## Clipboard faults and recovery follow-on
+
+The limit and filtering changes are implemented for the new component.
+The follow-on retains requested state after a verified Viewer reconnect. A
+reconnect without a matching login and runtime requires explicit consent.
+
+An observed X11 image copy first advertised file targets, then a new selection
+offered both file targets and inline PNG. The current Kasm snapshot cancels on
+any file marker. Prefer the inline PNG in the second selection when it passes
+the configured size and format checks. Ignore URI lists, file references and
+alternate text or HTML for a mixed file selection. A file-only selection
+continues to produce no transferable item. Validate that the owner and
+selection revision are still current before publishing. No file is opened.
+
+Browser clipboard readback can encode the same pixels into a larger PNG. The
+SDK currently applies the transfer size limit to readback and to the new local
+baseline on focus. A legal remote PNG can be written successfully and its
+larger browser representation can still block a later short remote copy.
+Separate bounded local equality checks from transfer validation. An unchanged
+local item that is too large to upload can be replaced by a valid, newly
+offered remote item. Treat a changed or unidentifiable local item as a
+conflict and preserve it until an explicit source choice. Apply the pinned 10 MiB or 2 MiB
+aggregate transfer cap in both directions before sending data. Bound local
+comparison to 32 MiB and retain only transient digests of oversized items.
+Keep equality data transient and local. For keyboard paste, surface an
+oversize upload failure and preserve the remote clipboard. The remote
+application menu remains available for pasting the existing X11 clipboard.
+
+The recovery scope is the same verified login and remote runtime generation.
+Retain the user's requested directions per logical Viewer. A disconnected
+Viewer retires pending work and discards old clipboard offers. After fresh
+Manager authorization, a focused Viewer with browser permission establishes
+its baseline and accepts new clipboard events. Treat focus pause separately
+from the user's on/off setting. Clear intent on explicit off, disposal, logout
+or target replacement. For the associated shared audio recovery requirements,
+see AUD-003 in [requirements](requirements.md).
+
+Qualify both failure reproductions on a real Chrome and Kasm Viewer. A mixed
+file-plus-PNG item must write PNG only. A PNG within the transfer limit that
+reads back above it must paste locally, then permit a new short remote copy in
+a second eligible Viewer. Add positive PNG-only and short-text controls and
+negative cases for file-only, unsent oversize uploads, simultaneous clipboard
+changes and stale Viewer ownership. Use the host workbench to verify display
+and audio interruption, Manager restart, foreground/background transitions,
+multiple tabs and explicit cancellation.

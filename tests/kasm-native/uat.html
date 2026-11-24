@@ -210,7 +210,7 @@ document.querySelector('#local-copy-png').onclick=async()=>{
     status('测试 PNG 已复制到本机；在 Writer 中粘贴并检查图片。文件／文件夹复制不支持。');
   }catch{status('浏览器未完成 PNG 复制；请检查权限与浏览器支持。');}
 };
-const clipboardCases=[['rich-html','HTML 格式文本双向粘贴'],['rich-png','PNG 图片双向粘贴'],['rich-combined','同一内容的多种表示保持完整'],['rich-boundary','2 MiB 合计边界与超限拒绝'],['rich-files','文件／文件夹复制不支持'],['text-both','双向中文／多行／emoji：实际粘贴读回'],['directions','单向、关闭与手动模式'],['permissions','首次授权、拒绝与撤销'],['focus-tabs','同一／不同 App、多 Tab 与隐藏窗口'],['retirement','切换、断线重连、退出账号后无旧内容重放'],['conflict-bounds','同时变化、空文本及当前组件大小边界'],['transports','WSS、WebRTC 与回退'],['audio','扬声器／麦克风同时启用']];
+const clipboardCases=[['rich-html','HTML 格式文本双向粘贴'],['rich-png','PNG 图片双向粘贴'],['rich-combined','同一内容的多种表示保持完整'],['rich-boundary','当前合计上限与超限拒绝'],['rich-files','文件／文件夹复制不支持'],['text-both','双向中文／多行／emoji：实际粘贴读回'],['directions','单向、关闭与手动模式'],['permissions','首次授权、拒绝与撤销'],['focus-tabs','同一／不同 App、多 Tab 与隐藏窗口'],['retirement','切换、断线重连、退出账号后无旧内容重放'],['conflict-bounds','同时变化、空文本及当前组件大小边界'],['transports','WSS、WebRTC 与回退'],['audio','扬声器／麦克风同时启用']];
 const clipboardMatrix=document.createElement('details');clipboardMatrix.id='clipboard-matrix';
 clipboardMatrix.innerHTML='<summary>剪贴板验收记录 · Clipboard UAT</summary><p>状态仅记录人工实际读回结果；连接成功不代表粘贴通过。导出不包含剪贴板内容。</p>'+clipboardCases.map(([id,label])=>`<p><label>${label} <select data-case="${id}"><option value="not-run">未测试</option><option value="pass">通过</option><option value="fail">失败</option><option value="not-supported">不支持</option></select></label></p>`).join('')+'<button id="clipboard-export">导出剪贴板记录</button>';
 document.querySelector('#input-tools').append(clipboardMatrix);

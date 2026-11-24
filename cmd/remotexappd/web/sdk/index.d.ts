@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.34.0';
+export const SDK_VERSION: '0.34.1';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -69,7 +69,7 @@ export interface RemoteXAppRecovery {
 }
 
 export interface RemoteXAppInstance {
-  displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string; nativeClipboard?:'text'|'rich-v1';
+  displayProvider?:'tigervnc'|'kasm'; displayComponentDigest?:string; nativeClipboard?:'text'|'rich-v1'|'rich-v2';
   nativeAudio?:'pcm-s16le-48k-v1';
   nativeTransport?:{policy:'wss-only'|'prefer-udp';available:boolean;grantRequired:boolean;readOnly?:boolean;reason?:string};
   recovery?:RemoteXAppRecovery;
@@ -137,7 +137,11 @@ export class RemoteXAppAPIError extends Error { status:number; body:unknown; }
 
 export class RemoteXAppNativeError extends Error { code:string; }
 export interface NativeKeyboardPolicy {profile:'unknown'|'windows'|'mac'|'gnome'|'fcitx'|'custom';mode?:'local'|'remote';bindings?:string[];}
+export interface RemoteXAppDisconnect {
+  at:number;code:string;httpStatus:number|null;recoveredAt?:number;durationMs?:number;
+}
 export type RemoteXAppNativeStats = {
+  lastDisconnect?:RemoteXAppDisconnect;
   schemaVersion:1; state:'disconnected'|'connecting'|'reconnecting'|'ready'|'failed'|'disposed';
   code:string|null; connectionEpoch:number; observedAt:number;
   transport:'wss'|'ws-loopback'|'webrtc-udp'|null; connectedForMs:number|null;
@@ -159,6 +163,7 @@ export interface NativeClipboardState {
 export class RemoteXAppNativeClient extends EventTarget {
   constructor(options:RemoteXNativeViewerOptions);
   readonly readOnly:boolean;
+  readonly heartbeatIntervalMs:number;
   readonly runtime?:RemoteXRuntimeHandle;
   bindRuntime(runtime:RemoteXRuntimeHandle):void;
   readonly state:'disconnected'|'connecting'|'reconnecting'|'ready'|'failed'|'disposed';
@@ -366,7 +371,8 @@ export interface RemoteXAudioRouteState {
   speaker:boolean;mic:boolean;actualSpeaker:boolean;actualMic:boolean;reason:string;
 }
 export interface RemoteXAudioSnapshot {
-  connection:'idle'|'connected'|'failed';protocol?:string|null;connectionId?:string|null;
+  lastDisconnect?:RemoteXAppDisconnect;
+  connection:'idle'|'connected'|'recovering'|'failed';protocol?:string|null;connectionId?:string|null;
   speakerOwner:boolean;micOwner:boolean;playbackBlocked?:boolean;reason?:string;
   routes:RemoteXAudioRouteState[];receivedBytes?:number;sentBytes?:number;droppedFrames?:number;
   playback?:{underrunBlocks:number;droppedFrames:number;peak:number;queuedFrames:number};
@@ -401,6 +407,8 @@ export interface NativeInputReceipt {
 export interface RemoteXNativeViewerOptions {
   container:HTMLElement;manager?:RemoteXAppManager;runtime?:RemoteXRuntimeHandle;timeout?:number;
   keyboardPolicy?:NativeKeyboardPolicy;preferUDP?:boolean;readOnly?:boolean;
+  /** Native WSS Fence interval, default 15000. Zero disables periodic probes. */
+  heartbeatIntervalMs?:number;
   reconnect?:boolean|{maxAttempts?:number;delays?:number[]};
 }
 export type RemoteXHostOpenOptions = ({templateId:string;instanceId?:never;managedId?:never;parameters?:Record<string,unknown>;profileRef?:string;overrides?:RemoteXAppOverrides} |

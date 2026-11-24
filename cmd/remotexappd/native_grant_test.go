@@ -225,3 +225,40 @@ func TestNativeGrantRealUpgradeAcknowledgesProtocolAndRevokeClosesWire(t *testin
 		t.Fatal("revoked socket remained readable")
 	}
 }
+
+func TestNativeClipboardContinuityBindsViewerGrantToTheVerifiedLogin(t *testing.T) {
+	m, item, req := grantFixture(t)
+	item.Components.NativeClipboard = "text"
+	withLogin := func(r *http.Request, login string) *http.Request {
+		return r.WithContext(context.WithValue(r.Context(), audioLoginKey{}, login))
+	}
+	issue := func(manager *manager, login string) (token, binding string) {
+		t.Helper()
+		payload, _ := json.Marshal(req)
+		r := httptest.NewRequest(http.MethodPost, "/native/grant", bytes.NewReader(payload))
+		r = r.WithContext(context.WithValue(r.Context(), requestIdentityKey{}, "alice"))
+		w := httptest.NewRecorder()
+		manager.serveNativeGrant(w, withLogin(r, login), item, "grant")
+		var result struct {
+			Token          string `json:"token"`
+			ClipboardLogin string `json:"clipboardLogin"`
+		}
+		if w.Code != 200 || json.Unmarshal(w.Body.Bytes(), &result) != nil {
+			t.Fatalf("grant issue failed: %d", w.Code)
+		}
+		return result.Token, result.ClipboardLogin
+	}
+	token, binding := issue(m, "verified-login-example")
+	_, same := issue(m, "verified-login-example")
+	_, next := issue(m, "different-login-example")
+	_, anonymous := issue(m, "")
+	if len(binding) != 64 || same != binding || next == binding || anonymous != "" || strings.Contains(binding, "example") {
+		t.Fatal("incorrect clipboard correlation")
+	}
+	if _, err := m.claimNativeGrant(withLogin(claimRequest(token, "alice"), "different-login-example"), item); err == nil {
+		t.Fatal("grant accepted after the login changed")
+	}
+	if _, err := m.claimNativeGrant(withLogin(claimRequest(token, "alice"), "verified-login-example"), item); err != nil {
+		t.Fatal(err)
+	}
+}

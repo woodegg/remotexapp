@@ -1,6 +1,6 @@
 // Bounded native clipboard data; no browser access, persistence or diagnostics.
 export const CLIPBOARD_FORMATS = Object.freeze(['text/plain', 'text/html', 'image/png']);
-export const MAX_RICH_CLIPBOARD_BYTES = 2 * 1024 * 1024;
+export const MAX_RICH_CLIPBOARD_BYTES = 10 * 1024 * 1024;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', {fatal:true});
 const failure = code => Object.assign(new Error(code), {code});

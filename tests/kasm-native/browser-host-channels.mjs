@@ -79,12 +79,13 @@ try{
   assert.equal(await a.evaluate('navigator.clipboard.readText()'),'Host remote 中文 rich');
   assert.deepEqual(await a.evaluate('navigator.clipboard.read().then(x=>x[0].types.slice().sort())'),['image/png','text/html','text/plain']);
   pass('public host Viewer reads all remote representations back into browser clipboard');
-  await a.evaluate("navigator.clipboard.writeText('x'.repeat(2097152))",true);await a.evaluate('qViewer.copyClipboardToRemote()',true);
-  await wait(async()=>(await xread(a,'UTF8_STRING')).length===2097152);
-  await a.evaluate("navigator.clipboard.writeText('x'.repeat(2097153))",true);
+  const limit=await a.evaluate('qViewer.getClipboardState().maxBytes');
+  await a.evaluate(`navigator.clipboard.writeText('x'.repeat(${limit}))`,true);await a.evaluate('qViewer.copyClipboardToRemote()',true);
+  await wait(async()=>(await xread(a,'UTF8_STRING')).length===limit);
+  await a.evaluate(`navigator.clipboard.writeText('x'.repeat(${limit+1}))`,true);
   assert.equal(await a.evaluate("qViewer.copyClipboardToRemote().then(()=>'',e=>e.code)",true),'clipboard-size');
-  assert.equal((await xread(a,'UTF8_STRING')).length,2097152);
-  pass('exact 2 MiB succeeds and one-byte excess preserves remote selection');
+  assert.equal((await xread(a,'UTF8_STRING')).length,limit);
+  pass('exact negotiated limit succeeds and one-byte excess preserves remote selection');
   await a.evaluate("navigator.clipboard.writeText('automatic baseline')",true);
   await a.evaluate("qViewer.configureClipboard({toRemote:'auto',toLocal:'auto'});qViewer.focus()",true);await wait(()=>a.evaluate('qViewer.getClipboardState().phase==="watching"'));
   await same.call('Page.bringToFront');await same.evaluate("qViewer.configureClipboard({toRemote:'auto',toLocal:'auto'});qViewer.focus()",true);await wait(()=>same.evaluate('qViewer.getClipboardState().phase==="watching"'));

@@ -11,6 +11,31 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+## 0.17.4
+
+Target: `0.17.4`. SDK `0.34.1`.
+
+- Update Gorilla WebSocket to the upstream fix for [GO-2026-6278](https://pkg.go.dev/vuln/GO-2026-6278).
+
+- Keep native audio controls usable after Manager and SharedWorker failure
+  ([#94](https://github.com/woodegg/remotexapp/issues/94)). Resume requested
+  speakers after an interruption when the proxy proves login continuity.
+  Resume a still-live microphone after a short, verified transport interruption.
+  A stopped capture requires a new explicit action.
+- Coordinate SharedWorker recovery across tabs. Retry a transient Viewer
+  renewal failure within its existing lease, preserve recent audio and
+  display disconnect diagnostics, and send native Viewer WebSocket Pings.
+- Send an automatic native Viewer RFB Fence heartbeat every 15 seconds by
+  default. Embedding hosts can set or disable it per Viewer.
+
+- Raise the aggregate native rich clipboard limit to 10 MiB with a new
+  Kasm component pin. Existing rich and text pins retain their original
+  limits. Transfer only inline PNG from a file-marked selection. Keep
+  oversized browser encodings local without blocking a new remote copy.
+
+- Retain clipboard directions across a verified same-Viewer reconnect.
+  Restart clipboard observation only after focus and discard old offers.
+
 ## 0.17.3
 
 Target: `0.17.3`. SDK `0.34.0`.

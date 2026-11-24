@@ -22,7 +22,7 @@ d = display.Display()
 window = d.screen().root.create_window(0, 0, 1, 1, 0, X.CopyFromParent, X.InputOnly, X.CopyFromParent)
 clipboard, targets, incr = [d.intern_atom(x) for x in ['CLIPBOARD', 'TARGETS', 'INCR']]
 values = {d.intern_atom(k): base64.b64decode(v, validate=True) for k, v in spec['formats'].items()}
-assert len(values) <= 8 and sum(len(v) for v in values.values()) <= 4 * 1024 * 1024
+assert len(values) <= 8 and sum(len(v) for v in values.values()) <= 11 * 1024 * 1024
 requests, chunks, pending = [], {}, []
 window.set_selection_owner(clipboard, X.CurrentTime)
 d.sync()

@@ -487,3 +487,62 @@ func TestAudioScopeCapacityAndManagerShutdown(t *testing.T) {
 		t.Fatal("draining service issued new scope")
 	}
 }
+
+func TestAudioLoginBindingAcrossManagerRestart(t *testing.T) {
+	networks, err := parseTrustedNetworks("127.0.0.1/32")
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := &manager{cfg: config{
+		authMode: "trusted-header", identityHeader: "X-Test-Identity",
+		audioLoginHeader: "X-Test-Login", trustedProxyNetworks: networks,
+	}}
+	a := newAudioService("test-manager", nil)
+	server := httptest.NewServer(m.secure(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		a.serve(w, r)
+	})))
+	defer server.Close()
+	client := audioTestClient(t)
+	contextFor := func(serverURL, account string, logins ...string) map[string]any {
+		t.Helper()
+		req, _ := http.NewRequest("POST", serverURL+"/api/audio/context", strings.NewReader("{}"))
+		req.Header.Set("X-Test-Identity", account)
+		for _, login := range logins {
+			req.Header.Add("X-Test-Login", login)
+		}
+		resp, err := client.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+		var result map[string]any
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil || resp.StatusCode != 200 {
+			t.Fatalf("context status=%d error=%v", resp.StatusCode, err)
+		}
+		return result
+	}
+	initial := contextFor(server.URL, "alice", "verified-login-initial")
+	if initial["login"] == "" || initial["login"] == "verified-login-initial" {
+		t.Fatal("missing opaque login binding")
+	}
+	restarted := newAudioService("test-manager", nil)
+	restartedServer := httptest.NewServer(m.secure(http.HandlerFunc(restarted.serve)))
+	defer restartedServer.Close()
+	same := contextFor(restartedServer.URL, "alice", "verified-login-initial")
+	if same["login"] != initial["login"] || same["scope"] == initial["scope"] || same["service"] == initial["service"] {
+		t.Fatal("Manager restart failed to separate login continuity from audio scope")
+	}
+	next := contextFor(restartedServer.URL, "alice", "verified-login-another")
+	if next["login"] == same["login"] || next["scope"] == same["scope"] {
+		t.Fatal("same-account re-login kept the previous audio epoch")
+	}
+	other := contextFor(restartedServer.URL, "bob", "verified-login-another")
+	if other["login"] == next["login"] || other["scope"] == next["scope"] {
+		t.Fatal("different account shared the previous binding")
+	}
+	for _, logins := range [][]string{nil, {"invalid"}, {"verified-login-initial", "verified-login-another"}} {
+		if contextFor(restartedServer.URL, "alice", logins...)["login"] != "" {
+			t.Fatal("unverified login header established continuity")
+		}
+	}
+}

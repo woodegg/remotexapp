@@ -105,22 +105,26 @@ try {
  check('last session reference releases its speaker and channel',(await hook('state')).readers===0);
  await other.call('Browser.setPermission',{permission:{name:'microphone'},setting:'granted',origin});
  await speaker(other,'appB',true);await mic(other,'appB',true);
+ const capturesBeforeWorkerExit=await other.evaluate('streams.length');
  const workers=await fetch(b.base+'/json/list').then(r=>r.json());
  const worker=workers.find(t=>t.type==='shared_worker'&&t.url===origin+'/sdk/audio-worker.js');
  assert.ok(worker,'owned audio SharedWorker target exists');
  const debugWorker=new WebSocket(worker.webSocketDebuggerUrl);await new Promise((resolve,reject)=>{debugWorker.onopen=resolve;debugWorker.onerror=reject;});
  debugWorker.send(JSON.stringify({id:1,method:'Runtime.evaluate',params:{expression:'self.close()'}}));await delay(100);debugWorker.close();
- await until(()=>other.evaluate('audio.closed && streams.every(s=>s.getTracks().every(t=>t.readyState==="ended"))'),15000);
+ await until(()=>other.evaluate('audio.stats.connection==="failed" && !appB.released && streams.every(s=>s.getTracks().every(t=>t.readyState==="ended"))'),15000);
  await until(async()=>JSON.stringify(await hook('state'))===JSON.stringify({connections:0,readers:0,writers:0}));
  check('silent SharedWorker exit ends capture, playback and remote relays',(await state(other)).connection==='failed');
- await other.evaluate(`const {RemoteXAppAudio}=await import('/sdk/remotexapp-audio.js');window.audio=new RemoteXAppAudio({baseURL:location.origin,microphoneProcessing:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});await audio.ready;window.recoveredB=await audio.acquire({id:'session-b',sessionGeneration:1});`);
- check('new controller after worker failure starts with audio off',(await hook('state')).connections===0);
- await speaker(other,'recoveredB',true);await mic(other,'recoveredB',true);
- check('explicit controller recreation restores real microphone readback',(await hook('readback','session-b')).amplitude>1000);
+ await speaker(other,'appB',true);
+ check('the same live handle recovers speaker without re-opening mic',await other.evaluate('!appB.released && audio.stats.routes[0].actualSpeaker && !audio.stats.routes[0].actualMic '));
+ const workerTone=hook('tone','session-b','speaker',660);
+ const afterWorker=[];for(let i=0;i<18;i++){await delay(100);afterWorker.push(await amplitude(other,660));}await workerTone;
+ check('replacement worker restores real speaker playback',afterWorker.filter(x=>x>.08).length>=2);
+ await mic(other,'appB',true);
+ check('explicit mic action on the same handle restores real readback',(await hook('readback','session-b')).amplitude>1000);
  await hook('retire-generation','session-b');
  await until(async()=>JSON.stringify(await hook('state'))===JSON.stringify({connections:0,readers:0,writers:0}));
  check('server retirement of final App closes shared channel and microphone',await other.evaluate('audio.stats.connection==="idle" && streams.every(s=>s.getTracks().every(t=>t.readyState==="ended"))'));
- await other.evaluate('await recoveredB.release()');
+ await other.evaluate('await appB.release()');
  check('browser exceptions absent',pages.every(p=>p.errors.length===0));
 } catch(error) {failure=error.stack;console.error(failure);for(let i=0;i<pages.length;i++){try{console.error('page',i,await state(pages[i]),pages[i].errors);}catch{}}}
 finally {

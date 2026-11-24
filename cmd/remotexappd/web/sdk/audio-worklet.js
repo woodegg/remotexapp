@@ -33,19 +33,27 @@ class RemoteXAppPlayback extends AudioWorkletProcessor {
 class RemoteXAppCapture extends AudioWorkletProcessor {
   constructor() {
     super(); this.frame = new Int16Array(960); this.offset = 0; this.credits = 8; this.frames = 0; this.dropped = 0; this.energy = 0;
-    this.port.onmessage = ({data}) => { if (data.op === 'credit') this.credits = Math.min(8,this.credits+1); };
+    this.delivery = null;
+    this.port.onmessage = ({data}) => {
+      if (data.op === 'credit') this.credits = Math.min(8,this.credits+1);
+      if (data.op === 'delivery') {
+        this.delivery = data.delivery;
+        this.offset = this.energy = this.frames = 0;
+        this.frame.fill(0);
+      }
+    };
   }
   process(inputs, outputs) {
     // The graph runs against a silent output. Captured microphone samples are
     // never copied into the local playback path.
     for (const channel of outputs[0] || []) channel.fill(0);
-    const channels = inputs[0]; if (!channels?.length) return true;
+    const channels = inputs[0]; if (!this.delivery || !channels?.length) return true;
     for (let i=0;i<channels[0].length;i++) {
       let value = 0; for (const channel of channels) value += channel[i] || 0;
       value = Math.max(-1,Math.min(1,value/channels.length)); this.energy += value*value;
       this.frame[this.offset++] = Math.round(value*(value < 0 ? 32768 : 32767));
       if (this.offset === 960) {
-        if (this.credits > 0) { const pcm = this.frame.buffer; this.credits--; this.port.postMessage({type:'pcm',pcm},[pcm]); }
+        if (this.credits > 0) { const pcm = this.frame.buffer; this.credits--; this.port.postMessage({type:'pcm',delivery:this.delivery,pcm},[pcm]); }
         else this.dropped++;
         this.frame = new Int16Array(960); this.offset = 0;
         if (++this.frames % 50 === 0) { this.port.postMessage({type:'stats',level:Math.sqrt(this.energy/48000),droppedFrames:this.dropped}); this.energy = 0; }

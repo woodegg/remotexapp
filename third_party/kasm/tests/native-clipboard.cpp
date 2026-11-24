@@ -7,7 +7,7 @@
 #include <stdint.h>
 namespace rdr { using U8=uint8_t; using U32=uint32_t; }
 using Exception=std::runtime_error;
-namespace rfb { namespace Server { int DLP_ClipAcceptMax=2097152; const char* DLP_Clip_Types="text/plain,text/html,image/png"; } }
+namespace rfb { namespace Server { int DLP_ClipAcceptMax=10*1024*1024; const char* DLP_Clip_Types="text/plain,text/html,image/png"; } }
 struct Stream {
   std::vector<unsigned char> bytes; size_t at=0;
   unsigned readU8() { if(at==bytes.size())throw Exception("short"); return bytes[at++]; }

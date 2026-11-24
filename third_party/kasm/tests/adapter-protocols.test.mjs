@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {LatencyProbe} from '../latency.mjs';
 import {ClipboardInputGate} from '../clipboard-input.mjs';
+import {MAX_RICH_CLIPBOARD_BYTES} from '../clipboard-payload.mjs';
 
 test('adapter passes the one-use grant through RFB WebSocket options, not video codecs',async t=>{
   const originalDocument=globalThis.document;
@@ -36,7 +37,8 @@ test('adapter passes the one-use grant through RFB WebSocket options, not video 
     rich.sendClipboard([{type:'text/plain',data:Uint8Array.of(97)},{type:'text/html',data:Uint8Array.of(98)}]);
     assert.deepEqual(clipboardCalls[0].mimes,['text/plain','text/html']);
     assert.throws(()=>rich.sendClipboard([{type:'text/rtf',data:Uint8Array.of(97)}]));
-    assert.throws(()=>rich.sendClipboardText('x'.repeat(2097153)));
+    assert.equal(Display.capabilities.clipboardMaxBytes,MAX_RICH_CLIPBOARD_BYTES);
+    assert.throws(()=>rich.sendClipboardText('x'.repeat(MAX_RICH_CLIPBOARD_BYTES+1)));
     const rfb=calls[0].rfb;
     rfb.dispatchEvent(new Event('connect'));
     t.mock.timers.tick(1000);

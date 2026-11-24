@@ -127,7 +127,8 @@ async function open(options){
   for(const [id,label] of [['transport','画面协议'],['fps','画面 FPS'],['download','下行 kb/s'],['upload','上行 kb/s'],['wss','WSS RTT'],['udp','UDP RTT'],['loss','UDP block loss'],['resolution','分辨率']]){
     const metric=node('div',undefined,'metric'),value=node('strong','—');metric.append(node('small',label),value);metrics.append(metric);w.metrics[id]=value;
   }
-  inspector.append(metrics,button('测量延迟 · Ping',()=>viewerCall(w,v=>v.measureLatency())),node('p','带宽为有效载荷；静止画面 FPS 可为 0。UDP loss 是显示块统计，不是 IP 包丢失率。','note'));
+  w.displayDisconnect=node('p',undefined,'note');w.displayDisconnect.hidden=true;
+  inspector.append(metrics,w.displayDisconnect,button('测量延迟 · Ping',()=>viewerCall(w,v=>v.measureLatency())),node('p','带宽为有效载荷；静止画面 FPS 可为 0。UDP loss 是显示块统计，不是 IP 包丢失率。','note'));
   toolbar.append(button('再开一个窗口',()=>open({instanceId:session.id})),button('移到另一工作区',()=>{w.workspace=workspace===1?2:1;show();}),
     button('卸载 / 恢复画面',async()=>{if(w.viewer){w.viewer.dispose();w.viewer=null;w.display.replaceChildren(node('div','画面已卸载；运行时和音频仍由此窗口持有。','display-message'));update(w);}else await attach(w);}),
     button('重连',()=>viewerCall(w,v=>v.reconnect())),button('关闭窗口',()=>close(w)),button('停止应用',()=>stop(w),'danger'));
@@ -145,15 +146,17 @@ async function open(options){
   const clip=section(inspector,'剪贴板 · Clipboard');const modes=[['off','关闭'],['manual','手动'],['auto','自动']];
   const applyClip=()=>viewerCall(w,v=>{v.focus();return v.configureClipboard({toRemote:toRemote.value,toLocal:toLocal.value});});
   const toRemote=select(clip,'本地 → 远端',modes,applyClip),toLocal=select(clip,'远端 → 本地',modes,applyClip);
+  w.clipModes={toRemote,toLocal};
   clip.append(button('授权自动剪贴板',()=>viewerCall(w,v=>{v.focus();return v.requestClipboardPermission();})),
     button('本地 → 远端',()=>viewerCall(w,v=>{v.focus();return v.copyClipboardToRemote();})),
     button('远端 → 本地',()=>viewerCall(w,v=>{v.focus();return v.copyClipboardToLocal();})));
-  w.clipState=node('output');clip.append(w.clipState,node('p','文本 / HTML / PNG，合计 2 MiB；不支持文件和文件夹。重连后重新启用。','note'));
+  w.clipState=node('output');clip.append(w.clipState,node('p','文本 / HTML / PNG，合计上限以当前组件为准。同一已验证登录的 Viewer 可恢复设置，失焦时暂停。','note'));
   const audio=section(inspector,'声音 · Speaker & microphone');w.audioState=node('output','未持有音频');
   audio.append(button('准备音频控制',async()=>{w.audio=await session.audio();update(w);}));
   w.speakerToggle=checkbox(audio,'远程播放 · Speaker',enabled=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setSpeaker(enabled);});
   w.micToggle=checkbox(audio,'麦克风 · Microphone',enabled=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setMicrophone(enabled);});
-  audio.append(button('接管麦克风',()=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setMicrophone(true,{takeover:true});}),w.audioState,
+  w.resumeAudio=button('恢复播放 · Resume playback',()=>w.audio?.setSpeaker(true));
+  audio.append(w.resumeAudio,button('接管麦克风',()=>{if(!w.audio)throw Error('prepare-audio-first');return w.audio.setMicrophone(true,{takeover:true});}),w.audioState,
     node('p','先准备控制，再明确启用；仅持有引用不会打开音频通道。同一会话的开关在标签页间共享。','note'));
   const actions=section(inspector,'应用动作与控制 · Actions');
   const actionForm=node('div');actions.append(button('读取可用动作',async()=>{
@@ -181,11 +184,31 @@ function update(w){
   for(const [id,value] of Object.entries({transport:stats?.transport || '—',fps:rate?rate.fps.toFixed(1):'—',download:rate?rate.download.toFixed(1):'—',upload:rate?rate.upload.toFixed(1):'—',
     wss:latencyText(stats?.latency?.wss),udp:latencyText(stats?.latency?.udp),loss:stats?.udpLoss?.state==='ready'?`${(stats.udpLoss.ratio*100).toFixed(2)}%`:'—',
     resolution:stats?.available?`${stats.width}×${stats.height}`:'—'}))w.metrics[id].textContent=value;
-  const clipboard=w.viewer?.getClipboardState();w.clipState.textContent=clipboard?`${clipboard.phase} · ${clipboard.effective.toRemote} / ${clipboard.effective.toLocal}`:'未连接';
+  const clipboard=w.viewer?.getClipboardState();
+  for(const [direction,control] of Object.entries(w.clipModes)) {
+    if(clipboard?.requested[direction] && control !== document.activeElement)control.value=clipboard.requested[direction];
+  }
+  const clipLimit=clipboard?.maxBytes >= 1024*1024 ? `${clipboard.maxBytes/(1024*1024)} MiB` : `${(clipboard?.maxBytes || 0)/1024} KiB`;
+  w.clipState.textContent=clipboard
+    ? `设置 ${clipboard.requested.toRemote} / ${clipboard.requested.toLocal} · ${clipboard.active ? '活动' : '暂停'} · ${clipboard.phase} · ${clipLimit}`
+    : '未连接';
+  const describe=incident=>incident?[
+    new Date(incident.at).toLocaleTimeString(),incident.code,incident.httpStatus,
+    incident.durationMs==null?'恢复待确认':(incident.durationMs/1000).toFixed(2)+' s'
+  ].filter(Boolean).join(' · '):'';
+  const displayIssue=describe(stats?.lastDisconnect);
+  w.displayDisconnect.hidden=!displayIssue;
+  w.displayDisconnect.textContent=displayIssue && '最近画面断链 · '+displayIssue;
   const audio=host.getAudioState(),route=audio.routes?.find(r=>r.runtime===w.session.id && r.generation===w.session.generation);
   if(!w.speakerToggle.disabled)w.speakerToggle.checked=!!route?.speaker;
   if(!w.micToggle.disabled)w.micToggle.checked=!!route?.mic;
-  w.audioState.textContent=`${audio.connection} · 播放 ${route?.actualSpeaker?'开':'关'} · 麦克风 ${route?.actualMic?'开':'关'}${route?.reason?` · ${route.reason}`:''}`;
+  const playbackBlocked=route?.speaker && audio.playbackBlocked;
+  const audioHint=playbackBlocked?'点击恢复声音 · Resume playback':
+    route?.reason==='speaker-action-required' || audio.connection==='failed'?'重新开启音频 · Enable audio again':
+    (route?.speaker || route?.mic) && audio.connection==='recovering'?'正在恢复音频 · Recovering audio':'';
+  w.resumeAudio.hidden=!w.audio || w.audio.released || !playbackBlocked;
+  w.audioState.textContent=`${audioHint || audio.connection} · 播放 ${route?.actualSpeaker?'开':'关'} · 麦克风 ${route?.actualMic?'开':'关'}${route?.reason?` · ${route.reason}`:''}`;
+  if(audio.lastDisconnect)w.audioState.textContent+=' · 最近音频断链 · '+describe(audio.lastDisconnect);
 }
 $('#template').addEventListener('change',templateSelected);
 $('#launch').addEventListener('submit',event=>{event.preventDefault();perform('打开应用',async()=>{

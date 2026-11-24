@@ -94,8 +94,8 @@ func (m *manager) serveNativeInstance(w http.ResponseWriter, r *http.Request, it
 		http.NotFound(w, r)
 		return
 	}
-	if channel != nil && readOnly {
-		m.serveReadOnlyNative(w, r, item, channel)
+	if channel != nil && isKasm(item) {
+		m.serveKasmNative(w, r, item, channel, readOnly)
 		return
 	}
 	target := &url.URL{Scheme: "http", Host: item.GatewayAddr}

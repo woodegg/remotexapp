@@ -149,7 +149,7 @@ instance's actual provider when dispatching an attachment.
 | Close window | `view.release()` | Releases this window's owned Session/Viewer/audio interests; does not stop a shared App or release a separate background task |
 | Close-and-stop editor | Explicit stop through the current `view.session`, then `view.release()` | Keep the separate user decision and pinned shutdown policy. A stale generation cannot stop its replacement. Do not force automatically |
 | Text/shortcut injection | `viewer.sendText(text)` / `viewer.sendKey(key, {modifiers})` | Native key path, no clipboard fallback; validate receipt target and perform App readback when required |
-| Clipboard prompts | `configureClipboard`, `requestClipboardPermission`, manual directional actions | Replace legacy prompt/offer UI. Explain auto/manual/off, focus ownership, permissions and reset on reconnect |
+| Clipboard prompts | `configureClipboard`, `requestClipboardPermission`, manual directional actions | Replace legacy prompt/offer UI. Explain auto/manual/off, focus ownership, permissions and verified recovery |
 | Speaker/microphone | Prepare `session.audio()` when the current Session is ready. Call `setSpeaker()` or `setMicrophone()` from the user's click | The host can initialize in the background and expose a single click for either direction |
 | Agent control endpoints | `session.connections()` and a trusted local executor | CDP, BiDi, UNO and D-Bus stay distinct, loopback-only protocols. Revalidate generation before control |
 | Logout | `await host.logout()` | Release this host's windows/tasks and retire the authenticated audio login epoch |
@@ -322,7 +322,10 @@ shared connection. On generation change, discard the old interest, prepare
 the new Session's interest and require a fresh microphone action. A late
 preparation result for a closed window must be released.
 
-Native clipboard supports plain text, HTML and PNG within an aggregate 2 MiB.
+Native clipboard supports plain text, HTML and PNG within the component's
+aggregate limit. The new rich component advertises 10 MiB, older rich
+components advertise 2 MiB, and text-only pins advertise 64 KiB.
+Read `getClipboardState().maxBytes` to display the current limit.
 It excludes file/folder transfer. Automatic directions require explicit opt-in
 and browser permissions; only the active Viewer synchronizes. Empty local reads
 preserve the remote clipboard, and conflicts remain visible rather than guessed.
@@ -435,3 +438,63 @@ managed selection, workspace/window/task ownership, recovery actions, logout,
 clipboard/audio consent and generation-qualified controls pass end to end.
 **Reference-page automation and the previous 0.16.0 UAT do not constitute
 acceptance of either this recovery extension or the downstream adapter.**
+
+
+## Adopt 0.17.4 audio recovery
+
+Use Core 0.17.4 with its served SDK 0.34.1. Keep the existing
+`session.audio()` handle and call the speaker and mic methods from user
+gestures. Remove host code that disposes and reacquires the entire audio
+controller for a Manager restart or worker failure. Render the desired
+`speaker` separately from `actualSpeaker`, and offer an explicit play action
+when `playbackBlocked` or `speaker-action-required` is reported. A failed
+worker channel can rebind automatically for previously enabled speakers when
+the Manager proves login continuity. Offer an explicit action if the browser
+requires playback activation or the login lacks that proof. A short transport outage can restore a live microphone under the same verified
+login and route ownership. An ended capture requires explicit activation.
+
+Display and audio snapshots expose optional `lastDisconnect` records with a
+reason, timestamp, optional HTTP status and observed recovery time. Keep
+showing the latest record after recovery. A transient Viewer lease retry can
+preserve the original Viewer when it finishes within the granted lease.
+
+Enable automatic speaker recovery at the trusted reverse proxy only when it
+can supply a verified login-session identifier as described in the
+[audio contract](native-audio.md#authentication-and-protocol). Application
+window and Viewer integration use the same APIs.
+
+
+### Integration continuity
+
+The SDK separates requested clipboard directions from current activity.
+Render requested settings as the controls' values and use phase and activity
+to show paused, recovering and permission-required states. Keep using the
+same live Viewer across a transient interruption. When the Manager verifies
+the same login, component pin and session generation, the Viewer restores
+settings after focus and accepts only fresh offers. On a 10 MiB component,
+make sure the reverse proxy and any native message filter accept that size
+plus protocol framing in both directions. The trusted ingress uses
+the existing `-audio-login-header` setting to provide verified per-login
+continuity for both clipboard and audio. An installation without the header
+requires fresh clipboard and microphone activation after channel loss.
+
+A live microphone track can survive up to 12 seconds of transport recovery.
+The SDK pauses the capture worklet's delivery during the outage and discards
+frames from the old route. Playback uses the existing shared audio channel.
+Browser capture retirement, worker replacement, explicit off and logout
+end microphone recovery. A new Viewer or a new runtime requires fresh consent.
+
+### Display keepalive
+
+The SDK now schedules a per-Viewer RFB Fence heartbeat over WSS every 15
+seconds. An embedding host can use the default through `host.mount()`. Set
+`heartbeatIntervalMs` in the Viewer options passed to `host.mount()` or
+`session.attach()` to choose a different interval. Use `0` to stop the
+automatic SDK heartbeat for that Viewer. Remove any separate host timer
+calling `measureLatency()` solely for keepalive. Existing on-demand
+measurements and statistics can use the same SDK methods.
+
+The browser must be able to run the Viewer. On wake the SDK attempts one
+overdue probe, then resumes its schedule. Continue showing reconnect
+state and the last disconnect reason. For the option bounds and protocol
+details, see the [browser SDK reference](browser-sdk.md#native-viewer-heartbeat).

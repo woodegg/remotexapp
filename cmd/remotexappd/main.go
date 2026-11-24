@@ -87,6 +87,7 @@ func main() {
 	flag.DurationVar(&cfg.shutdownForceAfter, "shutdown-force-after", 0, "force a host-initiated blocked shutdown after this duration (0 never forces)")
 	flag.DurationVar(&cfg.failedStartGrace, "failed-start-grace", 2*time.Minute, "retain an unattached anonymous instance after session startup fails before cleanup")
 	flag.StringVar(&cfg.authMode, "auth-mode", "trusted-header", "authentication mode: trusted-header or none")
+	flag.StringVar(&cfg.audioLoginHeader, "audio-login-header", "", "trusted reverse-proxy header carrying the verified login-session identifier for native integration recovery")
 	flag.StringVar(&cfg.identityHeader, "identity-header", "Cf-Access-Authenticated-User-Email", "identity header accepted from a trusted reverse proxy")
 	flag.StringVar(&cfg.trustedProxies, "trusted-proxies", "127.0.0.0/8,::1/128", "comma-separated reverse proxy CIDRs")
 	flag.BoolVar(&cfg.allowInsecure, "allow-insecure-public", false, "allow auth-mode=none, including sensitive API operations, on a non-loopback listener (controlled testing only)")
@@ -192,6 +193,9 @@ func main() {
 	}
 	if cfg.authMode != "trusted-header" && cfg.authMode != "none" {
 		log.Fatalf("unsupported auth mode %q", cfg.authMode)
+	}
+	if cfg.audioLoginHeader != "" && (cfg.authMode != "trusted-header" || !validRequestID(cfg.audioLoginHeader) || strings.EqualFold(cfg.audioLoginHeader, cfg.identityHeader)) {
+		log.Fatal("-audio-login-header requires trusted-header auth and a distinct valid header name")
 	}
 	if cfg.identityHeader == "" || cfg.maxInstances < 1 || cfg.maxInstances > 1000 {
 		log.Fatal("identity-header must be non-empty and max-instances must be between 1 and 1000")

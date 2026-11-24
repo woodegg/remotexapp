@@ -1,0 +1,70 @@
+diff --git a/common/rfb/NativeClipboard.h b/common/rfb/NativeClipboard.h
+--- a/common/rfb/NativeClipboard.h
++++ b/common/rfb/NativeClipboard.h
+@@ -2,7 +2,7 @@
+ #ifndef REMOTEXAPP_NATIVE_CLIPBOARD_H
+ #define REMOTEXAPP_NATIVE_CLIPBOARD_H
+ #include <string.h>
+-#define NATIVE_CLIPBOARD_LIMIT (2U * 1024U * 1024U)
++#define NATIVE_CLIPBOARD_LIMIT (10U * 1024U * 1024U)
+ static inline int nativeClipboardMime(const char *mime) {
+   if (!strcmp(mime, "text/plain")) return 0;
+   if (!strcmp(mime, "text/html")) return 1;
+diff --git a/unix/xserver/hw/vnc/vncSelection.c b/unix/xserver/hw/vnc/vncSelection.c
+--- a/unix/xserver/hw/vnc/vncSelection.c
++++ b/unix/xserver/hw/vnc/vncSelection.c
+@@ -600,24 +600,29 @@
+ {
+   if (prop->type != XA_ATOM || prop->format != 32 || prop->size > 256) { vncSnapshotCancel(); return; }
+   const Atom *targets = prop->data;
+-  /* File-manager selections are not clipboard file transfer. */
++  /* Mixed file selections may advertise a separately encoded inline image.
++     Do not request file objects or alternate text and HTML carrying paths. */
+   const char *fileTypes[] = {"text/uri-list", "x-special/gnome-copied-files", "application/x-kde-cutselection"};
++  Bool fileSelection = FALSE;
+   unsigned i;
+   for (i = 0; i < 3; i++) {
+     Atom type = MakeAtom(fileTypes[i], strlen(fileTypes[i]), TRUE);
+-    if (vncHasAtom(type, targets, prop->size)) { vncSnapshotCancel(); return; }
+-  }
+-  Atom plain = MakeAtom("text/plain", 10, TRUE);
+-  Atom target = vncHasAtom(xaUTF8_STRING, targets, prop->size) ? xaUTF8_STRING :
+-    vncHasAtom(plain, targets, prop->size) ? plain : vncHasAtom(xaSTRING, targets, prop->size) ? xaSTRING : None;
+-  if (target) {
+-    snapshot.items[0].target = target;
+-    snapshot.items[0].mime = "text/plain";
+-    snapshot.count = 1;
++    if (vncHasAtom(type, targets, prop->size)) fileSelection = TRUE;
++  }
++  if (!fileSelection) {
++    Atom plain = MakeAtom("text/plain", 10, TRUE);
++    Atom target = vncHasAtom(xaUTF8_STRING, targets, prop->size) ? xaUTF8_STRING :
++      vncHasAtom(plain, targets, prop->size) ? plain : vncHasAtom(xaSTRING, targets, prop->size) ? xaSTRING : None;
++    if (target) {
++      snapshot.items[0].target = target;
++      snapshot.items[0].mime = "text/plain";
++      snapshot.count = 1;
++    }
+   }
+   for (i = 0; i < dlp_num_mimetypes(); i++) {
+     const char *mime = dlp_get_mimetype(i);
+-    if (nativeClipboardMime(mime) <= 0 || !vncHasAtom(xaBinclips[i], targets, prop->size)) continue;
++    int kind = nativeClipboardMime(mime);
++    if (kind <= 0 || (fileSelection && kind != 2) || !vncHasAtom(xaBinclips[i], targets, prop->size)) continue;
+     if (snapshot.count >= 3) { vncSnapshotCancel(); return; }
+     snapshot.items[snapshot.count].target = xaBinclips[i];
+     snapshot.items[snapshot.count++].mime = mime;
+@@ -631,7 +636,12 @@
+   unsigned index = snapshot.index, size = snapshot.items[index].size;
+   unsigned char *data = snapshot.items[index].data;
+   const char *mime = snapshot.items[index].mime;
+-  if (strcmp(mime, "image/png")) {
++  if (!strcmp(mime, "image/png")) {
++    static const unsigned char signature[] = {137, 'P', 'N', 'G', 13, 10, 26, 10};
++    if (size < sizeof(signature) || memcmp(data, signature, sizeof(signature))) {
++      vncSnapshotCancel(); return;
++    }
++  } else {
+     if (size && data[size-1] == 0) size--;
+     if (size && memchr(data, 0, size)) { vncSnapshotCancel(); return; }
+     if (snapshot.target == xaSTRING) {

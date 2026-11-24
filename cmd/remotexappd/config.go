@@ -19,7 +19,7 @@ type config struct {
 	webRTC               webRTCConfig
 	nativeUDPCapable     bool
 	nativeClipboard      bool
-	nativeRichClipboard  bool
+	nativeClipboardMode  string
 	nativeAudio          bool
 	listen               string
 	stateDir             string
@@ -50,6 +50,7 @@ type config struct {
 	failedStartGrace     time.Duration
 	authMode             string
 	identityHeader       string
+	audioLoginHeader     string
 	trustedProxies       string
 	allowInsecure        bool
 	connectionsTokenFile string

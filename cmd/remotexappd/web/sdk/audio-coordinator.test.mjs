@@ -4,7 +4,7 @@ import {webcrypto} from 'node:crypto';
 import {AudioCoordinator} from './audio-coordinator.js';
 const turn=()=>new Promise(resolve=>setImmediate(resolve));
 function fixture(){
- const f={sockets:[],http:[],scope:'a'.repeat(64),service:'b'.repeat(64),conflict:false,denied:false};
+ const f={sockets:[],http:[],scope:'a'.repeat(64),service:'b'.repeat(64),login:'1'.repeat(64),conflict:false,denied:false};
  class Socket {
   constructor(){this.readyState=1;this.bufferedAmount=0;this.sent=[];f.sockets.push(this);queueMicrotask(()=>this.onmessage?.({data:JSON.stringify({type:'connected',connection:'connection-'+f.sockets.length})}));}
   send(data){this.sent.push(data);if(typeof data!=='string')return;const c=JSON.parse(data);const respond=()=>this.onmessage?.({data:JSON.stringify(c.op==='unsubscribe'?{type:'ack',request:c.request,slot:c.slot}:{type:'state',request:c.request,slot:c.slot,speaker:c.speaker,mic:c.mic&&!f.conflict,reason:c.mic&&f.conflict?'mic-conflict':'',domain:'d'.repeat(32)})});if(f.holdMic&&c.mic)f.held={command:c,respond};else queueMicrotask(respond);}
@@ -12,9 +12,13 @@ function fixture(){
  }
  const env={crypto:webcrypto,location:{origin:'https://audio.test'},WebSocket:Socket,setInterval:()=>1,setTimeout,clearTimeout,fetch:async(url,options)=>{
   const body=JSON.parse(options.body),action=url.split('/').at(-1);f.http.push({action,body});
+  if(action==='grant'&&f.busy)return {ok:false,status:409,json:async()=>({error:'audio connection already owned'})};
+  if(f.offline)throw TypeError('offline');
+  if(f.holdContext && action==='context') await f.holdContext;
+  if(action==='route'&&body.runtime===f.retiredRuntime)return {ok:false,status:410,json:async()=>({error:'audio runtime generation retired'})};
   if(f.denied)return {ok:false,status:403,json:async()=>({error:'auth rejected'})};
   if(action==='route'&&body.runtime===f.unavailableRuntime)return {ok:false,status:409,json:async()=>({error:'session audio unavailable'})};
-  const data=action==='context'?{service:f.service,scope:f.scope,protocol:'pcm-s16le-48k-v1'}:action==='route'?{token:'c'.repeat(64),domain:'d'.repeat(32)}:action==='grant'?{token:'c'.repeat(64)}:{ok:true};
+  const data=action==='context'?{service:f.service,scope:f.scope,login:f.login,protocol:'pcm-s16le-48k-v1'}:action==='route'?{token:'c'.repeat(64),domain:'d'.repeat(32)}:action==='grant'?{token:'c'.repeat(64)}:{ok:true};
   return {ok:true,json:async()=>data};
  }};
  f.coordinator=new AudioCoordinator(env);
@@ -43,19 +47,30 @@ test('same-session references deduplicate switches, first/last interests own one
  }finally{f.cleanup();}
 });
 
-test('capture fans out explicit targets, denied writer stops capture, network loss never recaptures',async()=>{
+test('microphone routes recover a live capture and discard audio from the disconnected channel',async()=>{
  const f=fixture();try{
   const a=f.peer(),b=f.peer();await ready(a);await ready(b);await acquire(a,'a','app-a');await acquire(b,'b','app-b');
   await a.request('microphone',{ref:'a',enabled:true});await b.request('microphone',{ref:'b',enabled:true});
   assert.equal(a.messages.filter(m=>m.type==='capture').length,1);assert.equal(b.messages.filter(m=>m.type==='capture').length,0);
   const capture=f.coordinator.capture;const pcm=new Int16Array(960).fill(100).buffer;
-  a.send('microphone-frame',{token:capture.token,pcm});assert.equal(f.sockets[0].sent.filter(s=>s instanceof ArrayBuffer).length,1);
-  b.send('microphone-frame',{token:capture.token,pcm});assert.equal(f.sockets[0].sent.filter(s=>s instanceof ArrayBuffer).length,1);
+  a.send('microphone-frame',{token:capture.token,delivery:capture.delivery,pcm});assert.equal(f.sockets[0].sent.filter(s=>s instanceof ArrayBuffer).length,1);
+  b.send('microphone-frame',{token:capture.token,delivery:capture.delivery,pcm});assert.equal(f.sockets[0].sent.filter(s=>s instanceof ArrayBuffer).length,1);
   await a.request('microphone',{ref:'a',enabled:false});assert.ok(f.coordinator.capture);await b.request('microphone',{ref:'b',enabled:false});assert.equal(f.coordinator.capture,null);
   f.conflict=true;const result=await b.request('microphone',{ref:'b',enabled:true});assert.equal(result.reason,'mic-conflict');assert.equal(f.coordinator.capture,null);
-  f.conflict=false;await a.request('microphone',{ref:'a',enabled:true});const count=a.messages.filter(m=>m.type==='capture').length;
-  f.sockets.at(-1).close();await turn();assert.equal(f.coordinator.capture,null);assert.equal(a.state().routes.some(r=>r.mic),false);
-  f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;assert.equal(a.messages.filter(m=>m.type==='capture').length,count);
+  f.conflict=false;await a.request('microphone',{ref:'a',enabled:true});
+  const live=f.coordinator.capture, oldDelivery=live.delivery, count=a.messages.filter(m=>m.type==='capture').length;
+  const oldSocket=f.sockets.at(-1);oldSocket.close();await turn();
+  assert.equal(f.coordinator.capture,live);assert.equal(live.delivery,null);
+  assert.equal(a.state().routes[0].mic,true);assert.equal(a.state().routes[0].actualMic,false);
+  f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;
+  assert.equal(a.messages.filter(m=>m.type==='capture').length,count);
+  assert.equal(a.state().routes[0].actualMic,true);assert.notEqual(live.delivery,oldDelivery);
+  const resumed=f.sockets.at(-1);
+  a.send('microphone-frame',{token:live.token,delivery:oldDelivery,pcm});
+  assert.equal(resumed.sent.filter(s=>s instanceof ArrayBuffer).length,0);
+  a.send('microphone-frame',{token:live.token,delivery:live.delivery,pcm});
+  assert.equal(resumed.sent.filter(s=>s instanceof ArrayBuffer).length,1);
+  assert.equal(a.state().routes[1].actualMic,false);
  }finally{f.cleanup();}
 });
 
@@ -77,8 +92,8 @@ test('speaker delivery is bounded by credits and capture respects websocket pres
   for(let i=0;i<100;i++)f.coordinator._speaker(packet);assert.equal(a.messages.filter(m=>m.type==='playback').length,8);assert.equal(f.coordinator.dropped,92);
   a.send('playback-credit');f.coordinator._speaker(packet);assert.equal(a.messages.filter(m=>m.type==='playback').length,9);
   await a.request('microphone',{ref:'a',enabled:true});const token=f.coordinator.capture.token;f.sockets.at(-1).bufferedAmount=10000;
-  const before=f.sockets.at(-1).sent.length;a.send('microphone-frame',{token,pcm:new ArrayBuffer(1920)});assert.equal(f.sockets.at(-1).sent.length,before);
-  f.sockets.at(-1).bufferedAmount=0;a.send('microphone-frame',{token,pcm:new ArrayBuffer(1920)});assert.equal(f.sockets.at(-1).sent.at(-1).byteLength,8);
+  const before=f.sockets.at(-1).sent.length;a.send('microphone-frame',{token,delivery:f.coordinator.capture.delivery,pcm:new ArrayBuffer(1920)});assert.equal(f.sockets.at(-1).sent.length,before);
+  f.sockets.at(-1).bufferedAmount=0;a.send('microphone-frame',{token,delivery:f.coordinator.capture.delivery,pcm:new ArrayBuffer(1920)});assert.equal(f.sockets.at(-1).sent.at(-1).byteLength,8);
   a.send('playback-ready',{ready:false});await f.coordinator.serial;assert.equal(a.state().playbackBlocked,true);
  }finally{f.cleanup();}
 });
@@ -115,14 +130,58 @@ test('a device ending immediately after permission cannot create a microphone ro
 });
 
 
-test('reconnect refreshes service epoch and retires stale references before granting routes',async()=>{
+test('Manager restart recovers enabled audio through one fresh socket under the verified login',async()=>{
+ const f=fixture();try{
+  const a=f.peer(),b=f.peer();await ready(a);await ready(b);await acquire(a,'a');await acquire(b,'b');
+  await a.request('speaker',{ref:'a',enabled:true});await a.request('microphone',{ref:'a',enabled:true});
+  f.service='f'.repeat(64);f.scope='e'.repeat(64);f.coordinator.lastRenew=0;
+  a.send('wake');b.send('wake');await f.coordinator.serial;
+  assert.equal(f.sockets.length,2);assert.equal(f.sockets[0].readyState,3);
+  assert.equal(a.state().routes[0].actualSpeaker,true);assert.equal(b.state().routes[0].refs,2);
+  assert.equal(b.state().routes[0].actualMic,true);
+  assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
+  assert.ok(!a.messages.some(m=>m.type==='retired'));
+  await a.request('speaker',{ref:'a',enabled:false});assert.equal(f.sockets[1].readyState,1);
+  await a.request('microphone',{ref:'a',enabled:false});assert.equal(f.sockets[1].readyState,3);
+ }finally{f.cleanup();}
+});
+
+test('a username-only deployment requires a click after loss and preserves the old control',async()=>{
+ const f=fixture();f.login='';
+ try{
+  const a=f.peer();await ready(a);await acquire(a,'a');await a.request('speaker',{ref:'a',enabled:true});
+  f.sockets[0].close();await turn();f.service='f'.repeat(64);f.scope='e'.repeat(64);
+  f.coordinator.retryAfter=0;a.send('wake');await f.coordinator.serial;
+  assert.equal(f.sockets.length,1);assert.equal(a.state().routes[0].reason,'speaker-action-required');
+  await a.request('speaker',{ref:'a',enabled:true});
+  assert.equal(f.sockets.length,2);assert.equal(a.state().routes[0].actualSpeaker,true);
+ }finally{f.cleanup();}
+});
+
+test('a different login and a stale runtime generation cannot reuse old speaker intent',async()=>{
  const f=fixture();try{
   const a=f.peer();await ready(a);await acquire(a,'a');await a.request('speaker',{ref:'a',enabled:true});
-  f.sockets[0].close();await turn();f.service='f'.repeat(64);f.coordinator.retryAfter=0;
-  f.coordinator._tick();await f.coordinator.serial;
-  assert.equal(f.coordinator.routes.size,0);assert.equal(f.coordinator.capture,null);assert.equal(f.sockets.length,1);
-  assert.ok(a.messages.some(m=>m.type==='retired'));
-  await acquire(a,'new');await a.request('speaker',{ref:'new',enabled:true});assert.equal(f.sockets.length,2);assert.equal(a.state().routes[0].actualSpeaker,true);
+  f.sockets[0].close();await turn();f.service='f'.repeat(64);f.login='2'.repeat(64);f.scope='e'.repeat(64);
+  f.coordinator.retryAfter=0;a.send('wake');await f.coordinator.serial;
+  assert.equal(f.sockets.length,1);assert.ok(a.messages.some(m=>m.type==='retired'));
+  await assert.rejects(a.request('speaker',{ref:'a',enabled:true}),/retired/);
+  await acquire(a,'stale','app');f.retiredRuntime='app';
+  const route=await a.request('speaker',{ref:'stale',enabled:true});
+  assert.equal(route.reason,'generation-retired');assert.equal(route.speaker,false);
+  assert.equal(f.sockets[1].readyState,3);
+ }finally{f.cleanup();}
+});
+
+test('a late context response cannot undo Speaker off during recovery',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a');
+  let resume;f.holdContext=new Promise(resolve=>{resume=resolve;});
+  const enabling=a.request('speaker',{ref:'a',enabled:true});
+  await turn();
+  const disabling=a.request('speaker',{ref:'a',enabled:false});
+  resume();
+  await Promise.all([enabling,disabling]);
+  assert.equal(f.sockets.length,0);assert.equal(a.state().routes[0].speaker,false);
  }finally{f.cleanup();}
 });
 
@@ -178,4 +237,48 @@ test('one unavailable domain does not disconnect another App or stop its microph
   f.denied=true;f.coordinator.lastRenew=0;f.coordinator._tick();await f.coordinator.serial;await turn();
   assert.equal(socket.readyState,3);assert.equal(f.coordinator.capture,null,'scope authentication failure still fences all capture');
  }finally{f.cleanup();}
+});
+
+
+test('audio ownership contention defers speaker without making a duplicate connection',async()=>{
+  const f=fixture();try {
+    const a=f.peer();await ready(a);await acquire(a,'a');
+    f.busy=true;
+    const pending=await a.request('speaker',{ref:'a',enabled:true});
+    assert.equal(pending.actualSpeaker,false);
+    assert.equal(a.state().connection,'recovering');
+    assert.equal(f.sockets.length,0);
+    f.busy=false;f.coordinator.retryAfter=0;a.send('wake');await f.coordinator.serial;
+    assert.equal(f.sockets.length,1);
+    assert.equal(a.state().routes[0].actualSpeaker,true);
+  }finally{f.cleanup();}
+});
+
+test('speaker restore requires the same login and respects a newer explicit cancellation',async()=>{
+  const f=fixture();try {
+    const a=f.peer();await ready(a);await acquire(a,'a');
+    const old=await a.request('restore-speaker',{ref:'a',login:'2'.repeat(64)});
+    assert.equal(old.speaker,false);
+    await a.request('speaker',{ref:'a',enabled:false});
+    const result=await a.request('restore-speaker',{ref:'a',login:f.login});
+    assert.equal(result.speaker,false);
+    assert.equal(f.sockets.length,0);
+  }finally{f.cleanup();}
+});
+
+test('microphone recovery stops on owner loss, unverified login or expired time',async t=>{
+ for(const fault of ['owner gone','unknown login','window elapsed'])await t.test(fault,async sub=>{
+  sub.mock.timers.enable({apis:['setTimeout']});
+  const f=fixture();try{
+   const a=f.peer();
+   if(fault==='unknown login')f.login='';
+   await ready(a);await acquire(a,'a');await a.request('microphone',{ref:'a',enabled:true});
+   f.sockets[0].close();await turn();
+   if(fault==='owner gone'){a.send('dispose');await f.coordinator.serial;}
+   if(fault==='window elapsed')sub.mock.timers.tick(12000);
+   assert.equal(f.coordinator.capture,null);
+   assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
+   assert.ok(a.messages.some(m=>m.type==='stop-capture'));
+  }finally{f.cleanup();sub.mock.timers.reset();}
+ });
 });

@@ -4,7 +4,7 @@ go 1.26.0
 
 toolchain go1.27.4
 
-require github.com/gorilla/websocket v1.5.3
+require github.com/gorilla/websocket v1.5.4-0.20240701034025-d67f41855da4
 
 require (
 	github.com/jezek/xgb v1.3.1
@@ -13,6 +13,7 @@ require (
 )
 
 require (
+	golang.org/x/net v0.59.0 // indirect
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/telemetry v0.0.0-20260924152758-ed294f943157 // indirect
 	golang.org/x/tools v0.51.0 // indirect

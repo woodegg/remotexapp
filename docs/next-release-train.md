@@ -3,6 +3,50 @@
 Source identity is maintained in [current-state.md](current-state.md). Earlier
 candidate labels are historical. Deployment is owned by each target's operator.
 
+## Core 0.17.4 — native audio recovery
+
+[Milestone 0.17.4](https://github.com/woodegg/remotexapp/milestone/8) targets
+Core 0.17.4 and SDK 0.34.1. [Issue #94](https://github.com/woodegg/remotexapp/issues/94)
+owns stable audio controls and recovery after a Manager restart, audio transport
+loss or browser suspension. Reuse the existing shared channel and fresh route
+grants. Restore speaker automatically only when the Manager can verify login and
+runtime continuity. Resume a still-live microphone after a short verified
+transport interruption. Ended capture requires a new explicit action.
+
+Keep a healthy Viewer during bounded transient renewal retries within its
+server lease. Native Viewer Ping frames keep the browser transport active
+without extending that lease. Preserve the latest content-free reason in
+display and audio diagnostics after recovery.
+
+Use a configurable 15-second SDK RFB Fence heartbeat on native Viewers.
+Qualify it through the authenticated public path with Edge and a comparable
+idle window, including recovery and foreground/background transitions.
+
+Qualify real playback, microphone fencing, overlapping tabs, worker failure,
+and user cancellation with fault injection in the local workbench. Formal
+publication requires separate exact post-merge qualification and human UAT
+under [Issue #96](https://github.com/woodegg/remotexapp/issues/96).
+
+### Integration recovery follow-on
+
+The scope is locked for local UAT on 2026-11-23. It includes automatic recovery of enabled clipboard, speaker and
+microphone integrations within the same verified login and remote runtime
+generation. SDK ownership persists across transient transport replacement.
+Reuse the Manager's continuity and fresh grant checks. The host displays
+requested and effective state and the recovery reason. It invokes a control
+for a user action rather than re-enabling it on each reconnect.
+
+The candidate adds a separate 10 MiB Kasm component pin, inline PNG from
+file-marked X11 selections and bounded browser readback comparison.
+The local Chrome/WSS matrix includes real Writer paste, exact limits,
+normalization and focused clipboard ownership. See
+[clipboard evidence](../tests/kasm-native/NATIVE-RICH-CLIPBOARD.md#10-mib-clipboard-candidate).
+
+Qualify the implemented recovery boundaries in
+[the rich clipboard follow-on](native-rich-clipboard.md#clipboard-faults-and-recovery-follow-on).
+The candidate retains verified clipboard intent and live capture during short
+transport recovery under KNC-010–011 and AUD-003.
+
 ## Core 0.17.3 — native recovery panel appearance
 
 Starting from [Core 0.17.2](https://github.com/woodegg/remotexapp/releases/tag/v0.17.2)

@@ -53,7 +53,7 @@ func (c *webRTCConfig) validate(protocol string) error {
 	if c.mode != "direct" && c.mode != "turn" {
 		return errors.New("webrtc-mode must be off, direct or turn")
 	}
-	if protocol != kasmbundle.RoutedUDPProtocol {
+	if !kasmbundle.SupportsRoutedUDP(protocol) {
 		return errors.New("WebRTC modes require a routed-UDP Kasm component")
 	}
 	low, high, ok := strings.Cut(c.ports, "-")

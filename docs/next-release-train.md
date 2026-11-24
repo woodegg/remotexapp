@@ -3,7 +3,7 @@
 Source identity is maintained in [current-state.md](current-state.md). Earlier
 candidate labels are historical. Deployment is owned by each target's operator.
 
-## Integration intent recovery — Issue #98
+## Core 0.17.5 / SDK 0.35.0 — integration intent recovery
 
 The owner selected SDK-owned recovery with ingress-owned authentication.
 [Issue #98](https://github.com/woodegg/remotexapp/issues/98) and the

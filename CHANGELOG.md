@@ -11,11 +11,19 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+## 0.17.5
+
+Target: `0.17.5`. SDK `0.35.0`.
+
 - Preserve native clipboard and speaker intent across transient connection loss
   without requiring an ingress login-session header. Recover a still-live mic
   through fresh runtime route grants. Expose requested audio independently from
   active capture and retain an action-required microphone request after capture
   expires. Authentication remains owned by the configured ingress.
+- Continue automatic Host Viewer recovery after long outages using bounded
+  retry bursts and a 30-second cooldown. Explicit finite retry policies retain
+  their budgets. Explicit audio off succeeds locally during an outage.
+- Use audio SharedWorker protocol v5 and document the SDK 0.35 adoption contract.
 
 ## 0.17.4
 

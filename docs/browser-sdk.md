@@ -54,7 +54,7 @@ model applies; this adapter does not add a separate multi-tenant ACL system.
 
 ## Integration intent recovery
 
-The next revision implements [SDK-owned integration recovery](integration-intent-recovery.md).
+Core 0.17.5 / SDK 0.35.0 implements [SDK-owned integration recovery](integration-intent-recovery.md).
 With reconnect:true (the Host default), the Viewer retries transient failures
 in bounded bursts with a 30-second cooldown between exhausted bursts. A finite
 reconnect policy object still reports exhaustion. Explicit disconnect, dispose,

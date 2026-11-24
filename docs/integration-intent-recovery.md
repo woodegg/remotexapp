@@ -1,5 +1,6 @@
 # Integration intent and connection recovery
 
+Core 0.17.5 / SDK 0.35.0 implements this contract.
 Issue [#98](https://github.com/woodegg/remotexapp/issues/98) supersedes the
 mandatory login-continuity condition introduced for recovery in Core 0.17.4.
 

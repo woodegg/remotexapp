@@ -146,15 +146,23 @@ test('Manager restart recovers enabled audio through one fresh socket under the 
  }finally{f.cleanup();}
 });
 
-test('a username-only deployment requires a click after loss and preserves the old control',async()=>{
+test('ingress-authorized audio without a login header recovers after loss and Manager restart',async()=>{
  const f=fixture();f.login='';
  try{
-  const a=f.peer();await ready(a);await acquire(a,'a');await a.request('speaker',{ref:'a',enabled:true});
-  f.sockets[0].close();await turn();f.service='f'.repeat(64);f.scope='e'.repeat(64);
-  f.coordinator.retryAfter=0;a.send('wake');await f.coordinator.serial;
-  assert.equal(f.sockets.length,1);assert.equal(a.state().routes[0].reason,'speaker-action-required');
-  await a.request('speaker',{ref:'a',enabled:true});
-  assert.equal(f.sockets.length,2);assert.equal(a.state().routes[0].actualSpeaker,true);
+  const a=f.peer();await ready(a);await acquire(a,'a');
+  await a.request('speaker',{ref:'a',enabled:true});await a.request('microphone',{ref:'a',enabled:true});
+  const capture=f.coordinator.capture;
+  for(let i=0;i<3;i++){
+   f.sockets.at(-1).close();await turn();
+   assert.equal(f.coordinator.capture,capture);
+   f.service=String(i+3).repeat(64);f.scope=String(i+6).repeat(64);
+   f.coordinator.retryAfter=0;a.send('wake');await f.coordinator.serial;
+   assert.equal(a.state().routes[0].actualSpeaker,true);
+   assert.equal(a.state().routes[0].actualMic,true);
+  }
+  assert.equal(f.sockets.length,4);
+  assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
+  assert.deepEqual(a.state().routes[0].requested,{speaker:true,microphone:true});
  }finally{f.cleanup();}
 });
 
@@ -266,19 +274,36 @@ test('speaker restore requires the same login and respects a newer explicit canc
   }finally{f.cleanup();}
 });
 
-test('microphone recovery stops on owner loss, unverified login or expired time',async t=>{
- for(const fault of ['owner gone','unknown login','window elapsed'])await t.test(fault,async sub=>{
+test('microphone recovery stops on owner loss or expired time while retaining the request',async t=>{
+ for(const fault of ['owner gone','window elapsed'])await t.test(fault,async sub=>{
   sub.mock.timers.enable({apis:['setTimeout']});
   const f=fixture();try{
    const a=f.peer();
-   if(fault==='unknown login')f.login='';
+   f.login='';
    await ready(a);await acquire(a,'a');await a.request('microphone',{ref:'a',enabled:true});
    f.sockets[0].close();await turn();
    if(fault==='owner gone'){a.send('dispose');await f.coordinator.serial;}
-   if(fault==='window elapsed')sub.mock.timers.tick(12000);
+   if(fault==='window elapsed'){
+    sub.mock.timers.tick(12000);
+    assert.equal(a.state().routes[0].requested.microphone,true);
+    assert.equal(a.state().routes[0].microphoneActionRequired,true);
+   }
    assert.equal(f.coordinator.capture,null);
    assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
    assert.ok(a.messages.some(m=>m.type==='stop-capture'));
   }finally{f.cleanup();sub.mock.timers.reset();}
  });
+});
+
+test('explicit audio off succeeds locally while reconnection HTTP is unavailable',async()=>{
+ const f=fixture();f.login='';
+ try {
+  const a=f.peer();await ready(a);await acquire(a,'a');
+  await a.request('speaker',{ref:'a',enabled:true});await a.request('microphone',{ref:'a',enabled:true});
+  f.offline=true;f.sockets.at(-1).close();await turn();
+  assert.equal((await a.request('speaker',{ref:'a',enabled:false})).speaker,false);
+  assert.equal((await a.request('microphone',{ref:'a',enabled:false})).requested.microphone,false);
+  f.offline=false;f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;
+  assert.equal(f.sockets.length,1);assert.equal(f.coordinator.capture,null);
+ } finally { f.cleanup(); }
 });

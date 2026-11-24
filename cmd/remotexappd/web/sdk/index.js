@@ -1,4 +1,4 @@
-export const SDK_VERSION = '0.34.1';
+export const SDK_VERSION = '0.35.0';
 export { RemoteXAppAPIError, RemoteXAppManager } from './remotexapp-manager.js';
 export { RemoteXAppCoordinator } from './remotexapp-coordinator.js';
 export { RemoteXAppClient } from './remotexapp-client.js';

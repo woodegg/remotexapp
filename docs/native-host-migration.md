@@ -202,6 +202,12 @@ cannot promise server-enforced read-only attachment. There is no silent downgrad
 
 ## Connection recovery
 
+Core 0.17.5 / SDK 0.35.0 changes automatic reconnect and integration intent as defined
+in [integration intent recovery](integration-intent-recovery.md). Host automatic
+reconnect continues in bounded bursts with a 30-second cooldown. An explicit
+finite retry-policy object retains its budget. The historical bounded-only and
+consent-reset descriptions below apply to earlier SDK versions.
+
 The recovery development pair incorporates the SDK 0.31.1 fix, applying the
 configured bounded native reconnect policy to transient
 lease-renewal failures as well as display disconnects. A renewal HTTP request
@@ -440,6 +446,40 @@ clipboard/audio consent and generation-qualified controls pass end to end.
 acceptance of either this recovery extension or the downstream adapter.**
 
 
+## Adopt 0.17.5 integration intent recovery
+
+Use Core 0.17.5 with its served SDK 0.35.0. Keep the existing pinned KasmVNC
+component; this release changes Manager-served SDK behavior and requires no
+Kasm runtime upgrade. The 0.17.4 component provides the 10 MiB clipboard limit.
+
+The ingress continues to authenticate public requests. An additional
+-audio-login-header is optional for recovery. The SDK uses fresh accepted grants
+for the same runtime generation. Existing optional identity-change metadata is
+still honored. A host switching accounts calls host.logout() before replacing
+its binding.
+
+Keep the same live Viewer and audio interest during transient outages. Host
+reconnect:true continues in bounded bursts with a 30-second cooldown; an explicit
+policy object retains a finite budget. Explicit disconnect/release/logout ends
+recovery. Never enable integrations again from reconnect listeners.
+
+Render route.requested.speaker and route.requested.microphone as switch values.
+Use actualSpeaker, actualMic, playbackBlocked, microphoneActionRequired and reason
+for activity and status. Existing speaker/mic fields remain available; mic tracks
+eligible capture while requested.microphone survives ended capture. A still-live
+microphone can resume within 12 seconds, while expired or retired capture needs a
+user action. Recovery never opens getUserMedia automatically. A fresh page starts
+with integrations off.
+
+The SDK uses SharedWorker protocol v5. Retire old SDK tabs as part of adoption
+so their old audio owner cannot temporarily occupy the shared channel. Per-App
+speaker and mic switches and last-reference cleanup keep their existing scope.
+
+Rollback selects the retained Core/SDK pair. This release changes no durable
+runtime schema or component pin. Reopen the host page after switching the served
+SDK to obtain its matching worker and initialize integration choices explicitly.
+See [architecture and tests](integration-intent-recovery.md).
+
 ## Adopt 0.17.4 audio recovery
 
 Use Core 0.17.4 with its served SDK 0.34.1. Keep the existing
@@ -465,6 +505,15 @@ window and Viewer integration use the same APIs.
 
 
 ### Integration continuity
+
+Core 0.17.5 / SDK 0.35.0 follows the
+[integration intent recovery contract](integration-intent-recovery.md).
+An ingress login-session header is optional for transient recovery. Keep the
+same logical Viewer and audio interests, and let the SDK obtain fresh grants
+for the existing runtime. Render audio `requested` separately from
+`actualSpeaker` / `actualMic`; `microphoneActionRequired` preserves an enabled
+request when capture needs a user action. Call logout before switching accounts.
+The following login-header conditions describe the Core 0.17.4 contract.
 
 The SDK separates requested clipboard directions from current activity.
 Render requested settings as the controls' values and use phase and activity

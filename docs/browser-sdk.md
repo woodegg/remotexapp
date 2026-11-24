@@ -52,6 +52,22 @@ source pins and rollback restrictions. No Kasm credentials are delivered to
 the host SDK. The existing Manager/trusted-ingress single-account authorization
 model applies; this adapter does not add a separate multi-tenant ACL system.
 
+## Integration intent recovery
+
+Core 0.17.5 / SDK 0.35.0 implements [SDK-owned integration recovery](integration-intent-recovery.md).
+With reconnect:true (the Host default), the Viewer retries transient failures
+in bounded bursts with a 30-second cooldown between exhausted bursts. A finite
+reconnect policy object still reports exhaustion. Explicit disconnect, dispose,
+logout and runtime invalidation cancel all retries. The same logical Viewer
+retains clipboard directions and obtains fresh grants without requiring a
+separate login-session header.
+
+Audio route snapshots expose requested.speaker and requested.microphone beside
+actualSpeaker and actualMic. microphoneActionRequired reports that an enabled
+microphone needs a new browser action. Render switches from requested state and
+show actual routing separately. Audio uses SharedWorker protocol v5; browser
+permissions and capture lifetime still determine whether a live mic can resume.
+
 ## Native connection and recovery panel appearance
 
 SDK 0.34.0 accepts a locale for the default native panel:

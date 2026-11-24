@@ -74,3 +74,31 @@ test('policy validation and permanent errors are explicit', () => {
   assert.equal(retryable({code:'stale-generation'}),false);
   const f=fixture({policy:false});assert.equal(f.r.begin(record(),new Error()),false);
 });
+
+test('automatic connection intent survives an outage longer than one retry cycle',async t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  let online=false,reads=0;
+  const f=fixture({policy:true,read:async()=>{reads++;if(!online)throw TypeError('offline');return record();}});
+  t.after(()=>f.r.cancel());
+  const settle=async()=>{for(let i=0;i<12;i++)await Promise.resolve();};
+  f.r.begin(record(),TypeError('offline'));
+  for(const ms of [1000,2000,5000,10000]){t.mock.timers.tick(ms);await settle();}
+  assert.equal(reads,4);assert.equal(f.connections.length,0);
+  assert.equal(f.events.at(-1).delayMs,30000);
+  assert.equal(f.events.some(e=>e.name==='reconnectexhausted'),false);
+  online=true;t.mock.timers.tick(30000);await settle();t.mock.timers.tick(1000);await settle();
+  assert.equal(f.connections.length,1);assert.equal(f.events.at(-1).name,'reconnected');
+});
+
+test('disconnect during the automatic retry cooldown cancels the retained intent',async t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  let reads=0;
+  const f=fixture({policy:true,read:async()=>{reads++;throw TypeError('offline');}});
+  f.r.begin(record(),TypeError('offline'));
+  for(const ms of [1000,2000,5000,10000]){
+    t.mock.timers.tick(ms);for(let i=0;i<12;i++)await Promise.resolve();
+  }
+  f.r.cancel();t.mock.timers.tick(60000);
+  for(let i=0;i<12;i++)await Promise.resolve();
+  assert.equal(reads,4);assert.equal(f.connections.length,0);
+});

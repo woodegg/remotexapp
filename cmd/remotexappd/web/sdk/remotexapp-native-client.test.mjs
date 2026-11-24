@@ -152,7 +152,7 @@ test('late local reads and retired offers cannot cross reconnect or revocation',
   const old=f.display,pending=f.viewer.copyClipboardToRemote();
   await assert.rejects(f.viewer.copyClipboardToRemote(),{code:'clipboard-busy'});
   await f.viewer.reconnect();resolve('stale');await assert.rejects(pending,{code:'clipboard-cancelled'});
-  assert.equal(f.viewer.clipboardEnabled,false);assert.deepEqual(old.sent,[]);assert.deepEqual(f.display.sent,[]);
+  assert.equal(f.viewer.clipboardEnabled,true);assert.deepEqual(old.sent,[]);assert.deepEqual(f.display.sent,[]);
   old.dispatchEvent(new CustomEvent('clipboard',{detail:{text:'stale'}}));
   f.viewer.enableClipboard();await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-empty'});
   const pendingRevoked=f.viewer.copyClipboardToRemote();f.viewer.enableClipboard(false);f.viewer.enableClipboard(true);resolve('stale again');
@@ -472,7 +472,7 @@ test('lease HTTP request has a ten-second deadline and a timeout preserves a hea
   assert.equal(f.viewer.state, 'ready'); assert.equal(f.old.closed, 0);
 });
 
-test('one Viewer lease failure leaves a second Viewer ready and clears clipboard consent', async t => {
+test('one Viewer lease failure preserves clipboard intent and leaves a second Viewer ready', async t => {
   const f = await leaseFailure(t, new TypeError('offline'));
   const other = fixture({udp:true, controls:true}); t.after(() => other.viewer.dispose());
   await other.viewer.connect('app');
@@ -482,7 +482,7 @@ test('one Viewer lease failure leaves a second Viewer ready and clears clipboard
   assert.equal(other.viewer.state, 'ready'); assert.equal(other.display.closed, 0);
   other.viewer.sendText('other remains usable');
   t.mock.timers.tick(1); await settleLease();
-  assert.equal(f.viewer.state, 'ready'); assert.equal(f.viewer.clipboardEnabled, false);
+  assert.equal(f.viewer.state, 'ready'); assert.equal(f.viewer.clipboardEnabled, true);
   assert.deepEqual(f.display.sent, []);
 });
 
@@ -619,7 +619,7 @@ test('public directional configuration, native paste callback and reset are conn
   assert.deepEqual(f.display.sent,['fresh paste']);
   await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-disabled'});
   const retired=f.display;await f.viewer.reconnect();
-  assert.deepEqual(f.viewer.getClipboardState().requested,{toRemote:'off',toLocal:'off'});
+  assert.deepEqual(f.viewer.getClipboardState().requested,{toRemote:'auto',toLocal:'off'});
   assert.throws(()=>retired.options.prepareClipboardPaste(),{name:'AbortError'});
   f.viewer.enableClipboard();assert.equal(f.viewer.getClipboardState().requested.toRemote,'manual');
   f.viewer.resetClipboard();assert.equal(f.viewer.clipboardEnabled,false);
@@ -710,14 +710,14 @@ test('real client retry fetches the current generation and reattaches once',asyn
   assert.equal(f.viewer.state,'ready');assert.notEqual(f.display,old);f.viewer.dispose();
 });
 
-test('verified same-Viewer reconnect restores intent but only accepts new focused clipboard events',async t=>{
+test('same-Viewer reconnect without a login header restores intent and accepts only fresh focused offers',async t=>{
   clipboardBrowser(t);
   navigator.permissions={query:async()=>({state:'granted'})};
   navigator.locks={request:async(_,options,fn)=>fn({})};
   const writes=[];
   navigator.clipboard.readText=async()=> 'local baseline';
   navigator.clipboard.writeText=async value=>writes.push(value);
-  const f=fixture({clipboard:true,clipboardAutomatic:true,controls:true,clipboardLogin:'c'.repeat(64)});
+  const f=fixture({clipboard:true,clipboardAutomatic:true,controls:true,clipboardLogin:undefined});
   await f.viewer.connect('app');t.after(()=>f.viewer.dispose());
   await f.viewer.configureClipboard({toRemote:'off',toLocal:'auto'});
   const retired=f.display;

@@ -369,6 +369,7 @@ export interface RemoteXConnections {
 export interface RemoteXAudioRouteState {
   runtime:string;generation:number;slot:number;refs:number;domain:string|null;
   speaker:boolean;mic:boolean;actualSpeaker:boolean;actualMic:boolean;reason:string;
+  requested:{speaker:boolean;microphone:boolean};microphoneActionRequired:boolean;
 }
 export interface RemoteXAudioSnapshot {
   lastDisconnect?:RemoteXAppDisconnect;

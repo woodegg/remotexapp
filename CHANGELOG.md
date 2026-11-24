@@ -11,6 +11,12 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Preserve native clipboard and speaker intent across transient connection loss
+  without requiring an ingress login-session header. Recover a still-live mic
+  through fresh runtime route grants. Expose requested audio independently from
+  active capture and retain an action-required microphone request after capture
+  expires. Authentication remains owned by the configured ingress.
+
 ## 0.17.4
 
 Target: `0.17.4`. SDK `0.34.1`.

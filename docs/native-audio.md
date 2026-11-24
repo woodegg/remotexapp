@@ -12,6 +12,13 @@ acceptance, post-merge qualification and publication remain separate.
 
 ## Ownership and compatibility
 
+The next SDK revision implements
+[integration intent recovery](integration-intent-recovery.md). Fresh accepted
+requests and runtime grants permit transient recovery without a login-session
+header. Requested microphone state survives an ended capture and is exposed as
+`requested.microphone` with `microphoneActionRequired`. The login-header recovery
+conditions below describe the Core 0.17.4 implementation.
+
 `-native-audio` opts new Kasm runtimes into `pcm-s16le-48k-v1`. The default provider
 and existing runtime pins are preserved. Audio pins use durable schema 6;
 old Core rejects that format. Existing schema 2–5 records retain their original

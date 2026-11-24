@@ -64,9 +64,10 @@ test('worker replacement rejects an old interest after same-account re-login',as
 });
 
 
-test('worker termination reopens the same shared name and replays authenticated speaker only',async()=>{
+test('worker termination without a login header restores speaker without reopening microphone',async()=>{
   const f=fixture();
   try {
+    f.binding={...f.binding,login:''};
     const interest=await f.audio.acquire({id:'app',sessionGeneration:1});
     f.audio._message({type:'state',connection:'connected',connectionId:'previous',routes:[
       {runtime:'app',generation:1,speaker:true,actualSpeaker:true,mic:true,actualMic:true}
@@ -81,4 +82,25 @@ test('worker termination reopens the same shared name and replays authenticated 
     assert.equal(f.messages.filter(m=>m.op==='microphone').length,0);
     assert.equal(f.audio.stats.lastDisconnect.code,'audio-worker-ended');
   } finally { f.audio.dispose(); }
+});
+
+test('worker replacement follows the latest shared microphone request',async()=>{
+  const f=fixture();
+  try {
+    f.binding={...f.binding,login:''};
+    const interest=await f.audio.acquire({id:'app',sessionGeneration:1});
+    f.audio._preparePlayback=async()=>{};
+    await interest.setSpeaker(true);
+    f.audio._context=async()=>({});
+    await interest.setMicrophone(true);
+    // Another tab disabled this session's microphone before worker loss.
+    f.audio._message({type:'state',connection:'connected',routes:[
+      {runtime:'app',generation:1,speaker:true,mic:false,actualSpeaker:true,actualMic:false,
+        requested:{speaker:true,microphone:false}}
+    ]});
+    f.audio.worker.onerror();await f.audio.rebind;
+    const restore=f.messages.findLast(m=>m.op==='restore-speaker');
+    assert.equal(restore.microphoneRequested,false);
+    assert.equal(f.messages.filter(m=>m.op==='microphone').length,1);
+  }finally{f.audio.dispose();}
 });

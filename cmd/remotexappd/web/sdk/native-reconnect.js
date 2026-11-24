@@ -8,7 +8,7 @@ export function reconnectPolicy(value = false) {
   if (!Number.isInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 20 ||
       !Array.isArray(delays) || !delays.length || delays.length > 20 ||
       delays.some(v => !Number.isFinite(v) || v < 1 || v > 60000)) throw new RangeError('Invalid native reconnect policy');
-  return Object.freeze({maxAttempts, delays:Object.freeze([...delays])});
+  return Object.freeze({maxAttempts, delays:Object.freeze([...delays]), continuous:value === true});
 }
 
 export function retryable(error) {
@@ -39,6 +39,12 @@ export class NativeReconnect {
     const schedule = () => {
       if (!current()) return;
       if (attempt >= this.policy.maxAttempts) {
+        if (this.policy.continuous) {
+          this.event('reconnecting', {attempt, maxAttempts:this.policy.maxAttempts, delayMs:30000});
+          if (!current()) return;
+          this.timer = setTimeout(() => { this.timer = null; attempt = 0; schedule(); }, 30000);
+          return;
+        }
         this.cancel(); this.event('reconnectexhausted', {attempts:attempt, code:'reconnect-exhausted'}); return;
       }
       const delayMs = this.policy.delays[Math.min(attempt, this.policy.delays.length - 1)];

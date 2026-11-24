@@ -3,6 +3,14 @@
 Source identity is maintained in [current-state.md](current-state.md). Earlier
 candidate labels are historical. Deployment is owned by each target's operator.
 
+## Integration intent recovery — Issue #98
+
+The owner selected SDK-owned recovery with ingress-owned authentication.
+[Issue #98](https://github.com/woodegg/remotexapp/issues/98) and the
+[architecture](integration-intent-recovery.md) cover clipboard, speaker and
+microphone intent across transient faults without a separate login-session
+header. Qualify the local fault matrix and report required browser actions.
+
 ## Core 0.17.4 — native audio recovery
 
 [Milestone 0.17.4](https://github.com/woodegg/remotexapp/milestone/8) targets

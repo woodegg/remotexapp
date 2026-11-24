@@ -5654,3 +5654,20 @@ delivery identifier while the channel or target route is unavailable.
 The capture worklet discards partial old frames and uses a new identifier
 after the route acknowledgement. The browser retains the previously
 authorized track only while ownership and device state remain eligible.
+
+## 2026-11-24 — Recover native integration intent through current ingress access
+
+Issue #98 and [integration intent recovery](integration-intent-recovery.md)
+supersede the mandatory login-continuity-header condition in the 0.17.4
+clipboard/audio recovery decisions. Ingress owns authentication. The live SDK
+owner preserves intent across transient channel replacement and uses fresh
+Manager grants for the same runtime generation and component. Optional existing
+identity metadata can fence a change. Explicit logout, release and generation
+retirement cancel recovery.
+
+Expose requested microphone state separately from eligible capture and actual
+routing. Retire expired or ended capture while preserving the requested setting
+and reporting that a user action is required. Existing mic fields remain
+compatible. Worker protocol v5 prevents sharing v4 recovery behavior in one
+coordinator. Validate in a project-owned loopback fixture without a login header
+using real clipboard and audio readback plus independent transport faults.

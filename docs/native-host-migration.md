@@ -202,6 +202,12 @@ cannot promise server-enforced read-only attachment. There is no silent downgrad
 
 ## Connection recovery
 
+The next revision changes automatic reconnect and integration intent as defined
+in [integration intent recovery](integration-intent-recovery.md). Host automatic
+reconnect continues in bounded bursts with a 30-second cooldown. An explicit
+finite retry-policy object retains its budget. The historical bounded-only and
+consent-reset descriptions below apply to earlier SDK versions.
+
 The recovery development pair incorporates the SDK 0.31.1 fix, applying the
 configured bounded native reconnect policy to transient
 lease-renewal failures as well as display disconnects. A renewal HTTP request
@@ -465,6 +471,15 @@ window and Viewer integration use the same APIs.
 
 
 ### Integration continuity
+
+The next SDK revision follows the
+[integration intent recovery contract](integration-intent-recovery.md).
+An ingress login-session header is optional for transient recovery. Keep the
+same logical Viewer and audio interests, and let the SDK obtain fresh grants
+for the existing runtime. Render audio `requested` separately from
+`actualSpeaker` / `actualMic`; `microphoneActionRequired` preserves an enabled
+request when capture needs a user action. Call logout before switching accounts.
+The following login-header conditions describe the Core 0.17.4 contract.
 
 The SDK separates requested clipboard directions from current activity.
 Render requested settings as the controls' values and use phase and activity

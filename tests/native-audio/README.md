@@ -111,3 +111,22 @@ Version 1.0.1 records App input/toolchain/binary hashes and includes XGB and Go
 license notices. The helper omits repository-wide VCS metadata so unrelated Core
 commits do not alter an immutable App version. Do not overwrite an installed
 App version with different contents; bump the App version when its inputs change.
+
+## Ingress-authorized integration continuity
+
+Issue #98 adds `tests/kasm-native/browser-integration-continuity.py`. Run it with
+an absolute private fixture JSON containing `projectOwnedDisposable: true`, a
+`local:remotexapp-host-*` container, a loopback HTTPS `origin`, the selected
+Manager `state` directory and `expectedCommit`. The fixture directory supplies
+`loopback.spki`, `mic-880.wav`, the existing integration control page and owned
+fault endpoints. Use the private UAT procedure for environment provisioning.
+
+The loopback Manager uses auth-mode none and no login-session header to reproduce
+an ingress-owned authentication boundary. The matrix reads real X11 clipboard,
+measures browser speaker playback and samples the selected remote Pulse mic. It
+cuts display and audio independently and together, restarts the Manager, holds
+an audio outage beyond capture expiry, injects renewal 503, cancels during an
+outage, tests browser offline/online and suspension, and holds both transports
+for 38 seconds to exercise automatic retry cooldown. Logout and explicit
+Viewer disconnect are terminal. Tests close their Apps and browser. This local
+matrix does not establish a cause for public ingress disconnects.

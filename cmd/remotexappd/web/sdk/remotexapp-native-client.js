@@ -81,8 +81,8 @@ export class RemoteXAppNativeClient extends EventTarget {
       event:(name, detail) => {
         if (name === 'reconnecting') this._state('reconnecting', detail);
         if (name === 'reconnectexhausted' || name === 'reconnectstopped') {
-          this._clipboardBinding = null;
-          this._clipboardSync.reset();
+          if (name === 'reconnectstopped') this._clipboardBinding = null;
+          this._clipboardSync.reset(name === 'reconnectexhausted');
           this._state('disconnected', detail);
         }
         this.dispatchEvent(new CustomEvent(name, {detail}));
@@ -308,8 +308,8 @@ export class RemoteXAppNativeClient extends EventTarget {
         this._lastDisconnect = {...this._lastDisconnect,recoveredAt,durationMs:Math.max(0,recoveredAt-this._lastDisconnect.at)};
       }
       const previousBinding = this._clipboardBinding;
-      const binding = clipboard && /^[a-f0-9]{64}$/.test(grant?.clipboardLogin || '')
-        ? JSON.stringify([prepared.id, prepared.sessionGeneration, prepared.displayComponentDigest, grant.clipboardLogin])
+      const binding = clipboard
+        ? JSON.stringify([prepared.id, prepared.sessionGeneration, prepared.displayComponentDigest, grant?.clipboardLogin || ''])
         : null;
       if (previousBinding && previousBinding !== binding) this._clipboardSync.reset();
       this._clipboardBinding = binding;

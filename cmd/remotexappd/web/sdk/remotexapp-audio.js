@@ -1,6 +1,8 @@
 const boundPort = Symbol();
 const resumeSpeaker = Symbol();
 const pendingSpeakerOff = Symbol();
+const resumeMicrophone = Symbol();
+const pendingMicrophoneOff = Symbol();
 
 /** Independent audio interests: no Viewer attachment, App start or keepalive. */
 export class RemoteXAppAudio extends EventTarget {
@@ -11,7 +13,7 @@ export class RemoteXAppAudio extends EventTarget {
     if (base.origin !== environment.location.origin) throw Error('Audio requires a same-origin Manager');
     if (!environment.isSecureContext || !environment.SharedWorker || !environment.AudioContext || !environment.AudioWorkletNode) throw Error('Secure context, SharedWorker and AudioWorklet are required');
     this.base = base.href.replace(/\/$/,''); this.requests = new Map(); this.interests = new Map(); this.next = 0; this.captureEpoch = 0; this.activating = 0; this.closed = false;
-    this.workerKey = "remotexapp-audio-v4:"+this.base;
+    this.workerKey = "remotexapp-audio-v5:"+this.base;
     this.stats = {connection:'idle',speakerOwner:false,micOwner:false,routes:[]};
     this._openWorker();
     this.watchdog = environment.setInterval(()=>{
@@ -61,11 +63,12 @@ export class RemoteXAppAudio extends EventTarget {
         else interest[boundPort] = port;
       }
       this._post({op:'playback-ready',ready:this.context?.state==='running' && !!this.playback});
-      if (current?.login && previous?.login === current.login) {
+      if (previous && !scopeChanged && !loginChanged) {
         for (const interest of this.interests.values()) {
-          if (!interest[resumeSpeaker] || interest[pendingSpeakerOff]) continue;
+          if (!(interest[resumeSpeaker] || interest[resumeMicrophone]) || interest[pendingSpeakerOff]) continue;
+          const enabled = !!interest[resumeSpeaker];
           interest[resumeSpeaker] = false;
-          void this._set(interest,'restore-speaker',{login:current.login}).catch(()=>{});
+          void this._set(interest,'restore-speaker',{enabled, login:current.login, microphoneRequested:!!interest[resumeMicrophone]}).catch(()=>{});
         }
       }
       return {protocol:contract.protocol};
@@ -142,10 +145,16 @@ export class RemoteXAppAudio extends EventTarget {
       setMicrophone: (enabled,{takeover=false}={}) => {
         if (interest.released) return Promise.reject(Error('Audio interest released'));
         const revision = ++micRevision;
+        interest[resumeMicrophone] = !!enabled;
         if (!enabled) {
           this.captureAllowed = false;
-          return this._disable(interest,'microphone');
+          interest[pendingMicrophoneOff] = true;
+          return this._disable(interest,'microphone').then(state => {
+            if (revision === micRevision) interest[pendingMicrophoneOff] = false;
+            return state;
+          });
         }
+        interest[pendingMicrophoneOff] = false;
         this.activating++; this.captureAllowed = true;
         return Promise.all([this._context(),this._ensureWorker()]).then(()=>{return revision === micRevision && this.captureAllowed ? this._set(interest,'microphone',{enabled:true,takeover:!!takeover}) : this._inactive(interest);}).finally(()=>{if (revision === micRevision) this.captureAllowed = false; this.activating--;});
       },
@@ -167,7 +176,9 @@ export class RemoteXAppAudio extends EventTarget {
   }
   _inactive(interest) {
     return {runtime:interest.runtime,generation:interest.generation,slot:0,refs:1,domain:null,
-      speaker:false,mic:false,actualSpeaker:false,actualMic:false,reason:this.stats.reason || ''};
+      speaker:false,mic:false,requested:{speaker:false,microphone:!!interest[resumeMicrophone]},
+      microphoneActionRequired:!!interest[resumeMicrophone],
+      actualSpeaker:false,actualMic:false,reason:this.stats.reason || ''};
   }
   _set(interest,op,options) {
     if (interest.released) throw Error('Audio interest released');
@@ -290,8 +301,10 @@ export class RemoteXAppAudio extends EventTarget {
     let replay = false;
     for (const interest of this.interests.values()) {
       const route = this.stats.routes.find(r=>r.runtime===interest.runtime && r.generation===interest.generation);
-      if (route?.speaker && this.binding?.login && !interest[pendingSpeakerOff]) interest[resumeSpeaker] = true;
-      replay ||= !!interest[resumeSpeaker];
+      if (route?.speaker && !interest[pendingSpeakerOff]) interest[resumeSpeaker] = true;
+      if (route) interest[resumeMicrophone] = !interest[pendingMicrophoneOff] &&
+        !!(route.requested?.microphone ?? route.mic);
+      replay ||= !!interest[resumeSpeaker] || !!interest[resumeMicrophone];
     }
     this._pauseCapture();
     this.playback?.port.postMessage({op:'reset'});

@@ -351,7 +351,6 @@ func (a *audioService) upgrade(w http.ResponseWriter, r *http.Request) {
 	c.sendJSON(map[string]any{"type": "connected", "connection": c.id, "protocol": sessionaudio.Protocol, "expiresInMs": audioLease.Milliseconds()})
 	window := time.Now()
 	messages := 0
-	binaryMessages := 0
 	for {
 		kind, data, err := socket.ReadMessage()
 		if err != nil {
@@ -360,13 +359,11 @@ func (a *audioService) upgrade(w http.ResponseWriter, r *http.Request) {
 		if time.Since(window) >= time.Second {
 			window = time.Now()
 			messages = 0
-			binaryMessages = 0
 		}
 		if kind == websocket.BinaryMessage {
-			binaryMessages++
-			if binaryMessages > 100 {
-				return
-			}
+			// Transport buffering can coalesce ordinary 50 fps capture. Admit
+			// valid frames; the fixed-size writer queue drops stale microphone
+			// data without retiring the shared speaker/microphone connection.
 			if !c.microphone(data) {
 				return
 			}

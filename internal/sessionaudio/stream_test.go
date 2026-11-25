@@ -46,7 +46,7 @@ func TestPCMProtocolBoundsSilenceAndSequence(t *testing.T) {
 }
 func TestMicQueueBoundedAndOldestDropped(t *testing.T) {
 	s := &Stream{done: make(chan struct{}), input: make(chan []byte, 5)}
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 2390; i++ {
 		frame := make([]byte, MicBytes)
 		frame[0] = byte(i)
 		if !s.Push(frame) {
@@ -54,10 +54,10 @@ func TestMicQueueBoundedAndOldestDropped(t *testing.T) {
 		}
 		frame[0] = 255
 	}
-	if len(s.input) != 5 || s.Dropped.Load() != 95 {
+	if len(s.input) != 5 || s.Dropped.Load() != 2385 {
 		t.Fatal("queue grew or drops uncounted")
 	}
-	for i := 95; i < 100; i++ {
+	for i := 2385; i < 2390; i++ {
 		if frame := <-s.input; frame[0] != byte(i) {
 			t.Fatal("retained stale/aliased PCM")
 		}

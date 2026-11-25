@@ -480,6 +480,18 @@ runtime schema or component pin. Reopen the host page after switching the served
 SDK to obtain its matching worker and initialize integration choices explicitly.
 See [architecture and tests](integration-intent-recovery.md).
 
+### Buffered microphone delivery
+
+The 0.17.5 audio burst fix ([#102](https://github.com/woodegg/remotexapp/issues/102))
+removes the server's binary arrival-rate disconnect. A network backlog of valid
+microphone frames no longer closes every speaker/mic route on the shared WSS.
+The existing five-frame microphone queue drops old PCM. Keep using served SDK
+0.35.0, the same intent APIs and the pinned Kasm component; no new host option,
+port mapping, heartbeat or queue setting is required. Qualification binds this
+fix to a new exact candidate, not the earlier 0.17.5 candidate. Verify continuous
+speaker output and the requested microphone target during buffered ingress,
+then repeat foreground/background recovery and explicit off.
+
 ## Adopt 0.17.4 audio recovery
 
 Use Core 0.17.4 with its served SDK 0.34.1. Keep the existing

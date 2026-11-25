@@ -152,7 +152,11 @@ Each packet has an eight-byte header: version 1, kind (1 speaker / 2 mic), slot,
 exact-silence flag, little-endian uint32 sequence. Speaker slots are 1–8; the
 single mic upstream uses slot 0 and server routing to authorized targets. Full
 payloads are 3840 / 1920 bytes. Digital zero frames use only the header. Invalid
-versions, sizes, slots, sequences or over-limit traffic are rejected.
+versions, sizes, slots and sequences are rejected. Valid microphone packets can
+arrive together after transport buffering; their arrival rate does not close
+the shared connection. The Pulse writer retains at most five queued frames
+(100 ms), dropping the oldest under pressure. Packet read bounds and the
+independent control-message limit remain in place.
 
 Non-silent PCM payload is 1.536 Mbit/s per speaker and 0.768 Mbit/s for one mic
 before WebSocket/TLS/IP overhead. Silence markers reduce quiet traffic, not

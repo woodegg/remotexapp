@@ -130,3 +130,26 @@ outage, tests browser offline/online and suspension, and holds both transports
 for 38 seconds to exercise automatic retry cooldown. Logout and explicit
 Viewer disconnect are terminal. Tests close their Apps and browser. This local
 matrix does not establish a cause for public ingress disconnects.
+
+
+## Buffered microphone regression
+
+Issue [#102](https://github.com/woodegg/remotexapp/issues/102) covers transport
+coalescing of normal 50 fps microphone frames. Run:
+
+```sh
+go test ./cmd/remotexappd -run '^TestAudioBufferedMicrophone' -count=1
+go test -race ./cmd/remotexappd ./internal/sessionaudio
+```
+
+The old reader fails after 100 buffered frames. Regression sends full and
+silence 140-frame and 2250-frame backlogs, then checks control acknowledgements,
+HTTP renewal and the same connection/scope. Invalid type/size/slot/sequence and
+expired/retired scope remain rejected. `TestMicQueueBoundedAndOldestDropped`
+checks that 2390 pushes keep only the newest five frames and count the drops.
+These checks establish admission and bounded buffering, not WAN audio quality.
+Real browser/Pulse qualification must additionally coalesce upstream microphone
+traffic while keeping downstream speaker traffic and grants available, measure
+actual selected microphone and speaker signals, then run a natural one-hour
+foreground/background observation. Preserve raw closure events and distinguish
+external clipboard interference and debugger limitations from product failures.

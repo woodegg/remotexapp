@@ -5671,3 +5671,22 @@ and reporting that a user action is required. Existing mic fields remain
 compatible. Worker protocol v5 prevents sharing v4 recovery behavior in one
 coordinator. Validate in a project-owned loopback fixture without a login header
 using real clipboard and audio readback plus independent transport faults.
+
+
+## 2026-11-25 — Separate buffered microphone arrival from shared audio lifetime
+
+Issue #102 supersedes the binary arrival-rate disconnect in the native audio
+reader. Ordinary 50 fps capture can arrive as a burst after network buffering;
+the previous 100-frame arrival window closed speaker and microphone together.
+The owner selected removal of that limit without a replacement traffic limiter.
+Keep per-frame format/sequence checks and current scope, lease, writer and runtime
+authorization. Reuse the existing five-frame drop-oldest Pulse writer queue;
+media pressure discards stale microphone data without growing a backlog or
+retiring the shared connection. Control-message limits and WebSocket read bounds
+remain unchanged. No wire-format, SDK API, heartbeat or queue-size change is needed.
+
+Regression must fail on the old reader and pass for full and silence bursts,
+subsequent control/renewal and retained scope. Invalid/replayed or unauthorized
+frames must still be rejected. Verify real Pulse routes and browser speaker
+continuity during buffered ingress, then natural foreground/background soak.
+A controlled reproduction does not alone attribute every historical WAN cut.

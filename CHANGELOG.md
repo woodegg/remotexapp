@@ -15,6 +15,11 @@ implementation; move them to a version section when publishing a release.
 
 Target: `0.17.5`. SDK `0.35.0`.
 
+- Keep shared native speaker/microphone connections alive when the network
+  delivers valid microphone frames in a burst. Remove the binary arrival-rate
+  disconnect; retain the five-frame drop-oldest microphone queue and packet,
+  sequence, scope and route validation. The wire format and SDK API are unchanged.
+
 - Preserve native clipboard and speaker intent across transient connection loss
   without requiring an ingress login-session header. Recover a still-live mic
   through fresh runtime route grants. Expose requested audio independently from

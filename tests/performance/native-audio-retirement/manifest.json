@@ -1,0 +1,28 @@
+{
+  "experiment": "P19",
+  "primaryVariable": "explicit playback/capture terminal render and awaited SDK owner retirement",
+  "baselineCommit": "4654223c7cf748718b4f3c05099d23dd9962820c",
+  "implementationCommit": "147460315e42a27431f9f39964255165d7ce33f3",
+  "baselineWorkletSHA256": "b5a2bb462afea0535f0a482aceafe6f503ef3a60f94d08667587d65efd3cc5cc",
+  "sourceSHA256": {
+    "cmd/remotexappd/web/sdk/audio-worklet.js": "36aa54b8804b5219887fdbefe9ed9498689ff01133bfc2c583c5e24f798abe00",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "630c95d26cd665a19ec07af8afeffce7acc2b12d8a2ecf5ebf482f412d639683",
+    "cmd/remotexappd/web/sdk/remotexapp-host.js": "671732bbcf031f8e74551aaa5fcb942351896970267968cf2556fdcaf3e272c7"
+  },
+  "harnessSHA256": {
+    "tests/native-audio/browser-retirement.py": "6b1845cdbf78aee9454129c6bf0123bc8ff64d7e3115c155173b6fa813407db0",
+    "tests/native-audio/browser-host-retirement.py": "434c929bb3525c3f77df7b78d934556692c2fb7365004946e35e19f3a29cbbc0",
+    "tests/native-audio/retirement_cdp.py": "d9742adcf74ff69090e6d42d1bbd88ab14c1287bd94f6e8dd323f25b7f7c6290",
+    "tests/native-audio/retirement-minimal.html": "234df5a9cf600f5a7bef7a256d32735af4e8cf593aa13ec4a1f431b334b92156",
+    "tests/native-audio/retirement-host.html": "86900336a05a331f00fa1577f5eb5e53ded26f6528ac0c51c632a5eb5d1f14c7",
+    "tests/native-audio/retirement-host.mjs": "7adb5970b0d5c2dbd286d08319f4cea09186bb8623e84e7a01c11a6ec9a6d105"
+  },
+  "resultSHA256": "991bfe294847073229575d6ab5dcf79bf6a54295361952399b1f2670663b6b4e",
+  "unchanged": [
+    "worker protocol v5 and PCM wire format",
+    "microphone permissions and capture epoch fencing",
+    "per-stream queues and credits",
+    "Manager grants, Kasm component and UDP routing"
+  ],
+  "qualifiedScope": "controlled native audio retirement; the separately labelled extended lane is not yet qualified"
+}

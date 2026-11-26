@@ -18,5 +18,6 @@
   { "id": "P15", "directory": "resize-debounce", "outcome": "accepted", "results": "results-2026-08-28.json" },
   { "id": "P16", "directory": "core-session-services", "outcome": "accepted", "results": "results-2026-09-14.json" },
   { "id": "P17", "directory": "native-audio-burst", "outcome": "accepted", "results": "results.json" },
-  { "id": "P18", "directory": "native-viewer-retirement", "outcome": "accepted", "results": "results.json" }
+  { "id": "P18", "directory": "native-viewer-retirement", "outcome": "accepted", "results": "results.json" },
+  { "id": "P19", "directory": "native-audio-retirement", "outcome": "accepted", "results": "results.json" }
 ]

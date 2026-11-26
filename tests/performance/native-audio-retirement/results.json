@@ -1,0 +1,122 @@
+{
+  "experiment": "P19",
+  "outcome": "accepted",
+  "status": "Controlled native retirement passes; extended natural/fault qualification is pending.",
+  "scope": "SDK-owned audio processor retirement, not whole-browser leak freedom",
+  "baselineCommit": "4654223c7cf748718b4f3c05099d23dd9962820c",
+  "implementationCommit": "147460315e42a27431f9f39964255165d7ce33f3",
+  "observations": [
+    {
+      "case": "exact-edge157-baseline",
+      "counts": {
+        "AudioContext": 6,
+        "AudioWorkletNode": 6,
+        "blink::AudioWorkletMessagingProxy": 6
+      },
+      "browser": "157.0.4341.60",
+      "rawReportSHA256": "4fd5e7961fbe53ddc377c731119772a778fbaff82298f1c448371b7e1a0122fc"
+    },
+    {
+      "case": "running-terminal",
+      "counts": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "browser": "157.0.4341.60",
+      "rawReportSHA256": "9b1ca47c22fa5708af425909fc0a5817627f0c896db38843526e758fca81bc2d"
+    },
+    {
+      "case": "suspended-without-drain-rejected",
+      "counts": {
+        "AudioContext": 6,
+        "AudioWorkletNode": 6,
+        "blink::AudioWorkletMessagingProxy": 6
+      },
+      "browser": "157.0.4341.60",
+      "rawReportSHA256": "1976f4438746371a00558f1c641f4d60a91c94ea904c3216e598c01d925e5180"
+    },
+    {
+      "case": "suspended-muted-drain",
+      "counts": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "browser": "157.0.4341.60",
+      "rawReportSHA256": "9b1ca47c22fa5708af425909fc0a5817627f0c896db38843526e758fca81bc2d"
+    },
+    {
+      "case": "original-worklet-reversal",
+      "counts": {
+        "AudioContext": 6,
+        "AudioWorkletNode": 6,
+        "blink::AudioWorkletMessagingProxy": 6
+      },
+      "browser": "157.0.4341.60",
+      "rawReportSHA256": "4fd5e7961fbe53ddc377c731119772a778fbaff82298f1c448371b7e1a0122fc"
+    },
+    {
+      "case": "capture-terminal-edge157",
+      "counts": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "browser": "157.0.4341.60",
+      "rawReportSHA256": "5e8106ab3b6a744fc223f2a3783784661222f55b6e194d092048a1451c7bc41b"
+    },
+    {
+      "case": "capture-terminal-chrome158",
+      "counts": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "browser": "158.0.8127.36",
+      "rawReportSHA256": "4a024c1d967a1de72fcb8dc4fdb67b36d44f6683ff37726821ca34ddd1e9334d"
+    },
+    {
+      "case": "source-sdk-035-control",
+      "counts": {
+        "AudioContext": 6,
+        "AudioWorkletNode": 14,
+        "blink::AudioWorkletMessagingProxy": 6
+      },
+      "browser": "Edg/157.0.4341.60",
+      "rawReportSHA256": "f14cb1ef738ff596568601d2e1422ba3e24eee631955230b9141e0e87973b1b6"
+    },
+    {
+      "case": "public-sdk-edge157",
+      "counts": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "browser": "Edg/157.0.4341.60",
+      "rawReportSHA256": "9edf4a5e6238552c2d7db33ff5c43a9fc1027a5d461371d82a7f125f941db694"
+    },
+    {
+      "case": "public-sdk-chrome158",
+      "counts": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "browser": "Chrome/158.0.8127.36",
+      "rawReportSHA256": "c4a09d9933aa60509b85825b342a80612cf1ea75f0b614acaa6d3f89c6c621d4"
+    }
+  ],
+  "extended": {
+    "status": "running",
+    "naturalSeconds": 10800,
+    "retirementCycles": 50,
+    "liveIdleSeconds": 80
+  },
+  "limits": [
+    "No matched three-hour patched/unpatched memory-saving benchmark",
+    "Physical devices, OS sleep and UDP/TURN not qualified by this audio retirement matrix",
+    "Source-module baseline and public bundled SDK results are separate lanes",
+    "Early probes are retained observations; the manifest binds the expanded current harness without retroactively claiming its hash for earlier probes"
+  ]
+}

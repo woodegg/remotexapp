@@ -194,3 +194,6 @@ other browsers separately. Do not mix a standalone protocol probe, source-module
 baseline, public bundled SDK result, resource observation or physical-device
 UAT into one claim. A missing browser, local service, Pulse/X11 dependencies or
 HTTPS permission context is a prerequisite failure, not proof of a product bug.
+
+[P19 controlled results](../performance/native-audio-retirement/README.md) bind
+the native retirement observations and expanded reproducible harness.

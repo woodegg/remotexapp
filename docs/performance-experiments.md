@@ -61,10 +61,10 @@ The current production-candidate URLs remain:
 | P15 | Caller-scheduled trailing remote resize reduces repeated desktop/application reflow while retaining bounded progress and final-size correctness | SDK remote-resize scheduling only | **Accepted:** compatibility, trailing, max-wait, flush, reconnect and real-stack input checks passed |
 | P16 | Core-owned session input supervision stays within bounded startup and resource overhead | Service ownership with unchanged Mousepad policies | **Accepted:** matched fresh/warm launches, cgroup resources and cleanup pass locked gates; human UAT is separate |
 | P17 | Per-speaker credits avoid competition between bounded audio queues | Aggregate playback credit allocation only | **Accepted:** deterministic two-speaker burst delivers ten of ten frames instead of eight; eight-slot aggregate remains capped at 64; WAN and physical quality are separate |
-
 | P18 | Retiring native channels and global listeners releases detached Viewer DOM | Native client retirement | **Accepted:** baseline +300 nodes/+240 listeners becomes zero growth over forty cycles; short diagnostic observation only |
+| P19 | Terminal Worklet rendering and awaited owner cleanup retire native audio objects | Audio processor/Context lifetime only | **Accepted:** exact Edge 157 control 6/6/6 becomes 0/0/0; suspended cleanup requires a muted drain; extended resource qualification remains separate |
 
-P01 through P18 have recorded experiment outcomes. Start the next experiment only after defining a
+P01 through P19 have recorded experiment outcomes. Start the next experiment only after defining a
 new isolated primary variable.
 
 ## P16: Core-owned session services
@@ -1100,3 +1100,21 @@ Owned Apps/browsers and fault containers were cleaned up; the original Manager
 on port 1991 and original display were not restarted. The accepted development
 pair remains in project-owned local UAT under the owner's deployment request.
 Human UAT, downstream integration and publication remain separate.
+
+
+## P19: native audio retirement
+
+[The controlled experiment](../tests/performance/native-audio-retirement/README.md)
+reproduces six native AudioContexts, WorkletNodes and MessagingProxies after
+six active closures on the exact affected Edge 157. Explicit terminal rendering
+plus awaited cleanup returns all three to zero. A suspended no-drain attempt
+still retains six of each; a muted existing-graph drain succeeds. Returning to
+the original Worklet bytes reproduces retention. The public SDK also finishes
+at zero in six-cycle Edge 157 and Chrome 158 runs. Live capture-only stop/resume
+releases the old processor while retaining its Context and playback node.
+
+This accepts the bounded lifecycle intervention. Diagnostic GC/native snapshots,
+source-module controls, public bundled SDK data flow and the separately labelled
+natural/fault resource lane are different evidence. It does not attribute all
+RSS growth, establish a matched three-hour memory saving, or qualify physical
+hardware, OS sleep, all browsers or downstream deployment.

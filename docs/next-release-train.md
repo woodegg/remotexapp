@@ -3,6 +3,22 @@
 Source identity is maintained in [current-state.md](current-state.md). Earlier
 candidate labels are historical. Deployment is owned by each target's operator.
 
+## Core 0.17.6 / SDK 0.36.0 — audio resource retirement
+
+The owner locked [Issue #104](https://github.com/woodegg/remotexapp/issues/104)
+for reproduction, implementation, regression and project-owned UAT on
+2026-11-26. Reproduce the exact affected Edge 157 native retention before
+repairing both Worklet processors and awaitable, idempotent public audio/Host
+cleanup. Stop microphone tracks and invalidate capture authority synchronously
+before asynchronous cleanup; qualify suspended contexts, capture-only retirement,
+late permission, multi-owner and disposal races. Preserve ingress-owned access,
+protocol v5, integration intent and explicit fresh microphone authorization.
+
+Run six-cycle native heap controls, real Pulse/clipboard integration, then a
+separate three-hour natural/fault lane followed by fifty retirement cycles and
+an eighty-second live idle endpoint. Keep deployment identifiers and raw heaps
+outside Git. A candidate does not imply human UAT or formal publication.
+
 ## Core 0.17.5 / SDK 0.35.0 — integration intent recovery
 
 The owner selected SDK-owned recovery with ingress-owned authentication.

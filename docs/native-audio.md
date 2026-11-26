@@ -62,7 +62,8 @@ playback owner. A microphone is captured once and sent only to explicitly enable
 targets. Each remote domain has one server-enforced writer. Another profile sees
 a conflict unless it explicitly requests takeover. A lost microphone owner,
 revoked permission or ended device stops capture. A transport-only outage can
-retain the live owner for up to 12 seconds with verified login continuity. Playback handoff requires a previously unlocked
+retain the live owner for up to 12 seconds under current ingress access, browser
+permission and fresh Manager route grants for the same runtime generation. Playback handoff requires a previously unlocked
 AudioContext; a page without a user gesture must report that limitation.
 
 No capture, AudioContext or audio WebSocket is created by merely launching an
@@ -75,9 +76,11 @@ Worker failure stops capture and playback and retains the live handle.
 Tabs rejoin the same named worker. If the existing worker fails to respond to
 initialization, browsers with Web Locks and writable origin storage can agree
 on one replacement name. The Manager grants at most one socket per audio scope.
-The SDK can restore requested speaker routes on a verified same-login rebind.
-A fresh page, retired login, or missing continuity proof requires an explicit
-speaker action. A live microphone may resume only after a fresh route
+The SDK restores requested speaker routes for the same live owner and runtime
+generation after current access and fresh route grants succeed. Optional login
+metadata can fence a changed identity; a separate login-session header is not
+required. A fresh page starts with audio off, and retired ownership cannot replay
+an earlier request. A live microphone may resume only after a fresh route
 acknowledgement. Recovery never starts a new browser capture. A recovered
 browser page allows heartbeat
 grace before its references can be retired. A page that stays unresponsive
@@ -85,9 +88,9 @@ while the worker is running may lose its references and need an explicit action.
 Ordinary background visibility changes leave healthy audio alone.
 
 A restarted Manager changes its service epoch. The worker obtains fresh
-connection and route grants for previously requested speakers when the
-authenticated login and runtime generation can be verified. Without that
-proof, use an explicit speaker action. Transport recovery pauses delivery
+connection and route grants for previously requested speakers under current
+ingress access and the same runtime generation. Explicit logout, owner release
+and generation replacement cancel recovery. Transport recovery pauses delivery
 and fences old capture frames. Worker replacement, page suspension and
 permission loss can end the live capture and require another action.
 Page unload releases its interests. The same live page can reconcile after
@@ -132,16 +135,19 @@ Fresh authenticated HTTP renewal is required within 30 seconds, normally every
 10 seconds. Audio packets and Ping/Pong do not renew authorization. Explicit SDK
 logout revokes the epoch. Out-of-band identity-provider logout is observed when
 authentication/renewal fails; it is not claimed to revoke an already upgraded
-socket instantaneously. Server restart changes the service epoch. For automatic speaker recovery,
-configure `-audio-login-header NAME` with `-auth-mode trusted-header`. The
+socket instantaneously. Server restart changes the service epoch. The optional
+`-audio-login-header NAME` with `-auth-mode trusted-header` adds a verified login
+epoch fence; it is not required for automatic speaker recovery. The
 trusted reverse proxy must strip client-supplied values and set exactly one
 opaque, non-secret session identifier derived from its verified login. Use a
 fresh high-entropy identifier for each login, stable across requests and
 Manager restarts. The value must be 16–128 ASCII letters, digits, dots, dashes
 or underscores. A username or a bearer credential cannot serve this role.
 The Manager returns an opaque binding to the SDK and checks the current
-login on scope, grant and renewal requests. A username-only installation
-remains usable and asks for another explicit speaker action after interruption.
+login on scope, grant and renewal requests. Without that optional header, ingress still owns authentication and the live
+SDK owner reconciles intent through fresh grants. See the current
+[integration recovery contract](integration-intent-recovery.md), which
+supersedes the mandatory-header recovery condition from Core 0.17.4.
 
 The existing
 selected-UID Manager access model remains the authority for its App catalog;
@@ -201,8 +207,9 @@ Final suspended-context disposal first mutes the output gain and stops every
 capture track, then drains only the existing graph. It does not request new
 capture, create a Context, enable a route or restore intent. Capture-only stop
 does not resume paused playback; a silent terminal processor waits for the next
-explicit resume or final disposal. Late microphone permission is fenced and its
-track stopped. Close the owning Host when retiring its login/server resources;
+explicit resume or final disposal. An outstanding browser permission prompt cannot be cancelled by the SDK and
+is not awaited indefinitely. A late grant is fenced: its tracks stop immediately
+and no processor or route is created. Close the owning Host when retiring its login/server resources;
 releasing one session leaves audio resources available for the remaining owners.
 
 Unload cleanup is best effort: browsers cannot await a closing page. Explicitly

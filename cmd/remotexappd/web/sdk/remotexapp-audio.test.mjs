@@ -188,3 +188,33 @@ test('direct audio logout fences all handles immediately and awaits native retir
   await assert.rejects(f.audio.acquire({id:'app',sessionGeneration:1}),/logging out/);
   f.nodes[0].ack();await done;assert.equal(f.contextClosed,1);
 });
+
+test('capture retirement pauses its ACK deadline while suspended, final disposal bounds a blocked resume',async()=>{
+  const f=graphFixture();await f.audio.ready;f.attach();const context=f.audio.context;
+  const timers=new Map();let next=0;
+  f.audio.env.setTimeout=fn=>{timers.set(++next,fn);return next;};
+  f.audio.env.clearTimeout=id=>timers.delete(id);
+  f.audio._stopCapture();assert.equal(timers.size,1);
+  context.state='suspended';context.dispatchEvent(new Event('statechange'));
+  assert.equal(timers.size,0);assert.equal(f.resumes,0);
+  context.resume=()=>new Promise(()=>{});
+  const done=f.audio.dispose();assert.equal(timers.size,1);
+  for(const fn of timers.values())fn();
+  await assert.rejects(done,/retirement incomplete/);
+  assert.equal(f.contextClosed,1);assert.equal(f.audio.retirements.size,0);
+});
+
+test('disposal during Worklet loading fences late speaker activation without constructing a node',async()=>{
+  const f=fixture();await f.audio.ready;let loaded,constructed=0;
+  f.audio.env.AudioContext=class {
+    constructor(){this.sampleRate=48000;this.state='running';this.audioWorklet={addModule:()=>new Promise(resolve=>{loaded=resolve;})};}
+    createGain(){return {gain:{value:1},connect(){},disconnect(){}};}
+    async resume(){}
+    async close(){f.contextClosed++;this.state='closed';}
+  };
+  f.audio.env.AudioWorkletNode=class {constructor(){constructed++;}};
+  const interest=await f.audio.acquire({id:'app',sessionGeneration:1});
+  const activation=interest.setSpeaker(true);await f.audio.dispose();loaded();
+  await assert.rejects(activation,/retired/);
+  assert.equal(constructed,0);assert.equal(f.contextClosed,1);assert.equal(interest.released,true);
+});

@@ -564,7 +564,8 @@ details, see the [browser SDK reference](browser-sdk.md#native-viewer-heartbeat)
 ## Adopt awaitable audio cleanup (Core 0.17.6 / SDK 0.36.0)
 
 Issue #104 fixes native Worklet retention after repeated Host retirement.
-Replace fire-and-forget owner cleanup with `await host.dispose()` or
+Adapters already awaiting `host.dispose()` or `host.logout()` keep their call
+shape; the SDK now joins audio retirement internally. Replace fire-and-forget owner cleanup with `await host.dispose()` or
 `await host.logout()` before considering the owner fully released. Direct audio
 owners use `await audio.dispose()`, which now returns `Promise<void>` instead of
 `void`; ignored return values remain usable for unload best effort. Repeated

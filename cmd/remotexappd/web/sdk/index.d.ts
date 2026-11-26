@@ -394,7 +394,7 @@ export class RemoteXAppAudio extends EventTarget {
   readonly stats:RemoteXAudioSnapshot;
   /** Requires an already-prepared audio-capable runtime generation. */
   acquire(instance:Pick<RemoteXAppInstance,'id'|'sessionGeneration'>):Promise<RemoteXAudioInterest>;
-  /** Revokes the current audio login epoch and retires all its interests. */
+  /** Fences local interests immediately, revokes the audio epoch and joins retirement. */
   logout():Promise<void>;
   /** Stops capture synchronously; resolves after processor retirement and Context close. */
   dispose():Promise<void>;

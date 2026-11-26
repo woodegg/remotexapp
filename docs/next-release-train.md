@@ -16,7 +16,8 @@ protocol v5, integration intent and explicit fresh microphone authorization.
 
 Run six-cycle native heap controls, real Pulse/clipboard integration, then a
 separate three-hour natural/fault lane followed by fifty retirement cycles and
-an eighty-second live idle endpoint. Keep deployment identifiers and raw heaps
+an eighty-second live idle endpoint. [Qualification Issue #106](https://github.com/woodegg/remotexapp/issues/106)
+tracks the candidate, UAT and later publication separately. Keep deployment identifiers and raw heaps
 outside Git. A candidate does not imply human UAT or formal publication.
 
 ## Core 0.17.5 / SDK 0.35.0 — integration intent recovery

@@ -109,19 +109,29 @@ export class RemoteXAppHost extends EventTarget {
     }
   }
   diagnostics() { return this.coordinator.getDiagnostics(); }
-  async logout() {
-    if (this.closed) return;
-    await this.dispose({logout:true});
-  }
-  async dispose({logout = false} = {}) {
-    if (this.closed) return;
+  logout() { return this.dispose({logout:true}); }
+  dispose({logout = false} = {}) {
+    if (this.disposal) return this.disposal;
+    let resolve, reject;
+    this.disposal = new Promise((done,failed)=>{resolve=done;reject=failed;});
+    this.disposal.catch(()=>{});
     this.closed = true; this._abort.abort(fail('disposed'));
-    await Promise.allSettled([...this.views].map(view => view.release()));
-    await Promise.allSettled([...this.sessions].map(session => session.release()));
-    this.coordinator.destroy();
-    try { if (logout) await this._audio?.logout(); }
-    finally { this._audio?.dispose(); this._audio = null; }
-    event(this,'closed',{logout});
+    const audio = this._audio;
+    // Revoke local capture before any asynchronous Viewer/session retirement.
+    const pending = logout ? audio?.logout() : audio?.dispose();
+    pending?.catch(()=>{});
+    void (async()=>{
+      try {
+        await Promise.allSettled([...this.views].map(view => view.release()));
+        await Promise.allSettled([...this.sessions].map(session => session.release()));
+        this.coordinator.destroy();
+        await pending;
+      } finally {
+        try { if (logout) await audio?.dispose(); }
+        finally { this._audio = null; event(this,'closed',{logout}); }
+      }
+    })().then(resolve,reject);
+    return this.disposal;
   }
 }
 

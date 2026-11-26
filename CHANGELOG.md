@@ -11,6 +11,18 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+Target: `0.17.6`. SDK `0.36.0`.
+
+- Retire native playback and capture processors explicitly, discard queued PCM,
+  acknowledge their terminal render and close message ports. Repeated audio
+  disposal returns the same Promise; Host disposal waits for audio retirement
+  and Context close. Stop microphone tracks and invalidate pending capture
+  authority synchronously before asynchronous teardown.
+- Drain an existing suspended graph only after muting its output and stopping
+  capture; do not request a device or silently restore audio intent. Bound the
+  terminal wait and report incomplete cleanup. Capture-only retirement waits
+  for the next explicit resume while preserving other audio owners.
+
 ## 0.17.5
 
 Target: `0.17.5`. SDK `0.35.0`.

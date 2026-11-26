@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.35.0';
+export const SDK_VERSION: '0.36.0';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -396,7 +396,8 @@ export class RemoteXAppAudio extends EventTarget {
   acquire(instance:Pick<RemoteXAppInstance,'id'|'sessionGeneration'>):Promise<RemoteXAudioInterest>;
   /** Revokes the current audio login epoch and retires all its interests. */
   logout():Promise<void>;
-  dispose():void;
+  /** Stops capture synchronously; resolves after processor retirement and Context close. */
+  dispose():Promise<void>;
 }
 
 

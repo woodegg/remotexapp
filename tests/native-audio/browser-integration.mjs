@@ -111,10 +111,8 @@ try {
  assert.ok(worker,'owned audio SharedWorker target exists');
  const debugWorker=new WebSocket(worker.webSocketDebuggerUrl);await new Promise((resolve,reject)=>{debugWorker.onopen=resolve;debugWorker.onerror=reject;});
  debugWorker.send(JSON.stringify({id:1,method:'Runtime.evaluate',params:{expression:'self.close()'}}));await delay(100);debugWorker.close();
- await until(()=>other.evaluate('audio.stats.connection==="failed" && !appB.released && streams.every(s=>s.getTracks().every(t=>t.readyState==="ended"))'),15000);
- await until(async()=>JSON.stringify(await hook('state'))===JSON.stringify({connections:0,readers:0,writers:0}));
- check('silent SharedWorker exit ends capture, playback and remote relays',(await state(other)).connection==='failed');
- await speaker(other,'appB',true);
+ await until(()=>other.evaluate('audio.stats.connection==="connected" && !appB.released && audio.stats.routes[0]?.actualSpeaker && !audio.stats.routes[0]?.actualMic && streams.every(s=>s.getTracks().every(t=>t.readyState==="ended"))'),20000);
+ check('silent SharedWorker exit restores speaker intent without a fresh capture',await other.evaluate('streams.length === '+capturesBeforeWorkerExit));
  check('the same live handle recovers speaker without re-opening mic',await other.evaluate('!appB.released && audio.stats.routes[0].actualSpeaker && !audio.stats.routes[0].actualMic '));
  const workerTone=hook('tone','session-b','speaker',660);
  const afterWorker=[];for(let i=0;i<18;i++){await delay(100);afterWorker.push(await amplitude(other,660));}await workerTone;

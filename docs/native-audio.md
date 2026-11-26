@@ -185,3 +185,27 @@ assets, preserve only the audio scope cookie, and terminate/filter external
 address and authentication metadata before the desktop container. Audio WSS
 must bypass the display-wire parser. Existing display UDP ports and host
 forwarding rules remain unchanged.
+
+
+## Awaitable audio retirement (SDK 0.36)
+
+`await audio.dispose()` stops local capture immediately and resolves only after
+terminal playback/capture acknowledgements, port cleanup and Context close.
+Repeated calls return the same Promise. `await host.dispose()` and
+`await host.logout()` join this cleanup; no host-side Worklet patch is needed.
+Direct audio logout fences its handles immediately, attempts server revocation
+and joins the same local retirement. A failure remains a rejected Promise,
+including a bounded terminal-ACK timeout; local teardown still runs.
+
+Final suspended-context disposal first mutes the output gain and stops every
+capture track, then drains only the existing graph. It does not request new
+capture, create a Context, enable a route or restore intent. Capture-only stop
+does not resume paused playback; a silent terminal processor waits for the next
+explicit resume or final disposal. Late microphone permission is fenced and its
+track stopped. Close the owning Host when retiring its login/server resources;
+releasing one session leaves audio resources available for the remaining owners.
+
+Unload cleanup is best effort: browsers cannot await a closing page. Explicitly
+await the public lifecycle when a host needs a completed retirement boundary.
+Native object release must be tested in a live browser with test-owned refs
+removed; closed track state and mock close call counts alone do not prove it.

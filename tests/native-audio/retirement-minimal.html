@@ -1,0 +1,67 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Owned AudioWorklet retirement control</title>
+<button>Create, run, and close one context</button>
+<pre id="status">0 cycles</pre>
+<script>
+const options = new URLSearchParams(location.search);
+const kind = options.get('kind') || 'playback';
+window.lab = {done:0,error:null,last:null};
+const button = document.querySelector('button');
+button.onclick = async () => {
+  button.disabled = true;
+  let context, node, oscillator, source, output, timer;
+  try {
+    context = new AudioContext({sampleRate:48000});
+    const resumed = context.resume();
+    await context.audioWorklet.addModule('./audio-worklet.js');
+    await resumed;
+    let stats, acknowledge;
+    const disposed = new Promise(resolve=>{acknowledge=resolve;});
+    node = new AudioWorkletNode(context, `remotexapp-${kind}-v1`, {
+      numberOfInputs:kind==='capture'?1:0,numberOfOutputs:1,
+      outputChannelCount:[kind==='capture'?1:2]
+    });
+    node.port.onmessage = ({data}) => {
+      if (data.type==='stats') stats=data;
+      if (data.type==='disposed') acknowledge();
+      if (data.type==='pcm') node.port.postMessage({op:'credit'});
+    };
+    output=context.createGain();output.gain.value=0;
+    node.connect(output);output.connect(context.destination);
+    if (kind==='capture') {
+      oscillator=context.createOscillator();oscillator.frequency.value=880;
+      source=context.createGain();source.gain.value=.1;
+      oscillator.connect(source);source.connect(node);oscillator.start();
+      node.port.postMessage({op:'delivery',delivery:'owned-synthetic'});
+    } else {
+      const frame=()=>node.port.postMessage({op:'frame',slot:1,pcm:new Int16Array(1920).fill(8192).buffer});
+      frame();timer=setInterval(frame,20);
+    }
+    const deadline=performance.now()+6000;
+    while (!stats) {
+      if(performance.now()>deadline)throw Error('processor did not run');
+      await new Promise(resolve=>setTimeout(resolve,20));
+    }
+    if (!(kind==='capture'?stats.level>0:stats.peak>0)) throw Error('no nonzero processing');
+    await new Promise(resolve=>setTimeout(resolve,500));
+    clearInterval(timer);oscillator?.stop();source?.disconnect();oscillator?.disconnect();
+    if(options.has('suspended'))await context.suspend();
+    if(options.has('terminal')) {
+      node.port.postMessage({op:'dispose'});
+      if(context.state==='suspended')await context.resume(); // graph is already muted
+      await Promise.race([disposed,new Promise((_,reject)=>setTimeout(()=>reject(Error('missing terminal ACK')),1000))]);
+    }
+    node.disconnect();output.disconnect();
+    await context.close();node.port.onmessage=null;node.port.close();
+    lab.last={contextState:context.state,processorStatsObserved:true,nonzero:true};
+    lab.done++;document.querySelector('#status').textContent=JSON.stringify(lab);
+  } catch(error) {lab.error=error.message;}
+  finally {
+    clearInterval(timer);
+    if(context && context.state!=='closed')await context.close();
+    context=node=oscillator=source=output=null;
+    button.disabled=false;
+  }
+};
+</script>

@@ -34,8 +34,11 @@ echo/disposal control.
 
 | Chrome 149 endpoint | Direct native clients | Document bootstrap |
 | --- | ---: | ---: |
-| After fifty retirements with one live peer | 51 Workers / 51 ports | 1 Worker / 2 ports |
+| After fifty retirements with one live peer | 51 native clients / 51 ports | 1 native client / 2 ports |
 | After final peer retirement and live idle | 51 / 51 | 1 / 1 |
+
+These are browser-native client wrappers; the named shared runtime remains
+one in both controls. They are not counts of Worker processes.
 
 An actual supplied Chrome 158 source-module control independently returns
 1/2 with a live peer and 1/1 after all logical peers retire. Its private source

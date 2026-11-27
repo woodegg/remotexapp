@@ -33,6 +33,9 @@ for the release artifact and its verification.
 | Core 0.17.0 / SDK 0.33.0 | Same native entry points and recovery model | KasmVNC default for new runtimes. Optional direct and TURN screen acceleration. `webRTCPath` reports the route after UDP paint |
 | Core 0.17.2 / SDK 0.33.0 | Same native entry points and recovery model | The [0.17.2 KasmVNC component](https://github.com/woodegg/remotexapp/releases/tag/v0.17.2) includes independent mouse capture and local viewport fitting. Runtime component pins determine which client is served. |
 | Core 0.17.3 / SDK 0.34.0 | `host.mount()` with optional `panelLocale` and scoped CSS properties | Localizes and themes the SDK overlay. The 0.17.2 KasmVNC component is reused by the qualified pair. [Candidate and component identity](https://github.com/woodegg/remotexapp/issues/91) |
+| Core 0.17.4 / SDK 0.34.1 | Native host/audio entries plus requested integration recovery | Historical login-header recovery conditions; use the following version for ingress-owned recovery without that extra header. |
+| Core 0.17.5 / SDK 0.35.0 | Same native Host, Session and Viewer entries | Published ingress-owned intent recovery and valid buffered microphone admission; awaitable cleanup and bounded Worker clients are added by the later repair candidate. |
+| Core 0.17.6 candidate / SDK 0.37.0 | Await Host/audio retirement; worker v6 bootstrap; verified clipboard receipt | Supersedes the unpublished 0.36.0 candidate. Manual unverified writes can return write-accepted. Exact archive, human acceptance and publication remain tracked in #106. |
 
 For the 0.16.1 recovery target, record the **Core commit/archive hash,
 SDK version and asset hashes, native component manifest hash and App pins**.

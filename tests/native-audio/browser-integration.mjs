@@ -36,6 +36,11 @@ try {
  await speaker(same,'sameA',true);await speaker(other,'appB',true);
  const topology=await hook('state');console.log('topology',topology);check('two sessions and three tabs reuse one WSS',topology.connections===1&&topology.readers===2);
  const states=await Promise.all([a,same,other].map(state));check('exactly one playback owner',states.filter(s=>s.speakerOwner).length===1);
+ await a.evaluate(`(async()=>{const {RemoteXAppAudio}=await import('/sdk/remotexapp-audio.js');const before={contexts:contexts.length,streams:streams.length};for(let i=0;i<50;i++){let owner=new RemoteXAppAudio({baseURL:location.origin});await owner.ready;await owner.acquire({id:'session-a',sessionGeneration:1});await owner.dispose();owner=null;}window.transientOwnerProof={before,after:{contexts:contexts.length,streams:streams.length},hubs:window[Symbol.for('remotexapp.audio-worker-hubs.v6')].size};})()`);
+ const transient=await a.evaluate('transientOwnerProof');
+ check('fifty same-page owners reuse one document hub without capture or Context creation',transient.hubs===1&&JSON.stringify(transient.before)===JSON.stringify(transient.after));
+ const afterTransient=await hook('state');check('retiring transient owners preserves the other tabs shared audio channel',afterTransient.connections===1&&afterTransient.readers===2);
+
  const tone=hook('tone','session-a','speaker',440);await delay(500);let observed=0;for(let i=0;i<8;i++){observed=Math.max(observed,await amplitude(a,440));await delay(100);}await tone;
  check('remote 440 Hz reaches actual browser playback graph',observed>.08);
  const toneB=hook('tone','session-b','speaker',660);await delay(500);observed=0;for(let i=0;i<8;i++){observed=Math.max(observed,await amplitude(a,660));await delay(100);}await toneB;

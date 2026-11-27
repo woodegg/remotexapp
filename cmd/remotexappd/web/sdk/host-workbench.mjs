@@ -189,8 +189,9 @@ function update(w){
     if(clipboard?.requested[direction] && control !== document.activeElement)control.value=clipboard.requested[direction];
   }
   const clipLimit=clipboard?.maxBytes >= 1024*1024 ? `${clipboard.maxBytes/(1024*1024)} MiB` : `${(clipboard?.maxBytes || 0)/1024} KiB`;
+  const clipPhase = {'copied-to-local':'已验证写入本机', 'write-accepted':'浏览器已接受写入，尚未验证', 'clipboard-uncertain':'写入结果不确定，请选择复制方向'}[clipboard?.phase] || clipboard?.phase;
   w.clipState.textContent=clipboard
-    ? `设置 ${clipboard.requested.toRemote} / ${clipboard.requested.toLocal} · ${clipboard.active ? '活动' : '暂停'} · ${clipboard.phase} · ${clipLimit}`
+    ? `设置 ${clipboard.requested.toRemote} / ${clipboard.requested.toLocal} · ${clipboard.active ? '活动' : '暂停'} · ${clipPhase} · ${clipLimit}`
     : '未连接';
   const describe=incident=>incident?[
     new Date(incident.at).toLocaleTimeString(),incident.code,incident.httpStatus,

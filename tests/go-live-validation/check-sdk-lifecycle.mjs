@@ -93,11 +93,14 @@ if (action === 'inspect') {
     client.clipboard.configure({toRemote:'prompt',toLocal:'prompt'});
     const deadline = Date.now() + 5000;
     let busyRetries = 0;
+    let lastBusy;
     for (;;) {
+      if (lastBusy && Date.now() >= deadline) throw lastBusy;
       // Each disposable-fixture operator attempt confirms fresh server state.
       // Production deliberately rejects a busy destructive operation, rather
       // than queuing a request whose generation/revision may become stale.
       const current = await client.manager.getInstance(client.instanceId);
+      if (lastBusy && Date.now() >= deadline) throw lastBusy;
       if (!current.versions?.eligible) throw new Error(current.versions?.reason || 'upgrade unavailable');
       try {
         const applied = await client.upgradeAndRestart({sessionGeneration:current.sessionGeneration,targetRevision:current.versions.targetRevision,force:true});
@@ -106,6 +109,7 @@ if (action === 'inspect') {
         return {phase:applied.upgrade.phase,generation:applied.sessionGeneration,oldGeneration:current.sessionGeneration,busyRetries};
       } catch (error) {
         if (error.status !== 409 || error.message !== 'a lifecycle operation is already in progress' || Date.now() >= deadline) throw error;
+        lastBusy = error;
         busyRetries++;
         await new Promise(resolve => setTimeout(resolve,100));
       }

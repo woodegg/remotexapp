@@ -40,3 +40,19 @@ test('rich browser capability and text-only fallback never silently drop a rich 
  const old={clipboard:true,clipboardMaxBytes:65536};const sent=[];sendClipboard({sendClipboardText:text=>sent.push(text)},textPayload('legacy'),old);assert.deepEqual(sent,['legacy']);
  assert.throws(()=>validateClipboard('x'.repeat(65537),old),{code:'clipboard-size'});
 });
+
+test('browser-private write receipts never become remote representations or public payload metadata',async t=>{
+ const {io,nav,Item}=browser(t);
+ const {writeAndVerifyClipboard}=await import('./native-clipboard-data.js');
+ nav.clipboard.write=async items=>{io.items=items;};
+ const payload=await writeAndVerifyClipboard(textPayload('verified'),caps);
+ assert.equal(payloadText(payload),'verified');assert.equal(payload.bytes,8);
+ assert.deepEqual(payload.items.map(i=>i.type),['text/plain']);
+ assert.equal(JSON.stringify(payload).includes('receipt'),false);
+ const sent=[];sendClipboard({sendClipboard:items=>sent.push(items)},payload,caps);
+ assert.deepEqual(sent[0].map(i=>i.type),['text/plain']);
+ const values=io.items[0].values;
+ const receipt=Object.keys(values).find(type=>type.startsWith('web '));assert(receipt);
+ io.items=[new Item({...values,[receipt]:new Blob(['x'.repeat(65)])})];
+ await assert.rejects(readClipboard(caps),{code:'clipboard-format'});
+});

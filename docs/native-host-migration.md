@@ -580,3 +580,35 @@ Host while other windows still use it. No Manager options, Pulse packaging,
 UDP/TURN mapping, ingress authentication, worker protocol or Kasm component
 change is required. Serve the new SDK and Worklet from the same Core artifact.
 See [audio retirement](native-audio.md#awaitable-audio-retirement-sdk-036).
+
+
+## Adopt bounded Worker owners and clipboard receipts (SDK 0.37)
+
+The Core 0.17.6 repair candidate pairs SDK 0.37.0 with audio worker protocol v6
+(#110/#111/#112). Earlier unpublished 0.36.0 candidates are not this pair. Serve
+the SDK, Worker and Worklet from the same archive; refresh deployment-owned
+asset pins and retire old SDK owners/tabs during adoption. Do not patch worker
+names, add host retry loops or terminate the shared worker on window close.
+Continue awaiting Host/audio disposal as described above.
+
+The SDK reuses one native Worker bootstrap per document/Manager/generation;
+each Host still owns independent logical audio interests. A small inert
+bootstrap remains for that document's lifetime. All off releases the media WSS
+and capture; another Host/tab's audio is not ended by local owner disposal.
+
+Automatic clipboard copied-to-local now means verified readback, including a
+browser-local receipt for rich normalization where supported. If readback is
+empty, stale, unrelated or unverifiable, phase is clipboard-uncertain, requested
+modes remain intact, and the SDK does not overwrite the clipboard again. Present
+that phase as attention required; let the user choose the source using the
+existing explicit copy/paste controls. Do not reset intent or blindly retry.
+Without custom receipt support, exact readback can still succeed; transformed
+rich content that cannot be tied to its write stays uncertain.
+
+`copyClipboardToLocal()` returns copied-to-local only when read permission was
+already granted and verification succeeds. Otherwise its ordinary browser write
+can return write-accepted: admission without verification, not proven delivery.
+The SDK does not prompt for new read access during that manual action. Render
+write-accepted as unverified rather than success. Real browser/OS focus and
+clipboard synchronizers remain environment prerequisites; SDK state is not a
+substitute for actual paste/readback testing.

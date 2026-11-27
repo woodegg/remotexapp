@@ -218,3 +218,13 @@ next local copy. Browser visibility alone can precede normalization completion.
 Concurrent source changes during that asynchronous interval are a separate
 [clipboard issue #107](https://github.com/woodegg/remotexapp/issues/107), outside
 this audio-resource qualification; do not report them as fixed by this lane.
+
+
+## Bounded native Worker clients (Issue #110)
+
+`browser-worker-hub-retirement.py --browser /path/to/chrome --output /private/output`
+loads the actual Worker hub in an owned minimal loopback fixture. Use `--legacy`
+for the direct-client negative control. Fifty logical retirements preserve a
+live peer; native endpoints are measured before page/browser close. This
+mechanism probe creates no audio and cannot substitute for full SDK/Pulse or
+post-merge candidate tests. See [P20](../performance/native-audio-worker-clients/README.md).

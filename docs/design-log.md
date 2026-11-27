@@ -5710,3 +5710,39 @@ closes ports and Context on failure and rejects incomplete retirement. No
 ordinary background visibility change triggers this terminal path. Preserve
 protocol v5, PCM queues and ingress-owned continuity. Native heap diagnostics
 and no-periodic-GC natural resource measurements remain separate experiments.
+
+
+## 2026-11-27 — Bound native audio Worker clients and verify clipboard receipts
+
+Issues #110/#111 and PR #112 supersede the port-only owner lifetime and the
+unproven rich normalization baseline. SDK 0.37 uses worker protocol v6. Reuse
+one native SharedWorker bootstrap per document, canonical Manager base and
+worker generation; transfer a fresh MessageChannel for each logical audio
+owner. Bootstrap ports have no routes or capture authority. Retiring an owner
+closes its logical peer while other owners keep their shared media connection.
+A document-lifetime inert bootstrap is an explicit bounded cache, not a claim
+that every Worker must vanish after the last Host. Audio processor/Context
+retirement from #104 remains awaited and separate. Named v5 peers cannot join
+the new bootstrap protocol. Native Worker errors invalidate their cached hub
+before dispatching peer errors so reentrant recovery cannot reuse that handle.
+
+A resolved clipboard write is browser admission, not verified delivery. For
+automatic rich writes, atomically include a bounded random browser-local custom
+MIME receipt when the browser supports it. Accept normalized readback only with
+that receipt, nonempty content and preserved representations/plain text; exact
+content equality also proves delivery without custom-format support. A distinct
+local copy that replaces the receipt is not a normalized remote baseline.
+Retain the old baseline, report uncertainty and require an explicit source
+choice rather than replaying the old write. Do not read after consent/focus is
+retired, and never turn on new read permission just to verify a manual write.
+Manual admission without existing read permission returns write-accepted.
+
+Receipt metadata stays in the browser clipboard only, is stripped before X11
+submission, and is excluded from user content size and state/diagnostics. It is
+not an authentication token. SDK versions predating this receipt reader can
+reject that custom representation; retire old SDK owners during adoption.
+The API cannot cancel an OS write already started or guarantee clipboard
+content remains unchanged after the verified observation. A browser API that
+silently fails to update the OS is surfaced honestly; SDK retries cannot repair
+that environment safely. No specific external writer or Wayland root cause is
+inferred from a no-SDK empty/stale readback alone.

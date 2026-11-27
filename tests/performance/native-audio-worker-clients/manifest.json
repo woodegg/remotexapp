@@ -1,0 +1,13 @@
+{
+  "experiment": "P20",
+  "baselineCommit": "a6e9d42b38fdb02c07bb433b17dd86569aa2acf5",
+  "sourceIdentity": "Selected development bytes below; not an exact post-merge release archive qualification.",
+  "sourceSHA256": {
+    "cmd/remotexappd/web/sdk/audio-worker-hub.js": "4e27b8cd4afc6d40dc0bf1cba428f25f72c795c39d54d2ce1098572071ffad06",
+    "cmd/remotexappd/web/sdk/audio-worker.js": "cfdfbb1b992609e6b9bea2dce9f558bd2d56144fc0b92e17f1bd096859be22ce",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "17161f053ff9eebd1b941b775f4d48034b6d257e98d8a663c233f2b3ffb7d218",
+    "tests/native-audio/browser-worker-hub-retirement.py": "6b2c0617441b3ca57b3719a50f89ea8ed527b956459aa6c1cd7b9af679fe47bf",
+    "tests/native-audio/worker-hub-retirement.html": "e3223d4139d5b50b2d0eefd89f1b8ed8dcd57693628444706aea51729ca88cc7"
+  },
+  "resultSHA256": "a068726707126e73bc4b59d060cabab0743131f1415d6c10d3f16681f9c05aaa"
+}

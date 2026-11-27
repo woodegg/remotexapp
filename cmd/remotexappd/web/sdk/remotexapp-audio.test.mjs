@@ -12,7 +12,7 @@ function fixture() {
     }};
     return port;
   }
-  f.env={location:{href:'https://audio.test/',origin:'https://audio.test'},crypto:webcrypto,isSecureContext:true,SharedWorker:class{constructor(_url,{name}){this.port=newPort();f.workerNames.push(name);}},AudioContext:class{},AudioWorkletNode:class{},
+  f.env={location:{href:'https://audio.test/',origin:'https://audio.test'},crypto:webcrypto,isSecureContext:true,SharedWorker:class{constructor(_url,{name}){this.port=newPort();f.workerNames.push(name);}},MessageChannel:class{constructor(){this.port1=newPort();this.port2={close(){}};}},AudioContext:class{},AudioWorkletNode:class{},
     addEventListener(){},removeEventListener(){},setTimeout,clearTimeout,
     setInterval(fn){const id=++next;f.intervals.set(id,fn);return id;},clearInterval(id){f.intervals.delete(id);}};
   f.audio=new RemoteXAppAudio({environment:f.env});
@@ -76,8 +76,7 @@ test('worker termination without a login header restores speaker without reopeni
     f.audio.worker.onerror();
     await f.audio.rebind;
     assert.equal(interest.released,false);
-    assert.equal(f.workerNames.length,2);
-    assert.equal(f.workerNames[0],f.workerNames[1]);
+    assert.equal(f.workerNames.length,1); // Rebind a logical port, reuse the document hub.
     assert.deepEqual(f.messages.filter(m=>m.op==='restore-speaker').map(m=>m.ref),[interest.ref]);
     assert.equal(f.messages.filter(m=>m.op==='microphone').length,0);
     assert.equal(f.audio.stats.lastDisconnect.code,'audio-worker-ended');

@@ -1,3 +1,5 @@
+import {connectAudioWorker} from './audio-worker-hub.js';
+
 const boundPort = Symbol();
 const resumeSpeaker = Symbol();
 const pendingSpeakerOff = Symbol();
@@ -11,9 +13,9 @@ export class RemoteXAppAudio extends EventTarget {
     for (const key of ['echoCancellation','noiseSuppression','autoGainControl']) { if (typeof microphoneProcessing[key] !== 'boolean') throw TypeError('Microphone processing flags must be booleans'); this.microphoneProcessing[key] = microphoneProcessing[key]; }
     const base = new URL(baseURL || './',environment.location.href); base.search = ''; base.hash = ''; base.pathname = base.pathname.replace(/\/$/,'');
     if (base.origin !== environment.location.origin) throw Error('Audio requires a same-origin Manager');
-    if (!environment.isSecureContext || !environment.SharedWorker || !environment.AudioContext || !environment.AudioWorkletNode) throw Error('Secure context, SharedWorker and AudioWorklet are required');
+    if (!environment.isSecureContext || !environment.SharedWorker || !environment.MessageChannel || !environment.AudioContext || !environment.AudioWorkletNode) throw Error('Secure context, SharedWorker, MessageChannel and AudioWorklet are required');
     this.base = base.href.replace(/\/$/,''); this.requests = new Map(); this.interests = new Map(); this.next = 0; this.captureEpoch = 0; this.activating = 0; this.closed = false;
-    this.workerKey = "remotexapp-audio-v5:"+this.base;
+    this.workerKey = "remotexapp-audio-v6:"+this.base;
     this.stats = {connection:'idle',speakerOwner:false,micOwner:false,routes:[]};
     this.retirements = new Set(); this.retirementErrors = [];
     this._openWorker();
@@ -43,7 +45,7 @@ export class RemoteXAppAudio extends EventTarget {
     } catch { return 0; }
   }
   _openWorker(generation = this._workerGeneration()) {
-    const worker = this.worker = new this.env.SharedWorker(this.base+'/sdk/audio-worker.js',{type:'module',name:this.workerKey+':'+generation});
+    const worker = this.worker = connectAudioWorker(this.env, this.base+'/sdk/audio-worker.js', this.workerKey+':'+generation);
     const port = this.port = worker.port;
     port.onmessage = event => { if (this.port === port) this._message(event.data); };
     port.start();
@@ -354,7 +356,7 @@ export class RemoteXAppAudio extends EventTarget {
   _closeWorker(reason) {
     this._post({op:'dispose'});
     if (this.port) { this.port.onmessage = null; this.port.close(); }
-    if (this.worker) this.worker.onerror = null;
+    if (this.worker) this.worker.release();
     this.worker = this.port = null;
     for (const pending of this.requests.values()) { this.env.clearTimeout(pending.timeout); pending.reject(Error(reason)); }
     this.requests.clear();

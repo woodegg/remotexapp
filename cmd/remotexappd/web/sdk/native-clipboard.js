@@ -1,4 +1,4 @@
-import {clipboardFormats, richBrowserClipboard, validateClipboard, readClipboard, writeClipboard, sendClipboard, sameLocalClipboard} from './native-clipboard-data.js';
+import {clipboardFormats, richBrowserClipboard, validateClipboard, readClipboard, writeAndVerifyClipboard, sendClipboard, sameLocalClipboard} from './native-clipboard-data.js';
 import {sameClipboard} from '../../../../third_party/kasm/clipboard-payload.mjs';
 // Native clipboard policy. Payloads are bounded, ephemeral and never emitted.
 const modes = new Set(['off', 'manual', 'auto']);
@@ -223,13 +223,13 @@ export class NativeClipboard {
         if (remote !== undefined && !sameLocalClipboard(remote, text) && this.effective('toLocal') === 'auto') {
           this.check(revision);
           startedWrite = true;
-          await writeClipboard(remote, this.client.capabilities);
+          const written = await writeAndVerifyClipboard(remote, this.client.capabilities, {check:()=>this.check(revision)});
           if (revision !== this.revision || !this.eligible()) {
             this.emit('clipboard-uncertain'); return;
           }
           // Rich browser writes can sanitize HTML or re-encode PNG. Establish
           // the actual local value once, preventing a normalization echo.
-          this.baseline = this.client.capabilities.clipboardRich ? await readClipboard(this.client.capabilities, {allowLocalOnly:true}) : remote;
+          this.baseline = written;
           this.check(revision);
           this.emit('copied-to-local');
         } else {
@@ -245,7 +245,7 @@ export class NativeClipboard {
     } catch (error) {
       if (revision === this.revision) {
         if (!paste || error.code !== 'clipboard-size') this.conflict = true;
-        if (error.name === 'NotAllowedError') this.permissions[startedWrite ? 'write' : 'read'] = 'denied';
+        if (error.name === 'NotAllowedError') this.permissions[error.clipboardStage || (startedWrite ? 'write' : 'read')] = 'denied';
         this.emit(startedWrite ? 'clipboard-uncertain' : (typeof error.code === 'string' ? error.code : error.name === 'NotAllowedError' ? 'clipboard-denied' : 'clipboard-unavailable'));
       } else if (startedWrite) this.emit('clipboard-uncertain');
       if (paste) throw error;
@@ -267,6 +267,10 @@ export class NativeClipboard {
       return !result.empty;
     });
   }
-  manualCompleted() { this.retire(); this.emit('baseline'); this.schedule(0); }
+  manualCompleted(phase = 'baseline', baseline) {
+    this.retire(); this.baseline = baseline;
+    if (phase === 'clipboard-uncertain') this.conflict = true;
+    this.emit(phase); this.schedule(0);
+  }
   dispose() { this.reset(); for (const remove of this.listeners) remove(); this.listeners = []; }
 }

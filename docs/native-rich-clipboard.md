@@ -146,3 +146,28 @@ negative cases for file-only, unsent oversize uploads, simultaneous clipboard
 changes and stale Viewer ownership. Use the host workbench to verify display
 and audio interruption, Manager restart, foreground/background transitions,
 multiple tabs and explicit cancellation.
+
+
+## Verified browser delivery (SDK 0.37)
+
+#111/#107 replace the assumption that any rich post-write read is our normalized
+value. Automatic writes use a bounded random browser-local custom-format
+receipt where supported; only matching receipt and preserved nonempty content,
+or exact content equality, proves the observed write. A new local copy is never
+silently absorbed as that remote baseline. Empty/stale/unverifiable readback
+reports clipboard-uncertain without replay or clearing requested modes. An
+explicit source choice can continue. Permission/focus retirement fences the
+verification read. Receipt bytes never travel to X11 or public state; the
+10 MiB content and 32 MiB comparison budgets remain unchanged.
+
+Without previously granted read permission, manual copying can return
+write-accepted rather than verified copied-to-local. No new read prompt is
+started for verification. Browser admission cannot guarantee an OS clipboard
+update, cancel an already-started write or protect against a later external
+writer. Validate actual data, not just successful promises. See the
+[SDK 0.37 adoption contract](native-host-migration.md#adopt-bounded-worker-owners-and-clipboard-receipts-sdk-037).
+
+Custom formats follow the [Clipboard API representation model](https://www.w3.org/TR/clipboard-apis/)
+and [Chromium's custom-format API](https://developer.chrome.com/blog/web-custom-formats-for-the-async-clipboard-api).
+No claim is made that another browser supports custom receipts; feature-detect
+it and retain exact verification or explicit uncertainty.

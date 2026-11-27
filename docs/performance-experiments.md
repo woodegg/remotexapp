@@ -63,6 +63,7 @@ The current production-candidate URLs remain:
 | P17 | Per-speaker credits avoid competition between bounded audio queues | Aggregate playback credit allocation only | **Accepted:** deterministic two-speaker burst delivers ten of ten frames instead of eight; eight-slot aggregate remains capped at 64; WAN and physical quality are separate |
 | P18 | Retiring native channels and global listeners releases detached Viewer DOM | Native client retirement | **Accepted:** baseline +300 nodes/+240 listeners becomes zero growth over forty cycles; short diagnostic observation only |
 | P19 | Terminal Worklet rendering and awaited owner cleanup retire native audio objects | Audio processor/Context lifetime only | **Accepted:** exact Edge 157 control 6/6/6 becomes 0/0/0; suspended cleanup requires a muted drain; three-hour implementation, fifty-cycle and live-idle retirement pass; exact candidate/UAT remain separate |
+| P20 | Native audio Worker clients | **Accepted:** controlled native client indirection stays at one document bootstrap over fifty retirements; full SDK and release qualification separate | [Experiment](../tests/performance/native-audio-worker-clients/README.md) |
 
 P01 through P19 have recorded experiment outcomes. Start the next experiment only after defining a
 new isolated primary variable.
@@ -1127,3 +1128,11 @@ continuous duration. PSS/RSS fluctuations and observed swap are not a matched
 whole-browser memory-saving claim. Concurrent clipboard normalization (#107),
 physical devices, actual OS sleep, UDP/TURN and exact-artifact/human UAT remain
 separate from this audio-resource experiment.
+
+## P20: bounded native audio Worker clients
+
+The [controlled experiment](../tests/performance/native-audio-worker-clients/README.md)
+compares fifty direct native clients with disposable logical MessageChannels
+on one document bootstrap. Another peer remains usable. Chrome 149 and a
+supplied Chrome 158 control keep native client counts bounded; full served
+SDK/Pulse, immutable candidate and human UAT remain separate.

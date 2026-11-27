@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.36.0';
+export const SDK_VERSION: '0.37.0';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -188,7 +188,7 @@ export class RemoteXAppNativeClient extends EventTarget {
   requestClipboardPermission():Promise<NativeClipboardState>;
   resetClipboard():void;
   copyClipboardToRemote():Promise<{status:'submitted'|'empty-noop'}>;
-  copyClipboardToLocal():Promise<{status:'copied-to-local'}>;
+  copyClipboardToLocal():Promise<{status:'copied-to-local'|'write-accepted'}>;
   clearRemoteClipboard():Promise<{status:'submitted'}>;
   connect(instance?:string|RemoteXAppInstance):Promise<RemoteXAppInstance>;
   reconnect():Promise<RemoteXAppInstance>;

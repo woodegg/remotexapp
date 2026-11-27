@@ -197,3 +197,17 @@ HTTPS permission context is a prerequisite failure, not proof of a product bug.
 
 [P19 controlled results](../performance/native-audio-retirement/README.md) bind
 the native retirement observations and expanded reproducible harness.
+
+Capture/route readiness can precede the first browser PCM callback. A real quiet
+microphone may legitimately produce zeros. Synthetic qualification therefore
+observes fresh frame submission and two consecutive nonzero remote readback
+windows within a bounded observation period; it never re-enables capture or
+replaces a connection while observing. The fixture records every window and
+fails with before/after state if fresh signal does not arrive. A single immediate
+half-second zero window is not proof of a broken connection.
+
+For a cheap owned preflight, `--fault-plan PATH` supplies sorted JSON
+`[elapsedSeconds, faultName]` pairs using the documented built-in fault names.
+Choose a timed lane long enough for the faults' hold and recovery intervals;
+unexecuted requested faults fail the preflight. The default three-hour lane
+retains its full natural duration and separate post-soak GC/lifecycle phase.

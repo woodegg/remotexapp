@@ -35,7 +35,10 @@ def main():
     parser.add_argument('--expect', choices=['released', 'retained'], default='released')
     parser.add_argument('--instance')
     parser.add_argument('--keep-app', action='store_true')
+    parser.add_argument('--fault-plan', type=Path, help='Owned preflight JSON of [elapsed seconds, fault name] pairs')
     args = parser.parse_args()
+    if args.fault_plan and args.natural_seconds <= 0:
+        parser.error('--fault-plan requires a timed preflight lane')
     config = json.loads(args.fixture.read_text())
     assert config['projectOwnedDisposable'] is True
     assert re.fullmatch(r'local:remotexapp-host-[a-z0-9-]+', config['container'])
@@ -44,6 +47,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True, mode=0o700)
     root = args.fixture.resolve().parent
     report = {'status': 'preparing', 'browserSHA256': hashlib.sha256(args.browser.read_bytes()).hexdigest(),
+        'microphoneInputSHA256': hashlib.sha256((root / 'mic-880.wav').read_bytes()).hexdigest(),
         'expected': args.expect, 'cycles': [], 'checks': [], 'samples': [], 'faults': [], 'noNetworkDomain': True}
     browser = page = background = None
     runtime = args.instance
@@ -99,8 +103,31 @@ finally:p.terminate();p.wait(timeout=2)
             'PULSE_CLIENTCONFIG=' + path + '/config/client.conf', 'python3', '-c', code)
         assert len(data) >= 12000
         peak = max(abs(value) for value, in struct.iter_unpack('<h', data))
-        assert peak > 250, peak
         return peak
+
+    def microphone_ready(label):
+        # Route/capture readiness does not promise a first non-silent sample.
+        # Observe actual fresh data without re-enabling, reconnecting or capture.
+        deadline = time.monotonic() + 8
+        windows = []
+        consecutive = 0
+        before = snap()
+        while time.monotonic() < deadline:
+            peak = microphone()
+            current = snap()
+            row = {'label':label, 'at':time.time(), 'peak':peak, 'captureRequests':current['requests'],
+                'trackStops':current['stopped'], 'micFrames':current['micFrames'],
+                'lastMicFrameAt':current['lastMicFrameAt'], 'audioConnection':current['audio']['connectionId']}
+            windows.append(row)
+            log('microphone-windows.jsonl', row)
+            assert current['requests'] == before['requests'], 'Observation must not reopen capture'
+            assert current['audio']['connectionId'] == before['audio']['connectionId'], 'Observation must not replace transport'
+            consecutive = consecutive + 1 if peak > 250 else 0
+            if consecutive == 2 and current['micFrames'] > before['micFrames']:
+                return min(window['peak'] for window in windows[-2:])
+        report['microphoneFailure'] = {'label':label,'before':before,'after':snap(),'windows':windows}
+        save()
+        raise AssertionError('Fresh synthetic microphone data missing after bounded observation')
 
     def clipboard(label):
         value = 'Audio retirement 中文🙂 ' + label
@@ -145,7 +172,7 @@ subprocess.run(['xclip','-selection','clipboard','-in','-target','UTF8_STRING','
 
     def functional(label, clip=True):
         wait_audio()
-        peak = microphone()
+        peak = microphone_ready(label)
         page.evaluate('()=>{lab.peak=0}')
         fault('tone')
         page.wait('()=>lab.peak>.02', timeout=8)
@@ -236,6 +263,13 @@ print(json.dumps({'processes':rows,'memoryEvents':events.read_text() if events.e
             faults = [(180, 'cut-viewer'), (360, 'cut-audio'), (540, 'lease-once'), (900, 'audio-block'),
                 (1800, 'network-long'), (2700, 'freeze'), (3600, 'manager-restart'), (5400, 'capture-only'),
                 (7200, 'suspended-retire')]
+            if args.fault_plan:
+                faults = json.loads(args.fault_plan.read_text())
+                allowed = {'cut-viewer','cut-audio','lease-once','audio-block','network-long','freeze',
+                    'manager-restart','capture-only','suspended-retire'}
+                assert all(isinstance(t, int) and t >= 0 and name in allowed for t, name in faults)
+                assert faults == sorted(faults, key=lambda item:item[0])
+                report['faultPlanSHA256'] = hashlib.sha256(args.fault_plan.read_bytes()).hexdigest()
             next_function = 120
             next_visibility = 60
             next_server = 60
@@ -304,6 +338,9 @@ print(json.dumps({'processes':rows,'memoryEvents':events.read_text() if events.e
                 save()
                 time.sleep(min(10, max(0, args.natural_seconds - (time.monotonic() - start))))
             report['natural']['elapsedSeconds'] = time.monotonic() - start
+            if args.fault_plan and faults:
+                report['unexecutedFaults'] = faults
+                raise AssertionError('Timed preflight ended before all requested faults ran')
             report['natural']['completedNaturally'] = True
             functional('natural-end')
             report['serverAfter'] = server_sample()
@@ -339,7 +376,7 @@ print(json.dumps({'processes':rows,'memoryEvents':events.read_text() if events.e
                     assert page.evaluate('()=>lab.owner.host._audio.context.state') == 'suspended'
                     click('mic')
                     page.wait('()=>lab.snapshot().audio.routes[0].actualMic')
-                    peak = microphone()
+                    peak = microphone_ready('mic-only-resume-' + str(iteration))
                     page.wait('()=>lab.owner.host._audio.retirements.size===0')
                     counts = module.snapshot(page.session, args.output / ('mic-only-resume-' + str(iteration) + '.heapsnapshot'))
                     assert counts == {'AudioContext': 1, 'AudioWorkletNode': 2, 'blink::AudioWorkletMessagingProxy': 1}, counts
@@ -389,8 +426,11 @@ print(json.dumps({'processes':rows,'memoryEvents':events.read_text() if events.e
     finally:
         cleanup_errors = []
         if page:
-            with contextlib.suppress(Exception):
-                page.evaluate('async()=>{if(lab.owner)await lab.owner.host.dispose();await lab.releaseKeeper();lab.owner=null;}')
+            report['browserErrors'] = list(page.errors)
+            try:
+                page.evaluate('async()=>{if(typeof lab!=="object")return;try{if(lab.owner)await lab.owner.host.dispose();}finally{if(lab.releaseKeeper)await lab.releaseKeeper();lab.owner=null;}}')
+            except Exception as error:
+                cleanup_errors.append('SDK retirement: ' + type(error).__name__)
             with contextlib.suppress(Exception):
                 page.close()
         if background:

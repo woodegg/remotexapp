@@ -11,13 +11,13 @@
   },
   "harnessSHA256": {
     "tests/native-audio/browser-retirement.py": "6b1845cdbf78aee9454129c6bf0123bc8ff64d7e3115c155173b6fa813407db0",
-    "tests/native-audio/browser-host-retirement.py": "434c929bb3525c3f77df7b78d934556692c2fb7365004946e35e19f3a29cbbc0",
+    "tests/native-audio/browser-host-retirement.py": "54a5bf2a002c5eafc70c8f954c4a24bff3e739cfd303bb30beba90fd778e92d9",
     "tests/native-audio/retirement_cdp.py": "d9742adcf74ff69090e6d42d1bbd88ab14c1287bd94f6e8dd323f25b7f7c6290",
     "tests/native-audio/retirement-minimal.html": "234df5a9cf600f5a7bef7a256d32735af4e8cf593aa13ec4a1f431b334b92156",
     "tests/native-audio/retirement-host.html": "86900336a05a331f00fa1577f5eb5e53ded26f6528ac0c51c632a5eb5d1f14c7",
-    "tests/native-audio/retirement-host.mjs": "7adb5970b0d5c2dbd286d08319f4cea09186bb8623e84e7a01c11a6ec9a6d105"
+    "tests/native-audio/retirement-host.mjs": "17c1fa3a44b15d4a726e8c267133483c1b55c1d04232a2d5a87c0d8d5081eed8"
   },
-  "resultSHA256": "991bfe294847073229575d6ab5dcf79bf6a54295361952399b1f2670663b6b4e",
+  "resultSHA256": "b58fb730635915daafa7080519f68ae4e5d648a6cb38cf975e4f8284bc08c336",
   "unchanged": [
     "worker protocol v5 and PCM wire format",
     "microphone permissions and capture epoch fencing",

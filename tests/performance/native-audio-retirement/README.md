@@ -48,3 +48,24 @@ A planned Manager restart must be separated from same-process server growth.
 No whole-browser leak-freedom or matched long-duration memory saving is claimed.
 Physical devices, actual OS sleep, UDP/TURN and downstream adoption remain outside
 this controlled audio-resource experiment.
+
+The first extended attempt ended around 45 minutes on an immediate zero mic
+readback after a freeze event; it is incomplete, not a three-hour pass. A
+same-environment control observes two initial zero windows with no browser PCM
+submission, then sustained synthetic signal without reconnect or another device
+request. This proves that one immediate window is an insufficient test, but does
+not establish what would have happened after the aborted original window. The
+expanded observer requires fresh submission and two consecutive remote-signal
+windows within a bounded period, retaining every window and failing persistent
+silence. A new continuous natural lane is required after the earlier browser
+was normally closed. Production SDK/Worklet bytes are unchanged by this
+observer correction; the earlier native diagnostics are not replayed as new data.
+
+A silent-input negative control produces eleven zero remote windows and fails
+the bounded synthetic-signal criterion while keeping one capture and the same
+connection; cleanup succeeds. This demonstrates that bounded observation does
+not silently accept a missing test signal or repair it by reopening devices.
+Corrected short preflights cover the nine built-in fault types across two owned
+runs and finish at zero native audio objects. The first preflight's short clock
+did not execute its last two scheduled faults; those are covered by the second
+run rather than counted as executed in the first.

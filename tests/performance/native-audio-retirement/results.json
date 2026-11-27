@@ -108,10 +108,75 @@
     }
   ],
   "extended": {
-    "status": "running",
+    "status": "pending-fresh-continuous-lane",
     "naturalSeconds": 10800,
     "retirementCycles": 50,
-    "liveIdleSeconds": 80
+    "liveIdleSeconds": 80,
+    "firstAttempt": {
+      "naturalCompleted": false,
+      "lastRecordedElapsedSeconds": 2690.6279333700077,
+      "rawReportSHA256": "2cddaf550100ff3dfb595336cf64a5282539cafeaf0da5c35e0d05c0b2e2ae10",
+      "reason": "Immediate single zero readback after freeze; later windows not observed before normal owned cleanup."
+    },
+    "observationControl": {
+      "sameEnvironmentFirstPulseWindows": [
+        0,
+        0,
+        6500,
+        6500,
+        6500
+      ],
+      "sameEnvironmentBrowserFrames": [
+        0,
+        0,
+        23,
+        59,
+        94
+      ],
+      "rawReportSHA256": "5d4a719ec6b4ce03137f431a445d4d749a56772253cde587d079bd706ada2b37",
+      "interpretation": "Readiness can precede first PCM. This control proves the single-window criterion insufficient; it cannot retroactively establish recovery of the aborted original capture."
+    },
+    "negativeObserverControl": {
+      "outcome": "expected failure",
+      "windows": 11,
+      "allWindowsZero": true,
+      "captureRequestsStayedAt": 1,
+      "connectionUnchanged": true,
+      "ownedCleanupPassed": true,
+      "rawReportSHA256": "fe3c13ce5c59181741f43ec4d7505c5d7de57490b8318c60a2af6afc7bbec690"
+    },
+    "correctedObserverPreflights": [
+      {
+        "executedFaults": [
+          "cut-viewer",
+          "cut-audio",
+          "lease-once",
+          "audio-block",
+          "network-long",
+          "freeze",
+          "manager-restart"
+        ],
+        "nativeEndpoint": {
+          "AudioContext": 0,
+          "AudioWorkletNode": 0,
+          "blink::AudioWorkletMessagingProxy": 0
+        },
+        "rawReportSHA256": "3fc4a6fc60c32cc3eb8038224407f8dea30aea40edbe3165cbc4ab6dba68df6a"
+      },
+      {
+        "executedFaults": [
+          "manager-restart",
+          "capture-only",
+          "suspended-retire"
+        ],
+        "nativeEndpoint": {
+          "AudioContext": 0,
+          "AudioWorkletNode": 0,
+          "blink::AudioWorkletMessagingProxy": 0
+        },
+        "rawReportSHA256": "e634cf4580a3318ed96fa955fe2b25a1c23dcd6cd5feedd7297b682b6d3256bf"
+      }
+    ]
   },
   "limits": [
     "No matched three-hour patched/unpatched memory-saving benchmark",

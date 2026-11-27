@@ -2,7 +2,13 @@ import {RemoteXAppHost} from '/sdk/index.js';
 
 // Counters only: no retained Stream/Context/Node/Host references across cycles.
 const lab=window.lab={owner:null,reply:null,done:0,error:null,peak:0,requests:0,
-  stopped:0,closedContexts:0,closedState:null,immediateStopped:0,acks:0};
+  stopped:0,closedContexts:0,closedState:null,immediateStopped:0,acks:0,micFrames:0,lastMicFrameAt:null};
+const post=MessagePort.prototype.postMessage;
+MessagePort.prototype.postMessage=function(message,...rest){
+  const result=post.call(this,message,...rest);
+  if(message?.op==='microphone-frame'){lab.micFrames++;lab.lastMicFrameAt=Date.now();}
+  return result;
+};
 const Worklet=AudioWorkletNode;
 window.AudioWorkletNode=class extends Worklet {
   constructor(...args){super(...args);this.port.addEventListener('message',({data})=>{if(data.type==='disposed')lab.acks++;});this.port.start();}
@@ -62,5 +68,6 @@ lab.snapshot=()=>{
   const owner=lab.owner,audio=owner?.host.getAudioState(),viewer=owner?.view.viewer;
   return {done:lab.done,error:lab.error,requests:lab.requests,stopped:lab.stopped,
     immediateStopped:lab.immediateStopped,closedContexts:lab.closedContexts,closedState:lab.closedState,acks:lab.acks,
+    micFrames:lab.micFrames,lastMicFrameAt:lab.lastMicFrameAt,
     peak:lab.peak,audio,display:viewer?.getStats(),clipboard:viewer?.getClipboardState()};
 };

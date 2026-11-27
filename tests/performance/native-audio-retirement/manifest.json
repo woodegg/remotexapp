@@ -17,7 +17,7 @@
     "tests/native-audio/retirement-host.html": "86900336a05a331f00fa1577f5eb5e53ded26f6528ac0c51c632a5eb5d1f14c7",
     "tests/native-audio/retirement-host.mjs": "17c1fa3a44b15d4a726e8c267133483c1b55c1d04232a2d5a87c0d8d5081eed8"
   },
-  "resultSHA256": "d80c8cdf99b25c2fdbf6bd332ee29238290420b87a35bd8a79771541b718bac6",
+  "resultSHA256": "d9631aa0dad1b6e4041f0735d073b7ae6f9ffcbbccae1c9fbcac10fc50c01cc4",
   "unchanged": [
     "worker protocol v5 and PCM wire format",
     "microphone permissions and capture epoch fencing",

@@ -21,7 +21,7 @@ Counts below mean native Context / WorkletNode / MessagingProxy instances.
 | Original Worklet bytes again | 6 / 6 / 6 | Reversible control |
 | Nonzero capture processing, Edge 157 and Chrome 158 | 0 / 0 / 0 each | Capture termination exercised |
 | SDK 0.35 source-module control | 6 / 14 / 6 | Actual capture/playback lifecycle; distinct from formal bundled bytes |
-| Candidate public bundled SDK, Edge 157 and Chrome 158 | 0 / 0 / 0 each | Real Viewer, clipboard and Pulse data before retirement |
+| Candidate public bundled SDK, Edge 157 / Edge 158 / Chrome 158 | 0 / 0 / 0 each | Real Viewer, clipboard and Pulse data before retirement |
 
 The source-module control has six ordinary captures and two extra capture-only
 resumes. Its 14 nodes must not be substituted for the original issue's 13-node
@@ -81,3 +81,10 @@ overlap is a negative control. The audio natural lane now waits for the public
 sequential clipboard data flow and does not claim the overlapping-source race
 is fixed. Both incomplete attempts and their owned cleanup remain separate from
 the fresh continuous qualification. No production clipboard bytes change.
+
+The sequential observer preflight executes eight faults before its short
+210-second window expires. Its guard correctly fails the unexecuted ninth
+entry; it is not presented as a nine-fault pass. A separate suspended-retirement
+preflight supplies that final fault and the expanded native zero endpoint.
+The new continuous lane uses the unchanged production bytes and the separately
+frozen sequential observer.

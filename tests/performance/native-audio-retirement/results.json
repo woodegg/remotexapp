@@ -105,6 +105,17 @@
       },
       "browser": "Chrome/158.0.8127.36",
       "rawReportSHA256": "c4a09d9933aa60509b85825b342a80612cf1ea75f0b614acaa6d3f89c6c621d4"
+    },
+    {
+      "case": "public-sdk-edge158",
+      "counts": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "browser": "Edg/158.0.4370.33",
+      "browserSHA256": "1a2468a96401f53482e9b2c0977c6824552fe2cb26bf4a1855e28d7ec87ac2b5",
+      "rawReportSHA256": "f682042fe7d05481bf7cacc49ede4e444a1d3822d5836ab3e654a4d43b35ef14"
     }
   ],
   "extended": {
@@ -193,7 +204,40 @@
       "followUpIssue": 107,
       "rawReportSHA256": "df361548a5bf19faf66629b5baf87c04f0854701d6b83064fcdd7fdaf0664aaa",
       "interpretation": "A gated remote write followed by concurrent local copy is absorbed into normalization baseline. This proves a separate timing race, not the exact cause of the incomplete second attempt. The natural audio lane qualifies sequential clipboard only."
-    }
+    },
+    "sequentialObserverPreflights": [
+      {
+        "status": "incomplete schedule, not product failure",
+        "executedFaults": [
+          "cut-viewer",
+          "cut-audio",
+          "lease-once",
+          "audio-block",
+          "network-long",
+          "freeze",
+          "manager-restart",
+          "capture-only"
+        ],
+        "unexecutedFaults": [
+          "suspended-retire"
+        ],
+        "ownedCleanupPassed": true,
+        "rawReportSHA256": "09bde2c06155fcc4e108bb4b412b7a99ef1b6bc764e982ee377140ef9be81639"
+      },
+      {
+        "status": "passed",
+        "executedFaults": [
+          "suspended-retire"
+        ],
+        "nativeEndpoint": {
+          "AudioContext": 0,
+          "AudioWorkletNode": 0,
+          "blink::AudioWorkletMessagingProxy": 0
+        },
+        "ownedCleanupPassed": true,
+        "rawReportSHA256": "b88fa2202c8a48296cb4c9bc40cd15b9dc187bcb033eab438cd5d0467f1561aa"
+      }
+    ]
   },
   "limits": [
     "No matched three-hour patched/unpatched memory-saving benchmark",

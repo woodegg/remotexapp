@@ -104,3 +104,117 @@ test('worker replacement follows the latest shared microphone request',async()=>
     assert.equal(f.messages.filter(m=>m.op==='microphone').length,1);
   }finally{f.audio.dispose();}
 });
+
+function graphFixture() {
+  const f=fixture();f.nodes=[];f.resumes=0;f.events=[];
+  const context=new EventTarget();
+  Object.assign(context,{state:'running',resume:async()=>{f.resumes++;context.state='running';context.dispatchEvent(new Event('statechange'));},
+    close:async()=>{f.events.push('close');f.contextClosed++;context.state='closed';}});
+  f.audio.context=context;
+  f.audio.output={gain:{value:1},disconnect(){f.events.push('output-disconnect');}};
+  f.node=()=>{
+    const node={disconnected:false,closed:false,messages:[],disconnect(){this.disconnected=true;},port:{
+      close(){node.closed=true;},postMessage(message){node.messages.push(message);}
+    }};
+    node.ack=()=>node.port.onmessage?.({data:{type:'disposed'}});f.nodes.push(node);return node;
+  };
+  f.attach=()=>{
+    f.track={stop(){f.stops++;f.events.push('track-stop');}};
+    f.audio.stream={getTracks:()=>[f.track]};f.audio.capture=f.node();
+    f.audio.captureSource={disconnect(){f.events.push('source-disconnect');}};
+  };
+  return f;
+}
+
+test('audio disposal synchronously fences capture then joins terminal ACKs and context close',async()=>{
+  const f=graphFixture();await f.audio.ready;f.attach();f.audio.playback=f.node();
+  const oldEpoch=f.audio.captureEpoch;
+  const pending=f.audio.dispose();
+  assert.equal(f.audio.dispose(),pending);assert.equal(f.stops,1);
+  assert.ok(f.audio.captureEpoch>oldEpoch);assert.equal(f.audio.output,null);
+  assert.equal(f.contextClosed,0);assert.equal(f.nodes.every(n=>!n.disconnected),true);
+  assert.ok(f.nodes.every(n=>n.messages[0].op==='dispose'));
+  f.nodes[0].ack();assert.equal(f.contextClosed,0);
+  f.nodes[1].ack();await pending;
+  assert.equal(f.contextClosed,1);assert.equal(f.audio.retirements.size,0);
+  assert.ok(f.nodes.every(n=>n.closed&&n.disconnected&&n.port.onmessage===null));
+  assert.equal(f.events[0],'track-stop');assert.deepEqual(f.audio.retirementErrors,[]);
+  await assert.rejects(f.audio._context(),/disposed/);
+});
+
+test('suspended capture retirement waits for the next authorized resume without resuming playback',async()=>{
+  const f=graphFixture();await f.audio.ready;f.attach();const context=f.audio.context;context.state='suspended';
+  f.audio._stopCapture();assert.equal(f.stops,1);assert.equal(f.resumes,0);
+  assert.equal(f.audio.retirements.size,1);assert.equal(f.nodes[0].disconnected,false);
+  await context.resume();f.nodes[0].ack();await Promise.resolve();
+  assert.equal(f.audio.retirements.size,0);assert.equal(context.state,'running');
+  await f.audio.dispose();
+});
+
+test('final suspended disposal drains only a muted graph after synchronously stopping capture',async()=>{
+  const f=graphFixture();await f.audio.ready;f.attach();f.audio.playback=f.node();
+  f.audio.context.state='suspended';const output=f.audio.output;
+  f.audio.context.resume=async()=>{
+    assert.equal(f.stops,1);assert.equal(output.gain.value,0);f.resumes++;
+  };
+  const done=f.audio.dispose();assert.equal(f.resumes,1);
+  f.nodes.forEach(n=>n.ack());await done;assert.equal(f.contextClosed,1);
+});
+
+test('missing terminal ACK is bounded, closes the context and reports incomplete retirement',async()=>{
+  const f=graphFixture();await f.audio.ready;f.audio.playback=f.node();
+  const timers=[];f.audio.env.setTimeout=fn=>{timers.push(fn);return timers.length;};f.audio.env.clearTimeout=()=>{};
+  const done=f.audio.dispose();timers.forEach(fn=>fn());
+  await assert.rejects(done,/retirement incomplete/);
+  assert.equal(f.contextClosed,1);assert.equal(f.nodes[0].closed,true);
+  assert.equal(f.audio.dispose(),done);
+});
+
+test('late microphone permission after disposal stops the track without creating a processor',async()=>{
+  const f=graphFixture();await f.audio.ready;let granted;
+  f.audio._context=async()=>f.audio.context;
+  f.audio.env.navigator={mediaDevices:{getUserMedia:()=>new Promise(r=>{granted=r;})}};
+  f.audio.captureAllowed=true;const capture=f.audio._startCapture('old');
+  await f.audio.dispose();granted({getTracks:()=>[{stop(){f.stops++;}}]});await capture;
+  assert.equal(f.stops,1);assert.equal(f.nodes.length,0);assert.equal(f.audio.stream,null);
+});
+
+test('direct audio logout fences all handles immediately and awaits native retirement',async()=>{
+  const f=graphFixture();await f.audio.ready;
+  const interest=await f.audio.acquire({id:'app',sessionGeneration:1});f.attach();
+  const done=f.audio.logout();assert.equal(f.stops,1);assert.equal(interest.released,true);
+  assert.equal(f.audio.logout(),done);
+  await assert.rejects(interest.setMicrophone(true),/released/);
+  await assert.rejects(f.audio.acquire({id:'app',sessionGeneration:1}),/logging out/);
+  f.nodes[0].ack();await done;assert.equal(f.contextClosed,1);
+});
+
+test('capture retirement pauses its ACK deadline while suspended, final disposal bounds a blocked resume',async()=>{
+  const f=graphFixture();await f.audio.ready;f.attach();const context=f.audio.context;
+  const timers=new Map();let next=0;
+  f.audio.env.setTimeout=fn=>{timers.set(++next,fn);return next;};
+  f.audio.env.clearTimeout=id=>timers.delete(id);
+  f.audio._stopCapture();assert.equal(timers.size,1);
+  context.state='suspended';context.dispatchEvent(new Event('statechange'));
+  assert.equal(timers.size,0);assert.equal(f.resumes,0);
+  context.resume=()=>new Promise(()=>{});
+  const done=f.audio.dispose();assert.equal(timers.size,1);
+  for(const fn of timers.values())fn();
+  await assert.rejects(done,/retirement incomplete/);
+  assert.equal(f.contextClosed,1);assert.equal(f.audio.retirements.size,0);
+});
+
+test('disposal during Worklet loading fences late speaker activation without constructing a node',async()=>{
+  const f=fixture();await f.audio.ready;let loaded,constructed=0;
+  f.audio.env.AudioContext=class {
+    constructor(){this.sampleRate=48000;this.state='running';this.audioWorklet={addModule:()=>new Promise(resolve=>{loaded=resolve;})};}
+    createGain(){return {gain:{value:1},connect(){},disconnect(){}};}
+    async resume(){}
+    async close(){f.contextClosed++;this.state='closed';}
+  };
+  f.audio.env.AudioWorkletNode=class {constructor(){constructed++;}};
+  const interest=await f.audio.acquire({id:'app',sessionGeneration:1});
+  const activation=interest.setSpeaker(true);await f.audio.dispose();loaded();
+  await assert.rejects(activation,/retired/);
+  assert.equal(constructed,0);assert.equal(f.contextClosed,1);assert.equal(interest.released,true);
+});

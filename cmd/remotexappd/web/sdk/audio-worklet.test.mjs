@@ -40,3 +40,21 @@ test('resumed microphone delivery discards the partial old frame',()=>{
  assert.equal(p.messages.length,1);assert.equal(p.messages[0].delivery,'fresh');
  assert.ok(new Int16Array(p.messages[0].pcm).every(sample=>sample===8192));
 });
+
+for (const name of ['playback','capture']) test(`${name} terminal retirement drops state, acknowledges once and stops processing`,()=>{
+ const p=worklet(`remotexapp-${name}-v1`);
+ if(name==='playback')p.port.onmessage({data:{op:'frame',slot:1,pcm:new Int16Array(1920).fill(8192).buffer}});
+ else {p.port.onmessage({data:{op:'delivery',delivery:'old'}});run(p,[[new Float32Array(128).fill(.5)]],1);}
+ p.port.onmessage({data:{op:'dispose'}});
+ // No later credit/frame/delivery can resurrect a terminal processor.
+ p.port.onmessage({data:{op:'delivery',delivery:'new'}});
+ p.port.onmessage({data:{op:'frame',slot:1,pcm:new Int16Array(1920).fill(8192).buffer}});
+ const output=[new Float32Array(128).fill(1)];
+ assert.equal(p.process([[new Float32Array(128).fill(.5)]],[output]),false);
+ assert.ok(output[0].every(v=>v===0));
+ assert.deepEqual(p.messages.filter(m=>m.type==='disposed').map(m=>m.type),['disposed']);
+ assert.equal(p.process([],[]),false);
+ assert.equal(p.messages.filter(m=>m.type==='disposed').length,1);
+ if(name==='playback')assert.equal(p.streams.size,0);
+ else {assert.equal(p.frame,null);assert.equal(p.delivery,null);assert.equal(p.offset,0);}
+});

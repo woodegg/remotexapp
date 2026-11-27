@@ -5690,3 +5690,23 @@ subsequent control/renewal and retained scope. Invalid/replayed or unauthorized
 frames must still be rejected. Verify real Pulse routes and browser speaker
 continuity during buffered ingress, then natural foreground/background soak.
 A controlled reproduction does not alone attribute every historical WAN cut.
+
+
+## 2026-11-26 — Retire audio processors before closing their Context
+
+Issue #104 adds AUD-004. Track stop, node disconnect and Context close do not
+alone establish native Worklet retirement in the affected Edge 157. Send a
+terminal message to both processors, clear queued/frame state, await their
+render acknowledgement and false return, then disconnect nodes, close ports
+and await Context close. Audio and Host disposal share one completion Promise.
+Stop capture and fence late permission results synchronously before waiting.
+
+Capture-only stop retains only a terminal silent processor while its Context
+is suspended; the next user-initiated resume drains it. Final disposal first
+mutes the owned output gain and stops all tracks, then may resume the existing
+graph solely to let terminal processors finish. It never obtains a device,
+restores a route or creates a Context. A one-second final ACK deadline still
+closes ports and Context on failure and rejects incomplete retirement. No
+ordinary background visibility change triggers this terminal path. Preserve
+protocol v5, PCM queues and ingress-owned continuity. Native heap diagnostics
+and no-periodic-GC natural resource measurements remain separate experiments.

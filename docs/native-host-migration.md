@@ -559,3 +559,24 @@ The browser must be able to run the Viewer. On wake the SDK attempts one
 overdue probe, then resumes its schedule. Continue showing reconnect
 state and the last disconnect reason. For the option bounds and protocol
 details, see the [browser SDK reference](browser-sdk.md#native-viewer-heartbeat).
+
+
+## Adopt awaitable audio cleanup (Core 0.17.6 / SDK 0.36.0)
+
+Issue #104 fixes native Worklet retention after repeated Host retirement.
+Adapters already awaiting `host.dispose()` or `host.logout()` keep their call
+shape; the SDK now joins audio retirement internally. Replace fire-and-forget owner cleanup with `await host.dispose()` or
+`await host.logout()` before considering the owner fully released. Direct audio
+owners use `await audio.dispose()`, which now returns `Promise<void>` instead of
+`void`; ignored return values remain usable for unload best effort. Repeated
+calls join the same operation. Handle rejection as incomplete cleanup, without
+reopening audio automatically. Capture stops and pending permission is fenced
+synchronously when cleanup starts.
+
+Do not patch Worklets, close SDK internals or add embedding-host timers to implement this.
+Continue expressing speaker/microphone intent through the current public
+controls. An individual window/session release must not dispose the shared
+Host while other windows still use it. No Manager options, Pulse packaging,
+UDP/TURN mapping, ingress authentication, worker protocol or Kasm component
+change is required. Serve the new SDK and Worklet from the same Core artifact.
+See [audio retirement](native-audio.md#awaitable-audio-retirement-sdk-036).

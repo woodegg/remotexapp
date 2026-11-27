@@ -15,13 +15,14 @@ export class RemoteXAppAudio extends EventTarget {
     this.base = base.href.replace(/\/$/,''); this.requests = new Map(); this.interests = new Map(); this.next = 0; this.captureEpoch = 0; this.activating = 0; this.closed = false;
     this.workerKey = "remotexapp-audio-v5:"+this.base;
     this.stats = {connection:'idle',speakerOwner:false,micOwner:false,routes:[]};
+    this.retirements = new Set(); this.retirementErrors = [];
     this._openWorker();
     this.watchdog = environment.setInterval(()=>{
       const now = Date.now(), suspended = now-this.lastWatchdogTick>5000; this.lastWatchdogTick = now;
       if (suspended) { this.lastWorkerMessage = now; this._pauseCapture(); this._wake(); return; }
       if (this.port && now-this.lastWorkerMessage>10000) this._fail('audio-worker-unresponsive');
     },1000);
-    this._pagehide = event => { if (event.persisted) this._suspend(); else this.dispose(); };
+    this._pagehide = event => { if (event.persisted) this._suspend(); else void this.dispose().catch(()=>{}); };
     this._suspend = () => { this._pauseCapture(); this._post({op:'suspend'}); };
     this._wake = () => {
       if (this.env.document?.visibilityState === 'hidden') return;
@@ -122,10 +123,13 @@ export class RemoteXAppAudio extends EventTarget {
     });
   }
   async acquire(instance) {
+    if (this.revoking) throw Error('Audio controller logging out');
     if (!instance?.id || !Number.isSafeInteger(instance.sessionGeneration) || instance.sessionGeneration < 1) throw TypeError('An active runtime generation is required');
     await this._ensureWorker();
+    if (this.closed || this.revoking) throw Error('Audio controller disposed');
     const ref = this.env.crypto.randomUUID();
     await this._request('acquire',{ref,runtime:instance.id,generation:instance.sessionGeneration});
+    if (this.closed || this.revoking) throw Error('Audio controller disposed');
     let speakerRevision = 0, micRevision = 0;
     const interest = {
       runtime:instance.id,generation:instance.sessionGeneration,ref,released:false,[boundPort]:this.port,
@@ -190,11 +194,13 @@ export class RemoteXAppAudio extends EventTarget {
     else this._stopCapture();
   }
   async _context() {
+    if (this.closed || this.revoking) throw Error('Audio controller disposed');
     if (!this.context) {
       const context = this.context = new this.env.AudioContext({sampleRate:48000,latencyHint:'interactive'});
       if (context.sampleRate !== 48000) { await context.close(); this.context = null; throw Error('48 kHz audio context unavailable'); }
       this.module = context.audioWorklet.addModule(this.base+'/sdk/audio-worklet.js');
-      context.onstatechange = () => { this._post({op:'playback-ready',ready:context.state==='running' && !!this.playback}); if (this.stream && context.state !== 'running') this._captureFailed('audio-context-suspended'); };
+      this.output = context.createGain(); this.output.connect(context.destination);
+      context.onstatechange = () => { if (this.closed || this.context !== context) return; this._post({op:'playback-ready',ready:context.state==='running' && !!this.playback}); if (this.stream && context.state !== 'running') this._captureFailed('audio-context-suspended'); };
     }
     const context = this.context;
     // resume() is called synchronously from the original speaker/mic gesture.
@@ -211,7 +217,7 @@ export class RemoteXAppAudio extends EventTarget {
         if (data.type === 'credit') this._post({op:'playback-credit'});
         if (data.type === 'stats') { this.playbackStats = data; this._emit(); }
       };
-      this.playback.connect(context.destination);
+      this.playback.connect(this.output);
     }
     this._post({op:'playback-ready',ready:true});
   }
@@ -245,9 +251,37 @@ export class RemoteXAppAudio extends EventTarget {
   _stopCapture() {
     ++this.captureEpoch;
     if (this.stream) for (const track of this.stream.getTracks()) { track.onended = track.onmute = null; track.stop(); }
-    this.captureSource?.disconnect(); this.capture?.disconnect();
-    if (this.capture) this.capture.port.onmessage = null;
+    this.captureSource?.disconnect();
+    // Leave only the silent processor connected until its terminal render ACK.
+    // A suspended context drains at the next explicit resume, or final disposal.
+    if (this.capture) this._retireProcessor(this.capture);
     this.stream = this.capture = this.captureSource = null; this.captureToken = null;
+  }
+  _retireProcessor(node) {
+    const context = this.context;
+    let resolve, timer;
+    const record = {done:new Promise(r=>{resolve=r;}), arm:()=>{
+      timer ??= this.env.setTimeout(()=>finish(false),1000);
+    }};
+    const changed = () => {
+      if (context?.state === 'running') record.arm();
+      else if (context?.state === 'closed') finish(false);
+      else if (!this.closed) { this.env.clearTimeout(timer); timer = undefined; }
+    };
+    const finish = acknowledged => {
+      if (!this.retirements.delete(record)) return;
+      this.env.clearTimeout(timer);
+      context?.removeEventListener?.('statechange',changed);
+      node.port.onmessage = null; node.disconnect(); node.port.close();
+      if (!acknowledged) this.retirementErrors.push(Error('Audio processor retirement timed out'));
+      resolve();
+    };
+    this.retirements.add(record);
+    node.port.onmessage = ({data}) => { if (data.type === 'disposed') finish(true); };
+    context?.addEventListener?.('statechange',changed);
+    node.port.postMessage({op:'dispose'});
+    if (this.closed || context?.state === 'running') record.arm();
+    return record.done;
   }
   _message(message) {
     this.lastWorkerMessage = Date.now();
@@ -325,18 +359,50 @@ export class RemoteXAppAudio extends EventTarget {
     for (const pending of this.requests.values()) { this.env.clearTimeout(pending.timeout); pending.reject(Error(reason)); }
     this.requests.clear();
   }
-  async logout() { await this._ensureWorker(); return this._request('logout'); }
+  logout() {
+    if (this.closed) return this.disposal;
+    if (this.revoking) return this.revoking;
+    this._retireInterests();
+    if (this.output) this.output.gain.value = 0;
+    this.revoking = (async()=>{
+      try { await this._ensureWorker(); await this._request('logout'); }
+      finally { await this.dispose(); }
+    })();
+    this.revoking.catch(()=>{});
+    return this.revoking;
+  }
   dispose() {
-    if (this.closed) return;
-    this._pauseCapture(); this._closeWorker('Audio controller disposed'); this.closed = true; this.env.clearInterval(this.watchdog);
-    this.playback?.disconnect(); if (this.context) void this.context.close();
-    this.context = null;
+    if (this.disposal) return this.disposal;
+    let resolve, reject;
+    this.disposal = new Promise((done,failed)=>{resolve=done;reject=failed;});
+    // Unload callers cannot await. Explicit callers still receive the rejection.
+    this.disposal.catch(()=>{});
+    this.closed = true; this.captureAllowed = false;
+    if (this.output) this.output.gain.value = 0;
+    this._pauseCapture(); this._closeWorker('Audio controller disposed'); this.env.clearInterval(this.watchdog);
+    if (this.playback) this._retireProcessor(this.playback);
+    const context = this.context, output = this.output;
+    this.context = this.output = this.playback = this.module = null;
     this.env.removeEventListener('pagehide',this._pagehide);
     this.env.removeEventListener('pageshow',this._wake);
     this.env.removeEventListener('online',this._wake);
     this.env.document?.removeEventListener('visibilitychange',this._wake);
     this.env.document?.removeEventListener('freeze',this._suspend);
     this.env.document?.removeEventListener('resume',this._wake);
- for (const interest of this.interests.values()) interest.released = true; this.interests.clear();
+    for (const interest of this.interests.values()) interest.released = true; this.interests.clear();
+    // A suspended graph cannot execute process(false). Drain only the existing
+    // muted graph, after capture revocation; never ask for a device or gesture.
+    // resume may remain pending under autoplay policy, so it is not awaited.
+    for (const retirement of this.retirements) retirement.arm();
+    if (context?.state === 'suspended' && this.retirements.size) void context.resume().catch(()=>{});
+    void (async()=>{
+      try { await Promise.all([...this.retirements].map(record=>record.done)); }
+      finally {
+        try { if (context) { context.onstatechange = null; if (context.state !== 'closed') await context.close(); } }
+        finally { output?.disconnect(); }
+      }
+      if (this.retirementErrors.length) throw new AggregateError(this.retirementErrors,'Audio retirement incomplete');
+    })().then(resolve,reject);
+    return this.disposal;
   }
 }

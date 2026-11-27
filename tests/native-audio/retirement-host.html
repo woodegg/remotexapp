@@ -1,0 +1,17 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Owned SDK audio retirement</title>
+<style>body{font:16px system-ui;margin:24px;background:#18212d;color:#edf5ff}button{padding:12px;margin:4px}#viewer{height:480px;width:960px}</style>
+<h1>SDK audio retirement</h1>
+<p>Project-owned fixture only. Uses the served SDK and explicit browser gestures.</p>
+<button id="open">Open existing App</button>
+<button id="speaker">Enable speaker</button>
+<button id="speaker-off">Stop speaker</button>
+<button id="mic">Enable / resume microphone</button>
+<button id="mic-off">Stop microphone</button>
+<button id="clipboard">Enable clipboard</button>
+<button id="suspend">Suspend Context</button>
+<button id="dispose">Dispose Host</button>
+<button id="logout">Logout Host</button>
+<output id="status"></output><div id="viewer"></div>
+<script type="module" src="/retirement-host.mjs"></script>

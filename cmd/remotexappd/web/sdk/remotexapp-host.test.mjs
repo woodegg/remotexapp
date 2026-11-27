@@ -108,6 +108,25 @@ test('audio acquisition is lazy, idempotent and independent of Viewers',async t=
   await host.logout();assert.equal(released,1);assert.equal(logout,1);assert.equal(disposed,1);
   await assert.rejects(host.open({instanceId:'app-123'}),{code:'disposed'});
 });
+
+test('Host disposal immediately retires audio and all callers await the same cleanup',async t=>{
+  const {host}=fixture(t);let finish,stopped=false,closed=0;
+  host._audio={dispose(){stopped=true;return new Promise(resolve=>{finish=resolve;});}};
+  host.addEventListener('closed',()=>closed++);
+  const first=host.dispose(),second=host.dispose();
+  assert.equal(stopped,true);assert.equal(first,second);assert.equal(host.logout(),first);
+  await tick();assert.equal(closed,0);finish();await first;
+  assert.equal(closed,1);assert.equal(host._audio,null);
+});
+
+test('Host logout awaits local cleanup even when server revocation fails',async t=>{
+  const {host}=fixture(t);let stopped=false,disposed=false;
+  host._audio={logout(){stopped=true;return Promise.reject(Error('offline'));},async dispose(){disposed=true;}};
+  const done=host.logout();assert.equal(stopped,true);
+  await assert.rejects(done,/offline/);assert.equal(disposed,true);assert.equal(host._audio,null);
+  // The test teardown joins the rejected operation explicitly.
+  host.disposal=Promise.resolve();
+});
 test('invalidation retires viewers and audio without silently taking the replacement',async t=>{
   const {host}=fixture(t),s=await host.open({instanceId:'app-123'}),v=await s.attach({});
   host.coordinator._invalidate(s.id,s.generation);

@@ -93,6 +93,7 @@ if (action === 'inspect') {
     const deadline = Date.now() + 5000;
     let busyRetries = 0;
     let lastBusy;
+    let injectedBusy = 0;
     for (;;) {
       if (lastBusy && Date.now() >= deadline) throw lastBusy;
       // Each disposable-fixture operator attempt confirms fresh server state.
@@ -104,11 +105,22 @@ if (action === 'inspect') {
       // A refused legacy upgrade intentionally leaves the client disconnected
       // with clipboard consent reset. This is a new operator attempt.
       client.clipboard.configure({toRemote:'prompt',toLocal:'prompt'});
+      if (${JSON.stringify(process.env.VALIDATION_UPGRADE_BUSY_ONCE === 'true')} && !injectedBusy) {
+        const originalFetch = client.manager.fetchImpl;
+        client.manager.fetchImpl = (url, options) => {
+          if (options?.method === 'POST' && String(url).endsWith('/upgrade-and-restart')) {
+            client.manager.fetchImpl = originalFetch;
+            injectedBusy++;
+            return Promise.resolve(new Response(JSON.stringify({error:'a lifecycle operation is already in progress'}), {status:409}));
+          }
+          return originalFetch(url, options);
+        };
+      }
       try {
         const applied = await client.upgradeAndRestart({sessionGeneration:current.sessionGeneration,targetRevision:current.versions.targetRevision,force:true});
         if (applied.id !== current.id || applied.sessionGeneration <= current.sessionGeneration || applied.upgrade.phase !== 'completed') throw new Error('upgrade identity or generation mismatch');
         if (client.clipboard.config.toRemote !== 'prompt' || client.clipboard.config.toLocal !== 'prompt') throw new Error('clipboard policy lost');
-        return {phase:applied.upgrade.phase,generation:applied.sessionGeneration,oldGeneration:current.sessionGeneration,busyRetries};
+        return {phase:applied.upgrade.phase,generation:applied.sessionGeneration,oldGeneration:current.sessionGeneration,busyRetries,injectedBusy};
       } catch (error) {
         if (error.status !== 409 || error.message !== 'a lifecycle operation is already in progress' || Date.now() >= deadline) throw error;
         lastBusy = error;

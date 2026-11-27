@@ -68,3 +68,7 @@ It records `busyRetries`; all other errors, stale confirmations and
 post-upgrade assertions still fail. This is test-driver behavior, not automatic
 SDK retry or a change to the Manager's destructive-operation guard. Preserve
 the original rejected attempts with the successful qualification evidence.
+The Kate fixture injects one explicit busy HTTP response through the test
+Manager fetch seam, restoring the original fetch function as it does so. This
+exercises the real SDK's refusal/disconnect path before the next actual upgrade;
+it is not an ambiguous network failure or a production retry feature.

@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><title>Owned Worker client retirement</title>
+<script type="module">
+import {connectAudioWorker} from './audio-worker-hub.js';
+const legacy=new URLSearchParams(location.search).has('legacy');
+const source=`const legacy=${legacy};self.onconnect=({ports})=>{
+  const attach=port=>{let p=port;p.onmessage=({data})=>{p.postMessage(data);if(data==='dispose'){p.onmessage=null;p.close();p=null;}};p.start();};
+  if(legacy)attach(ports[0]);
+  else{const bootstrap=ports[0];bootstrap.onmessage=({data})=>{if(data.op==='attach')attach(data.port);};bootstrap.start();}
+};`;
+const url=URL.createObjectURL(new Blob([source],{type:'text/javascript'}));
+function direct(){const worker=new SharedWorker(url,{type:'module',name:'owned-hub-retirement'});return {port:worker.port,release(){}};}
+const connect=()=>legacy?direct():connectAudioWorker(window,url,'owned-hub-retirement');
+const exchange=(client,value)=>new Promise(resolve=>{client.port.onmessage=({data})=>resolve(data);client.port.start();client.port.postMessage(value);});
+async function retire(client){await exchange(client,'dispose');client.port.onmessage=null;client.port.close();client.release();}
+window.lab={done:0,keeper:connect(),async cycles(count){for(let i=0;i<count;i++){let client=connect();await retire(client);client=null;this.done++;}},
+  async checkKeeper(){return await exchange(this.keeper,'alive')==='alive';},
+  async retireKeeper(){let client=this.keeper;this.keeper=null;await retire(client);client=null;}};
+</script>

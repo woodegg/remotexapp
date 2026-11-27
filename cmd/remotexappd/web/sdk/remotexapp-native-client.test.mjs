@@ -734,3 +734,36 @@ test('same-Viewer reconnect without a login header restores intent and accepts o
   await f.viewer.reconnect();
   assert.deepEqual(f.viewer.getClipboardState().requested,{toRemote:'off',toLocal:'off'});
 });
+
+test('manual clipboard admission is distinct from verified delivery and never prompts for a new read permission',async t=>{
+ let text='',reads=0;clipboardBrowser(t,{writeText:async value=>{text=value;},readText:async()=>{reads++;return text;}});
+ const f=fixture({clipboard:true});await f.viewer.connect('app');f.viewer.enableClipboard();
+ f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{text:'remote'}}));
+ assert.deepEqual(await f.viewer.copyClipboardToLocal(),{status:'write-accepted'});assert.equal(reads,0);
+ f.viewer._clipboardSync.permissions.read='granted';
+ assert.deepEqual(await f.viewer.copyClipboardToLocal(),{status:'copied-to-local'});assert.equal(reads,1);
+ f.viewer.dispose();
+});
+
+test('unverified manual readback keeps an uncertain phase and does not replay the write',async t=>{
+ let writes=0;clipboardBrowser(t,{writeText:async()=>{writes++;},readText:async()=>''});
+ const f=fixture({clipboard:true});await f.viewer.connect('app');f.viewer.enableClipboard();f.viewer._clipboardSync.permissions.read='granted';
+ f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{text:'fresh'}}));
+ await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-uncertain'});
+ assert.equal(f.viewer.getClipboardState().phase,'clipboard-uncertain');assert.equal(f.viewer._clipboardSync.conflict,true);
+ assert.equal(writes,1);assert.equal(f.viewer.getClipboardState().requested.toLocal,'manual');f.viewer.dispose();
+});
+
+test('a clipboard lock callback arriving after timeout cannot start a browser write',async t=>{
+ let delayed,writes=0,expire;const nav=clipboardBrowser(t,{writeText:async()=>{writes++;}});
+ nav.locks={request:(_name,_options,fn)=>new Promise(resolve=>{delayed=()=>Promise.resolve().then(()=>fn({})).then(resolve);})};
+ const f=fixture({clipboard:true});await f.viewer.connect('app');f.viewer.enableClipboard();
+ f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{text:'fresh'}}));
+ const set=globalThis.setTimeout;
+ globalThis.setTimeout=(fn,ms,...args)=>ms===5000?(expire=fn,0):set(fn,ms,...args);
+ try {
+  const pending=f.viewer.copyClipboardToLocal();assert(expire);expire();
+  await assert.rejects(pending,{code:'clipboard-timeout'});
+  await assert.rejects(delayed(),{code:'clipboard-cancelled'});assert.equal(writes,0);
+ } finally {globalThis.setTimeout=set;f.viewer.dispose();}
+});

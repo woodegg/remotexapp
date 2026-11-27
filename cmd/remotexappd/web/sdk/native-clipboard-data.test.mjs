@@ -40,3 +40,29 @@ test('rich browser capability and text-only fallback never silently drop a rich 
  const old={clipboard:true,clipboardMaxBytes:65536};const sent=[];sendClipboard({sendClipboardText:text=>sent.push(text)},textPayload('legacy'),old);assert.deepEqual(sent,['legacy']);
  assert.throws(()=>validateClipboard('x'.repeat(65537),old),{code:'clipboard-size'});
 });
+
+test('browser-private write receipts never become remote representations or public payload metadata',async t=>{
+ const {io,nav,Item}=browser(t);
+ const {writeAndVerifyClipboard}=await import('./native-clipboard-data.js');
+ nav.clipboard.write=async items=>{io.items=items;};
+ const payload=await writeAndVerifyClipboard(textPayload('verified'),caps);
+ assert.equal(payloadText(payload),'verified');assert.equal(payload.bytes,8);
+ assert.deepEqual(payload.items.map(i=>i.type),['text/plain']);
+ assert.equal(JSON.stringify(payload).includes('receipt'),false);
+ const sent=[];sendClipboard({sendClipboard:items=>sent.push(items)},payload,caps);
+ assert.deepEqual(sent[0].map(i=>i.type),['text/plain']);
+ const values=io.items[0].values;
+ const receipt=Object.keys(values).find(type=>type.startsWith('web '));assert(receipt);
+ io.items=[new Item({...values,[receipt]:new Blob(['x'.repeat(65)])})];
+ await assert.rejects(readClipboard(caps),{code:'clipboard-format'});
+});
+
+test('receipt verification preserves bounded comparison-only normalized content and checks its plain digest',async t=>{
+ const {io,nav,Item}=browser(t),small={...caps,clipboardMaxBytes:16};
+ const {writeAndVerifyClipboard}=await import('./native-clipboard-data.js');
+ let plain='ab';
+ nav.clipboard.write=async items=>{const values={...items[0].values,'text/plain':new Blob([plain]),'text/html':new Blob(['<html><b>ab</b></html>'])};io.items=[new Item(values)];};
+ const remote=clipboardPayload([{type:'text/plain',data:new TextEncoder().encode('ab')},{type:'text/html',data:new TextEncoder().encode('<b>ab</b>')}],16);
+ const result=await writeAndVerifyClipboard(remote,small);assert(result.localOnly);assert(result.bytes>16);
+ plain='cd';await assert.rejects(writeAndVerifyClipboard(remote,small),{code:'clipboard-uncertain'});
+});

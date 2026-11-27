@@ -1,0 +1,179 @@
+{
+  "experiment": "P20",
+  "outcome": "accepted",
+  "status": "Controlled native worker-client indirection accepted; full SDK/Pulse, exact archive and human UAT remain separate.",
+  "primaryVariable": "One document-native SharedWorker bootstrap with disposable logical MessageChannels instead of one native client per owner.",
+  "baseline": {
+    "browser": "Chrome/149.0.7827.102",
+    "cycles": 50,
+    "counts": {
+      "keeper": {
+        "SharedWorker": 1,
+        "MessagePort": 1,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "cyclesWithKeeper": {
+        "SharedWorker": 51,
+        "MessagePort": 51,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "allOwnersRetired": {
+        "SharedWorker": 51,
+        "MessagePort": 51,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "idlePageAlive": {
+        "SharedWorker": 51,
+        "MessagePort": 51,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      }
+    },
+    "keeperSurvives": true,
+    "pageAlive": true
+  },
+  "candidate": {
+    "browser": "Chrome/149.0.7827.102",
+    "cycles": 50,
+    "counts": {
+      "keeper": {
+        "SharedWorker": 1,
+        "MessagePort": 2,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "cyclesWithKeeper": {
+        "SharedWorker": 1,
+        "MessagePort": 2,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "allOwnersRetired": {
+        "SharedWorker": 1,
+        "MessagePort": 1,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "idlePageAlive": {
+        "SharedWorker": 1,
+        "MessagePort": 1,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      }
+    },
+    "keeperSurvives": true,
+    "pageAlive": true
+  },
+  "providedBrowserControl": {
+    "browser": "Chrome/158.0.8127.36",
+    "cycles": 50,
+    "counts": {
+      "empty": {
+        "SharedWorker": 0,
+        "MessagePort": 0,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "keeper-only": {
+        "SharedWorker": 1,
+        "MessagePort": 2,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "fifty-retired-with-peer": {
+        "SharedWorker": 1,
+        "MessagePort": 2,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "all-logical-owners-retired": {
+        "SharedWorker": 1,
+        "MessagePort": 1,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "idle-page-alive": {
+        "SharedWorker": 1,
+        "MessagePort": 1,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      }
+    },
+    "keeperSurvives": true,
+    "pageAlive": true
+  },
+  "limitations": [
+    "Minimal actual product hub, no audio or full SDK; no browser-wide RSS/PSS claim.",
+    "One intentional document-lifetime bootstrap remains, not zero native workers.",
+    "Worker crash/recovery and cross-tab audio continuity need separate real SDK qualification.",
+    "The rejected first candidate retained its first logical port through a shared lexical context; the selected factory scope removes that path.",
+    "A prior private observer connection closed without a frame; it is not counted as a media disconnect or a passed idle endpoint."
+  ],
+  "privateReportSHA256": {
+    "worker-local-baseline": "18b9b2a4f07b333769ef971b7f5024b8334022cde29135b21654ac612acdfb7b",
+    "worker-local-candidate": "4d5fde112e2046176fc24dde8d030ea5de34fd73f80b33ed8656ce678e51efbe",
+    "worker-hub-native-r2": "9be3b0068e24c1b3922d9e3e145c488c497abf3693daab4c000fc8b69a9d2260",
+    "worker-hub-native-r3": "7fc9dc6a38b7affca88481c58268d77fb8300c1851f954b94021cf0fbf2ead2d"
+  },
+  "selectedCacheEvictionRecheck": {
+    "browser": "Chrome/158.0.8127.36",
+    "cycles": 50,
+    "counts": {
+      "empty": {
+        "SharedWorker": 0,
+        "MessagePort": 0,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "keeper-only": {
+        "SharedWorker": 1,
+        "MessagePort": 2,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "fifty-retired-with-peer": {
+        "SharedWorker": 1,
+        "MessagePort": 2,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "all-logical-owners-retired": {
+        "SharedWorker": 1,
+        "MessagePort": 1,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "idle-page-alive": {
+        "SharedWorker": 1,
+        "MessagePort": 1,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      }
+    },
+    "keeperSurvives": true,
+    "pageAlive": true,
+    "bounded": true,
+    "hubSourceSHA256": "33ab783ced331c77def9fe0aca1d3d6f2f67ab75b387b57e4a96e307b1747d43"
+  }
+}

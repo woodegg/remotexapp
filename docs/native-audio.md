@@ -216,3 +216,16 @@ Unload cleanup is best effort: browsers cannot await a closing page. Explicitly
 await the public lifecycle when a host needs a completed retirement boundary.
 Native object release must be tested in a live browser with test-owned refs
 removed; closed track state and mock close call counts alone do not prove it.
+
+
+## Document-scoped bootstrap (SDK 0.37 / worker v6)
+
+The #110 follow-up supersedes one native SharedWorker connection per audio
+controller. A document reuses one native bootstrap for a canonical Manager base
+and worker generation, with disposable transferable MessageChannels for its
+independent controllers. Only logical ports join AudioCoordinator. Native
+bootstrap lifetime alone grants no audio interest, lease, route or capture.
+One bounded inert bootstrap may remain until document retirement. Owner cleanup
+still stops tracks and retires native processors/Contexts; last media interest
+still releases the WSS. Other owners and tabs are not terminated to reclaim a
+local wrapper. Worker v6 names isolate the bootstrap protocol from v5 peers.

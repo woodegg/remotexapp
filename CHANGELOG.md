@@ -11,7 +11,18 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.17.6`. SDK `0.36.0`.
+Target: `0.17.6`. SDK `0.37.0`.
+
+- Reuse one document-scoped native audio Worker connection per Manager/worker
+  generation, with independent disposable MessageChannels for audio owners.
+  Worker protocol v6 separates this bootstrap from earlier direct-peer clients;
+  ordinary owner recreation no longer creates another native SharedWorker client.
+- Verify automatic remote-to-local clipboard delivery before reporting success.
+  An ephemeral browser-local write receipt ties sanitized rich readback to its
+  write, preventing a newer local copy from becoming that write's baseline.
+  Empty, stale or unverifiable readback remains uncertain without replay or
+  changing requested directions. Manual copy without granted read permission
+  reports `write-accepted`, rather than claiming verified delivery.
 
 - Retire native playback and capture processors explicitly, discard queued PCM,
   acknowledge their terminal render and close message ports. Repeated audio

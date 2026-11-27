@@ -1,7 +1,7 @@
 import { RemoteXAppManager } from './remotexapp-manager.js';
 import { NativeClipboard } from './native-clipboard.js';
 import { NativeReconnect, retryable } from './native-reconnect.js';
-import {readClipboard, writeClipboard, sendClipboard, validateClipboard} from './native-clipboard-data.js';
+import {readClipboard, writeClipboard, writeAndVerifyClipboard, sendClipboard, validateClipboard} from './native-clipboard-data.js';
 
 export class RemoteXAppNativeError extends Error {
   constructor(code, message, options) {
@@ -491,35 +491,46 @@ export class RemoteXAppNativeClient extends EventTarget {
     if (direction === 'download' && this._clipboardText === undefined) throw new RemoteXAppNativeError('clipboard-empty', 'Copy text inside the remote App first');
     this._clipboardSync.retire();
     this._clipboardBusy = true;
-    let timer, startedWrite = false;
+    let timer, startedWrite = false, timedOut = false, completedPhase = 'baseline', completedBaseline;
     const bounded = promise => Promise.race([promise, new Promise((_,reject) => {
-      timer = setTimeout(() => reject(new RemoteXAppNativeError(startedWrite ? 'clipboard-uncertain' : 'clipboard-timeout', 'Clipboard action did not finish in time')), 5000);
+      timer = setTimeout(() => { timedOut = true; reject(new RemoteXAppNativeError(startedWrite ? 'clipboard-uncertain' : 'clipboard-timeout', 'Clipboard action did not finish in time')); }, 5000);
     })]);
+    const current = () => {
+      if (timedOut) throw new RemoteXAppNativeError('clipboard-cancelled', 'Clipboard action timed out');
+      return this._clipboardContext(epoch, grant);
+    };
     const localCall = action => globalThis.navigator?.locks?.request
       ? navigator.locks.request('remotexapp-native-clipboard', {ifAvailable:true}, lock => {
         if (!lock) throw new RemoteXAppNativeError('clipboard-busy', 'Another Viewer clipboard call is pending');
-        this._clipboardContext(epoch, grant);
+        current();
         return action();
       }) : action();
     try {
       if (direction === 'download') {
-        startedWrite = true;
-        await bounded(localCall(() => writeClipboard(this._clipboardText, this.capabilities)));
+        const verified = this._clipboardSync.permissions.read === 'granted';
+        completedBaseline = await bounded(localCall(() => {
+          current(); startedWrite = true; completedPhase = 'clipboard-uncertain';
+          return verified
+            ? writeAndVerifyClipboard(this._clipboardText, this.capabilities, {check:current})
+            : writeClipboard(this._clipboardText, this.capabilities);
+        }));
         try { this._clipboardContext(epoch, grant); }
         catch { throw new RemoteXAppNativeError('clipboard-uncertain', 'Local clipboard write may have completed after the Viewer changed'); }
-        return {status:'copied-to-local'};
+        completedPhase = verified ? 'copied-to-local' : 'write-accepted';
+        return {status:completedPhase};
       }
       const text = direction === 'clear' ? validateClipboard('', this.capabilities) : await bounded(localCall(() => readClipboard(this.capabilities)));
       const display = this._clipboardContext(epoch, grant);
       if (direction !== 'clear' && text.bytes === 0) return {status:'empty-noop'};
       sendClipboard(display, text, this.capabilities);
+      if (direction !== 'clear') completedBaseline = text;
       return {status:'submitted'}; // Native clipboard has no application-readback ACK.
     } catch (error) {
       if (error instanceof RemoteXAppNativeError) throw error;
       throw new RemoteXAppNativeError(typeof error?.code === 'string' ? error.code : error?.name === 'NotAllowedError' ? 'clipboard-denied' : 'clipboard-unavailable', 'Browser clipboard action failed', {cause:error});
     } finally {
       clearTimeout(timer);
-      if (epoch === this._epoch && grant === this._clipboardRevision) { this._clipboardBusy = false; this._clipboardSync.manualCompleted(); }
+      if (epoch === this._epoch && grant === this._clipboardRevision) { this._clipboardBusy = false; this._clipboardSync.manualCompleted(completedPhase, completedBaseline); }
     }
   }
   copyClipboardToRemote() { return this._clipboardAction('upload'); }

@@ -19,5 +19,6 @@
   { "id": "P16", "directory": "core-session-services", "outcome": "accepted", "results": "results-2026-09-14.json" },
   { "id": "P17", "directory": "native-audio-burst", "outcome": "accepted", "results": "results.json" },
   { "id": "P18", "directory": "native-viewer-retirement", "outcome": "accepted", "results": "results.json" },
-  { "id": "P19", "directory": "native-audio-retirement", "outcome": "accepted", "results": "results.json" }
+  { "id": "P19", "directory": "native-audio-retirement", "outcome": "accepted", "results": "results.json" },
+  { "id": "P20", "directory": "native-audio-worker-clients", "outcome": "accepted", "results": "results.json" }
 ]

@@ -124,6 +124,7 @@ The authoritative register, result files and reproduction instructions are in
 | P17 native audio playback credits | Two-speaker synthetic burst: ten of ten frames delivered versus eight; per-stream queues remain bounded and the aggregate cap is 64 | [Deterministic selection accepted](../tests/performance/native-audio-burst/README.md); live WAN/resource and physical UAT evidence remain separate |
 | P18 native Viewer retirement | Original +300 DOM/+240 listeners after twenty releases; repaired pair stays at 97 nodes/26 listeners over forty | [Short local resource gate passed](../tests/performance/native-viewer-retirement/README.md); new immutable component required, human UAT separate |
 | P19 native audio retirement | Exact Edge 157 control retains 6/6/6 native Context/Node/Proxy; terminal rendering plus awaited cleanup returns 0/0/0 | [Controlled and three-hour retirement accepted](../tests/performance/native-audio-retirement/README.md); fifty cycles and live idle pass, exact candidate and human UAT are separate |
+| P20 native audio Worker clients | Direct native clients retain 51 Worker/port wrappers; the document bootstrap retains one after fifty logical retirements | [Controlled construction accepted](../tests/performance/native-audio-worker-clients/README.md); actual served SDK/Pulse and UAT separate |
 
 For RFB queue changes repeat [P05](../tests/performance/rfb-queue/README.md).
 For cursor fan-out changes repeat [P11](../tests/performance/cursor-fanout/README.md).

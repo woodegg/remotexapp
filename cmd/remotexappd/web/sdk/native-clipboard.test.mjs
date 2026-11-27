@@ -149,10 +149,10 @@ function richFixture(t) {
   Object.defineProperty(globalThis,'ClipboardItem',{configurable:true,value:Item});
   t.after(()=>{if(old)Object.defineProperty(globalThis,'ClipboardItem',old);else delete globalThis.ClipboardItem;});
   f.io.payload=textPayload('baseline');f.io.richWrites=[];
-  f.nav.clipboard.read=async()=>[new Item(Object.fromEntries(f.io.payload.items.map(({type,data})=>[type,new Blob([data],{type})])))];
+  f.nav.clipboard.read=async()=>[new Item({...Object.fromEntries(f.io.payload.items.map(({type,data})=>[type,new Blob([data],{type})])),...(f.io.receipt ? {[f.io.receipt.type]:f.io.receipt.blob} : {})})];
   f.nav.clipboard.write=async items=>{
     const representations=[];
-    for(const type of items[0].types)representations.push({type,data:new Uint8Array(await (await items[0].getType(type)).arrayBuffer())});
+    for(const type of items[0].types){if(type.startsWith('web ')){f.io.receipt={type,blob:await items[0].getType(type)};continue;}representations.push({type,data:new Uint8Array(await (await items[0].getType(type)).arrayBuffer())});}
     f.io.payload=clipboardPayload(representations);f.io.richWrites.push(f.io.payload);
   };
   const client=f.create();client.capabilities.clipboardRich=true;client.capabilities.clipboardMaxBytes=2097152;
@@ -238,4 +238,50 @@ test('a changed oversized image preserves the local clipboard even if its length
   s.offer('conflicting remote text');await s.sync();
   assert.equal(s.phase,'conflict');
   assert.deepEqual(c.sent,[]);assert.deepEqual(f.io.richWrites,[]);
+});
+
+test('resolved text writes with empty or stale readback never report copied-to-local or consume local state',async t=>{
+  const f=fixture(t),c=await f.start(),s=c.clipboard;
+  const baseline=s.baseline;
+  for(const readback of ['', 'stale']) {
+    s.conflict=false;f.io.text='baseline';
+    f.nav.clipboard.writeText=async text=>{f.io.writes.push(text);f.io.text=readback;};
+    s.offer('fresh remote');await s.sync();
+    assert.equal(s.phase,'clipboard-uncertain');assert.equal(s.baseline,baseline);
+    assert.equal(s.conflict,true);assert.equal(f.io.text,readback);
+    assert.deepEqual(s.requested,{toRemote:'auto',toLocal:'auto'});
+  }
+  assert.deepEqual(c.sent,[]);assert.equal(f.io.writes.length,2);
+});
+
+test('a distinct local copy during remote normalization is preserved and requires an explicit source choice',async t=>{
+  const f=richFixture(t),c=await f.start(f.client),s=c.clipboard;
+  const originalWrite=f.nav.clipboard.write,gate=deferred(),entered=deferred();
+  f.nav.clipboard.write=async items=>{await originalWrite(items);entered.resolve();await gate.promise;};
+  const baseline=s.baseline;
+  s.offer(richText('remote','<b>remote</b>'));const pending=s.sync();await entered.promise;
+  f.io.payload=richText('fresh local','<i>fresh local</i>');f.io.receipt=null;gate.resolve();await pending;
+  assert.equal(s.phase,'clipboard-uncertain');assert.equal(s.conflict,true);
+  assert.equal(s.baseline,baseline);assert.equal(payloadText(f.io.payload),'fresh local');assert.deepEqual(c.sent,[]);
+  await s.sync();assert.equal(f.io.richWrites.length,1);assert.deepEqual(c.sent,[]);
+  assert.equal(await s.paste(),true);assert.equal(payloadText(c.sent[0]),'fresh local');
+});
+
+test('a receipt cannot hide missing representations or corrupted plain text',async t=>{
+  const f=richFixture(t),c=await f.start(f.client),s=c.clipboard,write=f.nav.clipboard.write;
+  f.nav.clipboard.write=async items=>{await write(items);f.io.payload=textPayload('remote');};
+  s.offer(richText('remote','<b>remote</b>'));await s.sync();assert.equal(s.phase,'clipboard-uncertain');
+  s.conflict=false;f.io.payload=s.baseline;f.io.receipt=null;
+  f.nav.clipboard.write=async items=>{await write(items);f.io.payload=richText('lost plain','<b>remote</b>');};
+  s.offer(richText('remote','<b>remote</b>'));await s.sync();assert.equal(s.phase,'clipboard-uncertain');
+  assert.deepEqual(c.sent,[]);
+});
+
+test('normalized rich writes without browser receipt support remain uncertain unless content is exact',async t=>{
+  const f=richFixture(t),c=await f.start(f.client),s=c.clipboard,write=f.nav.clipboard.write;
+  ClipboardItem.supports=type=>!type.startsWith('web ');
+  f.nav.clipboard.write=async items=>{await write(items);f.io.payload=richText('remote','<html><b>remote</b></html>');};
+  s.offer(richText('remote','<b>remote</b>'));await s.sync();assert.equal(s.phase,'clipboard-uncertain');
+  s.conflict=false;f.nav.clipboard.write=write;f.io.payload=s.baseline;
+  s.offer(richText('exact','<b>exact</b>'));await s.sync();assert.equal(s.phase,'copied-to-local');
 });

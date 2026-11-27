@@ -5746,3 +5746,25 @@ content remains unchanged after the verified observation. A browser API that
 silently fails to update the OS is surfaced honestly; SDK retries cannot repair
 that environment safely. No specific external writer or Wayland root cause is
 inferred from a no-SDK empty/stale readback alone.
+
+## 2026-11-27 — Retire native adapter input listeners before DOM removal
+
+Issue #115 extends the Viewer retirement boundary without replacing P18's
+accepted channel/global-listener decision or #110's bounded audio bootstrap.
+A supplied-browser heap exposes another non-weak root: the document animation
+controller retains a detached keyboard input, whose adapter-owned anonymous
+blur listener shares the constructor's `rfb` lexical context. The retired RFB
+then retains frame flags and decoder buffers even with zero native audio
+objects and one Worker bootstrap. DOM removal and owner counters are
+insufficient evidence of resource retirement.
+
+Keep the adapter's blur callback identity and unregister it before RFB
+teardown/input removal. Preserve live blur cancellation, unrelated input
+listeners and other Viewers. Do not terminate a shared Worker or clear another
+owner's event listeners to release this display. Ship a new immutable native
+client/server pair with verified unchanged server provenance; do not modify
+installed components or reinterpret ordinary adoption as component upgrade.
+Qualify actual backing-store/RFB retirement independently from Worker/audio
+counts, and retain failed or partial resource observations. This decision
+does not attribute or repair the separate no-SDK native clipboard readback
+failure in #111.

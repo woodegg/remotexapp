@@ -187,5 +187,37 @@
     "disposableFaultContainersStopped": true,
     "originalManagerAndDisplayIdentitiesPreserved": true,
     "projectLocalUATRetainedByAuthorization": true
+  },
+  "inputListenerFollowUp20261127": {
+    "issue": 115,
+    "state": "development; real new-pair resource qualification pending",
+    "scope": "Extends the original P18 accepted channel/global-listener scope; does not rewrite historical samples.",
+    "baseline": {
+      "coreCommit": "3576fb4e87181a2b21ea4befc9c9d4f875795e38",
+      "componentManifestSHA256": "1ae06be0fe9b1ae3312f40b0515cbbb5ae4691e6e89314f52beb1f6a865a38af",
+      "browser": "Chrome/158.0.8127.36",
+      "viewersPerOwner": 3,
+      "completedOwnersAtSamples": [
+        1,
+        26
+      ],
+      "arrayBufferBackingBytes": [
+        17541360,
+        455915360
+      ],
+      "snapshotSHA256": [
+        "aabe4fa3f775567136c4d4d85b7ef29cc285559625d557a03767fec088a8a165",
+        "4e118988e0a9b6fe2261ffd6df23023420e72a4ea385235b4b0458cad2a0ca5e"
+      ],
+      "retainer": "Document animation controller \u2192 detached native keyboard input \u2192 adapter blur listener \u2192 constructor rfb context \u2192 retired RFB/frame buffers"
+    },
+    "deterministicControl": {
+      "oldRetainedListenerCount": 2,
+      "newRetainedListenerCount": 1,
+      "unrelatedListenerPreserved": true,
+      "staleBlurCannotCallRetiredAdapter": true,
+      "repeatedDisconnectSafe": true
+    },
+    "newPairQualification": "pending; no whole-memory, release or human acceptance claim"
   }
 }

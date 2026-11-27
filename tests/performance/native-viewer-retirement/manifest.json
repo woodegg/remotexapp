@@ -1,7 +1,7 @@
 {
   "experiment": "P18",
   "primaryVariable": "native client channel/listener retirement",
-  "resultSHA256": "fedb87391f2cd8f7f59c1fe649ef7ac5f04abdb62716012f4f2b9686e15398f4",
+  "resultSHA256": "b3490c675250f06e4fe4729777f3c1403361740d515f8406defba9fb25ac0850",
   "harness": "tests/kasm-native/browser-recovery-cycles.mjs",
   "harnessSHA256": "8fafa6978642d0ff9409589becc9fad926c95841ae07885495c771149caff713",
   "patch": "third_party/kasm/patches/0025-client-close-window-channels.patch",
@@ -11,5 +11,9 @@
     "explicit background ownership and real paint per cycle",
     "existing isolated non-test Manager/display"
   ],
-  "qualifiedScope": "short collected browser DOM/listener retirement; source/component identities and original failed probes retained in results"
+  "qualifiedScope": "short collected browser DOM/listener retirement; source/component identities and original failed probes retained in results",
+  "inputListenerFollowUpSourceSHA256": {
+    "third_party/kasm/client-entry.js": "c1228ce03fdac89fb2b3930a8bc60d01171299a788eb3a668e4885f703991381",
+    "third_party/kasm/tests/adapter-protocols.test.mjs": "43c6734dff0bd1eb61b98e9dade4a63a80fa53b4eebfa470eba2dfb95bcc2d9d"
+  }
 }

@@ -44,3 +44,23 @@ audio, reconnect and UDP checks on the final pair. Owned test Apps/browsers are
 closed and fault containers stopped. The original non-test Manager/display
 identities remain unchanged; project-owned local UAT retains the qualified pair.
 This is development acceptance of the resource repair, not human UAT or release.
+
+
+## 2026-11-27 follow-up: detached native input (#115)
+
+The earlier P18 measurements retain their original channel/global-listener
+scope. A later real Chrome 158 repeated-Host run found another non-weak root:
+the document animation controller holds a detached keyboard textarea, whose
+adapter-owned blur listener retains its constructor's RFB lexical context.
+Three Viewers per owner retained about 16.73 MiB of ArrayBuffer backing stores
+after owner 1 and 434.79 MiB after owner 26. Bounded Worker/audio counts do not
+qualify those display buffers. This observation is not a long-term slope or
+whole-browser RSS/PSS claim.
+
+The adapter now saves/removes its own blur callback before input removal.
+A deterministic held-input test fails on the old adapter and passes on the new
+one, preserving live blur cancellation and unrelated listeners. Real new-pair
+resource qualification remains pending in #115/#106. Existing runtime pins
+must not be modified; select a rebuilt immutable component with verified
+unchanged server provenance. Raw heaps and deployment identities remain
+outside Git.

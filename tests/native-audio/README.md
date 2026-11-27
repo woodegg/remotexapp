@@ -211,3 +211,10 @@ For a cheap owned preflight, `--fault-plan PATH` supplies sorted JSON
 Choose a timed lane long enough for the faults' hold and recovery intervals;
 unexecuted requested faults fail the preflight. The default three-hour lane
 retains its full natural duration and separate post-soak GC/lifecycle phase.
+
+The retirement harness's periodic clipboard readbacks are sequential. It waits
+for focused ownership and the SDK's public `copied-to-local` phase before the
+next local copy. Browser visibility alone can precede normalization completion.
+Concurrent source changes during that asynchronous interval are a separate
+[clipboard issue #107](https://github.com/woodegg/remotexapp/issues/107), outside
+this audio-resource qualification; do not report them as fixed by this lane.

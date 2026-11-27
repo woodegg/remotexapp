@@ -176,7 +176,24 @@
         },
         "rawReportSHA256": "e634cf4580a3318ed96fa955fe2b25a1c23dcd6cd5feedd7297b682b6d3256bf"
       }
-    ]
+    ],
+    "secondAttempt": {
+      "naturalCompleted": false,
+      "lastRecordedElapsedSeconds": 3359.45219152997,
+      "rawReportSHA256": "d6c3797779aa9a958a7aad1b57113d0734c946e12c09a36b56121f148ee286f2",
+      "reason": "Local-to-remote clipboard readback timeout; the original attempt lacks a normalization-baseline trace and does not establish its precise cause."
+    },
+    "clipboardOverlapControl": {
+      "ordinaryTransfers": 100,
+      "ordinaryPassed": 100,
+      "gatedOverlapTrials": 1,
+      "gatedOverlapFailed": 1,
+      "serializedTransfers": 100,
+      "serializedPassed": 100,
+      "followUpIssue": 107,
+      "rawReportSHA256": "df361548a5bf19faf66629b5baf87c04f0854701d6b83064fcdd7fdaf0664aaa",
+      "interpretation": "A gated remote write followed by concurrent local copy is absorbed into normalization baseline. This proves a separate timing race, not the exact cause of the incomplete second attempt. The natural audio lane qualifies sequential clipboard only."
+    }
   },
   "limits": [
     "No matched three-hour patched/unpatched memory-saving benchmark",

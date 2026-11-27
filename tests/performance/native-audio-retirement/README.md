@@ -69,3 +69,15 @@ Corrected short preflights cover the nine built-in fault types across two owned
 runs and finish at zero native audio objects. The first preflight's short clock
 did not execute its last two scheduled faults; those are covered by the second
 run rather than counted as executed in the first.
+
+A second attempt ended around 56 minutes on local-to-remote clipboard readback
+timeout. Its baseline was not traced at failure, so a precise retrospective
+cause is unavailable. A separate controlled write/read gate reproduces a
+concurrent-source normalization race tracked in
+[Issue #107](https://github.com/woodegg/remotexapp/issues/107). One hundred ordinary
+transfers and one hundred explicitly serialized transfers pass; the gated
+overlap is a negative control. The audio natural lane now waits for the public
+`copied-to-local` completion phase before changing the local source. It validates
+sequential clipboard data flow and does not claim the overlapping-source race
+is fixed. Both incomplete attempts and their owned cleanup remain separate from
+the fresh continuous qualification. No production clipboard bytes change.

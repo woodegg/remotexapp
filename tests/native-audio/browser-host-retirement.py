@@ -148,7 +148,7 @@ for p in Path('/proc').glob('[0-9]*/cmdline'):
         env = ['env', 'DISPLAY=' + display, 'XAUTHORITY=' + authority]
         page.front()
         page.evaluate('()=>lab.owner.view.viewer.focus()')
-        page.wait('()=>lab.owner.view.viewer.getClipboardState().effective.toLocal==="auto"')
+        page.wait('()=>{const s=lab.owner.view.viewer.getClipboardState();return s.effective.toLocal==="auto" && s.active && ["watching","submitted","copied-to-local"].includes(s.phase);}')
         owned(*env, 'python3', '-c', """import subprocess,sys
 subprocess.run(['xclip','-selection','clipboard','-in','-target','UTF8_STRING','-silent'],input=sys.stdin.buffer.read(),stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,check=True)
 """, stdin=value.encode())
@@ -158,7 +158,12 @@ subprocess.run(['xclip','-selection','clipboard','-in','-target','UTF8_STRING','
                 break
             time.sleep(.15)
         else:
+            report['clipboardFailure'] = {'label':label,'direction':'to-local','snapshot':snap()}
+            save()
             raise AssertionError('Remote clipboard readback failed')
+        # Browser visibility of a write can precede SDK normalization readback.
+        # This lane tests sequential data flow, not overlapping source changes.
+        page.wait('()=>{const s=lab.snapshot().clipboard;return s.active && s.phase==="copied-to-local";}', timeout=12)
         local = value + ' local'
         page.evaluate('value=>navigator.clipboard.writeText(value)', local)
         deadline = time.monotonic() + 12
@@ -167,8 +172,12 @@ subprocess.run(['xclip','-selection','clipboard','-in','-target','UTF8_STRING','
                 break
             time.sleep(.15)
         else:
+            report['clipboardFailure'] = {'label':label,'direction':'to-remote','snapshot':snap(),
+                'localStillExpected':page.evaluate('()=>navigator.clipboard.readText()') == local,
+                'remoteSHA256':hashlib.sha256(owned(*env, 'xclip', '-selection', 'clipboard', '-out')).hexdigest()}
+            save()
             raise AssertionError('Local clipboard readback failed')
-        return {'bidirectional': True, 'bytes': len(local.encode())}
+        return {'bidirectional': True, 'bytes': len(local.encode()),'sequential':True}
 
     def functional(label, clip=True):
         wait_audio()

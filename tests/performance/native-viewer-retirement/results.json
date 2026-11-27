@@ -199,17 +199,25 @@
       "viewersPerOwner": 3,
       "completedOwnersAtSamples": [
         1,
-        26
+        26,
+        50,
+        50
       ],
       "arrayBufferBackingBytes": [
         17541360,
-        455915360
+        455915360,
+        876754400,
+        876754400
       ],
       "snapshotSHA256": [
         "aabe4fa3f775567136c4d4d85b7ef29cc285559625d557a03767fec088a8a165",
-        "4e118988e0a9b6fe2261ffd6df23023420e72a4ea385235b4b0458cad2a0ca5e"
+        "4e118988e0a9b6fe2261ffd6df23023420e72a4ea385235b4b0458cad2a0ca5e",
+        "2bb0abab0ca142b4b2e1ab41c1468af4c3a45f756c111713d6724258cd3e849b",
+        "1db2c8497752edf40c2b2c1ca5df463516d88e9c7ca51a832371721bb9985f61"
       ],
-      "retainer": "Document animation controller \u2192 detached native keyboard input \u2192 adapter blur listener \u2192 constructor rfb context \u2192 retired RFB/frame buffers"
+      "retainer": "Document animation controller \u2192 detached native keyboard input \u2192 adapter blur listener \u2192 constructor rfb context \u2192 retired RFB/frame buffers",
+      "lastSampleScope": "After eighty-second live-page idle, not page-close cleanup",
+      "resourceReviewPassed": false
     },
     "deterministicControl": {
       "oldRetainedListenerCount": 2,
@@ -218,6 +226,25 @@
       "staleBlurCannotCallRetiredAdapter": true,
       "repeatedDisconnectSafe": true
     },
-    "newPairQualification": "pending; no whole-memory, release or human acceptance claim"
+    "newPairQualification": "pending; no whole-memory, release or human acceptance claim",
+    "sourceMechanismControl": {
+      "scope": "Actual adapter constructor/input/clipboard-gate/latency modules, stub RFB 4MiB buffer and 51 deliberately held distinct native inputs; not real server/served component qualification",
+      "browser": "Chrome/158.0.8127.36",
+      "retiredOwners": 51,
+      "baseline": {
+        "sourceSHA256": "7d4bfa0418ddd83dc275d8dc51a02ba0da942595352a424bb56211cbc9198a5c",
+        "retiredRFBCount": 51,
+        "arrayBufferBackingBytes": 213909504,
+        "heapSHA256": "ea462f0c99bf075c1d18152b1fd3863dcbdda8b30c6be7b08c97ca3ae1059058"
+      },
+      "candidate": {
+        "sourceSHA256": "c1228ce03fdac89fb2b3930a8bc60d01171299a788eb3a668e4885f703991381",
+        "retiredRFBCount": 0,
+        "arrayBufferBackingBytes": 0,
+        "heapSHA256": "be960e9e415cae30004de327e52c8a70b8bef37491040e68c8cb1e472ea900a4"
+      },
+      "rawSHA256": "2bbdeb45ec575823661f903427c54d388dd73b451c0324e955d3da4876594a63",
+      "rejectedControl": "Initial minimal control retained the same keeper input repeatedly; it did not satisfy the intended retention precondition. The selected control asserts 51 distinct inputs."
+    }
   }
 }

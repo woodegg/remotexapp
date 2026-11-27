@@ -53,7 +53,8 @@ scope. A later real Chrome 158 repeated-Host run found another non-weak root:
 the document animation controller holds a detached keyboard textarea, whose
 adapter-owned blur listener retains its constructor's RFB lexical context.
 Three Viewers per owner retained about 16.73 MiB of ArrayBuffer backing stores
-after owner 1 and 434.79 MiB after owner 26. Bounded Worker/audio counts do not
+after owner 1, 434.79 MiB after owner 26 and 836.14 MiB after owner 50; the
+eighty-second live idle retains that last value. Bounded Worker/audio counts do not
 qualify those display buffers. This observation is not a long-term slope or
 whole-browser RSS/PSS claim.
 
@@ -64,3 +65,12 @@ resource qualification remains pending in #115/#106. Existing runtime pins
 must not be modified; select a rebuilt immutable component with verified
 unchanged server provenance. Raw heaps and deployment identities remain
 outside Git.
+
+
+An independent actual-Chrome source mechanism control retains 51 distinct
+native input nodes deliberately, using the actual adapter/input/gate/latency
+modules and a stub RFB with a 4 MiB buffer. The old adapter retains 51 RFBs and
+204 MiB; the new adapter retains zero RFBs/backing-store bytes. This isolates
+the callback root, not a real server or new-component performance result. The
+initial minimal control accidentally retained the keeper input repeatedly;
+its observation is rejected. The selected control asserts distinct inputs.

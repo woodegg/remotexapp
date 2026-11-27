@@ -606,6 +606,9 @@ and Worker counts are bounded. A Core/SDK refresh does not replace those pins:
 use the supported runtime component upgrade/recreation path and verify the
 new manifest digest. No host event-listener patch or forced browser GC is
 required. Exact component qualification remains tracked in #106/#115.
+If the deployment ingress pins native decoder assets, install and trust the
+new component digest there too. Retain decoder pins required by existing
+runtimes; a Manager default change alone does not update that external list.
 
 Automatic clipboard copied-to-local now means verified readback, including a
 browser-local receipt for rich normalization where supported. If readback is

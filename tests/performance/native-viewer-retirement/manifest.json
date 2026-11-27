@@ -1,7 +1,7 @@
 {
   "experiment": "P18",
   "primaryVariable": "native client channel/listener retirement",
-  "resultSHA256": "b3490c675250f06e4fe4729777f3c1403361740d515f8406defba9fb25ac0850",
+  "resultSHA256": "c8578a2009902433406be90033da63ba171bed89240ea6a1cf97792f5d67df61",
   "harness": "tests/kasm-native/browser-recovery-cycles.mjs",
   "harnessSHA256": "8fafa6978642d0ff9409589becc9fad926c95841ae07885495c771149caff713",
   "patch": "third_party/kasm/patches/0025-client-close-window-channels.patch",

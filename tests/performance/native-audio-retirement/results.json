@@ -1,7 +1,7 @@
 {
   "experiment": "P19",
   "outcome": "accepted",
-  "status": "Controlled native retirement passes; extended natural/fault qualification is pending.",
+  "status": "Controlled and extended implementation retirement pass; exact post-merge candidate and human UAT remain separate.",
   "scope": "SDK-owned audio processor retirement, not whole-browser leak freedom",
   "baselineCommit": "4654223c7cf748718b4f3c05099d23dd9962820c",
   "implementationCommit": "147460315e42a27431f9f39964255165d7ce33f3",
@@ -119,7 +119,7 @@
     }
   ],
   "extended": {
-    "status": "pending-fresh-continuous-lane",
+    "status": "passed-reviewed-implementation-lane",
     "naturalSeconds": 10800,
     "retirementCycles": 50,
     "liveIdleSeconds": 80,
@@ -237,7 +237,304 @@
         "ownedCleanupPassed": true,
         "rawReportSHA256": "b88fa2202c8a48296cb4c9bc40cd15b9dc187bcb033eab438cd5d0467f1561aa"
       }
-    ]
+    ],
+    "completed": {
+      "implementationCommit": "147460315e42a27431f9f39964255165d7ce33f3",
+      "harnessCommit": "d784902343d78d21a1174dc0d7c7e62900581c72",
+      "naturalSeconds": 10800.000040766026,
+      "retirementCycles": 50,
+      "liveIdleSeconds": 80.00192011898616,
+      "checks": 175,
+      "clipboardChecks": 150,
+      "faults": [
+        "cut-viewer",
+        "cut-audio",
+        "lease-once",
+        "audio-block",
+        "network-long",
+        "freeze",
+        "manager-restart",
+        "capture-only",
+        "suspended-retire"
+      ],
+      "audit": {
+        "requests": 80,
+        "stopped": 80,
+        "immediateStopped": 80,
+        "closedContexts": 52,
+        "done": 52,
+        "acks": 132
+      },
+      "nativeBaseline": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "nativeEndpoints": {
+        "0": {
+          "AudioContext": 0,
+          "AudioWorkletNode": 0,
+          "blink::AudioWorkletMessagingProxy": 0
+        },
+        "25": {
+          "AudioContext": 0,
+          "AudioWorkletNode": 0,
+          "blink::AudioWorkletMessagingProxy": 0
+        },
+        "49": {
+          "AudioContext": 0,
+          "AudioWorkletNode": 0,
+          "blink::AudioWorkletMessagingProxy": 0
+        }
+      },
+      "nativeIdle": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "noDiagnosticGCBeforeNaturalEnd": true,
+      "frozenHarnessVerified": true,
+      "noNetworkResponseCache": true,
+      "naturalConnections": {
+        "closes": 9,
+        "explicitFixtureCuts": 5,
+        "managerRestartCloses": 2,
+        "plannedOwnerRetirementCloses": 2,
+        "unplannedCloses": 0,
+        "proxyErrorsAtPlannedManagerRestart": 3
+      },
+      "serverProcessIdentityCounts": {
+        "remotexappd": 2,
+        "Xkasmvnc": 1,
+        "novnc-input": 1,
+        "pulseaudio": 1,
+        "mousepad": 1
+      },
+      "maximumSampleGapSeconds": 81.8836019039154,
+      "ownedCleanup": {
+        "appStopped": true,
+        "browserClosed": true,
+        "errors": []
+      },
+      "rawReportSHA256": "7aea6837b819e0d41c30f22b4248cdde864d273a76011146207df19f08ceb5bd",
+      "resourceObservations": {
+        "status": "passed",
+        "naturalSeconds": 10800.000040766026,
+        "browser": {
+          "PssMiB": {
+            "first": 497.880859375,
+            "last": 465.6875,
+            "min": 416.2685546875,
+            "max": 692.0283203125,
+            "delta": -32.193359375
+          },
+          "Pss_AnonMiB": {
+            "first": 187.5751953125,
+            "last": 189.8681640625,
+            "min": 134.8056640625,
+            "max": 322.982421875,
+            "delta": 2.29296875
+          },
+          "RssMiB": {
+            "first": 1184.859375,
+            "last": 1047.46484375,
+            "min": 998.2734375,
+            "max": 1393.39453125,
+            "delta": -137.39453125
+          },
+          "pageHeapMiB": {
+            "first": 2.7850723266601562,
+            "last": 3.4269447326660156,
+            "min": 2.2326202392578125,
+            "max": 4.272296905517578,
+            "delta": 0.6418724060058594
+          },
+          "nodes": {
+            "first": 64.0,
+            "last": 64.0,
+            "min": 64.0,
+            "max": 86.0,
+            "delta": 0.0
+          },
+          "listeners": {
+            "first": 107.0,
+            "last": 103.0,
+            "min": 103.0,
+            "max": 127.0,
+            "delta": -4.0
+          },
+          "foregroundSamples": 483,
+          "backgroundSamples": 528
+        },
+        "serverByType": {
+          "remotexappd": [
+            {
+              "PssMiB": {
+                "first": 17.06640625,
+                "last": 17.578125,
+                "min": 16.1875,
+                "max": 19.1953125,
+                "delta": 0.51171875
+              },
+              "Pss_AnonMiB": {
+                "first": 7.921875,
+                "last": 8.25390625,
+                "min": 6.921875,
+                "max": 9.93359375,
+                "delta": 0.33203125
+              },
+              "RssMiB": {
+                "first": 18.48828125,
+                "last": 19.0,
+                "min": 17.609375,
+                "max": 20.6171875,
+                "delta": 0.51171875
+              }
+            },
+            {
+              "PssMiB": {
+                "first": 16.140625,
+                "last": 17.51953125,
+                "min": 15.9296875,
+                "max": 19.0390625,
+                "delta": 1.37890625
+              },
+              "Pss_AnonMiB": {
+                "first": 7.18359375,
+                "last": 8.31640625,
+                "min": 6.84375,
+                "max": 9.8359375,
+                "delta": 1.1328125
+              },
+              "RssMiB": {
+                "first": 17.56640625,
+                "last": 18.9453125,
+                "min": 17.35546875,
+                "max": 20.46484375,
+                "delta": 1.37890625
+              }
+            }
+          ],
+          "Xkasmvnc": [
+            {
+              "PssMiB": {
+                "first": 51.9228515625,
+                "last": 19.798828125,
+                "min": 19.40625,
+                "max": 52.453125,
+                "delta": -32.1240234375
+              },
+              "Pss_AnonMiB": {
+                "first": 24.61328125,
+                "last": 13.203125,
+                "min": 12.84375,
+                "max": 25.01953125,
+                "delta": -11.41015625
+              },
+              "RssMiB": {
+                "first": 79.37890625,
+                "last": 25.796875,
+                "min": 25.4375,
+                "max": 79.87890625,
+                "delta": -53.58203125
+              }
+            }
+          ],
+          "novnc-input": [
+            {
+              "PssMiB": {
+                "first": 11.1181640625,
+                "last": 10.3740234375,
+                "min": 10.3056640625,
+                "max": 11.1181640625,
+                "delta": -0.744140625
+              },
+              "Pss_AnonMiB": {
+                "first": 4.09375,
+                "last": 3.2890625,
+                "min": 3.23046875,
+                "max": 4.09375,
+                "delta": -0.8046875
+              },
+              "RssMiB": {
+                "first": 12.9921875,
+                "last": 12.23828125,
+                "min": 12.1796875,
+                "max": 12.9921875,
+                "delta": -0.75390625
+              }
+            }
+          ],
+          "pulseaudio": [
+            {
+              "PssMiB": {
+                "first": 3.970703125,
+                "last": 5.6220703125,
+                "min": 3.96875,
+                "max": 6.3154296875,
+                "delta": 1.6513671875
+              },
+              "Pss_AnonMiB": {
+                "first": 1.5703125,
+                "last": 4.56640625,
+                "min": 1.5703125,
+                "max": 4.56640625,
+                "delta": 2.99609375
+              },
+              "RssMiB": {
+                "first": 8.65625,
+                "last": 10.265625,
+                "min": 8.65625,
+                "max": 11.0,
+                "delta": 1.609375
+              }
+            }
+          ],
+          "mousepad": [
+            {
+              "PssMiB": {
+                "first": 65.291015625,
+                "last": 11.072265625,
+                "min": 11.060546875,
+                "max": 65.296875,
+                "delta": -54.21875
+              },
+              "Pss_AnonMiB": {
+                "first": 24.3515625,
+                "last": 9.671875,
+                "min": 9.671875,
+                "max": 24.3515625,
+                "delta": -14.6796875
+              },
+              "RssMiB": {
+                "first": 95.70703125,
+                "last": 17.87890625,
+                "min": 17.87890625,
+                "max": 95.70703125,
+                "delta": -77.828125
+              }
+            }
+          ]
+        },
+        "memoryEventsFirst": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "memoryEventsLast": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "checks": 175,
+        "faults": [
+          "cut-viewer",
+          "cut-audio",
+          "lease-once",
+          "audio-block",
+          "network-long",
+          "freeze",
+          "manager-restart",
+          "capture-only",
+          "suspended-retire"
+        ]
+      },
+      "jobPeakBytes": 558649344,
+      "jobSwapPeakBytes": 90738688,
+      "rawResourceReviewSHA256": "8798fb9f231677cce7a7320335e1da2b905584a7569ad4a5a1b83429e0530c81"
+    }
   },
   "limits": [
     "No matched three-hour patched/unpatched memory-saving benchmark",

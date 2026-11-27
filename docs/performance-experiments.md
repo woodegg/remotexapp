@@ -62,7 +62,7 @@ The current production-candidate URLs remain:
 | P16 | Core-owned session input supervision stays within bounded startup and resource overhead | Service ownership with unchanged Mousepad policies | **Accepted:** matched fresh/warm launches, cgroup resources and cleanup pass locked gates; human UAT is separate |
 | P17 | Per-speaker credits avoid competition between bounded audio queues | Aggregate playback credit allocation only | **Accepted:** deterministic two-speaker burst delivers ten of ten frames instead of eight; eight-slot aggregate remains capped at 64; WAN and physical quality are separate |
 | P18 | Retiring native channels and global listeners releases detached Viewer DOM | Native client retirement | **Accepted:** baseline +300 nodes/+240 listeners becomes zero growth over forty cycles; short diagnostic observation only |
-| P19 | Terminal Worklet rendering and awaited owner cleanup retire native audio objects | Audio processor/Context lifetime only | **Accepted:** exact Edge 157 control 6/6/6 becomes 0/0/0; suspended cleanup requires a muted drain; extended resource qualification remains separate |
+| P19 | Terminal Worklet rendering and awaited owner cleanup retire native audio objects | Audio processor/Context lifetime only | **Accepted:** exact Edge 157 control 6/6/6 becomes 0/0/0; suspended cleanup requires a muted drain; three-hour implementation, fifty-cycle and live-idle retirement pass; exact candidate/UAT remain separate |
 
 P01 through P19 have recorded experiment outcomes. Start the next experiment only after defining a
 new isolated primary variable.
@@ -1118,3 +1118,12 @@ source-module controls, public bundled SDK data flow and the separately labelled
 natural/fault resource lane are different evidence. It does not attribute all
 RSS growth, establish a matched three-hour memory saving, or qualify physical
 hardware, OS sleep, all browsers or downstream deployment.
+
+The final P19 implementation lane separately completes three hours, nine planned
+faults, fifty retirement cycles and eighty seconds of live idle. All sampled
+retired native endpoints are zero, with 175 real data checks and normal owned
+cleanup. The earlier two incomplete attempts are retained, not stitched into the
+continuous duration. PSS/RSS fluctuations and observed swap are not a matched
+whole-browser memory-saving claim. Concurrent clipboard normalization (#107),
+physical devices, actual OS sleep, UDP/TURN and exact-artifact/human UAT remain
+separate from this audio-resource experiment.

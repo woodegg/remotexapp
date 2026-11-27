@@ -41,7 +41,7 @@ as evidence that the owner released its resources.
 
 The expanded natural/fault lane runs separately without periodic GC or CDP
 Network response caching. Its three-hour duration, fifty retirements and
-live eighty-second idle endpoint require their own final review; the controlled
+live eighty-second idle endpoint have their own final review below; the controlled
 results above do not stand in for that review. PSS/anonymous PSS/RSS describe the
 owned browser processes; heap/DOM/listener metrics describe the sampled page.
 A planned Manager restart must be separated from same-process server growth.
@@ -88,3 +88,38 @@ entry; it is not presented as a nine-fault pass. A separate suspended-retirement
 preflight supplies that final fault and the expanded native zero endpoint.
 The new continuous lane uses the unchanged production bytes and the separately
 frozen sequential observer.
+
+## Reviewed extended implementation lane — 2026-11-27
+
+The fresh frozen lane completes 10800.000041 seconds without periodic diagnostic
+GC, then fifty retirement cycles and 80.001920 seconds of live idle. All 175
+actual data checks pass, including 150 sequential bidirectional clipboard checks.
+All nine planned fault types execute. Native Context / Node / Proxy counts at
+retired cycles 0, 25, 49 and the final idle snapshot are 0 / 0 / 0. The final audit
+records 80 captures / 80 synchronous track stops, 52 Context closes and 132
+terminal acknowledgements. The two extra Context closes are the natural lane's
+planned owner retirement and final owner disposal. Owned App/browser cleanup
+passes, and the frozen inputs remain unchanged.
+
+Nine natural-lane WebSocket closes comprise five explicit fixture cuts, two
+channels closed by the planned Manager restart and two by planned owner
+retirement. There are no additional closes in that measured interval. The
+longest sampling gap is 81.884 seconds across the planned forty-second network
+block and recovery; it is not a fresh observation during that gap. Manager has
+two process identities across its planned restart; the four non-Manager measured backend
+types each retain one identity. Container
+OOM counters remain zero. The owned job peaks at 532.77 MiB cgroup
+memory and 86.54 MiB swap, under its 3 GiB memory cap.
+
+Browser-process PSS is 497.88 → 465.69 MiB (range 416.27–692.03), anonymous PSS
+187.58 → 189.87 MiB (range 134.81–322.98), and summed RSS 1184.86 → 1047.46 MiB.
+The sampled page heap ranges 2.23–4.27 MiB; DOM ends at its initial 64 nodes and
+listeners at 103 versus initial 107. There are 483 foreground and 528 background
+samples. The shared host also reclaims/swaps pages: these decreases are not a
+matched memory-saving result attributable to this fix. Pulse anonymous PSS grows
+about 3.00 MiB, recorded as an observation rather than a general leak diagnosis.
+The complete server ranges and before/after Manager groups are in results.json.
+
+This qualifies the implementation bytes, not an exact post-merge artifact,
+whole-browser leak freedom, physical media, actual OS sleep, UDP/TURN or downstream
+adoption. Candidate archive qualification and human UAT remain separate.

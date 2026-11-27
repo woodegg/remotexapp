@@ -59,3 +59,20 @@ include entered text, clipboard captures, credentials or user profiles.
 Automated test success, human UAT, publication and deployment are separate
 claims. Follow the [evidence contract](../../docs/development-quality-process.md#evidence-and-review)
 and [production handover](../../docs/production-handover.md).
+
+The browser upgrade driver treats the exact lifecycle-busy 409 as a rejected
+operator attempt. Within a five-second budget it reads the active generation
+and eligible target revision again before issuing a new disposable-fixture
+upgrade, explicitly setting its prompt clipboard policy for that new attempt.
+It records `busyRetries`; all other errors, stale confirmations and
+post-upgrade assertions still fail. This is test-driver behavior, not automatic
+SDK retry or a change to the Manager's destructive-operation guard. Preserve
+the original rejected attempts with the successful qualification evidence.
+The Kate fixture injects one explicit busy HTTP response through the test
+Manager fetch seam, restoring the original fetch function as it does so. This
+exercises the real SDK's refusal/disconnect path before the next actual upgrade;
+it is not an ambiguous network failure or a production retry feature.
+The KDE save fixture also paces direct XTEST typing and reads back the editor
+buffer before Ctrl+S. A completed automation process is not proof that the GUI
+has consumed its events. Exact buffer/file assertions remain required; this
+functional fixture is not a zero-delay typing performance benchmark.

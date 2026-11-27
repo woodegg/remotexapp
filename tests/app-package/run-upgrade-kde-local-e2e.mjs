@@ -112,11 +112,15 @@ try{
   const openedToken=await dbus(b,'tokenOpenUrl',[new URL('file://'+file).href,'UTF-8','false']);assert.match(openedToken,/\('.*'[,]?\)/);
   await delay(300);assert.equal(await readEditor(b),original);
   const publicBody=JSON.stringify(await manager.getInstance(blank.id));assert(!publicBody.includes(b.application.uniqueName));assert(!publicBody.includes(b.environment.sessionBus.address));
-  await key(o,['ctrl+a']);await exec('xdotool',['type','--clearmodifiers','--delay','0','discard unsaved changes'],{env:xenv(o),timeout:5000});
+  await key(o,['ctrl+a']);await exec('xdotool',['type','--clearmodifiers','--delay','10','discard unsaved changes'],{env:xenv(o),timeout:5000});
   await stop(opened.id);assert.equal(await readFile(file,'utf8'),original);await ready(blank.id);
   await manager.stopInstance(blank.id);assert.equal(await readFile(file,'utf8'),original);
   const saved=await create(app,{filePath:file}),s=await info(saved.id);
-  await key(s,['ctrl+a']);await exec('xdotool',['type','--clearmodifiers','--delay','0','explicitly saved'],{env:xenv(s),timeout:5000});await key(s,['ctrl+s']);
+  await key(s,['ctrl+a']);await exec('xdotool',['type','--clearmodifiers','--delay','10','explicitly saved'],{env:xenv(s),timeout:5000});
+  // XTEST command completion is not an application acknowledgement. Validate
+  // the editor buffer before saving, rather than racing queued input with Ctrl+S.
+  for(let n=0;n<30&&(await readEditor(s)).trimEnd()!=='explicitly saved';n++)await delay(100);
+  assert.match(await readEditor(s),/^explicitly saved\n?$/);await key(s,['ctrl+s']);
   for(let n=0;n<30&&(await readFile(file,'utf8')).trimEnd()!=='explicitly saved';n++)await delay(100);
   assert.match(await readFile(file,'utf8'),/^explicitly saved\n?$/);await stop(saved.id);assert.match(await readFile(file,'utf8'),/^explicitly saved\n?$/);await writeFile(file,original);
   const closed=await create(app);await key(await info(closed.id),['ctrl+q']);await stopped(closed.id);
@@ -141,8 +145,11 @@ try{
   let upgraded;
   if(['kate','kwrite'].includes(app)){
    await startBrowser(old.id);
-   const result=await exec('node',[join(harness,'check-sdk-lifecycle.mjs')],{env:{...env,VALIDATION_CDP_PORT:'9273',VALIDATION_INSTANCE_ID:old.id,VALIDATION_SDK_ACTION:'upgrade',VALIDATION_TIMEOUT_MS:'45000'},timeout:60000});
-   assert.equal(JSON.parse(result.stdout).upgrade.phase,'completed');
+   const result=await exec('node',[join(harness,'check-sdk-lifecycle.mjs')],{env:{...env,VALIDATION_CDP_PORT:'9273',VALIDATION_INSTANCE_ID:old.id,VALIDATION_SDK_ACTION:'upgrade',VALIDATION_UPGRADE_BUSY_ONCE:app==='kate'?'true':'false',VALIDATION_TIMEOUT_MS:'45000'},timeout:60000});
+   await writeFile(join(work,'sdk-upgrade-'+app+'.json'),result.stdout);
+   const receipt=JSON.parse(result.stdout).upgrade;
+   assert.equal(receipt.phase,'completed');
+   assert.equal(receipt.injectedBusy,app==='kate'?1:0);assert(receipt.busyRetries>=receipt.injectedBusy);
    upgraded=await manager.getInstance(old.id);
   }else upgraded=await manager.upgradeAndRestartInstance(old.id,{sessionGeneration:generation,targetRevision:revision,force:true});
   assert.equal(upgraded.id,old.id);assert(upgraded.sessionGeneration>generation);assert.equal(upgraded.upgrade.phase,'completed');assert(!upgraded.versions.updateAvailable);

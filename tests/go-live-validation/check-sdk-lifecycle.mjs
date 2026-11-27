@@ -90,13 +90,44 @@ if (action === 'inspect') {
 } else if (action === 'upgrade') {
   result.upgrade = await evaluate(`(async () => {
     const client = window.remoteXApp.client;
-    const current = await client.manager.getInstance(client.instanceId);
-    if (!current.versions?.eligible) throw new Error(current.versions?.reason || 'upgrade unavailable');
-    client.clipboard.configure({toRemote:'prompt',toLocal:'prompt'});
-    const applied = await client.upgradeAndRestart({sessionGeneration:current.sessionGeneration,targetRevision:current.versions.targetRevision,force:true});
-    if (applied.id !== current.id || applied.sessionGeneration <= current.sessionGeneration || applied.upgrade.phase !== 'completed') throw new Error('upgrade identity or generation mismatch');
-    if (client.clipboard.config.toRemote !== 'prompt' || client.clipboard.config.toLocal !== 'prompt') throw new Error('clipboard policy lost');
-    return {phase:applied.upgrade.phase,generation:applied.sessionGeneration,oldGeneration:current.sessionGeneration};
+    const deadline = Date.now() + 5000;
+    let busyRetries = 0;
+    let lastBusy;
+    let injectedBusy = 0;
+    for (;;) {
+      if (lastBusy && Date.now() >= deadline) throw lastBusy;
+      // Each disposable-fixture operator attempt confirms fresh server state.
+      // Production deliberately rejects a busy destructive operation, rather
+      // than queuing a request whose generation/revision may become stale.
+      const current = await client.manager.getInstance(client.instanceId);
+      if (lastBusy && Date.now() >= deadline) throw lastBusy;
+      if (!current.versions?.eligible) throw new Error(current.versions?.reason || 'upgrade unavailable');
+      // A refused legacy upgrade intentionally leaves the client disconnected
+      // with clipboard consent reset. This is a new operator attempt.
+      client.clipboard.configure({toRemote:'prompt',toLocal:'prompt'});
+      if (${JSON.stringify(process.env.VALIDATION_UPGRADE_BUSY_ONCE === 'true')} && !injectedBusy) {
+        const originalFetch = client.manager.fetchImpl;
+        client.manager.fetchImpl = (url, options) => {
+          if (options?.method === 'POST' && String(url).endsWith('/upgrade-and-restart')) {
+            client.manager.fetchImpl = originalFetch;
+            injectedBusy++;
+            return Promise.resolve(new Response(JSON.stringify({error:'a lifecycle operation is already in progress'}), {status:409}));
+          }
+          return originalFetch(url, options);
+        };
+      }
+      try {
+        const applied = await client.upgradeAndRestart({sessionGeneration:current.sessionGeneration,targetRevision:current.versions.targetRevision,force:true});
+        if (applied.id !== current.id || applied.sessionGeneration <= current.sessionGeneration || applied.upgrade.phase !== 'completed') throw new Error('upgrade identity or generation mismatch');
+        if (client.clipboard.config.toRemote !== 'prompt' || client.clipboard.config.toLocal !== 'prompt') throw new Error('clipboard policy lost');
+        return {phase:applied.upgrade.phase,generation:applied.sessionGeneration,oldGeneration:current.sessionGeneration,busyRetries,injectedBusy};
+      } catch (error) {
+        if (error.status !== 409 || error.message !== 'a lifecycle operation is already in progress' || Date.now() >= deadline) throw error;
+        lastBusy = error;
+        busyRetries++;
+        await new Promise(resolve => setTimeout(resolve,100));
+      }
+    }
   })()`);
   await waitFor("window.remoteXApp.client.state === 'connected'", 'SDK did not reconnect after upgrade');
 } else if (action === 'observe-reconnect') {

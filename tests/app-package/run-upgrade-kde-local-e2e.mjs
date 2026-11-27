@@ -142,6 +142,7 @@ try{
   if(['kate','kwrite'].includes(app)){
    await startBrowser(old.id);
    const result=await exec('node',[join(harness,'check-sdk-lifecycle.mjs')],{env:{...env,VALIDATION_CDP_PORT:'9273',VALIDATION_INSTANCE_ID:old.id,VALIDATION_SDK_ACTION:'upgrade',VALIDATION_TIMEOUT_MS:'45000'},timeout:60000});
+   await writeFile(join(work,'sdk-upgrade-'+app+'.json'),result.stdout);
    assert.equal(JSON.parse(result.stdout).upgrade.phase,'completed');
    upgraded=await manager.getInstance(old.id);
   }else upgraded=await manager.upgradeAndRestartInstance(old.id,{sessionGeneration:generation,targetRevision:revision,force:true});

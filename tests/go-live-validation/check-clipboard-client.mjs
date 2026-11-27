@@ -358,6 +358,13 @@ try {
     const promptOffer = explicitSendExpression('set', '-prompt');
     await first.evaluate(promptOffer.expression);
     await waitFor(second, "document.querySelectorAll('.remotexapp-clipboard-prompts [data-offer-id]').length>0", 'standard prompt did not appear');
+    // Restore the real source after the permission-degradation case. A synthetic
+    // offer races the focus reconciliation, which may correctly clear it when
+    // the actual local clipboard is empty.
+    await second.browser.command('Browser.setPermission', {
+      origin:second.origin, permission:{name:'clipboard-read'}, setting:'granted',
+    });
+    await second.evaluate(`navigator.clipboard.writeText(${JSON.stringify(`${token} layout local`)})`);
     const promptLayout = await second.evaluate(`(async()=>{
       const clipboard=window.remoteXApp.client.clipboard;
       const root=document.querySelector('.remotexapp-clipboard-prompts');
@@ -367,7 +374,8 @@ try {
       document.head.append(style);
       clipboard.configure({toRemote:'prompt',toLocal:'prompt'});
       window.remoteXApp.client.focus();
-      await clipboard._offerLocal([{type:'text/plain',data:new TextEncoder().encode(${JSON.stringify(`${token} layout local`)})}],'layout-regression');
+      await clipboard._reconcileLocal('layout-regression');
+      if (clipboard.permissions.read !== 'granted') throw new Error('layout fixture requires granted clipboard read access');
       await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
       const bars=[...root.querySelectorAll('[data-offer-id]')];
       const parentRect=root.parentElement.getBoundingClientRect();

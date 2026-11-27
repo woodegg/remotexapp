@@ -63,7 +63,8 @@ and [production handover](../../docs/production-handover.md).
 The browser upgrade driver treats the exact lifecycle-busy 409 as a rejected
 operator attempt. Within a five-second budget it reads the active generation
 and eligible target revision again before issuing a new disposable-fixture
-upgrade. It records `busyRetries`; all other errors, stale confirmations and
+upgrade, explicitly setting its prompt clipboard policy for that new attempt.
+It records `busyRetries`; all other errors, stale confirmations and
 post-upgrade assertions still fail. This is test-driver behavior, not automatic
 SDK retry or a change to the Manager's destructive-operation guard. Preserve
 the original rejected attempts with the successful qualification evidence.

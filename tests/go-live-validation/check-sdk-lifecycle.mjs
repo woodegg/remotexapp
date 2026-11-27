@@ -90,7 +90,6 @@ if (action === 'inspect') {
 } else if (action === 'upgrade') {
   result.upgrade = await evaluate(`(async () => {
     const client = window.remoteXApp.client;
-    client.clipboard.configure({toRemote:'prompt',toLocal:'prompt'});
     const deadline = Date.now() + 5000;
     let busyRetries = 0;
     let lastBusy;
@@ -102,6 +101,9 @@ if (action === 'inspect') {
       const current = await client.manager.getInstance(client.instanceId);
       if (lastBusy && Date.now() >= deadline) throw lastBusy;
       if (!current.versions?.eligible) throw new Error(current.versions?.reason || 'upgrade unavailable');
+      // A refused legacy upgrade intentionally leaves the client disconnected
+      // with clipboard consent reset. This is a new operator attempt.
+      client.clipboard.configure({toRemote:'prompt',toLocal:'prompt'});
       try {
         const applied = await client.upgradeAndRestart({sessionGeneration:current.sessionGeneration,targetRevision:current.versions.targetRevision,force:true});
         if (applied.id !== current.id || applied.sessionGeneration <= current.sessionGeneration || applied.upgrade.phase !== 'completed') throw new Error('upgrade identity or generation mismatch');

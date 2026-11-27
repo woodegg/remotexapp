@@ -7,7 +7,7 @@ const registry = Symbol.for('remotexapp.audio-worker-hubs.v6');
 // with a disposable client can itself retain the first logical MessagePort.
 function createHub(env, url, name, hubs, key) {
   const worker = new env.SharedWorker(url, {type:'module', name});
-  const hub = {worker, clients:new Set()};
+  const hub = {worker, url, clients:new Set()};
   hubs.set(key, hub);
   worker.port.start();
   worker.onerror = () => {
@@ -25,6 +25,15 @@ function createHub(env, url, name, hubs, key) {
 export function connectAudioWorker(env, url, name) {
   const hubs = env[registry] ||= new Map();
   const key = url + '\n' + name;
+  // Recovery generations must not become an ever-growing JS cache. Existing
+  // logical owners keep their hub; only unused superseded handles are dropped.
+  for (const [oldKey, old] of hubs) {
+    if (oldKey !== key && old.url === url && old.clients.size === 0) {
+      hubs.delete(oldKey);
+      old.worker.onerror = null;
+      old.worker.port.close();
+    }
+  }
   const hub = hubs.get(key) || createHub(env, url, name, hubs, key);
   const channel = new env.MessageChannel();
   const client = {port:channel.port1, onerror:null, release() {

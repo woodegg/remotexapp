@@ -56,3 +56,13 @@ test('browser-private write receipts never become remote representations or publ
  io.items=[new Item({...values,[receipt]:new Blob(['x'.repeat(65)])})];
  await assert.rejects(readClipboard(caps),{code:'clipboard-format'});
 });
+
+test('receipt verification preserves bounded comparison-only normalized content and checks its plain digest',async t=>{
+ const {io,nav,Item}=browser(t),small={...caps,clipboardMaxBytes:16};
+ const {writeAndVerifyClipboard}=await import('./native-clipboard-data.js');
+ let plain='ab';
+ nav.clipboard.write=async items=>{const values={...items[0].values,'text/plain':new Blob([plain]),'text/html':new Blob(['<html><b>ab</b></html>'])};io.items=[new Item(values)];};
+ const remote=clipboardPayload([{type:'text/plain',data:new TextEncoder().encode('ab')},{type:'text/html',data:new TextEncoder().encode('<b>ab</b>')}],16);
+ const result=await writeAndVerifyClipboard(remote,small);assert(result.localOnly);assert(result.bytes>16);
+ plain='cd';await assert.rejects(writeAndVerifyClipboard(remote,small),{code:'clipboard-uncertain'});
+});

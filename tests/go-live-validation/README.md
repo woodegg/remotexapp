@@ -72,3 +72,7 @@ The Kate fixture injects one explicit busy HTTP response through the test
 Manager fetch seam, restoring the original fetch function as it does so. This
 exercises the real SDK's refusal/disconnect path before the next actual upgrade;
 it is not an ambiguous network failure or a production retry feature.
+The KDE save fixture also paces direct XTEST typing and reads back the editor
+buffer before Ctrl+S. A completed automation process is not proof that the GUI
+has consumed its events. Exact buffer/file assertions remain required; this
+functional fixture is not a zero-delay typing performance benchmark.

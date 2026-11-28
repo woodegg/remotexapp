@@ -5819,3 +5819,22 @@ Exhaustion of genuinely reserved capacity remains a quota error. Focused
 backend/SDK tests cover scope refresh, principal isolation, old-server fallback,
 grant rejection and pressure boundaries; end-to-end and full self-recovery
 qualification remain separate gates.
+
+## 2026-11-28 — Keep source lifetime independent from a disconnected transport lease
+
+The twelve-second capture retirement rule is superseded for an already live
+source whose owner remains responsive and mic targets stay requested. An audio
+WSS/service interruption fences delivery and disables the source track; it does
+not by itself invalidate that device or require a new permission operation.
+Fresh connection/runtime authorization and a new delivery nonce permit reuse.
+Do not replay old PCM. Explicit off/logout, owner loss, failed authorization and
+genuinely ended capture retain their own fences; this transport repair does not
+authorize a replacement device or a new Worker owner by itself.
+
+The [real transport control](../tests/native-audio/results-retained-source-20261128.json)
+checks the source/processor identity and actual speaker/mic data across a long
+cut and genuine background interval. A valid background test must first prove
+visible/hidden transitions without forced-focus emulation or scheduling
+overrides. Keep failed visibility/cleanup attempts separate; an extended
+disconnection control is not the natural soak, combined stress, physical-device
+acceptance or whole-process allocation review required by #119.

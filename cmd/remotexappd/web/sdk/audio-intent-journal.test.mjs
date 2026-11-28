@@ -136,6 +136,16 @@ test('a newly created peer observes a previous last owner delayed logout',async(
   await b.dispose();assert.equal(f.events.size,0);
 });
 
+test('separate SDK module copies in one document share switch notifications and retire the registry',async()=>{
+  const f=fixture(),a=f.create();
+  const {AudioIntentJournal:OtherCopy}=await import('./audio-intent-journal.js?other-sdk-copy');
+  const b=new OtherCopy(f.env,'/rx/');let calls=0;a.subscribe(()=>calls++);
+  await a.publish('app',1,'microphone',true);const before=calls;
+  await b.publish('app',1,'microphone',false);assert(calls>before);
+  await a.dispose();await b.dispose();
+  assert.equal(f.env[Symbol.for('remotexapp.audio-intent-observers.v1')],undefined);
+});
+
 test('a browser SecurityError while accessing localStorage fails closed',async()=>{
   const f=fixture(),a=f.create();Object.defineProperty(f.env,'localStorage',{get(){throw new DOMException('blocked','SecurityError');}});
   assert.equal(a.read('app',1,'microphone').available,false);

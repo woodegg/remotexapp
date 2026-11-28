@@ -104,7 +104,13 @@ twelve-second cutoff while owner heartbeats and requested mic routes remain.
 It fences delivery and disables the live track during the interruption; a fresh
 route and delivery nonce can resume it without another device request. Unit
 controls include a simulated two-minute outage and temporary connection
-contention. This is partial implementation: actual Worker/source replacement,
+contention. A [real headed Chrome/Kasm/Pulse control](../tests/native-audio/results-retained-source-20261128.json)
+also passes over two minutes disconnected with fifty genuinely hidden samples,
+the same live source/processor, no extra device request and fresh speaker/mic data
+after reconnect. This uses an unchanged archived Core plus a development SDK,
+without focus emulation or background timer overrides; it does not qualify new
+backend scope correlation or long-duration allocation. This is partial
+implementation: actual Worker/source replacement,
 permission-driven reacquisition and full qualification are still outstanding.
 
 Keep separate failure classes: retryable connection/service/device/domain loss;

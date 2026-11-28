@@ -1105,10 +1105,12 @@ Human UAT, downstream integration and publication remain separate.
 
 The 2026-11-27 [input-listener follow-up](../tests/performance/native-viewer-retirement/README.md#2026-11-27-follow-up-detached-native-input-115)
 records a separate detached-input retainer in Chrome 158 (#115), outside the
-original channel/global-listener proof. Adapter callback removal passes its
-held-input negative/positive control; real new-component resource qualification
-remains pending. Worker/audio endpoint counts cannot stand in for RFB buffer
-retirement.
+original channel/global-listener proof. Adapter callback removal passes held-input
+negative/positive controls and actual new-component forty/fifty-owner controls.
+The three-Viewer control retains zero RFBs and 6400 backing-store bytes after
+fifty owners and eighty-second live idle, instead of 150 RFBs/~836 MiB. Exact
+post-merge archive and human/release qualification remain separate. Worker/audio
+endpoint counts cannot stand in for RFB buffer retirement.
 
 
 ## P19: native audio retirement

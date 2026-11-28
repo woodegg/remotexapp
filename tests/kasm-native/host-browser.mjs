@@ -25,12 +25,13 @@ export function remote(args,input=''){
 export async function open(url){
   const page=await fetch(config.cdpURL+'/json/new?'+encodeURIComponent(url),{method:'PUT'}).then(r=>r.json());
   const socket=new WebSocket(page.webSocketDebuggerUrl);await new Promise((resolve,reject)=>{socket.onopen=resolve;socket.onerror=reject;});
-  let serial=0;const pending=new Map(),events=[];
-  socket.onmessage=({data})=>{const m=JSON.parse(data);if(m.id){const p=pending.get(m.id);if(!p)return;pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(Error(m.error.message)):p.resolve(m.result);}else{events.push(m);if(events.length>1000)events.shift();}};
+  let serial=0;const pending=new Map(),events=[],listeners=new Map();
+  socket.onmessage=({data})=>{const m=JSON.parse(data);if(m.id){const p=pending.get(m.id);if(!p)return;pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(Error(m.error.message)):p.resolve(m.result);}else{for(const listener of listeners.get(m.method)||[])listener(m);events.push(m);if(events.length>1000)events.shift();}};
+  const onEvent=(method,listener)=>{if(!listeners.has(method))listeners.set(method,new Set());const group=listeners.get(method);group.add(listener);return()=>{group.delete(listener);if(!group.size)listeners.delete(method);};};
   const call=(method,params={})=>new Promise((resolve,reject)=>{const id=++serial,timer=setTimeout(()=>{pending.delete(id);reject(Error(method+' timed out'));},120000);pending.set(id,{resolve,reject,timer});socket.send(JSON.stringify({id,method,params}));});
   const evaluate=async(expression,gesture=false)=>{const result=await call('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true,userGesture:gesture});if(result.exceptionDetails)throw Error(result.exceptionDetails.exception?.description || result.exceptionDetails.text);return result.result.value;};
   await call('Runtime.enable');await call('Page.enable');await call('Page.bringToFront');
-  return {page,events,call,evaluate,close:async()=>{socket.close();await fetch(config.cdpURL+'/json/close/'+page.id);}};
+  return {page,events,call,onEvent,evaluate,close:async()=>{socket.close();await fetch(config.cdpURL+'/json/close/'+page.id);}};
 }
 export async function click(browser,selector){
   const box=await browser.evaluate(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('control missing');e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();if(!r.width || !r.height || e.disabled)throw Error('control is hidden or disabled: '+${JSON.stringify(selector)});const x=r.x+r.width/2,y=r.y+r.height/2;if(!e.contains(document.elementFromPoint(x,y)))throw Error('control is obscured: '+${JSON.stringify(selector)});return {x,y}})()`);

@@ -1,7 +1,7 @@
 {
   "experiment": "P21",
   "outcome": "pending",
-  "status": "Planned native destination-ordering and resource experiment; portable regressions pass but no native concurrency/performance acceptance.",
+  "status": "Planned complete resource/natural/stress experiment; portable and scoped real native functional/queue controls pass, with no full performance acceptance.",
   "primaryVariable": "Native clipboard destination admission/metadata strategy on otherwise fixed runtime and synthetic clipboard inputs",
   "proven": {
     "portableFocusedTests": 137,
@@ -9,7 +9,23 @@
     "todos": 0,
     "scope": "SDK/adapter/native admission models; not actual X11 concurrency or resource measurement"
   },
-  "nativeMeasurements": null,
+  "nativeMeasurements": {
+    "status": "scoped-functional-and-queue-observation-only",
+    "productSourceCommit": "9f608cfb0feb628bb6f3c0da89d3e344b73ac7dc",
+    "componentManifestSHA256": "8e2c5874368e25286e15b0a73403c0fb30f81c2aa45b65c000a865294e07e84f",
+    "functionalCases": 18,
+    "unacknowledgedNotifications": {
+      "ownerChanges": 1000,
+      "connections": 2,
+      "notifications": 2
+    },
+    "slowPayload": {
+      "status": "submitted",
+      "elapsedSeconds": 40.915600000023844
+    },
+    "source": "../../kasm-native/results-native-clipboard-current-pair-20261128.json",
+    "allocationMeasurements": null
+  },
   "required": [
     "Actual unannounced X11-owner race and delayed INCR with unchanged destination on conflict",
     "Same-owner/A-B-A and simultaneous Viewer admission with actual data readback",

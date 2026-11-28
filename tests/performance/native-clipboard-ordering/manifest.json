@@ -10,7 +10,7 @@
     "cmd/remotexappd/web/sdk/native-clipboard.js": "871f69ff07da2ac9928d27d8c2343d358bf29a0ba52fddebfe2eb400d76aa86a",
     "third_party/kasm/patches/0030-server-nonblocking-clipboard.patch": "e67b07227824b82ba24d560447a1b667a2663b8bab87855affdb0160bfb09e48"
   },
-  "resultSHA256": "c55661ea977e180f3e39fc851860bc30ab76109c0c3504cecb1900b0b2edbd9a",
+  "resultSHA256": "13f82c78f12cb34e6295a5926718ba110bbae364d31100192ca81b9be1fc4e07",
   "unchanged": [
     "RFB reliable ordered transport",
     "10MiB text/HTML/PNG format budget",

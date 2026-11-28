@@ -1,0 +1,308 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "passed-scoped-current-pair-native-clipboard-control",
+  "releaseQualified": false,
+  "productSourceCommit": "9f608cfb0feb628bb6f3c0da89d3e344b73ac7dc",
+  "componentManifestSHA256": "8e2c5874368e25286e15b0a73403c0fb30f81c2aa45b65c000a865294e07e84f",
+  "sdkVersion": "0.38.0",
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headed": true,
+    "sandboxEnabled": true,
+    "nativeCDP": true,
+    "embeddedSDK": true,
+    "actualWSSAndX11": true,
+    "syntheticDataOnly": true,
+    "actualBackgroundBeforeFreeze": true,
+    "nativeWindowFocusRestoredBeforeClipboardIO": true,
+    "focusEmulation": false,
+    "manualRichSlowClearActions": "Trusted CDP mouse clicks on test controls invoking public SDK methods",
+    "loopbackPayloadPacing": {
+      "bytesPerTick": 32768,
+      "tickMs": 125
+    },
+    "networkObserverForMetadataProof": true,
+    "naturalSoak": false,
+    "actualAudioDataQualifiedHere": false,
+    "periodicGC": false
+  },
+  "cases": [
+    {
+      "name": "new-v4-handshake-and-auto-mode",
+      "status": "passed"
+    },
+    {
+      "name": "actual-A-B-A-bidirectional-readback",
+      "status": "passed"
+    },
+    {
+      "name": "delayed-unannounced-X11-owner-during-browser-read-conflicts-without-overwrite",
+      "status": "passed",
+      "noRemoteOfferBeforeAdmission": true,
+      "destinationReadback": true
+    },
+    {
+      "name": "explicit-source-choice-after-conflict",
+      "status": "passed",
+      "result": "submitted"
+    },
+    {
+      "name": "native-stale-admission-preserves-X11-destination",
+      "status": "passed"
+    },
+    {
+      "name": "actual-INCR-snapshot-readback",
+      "status": "passed",
+      "bytes": 524288,
+      "completedTransfers": 1
+    },
+    {
+      "name": "simultaneous-two-Viewers-one-accept-one-conflict",
+      "status": "passed",
+      "accepted": 1,
+      "conflicts": 1,
+      "destinationReadback": true
+    },
+    {
+      "name": "split-upload-owner-change-remains-responsive-and-conflicts",
+      "status": "passed",
+      "x11OwnerCompletedBeforeRelease": true,
+      "writerElapsedSeconds": 0.1604233329417184,
+      "admission": "clipboard-conflict",
+      "destinationPreserved": true
+    },
+    {
+      "name": "unacknowledged-two-Viewer-metadata-storm-bounded",
+      "status": "passed",
+      "ownerChanges": 1000,
+      "notificationsWhileACKsWithheld": 2,
+      "expectedMaximumPerConnection": 1,
+      "freshRevisionAfterUnblock": true
+    },
+    {
+      "name": "actual-background-freeze-resume-keeps-intent-and-live-two-Viewers",
+      "status": "passed",
+      "requestedModesRetained": true,
+      "readyAfterResume": [
+        "ready",
+        "ready"
+      ],
+      "orderingReadyAfterResume": true,
+      "connectionOutcome": [
+        "reconnected",
+        "reconnected"
+      ],
+      "freshPostResumeRTT": [
+        {
+          "state": "ready",
+          "rttMs": 3.399999976158142,
+          "ageMs": 91
+        },
+        {
+          "state": "ready",
+          "rttMs": 42,
+          "ageMs": 52.199999928474426
+        }
+      ],
+      "transitions": [
+        {
+          "state": "disconnected",
+          "elapsedMs": 0,
+          "code": "display-disconnected"
+        },
+        {
+          "state": "reconnecting",
+          "elapsedMs": 0
+        },
+        {
+          "state": "disconnected",
+          "elapsedMs": 3,
+          "code": "display-disconnected"
+        },
+        {
+          "state": "reconnecting",
+          "elapsedMs": 3
+        },
+        {
+          "state": "disconnected",
+          "elapsedMs": 1105
+        },
+        {
+          "state": "connecting",
+          "elapsedMs": 1105
+        },
+        {
+          "state": "disconnected",
+          "elapsedMs": 1129
+        },
+        {
+          "state": "connecting",
+          "elapsedMs": 1129
+        },
+        {
+          "state": "ready",
+          "elapsedMs": 1615
+        },
+        {
+          "state": "ready",
+          "elapsedMs": 1721
+        }
+      ]
+    },
+    {
+      "name": "actual-exact-10MiB-conditional-upload-and-X11-readback",
+      "status": "passed",
+      "bytes": 10485760
+    },
+    {
+      "name": "one-byte-oversize-preserves-native-destination",
+      "status": "passed"
+    },
+    {
+      "name": "real-browser-three-format-upload-X11-readback",
+      "status": "passed",
+      "types": [
+        "text/plain",
+        "text/html",
+        "image/png"
+      ],
+      "width": 24,
+      "height": 18
+    },
+    {
+      "name": "real-X11-three-format-browser-readback-and-PNG-pixels",
+      "status": "passed",
+      "types": [
+        "image/png",
+        "text/html",
+        "text/plain"
+      ],
+      "width": 24,
+      "height": 18,
+      "pixel": [
+        30,
+        120,
+        210,
+        255
+      ],
+      "html": true
+    },
+    {
+      "name": "SDK-10MiB-slow-transfer-over-five-seconds-keeps-peer-responsive",
+      "status": "passed",
+      "slow": {
+        "status": "submitted",
+        "elapsedSeconds": 40.915600000023844
+      },
+      "probes": [
+        {
+          "duringTransferMs": 5160.399999976158,
+          "wss": {
+            "state": "ready",
+            "rttMs": 3.200000047683716,
+            "ageMs": 94.5
+          },
+          "ownedX11CommandWallSeconds": 0.09134933992754668
+        },
+        {
+          "duringTransferMs": 16837.200000047684,
+          "wss": {
+            "state": "ready",
+            "rttMs": 2.899999976158142,
+            "ageMs": 159.70000004768372
+          },
+          "ownedX11CommandWallSeconds": 0.07215638202615082
+        },
+        {
+          "duringTransferMs": 25161.899999976158,
+          "wss": {
+            "state": "ready",
+            "rttMs": 4,
+            "ageMs": 86.60000002384186
+          },
+          "ownedX11CommandWallSeconds": 0.08265447500161827
+        },
+        {
+          "duringTransferMs": 35172.10000002384,
+          "wss": {
+            "state": "ready",
+            "rttMs": 1.2999999523162842,
+            "ageMs": 88.60000002384186
+          },
+          "ownedX11CommandWallSeconds": 0.08630550198722631
+        }
+      ],
+      "nominalThrottleBytesPerSecond": 262144
+    },
+    {
+      "name": "actual-mid-transfer-current-policy-rejection-AcceptCutText",
+      "status": "passed",
+      "outcome": "clipboard-uncertain",
+      "destinationPreserved": true,
+      "peerReady": true
+    },
+    {
+      "name": "actual-mid-transfer-current-policy-rejection-SendCutText",
+      "status": "passed",
+      "outcome": "clipboard-uncertain",
+      "destinationPreserved": true,
+      "peerReady": true
+    },
+    {
+      "name": "explicit-empty-clear-remains-acknowledged",
+      "status": "passed"
+    }
+  ],
+  "sameSplitCase": {
+    "x11OwnerCompletedBeforeRelease": true,
+    "writerElapsedSeconds": 0.1604233329417184,
+    "admission": "clipboard-conflict",
+    "destinationPreserved": true
+  },
+  "nativePolicy": {
+    "actualParameterSetAndReadbackVerified": true,
+    "actualMutableChanges": [
+      "AcceptCutText",
+      "SendCutText"
+    ],
+    "runtimeMIMEAndByteLimitsNotExposedThroughDefaultOverride": true,
+    "currentMIMEAndByteRevalidation": "Separate compiled-reader ASan/UBSan red/green models; no production hot-reload endpoint added"
+  },
+  "portableQualityGates": {
+    "sourceCommit": "9f608cfb0feb628bb6f3c0da89d3e344b73ac7dc",
+    "makeCheck": "passed",
+    "coreBuild": "all-four-default-CGO-builds-passed",
+    "race": "passed",
+    "coverage": "passed",
+    "goVulnerabilityCallPaths": "passed-no-vulnerabilities-found",
+    "module": "passed",
+    "hostedCI": "passed"
+  },
+  "limitations": [
+    "Scoped functional/queue/slow-payload native control, not final candidate or complete24-class acceptance.",
+    "Pacing at approximately2Mbit/s is an owned sender control, not WAN loss/jitter qualification. X11 command wall time includes the fixture executor.",
+    "Both Viewers are in one SDK document. Freeze retains manual modes; full automatic/multi-document/audio combinations remain separate.",
+    "MIME/byte limits are fixed per pinned runtime; changing live permissions tests supported existing switches. Do not widen native override authority merely for a test.",
+    "No whole-process allocation/native-retirement, natural8h or90-minute/1000-operation stress acceptance.",
+    "An unrelated OS clipboard writer cannot be made atomic by native destination CAS. Actual WeChat incident not captured."
+  ],
+  "evidenceSHA256": {
+    "run.py": "25a23b00cf1b765de576cac573af8f4ccb6146c5ece46dfc06fe131fdd077cf4",
+    "results.json": "6918632b3a390f11053442b16e987742c2bd188fbda935d4cae42db9b70229ca",
+    "run.log": "a7a2ba4404e6a3184cb58388cfa17cf8a944d006354887fbf2cd208765ce8b6e",
+    "static-js-check.log": "506c7cdd5ceff167045cafed8459c033d75ab17176e447af682ce800ba881d98",
+    "build-pins.json": "4c9c1f98c4be1dc2adfb02910568a286270abbe138d478a302da4c2acdf93b74",
+    "memory-fixture.json": "148d4f6fc0674297f7714f0edd87dae064c1970df445ec86d3acd2bec29c457a"
+  },
+  "fixtureHelperSHA256": "dd81f82a2993740a1ed30f35cfa39c868be0c89c4ad85f84ea6a9c8ed5df66f1",
+  "cleanup": {
+    "browserProfileRemoved": true,
+    "xvfbExited": true,
+    "allOwnedRuntimeRecordsStopped": true,
+    "ownedServicesStopped": true,
+    "ownedUnitRemoved": true,
+    "dedicatedTestContainerStopped": true,
+    "existingPublicUATPreserved": true
+  }
+}

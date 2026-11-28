@@ -379,6 +379,10 @@ commits it only after native admission or a matching remote snapshot. Old pins
 expose passive upload as manual; explicit source choice and supported automatic
 download remain. Complete native X11/INCR/multi-owner and final qualification are
 still required; do not declare it repaired merely because A-B-A or models pass.
+The [current eighteen-case native control](../tests/kasm-native/results-native-clipboard-current-pair-20261128.json)
+adds actual scoped concurrency, rich-format/size, slow-payload, existing native
+permission switches and real background-return proof. It does not close the
+shared-document/audio/whole-fault/natural/stress/resource/candidate gates.
 
 ## Completion gates
 

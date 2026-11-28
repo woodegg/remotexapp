@@ -27,7 +27,16 @@ requests, chunks, pending = [], {}, []
 window.set_selection_owner(clipboard, X.CurrentTime)
 d.sync()
 result = {'ready': True, 'requests': [], 'completed': 0}
-Path(args.result).write_text(json.dumps(result))
+
+def save():
+    # The controller polls while transfers update metadata. Publish a complete
+    # snapshot rather than exposing the truncate/write interval to readers.
+    destination = Path(args.result)
+    pending = destination.with_name(destination.name + '.pending')
+    pending.write_text(json.dumps(result))
+    pending.replace(destination)
+
+save()
 end = time.monotonic() + min(120, spec.get('seconds', 30))
 
 def respond(event):
@@ -82,6 +91,6 @@ try:
                     result['completed'] += 1
                 d.flush()
         result['requests'] = requests
-        Path(args.result).write_text(json.dumps(result))
+        save()
 finally:
     d.close()

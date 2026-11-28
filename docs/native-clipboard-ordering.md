@@ -4,9 +4,10 @@ Issue [#119](https://github.com/woodegg/remotexapp/issues/119) includes the
 unannounced-remote/concurrent-upload window separately from the repaired
 [A-B-A echo defect](../tests/kasm-native/CLIPBOARD-ABA.md). This document selects
 the destination-ordering invariant. Development implements the wire extension, conditional admission, SDK
-baseline/acknowledgement handling and portable regressions. The current immutable
-component build, real X11 qualification and complete release gates remain
-**pending**; this is not a published or UAT-qualified contract.
+baseline/acknowledgement handling and portable regressions. The new immutable pair
+builds and passes scoped real X11/browser controls. Complete fault, resource,
+natural/stress and final artifact gates remain **pending**; this is not published
+or UAT-qualified.
 
 ## Why an SDK offer check is insufficient
 
@@ -143,10 +144,10 @@ requested manual modes retained. Exact 10 MiB conditional upload/X11 readback
 and one-byte oversize preservation also pass.
 
 This is a scoped development control, not full natural/stress/resource or final
-artifact acceptance. The subsequent current-policy revalidation has its own
-red/green native models and still needs the new exact component. Automatic
-modes/focus, more real documents, audio combinations, other formats/slow links
-and the full fault/candidate gates remain separate. Earlier native failure and
+artifact acceptance. That older pair does not contain the subsequent
+current-policy follow-up. The current-pair control below supersedes its native
+format/slow-payload/permission scope; full automatic modes, more real SDK
+documents, audio combinations and the fault/resource/candidate gates stay open. Earlier native failure and
 incomplete driver attempts are retained rather than combined into a single run.
 
 ## Required proof
@@ -171,3 +172,32 @@ When incremental native staging yields, format/byte policy may change. Revalidat
 current policy immediately before admission, in the same final event-loop turn;
 parsed earlier headers are not lasting permission. Mid-transfer policy rejection
 must leave the prior destination and connection cache untouched.
+
+## Current exact-pair development control
+
+The [eighteen-case control](../tests/kasm-native/results-native-clipboard-current-pair-20261128.json)
+uses Core/embedded SDK and the fully rebuilt v4 pair from `9f608cf`. It repeats
+unannounced-owner, A-B-A, INCR, simultaneous admission, split-body and bounded
+metadata checks. A real background tab precedes forced freeze; returning verifies
+actual visibility/focus, requested-mode retention and fresh per-Viewer RTT.
+An old ready state or CDP lifecycle `active` alone is not recovery proof.
+
+Real browser/X11 text, HTML and PNG readback passes in both directions, including
+PNG dimensions/pixels. A real public SDK action sends 10 MiB at an owned nominal
+262,144 bytes/second and completes in about 41 seconds. Fresh peer RTT and owned X11
+commands at four points remain responsive. Exact-limit, one-byte-oversize and
+explicit empty-clear controls also pass. This is not a WAN throughput claim.
+
+Supported native `AcceptCutText`/`SendCutText` switches change after body staging;
+verified set/readback, rejected unconditional admission and unchanged destination
+prove current-permission fencing without a stale CAS masking it. Default native
+`AllowOverride` excludes MIME/byte limit changes: those limits stay fixed per
+pinned runtime. Their late-validation repair retains compiled-reader red/green
+coverage; no new live configuration authority is introduced for testing.
+
+The earlier active-visible forced-freeze controls retain their narrower results.
+The current run proves actual background/return setup before browser I/O. It is
+still single-document/manual-mode freeze qualification, with no audio allocation,
+full fault-class, natural/stress or final-candidate acceptance. Owned runtimes,
+services, browser/profile and dedicated test container are retired; existing UAT
+is preserved. See [reproduction and limits](../tests/kasm-native/NATIVE-CLIPBOARD-ORDERING.md).

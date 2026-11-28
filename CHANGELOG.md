@@ -22,7 +22,7 @@ Target: `0.17.6`. SDK `0.38.0`.
 - Select systematic native integration recovery under #119. The implementation
   and qualification plan covers granted-permission mic reacquisition, shared
   intent fencing, bounded recovery and combined long-duration/stress gates.
-  SDK 0.38 / Worker 7 state-machine integration is in development; production
+  SDK 0.38 / Worker 8 state-machine integration is in development; production
   qualification is incomplete.
 - Distinguish native audio cookie refresh from an observed ingress-principal
   change. Context responses add a Manager-scoped principal correlation; current
@@ -37,7 +37,7 @@ Target: `0.17.6`. SDK `0.38.0`.
   fresh delivery nonce resume it without another device request. Explicit off,
   logout, owner loss and authorization failure still retire capture. Worker
   replacement and ended-source automatic reacquisition remain in development.
-- Integrate shared speaker/mic intent ordering into SDK 0.38 / Worker 7, including
+- Integrate shared speaker/mic intent ordering into SDK 0.38 / Worker 8, including
   stale-command rejection across off/on, same-document and cross-document
   participation, source reuse on Worker rebind and permitted device recovery.
   Reserve the target writer before opening a device and require the capture
@@ -47,6 +47,15 @@ Target: `0.17.6`. SDK `0.38.0`.
   acquire local audio interests without an HTTP dependency. Model regressions
   pass; repeated silent Worker exit, full browser/fault/resource qualification
   and the final UAT gates remain incomplete.
+
+- Repair repeated silent audio Worker replacement with bounded same-name native
+  bootstrap probes and an ephemeral incarnation identifier in Worker 8. Confirmed
+  new incarnations reset their probe budget; same/unknown live incarnations do
+  not. Coalesce competing probes, reject stale init replies, retain the source
+  where valid and allow a committed off while Worker recovery is unavailable.
+  Repeated-exit models, twenty headed audio exits and a separate fifty-exit
+  native-client mechanism control pass. Full fault/resource qualification remains
+  required, including short-run anonymous PSS growth and known graph failures.
 
 - Unregister the native display adapter's keyboard blur listener before
   removing its input. A browser-retained detached input must not keep retired

@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "passed-development-control",
+  "releaseQualified": false,
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 8,
+  "runtimeCoreCommit": "00c97b4dd2262dc083075e23609feb26398fd437",
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headless": false,
+    "sandboxEnabled": true,
+    "nativeCDP": true,
+    "realSharedWorkerSelfClose": true,
+    "realKasmPulse": true,
+    "syntheticMicrophone": true,
+    "playbackSink": "none",
+    "developmentSDKOverride": true,
+    "forcedGC": false
+  },
+  "silentExits": 20,
+  "recoveryObservedSeconds": {
+    "minimum": 18.04215187591035,
+    "maximum": 19.084142228006385
+  },
+  "sameSourceAndProcessorEveryCut": true,
+  "deviceRequests": 1,
+  "sameNameEveryCut": true,
+  "documentHubEntries": 1,
+  "freshMicReadbackEveryCut": true,
+  "freshSpeakerPeakEveryCut": true,
+  "pageErrors": [],
+  "sourceSHA256": {
+    "audio-coordinator.js": "56a08c14d1cce4d7a8ebe18eda1c7bb17a63661e370003085ef8b3e879b85eb5",
+    "remotexapp-audio.js": "fbdf12419210834b9f1582ce4a8c524f583f3ddf5caf8a3fbf3f404eaa25d8f1",
+    "audio-worklet.js": "d0ca3c748bceb3807d4408bec068ade5a0e13a0e0225d60506e8262aac1d5726",
+    "audio-worker-hub.js": "285d0b7e26f72a548f6f852b3b245b1862feea8436c8f734e3e4c8d391f234bc",
+    "audio-intent-journal.js": "0dfcd3ec148dc3f506e0b990bb44ca0396c98601275b41c96634082edc26492b"
+  },
+  "resourceObservations": {
+    "samples": 75,
+    "errorSamples": 0,
+    "observedSeconds": 383.37294936180115,
+    "forcedGC": false,
+    "totalsKiB": {
+      "Pss": {
+        "first": 534615,
+        "last": 602062,
+        "minimum": 466242,
+        "maximum": 602062
+      },
+      "Pss_Anon": {
+        "first": 209945,
+        "last": 274316,
+        "minimum": 209945,
+        "maximum": 274316
+      },
+      "SwapPss": {
+        "first": 0,
+        "last": 0,
+        "minimum": 0,
+        "maximum": 0
+      },
+      "Rss": {
+        "first": 1424768,
+        "last": 1506800,
+        "minimum": 1424768,
+        "maximum": 1506800
+      }
+    },
+    "scope": "Short ownership-verified Chrome family observations during faults; no long-duration allocation/slope acceptance. Worker targets intentionally exit; a final browser-close sample can fail. Native counts are separate P20 no-audio evidence."
+  },
+  "limits": [
+    "Archived Core plus current development SDK override; not new-backend scope-correlation or immutable release qualification.",
+    "Synthetic microphone and no physical playback sink; no hardware/OS-sleep/acoustic acceptance.",
+    "A single-document fault control does not qualify real multi-document recovery, natural soak or combined stress.",
+    "Native client counts are independently measured in P20; this functional run did not take native heap snapshots."
+  ]
+}

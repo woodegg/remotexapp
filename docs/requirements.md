@@ -166,7 +166,7 @@ previously observed binding and retains conservative handling of older servers
 without this field. Scope-pressure reclamation may remove only inactive scopes
 without unexpired grants, preserving active and reserved authority and the cap.
 
-SDK 0.38 / Worker 7 integrates the ordered journal with the audio runtime in
+SDK 0.38 / Worker 8 integrates the ordered journal with the audio runtime in
 development. Fresh target writer eligibility precedes device acquisition;
 `actualMic` requires a ready source and current processor delivery acknowledgement.
 Requested mic remains distinct from `microphonePending` and browser-action
@@ -175,6 +175,15 @@ fresh observed identity changes and explicit logout still retire it. Worker
 rebind and ended-source recovery are covered by integrated module models;
 repeated silent exits, real browser/fault/resource and final acceptance gates
 are still incomplete. Do not qualify the policy from those models alone.
+
+AUD-006 Worker 8 requires repeated silent-exit recovery without consuming an
+unbounded namespace or native client count. A confirmed ephemeral incarnation
+change permits another same-name bootstrap probe; an error or timeout alone
+cannot erase its budget. Bound two nonresponsive names to four native bootstrap
+clients, coalesce probes, reject stale replies and preserve explicit cancellation
+while no Worker is available. Integrated models are passing development evidence;
+real repeated exits, multi-owner recovery and native resource review remain
+qualification gates. See [the bootstrap contract](native-self-recovery.md#worker-bootstrap-recovery-development-worker-8).
 
 AUD-003 verification uses the [audio fault inventory](native-audio-faults.md)
 to distinguish display, transport, service, Worker, capture, runtime and identity

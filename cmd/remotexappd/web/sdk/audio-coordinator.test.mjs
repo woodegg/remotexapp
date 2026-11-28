@@ -33,7 +33,7 @@ function fixture(){
  f.cleanup=()=>f.coordinator._retire('test-finished');
  return f;
 }
-async function ready(peer){await peer.request('init',{base:'https://audio.test',workerProtocol:7});}
+async function ready(peer){await peer.request('init',{base:'https://audio.test',workerProtocol:8});}
 async function acquire(peer,ref,runtime='app'){await peer.request('acquire',{ref,runtime,generation:1});}
 
 test('native cookie refresh retains valid audio intent under the same ingress principal',async()=>{

@@ -24,7 +24,7 @@ function fixture(t){
    return {ok:true,json:async()=>action==='context'?{scope:f.scope,service:f.service,principal:f.principal,login:'',protocol:'pcm-s16le-48k-v1'}:action==='grant'||action==='route'?{token:'e'.repeat(64),domain:'d'.repeat(32)}:{ok:true}};
   }});}
  f.makeDoc=()=>{
-  const doc={captures:0,streams:[],listeners:new Map(),timers:new Map(),permission:Object.assign(new EventTarget(),{state:'granted'})};f.docs.push(doc);
+  const doc={captures:0,bootstraps:0,streams:[],listeners:new Map(),timers:new Map(),permission:Object.assign(new EventTarget(),{state:'granted'})};f.docs.push(doc);
   const env={location:{href:'https://audio.test/',origin:'https://audio.test'},crypto:webcrypto,isSecureContext:true,MessageChannel,setTimeout,clearTimeout,
    setInterval(fn){const key=++sequence;doc.timers.set(key,fn);return key;},clearInterval(key){doc.timers.delete(key);},document:Object.assign(new EventTarget(),{visibilityState:'visible'}),
    addEventListener(name,fn){if(!doc.listeners.has(name))doc.listeners.set(name,new Set());doc.listeners.get(name).add(fn);},removeEventListener(name,fn){doc.listeners.get(name)?.delete(fn);},
@@ -35,8 +35,9 @@ function fixture(t){
    }})}};
   env.SharedWorker=class {
    constructor(_url,{name}){
+    doc.bootstraps++;
     let core=f.cores.get(name);if(!core){core={coordinator:coordinator(),clients:[]};f.cores.set(name,core);}core.clients.push(this);
-    this.port={start(){},close(){},postMessage:({port})=>core.coordinator.add(port)};
+    this.port={start(){},close(){},postMessage:({port})=>{if(core.terminated || f.hangWorkers)port.close();else core.coordinator.add(port);}};
    }
   };
   env.AudioContext=class extends EventTarget {
@@ -59,10 +60,11 @@ function fixture(t){
   doc.env=env;doc.audio=new RemoteXAppAudio({environment:env});return doc;
  };
  f.tick=async()=>{for(const core of f.cores.values())core.coordinator._tick();for(const doc of f.docs)for(const fn of doc.timers.values())fn();await turn();await turn();};
- f.killWorker=()=>{
+ f.killWorker=({silent=false}={})=>{
   const old=[...f.cores.entries()];f.cores.clear();for(const [,core] of old){
+   core.terminated=true;
    core.coordinator._disconnect('actual-worker-exit-model');for(const peer of core.coordinator.ports.values())peer.port.close();core.coordinator.ports.clear();core.coordinator._stopCapture('actual-worker-exit-model');
-   for(const worker of core.clients)worker.onerror?.();
+   if(!silent)for(const worker of core.clients)worker.onerror?.();
   }
  };
  f.route=doc=>doc.audio.stats.routes[0];
@@ -81,6 +83,66 @@ test('owner/coordinator/journal/worklet model rebinds a live source after Worker
  f.killWorker();await until(()=>doc.audio.port&&f.route(doc)?.actualMic&&f.sockets.length===2);
  assert.equal(doc.audio.stream,source);assert.equal(doc.audio.capture,node);assert.equal(f.gum,1);
  assert.equal(source.getAudioTracks()[0].enabled,true);assert.equal(interest.released,false);
+});
+
+test('repeated silent exits require a fresh native bootstrap and retain the same live source and processor',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ // Shorten only the init deadline; an old native bootstrap deliberately drops
+ // attached ports after silent termination instead of resurrecting its Worker.
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===7000?25:ms);
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream,node=doc.audio.capture;
+ for(let i=0;i<20;i++){
+  f.killWorker({silent:true});assert.equal(doc.audio.port!==null,true,'silent exit has no native error callback');
+  doc.audio._fail('audio-worker-unresponsive');
+  await until(()=>doc.audio.port&&f.route(doc)?.actualMic&&f.sockets.length===i+2);
+  assert.equal(doc.audio.stream,source);assert.equal(doc.audio.capture,node);assert.equal(f.gum,1);
+  assert.equal(doc.audio.workerGeneration,0);assert.equal(doc.audio.workerExhausted,undefined);
+  const hubs=doc.env[Symbol.for('remotexapp.audio-worker-hubs.v8')];
+  assert.equal(hubs.size,1);assert.equal([...hubs.values()][0].clients.size,1);
+  assert.equal(f.cores.size,1);assert.equal([...f.cores.values()][0].clients.length,1);
+ }
+ assert.equal(interest.released,false);assert.equal(source.getAudioTracks()[0].enabled,true);
+});
+
+test('two unresponsive recovery names block within four native bootstraps and an explicit off still cancels intent',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===7000?25:ms);
+ await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream;
+ f.killWorker({silent:true});f.hangWorkers=true;doc.audio._fail('audio-worker-unresponsive');
+ await until(()=>doc.audio.workerExhausted && doc.audio.stats.connection==='blocked');
+ assert.equal(doc.bootstraps,4);assert.equal(f.gum,1);assert.equal(source.getAudioTracks()[0].enabled,false);
+ for(let i=0;i<20;i++){doc.audio._wake();await f.tick();}
+ assert.equal(doc.bootstraps,4);assert.equal(f.gum,1);
+ await interest.setMicrophone(false);assert.equal(doc.audio.stream,null);
+ assert.equal(doc.audio.journal.read('app',1,'microphone').enabled,false);
+});
+
+test('off during a silent-exit rebind prevents microphone replay and releases the retained source',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===7000?25:ms);
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ f.killWorker({silent:true});doc.audio._fail('audio-worker-unresponsive');
+ await interest.setMicrophone(false);
+ await until(()=>doc.audio.port&&f.route(doc)?.actualSpeaker&&f.sockets.length===2);
+ assert.equal(f.route(doc).requested.microphone,false);assert.equal(f.route(doc).actualMic,false);
+ assert.equal(doc.audio.stream,null);assert.equal(f.gum,1);
+});
+
+test('two participating documents rebind a silently dead Worker without retaining an unused source',async t=>{
+ const f=fixture(t),a=f.makeDoc(),b=f.makeDoc();
+ for(const doc of [a,b])doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===7000?25:ms);
+ const first=await a.audio.acquire({id:'app',sessionGeneration:1}),second=await b.audio.acquire({id:'app',sessionGeneration:1});
+ await first.setMicrophone(true);await second.setMicrophone(true);await until(()=>f.route(a)?.actualMic&&f.route(b)?.actualMic);
+ assert.equal(f.gum,1);
+ for(let i=0;i<5;i++){
+  f.killWorker({silent:true});a.audio._fail('audio-worker-unresponsive');b.audio._fail('audio-worker-unresponsive');
+  await until(()=>a.audio.port&&b.audio.port&&f.route(a)?.actualMic&&f.route(b)?.actualMic&&f.sockets.length===i+2);
+  assert.equal([...a.streams,...b.streams].filter(s=>s.getAudioTracks()[0].readyState==='live').length,1);
+  assert.equal(f.cores.size,1);
+ }
+ assert.equal(first.released,false);assert.equal(second.released,false);
 });
 
 test('ended capture is reacquired automatically under granted permission after fresh route authorization',async t=>{

@@ -8,7 +8,7 @@ qualification, not separate acceptance of small implementation checkpoints.
 PR #118 now carries this implementation, superseding its initial test-only scope.
 This document is an implementation target and gate list, not a claim of passage.
 
-Development checkpoint: SDK 0.38 / Worker 7 now connects the intent journal to
+Development checkpoint: SDK 0.38 / Worker 8 now connects the intent journal to
 the audio owner/coordinator. Integrated module models cover rebind with a live
 source, ended-source reacquisition, permission revoke/grant, late-result/off,
 cross-document off/on, domain recovery with a healthy peer and access/identity
@@ -21,9 +21,54 @@ on an unfinished state machine.
 A [real Chrome silent-exit control](../tests/native-audio/results-worker-silent-exit-20261128.json)
 now confirms one Worker replacement reuses the same source and processor with
 fresh speaker/mic data, but the next actual exit reaches the fixed replacement
-limit while no Worker remains alive. The cached bootstrap/replacement bound must
-be repaired before this contract can be accepted. That failed second recovery
-is retained, not counted as passage of the fault class.
+limit while no Worker remains alive. Worker 8 adds an incarnation-qualified same-name bootstrap probe to repair
+that bound. A [new headed Chrome control](../tests/native-audio/results-worker8-silent-exit-20261128.json)
+passes twenty actual exits, retaining one source/processor and a single device
+request with fresh speaker/mic data after every recovery. This single-document
+development control does not qualify the whole fault class, new backend or
+release. The failed Worker 7 control remains unchanged.
+
+## Worker bootstrap recovery (development Worker 8)
+
+A silent exit need not emit `SharedWorker.onerror`. A new logical MessageChannel
+sent over its cached dead native bootstrap cannot recreate the Worker. After a
+bounded init timeout, construct one fresh native bootstrap under the **same**
+name. The Worker returns an ephemeral random `workerId` in its init contract;
+only a different confirmed incarnation resets that name's probe budget. The ID
+is correlation, never capture, login or server authority. Unknown or unchanged
+incarnations consume at most one extra native bootstrap per name. An error event
+alone cannot reset the budget because an uncaught error may leave the Worker
+alive. Coalesce concurrent document probes onto the newest bootstrap and reject
+stale init completions.
+
+Use at most two recovery names and at most four native bootstrap clients when
+both names are nonresponsive. A genuine repeated Worker termination must reuse
+the same name and recover repeatedly without exhausting it. A permanently hung
+pair remains honestly blocked rather than accumulating unlimited native clients.
+Existing owner watchdog/wake reconciliation follows a changed preferred name;
+source availability is only a candidate preference, not permission. A responsive
+owner releases an unselected retained source after another capture is ready.
+Explicit off fences locally and commits the shared switch even when the Worker
+cannot respond; it does not require a new Worker to cancel intent. Returned
+inactive state does not claim remote delivery or completed peer processing.
+
+Model tests exercise twenty silent exits, one hundred incarnation-qualified
+hub replacements, same-incarnation/error probe bounds, concurrent probes and
+cancellation during rebind. Real browser/native-resource and multi-document
+fault qualification remain separate requirements. P20 also verifies fifty
+actual same-name exits with bounded native clients in a separate minimal
+no-audio control. The headed audio run observed anonymous PSS increase from
+about 205 to 268 MiB across its short sampled interval, with no forced GC and
+zero SwapPss. This is an unresolved resource observation, not long-duration
+allocation acceptance; inspect retirement/GC and native roots before qualification.
+
+The [graph baseline](../tests/native-audio/results-graph-baseline-20261128.json)
+separately reproduces three still-open SDK defects using controlled browser API
+models: rejected Worklet loading remains cached, a closed Context is reused on
+later attempts, and temporary Context suspension stops the held capture source.
+Worker recovery does not repair those graph failures. Bound module/resume/close
+operations, retire unusable native graphs and preserve valid source/intent
+before starting final long-duration qualification.
 
 ## Contract
 

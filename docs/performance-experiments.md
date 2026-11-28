@@ -1146,3 +1146,10 @@ compares fifty direct native clients with disposable logical MessageChannels
 on one document bootstrap. Another peer remains usable. Chrome 149 and a
 supplied Chrome 158 control keep native client counts bounded; full served
 SDK/Pulse, immutable candidate and human UAT remain separate.
+
+Worker 8's additional P20 control performs fifty actual silent exits and
+incarnation-qualified same-name bootstrap probes in Chrome 158.0.8127.88.
+Native clients remain one after live owner retirement/idle; this minimal
+headless diagnostic-GC control has no audio and does not qualify the complete
+SDK/Pulse recovery or production resource envelope. The linked experiment
+retains source/report hashes and the earlier measurements.

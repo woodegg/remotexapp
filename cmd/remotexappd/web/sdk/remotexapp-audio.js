@@ -14,7 +14,7 @@ export class RemoteXAppAudio extends EventTarget {
     if (base.origin !== environment.location.origin) throw Error('Audio requires a same-origin Manager');
     if (!environment.isSecureContext || !environment.SharedWorker || !environment.MessageChannel || !environment.AudioContext || !environment.AudioWorkletNode) throw Error('Secure context, SharedWorker, MessageChannel and AudioWorklet are required');
     this.base = base.href.replace(/\/$/,''); this.requests = new Map(); this.interests = new Map(); this.next = 0; this.captureEpoch = 0; this.activating = 0; this.closed = false;
-    this.workerKey = "remotexapp-audio-v7:"+this.base;
+    this.workerKey = "remotexapp-audio-v8:"+this.base;
     this.stats = {connection:'idle',speakerOwner:false,micOwner:false,routes:[]};
     this.retirements = new Set(); this.retirementErrors = [];
     this.journal = new AudioIntentJournal(environment,this.base);
@@ -23,6 +23,7 @@ export class RemoteXAppAudio extends EventTarget {
     this.watchdog = environment.setInterval(()=>{
       const now = Date.now(), suspended = now-this.lastWatchdogTick>5000; this.lastWatchdogTick = now;
       if (suspended) { this.lastWorkerMessage = now; this._fenceCapture(); this._wake(); return; }
+      if(this.port && this.workerGeneration!==this._workerGeneration())this._fail('audio-worker-superseded');
       if (this.port && now-this.lastWorkerMessage>10000) this._fail('audio-worker-unresponsive');
       this._journalChanged();
       if (!this.port && this.interests.size && now >= (this.workerRetryAfter || 0) && !this.workerExhausted) this._recoverWorker();
@@ -30,6 +31,7 @@ export class RemoteXAppAudio extends EventTarget {
     this._pagehide = event => { if (event.persisted) this._suspend(); else void this.dispose().catch(()=>{}); };
     this._suspend = () => { this._fenceCapture(); this._post({op:'suspend'}); };
     this._wake = () => {
+      if(this.port && this.workerGeneration!==this._workerGeneration())this._fail('audio-worker-superseded');
       if (this.port) { this._post({op:'wake'}); this._post({op:'capture-eligible'}); this._journalChanged(); }
       else if (this.interests.size) this._recoverWorker();
     };
@@ -44,23 +46,27 @@ export class RemoteXAppAudio extends EventTarget {
   _workerGeneration() {
     try {
       const generation = Number(this.env.localStorage?.getItem(this.workerKey));
-      return Number.isSafeInteger(generation) && generation >= 0 ? generation : 0;
+      return Number.isSafeInteger(generation) && generation >= 0 && generation<=1 ? generation : 0;
     } catch { return 0; }
   }
-  _openWorker(generation = this._workerGeneration()) {
+  _openWorker(generation = this._workerGeneration(),options = {}) {
     let worker;
-    try { worker = this.worker = connectAudioWorker(this.env, this.base+'/sdk/audio-worker.js', this.workerKey+':'+generation); }
+    try { worker = this.worker = connectAudioWorker(this.env, this.base+'/sdk/audio-worker.js', this.workerKey+':'+generation,options); }
     catch(error){if(error.message==='audio-worker-capacity')this.workerExhausted=true;throw error;}
     const port = this.port = worker.port;
+    this.workerGeneration=generation;
+    const currentPort=()=>{if(this.closed || this.port!==port)throw Object.assign(Error('audio-worker-superseded'),{code:'audio-worker-superseded'});};
     port.onmessage = event => { if (this.port === port) this._message(event.data); };
     port.start();
     worker.onerror = () => { if (this.worker === worker) this._fail('audio-worker-ended'); };
     this.lastWorkerMessage = this.lastWatchdogTick = Date.now();
     const previous = this.binding;
-    this.ready = this._request('init',{base:this.base,binding:previous || null,workerProtocol:7}).then(async contract => {
-      if(contract.protocol!=='pcm-s16le-48k-v1' || contract.workerProtocol!==7) {
+    this.ready = this._request('init',{base:this.base,binding:previous || null,workerProtocol:8,sourceLive:this._liveSource()}).then(async contract => {
+      currentPort();
+      if(contract.protocol!=='pcm-s16le-48k-v1' || contract.workerProtocol!==8) {
         this.workerExhausted=true;throw Object.assign(Error('Incompatible audio Worker assets'),{code:'audio-worker-contract'});
       }
+      try{worker.confirm(contract.workerId);}catch(error){if(error.code==='audio-worker-contract')this.workerExhausted=true;throw error;}
       const current = contract.binding;
       const samePrincipal = previous?.principal && previous.principal === current?.principal;
       const principalChanged = previous?.principal && previous.principal !== current?.principal;
@@ -71,15 +77,20 @@ export class RemoteXAppAudio extends EventTarget {
       }
       if (current) this.binding = current;
       for (const interest of this.interests.values()) {
+        currentPort();
         await this._request('acquire',{ref:interest.ref,runtime:interest.runtime,generation:interest.generation});
+        currentPort();
         if (interest.released) await this._request('release',{ref:interest.ref});
         else interest[boundPort] = port;
       }
+      currentPort();
       this._post({op:'playback-ready',ready:this.context?.state==='running' && !!this.playback});
       for (const interest of this.interests.values()) await this._replayInterest(interest);
+      currentPort();
       return {protocol:contract.protocol};
     });
     this.ready.catch(error=>{ if (this.port === port) this._fail(error.code || 'audio-worker-init-failed'); });
+    return worker;
   }
   async _ensureWorker() {
     if (this.closed) throw Error('Audio controller disposed');
@@ -91,30 +102,31 @@ export class RemoteXAppAudio extends EventTarget {
     try { return await next; } finally { if (this.rebind === next) this.rebind = null; }
   }
   async _replaceWorker(generation) {
-    // A terminated worker can be recreated under its original name by any
-    // page. Only an unanswered init warrants moving away from a live name.
-    this._openWorker(generation);
-    try { return await this.ready; } catch (error) {
-      if (error.code !== 'audio-worker-init-timeout' || !this.env.navigator?.locks || this.closed) throw error;
+    for(let slot=generation;slot<=1;){
+      let attempt,error;
+      try {attempt=this._openWorker(slot);return await this.ready;}catch(e){error=e;}
+      if(error.code==='audio-worker-init-timeout' && !this.closed) {
+        try {this._openWorker(slot,{probeOf:attempt});return await this.ready;}catch(e){error=e;}
+      }
+      if(!['audio-worker-init-timeout','audio-worker-probe-exhausted'].includes(error.code) || this.closed)throw error;
+      const selected=await this.env.navigator.locks.request(this.workerKey,()=>{
+        const current=this._workerGeneration();
+        if(current!==slot)return current;
+        if(slot>=1){this.workerExhausted=true;throw Error('audio-worker-capacity');}
+        this.env.localStorage.setItem(this.workerKey,'1');return 1;
+      });
+      if(this.closed)throw Error('Audio controller disposed');
+      slot=selected;
     }
-    const selected = await this.env.navigator.locks.request(this.workerKey, () => {
-      const current = this._workerGeneration();
-      if (current >= 1 && current === generation) { this.workerExhausted = true; throw Error('audio-worker-capacity'); }
-      if (current !== generation) return current;
-      this.env.localStorage.setItem(this.workerKey,String(generation+1));
-      return generation+1;
-    });
-    if (this.closed) throw Error('Audio controller disposed');
-    this._openWorker(selected);
-    return this.ready;
+    this.workerExhausted=true;throw Error('audio-worker-capacity');
   }
   _recoverWorker() {
     if (this.closed || this.rebind || this.workerExhausted) return;
-    void this._ensureWorker().then(()=>{this.workerBackoff = 0;}).catch(()=>{
+    void this._ensureWorker().then(()=>{this.workerBackoff = 0;}).catch(error=>{
       if (this.closed) return;
       this.workerBackoff = Math.min(30000,Math.max(1000,(this.workerBackoff || 500)*2));
       this.workerRetryAfter = Date.now()+this.workerBackoff;
-      this.stats = {...this.stats,connection:this.workerExhausted?'blocked':'recovering'}; this._emit();
+      this.stats = {...this.stats,connection:this.workerExhausted?'blocked':'recovering',reason:error.message}; this._emit();
     });
   }
   _post(message,transfer) { this.port?.postMessage(message,transfer || []); }
@@ -181,6 +193,10 @@ export class RemoteXAppAudio extends EventTarget {
         return this._inactive(interest);
       }
       for (const i of this._locals(interest)) i.stamps[kind]=state;
+      // Off is already fenced locally and committed for the other owners. A
+      // dead/rebinding Worker must not turn that cancellation into a failure or
+      // require another Worker merely to cancel an integration.
+      if(!enabled && (!this.port || this.rebind))return this._inactive(interest);
       await Promise.all([preparing,this._ensureWorker()]);
       if(interest.released || this.closed)throw Error('Audio context retired');
       if (interest.operations[kind]!==revision) return this._inactive(interest);
@@ -330,7 +346,7 @@ export class RemoteXAppAudio extends EventTarget {
           if(permission==='granted' && this.env.document?.visibilityState!=='hidden') {
             for(const track of this.stream.getAudioTracks())if(track.readyState==='live')track.enabled=true;
           }
-          this._post({op:'capture-failed',token,reason:'microphone-device-muted'});return;
+          this._post({op:'capture-failed',token,reason:'microphone-device-muted',retainedSource:true});return;
         }
         if (!reusable && !canPrompt && permission!=='granted') {
           this._post({op:'capture-failed',token,reason:'microphone-permission-required'});return;
@@ -348,7 +364,7 @@ export class RemoteXAppAudio extends EventTarget {
           this.captureSource=context.createMediaStreamSource(stream);this.captureSource.connect(this.capture);this.capture.connect(context.destination);
           for(const track of stream.getTracks()){
             track.enabled=false;track.onended=()=>this._captureFailed('microphone-device-ended');
-            track.onmute=()=>{const old=this.captureToken;this._fenceCapture({disableTrack:false});if(old)this._post({op:'capture-failed',token:old,reason:'microphone-device-muted'});};
+            track.onmute=()=>{const old=this.captureToken;this._fenceCapture({disableTrack:false});if(old)this._post({op:'capture-failed',token:old,reason:'microphone-device-muted',retainedSource:true});};
             track.onunmute=()=>this._wake();
           }
         }
@@ -412,7 +428,7 @@ export class RemoteXAppAudio extends EventTarget {
     if (message.type === 'capture-delivery') {
       if (this.captureToken !== message.token || !this.capture) return;
       if(message.delivery && this.stream.getAudioTracks().some(track=>track.muted)) {
-        const token=this.captureToken;this._fenceCapture({disableTrack:false});this._post({op:'capture-failed',token,reason:'microphone-device-muted'});return;
+        const token=this.captureToken;this._fenceCapture({disableTrack:false});this._post({op:'capture-failed',token,reason:'microphone-device-muted',retainedSource:true});return;
       }
       if (message.delivery && (![...this.interests.values()].some(i=>i[resumeMicrophone] && this._micInterest({runtime:i.runtime,generation:i.generation})) || this.stream.getAudioTracks().some(track=>track.readyState!=='live'))) {
         this._captureFailed('microphone-device-unavailable');
@@ -433,6 +449,7 @@ export class RemoteXAppAudio extends EventTarget {
     if (message.type === 'binding') { this.binding = message.binding; return; }
     if (message.type === 'retired') this._retireInterests();
     if (message.type === 'state') {
+      if(message.captureReady && !message.micOwner && this.stream && !this.captureToken && !this.captureRequest)this._stopCapture();
       let lastDisconnect = message.lastDisconnect;
       if (this.stats.lastDisconnect && (!lastDisconnect || this.stats.lastDisconnect.at > lastDisconnect.at ||
           (this.stats.lastDisconnect.at === lastDisconnect.at && this.stats.lastDisconnect.recoveredAt != null))) {

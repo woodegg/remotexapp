@@ -55,3 +55,29 @@ Accepted scope is bounded native client construction in these controls. Actual
 served SDK/Worker pairing, cross-tab speaker/mic continuity, Worker failover,
 full resource trends, immutable archive and human UAT are separate gates.
 Do not interpret counts as whole-browser RSS/PSS or zero-cost idle behavior.
+
+## Worker 8 repeated silent-exit control (2026-11-28)
+
+The [Worker 7 real SDK control](../../native-audio/results-worker-silent-exit-20261128.json)
+reproduced a second-exit recovery block. Worker 8 adds a same-name native
+bootstrap probe after a cached logical init timeout, qualified by the new
+Worker's random incarnation ID. An unknown or unchanged incarnation cannot
+reset that budget. This replaces the fixed lifetime failover-name limit while
+preserving the native-client bound.
+
+```sh
+python3 tests/native-audio/browser-worker-hub-retirement.py \
+  --browser /path/to/chrome --output /private/silent-exits \
+  --silent-exits --cycles 50
+```
+
+The actual product hub now passes fifty actual `self.close()`/recovery cycles
+under one name in Chrome 158.0.8127.88. Every cached logical init must time out;
+a fresh bootstrap must report a distinct incarnation. Native snapshots retain
+one SharedWorker client/two ports with the live logical owner and one client/one
+port after owner retirement and live idle. Playback/capture native counts are
+zero because this mechanism probe creates no audio. Headless mode, disabled
+sandbox and diagnostic GC snapshots are explicit limits of this control; the
+separate real headed SDK/Kasm/Pulse repeated-exit control and long-duration,
+multi-owner, resource and release gates still apply. The earlier accepted
+measurements and failed Worker 7 evidence are retained.

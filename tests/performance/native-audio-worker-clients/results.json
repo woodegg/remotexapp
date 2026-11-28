@@ -129,7 +129,8 @@
     "worker-local-baseline": "18b9b2a4f07b333769ef971b7f5024b8334022cde29135b21654ac612acdfb7b",
     "worker-local-candidate": "4d5fde112e2046176fc24dde8d030ea5de34fd73f80b33ed8656ce678e51efbe",
     "worker-hub-native-r2": "9be3b0068e24c1b3922d9e3e145c488c497abf3693daab4c000fc8b69a9d2260",
-    "worker-hub-native-r3": "7fc9dc6a38b7affca88481c58268d77fb8300c1851f954b94021cf0fbf2ead2d"
+    "worker-hub-native-r3": "7fc9dc6a38b7affca88481c58268d77fb8300c1851f954b94021cf0fbf2ead2d",
+    "worker8SilentExitControl": "dcfefc9359f12a260e3a8fb3a1aded99585718eeaf6a91efec21c3ae69f430dd"
   },
   "selectedCacheEvictionRecheck": {
     "browser": "Chrome/158.0.8127.36",
@@ -175,5 +176,48 @@
     "pageAlive": true,
     "bounded": true,
     "hubSourceSHA256": "33ab783ced331c77def9fe0aca1d3d6f2f67ab75b387b57e4a96e307b1747d43"
+  },
+  "worker8SilentExitControl": {
+    "browser": "Chrome/158.0.8127.88",
+    "cycles": 50,
+    "counts": {
+      "keeper": {
+        "SharedWorker": 1,
+        "MessagePort": 2,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "cyclesWithKeeper": {
+        "SharedWorker": 1,
+        "MessagePort": 2,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "allOwnersRetired": {
+        "SharedWorker": 1,
+        "MessagePort": 1,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "idlePageAlive": {
+        "SharedWorker": 1,
+        "MessagePort": 1,
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      }
+    },
+    "keeperSurvives": true,
+    "pageAlive": true,
+    "ownedBrowserClosed": true,
+    "hubSourceSHA256": "285d0b7e26f72a548f6f852b3b245b1862feea8436c8f734e3e4c8d391f234bc",
+    "pageSourceSHA256": "bda575793de013da325c4e61afc6116a925ca9f9384ea74cc43730fa09fe193c",
+    "method": "Actual Worker self.close, cached logical init timeout, fresh same-name native probe and distinct confirmed incarnation; minimal actual hub, no audio. Headless browser with sandbox disabled; diagnostic GC snapshots before page retirement.",
+    "workerProtocol": 8,
+    "singleName": true,
+    "releaseQualified": false
   }
 }

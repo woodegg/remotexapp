@@ -5864,3 +5864,27 @@ logout remain terminal for old interests. This supersedes the earlier treatment
 of every context rejection as permanent interest retirement, and adds no new
 credential or required login header. Model regressions do not close repeated
 silent Worker exit, real browser, native retirement or long-duration gates.
+
+## 2026-11-28 — Bound native probes by confirmed Worker incarnation
+
+The Worker 7 real Chrome control recovered the first `self.close()` but blocked
+on the second with no live Worker and a healthy backend. A cached native
+bootstrap cannot deliver a new logical port to a silently terminated global.
+This supersedes the fixed lifetime replacement limit, retaining its purpose of
+bounding native SharedWorkerClient retention. Worker 8 first retries the cached
+logical channel, then probes a fresh native bootstrap under the same name. A
+random ephemeral init `workerId` confirms a new incarnation before its probe
+budget resets; same or unknown IDs and native errors do not reset it. Competing
+probes reuse the newest bootstrap, stale init completions are rejected and two
+nonresponsive names bound native clients to four. A permanently unresponsive
+pair reports blocked instead of creating unlimited names. No new authentication
+or server authority is attached to that correlation ID.
+
+Live-source hints prefer an already held source only among currently authorized
+participants. They do not authorize capture. Existing watchdog/wake callbacks
+reconcile preferred-name changes; a responsive unselected owner retires its held
+source after another capture becomes ready. A local off and its committed shared
+switch remain successful with no Worker; returned inactive state claims no
+remote delivery. Models cover repeated silent exits, budget and cancellation.
+Real repeated-exit, multi-document, native-retainer and full production gates in
+[native-self-recovery.md](native-self-recovery.md) remain incomplete.

@@ -3,6 +3,7 @@
 export class AudioCoordinator {
   constructor(env = globalThis) {
     this.env = env; this.ports = new Map(); this.routes = new Map(); this.pending = new Map(); this.serial = Promise.resolve(); this.client = env.crypto.randomUUID();
+    this.workerId=env.crypto.randomUUID();
     this.connection = null; this.socket = null; this.capture = null; this.player = null; this.next = 0; this.epoch = 0; this.sequence = 0; this.received = 0; this.sent = 0; this.dropped = 0; this.reason = ''; this.lastTick = Date.now();
     this.timer = env.setInterval(()=>this._tick(),1000);
   }
@@ -89,9 +90,10 @@ export class AudioCoordinator {
     if (data.op === 'capture-ready' || data.op === 'capture-failed') {
       const capture = this.capture;
       if (capture?.peer !== peer || data.token !== capture.token) return;
-      if (data.op === 'capture-ready') { capture.ready = true; capture.resolve?.(); capture.resolve = capture.reject = null; }
+      if (data.op === 'capture-ready') { peer.holdsSource=true;capture.ready = true; capture.resolve?.(); capture.resolve = capture.reject = null; }
       else {
         const reason = data.reason || 'microphone-ended';
+        peer.holdsSource=!!data.retainedSource;
         const blocked = ['microphone-permission-required','microphone-permission-denied','microphone-device-muted','intent-state-unavailable','microphone-intent-retired'].includes(reason);
         if (capture.ref) capture.ref.captureBlocked = blocked;
         peer.captureBackoff = Math.min(30000,Math.max(1000,(peer.captureBackoff || 500)*2));
@@ -191,9 +193,10 @@ export class AudioCoordinator {
       const base = new URL(data.base);
       if (base.origin !== this.env.location.origin || base.search || base.hash || base.username || base.password) throw Error('Invalid audio service origin');
       if (this.base && this.base !== data.base) throw Error('Audio service scope differs');
-      if(data.workerProtocol!==7)throw Error('Unsupported audio Worker contract');
+      if(data.workerProtocol!==8)throw Error('Unsupported audio Worker contract');
       peer.binding=data.binding || null;
-      this.base = data.base; this._broadcast(); return {protocol:'pcm-s16le-48k-v1',workerProtocol:7,binding:this._binding()};
+      peer.holdsSource=!!data.sourceLive;
+      this.base = data.base; this._broadcast(); return {protocol:'pcm-s16le-48k-v1',workerProtocol:8,workerId:this.workerId,binding:this._binding()};
     }
     if (data.op === 'dispose') return this._remove(peer);
     if (data.op === 'suspend') { if (this.connection) await this._sync(); return; }
@@ -250,7 +253,8 @@ export class AudioCoordinator {
         // device. A conflict/unavailable domain must not churn local capture.
         await this._sync();
         if (data.enabled && route.actualMic && route.mic && data.revision === route.micRevision && peer.refs.has(ref.id)) {
-          const capture = await this._ensureCapture(peer,ref,!!data.automatic);
+          const source=data.automatic ? this._captureCandidate() || ref : ref;
+          const capture = await this._ensureCapture(source.peer,source,!!data.automatic);
           if (!capture || this.capture !== capture || !capture.ready) throw Error('microphone-ended-before-routing');
           if (data.revision !== route.micRevision || !peer.refs.has(ref.id)) this._releaseCaptureIfUnused();
           await this._sync();
@@ -277,7 +281,7 @@ export class AudioCoordinator {
     const routes = [...this.routes.values()].map(r=>this._routeState(r));
     const wanted=routes.some(r=>r.requested.speaker||r.requested.microphone);
     const connection=this.connection?'connected':wanted?(this.accessBlocked?'blocked':'recovering'):'idle';
-    for (const peer of this.ports.values()) this._send(peer,{type:'state',connection,protocol:this.connection?'WSS / PCM16 48 kHz':null,playbackBlocked:routes.some(r=>r.speaker)&&!this.player,connectionId:this.connection,speakerOwner:this.player===peer,micOwner:this.capture?.peer===peer,reason:this.reason,lastDisconnect:this.lastDisconnect,routes,receivedBytes:this.received,sentBytes:this.sent,droppedFrames:this.dropped});
+    for (const peer of this.ports.values()) this._send(peer,{type:'state',connection,protocol:this.connection?'WSS / PCM16 48 kHz':null,playbackBlocked:routes.some(r=>r.speaker)&&!this.player,connectionId:this.connection,speakerOwner:this.player===peer,micOwner:this.capture?.peer===peer,captureReady:!!(this.capture?.ready && this.capture.delivering),reason:this.reason,lastDisconnect:this.lastDisconnect,routes,receivedBytes:this.received,sentBytes:this.sent,droppedFrames:this.dropped});
   }
   _selectPlayer() {
     const count = [...this.routes.values()].filter(r=>r.speaker).length;
@@ -445,10 +449,7 @@ export class AudioCoordinator {
     if (!this.connection) return;
     for (const route of this.routes.values()) await this._syncRoute(route);
     if (recoverCapture && !this.capture) {
-      const candidates = [...this.routes.values()].filter(r=>r.mic && r.actualMic)
-        .flatMap(r=>[...r.refs]).filter(ref=>ref.micIntent && !ref.captureBlocked &&
-          Date.now()>=(ref.peer.captureRetryAfter || 0) && Date.now()-ref.peer.seen<=5000);
-      const ref = candidates[0];
+      const ref = this._captureCandidate();
       if (ref) {
         try { await this._ensureCapture(ref.peer,ref,true); }
         catch { /* Capture failure retains intent; per-owner backoff controls retry. */ }
@@ -463,6 +464,12 @@ export class AudioCoordinator {
     this._captureDelivery([...this.routes.values()].some(r=>r.mic && r.actualMic));
     this._selectPlayer(); this._broadcast();
     if (![...this.routes.values()].some(r=>r.speaker||r.mic)) this._disconnect('no-authorized-audio-targets');
+  }
+  _captureCandidate() {
+    return [...this.routes.values()].filter(r=>r.mic && r.actualMic && !r.retired)
+      .flatMap(r=>[...r.refs]).filter(ref=>ref.micIntent && !ref.captureBlocked &&
+        Date.now()>=(ref.peer.captureRetryAfter || 0) && Date.now()-ref.peer.seen<=5000)
+      .sort((a,b)=>Number(!!b.peer.holdsSource)-Number(!!a.peer.holdsSource))[0];
   }
   _speaker(data) {
     if (data.byteLength<8) return;

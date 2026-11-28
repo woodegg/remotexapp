@@ -1,0 +1,32 @@
+{
+  "status": "remaining-graph-defects-reproduced",
+  "method": "Actual SDK methods with controlled browser-API model; not browser/device qualification",
+  "cases": [
+    {
+      "name": "module-load-rejection-poisons-later-retry",
+      "status": "defect-reproduced",
+      "contexts": 1,
+      "moduleAttempts": 1
+    },
+    {
+      "name": "closed-Context-reused-on-recovery",
+      "status": "defect-reproduced",
+      "contexts": 1
+    },
+    {
+      "name": "temporary-suspension-stops-held-source",
+      "status": "defect-reproduced",
+      "sourceStops": 1
+    }
+  ],
+  "releaseQualified": false,
+  "schemaVersion": 1,
+  "issue": 119,
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 8,
+  "sourceSHA256": "fbdf12419210834b9f1582ce4a8c524f583f3ddf5caf8a3fbf3f404eaa25d8f1",
+  "limits": [
+    "Controlled browser-API model of actual SDK _context methods; not actual browser/physical device results.",
+    "Does not qualify Worker, graph, native cleanup, long-duration or final release acceptance."
+  ]
+}

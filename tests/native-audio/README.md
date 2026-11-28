@@ -228,3 +228,11 @@ for the direct-client negative control. Fifty logical retirements preserve a
 live peer; native endpoints are measured before page/browser close. This
 mechanism probe creates no audio and cannot substitute for full SDK/Pulse or
 post-merge candidate tests. See [P20](../performance/native-audio-worker-clients/README.md).
+
+Use `--silent-exits --cycles 50` on the same Worker hub harness for actual
+`self.close()`/same-name recovery with a confirmed fresh incarnation on every
+cycle. The current logical owner remains usable and all owners retire before
+the final live-page native endpoint. This is a minimal no-audio mechanism probe
+with diagnostic GC; it is separate from headed SDK/Pulse recovery, natural soak,
+combined stress and final artifact qualification. See P20 for exact measured
+bytes and limitations.

@@ -229,3 +229,13 @@ New server patches require a full rebuild; the client-rebuild helper refuses
 to reuse a parent server whose patch recipe differs. See
 [destination ordering](../../docs/native-clipboard-ordering.md) for uncompleted
 native qualification and older-component manual fallback.
+
+Development patch `0030-server-nonblocking-clipboard.patch` replaces synchronous
+rich-body reads with incremental, bounded staging. Partial input yields the
+shared X11 event loop; a per-connection absolute 50-second timer closes a stalled
+body. Complete validation still precedes the v4 revision admission and mutation.
+A new complete immutable server/client build is required; the prior v4 prototype
+without this patch is not the final qualified pair. See the
+[ordering contract](../../docs/native-clipboard-ordering.md#partial-native-uploads-development-repair)
+and retained native failure. Real split-body/peer, slow-link and resource
+qualification remain required; portable tests do not close those gates.

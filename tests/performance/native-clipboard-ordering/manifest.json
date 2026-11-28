@@ -7,7 +7,8 @@
     "third_party/kasm/clipboard-input.mjs": "a5d8776af822116254644936e1d0c813eefa781c1ada91ba36412b8c951b55cb",
     "third_party/kasm/clipboard-payload.mjs": "d4c911158fe7bf06eee032c929ac8feedc878dd3c925e24634fddead4868a19c",
     "third_party/kasm/patches/0029-server-clipboard-ordering.patch": "d49df2369546d1fa19b52473d084de616cfe395426456fdd14783ab19b8599d0",
-    "cmd/remotexappd/web/sdk/native-clipboard.js": "871f69ff07da2ac9928d27d8c2343d358bf29a0ba52fddebfe2eb400d76aa86a"
+    "cmd/remotexappd/web/sdk/native-clipboard.js": "871f69ff07da2ac9928d27d8c2343d358bf29a0ba52fddebfe2eb400d76aa86a",
+    "third_party/kasm/patches/0030-server-nonblocking-clipboard.patch": "975cfd860ff1d1486859d8c5f9cacaac9b95368c4b2a7b4aaa70dfe656bd3c66"
   },
   "resultSHA256": "c55661ea977e180f3e39fc851860bc30ab76109c0c3504cecb1900b0b2edbd9a",
   "unchanged": [

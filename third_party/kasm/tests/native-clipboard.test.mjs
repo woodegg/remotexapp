@@ -7,7 +7,7 @@ import {join} from 'node:path';
 const source=process.env.KASM_SERVER_SOURCE;
 test('applied server stages rich clipboard before mutation and bounds allocations', {skip:!source},()=>{
   const input=readFileSync(join(source,'common/rfb/SMsgReader.cxx'),'utf8');
-  const start=input.indexOf('void SMsgReader::readBinaryClipboard()'),end=input.indexOf('void SMsgReader::readExtendedClipboard',start);
+  const start=input.indexOf('bool SMsgReader::readBinaryClipboard()'),end=input.indexOf('void SMsgReader::readExtendedClipboard',start);
   assert(start>=0&&end>start);
   const work=mkdtempSync(join(tmpdir(),'native-clipboard-'));
   try {

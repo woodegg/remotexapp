@@ -108,6 +108,27 @@ adoption instructions and UAT diagnostics must describe that boundary together.
 The host declares intent and renders effective/conflict/uncertain state; it does
 not implement a clipboard recovery or ordering loop.
 
+## Partial native uploads (development repair)
+
+The [real partial-upload control](../tests/kasm-native/results-native-clipboard-partial-stall-20261128.json)
+passes A-B-A, delayed/unannounced owner conflict, explicit source choice, INCR
+and simultaneous two-Viewer admission, then reproduces a separate blocking-read
+defect. Holding a rich body after its first 24 bytes prevents an independent X11
+owner operation from finishing until the tail is released. Final destination
+readback survives, but this stalls the shared desktop and is not an acceptable
+slow-link design. A completed ordinary upload does not exercise that boundary.
+
+Development patch 0030 stages one transaction per connection incrementally using
+nonblocking availability checks and yields the native event loop while incomplete.
+Only complete validated representations reach final revision admission/mutation.
+One absolute fifty-second native deadline bounds an incomplete body; progress
+cannot reset it. A timer closes a stalled connection even if it sends no further
+bytes, freeing its staged data. Completed transactions release staging before the
+next message. This bound is separate from browser I/O and size-based SDK waits.
+The same split-body test and actual peer responsiveness must pass before this
+repair is qualified. Other small upstream RFB message readers are unchanged;
+this repair does not claim that all native message parsing is nonblocking.
+
 ## Required proof
 
 - Preserve the original A-B-A text/HTML/PNG cases and genuine-echo controls.

@@ -11,6 +11,12 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Repair development native clipboard partial-upload stalls: resume bounded
+  staging without blocking the desktop event loop, preserve final atomic
+  revision admission, and close incomplete transactions at an absolute native
+  deadline. The original real split-body failure is retained; new native and
+  slow-link qualification remain pending.
+
 - Add development native clipboard destination ordering on new immutable v4
   Kasm pairs. A complete automatic upload compares its baseline revision before
   any native clipboard buffer/selection mutation; stale submissions preserve the

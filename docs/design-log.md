@@ -6006,3 +6006,18 @@ and a fresh transfer. Check elapsed deadlines before accepting results or keys,
 even when browser suspension delayed timer callbacks. Freeze retires clipboard
 work and a still-focused resume acquires a fresh baseline. These are selected
 lifetime/backpressure invariants, not proof of native slow-link qualification.
+
+## 2026-11-28 — Yield during incomplete native rich clipboard uploads
+
+The real split-body control in KNC-013 blocks unrelated X11 owner changes until
+its tail arrives. Synchronous staging protects atomicity but cannot protect
+shared-desktop responsiveness. Supersede that staging mechanism with one
+incremental bounded transaction per connection: check availability without
+waiting, yield on partial input, then validate and compare/mutate only after the
+whole body arrives. Propagate incomplete processing to the native dispatch loop
+so buffered partial headers cannot spin. A fifty-second absolute native deadline
+and connection-owned timer close incomplete transfers without resetting on
+progress; completion/disconnect releases staging. Preserve clipboard permissions,
+10 MiB bounds, correlated admission and old-pair fallback. Native reproduction,
+repair proof and complete performance gates remain distinct requirements. Small
+upstream message readers are outside this bounded replacement.

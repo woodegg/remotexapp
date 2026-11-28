@@ -3,16 +3,46 @@ class RemoteXAppPlayback extends AudioWorkletProcessor {
   constructor() {
     super(); this.disposed = false; this.acknowledged = false; this.streams = new Map(); this.blocks = 0; this.underruns = 0; this.dropped = 0; this.peak = 0;
     this.port.onmessage = ({data}) => {
-      if (this.disposed) return;
-      if (data.op === 'dispose') { this.disposed = true; this.streams.clear(); this.peak = 0; return; }
-      if (data.op === 'reset') { for (const stream of this.streams.values()) for (const _ of stream.queue) this.port.postMessage({type:'credit'}); this.streams.clear(); return; }
-      if (data.op === 'remove') { const s = this.streams.get(data.slot); if (s) for (const _ of s.queue) this.port.postMessage({type:'credit'}); this.streams.delete(data.slot); return; }
-      if (data.op !== 'frame' || !(data.pcm instanceof ArrayBuffer) || data.pcm.byteLength !== 3840 || data.slot < 1 || data.slot > 8) return;
-      let stream = this.streams.get(data.slot);
-      if (!stream) { stream = {queue:[], offset:0}; this.streams.set(data.slot,stream); }
-      if (stream.queue.length >= 8) { stream.queue.shift(); stream.offset = 0; this.dropped++; this.port.postMessage({type:'credit'}); }
-      stream.queue.push(new Int16Array(data.pcm));
+      if (this.disposed || !data || typeof data.op!=='string') return;
+      if (data.op === 'dispose') { this.disposed = true; this.streams.clear(); this.peak = 0; this._closeMedia(); return; }
+      if (data.op === 'media-unbind') {if(this.media?.binding===data.binding){this._closeMedia();this.streams.clear();}return;}
+      if (data.op === 'media-bind') {
+        if(typeof data.binding!=='string' || !data.binding || data.binding.length>64 || ['postMessage','close','start'].some(key=>typeof data.port?.[key]!=='function')){if(typeof data.port?.close==='function')data.port.close();return;}
+        this._closeMedia();this.streams.clear();this.mediaEpoch=null;
+        const media=this.media={binding:data.binding,port:data.port};
+        media.port.onmessage=({data})=>{
+          if(this.disposed || this.media!==media || !data || typeof data.op!=='string')return;
+          if(data.op==='reset') {
+            if(typeof data.epoch!=='string' || !data.epoch)return;
+            this.mediaEpoch=data.epoch;this.streams.clear();return;
+          }
+          if(data.epoch===this.mediaEpoch)this._message(data);
+        };
+        media.port.onmessageerror=()=>{
+          if(this.media!==media || this.disposed)return;
+          this._closeMedia();this.streams.clear();this.port.postMessage({type:'media-error',binding:media.binding});
+        };
+        media.port.start();return;
+      }
+      this._message(data);
     };
+  }
+  _closeMedia() {
+    const media=this.media;this.media=null;
+    if(media){media.port.onmessage=media.port.onmessageerror=null;media.port.close();}
+  }
+  _credit() {
+    if(this.media)this.media.port.postMessage({type:'credit',binding:this.media.binding,epoch:this.mediaEpoch});
+    else this.port.postMessage({type:'credit'});
+  }
+  _message(data) {
+    if (data.op === 'reset') { for (const stream of this.streams.values()) for (const _ of stream.queue) this._credit(); this.streams.clear(); return; }
+    if (data.op === 'remove') { const s = this.streams.get(data.slot); if (s) for (const _ of s.queue) this._credit(); this.streams.delete(data.slot); return; }
+    if (data.op !== 'frame' || !(data.pcm instanceof ArrayBuffer) || data.pcm.byteLength !== 3840 || data.slot < 1 || data.slot > 8) return;
+    let stream = this.streams.get(data.slot);
+    if (!stream) { stream = {queue:[], offset:0}; this.streams.set(data.slot,stream); }
+    if (stream.queue.length >= 8) { stream.queue.shift(); stream.offset = 0; this.dropped++; this._credit(); }
+    stream.queue.push(new Int16Array(data.pcm));
   }
   process(_inputs, outputs) {
     if (this.disposed) {
@@ -28,7 +58,7 @@ class RemoteXAppPlayback extends AudioWorkletProcessor {
         const frame = stream.queue[0]; if (!frame) { missed = true; break; }
         out[0][i] += frame[stream.offset*2]/32768;
         if (out[1]) out[1][i] += frame[stream.offset*2+1]/32768;
-        if (++stream.offset === 960) { stream.queue.shift(); stream.offset = 0; this.port.postMessage({type:'credit'}); }
+        if (++stream.offset === 960) { stream.queue.shift(); stream.offset = 0; this._credit(); }
       }
       if (missed) this.underruns++;
     }

@@ -33,7 +33,7 @@ function fixture(){
  f.cleanup=()=>f.coordinator._retire('test-finished');
  return f;
 }
-async function ready(peer){await peer.request('init',{base:'https://audio.test',workerProtocol:8});}
+async function ready(peer){await peer.request('init',{base:'https://audio.test',workerProtocol:9});}
 async function acquire(peer,ref,runtime='app'){await peer.request('acquire',{ref,runtime,generation:1});}
 
 test('a server speaker route ACK is not effective playback until an eligible graph is ready',async()=>{
@@ -502,4 +502,38 @@ test('explicit audio off succeeds locally while reconnection HTTP is unavailable
   f.offline=false;f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;
   assert.equal(f.sockets.length,1);assert.equal(f.coordinator.capture,null);
  } finally { f.cleanup(); }
+});
+
+test('a bound playback media port delivers and returns current credits without the UI relay',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a');
+  const media={sent:[],closed:false,start(){},close(){this.closed=true;},postMessage(m){this.sent.push(m);}};
+  a.send('playback-media',{binding:'media-a',port:media});a.send('playback-ready',{ready:true});await a.request('speaker',{ref:'a',enabled:true});
+  const route=[...f.coordinator.routes.values()][0],epoch=media.sent.findLast(m=>m.op==='reset')?.epoch;
+  const frame=()=>{const b=new ArrayBuffer(3848),v=new DataView(b);v.setUint8(0,1);v.setUint8(1,1);v.setUint8(2,route.slot);return b;};
+  for(let i=0;i<8;i++)f.coordinator._speaker(frame());
+  assert.equal(a.messages.filter(m=>m.type==='playback').length,0);
+  assert.equal(media.sent.filter(m=>m.op==='frame').length,8);
+  const peer=f.coordinator.player;assert.equal(peer.credits,0);
+  a.send('playback-credit');assert.equal(peer.credits,0);
+  media.onmessage({data:{type:'credit',binding:'media-a',epoch:'stale'}});assert.equal(peer.credits,0);
+  media.onmessage({data:{type:'credit',binding:'media-a',epoch}});assert.equal(peer.credits,1);
+  f.coordinator._speaker(frame());assert.equal(media.sent.filter(m=>m.op==='frame').length,9);
+  await a.request('speaker',{ref:'a',enabled:false});assert.ok(media.sent.some(m=>m.op==='remove'&&m.slot===route.slot));
+ }finally{f.cleanup();}
+});
+
+test('replaced playback ports and old reset credits cannot change the current budget',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a');
+  const make=()=>({sent:[],closed:false,start(){},close(){this.closed=true;},postMessage(m){this.sent.push(m);}});
+  const old=make();a.send('playback-media',{binding:'old',port:old});a.send('playback-ready',{ready:true});await a.request('speaker',{ref:'a',enabled:true});
+  const oldCallback=old.onmessage,oldEpoch=old.sent.findLast(m=>m.op==='reset').epoch,next=make();
+  a.send('playback-media',{binding:'next',port:next});assert.equal(old.closed,true);
+  const peer=f.coordinator.player;peer.credits=0;
+  oldCallback({data:{type:'credit',binding:'old',epoch:oldEpoch}});assert.equal(peer.credits,0);
+  next.onmessage({data:{type:'credit',binding:'next',epoch:oldEpoch}});assert.equal(peer.credits,0);
+  const epoch=next.sent.findLast(m=>m.op==='reset').epoch;next.onmessage({data:{type:'credit',binding:'next',epoch}});assert.equal(peer.credits,1);
+  a.send('dispose');await f.coordinator.serial;assert.equal(next.closed,true);
+ }finally{f.cleanup();}
 });

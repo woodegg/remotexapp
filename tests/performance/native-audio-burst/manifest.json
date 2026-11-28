@@ -5,12 +5,22 @@
   "baselineSourceSHA256": "4f6a5ea8bd70f1052dcbd9d0cde8c9f3aa047783edbe7e7670da4eecc4a785d3",
   "candidateSourceSHA256": "dfc1ce450483b8749bd56f08a2cd776f04ab2b5c718581b44a6bdecce1fb6803",
   "harnessSHA256": "d4de39a099c513c6a8fa42c408959c6667997ce293b990b281865c0932d3d87b",
-  "resultSHA256": "3f0dcd0d77981c2ab9f3b26829519ebc5a8b4948ac08e29a27a9e8e590af6ba7",
+  "resultSHA256": "299e148ebf8b0c32b731536f928e87f6a272811059d829f0fc3272b5c5017e4a",
   "unchanged": [
     "20 ms stereo PCM frames",
     "eight-frame worklet queue per stream",
     "eight maximum speaker routes",
     "microphone credits"
   ],
-  "qualifiedScope": "deterministic burst delivery and bounded aggregate credits"
+  "qualifiedScope": "deterministic burst delivery and bounded aggregate credits",
+  "schedulingFollowupEvidenceSHA256": "73e5eaf27d66dc26c8071aca52878e85c6c3f392460bd9a40d97b1c770c5fa32",
+  "schedulingFollowupSourceSHA256": {
+    "cmd/remotexappd/web/sdk/audio-coordinator.js": "d609b787fe0c0fc2c3dbab8b2ef29647712bc5fbb71881f367fe7504d9cfffe2",
+    "cmd/remotexappd/web/sdk/audio-worklet.js": "b70d4d053bbf3162629990853142a546b27f0c079f75138956855758b1ef7788",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "3600442749590e6ed1ff90f0ae69a8febc17b76fdec8c7ef9f6340eab326d0df",
+    "cmd/remotexappd/web/sdk/audio-coordinator.test.mjs": "f4a0e9c15c0b5ccf9f05395662210db8a71905914cab897bd9c829938266e687",
+    "cmd/remotexappd/web/sdk/audio-worklet.test.mjs": "dd7767931caff71812c92bdec64f470c7f51d89005a9055614f450830a55dd2d",
+    "cmd/remotexappd/web/sdk/audio-recovery.test.mjs": "2f32609761859847f5eb88b8224f8d1444a8535c1a820fc602c23cf1ece0a60a",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.test.mjs": "43f7a0458e1a447f1b110644f48f3a487bad8b2c3a345cbc0d4e64496bf6a2ae"
+  }
 }

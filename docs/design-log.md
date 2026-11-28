@@ -6089,3 +6089,23 @@ Explicit off and a late pending device acquisition remain cancellation fences.
 This differs from actual document freeze, which must stop the old source before
 another document takes ownership. Native counterfactual proof is diagnostic;
 new immutable-artifact and natural/stress gates remain separate.
+
+## 2026-11-28 — Separate playback media from document control scheduling
+
+The actual same-Context crossover keeps SDK transports, capture and processors
+live while switching only the audible source. A 240 ms document task leaves the
+native oscillator complete but starves the SDK playback relay; normal-load and
+post-fault SDK windows recover fresh sound. Earlier direct-port diagnostics with
+the same queue bounds remove the observed UI-related relay drop bursts. A
+separate no-SDK duplex failure prevents attributing all output gaps to this one
+mechanism. Preserve every failed window and the [scoped evidence](../tests/native-audio/results-speaker-scheduling-20261128.json).
+
+Refine AUD-006 prospectively for development Worker 9: transfer playback PCM and
+consumed credits through a separately owned Worker/Worklet MessageChannel. The
+parent keeps intent, permission, graph/device ownership and terminal processing
+acknowledgements. Bind/reset epochs fence old callbacks, frames and credits;
+replacement, per-App off and retirement must not affect healthy peers or leak
+ports. Do not increase the accepted P17 eight-frame/per-speaker and 64-credit
+aggregate bounds. This supersedes the parent playback-relay mechanism only when
+new artifact and full qualification pass. Microphone media needs corresponding
+source/delivery fencing; that part and final acceptance remain incomplete.

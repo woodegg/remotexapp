@@ -18,7 +18,7 @@ export class RemoteXAppAudio extends EventTarget {
     if (base.origin !== environment.location.origin) throw Error('Audio requires a same-origin Manager');
     if (!environment.isSecureContext || !environment.SharedWorker || !environment.MessageChannel || !environment.AudioContext || !environment.AudioWorkletNode) throw Error('Secure context, SharedWorker, MessageChannel and AudioWorklet are required');
     this.base = base.href.replace(/\/$/,''); this.requests = new Map(); this.interests = new Map(); this.next = 0; this.captureEpoch = 0; this.activating = 0; this.closed = false;
-    this.workerKey = "remotexapp-audio-v8:"+this.base;
+    this.workerKey = "remotexapp-audio-v9:"+this.base;
     this.stats = {connection:'idle',speakerOwner:false,micOwner:false,routes:[]};
     this.retirements = new Set(); this.retirementErrors = [];
     this.contextOps=new AudioContextOperations(environment,(_context,_kind,late)=>{
@@ -78,9 +78,9 @@ export class RemoteXAppAudio extends EventTarget {
     worker.onerror = () => { if (this.worker === worker) this._fail('audio-worker-ended'); };
     this.lastWorkerMessage = this.lastWatchdogTick = Date.now();
     const previous = this.binding;
-    this.ready = this._request('init',{base:this.base,binding:previous || null,workerProtocol:8,sourceLive:this._liveSource()}).then(async contract => {
+    this.ready = this._request('init',{base:this.base,binding:previous || null,workerProtocol:9,sourceLive:this._liveSource()}).then(async contract => {
       currentPort();
-      if(contract.protocol!=='pcm-s16le-48k-v1' || contract.workerProtocol!==8) {
+      if(contract.protocol!=='pcm-s16le-48k-v1' || contract.workerProtocol!==9) {
         this.workerExhausted=true;throw Object.assign(Error('Incompatible audio Worker assets'),{code:'audio-worker-contract'});
       }
       try{worker.confirm(contract.workerId);}catch(error){if(error.code==='audio-worker-contract')this.workerExhausted=true;throw error;}
@@ -102,6 +102,7 @@ export class RemoteXAppAudio extends EventTarget {
         else interest[boundPort] = port;
       }
       currentPort();
+      this._bindPlaybackMedia();
       this._post({op:'playback-ready',ready:this.context?.state==='running' && !!this.playback});
       for (const interest of this.interests.values()) await this._replayInterest(interest);
       currentPort();
@@ -320,6 +321,7 @@ export class RemoteXAppAudio extends EventTarget {
       if(token)this._post({op:'capture-failed',token,reason,retainedSource:this._liveSource()});
     }else this._post({op:'playback-ready',ready:false});
     this[kind]=null;
+    this._releasePlaybackMedia(node);
     node.onprocessorerror=null;node.port.onmessage=null;node.disconnect();node.port.close();
     // The native processorerror already stopped this processor. Replacing the
     // whole Context would unnecessarily terminate its healthy sibling graph.
@@ -468,13 +470,40 @@ export class RemoteXAppAudio extends EventTarget {
       this.playback.port.onmessage = ({data}) => {
         if (data.type === 'credit') this._post({op:'playback-credit'});
         if (data.type === 'stats') { this.playbackStats = data; this._emit(); }
+        if (data.type === 'media-error' && this.playback===node) this._playbackMediaFailed(data.binding);
       };
       this.playback.connect(this.output);
     }}catch(error){
       this._graphFault('audio-playback-graph-failed',{retire:true});
       throw Object.assign(Error('audio-playback-graph-failed'),{code:'audio-playback-graph-failed',cause:error});
     }
-    this._post({op:'playback-ready',ready:true});
+    this._bindPlaybackMedia();this._post({op:'playback-ready',ready:true});
+  }
+  _bindPlaybackMedia() {
+    const node=this.playback;
+    if(!node || !this.port || node.mediaOwner===this.port)return;
+    const {port1,port2}=new this.env.MessageChannel(),binding=this.env.crypto.randomUUID();
+    try {
+      node.port.postMessage({op:'media-bind',binding,port:port1},[port1]);
+      this._post({op:'playback-media',binding,port:port2},[port2]);
+      node.mediaOwner=this.port;node.mediaBinding=binding;
+    }catch(error){node.port.postMessage({op:'media-unbind',binding});port1.close();port2.close();throw error;}
+  }
+  _releasePlaybackMedia(node) {
+    if(!node.mediaBinding)return;
+    const binding=node.mediaBinding;node.mediaBinding=node.mediaOwner=null;
+    this._post({op:'release-playback-media',binding});
+    node.port.postMessage({op:'media-unbind',binding});
+  }
+  _playbackMediaFailed(binding) {
+    const node=this.playback;
+    if(this.closed || !node || node.mediaBinding!==binding)return;
+    this._releasePlaybackMedia(node);
+    if(!this._graphIntent('speaker')){this._post({op:'playback-ready',ready:false});return;}
+    try {
+      if(this.context?.state!=='running' || this.graphInvalid)throw Error('Audio graph unavailable');
+      this._bindPlaybackMedia();this._post({op:'playback-ready',ready:true});
+    }catch {this._graphFault('audio-playback-media-failed',{retire:true});this._recoverGraph();}
   }
   _micInterest(request) {
     return [...this.interests.values()].find(i=>!i.released && i[resumeMicrophone] &&
@@ -591,6 +620,7 @@ export class RemoteXAppAudio extends EventTarget {
   }
   _retireProcessor(node,{context=this.context,realm=this.graphRealm} = {}) {
     for(const record of this.retirements)if(record.node===node)return record;
+    this._releasePlaybackMedia(node);
     let resolve, timer;
     const record = {context,realm,node,done:new Promise(r=>{resolve=r;}), arm:()=>{
       timer ??= this.env.setTimeout(()=>finish(false),1000);
@@ -625,6 +655,7 @@ export class RemoteXAppAudio extends EventTarget {
   }
   _message(message) {
     this.lastWorkerMessage = Date.now();
+    if(message.type==='playback-media-failed'){this._playbackMediaFailed(message.binding);return;}
     if (message.reply) { const pending = this.requests.get(message.reply); if (!pending) return; this.requests.delete(message.reply); this.env.clearTimeout(pending.timeout); message.error ? pending.reject(Error(message.error)) : pending.resolve(message.value); return; }
     if (message.type === 'ping') { this._post({op:'pong'}); return; }
     if (message.type === 'capture') { void this._startCapture(message.token,message); return; }

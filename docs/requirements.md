@@ -158,6 +158,18 @@ supersedes AUD-003's mandatory extra click after every expired/replaced capture,
 not its cancellation, access or generation fences. Implementation/qualification
 are incomplete; legacy evidence does not accept the new policy.
 
+AUD-006 development Worker 9 separates playback media from the document control
+queue. Use a bounded direct Worker/Worklet MessageChannel for frames and consumed
+credits; keep intent, browser permission, graph/device ownership and retirement
+in the document controller. Bind a new endpoint to the current processor/Worker,
+reject replaced-port and reset-epoch frames/credits, preserve per-App mute and
+close both endpoints at retirement. A current channel failure must rebind a
+still-valid node without new capture or audio WSS; off or a replaced binding
+must fence that recovery. Eight frames per speaker and the aggregate
+64-credit cap remain unchanged. The analogous microphone media path and full
+native/resource/fault qualification remain incomplete. A diagnostic or model
+pass does not accept a release. See the [layered controls](../tests/native-audio/results-speaker-scheduling-20261128.json).
+
 AUD-006 also distinguishes refreshed native cookies from authenticated-principal
 changes. The context supplies an opaque Manager-scoped principal correlation,
 stable across service/cookie epochs; it does not authorize requests or identify

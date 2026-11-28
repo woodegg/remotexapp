@@ -58,3 +58,41 @@ for (const name of ['playback','capture']) test(`${name} terminal retirement dro
  if(name==='playback')assert.equal(p.streams.size,0);
  else {assert.equal(p.frame,null);assert.equal(p.delivery,null);assert.equal(p.offset,0);}
 });
+
+test('playback data and credits use the media port while control and retirement stay local',()=>{
+ const p=worklet('remotexapp-playback-v1'),media={messages:[],start(){},close(){this.closed=true;},postMessage(m){this.messages.push(m);}};
+ p.port.onmessage({data:{op:'media-bind',binding:'bound',port:media}});
+ media.onmessage({data:{op:'reset',epoch:'current'}});
+ const frame=new Int16Array(1920).fill(8192);
+ media.onmessage({data:{op:'frame',slot:1,epoch:'current',pcm:frame.buffer}});
+ for(let i=0;i<8;i++)assert.equal(run(p,[])[0][0],.25);
+ assert.equal(media.messages.filter(m=>m.type==='credit').length,1);
+ assert.equal(media.messages[0].binding,'bound');assert.equal(media.messages[0].epoch,'current');
+ assert.equal(p.messages.filter(m=>m.type==='credit').length,0);
+ p.port.onmessage({data:{op:'dispose'}});assert.equal(p.process([],[[new Float32Array(128)]]),false);
+ assert.equal(media.closed,true);assert.ok(p.messages.some(m=>m.type==='disposed'));
+});
+
+test('playback media replacement fences stale frames and old reset credits',()=>{
+ const p=worklet('remotexapp-playback-v1'),make=()=>({messages:[],start(){},close(){this.closed=true;},postMessage(m){this.messages.push(m);}}),old=make(),next=make();
+ p.port.onmessage({data:{op:'media-bind',binding:'old',port:old}});const oldCallback=old.onmessage;
+ old.onmessage({data:{op:'reset',epoch:'old-epoch'}});old.onmessage({data:{op:'frame',slot:1,epoch:'old-epoch',pcm:new Int16Array(1920).fill(16384).buffer}});
+ p.port.onmessage({data:{op:'media-bind',binding:'next',port:next}});assert.equal(old.closed,true);
+ next.onmessage({data:{op:'reset',epoch:'new-epoch'}});
+ oldCallback({data:{op:'frame',slot:1,epoch:'old-epoch',pcm:new Int16Array(1920).fill(16384).buffer}});
+ next.onmessage({data:{op:'frame',slot:1,epoch:'old-epoch',pcm:new Int16Array(1920).fill(16384).buffer}});
+ assert.ok(run(p,[])[0].every(v=>v===0));assert.equal(next.messages.length,0);
+ next.onmessage({data:{op:'frame',slot:1,epoch:'new-epoch',pcm:new Int16Array(1920).fill(8192).buffer}});
+ assert.equal(run(p,[])[0][0],.25);
+});
+
+test('malformed playback binding or media data cannot disrupt a current processor',()=>{
+ const p=worklet('remotexapp-playback-v1'),media={messages:[],start(){},close(){this.closed=true;},postMessage(m){this.messages.push(m);}};
+ for(const data of [null,{op:'media-bind',binding:'',port:media},{op:'media-bind',binding:'bad',port:{close:'not-callable'}}])assert.doesNotThrow(()=>p.port.onmessage({data}));
+ p.port.onmessage({data:{op:'media-bind',binding:'valid',port:media}});
+ media.onmessage({data:{op:'reset',epoch:'current'}});
+ for(const data of [null,{}, {op:'reset',epoch:null},{op:'frame',epoch:'wrong'}])assert.doesNotThrow(()=>media.onmessage({data}));
+ p.port.onmessage({data:{op:'media-unbind',binding:'old'}});assert.equal(p.media.port,media);
+ media.onmessage({data:{op:'frame',slot:1,epoch:'current',pcm:new Int16Array(1920).fill(8192).buffer}});assert.equal(run(p,[])[0][0],.25);
+ p.port.onmessage({data:{op:'media-unbind',binding:'valid'}});assert.equal(media.closed,true);assert.equal(p.streams.size,0);
+});

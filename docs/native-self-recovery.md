@@ -468,3 +468,52 @@ shared-document/audio/whole-fault/natural/stress/resource/candidate gates.
 
 The tracker and evidence must mark each gate's actual status. A green unit suite,
 a short restart test or an implemented retry loop is not production qualification.
+
+## Playback scheduling investigation (development)
+
+[Actual layered controls](../tests/native-audio/results-speaker-scheduling-20261128.json)
+identify a bounded-loss mechanism in the current relay: speaker PCM and returned
+credits pass through the parent UI thread, so a short task stall can exhaust the
+eight-frame allowance even while the Worker and route remain healthy. A temporary
+direct Worker/Worklet media port removes the observed stall-related relay drops
+with unchanged queue bounds. It does not qualify a production change or explain
+every output gap. An independent no-SDK duplex control also has an impaired
+window and subsequent recovery; plain generated-tone controls pass. Continue
+causal separation while qualifying the selected direct-media repair; do not
+change acceptance assertions to turn failed output windows into passes.
+
+Bounded data loss under scheduling overload differs from permanent silence or
+lost intent. The qualification must report both actual PCM continuity and fresh
+recovery, including nominal-load controls, without treating connection flags as
+sound or weakening a failed waveform check. Existing P17 results remain scoped
+to deterministic multiplexed credit allocation. Final natural, stress, resource
+and exact-candidate gates remain open.
+
+## Worker 9 playback media binding (in development)
+
+The selected change removes the parent UI queue from playback PCM and consumed
+credits. The parent still owns requested state, browser permission, source and
+Context lifetimes, and the processor's control/terminal-ACK port. A separately
+transferred MessageChannel connects each current playback processor to its
+coordinator peer. Bind IDs fence replaced ports; reset epochs fence queued old
+frames and returned credits. Per-App remove reaches that processor directly,
+leaving other speakers intact. Preserve the existing eight-frame queue per
+speaker and 64-credit aggregate cap. Closing/replacing a node closes its media
+endpoint; delayed retirement cannot release a newer binding.
+
+A distinct Worker namespace prevents mixing this contract with a cached Worker 8.
+Public Host intent APIs and the server PCM wire protocol do not change. Current
+module models cover the new playback channel, including actual MessageChannels
+with the document control receiver held. The microphone media path still uses
+the original parent relay and needs the corresponding current-capture/delivery
+fences before selecting a final artifact. New immutable native proof must verify
+normal and stalled playback, off/handoff, Worker/processor/Context replacement,
+late credits and native port/graph retirement. Neither the runtime diagnostic
+prototype nor these module tests qualify that production candidate.
+
+A current playback media-channel failure rebinds that node under current speaker
+intent, without recreating the healthy mic or WSS. Stale failures and an explicit
+off cannot trigger a new binding. A graph fault still uses graph recovery rather
+than pretending the node is usable. Model red/green controls and complete check
+pass, but actual suspension/handoff, new native media ports and immutable-artifact
+fault/resource proof remain required before qualification.

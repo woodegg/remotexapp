@@ -10,7 +10,7 @@ function fixture() {
   f.messages=[];f.workerNames=[];f.binding={service:'service',scope:'scope',login:'login'};f.workerId=webcrypto.randomUUID();
   function newPort(){
     const port={start(){},close(){f.closedPorts++;},postMessage(m){
-      f.messages.push(m);if(m.request)queueMicrotask(()=>port.onmessage?.({data:{reply:m.request,value:m.op==='init'?{protocol:'pcm-s16le-48k-v1',workerProtocol:8,workerId:f.workerId,binding:f.binding}:{speaker:true}}}));
+      f.messages.push(m);if(m.request)queueMicrotask(()=>port.onmessage?.({data:{reply:m.request,value:m.op==='init'?{protocol:'pcm-s16le-48k-v1',workerProtocol:9,workerId:f.workerId,binding:f.binding}:{speaker:true}}}));
     }};
     return port;
   }

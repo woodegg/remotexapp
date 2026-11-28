@@ -1082,6 +1082,12 @@ final detach. It does not alter P14's resource comparison.
 
 ## P17: bounded playback credits per speaker
 
+The [2026-11-28 scheduling follow-up](../tests/performance/native-audio-burst/README.md#2026-11-28-scheduling-follow-up-development)
+records a distinct UI relay limit and development direct-port repair. It retains
+the accepted allocation result; new native/resource/long-duration and microphone
+media qualification remain incomplete.
+
+
 The deterministic [native audio burst experiment](../tests/performance/native-audio-burst/README.md)
 compares commit `299e0d4a1901ec0003efc3f15055c2372e34b024` with the selected
 per-speaker allowance. The primary variable is aggregate credits; packet format,

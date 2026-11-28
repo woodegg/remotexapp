@@ -344,3 +344,41 @@ HTTP503/timeout/late-positive-ACK/off/actual401-recovery control. The old401 cas
 now restores actual data without a host re-enable. These are separate attempts;
 the speaker-quality, complete fault matrix, natural/stress and final candidate
 gates remain open.
+
+## Playback scheduling diagnosis (development)
+
+[Bounded native scheduling controls](results-speaker-scheduling-20261128.json)
+separate actual WSS PCM, coordinator forwarding, render output and the browser
+output monitor. Valid speaker frames can arrive while playback credit is zero.
+A real 240 ms parent task delays the current media relay and returned credits;
+the eight-frame bound then drops data. Persistent output monitoring alone does
+not remove the condition. A temporary direct Worker/Worklet media port removes
+the observed relay drops in the matched stall cases with the same queue bound,
+but does not repair every observed output window. It is diagnostic instrumentation,
+not a shipped architecture or qualified fix.
+
+Keep no-SDK controls distinct. Native generated tones remain complete across
+these UI stalls with either parent or hidden child Contexts and both tested
+output sample specifications. A no-SDK duplex capture control also has an impaired
+window, then recovers. That evidence prevents assigning every gap to the SDK,
+without dismissing the independently observed relay drops. Render and output
+windows overlap but are not sample-identity aligned. Startup, nominal load,
+scheduling overload, persistent failure and recovered fresh data need separate
+assertions. Preserve the unchanged failed signal windows and the accepted P17
+bounds; no whole-attempt pass or production-quality claim follows from these
+short diagnostics.
+
+The development repair uses Worker 9 and a separate playback media port. Eight
+regressions cover direct credits/data, replaced ports/reset epochs, terminal
+cleanup and actual MessageChannels while the document control receiver is held.
+The composed regression fails on the archived old product; current module/full
+checks pass. No repaired native artifact is qualified yet. Microphone media and
+full binding/handoff/native-resource/combined-duration gates remain required.
+
+The current 105-test audio model suite additionally verifies a failed media
+channel automatically binds a fresh endpoint to the same live node, without a
+new source or audio WSS. Two red controls exposed the missing failure recovery
+and off-race guard before repair. Explicit speaker off prevents reopening; old
+failure notifications cannot replace the current binding. Full isolated check
+and coverage pass. Current native evidence still belongs to the previous
+Worker 8 artifact; Worker 9 native qualification is pending.

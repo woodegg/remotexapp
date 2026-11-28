@@ -11,6 +11,13 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Develop a direct Worker/Worklet playback media channel so PCM and consumed-frame
+  credits do not depend on the parent UI task queue. Keep per-speaker queues at
+  eight frames and the aggregate allowance at 64. Bind/reset epochs reject old
+  credits and queued frames; release and processor retirement close media ports.
+  Worker 9 isolates this development contract. Microphone media, native artifact,
+  resource, fault and long-duration qualification remain in progress.
+
 - Reconcile capture after a delayed document watchdog tick. Previously the SDK
   fenced its local processor epoch without notifying the coordinator, leaving
   a disabled live track behind a misleading effective microphone state. Notify

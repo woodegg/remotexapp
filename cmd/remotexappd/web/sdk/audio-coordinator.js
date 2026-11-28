@@ -19,6 +19,11 @@ export class AudioCoordinator {
       this._stopCapture('microphone-owner-suspended');
     }
     peer.seen = Date.now();
+    if (data.op === 'playback-media') { this._bindPlaybackMedia(peer,data); return; }
+    if (data.op === 'release-playback-media') {
+      if(peer.playbackMedia?.binding===data.binding){this._closePlaybackMedia(peer);peer.ready=false;this._selectPlayer();this._broadcast();}
+      return;
+    }
     if (data.op === 'pong') return;
     if (data.op === 'capture-eligible') {
       peer.captureRetryAfter = 0;
@@ -80,7 +85,7 @@ export class AudioCoordinator {
       }
       if (this.capture?.peer === peer && ![...peer.refs.values()].some(r=>r.micIntent)) this._stopCapture('microphone-owner-disabled');
     }
-    if (data.op === 'playback-credit') { peer.credits = Math.min(peer.creditLimit,peer.credits+1); return; }
+    if (data.op === 'playback-credit') { if(!peer.playbackMedia)peer.credits = Math.min(peer.creditLimit,peer.credits+1); return; }
     if (data.op === 'microphone-frame') { this._mic(peer,data); return; }
     if (data.op === 'capture-delivery-ready') {
       const capture = this.capture;
@@ -167,10 +172,45 @@ export class AudioCoordinator {
     const {scope,service,login,principal} = this.context;
     return {scope,service,login,...(principal ? {principal} : {})};
   }
+  _closePlaybackMedia(peer) {
+    const media=peer.playbackMedia;peer.playbackMedia=null;
+    if(media){media.port.onmessage=media.port.onmessageerror=null;media.port.close();}
+  }
+  _failPlaybackMedia(peer) {
+    const binding=peer.playbackMedia?.binding;
+    this._closePlaybackMedia(peer);peer.ready=false;this._selectPlayer();
+    this._send(peer,{type:'playback-media-failed',binding});this._broadcast();
+  }
+  _bindPlaybackMedia(peer,{binding,port}) {
+    if(typeof binding!=='string' || !binding || binding.length>64 || ['postMessage','close','start'].some(key=>typeof port?.[key]!=='function')){if(typeof port?.close==='function')port.close();return;}
+    this._closePlaybackMedia(peer);
+    const media=peer.playbackMedia={binding,port};
+    port.onmessage=({data})=>{
+      if(peer.playbackMedia!==media || this.player!==peer || !this.ports.has(peer.port))return;
+      if(data?.type==='credit' && data.binding===binding && data.epoch===peer.playbackEpoch)
+        peer.credits=Math.min(peer.creditLimit,peer.credits+1);
+    };
+    port.onmessageerror=()=>{
+      if(peer.playbackMedia!==media)return;
+      this._failPlaybackMedia(peer);
+    };
+    port.start();this._resetPlayback(peer);
+  }
+  _resetPlayback(peer) {
+    peer.playbackEpoch=this.env.crypto.randomUUID();peer.credits=peer.creditLimit;
+    this._playback(peer,{type:'reset-playback'});
+  }
+  _playback(peer,message,transfer) {
+    const media=peer.playbackMedia;
+    if(!media){this._send(peer,message,transfer);return;}
+    const op=message.type==='playback'?'frame':message.type==='remove-playback'?'remove':'reset';
+    try {media.port.postMessage({op,epoch:peer.playbackEpoch,slot:message.slot,pcm:message.pcm},transfer || []);}
+    catch {this._failPlaybackMedia(peer);}
+  }
   _muteSpeaker(route,reason = '') {
     route.speaker = false;
     route.reason = reason;
-    if (this.player) this._send(this.player,{type:'remove-playback',slot:route.slot});
+    if (this.player) this._playback(this.player,{type:'remove-playback',slot:route.slot});
   }
   _interrupt(reason,allowCaptureRecovery = false) {
     if (this.connection || !this.lastDisconnect) this.lastDisconnect = {at:Date.now(),code:reason,httpStatus:null};
@@ -197,10 +237,10 @@ export class AudioCoordinator {
       const base = new URL(data.base);
       if (base.origin !== this.env.location.origin || base.search || base.hash || base.username || base.password) throw Error('Invalid audio service origin');
       if (this.base && this.base !== data.base) throw Error('Audio service scope differs');
-      if(data.workerProtocol!==8)throw Error('Unsupported audio Worker contract');
+      if(data.workerProtocol!==9)throw Error('Unsupported audio Worker contract');
       peer.binding=data.binding || null;
       peer.holdsSource=!!data.sourceLive;
-      this.base = data.base; this._broadcast(); return {protocol:'pcm-s16le-48k-v1',workerProtocol:8,workerId:this.workerId,binding:this._binding()};
+      this.base = data.base; this._broadcast(); return {protocol:'pcm-s16le-48k-v1',workerProtocol:9,workerId:this.workerId,binding:this._binding()};
     }
     if (data.op === 'dispose') return this._remove(peer);
     if (data.op === 'suspend') { if (this.connection) await this._sync(); return; }
@@ -304,7 +344,7 @@ export class AudioCoordinator {
     const count = [...this.routes.values()].filter(r=>r.speaker).length;
     const wanted = count>0, budget = Math.max(1,count)*8;
     const next = wanted ? (this.player?.ready && this.ports.has(this.player.port) ? this.player : [...this.ports.values()].find(p=>p.ready)) : null;
-    if (next !== this.player) { if (this.player) this._send(this.player,{type:'reset-playback'}); this.player = next || null; if (this.player) { this.player.creditLimit = this.player.credits = budget; this._send(this.player,{type:'reset-playback'}); } }
+    if (next !== this.player) { if (this.player) this._resetPlayback(this.player); this.player = next || null; if (this.player) { this.player.creditLimit = budget; this._resetPlayback(this.player); } }
     else if (this.player) {
       // Each speaker already has its own eight-frame worklet queue. Sharing a
       // fixed eight credits starves ordinary bursts when several routes play.
@@ -505,7 +545,7 @@ export class AudioCoordinator {
     const peer = this.player;
     if (!route?.speaker || !route.actualSpeaker || !peer || peer.credits<1) { this.dropped++; return; }
     peer.credits--; const pcm = silent ? new ArrayBuffer(3840) : data.slice(8);
-    this._send(peer,{type:'playback',slot,pcm},[pcm]);
+    this._playback(peer,{type:'playback',slot,pcm},[pcm]);
   }
   _mic(peer,message) {
     const capture = this.capture;
@@ -520,6 +560,8 @@ export class AudioCoordinator {
   }
   async _remove(peer) {
     if (!this.ports.has(peer.port)) return;
+    this._closePlaybackMedia(peer);
+    peer.ready=false;this._selectPlayer();
     if (this.capture?.peer===peer) this._stopCapture('microphone-owner-ended');
     for (const ref of peer.refs.values()) { ref.route.refs.delete(ref); if (!ref.route.refs.size) { ref.route.speaker = ref.route.mic = false; try { await this._syncRoute(ref.route); } catch {} this.routes.delete(ref.route.key); } }
     peer.refs.clear(); this.ports.delete(peer.port); peer.port.close(); this._selectPlayer(); await this._sync();

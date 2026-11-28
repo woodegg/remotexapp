@@ -524,3 +524,50 @@ test('watchdog recovery during pending device acquisition cannot reopen mic afte
  assert.equal(doc.audio.stream,null);assert.equal(f.route(doc).requested.microphone,false);
  assert.equal(f.route(doc).actualMic,false);assert.equal(f.route(doc).actualSpeaker,true);
 });
+
+test('actual playback MessageChannels keep PCM and credits moving while the document control receiver is held',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await until(()=>f.route(doc)?.actualSpeaker);
+ const core=[...f.cores.values()][0].coordinator,node=doc.audio.playback,route=[...core.routes.values()][0];
+ await until(()=>!!core.player?.playbackMedia && !!node.processor.mediaEpoch);
+ const control=doc.audio.port,receive=control.onmessage,held=[];
+ control.onmessage=e=>held.push(e);
+ try {
+  for(let cycle=0;cycle<3;cycle++){
+   for(let i=0;i<8;i++){
+    const bytes=new ArrayBuffer(3848),head=new DataView(bytes);head.setUint8(0,1);head.setUint8(1,1);head.setUint8(2,route.slot);new Int16Array(bytes,8).fill(8192+cycle*8192);core._speaker(bytes);
+   }
+   await until(()=>node.processor.streams.get(route.slot)?.queue.length===8);
+   for(let i=0;i<60;i++){
+    const output=[new Float32Array(128),new Float32Array(128)];node.processor.process([],[output]);assert.equal(output[0][0],.25+cycle*.25);
+   }
+   await until(()=>core.player.credits===8);
+  }
+  assert.equal(core.dropped,0);assert.equal(held.filter(e=>e.data.type==='playback').length,0);
+ }finally{control.onmessage=receive;for(const e of held)receive(e);}
+});
+
+test('playback media channel failure rebinds the current node without reopening capture or the mux',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const core=[...f.cores.values()][0].coordinator,node=doc.audio.playback,source=doc.audio.stream;
+ await until(()=>!!core.player?.playbackMedia && !!node.processor.mediaEpoch);
+ const old=core.player.playbackMedia;old.port.onmessageerror();
+ await until(()=>!!core.player?.playbackMedia && core.player.playbackMedia.binding!==old.binding && !!node.processor.mediaEpoch);
+ assert.equal(doc.audio.playback,node);assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);assert.equal(f.sockets.length,1);
+ const current=core.player.playbackMedia;
+ doc.audio._message({type:'playback-media-failed',binding:old.binding});assert.equal(core.player.playbackMedia,current);
+ const route=[...core.routes.values()][0],bytes=new ArrayBuffer(3848),head=new DataView(bytes);head.setUint8(0,1);head.setUint8(1,1);head.setUint8(2,route.slot);new Int16Array(bytes,8).fill(8192);core._speaker(bytes);
+ await until(()=>node.processor.streams.get(route.slot)?.queue.length===1);
+ const output=[new Float32Array(128),new Float32Array(128)];node.processor.process([],[output]);assert.equal(output[0][0],.25);
+});
+
+test('a playback media fault after explicit speaker off cannot re-enable it or disrupt the live mic',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const core=[...f.cores.values()][0].coordinator,peer=core.player,node=doc.audio.playback,source=doc.audio.stream;
+ await until(()=>!!peer.playbackMedia && !!node.processor.mediaEpoch);const old=peer.playbackMedia;
+ await interest.setSpeaker(false);old.port.onmessageerror();await until(()=>!node.mediaBinding);
+ assert.equal(peer.playbackMedia,null);assert.equal(core.player,null);assert.equal(doc.audio.playback,node);
+ assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);assert.equal(f.route(doc).requested.speaker,false);assert.equal(f.route(doc).actualMic,true);
+});

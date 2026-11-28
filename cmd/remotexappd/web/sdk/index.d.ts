@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.37.0';
+export const SDK_VERSION: '0.38.0';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -370,10 +370,11 @@ export interface RemoteXAudioRouteState {
   runtime:string;generation:number;slot:number;refs:number;domain:string|null;
   speaker:boolean;mic:boolean;actualSpeaker:boolean;actualMic:boolean;reason:string;
   requested:{speaker:boolean;microphone:boolean};microphoneActionRequired:boolean;
+  microphonePending:boolean;
 }
 export interface RemoteXAudioSnapshot {
   lastDisconnect?:RemoteXAppDisconnect;
-  connection:'idle'|'connected'|'recovering'|'failed';protocol?:string|null;connectionId?:string|null;
+  connection:'idle'|'connected'|'recovering'|'blocked'|'failed';protocol?:string|null;connectionId?:string|null;
   speakerOwner:boolean;micOwner:boolean;playbackBlocked?:boolean;reason?:string;
   routes:RemoteXAudioRouteState[];receivedBytes?:number;sentBytes?:number;droppedFrames?:number;
   playback?:{underrunBlocks:number;droppedFrames:number;peak:number;queuedFrames:number};
@@ -383,7 +384,7 @@ export interface RemoteXAudioInterest {
   readonly runtime:string;readonly generation:number;readonly ref:string;readonly released:boolean;
   /** Enable from a browser user gesture; the switch is shared by this session's tabs. */
   setSpeaker(enabled:boolean):Promise<RemoteXAudioRouteState>;
-  /** Permission and ownership are explicit. Fault recovery never reopens capture. */
+  /** Initial permission is explicit. Recovery may reacquire only for live intent, granted permission and fresh runtime authorization. */
   setMicrophone(enabled:boolean,options?:{takeover?:boolean}):Promise<RemoteXAudioRouteState>;
   release():Promise<void>;
 }

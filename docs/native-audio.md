@@ -12,6 +12,18 @@ acceptance, post-merge qualification and publication remain separate.
 
 ## Ownership and compatibility
 
+Development SDK 0.38 / Worker 7 implements the selected
+[self-recovery contract](native-self-recovery.md): the owner expresses intent
+once, and valid intent may survive Worker replacement or reacquire an ended
+source when current permission is granted and a fresh target writer is reserved.
+The initial browser permission remains explicit; automatic recovery never
+prompts. A ready source and a current processor delivery ACK are both required
+for `actualMic`. `microphonePending` reports setup/recovery separately from
+`microphoneActionRequired`. Temporary access rejection stops capture and parks
+intent; an observed identity change retires old interests. This supersedes
+the older manual-resume statements below for this new SDK only. Its real browser,
+repeated silent-exit, resource and release qualification are not complete.
+
 For failure causes, the distinct epoch fences, automatic-recovery limits and
 isolated fault-injection steps, see [audio faults and recovery](native-audio-faults.md).
 

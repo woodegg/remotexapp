@@ -18,6 +18,19 @@ and component pins. See the
 
 ## Choose the exact migration target
 
+The development target is Core 0.17.6 / SDK 0.38 / audio Worker 7 under
+[the systematic recovery plan](native-self-recovery.md). It is not yet a
+qualified release or final UAT candidate. Initial speaker/mic enables remain
+user actions; the host should keep the same live interest and render requested
+state rather than resend enables after every connection event. The SDK journal
+orders shared off/on, and recovery uses current permission and fresh writer
+authorization. Render `microphonePending` as setup/recovery, `actualMic` as
+acknowledged delivery readiness, and `microphoneActionRequired` as a browser
+block. `connection: 'blocked'` may instead mean current ingress access is needed;
+it does not request another mic permission prompt. Pin and reload SDK/Worker/
+worklet assets together; the v7 internal contract is incompatible with v6.
+Full candidate, fault and resource qualification remains required before adoption.
+
 Load the SDK served by the matching Manager's authenticated `/sdk/index.js`,
 under its proxy prefix if one is configured. Record the
 Core commit and archive SHA-256, served SDK version, native component digest

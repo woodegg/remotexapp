@@ -11,7 +11,7 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.17.6`. SDK `0.37.0`.
+Target: `0.17.6`. SDK `0.38.0`.
 
 - Fix native clipboard A-B-A delivery by removing permanent uploaded-payload
   echo suppression. Compare the current local value and baseline instead;
@@ -22,7 +22,8 @@ Target: `0.17.6`. SDK `0.37.0`.
 - Select systematic native integration recovery under #119. The implementation
   and qualification plan covers granted-permission mic reacquisition, shared
   intent fencing, bounded recovery and combined long-duration/stress gates.
-  Audio state-machine integration is still in development.
+  SDK 0.38 / Worker 7 state-machine integration is in development; production
+  qualification is incomplete.
 - Distinguish native audio cookie refresh from an observed ingress-principal
   change. Context responses add a Manager-scoped principal correlation; current
   SDK owners can keep valid intent across a refreshed cookie scope, while changed
@@ -36,6 +37,16 @@ Target: `0.17.6`. SDK `0.37.0`.
   fresh delivery nonce resume it without another device request. Explicit off,
   logout, owner loss and authorization failure still retire capture. Worker
   replacement and ended-source automatic reacquisition remain in development.
+- Integrate shared speaker/mic intent ordering into SDK 0.38 / Worker 7, including
+  stale-command rejection across off/on, same-document and cross-document
+  participation, source reuse on Worker rebind and permitted device recovery.
+  Reserve the target writer before opening a device and require the capture
+  processor's fresh delivery acknowledgement before reporting `actualMic` or
+  forwarding PCM. Temporary access rejection parks intent and stops capture;
+  fresh observed identity changes still retire old interests. Initialize and
+  acquire local audio interests without an HTTP dependency. Model regressions
+  pass; repeated silent Worker exit, full browser/fault/resource qualification
+  and the final UAT gates remain incomplete.
 
 - Unregister the native display adapter's keyboard blur listener before
   removing its input. A browser-retained detached input must not keep retired

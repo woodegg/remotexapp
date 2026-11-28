@@ -8,6 +8,16 @@ qualification, not separate acceptance of small implementation checkpoints.
 PR #118 now carries this implementation, superseding its initial test-only scope.
 This document is an implementation target and gate list, not a claim of passage.
 
+Development checkpoint: SDK 0.38 / Worker 7 now connects the intent journal to
+the audio owner/coordinator. Integrated module models cover rebind with a live
+source, ended-source reacquisition, permission revoke/grant, late-result/off,
+cross-document off/on, domain recovery with a healthy peer and access/identity
+fences. Writer reservation precedes device acquisition; processor delivery ACK
+precedes effective mic and PCM. These are model results, not real browser
+qualification of the new state machine. Repeated silent Worker exits and the
+remaining fault/resource gates are still open; do not start final qualification
+on an unfinished state machine.
+
 ## Contract
 
 The live client sets requested speaker/microphone/connection intent. SDK and
@@ -129,6 +139,15 @@ capture; automatic recovery must not ask for them again. Fresh granted permissio
 can permit recovery under the still-live intent. Playback recovery attempts to
 resume/rebuild an already authorized graph, reporting an actual autoplay block
 when the browser still requires an action.
+
+The [capture specification's media lifecycle](https://www.w3.org/TR/mediacapture-streams/#life-cycle-and-media-flow)
+permits releasing disabled devices and deferring reacquisition/unmute while a
+document is out of view. Do not create an SDK deadlock by disabling a track merely
+because the UA muted it and then requiring unmute before it can be enabled.
+Fence PCM separately; preserve a valid source's enabled state through UA mute,
+and allow permitted, in-view re-enablement only under current intent and writer
+authorization. A module model covers this ordering; actual hardware/browser
+behavior remains a separate qualification requirement.
 
 ## Fault disposition and required evidence
 

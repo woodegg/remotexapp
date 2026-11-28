@@ -45,10 +45,15 @@ class RemoteXAppCapture extends AudioWorkletProcessor {
       if (this.disposed) return;
       if (data.op === 'dispose') { this.disposed = true; this.delivery = this.frame = null; this.offset = this.energy = this.credits = 0; return; }
       if (data.op === 'credit') this.credits = Math.min(8,this.credits+1);
+      if (data.op === 'rebind') {
+        this.delivery = null; this.offset = this.energy = this.frames = 0;
+        this.credits = 8; this.frame.fill(0);
+      }
       if (data.op === 'delivery') {
         this.delivery = data.delivery;
         this.offset = this.energy = this.frames = 0;
         this.frame.fill(0);
+        this.port.postMessage({type:'delivery-ready',delivery:this.delivery});
       }
     };
   }

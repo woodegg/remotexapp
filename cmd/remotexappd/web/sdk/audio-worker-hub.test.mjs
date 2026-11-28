@@ -20,10 +20,10 @@ function fixture(t) {
 const receive = port => new Promise(resolve => {port.onmessage=({data})=>resolve(data);port.start();});
 
 test('fifty same-document owners share one native worker and have independent disposable ports',async t=>{
-  const {env,workers}=fixture(t);let keeper=connectAudioWorker(env,'https://audio.test/sdk/audio-worker.js','v6:0');
+  const {env,workers}=fixture(t);let keeper=connectAudioWorker(env,'https://audio.test/sdk/audio-worker.js','v7:0');
   try {
     for(let i=0;i<50;i++){
-      const client=connectAudioWorker(env,'https://audio.test/sdk/audio-worker.js','v6:0');
+      const client=connectAudioWorker(env,'https://audio.test/sdk/audio-worker.js','v7:0');
       assert.notEqual(client.port,keeper.port);
       const response=receive(client.port);client.port.postMessage(i);assert.equal(await response,i);
       client.port.close();client.release();client.release();
@@ -35,11 +35,11 @@ test('fifty same-document owners share one native worker and have independent di
 
 test('a native worker error invalidates its hub before peers rebind and fences only that hub',async t=>{
   const {env,workers}=fixture(t);
-  const a=connectAudioWorker(env,'https://audio.test/sdk/audio-worker.js','v6:0');
-  const b=connectAudioWorker(env,'https://audio.test/sdk/audio-worker.js','v6:0');
-  const other=connectAudioWorker(env,'https://other.test/sdk/audio-worker.js','v6:0');
+  const a=connectAudioWorker(env,'https://audio.test/sdk/audio-worker.js','v7:0');
+  const b=connectAudioWorker(env,'https://audio.test/sdk/audio-worker.js','v7:0');
+  const other=connectAudioWorker(env,'https://other.test/sdk/audio-worker.js','v7:0');
   let next,failed=0;
-  a.onerror=()=>{failed++;a.port.close();a.release();next=connectAudioWorker(env,'https://audio.test/sdk/audio-worker.js','v6:0');};
+  a.onerror=()=>{failed++;a.port.close();a.release();next=connectAudioWorker(env,'https://audio.test/sdk/audio-worker.js','v7:0');};
   b.onerror=()=>{failed++;b.port.close();b.release();};
   other.onerror=()=>assert.fail('another Manager is independent');
   try {
@@ -51,19 +51,21 @@ test('a native worker error invalidates its hub before peers rebind and fences o
 test('worker generations and documents do not share native handles',t=>{
   const f=fixture(t),g=fixture(t),clients=[];
   try {
-    clients.push(connectAudioWorker(f.env,'https://audio.test/sdk/audio-worker.js','v6:0'));
-    clients.push(connectAudioWorker(f.env,'https://audio.test/sdk/audio-worker.js','v6:1'));
-    clients.push(connectAudioWorker(g.env,'https://audio.test/sdk/audio-worker.js','v6:0'));
+    clients.push(connectAudioWorker(f.env,'https://audio.test/sdk/audio-worker.js','v7:0'));
+    clients.push(connectAudioWorker(f.env,'https://audio.test/sdk/audio-worker.js','v7:1'));
+    clients.push(connectAudioWorker(g.env,'https://audio.test/sdk/audio-worker.js','v7:0'));
     assert.equal(f.workers.length,2);assert.equal(g.workers.length,1);
   } finally {for(const c of clients){c.port.close();c.release();}}
 });
 
-test('replacement generations evict unused cache entries while keeping an active old generation intact',t=>{
- const {env,workers}=fixture(t),url='https://audio.test/sdk/audio-worker.js',key=Symbol.for('remotexapp.audio-worker-hubs.v6');
- let old=connectAudioWorker(env,url,'v6:0'),current=connectAudioWorker(env,url,'v6:1');
+test('two recovery names retain reusable bootstraps and reject unbounded replacement clients',t=>{
+ const {env,workers}=fixture(t),url='https://audio.test/sdk/audio-worker.js',key=Symbol.for('remotexapp.audio-worker-hubs.v7');
+ let old=connectAudioWorker(env,url,'v7:0'),current=connectAudioWorker(env,url,'v7:1');
  assert.equal(env[key].size,2);
  old.port.close();old.release();
- const next=connectAudioWorker(env,url,'v6:1');
- assert.equal(workers.length,2);assert.equal(env[key].size,1);assert.equal(workers[0].onerror,null);
+ const next=connectAudioWorker(env,url,'v7:1');
+ assert.equal(workers.length,2);assert.equal(env[key].size,2);assert.equal(typeof workers[0].onerror,'function');
+ assert.throws(()=>connectAudioWorker(env,url,'v7:2'),/capacity/);
+ const reused=connectAudioWorker(env,url,'v7:0');assert.equal(workers.length,2);reused.port.close();reused.release();
  current.port.close();current.release();next.port.close();next.release();
 });

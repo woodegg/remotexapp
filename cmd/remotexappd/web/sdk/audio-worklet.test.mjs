@@ -22,7 +22,7 @@ test('mic emits complete 20 ms frames, bounds credits and never monitors locally
  for(let i=0;i<20;i++)run(p,[input],1);
  assert.equal(p.messages.length,0);
  p.port.onmessage({data:{op:'delivery',delivery:'lease-a'}});
- for(let i=0;i<7;i++)assert.ok(run(p,[input],1)[0].every(v=>v===0));assert.equal(p.messages.length,0);
+ for(let i=0;i<7;i++)assert.ok(run(p,[input],1)[0].every(v=>v===0));assert.equal(p.messages.filter(m=>m.type==='pcm').length,0);
  run(p,[input],1);let packets=p.messages.filter(m=>m.type==='pcm');assert.equal(packets.length,1);assert.equal(packets[0].pcm.byteLength,1920);assert.equal(packets[0].delivery,'lease-a');assert.equal(new Int16Array(packets[0].pcm)[0],8192);
  for(let i=0;i<1000;i++)run(p,[input],1);packets=p.messages.filter(m=>m.type==='pcm');assert.equal(packets.length,8);assert.ok(p.dropped>0);
  p.port.onmessage({data:{op:'credit'}});for(let i=0;i<8;i++)run(p,[input],1);assert.equal(p.messages.filter(m=>m.type==='pcm').length,9);
@@ -37,8 +37,8 @@ test('resumed microphone delivery discards the partial old frame',()=>{
  for(let i=0;i<20;i++)run(p,[old],1);
  p.port.onmessage({data:{op:'delivery',delivery:'fresh'}});
  for(let i=0;i<8;i++)run(p,[fresh],1);
- assert.equal(p.messages.length,1);assert.equal(p.messages[0].delivery,'fresh');
- assert.ok(new Int16Array(p.messages[0].pcm).every(sample=>sample===8192));
+ const packets=p.messages.filter(m=>m.type==='pcm');assert.equal(packets.length,1);assert.equal(packets[0].delivery,'fresh');
+ assert.ok(new Int16Array(packets[0].pcm).every(sample=>sample===8192));
 });
 
 for (const name of ['playback','capture']) test(`${name} terminal retirement drops state, acknowledges once and stops processing`,()=>{

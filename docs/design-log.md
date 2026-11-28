@@ -5838,3 +5838,29 @@ visible/hidden transitions without forced-focus emulation or scheduling
 overrides. Keep failed visibility/cleanup attempts separate; an extended
 disconnection control is not the natural soak, combined stress, physical-device
 acceptance or whole-process allocation review required by #119.
+
+## 2026-11-28 — Reconcile ordered audio intent before reporting effective delivery
+
+SDK 0.38 / Worker 7 carries bounded journal switch epochs into the live audio
+owner and coordinator. An emergency cancellation removes only that owner's
+participation; a committed global off is ordered by its actual journal revision.
+Never borrow a later on's revision for an older off, or allow a late on to cross
+the latest off/on epoch. Independent module copies in one document share the
+notification registry. A fresh document does not inherit capture authority.
+
+Reserve the current runtime writer before acquiring a device. A server route ACK
+is authorization, not proof that a browser source or processor is sending.
+Require source readiness and the processor's fresh delivery ACK before effective
+mic/PCM; reject stale ACKs/frames. Domain loss and speaker-only route changes
+must not reset a healthy peer's delivery fence. Ended-source recovery needs live
+participation, current granted permission and fresh routing. Initial permission
+can prompt only in the explicit enable path; off/logout/revocation fence late
+acquisition and a valid source can instead be rebound to a new Worker token.
+
+Audio interest initialization no longer waits for a Manager HTTP context.
+Temporary access rejection stops capture and parks intent; fresh accepted access
+must still match the previously observed binding. Changed identity and explicit
+logout remain terminal for old interests. This supersedes the earlier treatment
+of every context rejection as permanent interest retirement, and adds no new
+credential or required login header. Model regressions do not close repeated
+silent Worker exit, real browser, native retirement or long-duration gates.

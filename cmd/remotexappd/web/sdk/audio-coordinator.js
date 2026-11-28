@@ -19,26 +19,85 @@ export class AudioCoordinator {
     }
     peer.seen = Date.now();
     if (data.op === 'pong') return;
+    if (data.op === 'capture-eligible') {
+      peer.captureRetryAfter = 0;
+      for (const ref of peer.refs.values()) ref.captureBlocked = false;
+      this.retryAfter = 0; this._tick(); return;
+    }
     if (data.op === 'wake') { this._tick(); return; }
     if (data.op === 'suspend' && this.capture?.peer === peer) this._stopCapture('microphone-owner-suspended');
     const ref = peer.refs.get(data.ref);
-    if (ref && data.op === 'microphone' && !data.enabled) ref.route.micRequested = false;
-    if (ref?.route.mic && ((data.op === 'microphone' && !data.enabled) || data.op === 'release')) this._captureDelivery(false);
+    if (ref && data.intent && ['speaker','microphone','forget-intent'].includes(data.op)) {
+      const kind = data.op==='forget-intent'?data.kind:data.op, state=data.intent;
+      const previous=ref.route[kind+'Stamp'];
+      const valid=['speaker','microphone'].includes(kind) && state.available===true &&
+        Number.isSafeInteger(state.revision) && state.revision>0 && Number.isSafeInteger(state.epoch) && state.epoch>0 && state.epoch<=state.revision &&
+        typeof state.enabled==='boolean' && typeof state.participating==='boolean' &&
+        (data.op==='forget-intent' || (state.enabled===!!data.enabled && (!data.enabled || state.participating)));
+      if (!valid) {if(data.request)this._send(peer,{reply:data.request,error:'Invalid audio intent stamp'});return;}
+      if (previous && (state.revision<previous.revision || (state.revision===previous.revision && (state.epoch!==previous.epoch || state.enabled!==previous.enabled)))) {
+        if(data.request)this._send(peer,{reply:data.request,value:this._routeState(ref.route)});return;
+      }
+      if (!previous || previous.epoch!==state.epoch || !state.enabled) {
+        for(const other of ref.route.refs)other[kind==='microphone'?'micIntent':'speakerIntent']=false;
+        if(kind==='microphone'){ref.route.micRequested=ref.route.mic=false;this._captureDelivery(false);}
+        else {ref.route.speakerRevision=(ref.route.speakerRevision || 0)+1;this._muteSpeaker(ref.route);}
+      }
+      ref.route[kind+'Stamp']={revision:state.revision,epoch:state.epoch,enabled:state.enabled};
+    }
+    if (ref && data.op === 'microphone') {
+      data.revision = ref.route.micRevision = (ref.route.micRevision || 0)+1;
+      ref.route.micRequested = !!data.enabled;
+      if (data.enabled) ref.micIntent = true;
+      else for (const other of ref.route.refs) other.micIntent = false;
+      if (!data.enabled) ref.route.mic = false;
+    }
+    if ((ref?.route.mic || ref?.route.actualMic) && ((data.op === 'microphone' && !data.enabled) || data.op === 'release')) this._captureDelivery(false);
     if (ref && data.op === 'release' && ref.route.refs.size === 1) {
       ref.route.speakerRevision = (ref.route.speakerRevision || 0)+1;
       this._muteSpeaker(ref.route);
     }
     if (ref && data.op === 'speaker') {
       data.revision = ref.route.speakerRevision = (ref.route.speakerRevision || 0)+1;
+      if(data.enabled)ref.speakerIntent=true;else for(const other of ref.route.refs)other.speakerIntent=false;
+      if(data.enabled)ref.route.speaker=true;
       if (!data.enabled) { this._muteSpeaker(ref.route); this._broadcast(); }
+    }
+    if (ref && data.op === 'forget-intent') {
+      if (data.kind === 'microphone') {
+        ref.micIntent = false;
+        ref.route.micRequested = [...ref.route.refs].some(r=>r.micIntent);
+        if (!ref.route.micRequested) { ref.route.mic = false; this._captureDelivery(false); }
+      }
+      if (data.kind === 'speaker') {
+        ref.speakerIntent=false;
+        if (![...ref.route.refs].some(r=>r.speakerIntent)) this._muteSpeaker(ref.route);
+      }
+      if (this.capture?.peer === peer && ![...peer.refs.values()].some(r=>r.micIntent)) this._stopCapture('microphone-owner-disabled');
     }
     if (data.op === 'playback-credit') { peer.credits = Math.min(peer.creditLimit,peer.credits+1); return; }
     if (data.op === 'microphone-frame') { this._mic(peer,data); return; }
+    if (data.op === 'capture-delivery-ready') {
+      const capture = this.capture;
+      if (capture?.peer === peer && capture.ready && capture.token === data.token &&
+          capture.delivery && capture.delivery === data.delivery) {
+        this.env.clearTimeout(capture.deliveryTimer); capture.deliveryTimer = null;
+        capture.delivering = true; this._broadcast();
+      }
+      return;
+    }
     if (data.op === 'capture-ready' || data.op === 'capture-failed') {
       const capture = this.capture;
-      if (capture?.peer !== peer || (data.token && data.token !== capture.token)) return;
+      if (capture?.peer !== peer || data.token !== capture.token) return;
       if (data.op === 'capture-ready') { capture.ready = true; capture.resolve?.(); capture.resolve = capture.reject = null; }
-      else { this._stopCapture(data.reason || 'microphone-ended'); this._enqueue(()=>this._sync()).catch(()=>{}); }
+      else {
+        const reason = data.reason || 'microphone-ended';
+        const blocked = ['microphone-permission-required','microphone-permission-denied','microphone-device-muted','intent-state-unavailable','microphone-intent-retired'].includes(reason);
+        if (capture.ref) capture.ref.captureBlocked = blocked;
+        peer.captureBackoff = Math.min(30000,Math.max(1000,(peer.captureBackoff || 500)*2));
+        peer.captureRetryAfter = Date.now()+peer.captureBackoff;
+        this._stopCapture(reason); this._enqueue(()=>this._sync()).catch(()=>{});
+      }
       return;
     }
     // Cancellation must not wait behind an outstanding browser permission prompt.
@@ -46,7 +105,13 @@ export class AudioCoordinator {
     this._enqueue(async()=>{
       let value;
       try { value = await this._command(peer,data); if (data.request) this._send(peer,{reply:data.request,value}); }
-      catch (error) { if (data.request) this._send(peer,{reply:data.request,error:error.message || 'Audio operation failed'}); this.reason = error.message; this._broadcast(); }
+      catch (error) {
+        this.reason = error.message;
+        const ref=peer.refs.get(data.ref),transient=error instanceof TypeError || error.name==='TimeoutError' || error.transport || error.status>=500;
+        if (data.request) this._send(peer,ref && transient && ['speaker','microphone'].includes(data.op)
+          ? {reply:data.request,value:this._routeState(ref.route)} : {reply:data.request,error:error.message || 'Audio operation failed'});
+        this._broadcast();
+      }
     });
   }
   async _api(action,body = {}) {
@@ -61,14 +126,22 @@ export class AudioCoordinator {
     let context;
     try { context = await this._api('context'); }
     catch (error) {
-      if (error.status === 401 || error.status === 403) { this.context = null; this._retire('audio-login-required'); }
+      if (error.status === 401 || error.status === 403) { this.accessBlocked=true;this._interrupt('audio-login-required',false); }
       throw error;
     }
     if (context.protocol !== 'pcm-s16le-48k-v1' || !/^[a-f0-9]{64}$/.test(context.scope || '') || !/^[a-f0-9]{64}$/.test(context.service || '') || (context.login && !/^[a-f0-9]{64}$/.test(context.login)) || (context.principal !== undefined && !/^[a-f0-9]{64}$/.test(context.principal))) throw Error('Unsupported audio contract');
     const previous = this.context;
+    this.accessBlocked=false;
     this.context = context;
+    for (const peer of this.ports.values()) {
+      const binding=peer.binding;
+      if (binding && ((binding.principal && binding.principal!==context.principal) || (binding.login && binding.login!==context.login) ||
+          (binding.service===context.service && binding.scope!==context.scope && !(binding.principal && binding.principal===context.principal)))) {
+        this._retire('audio-login-changed');throw Error('Audio login epoch changed; acquire current session interests again');
+      }
+    }
     if (!previous || previous.scope !== context.scope || previous.service !== context.service) {
-      for (const peer of this.ports.values()) this._send(peer,{type:'binding',binding:this._binding()});
+      for (const peer of this.ports.values()) {peer.binding=this._binding();this._send(peer,{type:'binding',binding:peer.binding});}
     }
     if (previous) {
       const changed = context.scope !== previous.scope || context.service !== previous.service;
@@ -84,6 +157,7 @@ export class AudioCoordinator {
     return context;
   }
   _binding() {
+    if(!this.context)return null;
     const {scope,service,login,principal} = this.context;
     return {scope,service,login,...(principal ? {principal} : {})};
   }
@@ -109,7 +183,7 @@ export class AudioCoordinator {
   _body(extra = {}) { return {scope:this.context.scope,client:this.client,connection:this.connection,...extra}; }
   _retire(reason) {
     this._disconnect(reason); this._stopCapture(reason);
-    this.routes.clear(); for (const peer of this.ports.values()) { peer.refs.clear(); this._send(peer,{type:'retired',reason}); }
+    this.routes.clear(); for (const peer of this.ports.values()) { peer.refs.clear(); peer.binding=this._binding();this._send(peer,{type:'retired',reason}); }
     this.reason = reason; this._broadcast();
   }
   async _command(peer,data) {
@@ -117,14 +191,18 @@ export class AudioCoordinator {
       const base = new URL(data.base);
       if (base.origin !== this.env.location.origin || base.search || base.hash || base.username || base.password) throw Error('Invalid audio service origin');
       if (this.base && this.base !== data.base) throw Error('Audio service scope differs');
-      this.base = data.base; if (!this.context) await this._context(); this._broadcast(); return {protocol:this.context.protocol,binding:this._binding()};
+      if(data.workerProtocol!==7)throw Error('Unsupported audio Worker contract');
+      peer.binding=data.binding || null;
+      this.base = data.base; this._broadcast(); return {protocol:'pcm-s16le-48k-v1',workerProtocol:7,binding:this._binding()};
     }
     if (data.op === 'dispose') return this._remove(peer);
     if (data.op === 'suspend') { if (this.connection) await this._sync(); return; }
-    if (data.op === 'logout') { if (!this.context) return; const body = this._body(); this._retire('logout'); await this._api('logout',body); this.context = null; return; }
+    if (data.op === 'logout') {
+      const body=this.context?this._body():null;this.accessBlocked=false;this._retire('logout');this.context=null;
+      if(body)await this._api('logout',body);return;
+    }
     if (data.op === 'playback-ready') { peer.ready = !!data.ready; this._selectPlayer(); this._broadcast(); return; }
     if (data.op === 'acquire') {
-      if (!this.context) await this._context();
       if (!/^[a-zA-Z0-9_.-]{1,128}$/.test(data.runtime || '') || !Number.isSafeInteger(data.generation) || data.generation < 1 || typeof data.ref !== 'string' || data.ref.length > 64 || peer.refs.has(data.ref)) throw Error('Invalid audio interest');
       const key = data.runtime+':'+data.generation;
       let route = this.routes.get(key);
@@ -133,10 +211,11 @@ export class AudioCoordinator {
         if (slot > 8) throw Error('Audio session capacity reached');
         route = {key,runtime:data.runtime,generation:data.generation,slot,refs:new Set(),speaker:false,mic:false,micRequested:false,actualSpeaker:false,actualMic:false,applied:'',reason:''}; this.routes.set(key,route);
       }
-      const ref = {peer,id:data.ref,route}; peer.refs.set(data.ref,ref); route.refs.add(ref); this._broadcast(); return;
+      const ref = {peer,id:data.ref,route,micIntent:false,speakerIntent:false,captureBlocked:false}; peer.refs.set(data.ref,ref); route.refs.add(ref); this._broadcast(); return;
     }
     const ref = peer.refs.get(data.ref); if (!ref) throw Error('Audio interest is retired');
     const route = ref.route;
+    if (data.op === 'forget-intent') { await this._sync(); return this._routeState(route); }
     if (data.op === 'release') { peer.refs.delete(data.ref); route.refs.delete(ref); if (!route.refs.size) { route.speaker = route.mic = false; await this._syncRoute(route); this.routes.delete(route.key); } await this._sync(); return; }
     if (route.retired) return this._routeState(route);
     if (data.op === 'restore-speaker') {
@@ -151,7 +230,7 @@ export class AudioCoordinator {
     if (data.op === 'speaker') {
       if (data.enabled) {
         await this._context();
-        if (data.revision !== route.speakerRevision || !peer.refs.has(ref.id)) return this._routeState(route);
+        if (data.revision !== route.speakerRevision || !peer.refs.has(ref.id) || !ref.speakerIntent) return this._routeState(route);
         route.speaker = true; route.reason = ''; this._selectPlayer();
       }
       try { await this._sync(); }
@@ -159,16 +238,27 @@ export class AudioCoordinator {
       this._broadcast(); return this._routeState(route);
     }
     if (data.op === 'microphone') {
-      route.micRequested = !!data.enabled;
+      if (data.revision !== route.micRevision) return this._routeState(route);
       if (data.enabled) {
         await this._context();
-        const capture = await this._ensureCapture(peer);
-        if (!capture || this.capture !== capture || !capture.ready) throw Error('microphone-ended-before-routing');
+        if (data.revision !== route.micRevision || !peer.refs.has(ref.id) || !ref.micIntent) return this._routeState(route);
         route.mic = true; route.takeover = !!data.takeover; route.reason = '';
+        if (!data.automatic) { ref.captureBlocked = false; peer.captureRetryAfter = peer.captureBackoff = 0; }
       } else route.mic = false;
-      try { await this._sync(); }
+      try {
+        // Reserve the current target writer before asking a browser for a
+        // device. A conflict/unavailable domain must not churn local capture.
+        await this._sync();
+        if (data.enabled && route.actualMic && route.mic && data.revision === route.micRevision && peer.refs.has(ref.id)) {
+          const capture = await this._ensureCapture(peer,ref,!!data.automatic);
+          if (!capture || this.capture !== capture || !capture.ready) throw Error('microphone-ended-before-routing');
+          if (data.revision !== route.micRevision || !peer.refs.has(ref.id)) this._releaseCaptureIfUnused();
+          await this._sync();
+        }
+      }
       catch (error) {
         route.mic = false; this._releaseCaptureIfUnused();
+        if (this.connection) { try { await this._sync(); } catch {} }
         if (data.enabled) throw error;
       }
       this._broadcast();
@@ -176,12 +266,18 @@ export class AudioCoordinator {
     }
     throw Error('Unknown audio operation');
   }
-  _routeState(r) { return {runtime:r.runtime,generation:r.generation,slot:r.slot,speaker:r.speaker,mic:r.mic,
-    requested:{speaker:r.speaker,microphone:r.micRequested}, microphoneActionRequired:r.micRequested && !r.mic,
-    actualSpeaker:r.actualSpeaker,actualMic:r.actualMic,reason:r.reason,refs:r.refs.size,domain:r.domain || null}; }
+  _routeState(r) {
+    const actualMic = !!(r.actualMic && r.mic && this.capture?.ready && this.capture.delivering);
+    const actionRequired=!!(r.micRequested && ![...r.refs].some(ref=>ref.micIntent && !ref.captureBlocked));
+    return {runtime:r.runtime,generation:r.generation,slot:r.slot,speaker:r.speaker,mic:r.mic,
+    requested:{speaker:r.speaker,microphone:r.micRequested}, microphoneActionRequired:actionRequired,
+    microphonePending:!!(r.micRequested && !actionRequired && !actualMic),
+    actualSpeaker:r.actualSpeaker,actualMic,reason:r.reason,refs:r.refs.size,domain:r.domain || null}; }
   _broadcast() {
     const routes = [...this.routes.values()].map(r=>this._routeState(r));
-    for (const peer of this.ports.values()) this._send(peer,{type:'state',connection:this.connection ? 'connected' : routes.some(r=>r.speaker||r.mic) ? 'recovering' : 'idle',protocol:this.connection?'WSS / PCM16 48 kHz':null,playbackBlocked:routes.some(r=>r.speaker)&&!this.player,connectionId:this.connection,speakerOwner:this.player===peer,micOwner:this.capture?.peer===peer,reason:this.reason,lastDisconnect:this.lastDisconnect,routes,receivedBytes:this.received,sentBytes:this.sent,droppedFrames:this.dropped});
+    const wanted=routes.some(r=>r.requested.speaker||r.requested.microphone);
+    const connection=this.connection?'connected':wanted?(this.accessBlocked?'blocked':'recovering'):'idle';
+    for (const peer of this.ports.values()) this._send(peer,{type:'state',connection,protocol:this.connection?'WSS / PCM16 48 kHz':null,playbackBlocked:routes.some(r=>r.speaker)&&!this.player,connectionId:this.connection,speakerOwner:this.player===peer,micOwner:this.capture?.peer===peer,reason:this.reason,lastDisconnect:this.lastDisconnect,routes,receivedBytes:this.received,sentBytes:this.sent,droppedFrames:this.dropped});
   }
   _selectPlayer() {
     const count = [...this.routes.values()].filter(r=>r.speaker).length;
@@ -194,24 +290,25 @@ export class AudioCoordinator {
       const peer = this.player; peer.credits = Math.max(0,Math.min(budget,peer.credits+budget-peer.creditLimit)); peer.creditLimit = budget;
     }
   }
-  async _ensureCapture(peer) {
+  async _ensureCapture(peer,ref,automatic = false) {
     if (this.capture?.ready) return this.capture;
     if (this.capture) throw Error('Microphone permission is already pending');
     const token = this.env.crypto.randomUUID();
     await new Promise((resolve,reject)=>{
       const timeout = this.env.setTimeout(()=>{if (this.capture?.token===token) this._stopCapture('microphone-permission-timeout');},15000);
-      this.capture = {peer,token,ready:false,resolve:()=>{this.env.clearTimeout(timeout);resolve();},reject:error=>{this.env.clearTimeout(timeout);reject(error);}};
-      this._send(peer,{type:'capture',token});
+      this.capture = {peer,ref,token,ready:false,resolve:()=>{this.env.clearTimeout(timeout);resolve();},reject:error=>{this.env.clearTimeout(timeout);reject(error);}};
+      this._send(peer,{type:'capture',token,runtime:ref?.route.runtime,generation:ref?.route.generation,automatic});
     });
     return this.capture;
   }
   _stopCapture(reason) {
     const capture = this.capture; this.capture = null;
     if (capture) {
+      this.env.clearTimeout(capture.deliveryTimer);
       capture.reject?.(Error(reason));
-      this._send(capture.peer,{type:'stop-capture',reason});
+      this._send(capture.peer,{type:'stop-capture',token:capture.token,reason});
     }
-    for (const route of this.routes.values()) { if (route.mic) route.reason = reason; route.mic = false; }
+    for (const route of this.routes.values()) { if (route.mic) route.reason = reason; route.mic = false; if(capture)route.applied = ''; }
     this._broadcast();
   }
   _captureDelivery(enabled) {
@@ -220,9 +317,17 @@ export class AudioCoordinator {
     const delivery = enabled ? capture.delivery || this.env.crypto.randomUUID() : null;
     if (delivery === (capture.delivery || null)) return;
     capture.delivery = delivery;
+    capture.delivering = false;
+    this.env.clearTimeout(capture.deliveryTimer); capture.deliveryTimer = null;
+    if (delivery) capture.deliveryTimer = this.env.setTimeout(()=>{
+      if (this.capture === capture && capture.delivery === delivery && !capture.delivering) {
+        this._stopCapture('microphone-delivery-timeout');
+        this._enqueue(()=>this._sync()).catch(()=>{});
+      }
+    },2000);
     this._send(capture.peer,{type:'capture-delivery',token:capture.token,delivery});
   }
-  _releaseCaptureIfUnused() { if (![...this.routes.values()].some(r=>r.mic)) this._stopCapture('all-microphones-disabled'); }
+  _releaseCaptureIfUnused() { if (![...this.routes.values()].some(r=>r.micRequested)) this._stopCapture('all-microphones-disabled'); }
   async _connect() {
     if (this.connection && this.socket?.readyState===1) return;
     await this._context();
@@ -279,7 +384,7 @@ export class AudioCoordinator {
       if (message.reason && message.reason!=='reconfigured' && message.reason!=='disabled') {
         route.reason = message.reason; route.applied = '';
         if (['domain-retired','generation-retired'].includes(message.reason)) { route.mic = false; if (message.reason==='generation-retired') { route.speaker = route.micRequested = false; route.retired = true; } }
-        if (message.reason.startsWith('mic-')) route.mic = false;
+        if (message.reason.startsWith('mic-')) {route.mic = false;route.micRetryAfter=Date.now()+5000;}
       }
       if (!route.actualSpeaker && this.player) this._send(this.player,{type:'remove-playback',slot:route.slot});
     }
@@ -292,13 +397,13 @@ export class AudioCoordinator {
   async _syncRoute(route) {
     if (!this.connection) { route.applied = ''; return; }
     if (!route.speaker && !route.mic) {
-      if (route.applied) this._captureDelivery(false);
+      if (route.applied && route.actualMic) this._captureDelivery(false);
       if (route.applied) await this._control({op:'unsubscribe',slot:route.slot});
       route.applied = ''; route.actualSpeaker = route.actualMic = false; return;
     }
     const key = this.connection+':'+route.speaker+':'+route.mic;
     if (route.applied === key) return;
-    if (route.mic || route.actualMic) this._captureDelivery(false);
+    if (route.actualMic && !route.mic) this._captureDelivery(false);
     let grant;
     try { grant = await this._api('route',this._body({runtime:route.runtime,generation:route.generation})); }
     catch (error) {
@@ -312,6 +417,7 @@ export class AudioCoordinator {
       // An unavailable App domain is local to this route. Authentication and
       // shared-transport failures still propagate to the connection fence.
       route.mic = false; route.actualSpeaker = route.actualMic = false; route.reason = 'session-audio-unavailable';
+      route.micRetryAfter = Date.now()+5000;
       if (route.applied) await this._control({op:'unsubscribe',slot:route.slot});
       route.applied = ''; this._releaseCaptureIfUnused(); return;
     }
@@ -326,12 +432,28 @@ export class AudioCoordinator {
     if (!state.speaker && route.speaker) route.reason = state.reason || 'speaker-unavailable';
     if (!state.mic && route.mic) { route.mic = false; route.reason = state.reason || 'mic-unavailable'; }
   }
-  async _sync() {
+  async _sync({recoverCapture = false} = {}) {
+    if (recoverCapture) for (const route of this.routes.values()) {
+      if (!route.retired && route.micRequested && Date.now()>=(route.micRetryAfter || 0)) {
+        route.mic = [...route.refs].some(ref=>ref.micIntent && !ref.captureBlocked &&
+          Date.now()>=(ref.peer.captureRetryAfter || 0) && Date.now()-ref.peer.seen<=5000);
+      }
+    }
     const wanted = [...this.routes.values()].some(r=>r.speaker||r.mic);
     if (!wanted) { this.busySince = null; this._disconnect('all-audio-disabled'); this._releaseCaptureIfUnused(); this._selectPlayer(); this._broadcast(); return; }
     await this._connect();
     if (!this.connection) return;
     for (const route of this.routes.values()) await this._syncRoute(route);
+    if (recoverCapture && !this.capture) {
+      const candidates = [...this.routes.values()].filter(r=>r.mic && r.actualMic)
+        .flatMap(r=>[...r.refs]).filter(ref=>ref.micIntent && !ref.captureBlocked &&
+          Date.now()>=(ref.peer.captureRetryAfter || 0) && Date.now()-ref.peer.seen<=5000);
+      const ref = candidates[0];
+      if (ref) {
+        try { await this._ensureCapture(ref.peer,ref,true); }
+        catch { /* Capture failure retains intent; per-owner backoff controls retry. */ }
+      }
+    }
     if (this.lastDisconnect && this.lastDisconnect.recoveredAt == null &&
         [...this.routes.values()].some(r=>r.actualSpeaker||r.actualMic)) {
       const recoveredAt = Date.now();
@@ -356,7 +478,7 @@ export class AudioCoordinator {
   _mic(peer,message) {
     const capture = this.capture;
     this._send(peer,{type:'microphone-credit'});
-    if (capture?.peer!==peer || capture.token!==message.token || !capture.delivery || capture.delivery!==message.delivery ||
+    if (capture?.peer!==peer || !capture.delivering || capture.token!==message.token || !capture.delivery || capture.delivery!==message.delivery ||
         !(message.pcm instanceof ArrayBuffer) || message.pcm.byteLength!==1920 || ![...this.routes.values()].some(r=>r.mic && r.actualMic)) return;
     if (this.socket?.readyState!==1 || this.socket.bufferedAmount>3840) { this.dropped++; return; }
     const pcm = new Uint8Array(message.pcm); const silent = pcm.every(v=>v===0);
@@ -393,7 +515,7 @@ export class AudioCoordinator {
       }
       // Server-side retirement can clear the last desired route without a UI command.
       // Reconcile an existing connection too, so an empty channel is released.
-      if (Date.now()>=(this.retryAfter || 0) && (this.connection || [...this.routes.values()].some(r=>r.speaker||r.mic))) await this._sync();
+      if (Date.now()>=(this.retryAfter || 0) && (this.connection || [...this.routes.values()].some(r=>r.speaker||r.mic||r.micRequested))) await this._sync({recoverCapture:true});
       this._broadcast();
     }).catch(error=>{
       const transient = error.transport === true || error.name === 'TimeoutError' ||

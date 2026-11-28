@@ -24,7 +24,7 @@ function fixture(){
  f.coordinator=new AudioCoordinator(env);
  f.peer=()=>{
   const messages=[],pending=new Map();let next=0;
-  const port={start(){},close(){},postMessage(m){messages.push(m);if(m.reply){const p=pending.get(m.reply);pending.delete(m.reply);m.error?p.reject(Error(m.error)):p.resolve(m.value);}else if(m.type==='capture'&&port.allowCapture!==false){queueMicrotask(()=>{port.onmessage({data:{op:'capture-ready',token:m.token}});if(port.endAfterCapture)port.onmessage({data:{op:'capture-failed',token:m.token,reason:'microphone-device-ended'}});});}}};
+  const port={start(){},close(){},postMessage(m){messages.push(m);if(m.reply){const p=pending.get(m.reply);pending.delete(m.reply);m.error?p.reject(Error(m.error)):p.resolve(m.value);}else if(m.type==='capture-delivery'&&m.delivery&&port.allowDelivery!==false){queueMicrotask(()=>port.onmessage({data:{op:'capture-delivery-ready',token:m.token,delivery:m.delivery}}));}else if(m.type==='capture'&&port.allowCapture!==false){queueMicrotask(()=>{port.onmessage({data:{op:'capture-ready',token:m.token}});if(port.endAfterCapture)port.onmessage({data:{op:'capture-failed',token:m.token,reason:'microphone-device-ended'}});});}}};
   f.coordinator.add(port);
   const request=(op,extra={})=>new Promise((resolve,reject)=>{const request=String(++next);pending.set(request,{resolve,reject});port.onmessage({data:{op,request,...extra}});});
   const send=(op,extra={})=>port.onmessage({data:{op,...extra}});
@@ -33,7 +33,7 @@ function fixture(){
  f.cleanup=()=>f.coordinator._retire('test-finished');
  return f;
 }
-async function ready(peer){await peer.request('init',{base:'https://audio.test'});}
+async function ready(peer){await peer.request('init',{base:'https://audio.test',workerProtocol:7});}
 async function acquire(peer,ref,runtime='app'){await peer.request('acquire',{ref,runtime,generation:1});}
 
 test('native cookie refresh retains valid audio intent under the same ingress principal',async()=>{
@@ -71,12 +71,70 @@ test('principal or previously present login binding changes retire authority eve
 
 test('malformed principal correlation never replaces a valid context',async()=>{
  const f=fixture();f.principal='2'.repeat(64);try{
-  const a=f.peer();await ready(a);const before=f.coordinator.context;
+  const a=f.peer();await ready(a);await f.coordinator._context();const before=f.coordinator.context;
   for(const invalid of ['',null,{},'not-a-principal']){
    f.principal=invalid;await assert.rejects(f.coordinator._context(),/Unsupported audio contract/);
    assert.equal(f.coordinator.context,before);
   }
  }finally{f.cleanup();}
+});
+
+test('an old on or delayed owner cancellation cannot undo a newer shared off/on epoch',async()=>{
+ const f=fixture();try{
+  const a=f.peer(),b=f.peer();await ready(a);await ready(b);await acquire(a,'a');await acquire(b,'b');
+  const stamp=(revision,enabled,epoch=revision)=>({available:true,enabled,participating:enabled,revision,epoch});
+  await a.request('microphone',{ref:'a',enabled:true,intent:stamp(1,true)});
+  await b.request('microphone',{ref:'b',enabled:false,intent:stamp(2,false)});
+  await b.request('microphone',{ref:'b',enabled:true,intent:stamp(3,true)});
+  const live=f.coordinator.capture;assert.equal(live.peer.port,b.port);
+  await a.request('microphone',{ref:'a',enabled:true,intent:stamp(1,true)});
+  await a.request('forget-intent',{ref:'a',kind:'microphone'});
+  assert.equal(f.coordinator.capture,live);assert.equal(a.state().routes[0].actualMic,true);
+  await assert.rejects(a.request('microphone',{ref:'a',enabled:false,intent:stamp(3,true)}),/Invalid audio intent stamp/);
+  assert.equal(a.state().routes[0].requested.microphone,true);assert.equal(f.coordinator.capture,live);
+ }finally{f.cleanup();}
+});
+
+test('offline initialization and first speaker intent recover without another enable call',async()=>{
+ const f=fixture();try{
+  f.offline=true;const a=f.peer();await ready(a);await acquire(a,'a');assert.equal(f.http.length,0);
+  const state=await a.request('speaker',{ref:'a',enabled:true});assert.equal(state.requested.speaker,true);assert.equal(state.actualSpeaker,false);
+  f.offline=false;f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;
+  assert.equal(a.state().routes[0].actualSpeaker,true);assert.equal(f.sockets.length,1);
+ }finally{f.cleanup();}
+});
+
+test('writer eligibility precedes capture, and delivery ACK precedes effective microphone activity',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a');a.port.allowDelivery=false;
+  f.holdMic=true;const enabling=a.request('microphone',{ref:'a',enabled:true});await turn();
+  assert(f.held);assert.equal(a.messages.filter(m=>m.type==='capture').length,0);
+  assert.equal(a.state().routes[0].actualMic,false);
+  f.holdMic=false;f.held.respond();await enabling;
+  const capture=f.coordinator.capture;assert(capture?.ready);assert(capture.delivery);
+  assert.equal(a.state().routes[0].actualMic,false);assert.equal(a.state().routes[0].microphonePending,true);
+  const pcm=new Int16Array(960).fill(100).buffer;
+  a.send('microphone-frame',{token:capture.token,delivery:capture.delivery,pcm});
+  assert.equal(f.sockets[0].sent.filter(m=>m instanceof ArrayBuffer).length,0);
+  a.send('capture-delivery-ready',{token:capture.token,delivery:'stale'});
+  assert.equal(a.state().routes[0].actualMic,false);
+  a.send('capture-delivery-ready',{token:capture.token,delivery:capture.delivery});
+  assert.equal(a.state().routes[0].actualMic,true);
+  a.send('microphone-frame',{token:capture.token,delivery:capture.delivery,pcm});
+  assert.equal(f.sockets[0].sent.filter(m=>m instanceof ArrayBuffer).length,1);
+ }finally{f.cleanup();}
+});
+
+test('unavailable or contended target writers do not open a browser microphone',async()=>{
+ for(const fault of ['conflict','domain']){
+  const f=fixture();try{
+   const a=f.peer();await ready(a);await acquire(a,'a');
+   if(fault==='conflict')f.conflict=true;else f.unavailableRuntime='app';
+   const state=await a.request('microphone',{ref:'a',enabled:true});
+   assert.equal(state.actualMic,false);assert.equal(state.requested.microphone,true);
+   assert.equal(a.messages.filter(m=>m.type==='capture').length,0);
+  }finally{f.cleanup();}
+ }
 });
 
 test('same-session references deduplicate switches, first/last interests own one socket',async()=>{
@@ -154,21 +212,25 @@ test('route quota, auth failure, logout and session release remain explicit',asy
 test('device loss while a mic route ACK is pending retires that writer and preserves speaker',async()=>{
  const f=fixture();try{
   const a=f.peer();await ready(a);await acquire(a,'a');await a.request('speaker',{ref:'a',enabled:true});
-  f.holdMic=true;const enabling=a.request('microphone',{ref:'a',enabled:true});await turn();assert.ok(f.held);
+  await a.request('microphone',{ref:'a',enabled:true});await acquire(a,'b','app-b');
+  f.holdMic=true;const enabling=a.request('microphone',{ref:'b',enabled:true});await turn();assert.ok(f.held);
   a.send('capture-failed',{token:f.coordinator.capture.token,reason:'microphone-device-ended'});
   f.holdMic=false;f.held.respond();await enabling;await f.coordinator.serial;
   assert.equal(f.coordinator.capture,null);assert.equal(a.state().routes[0].mic,false);assert.equal(a.state().routes[0].actualMic,false);
   assert.equal(a.state().routes[0].actualSpeaker,true);assert.equal(f.sockets[0].readyState,1);
-  const sent=f.sockets[0].sent.filter(s=>typeof s==='string').map(JSON.parse);assert.equal(sent.at(-1).mic,false);
+  const sent=f.sockets[0].sent.filter(s=>typeof s==='string').map(JSON.parse);
+  assert.equal(sent.filter(m=>m.slot===1).at(-1).mic,false);
+  assert.equal(sent.filter(m=>m.slot===2).at(-1).op,'unsubscribe');
   assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
  }finally{f.cleanup();}
 });
 
-test('a device ending immediately after permission cannot create a microphone route',async()=>{
+test('a device ending immediately after permission cannot deliver to its preauthorized microphone route',async()=>{
  const f=fixture();try{
   const a=f.peer();await ready(a);await acquire(a,'a');a.port.endAfterCapture=true;
   await assert.rejects(a.request('microphone',{ref:'a',enabled:true}),/ended-before-routing/);
-  await f.coordinator.serial;assert.equal(f.coordinator.capture,null);assert.equal(f.sockets.length,0);assert.equal(a.state().routes[0].mic,false);
+  await f.coordinator.serial;assert.equal(f.coordinator.capture,null);assert.equal(f.sockets.length,1);assert.equal(a.state().routes[0].mic,false);
+  assert.equal(f.sockets[0].readyState,3);assert.equal(f.sockets[0].sent.filter(m=>m instanceof ArrayBuffer).length,0);
  }finally{f.cleanup();}
 });
 

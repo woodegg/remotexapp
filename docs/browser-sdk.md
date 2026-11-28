@@ -65,8 +65,14 @@ separate login-session header.
 Audio route snapshots expose requested.speaker and requested.microphone beside
 actualSpeaker and actualMic. microphoneActionRequired reports that an enabled
 microphone needs a new browser action. Render switches from requested state and
-show actual routing separately. Audio uses SharedWorker protocol v5; browser
-permissions and capture lifetime still determine whether a live mic can resume.
+show actual routing separately. Development SDK 0.38 uses SharedWorker protocol
+v7 with ordered live-owner intent and a fresh processor delivery acknowledgement.
+`microphonePending` distinguishes recoverable setup from a browser-action block;
+an enabled mic may reacquire only under live participation, granted permission
+and fresh target writer authorization. A temporary access rejection reports
+`blocked` while retaining intent and stopping capture. No new login header is
+required. See the [self-recovery plan](native-self-recovery.md) for incomplete
+qualification and the older release contract's superseded manual boundaries.
 
 ## Native connection and recovery panel appearance
 

@@ -166,6 +166,16 @@ previously observed binding and retains conservative handling of older servers
 without this field. Scope-pressure reclamation may remove only inactive scopes
 without unexpired grants, preserving active and reserved authority and the cap.
 
+SDK 0.38 / Worker 7 integrates the ordered journal with the audio runtime in
+development. Fresh target writer eligibility precedes device acquisition;
+`actualMic` requires a ready source and current processor delivery acknowledgement.
+Requested mic remains distinct from `microphonePending` and browser-action
+requirements. Temporary access rejection parks intent without old capture;
+fresh observed identity changes and explicit logout still retire it. Worker
+rebind and ended-source recovery are covered by integrated module models;
+repeated silent exits, real browser/fault/resource and final acceptance gates
+are still incomplete. Do not qualify the policy from those models alone.
+
 AUD-003 verification uses the [audio fault inventory](native-audio-faults.md)
 to distinguish display, transport, service, Worker, capture, runtime and identity
 fences. A changed service epoch must be observed directly; fresh sound and remote

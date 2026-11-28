@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "passed-scoped-new-Manager-control",
+  "releaseQualified": false,
+  "implementationCommit": "3b26808efc7d4cc47675dd2ffe88979d76e1262c",
+  "runtimeCoreSHA256": "6db4da33335603669fa4119cfe98e111a3ed9af26fd122dd765313d03eba76b8",
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 8,
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "nativeCDP": true,
+    "headless": false,
+    "sandboxEnabled": true,
+    "newManager": true,
+    "currentSDK": true,
+    "archivedUnchangedHelpersAndKasm": true,
+    "syntheticMic": true,
+    "playbackSink": "none",
+    "audioOnlyHostSession": true,
+    "trustedIngressIdentity": true,
+    "extraLoginHeader": false,
+    "periodicGC": false,
+    "diagnosticGC": "Final owner retirement only; same page alive"
+  },
+  "checks": [
+    {
+      "name": "new-Manager-trusted-ingress-baseline",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 1,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625,
+      "freshRemoteMic": {
+        "windows": 2,
+        "minimumPeak": 6500,
+        "bytesPerWindow": [
+          48000,
+          48000
+        ]
+      }
+    },
+    {
+      "name": "native-cookie-loss-same-principal-automatic-recovery",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 1,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625,
+      "freshRemoteMic": {
+        "windows": 2,
+        "minimumPeak": 6500,
+        "bytesPerWindow": [
+          48000,
+          48000
+        ]
+      }
+    },
+    {
+      "name": "actual-Manager-restart-1",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 1,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625,
+      "freshRemoteMic": {
+        "windows": 2,
+        "minimumPeak": 6500,
+        "bytesPerWindow": [
+          48000,
+          48000
+        ]
+      }
+    },
+    {
+      "name": "actual-Manager-restart-2",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 1,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625,
+      "freshRemoteMic": {
+        "windows": 2,
+        "minimumPeak": 6500,
+        "bytesPerWindow": [
+          48000,
+          48000
+        ]
+      }
+    },
+    {
+      "name": "actual-Manager-outage-over-sixteen-seconds",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 1,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625,
+      "freshRemoteMic": {
+        "windows": 2,
+        "minimumPeak": 6500,
+        "bytesPerWindow": [
+          48000,
+          48000
+        ]
+      }
+    },
+    {
+      "name": "transient-access-rejection-then-permitted-automatic-reacquisition",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 2,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625,
+      "freshRemoteMic": {
+        "windows": 2,
+        "minimumPeak": 6500,
+        "bytesPerWindow": [
+          48000,
+          48000
+        ]
+      }
+    },
+    {
+      "name": "actual-runtime-stop-retires-only-target-and-keeps-other-source",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 2,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625,
+      "freshRemoteMic": {
+        "windows": 2,
+        "minimumPeak": 6500,
+        "bytesPerWindow": [
+          48000,
+          48000
+        ]
+      }
+    },
+    {
+      "name": "actual-HTTP410-old-runtime-does-not-recapture-or-retire-other-target",
+      "status": "passed",
+      "released": true,
+      "interests": 1,
+      "requests": 2
+    },
+    {
+      "name": "actual-Worker-exit-after-runtime-retirement-replays-only-live-target",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 2,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625,
+      "freshRemoteMic": {
+        "windows": 2,
+        "minimumPeak": 6500,
+        "bytesPerWindow": [
+          48000,
+          48000
+        ]
+      }
+    },
+    {
+      "name": "observed-trusted-principal-change-retires-old-intent-no-capture",
+      "status": "passed",
+      "requests": 2
+    }
+  ],
+  "routeHTTPStatusCounts": {
+    "200": 11,
+    "410": 1
+  },
+  "retiredNative": {
+    "AudioContext": 0,
+    "AudioWorkletNode": 0,
+    "blink::AudioWorkletMessagingProxy": 0,
+    "MediaStreamAudioSourceNode": 0,
+    "MediaStream": 0,
+    "MediaStreamTrack": 0,
+    "GainNode": 0,
+    "AudioWorklet": 0,
+    "AudioDestinationNode": 0
+  },
+  "retiredAudioFrames": 0,
+  "pageErrors": [],
+  "cleanup": {
+    "status": "passed",
+    "ownAppsStoppedOrRemoved": true,
+    "browserProfileRemoved": true,
+    "xvfbExited": true,
+    "ownUnitsStopped": true,
+    "dedicatedFixtureStopped": true,
+    "originalPublicUATPreserved": true
+  },
+  "rawReportSHA256": "a860dc93a2b0f257c564051360875fbfa93249f78511434a52e40302c0916f1e",
+  "rawCleanupSHA256": "9c23d9cdf0fef4b46d2bb9c5c4beb2eaf8f012d7e5de8cd0f4bed961923d166a",
+  "sourceSHA256": {
+    "cmd/remotexappd/native_audio.go": "51fa872be1f3028b2462e236f4e8dfc15b98f53a487ee65d42aaf15f1cd39d5e",
+    "cmd/remotexappd/web/sdk/audio-coordinator.js": "3e83b53d84dae4d81db7023e7ee7e3ce7884424c1d1700b5445504d2fbb72102",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "dba08376d2463424a0901b1811035dc702bd662b88a45b923cc2dd08846d1fa8",
+    "cmd/remotexappd/web/sdk/audio-graph-realm.js": "1d78635aa146891a70f9370029eff335a661e22b635e08aeb314a2acdb51b198",
+    "cmd/remotexappd/web/sdk/audio-context-operations.js": "fae185ab4633148110e06fb372c6c08c7a0744c8e3a1d1f39ed7d5feb2c402f7",
+    "cmd/remotexappd/web/sdk/audio-intent-journal.js": "0dfcd3ec148dc3f506e0b990bb44ca0396c98601275b41c96634082edc26492b",
+    "cmd/remotexappd/web/sdk/audio-worker.js": "cfdfbb1b992609e6b9bea2dce9f558bd2d56144fc0b92e17f1bd096859be22ce",
+    "cmd/remotexappd/web/sdk/audio-worker-hub.js": "285d0b7e26f72a548f6f852b3b245b1862feea8436c8f734e3e4c8d391f234bc",
+    "cmd/remotexappd/web/sdk/audio-worklet.js": "d0ca3c748bceb3807d4408bec068ade5a0e13a0e0225d60506e8262aac1d5726"
+  },
+  "scope": [
+    "Native cookie deletion changes scope under same principal/service and recovers automatically with original source; no optional login header",
+    "Two actual Manager restarts and an actual >16s outage change service epoch and restore fresh data with original capture",
+    "Temporary controlled ingress HTTP401 stops capture; restored current access and already granted microphone permission allow automatic new capture",
+    "Actual stop pushes terminal retirement, new old-generation acquire yields HTTP410, other target keeps source; actual Worker exit replays only live interest",
+    "Observed trusted identity change retires old intent and stops capture; no new device request during a further twelve-second observation",
+    "All nine sampled native audio classes zero after awaited cleanup in same live page; not whole-browser resource qualification"
+  ],
+  "remaining": [
+    "Complete 24-class and multi-document real/mixed fault audit",
+    "Clipboard unannounced remote/concurrent upload destination ordering",
+    "Eight-hour natural and >=90min/>=1000-operation stress with PSS/AnonPSS/SwapPss/resources",
+    "Physical devices, actual OS sleep, other browser/embedding policies",
+    "Exact final artifact, production build matrix, final checks/review and one complete human UAT"
+  ]
+}

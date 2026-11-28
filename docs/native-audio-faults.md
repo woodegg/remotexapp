@@ -154,3 +154,22 @@ policy/late-operation boundaries. After same-page idle all nine sampled native
 audio classes are zero. These controls refine playback, device/processor,
 resource and retirement classes rather than add a twenty-fifth fault category;
 the complete fault-class audit and long-duration qualification remain pending.
+
+## New Manager development control
+
+The [ten-case control](../tests/native-audio/results-new-manager-recovery-20261128.json)
+uses the new committed Manager and SDK against unchanged pinned helpers/Kasm.
+It verifies actual cookie loss under the same ingress principal, two Manager
+restarts, a greater-than-sixteen-second outage, controlled HTTP 401 followed by
+permitted automatic reacquisition, actual runtime stop/old-target HTTP 410,
+Worker exit with only the healthy target replayed and observed identity-change
+fencing. Every sound recovery checks fresh speaker/remote mic data; an explicit
+identity change produces no new capture. Final nine native audio counters are
+zero after awaited cleanup in the same page.
+
+This supersedes the earlier short-outage/manual-resume expectations only for
+these qualified development paths. It is an audio-only, single-document,
+synthetic-device control, not the complete 24-class audit or production resource
+envelope. The earlier failed stopped-target attempt remains recorded separately;
+successful source/cookie recovery does not turn an explicitly stopped target
+into a recoverable domain outage.

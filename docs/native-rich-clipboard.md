@@ -171,3 +171,12 @@ Custom formats follow the [Clipboard API representation model](https://www.w3.or
 and [Chromium's custom-format API](https://developer.chrome.com/blog/web-custom-formats-for-the-async-clipboard-api).
 No claim is made that another browser supports custom receipts; feature-detect
 it and retain exact verification or explicit uncertainty.
+
+## Concurrent destination ordering (development)
+
+The repaired SDK A-B-A echo comparison does not close an X11 owner change whose
+offer has not arrived before an automatic upload. The selected
+[destination-ordering design](native-clipboard-ordering.md) requires a revision
+comparison at native transaction admission, before any clipboard buffer or X11
+selection mutation. This needs a newly qualified immutable component/capability;
+it is not implemented or accepted by the earlier receipt/normalization tests.

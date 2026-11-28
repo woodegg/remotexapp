@@ -5968,3 +5968,16 @@ advance. Preserve recoverable domain/endpoint failures and graceful shutdown
 review rather than treating every unavailable domain as terminal. This refines
 the backend classification supporting the existing terminal-runtime invariant;
 the failed browser attempt and red HTTP cases remain separate evidence.
+
+## 2026-11-28 — Compare clipboard destination revision at native admission
+
+Select [KNC-013 destination ordering](native-clipboard-ordering.md) for the
+separate unannounced-remote/concurrent-upload defect. A last-offer SDK check or
+transport round trip cannot prove that X11 ownership stayed unchanged. Compare
+the observed destination revision atomically before any native clipboard-buffer
+or selection mutation, preserving the complete staged transaction on conflict.
+Advance revision before asynchronous snapshot discovery, including unsupported
+selections; content equality is not a revision. Keep consent/focus/permission,
+verified local delivery, format/size bounds and explicit source choice. Require
+an honest capability/manual fallback on old components. This selects the
+invariant, not a completed wire implementation or qualified native component.

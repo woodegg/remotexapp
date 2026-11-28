@@ -13,10 +13,11 @@ the audio owner/coordinator. Integrated module models cover rebind with a live
 source, ended-source reacquisition, permission revoke/grant, late-result/off,
 cross-document off/on, domain recovery with a healthy peer and access/identity
 fences. Writer reservation precedes device acquisition; processor delivery ACK
-precedes effective mic and PCM. These are model results, not real browser
-qualification of the new state machine. Repeated silent Worker exits and the
-remaining fault/resource gates are still open; do not start final qualification
-on an unfinished state machine.
+precedes effective mic and PCM. These models are supplemented by scoped real
+controls below; they do not qualify the complete state machine. Repeated silent
+exit recovery is repaired in development, while full multi-document/Worker-hang,
+clipboard destination ordering and remaining fault/resource gates stay open.
+Do not start final qualification on an unfinished state machine.
 
 A [real Chrome silent-exit control](../tests/native-audio/results-worker-silent-exit-20261128.json)
 now confirms one Worker replacement reuses the same source and processor with
@@ -27,6 +28,30 @@ passes twenty actual exits, retaining one source/processor and a single device
 request with fresh speaker/mic data after every recovery. This single-document
 development control does not qualify the whole fault class, new backend or
 release. The failed Worker 7 control remains unchanged.
+
+## New Manager recovery control (development)
+
+The [ten-case new-Manager control](../tests/native-audio/results-new-manager-recovery-20261128.json)
+uses the committed development Manager/SDK with unchanged pinned gateway,
+drivers and Kasm component. Headed sandboxed Chrome, real Pulse and a synthetic
+mic verify native-cookie deletion, two actual Manager restarts and a greater
+than sixteen-second outage with the same parent source and fresh data. Temporary
+controlled HTTP 401 stops capture; restored current access and already granted
+permission allow an automatic new capture. No optional login-session header is
+used. A changed observed ingress principal instead retires the old interests,
+stops capture and causes no further capture during twelve seconds of observation.
+
+An actual App stop retires its interests while another target retains the source.
+After the [earlier failed attempt](../tests/native-audio/results-runtime-terminal-failure-20261128.json)
+and backend classification repair, acquiring the old target receives HTTP 410 and
+immediately releases that interest. A subsequent actual Worker exit replays only
+the healthy target. Final awaited cleanup returns all nine sampled native audio
+classes to zero in the same live page. Owned test resources are cleaned.
+
+This audio-only Host-session control qualifies neither a complete display/24-class
+matrix nor multiple real documents, physical hardware, OS sleep, long-duration
+allocation, new native clipboard component, production build matrix or immutable
+release. The final diagnostic GC is separate from the fault interval.
 
 ## Worker bootstrap recovery (development Worker 8)
 

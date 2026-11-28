@@ -674,4 +674,9 @@ generation is authoritatively retired. The host must acquire a fresh interest
 for a newly opened runtime, rather than reuse that released handle or repeatedly
 enable it. SDK/Worker own retirement propagation, local replay cancellation and
 late microphone fencing; the host does not need another recovery loop. Other
-live runtime interests remain independent. Real fault qualification is pending.
+live runtime interests remain independent. A
+[scoped new-Manager control](../tests/native-audio/results-new-manager-recovery-20261128.json)
+now verifies actual stop, old-target HTTP 410 and Worker rebind without disturbing
+another capture route, along with cookie/service/access recovery and observed
+identity-change fencing. Complete fault, long-duration and final-candidate
+qualification remain pending; this is not an adoption-ready formal tuple.

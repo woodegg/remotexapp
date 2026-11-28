@@ -129,6 +129,26 @@ The same split-body test and actual peer responsiveness must pass before this
 repair is qualified. Other small upstream RFB message readers are unchanged;
 this repair does not claim that all native message parsing is nonblocking.
 
+## Scoped real native control
+
+The [twelve-case development control](../tests/kasm-native/results-native-clipboard-ordering-20261128.json)
+uses committed Core/embedded SDK and a fully rebuilt v4 native pair. The same
+split-body failure now permits the independent X11 copy to finish before release,
+rejects stale admission and preserves the destination. Actual A-B-A, unannounced
+owner conflict, explicit source choice, INCR and two-Viewer competition pass.
+With 1,000 X11 owner changes and ACKs withheld, each of two connections sends
+only one revision notification. Releasing ACKs restores current observation.
+Actual page freeze disconnects the Viewers; both recover automatically with
+requested manual modes retained. Exact 10 MiB conditional upload/X11 readback
+and one-byte oversize preservation also pass.
+
+This is a scoped development control, not full natural/stress/resource or final
+artifact acceptance. The subsequent current-policy revalidation has its own
+red/green native models and still needs the new exact component. Automatic
+modes/focus, more real documents, audio combinations, other formats/slow links
+and the full fault/candidate gates remain separate. Earlier native failure and
+incomplete driver attempts are retained rather than combined into a single run.
+
 ## Required proof
 
 - Preserve the original A-B-A text/HTML/PNG cases and genuine-echo controls.
@@ -146,3 +166,8 @@ this repair does not claim that all native message parsing is nonblocking.
   immutable source/binary provenance. Then include these paths in the combined
   natural/stress and final-candidate gates; models alone cannot prove the native
   selection boundary.
+
+When incremental native staging yields, format/byte policy may change. Revalidate
+current policy immediately before admission, in the same final event-loop turn;
+parsed earlier headers are not lasting permission. Mid-transfer policy rejection
+must leave the prior destination and connection cache untouched.

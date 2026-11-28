@@ -57,6 +57,15 @@ int main(){
  Stream raced;raced.bytes=good;raced.exposed=good.size()-1;Handler racedOwner;racedOwner.order.subscribed=true;racedOwner.order.arm('A',8,7);SMsgReader race{&raced,&racedOwner};
  assert(!race.readBinaryClipboard());racedOwner.revision=8;raced.exposed=good.size();assert(race.readBinaryClipboard());assert(racedOwner.status=='F'&&racedOwner.mutations==0);
 
+ // Configuration may change while staging now yields. Revalidate current
+ // limits and format policy at commit, rather than trusting parsed headers.
+ for(bool formats:{false,true}){
+  Stream input;input.bytes=good;input.exposed=good.size()-1;Handler owner;SMsgReader reader{&input,&owner};assert(!reader.readBinaryClipboard());
+  if(formats)rfb::Server::DLP_Clip_Types="text/plain";else rfb::Server::DLP_ClipAcceptMax=4;
+  input.exposed=good.size();bool denied=false;try{reader.readBinaryClipboard();}catch(const Exception&){denied=true;}
+  assert(denied&&owner.mutations==0&&owner.admissions==0);
+  rfb::Server::DLP_Clip_Types="text/plain,text/html,image/png";rfb::Server::DLP_ClipAcceptMax=NATIVE_CLIPBOARD_LIMIT;
+ }
  Stream s;s.bytes=good;Handler h;SMsgReader r{&s,&h};r.readBinaryClipboard();assert(h.announced==3&&h.total==8&&h.mutations==5);
  // The applied reader must consult admission after complete staging and before
  // touching old connection buffers or selection ownership.

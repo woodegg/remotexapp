@@ -93,7 +93,7 @@
  }
  
  void SMsgReader::readSetPixelFormat()
-@@ -266,38 +267,69 @@
+@@ -266,38 +267,75 @@
    vlog.error("Client sent old cuttext msg, ignoring");
  }
  
@@ -180,6 +180,12 @@
 +        throw Exception("Native clipboard is not valid UTF-8 text");
 +      if (++tx.index < tx.count) { tx.phase = 1; continue; }
 +      if (!tx.remainingMs()) throw Exception("Native clipboard transfer timed out");
++      // Policy may have changed while an incomplete body yielded to X11.
++      if (rfb::Server::DLP_ClipAcceptMax && tx.total > (unsigned)rfb::Server::DLP_ClipAcceptMax)
++        throw Exception("Native clipboard exceeds current byte limit");
++      for (unsigned i = 0; i < tx.count; i++)
++        if (!nativeClipboardAllowed(rfb::Server::DLP_Clip_Types, tx.mimes[i]))
++          throw Exception("Native clipboard MIME no longer allowed");
 +      // No event-loop re-entry between this revision comparison and commit.
 +      if (handler->acceptBinaryClipboard()) {
 +        handler->clearBinaryClipboard();

@@ -6021,3 +6021,8 @@ progress; completion/disconnect releases staging. Preserve clipboard permissions
 10 MiB bounds, correlated admission and old-pair fallback. Native reproduction,
 repair proof and complete performance gates remain distinct requirements. Small
 upstream message readers are outside this bounded replacement.
+
+When incremental native staging yields, format/byte policy may change. Revalidate
+current policy immediately before admission, in the same final event-loop turn;
+parsed earlier headers are not lasting permission. Mid-transfer policy rejection
+must leave the prior destination and connection cache untouched.

@@ -249,5 +249,20 @@
       "wholeProcessOrLongDurationQualified": false
     },
     "scope": "Full SDK/actual audio control; does not rewrite the minimal no-audio baseline or qualify whole-process memory."
+  },
+  "currentPairRepeatedExitResourceFollowup": {
+    "evidence": "tests/native-audio/results-matched-audio-resources-20261128.json",
+    "evidenceSHA256": "02b40495bf6270e4b7fc3af52153fd8f1583282179557b0c0ad0eb3996f6c72a",
+    "productCommit": "98be104d0803f85eb26517d105621b096143b37c",
+    "matchedAttemptPassed": false,
+    "passedFaultLanes": 2,
+    "actualExitsPerFaultLane": 20,
+    "originalCapturePreservedPerFaultLane": true,
+    "nativeEndpointEachFaultLane": {
+      "SharedWorker": 1,
+      "MessagePort": 1,
+      "nineAudioClasses": 0
+    },
+    "remainingFailedLane": "No-exit idle lane completed20micchecks/nativeendpoint butfailedfinalbrowser-speaker readback. Wholeattempt isfailed; no longresource acceptance."
   }
 }

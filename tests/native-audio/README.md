@@ -322,3 +322,11 @@ fresh microphone/browser-output data and final cleanup. The separate native
 endpoint follows one Worker exit, not twenty exits or a long memory study.
 Full check/build/coverage and hosted CI pass; natural/stress and final candidate
 acceptance remain open.
+
+The [matched three-profile resource follow-up](results-matched-audio-resources-20261128.json)
+keeps cold/warm/timed/idle/GC-only/native endpoints distinct. Two twenty-exit
+lanes pass fresh-data and native retirement checks; the idle lane fails final
+speaker readback, so the whole attempt remains failed. Observed short-run memory
+decreases are not a leak-free claim. Preserve the failed signal windows and
+trace remote Pulse, actual transmitted PCM and browser output before assigning
+the distortion to a product component or changing the spectral assertion.

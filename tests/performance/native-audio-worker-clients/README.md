@@ -118,3 +118,14 @@ one Chrome capture, domain epoch replacement, fresh data and final cleanup.
 Neither control qualifies twenty repeated exits, whole-process memory or full
 natural/stress acceptance. The accepted minimal no-audio baseline above is
 unchanged.
+
+A later [matched three-profile resource control](../../native-audio/results-matched-audio-resources-20261128.json)
+uses that repaired product. Both actual-Worker-exit lanes complete twenty exits
+with new mic data and the original source/processor/capture request; each returns
+to one bootstrap/one port/nine audio classes zero. The no-exit lane completes its
+twenty mic checks and the same native endpoint but fails final browser-speaker
+readback. **The entire matched attempt is failed**, despite the two scoped
+repeated-exit passes. All observed PCM windows are retained. Warmed anonymous-PSS
+endpoint decreases in these short samples do not qualify long-term allocation;
+common blank-browser allocation is not attributed to a particular subsystem.
+Natural/stress, steady-PCM attribution and final acceptance remain open.

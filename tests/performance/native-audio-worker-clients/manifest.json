@@ -9,7 +9,7 @@
     "tests/native-audio/browser-worker-hub-retirement.py": "6b2c0617441b3ca57b3719a50f89ea8ed527b956459aa6c1cd7b9af679fe47bf",
     "tests/native-audio/worker-hub-retirement.html": "e3223d4139d5b50b2d0eefd89f1b8ed8dcd57693628444706aea51729ca88cc7"
   },
-  "resultSHA256": "ed3741dd4be29b0924fc52c6da43773dfe1bf358c43a3458ff02ee1c6632bf81",
+  "resultSHA256": "fc109f2e1d51434324d424f338a94a7753a6403fb684282c61adcd78ec77651c",
   "initialMechanismSourceSHA256": {
     "cmd/remotexappd/web/sdk/audio-worker-hub.js": "4e27b8cd4afc6d40dc0bf1cba428f25f72c795c39d54d2ce1098572071ffad06",
     "cmd/remotexappd/web/sdk/audio-worker.js": "cfdfbb1b992609e6b9bea2dce9f558bd2d56144fc0b92e17f1bd096859be22ce",
@@ -31,5 +31,6 @@
     "tests/native-audio/headed_cdp.py": "b8cb78f5c21789ec8870c4db12102ce1fb33df1009a45b8398a735c65bad8a61",
     "tests/native-audio/virtual_pulse.py": "52c7e5bd5ebaa03f4156844ebe24a056838a4f95fb7d4f5008d82b382581a573"
   },
-  "terminalHandleFollowupEvidenceSHA256": "72d51c1c7dee3eeb0ea7c003659e450b161daa887ebc88b53176f377f70070f2"
+  "terminalHandleFollowupEvidenceSHA256": "72d51c1c7dee3eeb0ea7c003659e450b161daa887ebc88b53176f377f70070f2",
+  "currentPairRepeatedExitResourceEvidenceSHA256": "02b40495bf6270e4b7fc3af52153fd8f1583282179557b0c0ad0eb3996f6c72a"
 }

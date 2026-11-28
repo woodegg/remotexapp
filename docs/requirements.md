@@ -158,6 +158,14 @@ supersedes AUD-003's mandatory extra click after every expired/replaced capture,
 not its cancellation, access or generation fences. Implementation/qualification
 are incomplete; legacy evidence does not accept the new policy.
 
+AUD-006 also distinguishes refreshed native cookies from authenticated-principal
+changes. The context supplies an opaque Manager-scoped principal correlation,
+stable across service/cookie epochs; it does not authorize requests or identify
+a distinct login of the same account. SDK recovery fences a changed or lost
+previously observed binding and retains conservative handling of older servers
+without this field. Scope-pressure reclamation may remove only inactive scopes
+without unexpired grants, preserving active and reserved authority and the cap.
+
 AUD-003 verification uses the [audio fault inventory](native-audio-faults.md)
 to distinguish display, transport, service, Worker, capture, runtime and identity
 fences. A changed service epoch must be observed directly; fresh sound and remote

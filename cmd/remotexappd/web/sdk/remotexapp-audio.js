@@ -54,9 +54,11 @@ export class RemoteXAppAudio extends EventTarget {
     const previous = this.binding;
     this.ready = this._request('init',{base:this.base}).then(async contract => {
       const current = contract.binding;
-      const scopeChanged = previous?.service === current?.service && previous?.scope !== current?.scope;
-      const loginChanged = previous?.login && current?.login && previous.login !== current.login;
-      if (scopeChanged || loginChanged) {
+      const samePrincipal = previous?.principal && previous.principal === current?.principal;
+      const principalChanged = previous?.principal && previous.principal !== current?.principal;
+      const scopeChanged = previous?.service === current?.service && previous?.scope !== current?.scope && !samePrincipal;
+      const loginChanged = previous?.login && previous.login !== current?.login;
+      if (scopeChanged || loginChanged || principalChanged) {
         this._retireInterests();
       }
       this.binding = current;
@@ -66,7 +68,7 @@ export class RemoteXAppAudio extends EventTarget {
         else interest[boundPort] = port;
       }
       this._post({op:'playback-ready',ready:this.context?.state==='running' && !!this.playback});
-      if (previous && !scopeChanged && !loginChanged) {
+      if (previous && !scopeChanged && !loginChanged && !principalChanged) {
         for (const interest of this.interests.values()) {
           if (!(interest[resumeSpeaker] || interest[resumeMicrophone]) || interest[pendingSpeakerOff]) continue;
           const enabled = !!interest[resumeSpeaker];

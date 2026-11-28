@@ -63,6 +63,30 @@ test('worker replacement rejects an old interest after same-account re-login',as
   }finally{f.audio.dispose();}
 });
 
+test('worker rebind preserves live interests across native cookie refresh under the same principal',async()=>{
+  const f=fixture();try{
+    f.binding={...f.binding,login:'',principal:'same-principal'};
+    const interest=await f.audio.acquire({id:'app',sessionGeneration:1});
+    f.audio.worker.onerror();f.binding={...f.binding,scope:'new-native-cookie-scope'};
+    await f.audio._ensureWorker();
+    assert.equal(interest.released,false);assert.equal(f.audio.interests.size,1);
+    assert.equal(f.messages.filter(m=>m.op==='acquire').length,2);
+  }finally{await f.audio.dispose();}
+});
+
+test('worker rebind never crosses an observed principal change or missing previous correlation',async()=>{
+  for(const principal of ['different-principal',undefined]){
+    const f=fixture();try{
+      f.binding={...f.binding,login:'',principal:'original-principal'};
+      const interest=await f.audio.acquire({id:'app',sessionGeneration:1});
+      f.audio.worker.onerror();f.binding={...f.binding,service:'new-service',scope:'new-scope',principal};
+      await f.audio._ensureWorker();
+      assert.equal(interest.released,true);assert.equal(f.audio.interests.size,0);
+      assert.equal(f.messages.filter(m=>m.op==='acquire').length,1);
+    }finally{await f.audio.dispose();}
+  }
+});
+
 
 test('worker termination without a login header restores speaker without reopening microphone',async()=>{
   const f=fixture();

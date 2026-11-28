@@ -5793,3 +5793,29 @@ value/baseline comparison handles no-op echoes and concurrent local conflicts.
 Development unit and real Chrome/X11 old/new controls pass; final-candidate
 qualification remains outstanding. Kasm already fences stale X11 snapshot owners
 and revisions; no second legacy clipboard path is introduced by this repair.
+
+## 2026-11-28 — Separate native-cookie refresh from ingress-principal replacement
+
+Under #119, a same-service native-cookie scope change must not permanently
+discard valid audio intent merely because the browser forgot that cookie.
+Add an opaque principal correlation to the context/Worker binding, derived
+from the existing authenticated request principal and stable Manager namespace.
+Fresh cookie scopes and service epochs can then reconcile under the same
+observed principal. Changed or lost previously observed principal/login bindings
+still retire old interests, including across service restart. Older servers
+without correlation retain conservative same-service scope-change behavior.
+
+This supersedes only the scope-equality inference in the earlier recovery
+contract. It does not create an authentication credential or a new required
+login header, distinguish a new login of the same account, or infer an identity
+that ingress never supplied. Explicit host logout and fresh request/grant
+authorization remain necessary. Development-mode correlation describes its
+configured trust domain, not a Cloudflare account.
+
+Repeated forgotten cookies can otherwise strand new contexts at the 64-scope
+cap for twenty-four hours. At capacity evict the least recently used inactive
+scope with no unexpired grant; protect every active channel and reservation.
+Exhaustion of genuinely reserved capacity remains a quota error. Focused
+backend/SDK tests cover scope refresh, principal isolation, old-server fallback,
+grant rejection and pressure boundaries; end-to-end and full self-recovery
+qualification remain separate gates.

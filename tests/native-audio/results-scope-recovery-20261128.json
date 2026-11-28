@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "development-regressions-passed",
+  "releaseQualified": false,
+  "baselineCommit": "42977b3",
+  "cases": [
+    {
+      "case": "same-principal native cookie refresh",
+      "baseline": "failed; valid route retired",
+      "repaired": "passed; speaker/mic resumed with retained live capture and fresh delivery fence"
+    },
+    {
+      "case": "same-principal logical Worker rebind",
+      "baseline": "failed; interest released",
+      "repaired": "passed; interest preserved"
+    },
+    {
+      "case": "observed principal/login replacement or disappearance",
+      "repaired": "passed; old capture/interests retired"
+    },
+    {
+      "case": "three-capacity idle cookie churn",
+      "baseline": "HTTP 429 at refresh 64",
+      "repaired": "192 refreshes passed; scope cap retained"
+    },
+    {
+      "case": "all scopes live or reserved",
+      "repaired": "quota retained; no authority evicted"
+    }
+  ],
+  "verification": {
+    "focusedAudioCoordinatorTests": 24,
+    "focusedAudioOwnerTests": 16,
+    "allGoAudioTests": "passed",
+    "makeCheck": "passed",
+    "oldSourceNegativeControls": 3
+  },
+  "sourceSHA256": {
+    "cmd/remotexappd/native_audio.go": "5cb4fcf743f7546a1c361d93c019561b82e6bdd180447104c2b59e95ec7f9567",
+    "cmd/remotexappd/web/sdk/audio-coordinator.js": "ef29fe355bbfaa7672c1ae7d93f961005d68a90519ea9beebc5e3e2d4f03a70d",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "7d32d0ea627eb6987f2eaefd98e4d4c9ddfaa72cf18415b5d999849daae9fe66"
+  },
+  "limitations": [
+    "Unit and HTTP controls, not a real browser end-to-end cookie-epoch test.",
+    "Shared intent integration, automatic source reacquisition, long-duration and stress qualification remain incomplete."
+  ]
+}

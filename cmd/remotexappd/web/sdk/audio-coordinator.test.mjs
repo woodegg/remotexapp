@@ -18,7 +18,7 @@ function fixture(){
   if(action==='route'&&body.runtime===f.retiredRuntime)return {ok:false,status:410,json:async()=>({error:'audio runtime generation retired'})};
   if(f.denied)return {ok:false,status:403,json:async()=>({error:'auth rejected'})};
   if(action==='route'&&body.runtime===f.unavailableRuntime)return {ok:false,status:409,json:async()=>({error:'session audio unavailable'})};
-  const data=action==='context'?{service:f.service,scope:f.scope,login:f.login,protocol:'pcm-s16le-48k-v1'}:action==='route'?{token:'c'.repeat(64),domain:'d'.repeat(32)}:action==='grant'?{token:'c'.repeat(64)}:{ok:true};
+  const data=action==='context'?{service:f.service,scope:f.scope,login:f.login,...(f.principal !== undefined ? {principal:f.principal} : {}),protocol:'pcm-s16le-48k-v1'}:action==='route'?{token:'c'.repeat(64),domain:'d'.repeat(32)}:action==='grant'?{token:'c'.repeat(64)}:{ok:true};
   return {ok:true,json:async()=>data};
  }};
  f.coordinator=new AudioCoordinator(env);
@@ -35,6 +35,49 @@ function fixture(){
 }
 async function ready(peer){await peer.request('init',{base:'https://audio.test'});}
 async function acquire(peer,ref,runtime='app'){await peer.request('acquire',{ref,runtime,generation:1});}
+
+test('native cookie refresh retains valid audio intent under the same ingress principal',async()=>{
+ const f=fixture();f.principal='2'.repeat(64);f.login='';try{
+  const a=f.peer();await ready(a);await acquire(a,'a');
+  await a.request('speaker',{ref:'a',enabled:true});await a.request('microphone',{ref:'a',enabled:true});
+  const capture=f.coordinator.capture, oldDelivery=capture.delivery;
+  f.scope='e'.repeat(64);f.coordinator.lastRenew=0;
+  f.coordinator._tick();await f.coordinator.serial;
+  assert.equal(f.sockets.length,2);assert.equal(f.sockets[0].readyState,3);
+  assert.equal(f.coordinator.capture,capture);assert.notEqual(capture.delivery,oldDelivery);
+  assert.equal(a.state().routes[0].actualSpeaker,true);assert.equal(a.state().routes[0].actualMic,true);
+  assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
+  assert.ok(!a.messages.some(m=>m.type==='retired'));
+  assert.deepEqual(a.state().routes[0].requested,{speaker:true,microphone:true});
+ }finally{f.cleanup();}
+});
+
+test('principal or previously present login binding changes retire authority even across service restarts',async()=>{
+ for(const change of ['principal','missing-principal','login','missing-login']){
+  const f=fixture();f.principal='2'.repeat(64);try{
+   const a=f.peer();await ready(a);await acquire(a,'a');await a.request('microphone',{ref:'a',enabled:true});
+   f.service='e'.repeat(64);f.scope='f'.repeat(64);
+   if(change==='principal') f.principal='3'.repeat(64);
+   if(change==='missing-principal') f.principal=undefined;
+   if(change==='login') f.login='4'.repeat(64);
+   if(change==='missing-login') f.login='';
+   await assert.rejects(f.coordinator._context(),/epoch changed/,change);
+   assert.equal(f.coordinator.capture,null,change);assert.equal(f.coordinator.routes.size,0,change);
+   assert.equal(f.sockets.length,1,change);assert.equal(f.sockets[0].readyState,3,change);
+   assert.ok(a.messages.some(m=>m.type==='retired'),change);
+  }finally{f.cleanup();}
+ }
+});
+
+test('malformed principal correlation never replaces a valid context',async()=>{
+ const f=fixture();f.principal='2'.repeat(64);try{
+  const a=f.peer();await ready(a);const before=f.coordinator.context;
+  for(const invalid of ['',null,{},'not-a-principal']){
+   f.principal=invalid;await assert.rejects(f.coordinator._context(),/Unsupported audio contract/);
+   assert.equal(f.coordinator.context,before);
+  }
+ }finally{f.cleanup();}
+});
 
 test('same-session references deduplicate switches, first/last interests own one socket',async()=>{
  const f=fixture();try{

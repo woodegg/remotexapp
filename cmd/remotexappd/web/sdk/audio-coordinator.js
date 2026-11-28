@@ -66,24 +66,28 @@ export class AudioCoordinator {
       if (error.status === 401 || error.status === 403) { this.context = null; this._retire('audio-login-required'); }
       throw error;
     }
-    if (context.protocol !== 'pcm-s16le-48k-v1' || !/^[a-f0-9]{64}$/.test(context.scope || '') || !/^[a-f0-9]{64}$/.test(context.service || '') || (context.login && !/^[a-f0-9]{64}$/.test(context.login))) throw Error('Unsupported audio contract');
+    if (context.protocol !== 'pcm-s16le-48k-v1' || !/^[a-f0-9]{64}$/.test(context.scope || '') || !/^[a-f0-9]{64}$/.test(context.service || '') || (context.login && !/^[a-f0-9]{64}$/.test(context.login)) || (context.principal !== undefined && !/^[a-f0-9]{64}$/.test(context.principal))) throw Error('Unsupported audio contract');
     const previous = this.context;
     this.context = context;
     if (!previous || previous.scope !== context.scope || previous.service !== context.service) {
       for (const peer of this.ports.values()) this._send(peer,{type:'binding',binding:this._binding()});
     }
-    if (previous && (context.scope !== previous.scope || context.service !== previous.service)) {
-      if (context.service === previous.service || (previous.login && context.login && previous.login !== context.login)) {
+    if (previous) {
+      const changed = context.scope !== previous.scope || context.service !== previous.service;
+      const principalChanged = previous.principal && previous.principal !== context.principal;
+      const loginChanged = previous.login && previous.login !== context.login;
+      const samePrincipal = previous.principal && previous.principal === context.principal;
+      if (principalChanged || loginChanged || (changed && context.service === previous.service && !samePrincipal)) {
         this._retire('audio-login-changed');
         throw Error('Audio login epoch changed; acquire current session interests again');
       }
-      this._interrupt('audio-service-restarted',true);
+      if (changed) this._interrupt(context.service === previous.service ? 'audio-scope-refreshed' : 'audio-service-restarted',true);
     }
     return context;
   }
   _binding() {
-    const {scope,service,login} = this.context;
-    return {scope,service,login};
+    const {scope,service,login,principal} = this.context;
+    return {scope,service,login,...(principal ? {principal} : {})};
   }
   _muteSpeaker(route,reason = '') {
     route.speaker = false;

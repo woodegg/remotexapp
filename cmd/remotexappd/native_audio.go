@@ -69,13 +69,14 @@ type audioConnection struct {
 	dropped     uint64
 }
 type audioService struct {
-	closed     bool
-	mu         sync.Mutex
-	id, cookie string
-	scopes     map[[32]byte]*audioScope
-	grants     map[[32]byte]*audioGrant
-	hubs       map[string]*audioHub
-	resolve    func(string, int64) (sessionaudio.Record, error)
+	closed            bool
+	mu                sync.Mutex
+	id, cookie        string
+	identityNamespace [32]byte
+	scopes            map[[32]byte]*audioScope
+	grants            map[[32]byte]*audioGrant
+	hubs              map[string]*audioHub
+	resolve           func(string, int64) (sessionaudio.Record, error)
 }
 
 func audioToken() string {
@@ -87,7 +88,7 @@ func audioToken() string {
 }
 func newAudioService(cookieIdentity string, resolve func(string, int64) (sessionaudio.Record, error)) *audioService {
 	hash := sha256.Sum256([]byte(cookieIdentity))
-	return &audioService{id: audioToken(), cookie: fmt.Sprintf("rxa_audio_%x", hash[:6]), scopes: map[[32]byte]*audioScope{}, grants: map[[32]byte]*audioGrant{}, hubs: map[string]*audioHub{}, resolve: resolve}
+	return &audioService{id: audioToken(), cookie: fmt.Sprintf("rxa_audio_%x", hash[:6]), identityNamespace: hash, scopes: map[[32]byte]*audioScope{}, grants: map[[32]byte]*audioGrant{}, hubs: map[string]*audioHub{}, resolve: resolve}
 }
 func (m *manager) audioService() *audioService {
 	m.audioOnce.Do(func() { m.audio = newAudioService(m.cfg.stateDir+"\n"+m.cfg.listen, m.resolveAudioDomain) })
@@ -134,6 +135,17 @@ func (a *audioService) loginBinding(r *http.Request) string {
 	return loginBinding(r, a.cookie)
 }
 
+// Correlate the existing ingress principal across cookie and service epochs.
+// This is not a credential or a login-session identifier. In development mode
+// it identifies only that Manager's configured development trust domain.
+func (a *audioService) principalBinding(r *http.Request) string {
+	hash := sha256.New()
+	hash.Write(a.identityNamespace[:])
+	hash.Write([]byte("\x00audio-principal-v1\x00"))
+	hash.Write([]byte(grantIdentity(r)))
+	return hex.EncodeToString(hash.Sum(nil))
+}
+
 func (a *audioService) scopeLocked(r *http.Request) *audioScope {
 	cookie, err := r.Cookie(a.cookie)
 	if err != nil {
@@ -162,6 +174,33 @@ func (a *audioService) pruneLocked() {
 			delete(a.scopes, key)
 		}
 	}
+}
+
+// A forgotten browser cookie must not consume a scope for twenty-four hours
+// under pressure. Never evict a live channel or a pending one-use grant.
+func (a *audioService) makeScopeRoomLocked() bool {
+	if len(a.scopes) < audioMaxScopes {
+		return true
+	}
+	protected := make(map[*audioScope]bool, len(a.grants))
+	for _, grant := range a.grants {
+		protected[grant.scope] = true
+	}
+	var oldest *audioScope
+	var oldestKey [32]byte
+	for key, scope := range a.scopes {
+		if scope.connection != nil || protected[scope] {
+			continue
+		}
+		if oldest == nil || scope.seen.Before(oldest.seen) || (scope.seen.Equal(oldest.seen) && scope.id < oldest.id) {
+			oldest, oldestKey = scope, key
+		}
+	}
+	if oldest == nil {
+		return false
+	}
+	delete(a.scopes, oldestKey)
+	return true
 }
 
 type audioRequest struct {
@@ -223,7 +262,7 @@ func (a *audioService) serve(w http.ResponseWriter, r *http.Request) {
 					delete(a.scopes, key)
 				}
 			}
-			if len(a.scopes) >= audioMaxScopes {
+			if !a.makeScopeRoomLocked() {
 				writeError(w, 429, "audio scope capacity reached")
 				return
 			}
@@ -234,7 +273,7 @@ func (a *audioService) serve(w http.ResponseWriter, r *http.Request) {
 			http.SetCookie(w, &http.Cookie{Name: a.cookie, Value: token, Path: "/", HttpOnly: true, Secure: r.TLS != nil || strings.EqualFold(r.Header.Get("X-Forwarded-Proto"), "https"), SameSite: http.SameSiteStrictMode})
 		}
 		scope.seen = time.Now()
-		writeJSON(w, 200, map[string]any{"service": a.id, "scope": scope.id, "login": scope.login, "protocol": sessionaudio.Protocol, "maxRoutes": audioMaxRoutes, "renewAfterMs": 10000, "expiresInMs": audioLease.Milliseconds()})
+		writeJSON(w, 200, map[string]any{"service": a.id, "scope": scope.id, "principal": a.principalBinding(r), "login": scope.login, "protocol": sessionaudio.Protocol, "maxRoutes": audioMaxRoutes, "renewAfterMs": 10000, "expiresInMs": audioLease.Milliseconds()})
 		return
 	}
 	if scope == nil || req.Scope != scope.id {

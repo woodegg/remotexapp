@@ -134,6 +134,21 @@ private audio domain. Browsers cannot supply backend socket paths, URLs or
 commands. Stop/generation retirement removes corresponding routes and grants;
 other sessions on the shared channel continue.
 
+The development self-recovery implementation adds `principal` to the context
+and Worker binding: a 64-character opaque correlation derived from the existing
+authenticated principal and stable Manager namespace. It survives native-cookie
+refresh and service restart, allowing a live SDK owner to distinguish those
+events from an observed account change. It is not a credential or proof of a
+distinct login session. With `auth-mode=none` it represents only the configured
+development trust domain; the Manager cannot infer a Cloudflare user's identity
+that ingress does not pass. Explicit host logout remains a revocation boundary.
+No new header or setting is required. Previously observed principal/login
+bindings changing or disappearing fence old intent; older servers without a
+principal correlation retain conservative same-service scope-change behavior.
+At the 64-scope cap, only inactive scopes with no pending unexpired grants may
+be reclaimed. Live connections/reservations remain protected and can exhaust
+capacity honestly. This development contract is not full AUD-006 qualification.
+
 Fresh authenticated HTTP renewal is required within 30 seconds, normally every
 10 seconds. Audio packets and Ping/Pong do not renew authorization. Explicit SDK
 logout revokes the epoch. Out-of-band identity-provider logout is observed when

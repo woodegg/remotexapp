@@ -86,6 +86,15 @@ page resume and Worker messages. Ordinary hidden tabs retain healthy connections
 Freeze/OS suspension fences delivery, then resume reconciles current intent and
 permission without requiring a new button click where the browser permits it.
 
+Native cookie replacement is distinct from account replacement. Context returns
+a stable Manager-scoped correlation of the existing ingress principal. Equal
+observed principals permit fresh scope/service grants; changed or lost observed
+principal/login bindings retire old interests. The correlation is not authority,
+nor does it distinguish repeated logins of the same account. Older servers
+without it retain conservative same-service scope-change handling. No extra
+login header is required. Under scope pressure reclaim only inactive scopes with
+no pending grants; never evict an active channel or reservation to hide a quota.
+
 Keep separate failure classes: retryable connection/service/device/domain loss;
 blocked browser permission/playback/capability; terminal owner/identity/runtime
 retirement; and explicit user cancellation. Initialization failure must not leave

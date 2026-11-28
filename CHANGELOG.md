@@ -23,6 +23,13 @@ Target: `0.17.6`. SDK `0.37.0`.
   and qualification plan covers granted-permission mic reacquisition, shared
   intent fencing, bounded recovery and combined long-duration/stress gates.
   Audio state-machine integration is still in development.
+- Distinguish native audio cookie refresh from an observed ingress-principal
+  change. Context responses add a Manager-scoped principal correlation; current
+  SDK owners can keep valid intent across a refreshed cookie scope, while changed
+  or lost previously observed identity/login bindings fence old interests.
+  This adds no credential, required login header or configuration. Under scope
+  pressure, reclaim only idle scopes without live connections or pending grants;
+  active/reserved capacity still returns a bounded quota error.
 
 - Unregister the native display adapter's keyboard blur listener before
   removing its input. A browser-retained detached input must not keep retired

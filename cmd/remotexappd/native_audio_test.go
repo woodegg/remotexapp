@@ -35,6 +35,30 @@ func audioTestServer(t *testing.T, a *audioService) *httptest.Server {
 	t.Cleanup(server.Close)
 	return server
 }
+
+func TestAudioTerminalRuntimeReturnsGoneInsteadOfRecoverableDomainConflict(t *testing.T) {
+	for _, test := range []struct {
+		name, state, session string
+		want                 int
+	}{
+		{"stopped-session", "server-ready", "stopped", http.StatusGone},
+		{"stopping-session", "ready", "stopping", http.StatusGone},
+		{"stopped-runtime", "stopped", "stopped", http.StatusGone},
+		{"stopping-runtime", "stopping", "running", http.StatusGone},
+		{"temporary-session-failure", "server-ready", "failed", http.StatusConflict},
+		{"temporarily-unavailable-domain", "ready", "running", http.StatusConflict},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m := &manager{instances: map[string]*instance{"app": {ID: "app", State: test.state, SessionState: test.session, SessionGeneration: 2}}}
+			a := newAudioService("terminal-runtime-test", m.resolveAudioDomain)
+			server := audioTestServer(t, a)
+			status, _ := audioPost(t, audioTestClient(t), server.URL, "route", "alice", audioRequest{Runtime: "app", Generation: 2})
+			if status != test.want {
+				t.Fatalf("route status=%d, want %d for runtime=%s session=%s", status, test.want, test.state, test.session)
+			}
+		})
+	}
+}
 func audioTestClient(t *testing.T) *http.Client {
 	t.Helper()
 	jar, _ := cookiejar.New(nil)

@@ -104,6 +104,11 @@ func (m *manager) resolveAudioDomain(id string, generation int64) (sessionaudio.
 	if item == nil || item.SessionGeneration != generation {
 		return sessionaudio.Record{}, errAudioGenerationRetired
 	}
+	// Stopped records retain their old generation until a later explicit start.
+	// That retained metadata is not a temporarily unavailable audio domain.
+	if item.State == "stopped" || item.State == "stopping" || item.SessionState == "stopped" || item.SessionState == "stopping" {
+		return sessionaudio.Record{}, errAudioGenerationRetired
+	}
 	if !isKasm(item) || item.Components.NativeAudio != sessionaudio.Protocol || item.SessionState != "running" || (item.State != "ready" && item.State != "server-ready") {
 		return sessionaudio.Record{}, errors.New("session audio unavailable")
 	}

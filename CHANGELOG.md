@@ -11,6 +11,12 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Return terminal audio-route HTTP 410 for stopped/stopping App sessions and
+  runtimes even while their old generation metadata remains. Previously HTTP
+  409 classified an explicitly retired target as a temporary domain outage.
+  Actual new-Manager testing reproduced the gap; transient domain failures
+  retain their recoverable classification.
+
 - Retire local audio interests and journal participation when the server confirms
   a runtime generation is gone. Worker replacement cannot replay that target;
   stale commands/ACKs cannot reactivate it, and other live audio routes retain

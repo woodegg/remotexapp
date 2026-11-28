@@ -5956,3 +5956,15 @@ retains its intent and usable capture source; a domain outage or replacement
 is not runtime-generation retirement. No new host recovery loop or server
 authentication boundary is introduced. This completes the local half of the
 existing terminal-runtime invariant; real faults remain a separate gate.
+
+## 2026-11-28 — Classify retained stopped audio targets as terminal
+
+The new-Manager browser control proves a second half of this boundary: actual
+stop correctly pushes generation retirement, but a subsequent old-target acquire
+gets recoverable HTTP 409 because the stopped record still holds that generation.
+Return HTTP 410 for stopped/stopping runtime or session records. A later explicit
+start allocates a new generation; old audio authority must not wait for it to
+advance. Preserve recoverable domain/endpoint failures and graceful shutdown
+review rather than treating every unavailable domain as terminal. This refines
+the backend classification supporting the existing terminal-runtime invariant;
+the failed browser attempt and red HTTP cases remain separate evidence.

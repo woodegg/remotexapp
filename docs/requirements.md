@@ -203,7 +203,10 @@ AUD-006 requires an authoritative runtime-generation retirement to revoke local
 replay and journal participation, not only mark a Worker route inactive. Notify
 all participating owners, fence late acquisition/commands/ACKs and reject reuse
 of released interests. Keep unaffected runtimes and their valid capture usable.
-Worker replacement must not reconstruct retired interests. Model regressions
+Worker replacement must not reconstruct retired interests. The backend returns
+terminal route HTTP 410 for retained stopped/stopping runtime/session records,
+without waiting for an explicit later start to advance the generation counter;
+temporary domain failure remains a recoverable conflict. Model regressions
 cover push/HTTP retirement, two documents and delayed device completion; real
 fault and final candidate gates remain separate.
 

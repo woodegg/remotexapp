@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "failed-new-Manager-control-retained",
+  "releaseQualified": false,
+  "sourceCommit": "4846dbc6a584e0378d2ee466a2320a8d559e9d46",
+  "runtimeCoreSHA256": "6b37addd9535eb9abff8e3b20d70193815d8234c1987129cb8ef77f4c29570e8",
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headless": false,
+    "sandboxEnabled": true,
+    "nativeCDP": true,
+    "newManager": true,
+    "currentSDK": true,
+    "archivedUnchangedHelpersAndKasm": true,
+    "syntheticMic": true,
+    "sink": "none",
+    "trustedIngressIdentity": true,
+    "extraLoginHeader": false,
+    "audioOnlyHostSession": true,
+    "periodicGC": false
+  },
+  "passedBeforeFailure": [
+    {
+      "name": "new-Manager-trusted-ingress-baseline",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 1,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "native-cookie-loss-same-principal-automatic-recovery",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 1,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-Manager-restart-1",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 1,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-Manager-restart-2",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 1,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-Manager-outage-over-sixteen-seconds",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 1,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "transient-access-rejection-then-permitted-automatic-reacquisition",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 2,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-runtime-stop-retires-only-target-and-keeps-other-source",
+      "status": "passed",
+      "sameSource": true,
+      "requests": 2,
+      "actualMic": true,
+      "actualSpeaker": true,
+      "speakerPeak": 0.2593994140625
+    }
+  ],
+  "failedCase": {
+    "name": "new-old-target-acquire-after-actual-stop",
+    "expected": {
+      "released": true,
+      "interests": 1,
+      "requests": 2
+    },
+    "actual": {
+      "released": false,
+      "interests": 2,
+      "requests": 2
+    }
+  },
+  "rootCause": "resolveAudioDomain keeps matching stopped-generation metadata, then returns a recoverable domain error. Stopped/stopping records need terminal classification independent of the later generation increment. The actual push retirement already succeeded.",
+  "separateHTTPReproduction": {
+    "fourRedCases": [
+      "stopped-session",
+      "stopping-session",
+      "stopped-runtime",
+      "stopping-runtime"
+    ],
+    "actualHTTPStatus": 409,
+    "requiredHTTPStatus": 410,
+    "redLogSHA256": "aa8ef365ae0ef0bd9d20ab20af8afc23f66c6e67373e0c57799d8b86ba3ff1c5"
+  },
+  "notExecuted": [
+    "Worker exit after retired target",
+    "Observed ingress principal change",
+    "Final native retirement diagnostic"
+  ],
+  "cleanup": {
+    "status": "passed",
+    "browserProfileRemoved": true,
+    "ownUnitsStopped": true,
+    "dedicatedFixtureStopped": true,
+    "originalPublicUATPreserved": true
+  },
+  "rawReportSHA256": "054fa113972aae4f5878a649a373aa7f239540cf9cb88f40fef1344e40fb8177",
+  "rawCleanupSHA256": "114a860b9e3a742cd1383e31397f47f7f4d49c3b03a677ed8c5816d6b9392fb1"
+}

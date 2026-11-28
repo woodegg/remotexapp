@@ -331,6 +331,14 @@ reacquire a retired local interest. The
 [development model regressions](../tests/native-audio/results-runtime-intent-retirement-20261128.json) are separate
 from real runtime-stop and final-artifact qualification.
 
+The backend must also classify retained stopped/stopping runtime or session
+records as terminal HTTP 410, even before their generation counter advances.
+The [failed real new-Manager control](../tests/native-audio/results-runtime-terminal-failure-20261128.json)
+found that these records returned recoverable 409;
+the existing push fence worked but a later old-target acquire was misclassified.
+Temporary domain/service failure remains recoverable and does not become terminal
+merely because its audio endpoint is currently unavailable.
+
 ## Clipboard
 
 Remove permanent payload-based echo suppression. A remote A after B is a new

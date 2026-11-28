@@ -63,12 +63,54 @@ zero SwapPss. This is an unresolved resource observation, not long-duration
 allocation acceptance; inspect retirement/GC and native roots before qualification.
 
 The [graph baseline](../tests/native-audio/results-graph-baseline-20261128.json)
-separately reproduces three still-open SDK defects using controlled browser API
-models: rejected Worklet loading remains cached, a closed Context is reused on
+preserves the pre-repair reproduction of three SDK defects using controlled
+browser API models: rejected Worklet loading remains cached, a closed Context is reused on
 later attempts, and temporary Context suspension stops the held capture source.
-Worker recovery does not repair those graph failures. Bound module/resume/close
-operations, retire unusable native graphs and preserve valid source/intent
-before starting final long-duration qualification.
+Worker replacement alone does not repair these graph failures. The new graph
+implementation resumes/rebuilds under valid intent and passes model regressions;
+real browser/native retirement and complete qualification remain required.
+
+## Audio graph recovery (development)
+
+A source and its processing graph have separate lifetimes. Suspend fences PCM and
+attempts to resume an already authorized Context; it does not stop a valid track.
+A failed module retires the unusable graph before replacement and preserves
+valid intent. A processor error replaces only that failed node; its healthy
+sibling and Context remain usable. Whole-Context replacement/retirement is still
+a known implementation blocker, described below. Rebuild
+capture only after current intent, permission and writer checks, and require a
+fresh processor delivery ACK. An old processor's delayed error cannot invalidate
+a newer graph. Playback-node construction failure also enters this reconciliation.
+
+A native `addModule`, `resume` or `close` Promise may remain pending after the
+SDK's three-second observation deadline. Join that native flight rather than
+creating another for every retry. One additional resume is permitted for a real
+user gesture that can unblock an earlier automatic autoplay attempt. A closed
+graph with unresolved native operations remains quarantined; it cannot authorize
+unlimited new Contexts. A shared document/Manager quarantine pool also gates new
+owners once two retired graphs remain unproven, rather than letting Host
+recreation bypass the limit. Existing healthy graphs continue; late native
+completion releases the pool slot. Late settlement wakes recovery, including when the wake
+arrives during another reconciliation. Close/retirement failure is reported,
+not treated as successful native cleanup. Pending operation records detach owner
+callbacks on disposal and release closed Contexts when late native work settles.
+Native-resource behavior still needs real browser qualification.
+
+Explicit off/logout/retirement must prevent late construction or device opening.
+Automatic graph recovery checks current participation and never prompts. Bound
+retirement error history to eight records plus a total counter. A Context
+reported closed is **not** terminal render evidence. Healthy processors must
+terminate before SDK-owned Context close; native release after an already-closed
+Context remains under investigation. A missing ACK is an error, not successful
+retirement.
+
+`actualSpeaker` now requires both an acknowledged server route and an eligible
+ready playback owner. It cannot prove the user's physical output is audible.
+`playbackBlocked` and local `contextState`/`contextReason` distinguish graph and
+browser-policy conditions from mux transport. `actualMic` retains its source
+and delivery-ACK requirement. A permanent native close/module/resume hang remains
+an honest bounded recovery/cleanup condition; final fault audit and long-duration
+native/allocation tests are not replaced by model passage.
 
 ## Contract
 
@@ -99,6 +141,50 @@ The [Media Capture specification](https://www.w3.org/TR/mediacapture-streams/#pe
 states that granted permission avoids a permission prompt but does not guarantee
 device acquisition. Device and context failures therefore need bounded recovery
 and cancellation, not permission assumptions or a blind repeated enable call.
+
+## Graph qualification blocker
+
+The [node-isolation control](../tests/native-audio/results-graph-node-recovery-20261128.json)
+passes a real module 404/retry, suspension and ten actual processor throws in
+headed Chrome/Kasm/Pulse. It reuses one source/Context/getUserMedia call; nine
+native audio classes match their positive baseline after faults and reach zero
+only after awaited owner retirement in the still-live page. The test-only
+Worklet subclass delegates normal processing to production code and throws on
+an owned fixture message. Stock production Worklet bytes contain no fault hook.
+
+A [separate whole-Context control](../tests/native-audio/results-graph-retirement-failure-20261128.json)
+passes functional data recovery but retains twelve native Contexts, fourteen
+WorkletNodes and twelve MessagingProxies after diagnostic GC. Do not close a
+healthy processor's Context before terminal processing and then treat `closed`
+as native cleanup proof. Current full-graph retirement still needs repair and
+the already-closed case needs an evidenced disposition. The first driver also
+expected two proxies; a fresh positive baseline measures one per Context. That
+harness correction does not remove the independently measured retention.
+
+This remaining defect blocks final qualification. Passing models, the
+node-isolation lane or earlier Worker controls cannot accept it, nor the complete
+24-class audit, natural soak, combined stress or immutable UAT candidate.
+
+## Measured direction for complete graph ownership
+
+A [matched closed-Context mechanism control](../tests/native-audio/results-closed-context-frame-20261128.json)
+reproduces six retained Contexts/nodes/proxies in direct construction, then
+returns all three native classes to zero over six equal cycles when the graph
+belongs to a same-origin SDK-owned iframe and that frame is retired. Production
+Worklet processing bytes are unchanged. The page/browser stay alive; destroying
+the owned graph execution environment is the proposed product lifecycle, not a
+test-only page exit used to hide retention. This is a minimal headless diagnostic
+control, not an integrated SDK fix or full audio acceptance.
+
+Investigate this as the native lifetime boundary while the parent SDK keeps
+intent, permissions, transport and its live microphone source. Processor errors
+still replace only the failed node. Graph failure may retire/recreate the owned
+execution environment without reloading the host or stopping a valid parent
+source. Integration must prove same-origin/CSP and autoplay behavior, parent
+source continuity, late native operations, cancellation and final native/DOM
+retirement in real served SDK tests. No new host recovery loop or user action
+may be inferred from the prototype. The whole-graph blocker remains open until
+that implementation and the full evidence pass.
 
 ## Ownership and ordering
 

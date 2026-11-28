@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "passed-scoped-development-control",
+  "releaseQualified": false,
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 8,
+  "runtimeCoreCommit": "00c97b4dd2262dc083075e23609feb26398fd437",
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headless": false,
+    "sandboxEnabled": true,
+    "nativeCDP": true,
+    "syntheticMic": true,
+    "playbackSink": "none",
+    "realKasmPulse": true,
+    "developmentSDKOverride": true,
+    "testOnlyWorkletSubclass": true,
+    "diagnosticGC": "Baseline and post-fault only; no natural soak claim"
+  },
+  "cases": [
+    {
+      "name": "actual-addModule-404-then-automatic-retry",
+      "status": "passed",
+      "moduleAttempts": 2,
+      "deviceRequests": 0
+    },
+    {
+      "name": "baseline",
+      "status": "passed"
+    },
+    {
+      "name": "actual-Context-suspend",
+      "status": "passed",
+      "sameSource": true,
+      "sameProcessor": true,
+      "sameContext": true,
+      "requests": 1,
+      "contexts": 1,
+      "retirements": 0,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-processor-throw-1",
+      "status": "passed",
+      "sameSource": true,
+      "sameProcessor": false,
+      "sameContext": true,
+      "requests": 1,
+      "contexts": 1,
+      "retirements": 0,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-processor-throw-2",
+      "status": "passed",
+      "sameSource": true,
+      "sameProcessor": true,
+      "sameContext": true,
+      "requests": 1,
+      "contexts": 1,
+      "retirements": 0,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-processor-throw-3",
+      "status": "passed",
+      "sameSource": true,
+      "sameProcessor": false,
+      "sameContext": true,
+      "requests": 1,
+      "contexts": 1,
+      "retirements": 0,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-processor-throw-4",
+      "status": "passed",
+      "sameSource": true,
+      "sameProcessor": true,
+      "sameContext": true,
+      "requests": 1,
+      "contexts": 1,
+      "retirements": 0,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-processor-throw-5",
+      "status": "passed",
+      "sameSource": true,
+      "sameProcessor": false,
+      "sameContext": true,
+      "requests": 1,
+      "contexts": 1,
+      "retirements": 0,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-processor-throw-6",
+      "status": "passed",
+      "sameSource": true,
+      "sameProcessor": true,
+      "sameContext": true,
+      "requests": 1,
+      "contexts": 1,
+      "retirements": 0,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-processor-throw-7",
+      "status": "passed",
+      "sameSource": true,
+      "sameProcessor": false,
+      "sameContext": true,
+      "requests": 1,
+      "contexts": 1,
+      "retirements": 0,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-processor-throw-8",
+      "status": "passed",
+      "sameSource": true,
+      "sameProcessor": true,
+      "sameContext": true,
+      "requests": 1,
+      "contexts": 1,
+      "retirements": 0,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-processor-throw-9",
+      "status": "passed",
+      "sameSource": true,
+      "sameProcessor": false,
+      "sameContext": true,
+      "requests": 1,
+      "contexts": 1,
+      "retirements": 0,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "actual-processor-throw-10",
+      "status": "passed",
+      "sameSource": true,
+      "sameProcessor": true,
+      "sameContext": true,
+      "requests": 1,
+      "contexts": 1,
+      "retirements": 0,
+      "speakerPeak": 0.2593994140625
+    }
+  ],
+  "freshMicReadbackEveryCaptureCase": true,
+  "freshSpeakerEveryFault": true,
+  "nativeCounts": {
+    "baseline": {
+      "AudioContext": 1,
+      "AudioWorkletNode": 2,
+      "blink::AudioWorkletMessagingProxy": 1,
+      "MediaStreamAudioSourceNode": 1,
+      "MediaStream": 1,
+      "MediaStreamTrack": 1,
+      "GainNode": 1,
+      "AudioWorklet": 1,
+      "AudioDestinationNode": 1
+    },
+    "active": {
+      "AudioContext": 1,
+      "AudioWorkletNode": 2,
+      "blink::AudioWorkletMessagingProxy": 1,
+      "MediaStreamAudioSourceNode": 1,
+      "MediaStream": 1,
+      "MediaStreamTrack": 1,
+      "GainNode": 1,
+      "AudioWorklet": 1,
+      "AudioDestinationNode": 1
+    },
+    "retired": {
+      "AudioContext": 0,
+      "AudioWorkletNode": 0,
+      "blink::AudioWorkletMessagingProxy": 0,
+      "MediaStreamAudioSourceNode": 0,
+      "MediaStream": 0,
+      "MediaStreamTrack": 0,
+      "GainNode": 0,
+      "AudioWorklet": 0,
+      "AudioDestinationNode": 0
+    }
+  },
+  "sourceSHA256": {
+    "remotexapp-audio.js": "61f5fb3efd5aad13af74c4302c08de38d690362bcc27eab2377d8c519373e729",
+    "audio-context-operations.js": "b6269b7c839b12eb3d808a3671d7ebbd262701ca7b8e2d79e890b9446cd0bca6",
+    "audio-coordinator.js": "89d88de2e7997dd00263135361dc21d3143320a7cfc66fb9d8291ccfa7135a9d",
+    "audio-worklet.js": "d0ca3c748bceb3807d4408bec068ade5a0e13a0e0225d60506e8262aac1d5726"
+  },
+  "faultWorkletSHA256": "c6b593fee1642fe4de6090843a788888d9417c58a345092f3bfb7619b1ec6988",
+  "pageErrors": [],
+  "cleanup": "passed; owned resources retired and dedicated fixture stopped; existing public UAT preserved",
+  "limits": [
+    "This lane deliberately isolates Context suspension, initial real module rejection and ten actual processor throws; it does not accept whole-Context retirement.",
+    "Earlier whole-Context rebuild control recovered functional data but retained12Contexts/14WorkletNodes/12MessagingProxies; this separate defect remains OPEN.",
+    "Archived Core and staged development SDK/Worklet; not new-backend or immutable candidate qualification.",
+    "Physical devices, OS sleep, whole-process allocation, natural8h and combination stress remain separate."
+  ]
+}

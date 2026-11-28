@@ -123,3 +123,48 @@ The complete server ranges and before/after Manager groups are in results.json.
 This qualifies the implementation bytes, not an exact post-merge artifact,
 whole-browser leak freedom, physical media, actual OS sleep, UDP/TURN or downstream
 adoption. Candidate archive qualification and human UAT remain separate.
+
+## SDK 0.38 graph development follow-up (2026-11-28)
+
+[Isolated processor recovery](../../native-audio/results-graph-node-recovery-20261128.json)
+passes a real module 404/retry, suspension and ten actual Worklet throws in
+headed sandboxed Chrome 158.0.8127.88 with real Kasm/Pulse, a synthetic mic and
+sink:none. One source and Context survive; device requests remain one. Baseline
+and post-fault native Context/WorkletNode/MessagingProxy counts are 1/2/1; after
+awaited owner disposal they are 0/0/0 in the same live page. MediaStream source,
+stream, track, Gain, Worklet and destination counts also return to zero. GC is
+explicitly diagnostic; this is not a natural soak, new backend or immutable
+release qualification.
+
+Stage only a private test Worklet; never install its hook as a production asset:
+
+```sh
+python3 tests/native-audio/stage-graph-fault-worklet.py \
+  --output /private/fixture/audio-worklet.js
+```
+
+The helper reproduces the measured staged bytes. A subclass delegates normal
+processing to the production class; an owned `fixtureThrow:true` port message
+causes an actual processor exception on the next render. Test each capture and
+playback role, check fresh remote mic readback and speaker tone after recovery,
+then inspect native snapshots before closing the page/browser. Keep controller,
+addresses and raw heaps outside Git.
+
+A [separate whole-Context control](../../native-audio/results-graph-retirement-failure-20261128.json)
+passes functional checks but retains12/14/12 native Contexts/nodes/proxies.
+Its first proxy expectation was incorrect; the fresh positive baseline1/2/1
+corrects that expectation without excusing the measured retention. Closing
+before healthy processors terminate violates P19's retirement requirement.
+Whole-graph and already-closed cleanup remain OPEN; neither models nor the
+isolated-node pass accept complete resource recovery. Earlier accepted P19
+measurements remain unchanged in scope.
+
+A further [matched closed-Context control](../../native-audio/results-closed-context-frame-20261128.json)
+uses the unchanged production Worklet. Six ordinary direct cycles retain6/6/6;
+six cycles constructed in a same-origin owned frame and followed by frame
+retirement reach0/0/0. Reproduce the mechanism by staging the stock Worklet and
+`retirement-frame.html`, then running `browser-retirement.py --page retirement-frame.html`
+with the same six-cycle settings and a private output directory. This headless,
+diagnostic-GC prototype is not yet the SDK architecture. Parent microphone
+continuity, host policy/activation, whole-graph integration and full production
+qualification remain pending. Do not relabel the prior SDK graph failure passed.

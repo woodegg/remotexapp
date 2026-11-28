@@ -23,7 +23,7 @@ function fixture() {
   f.audio=new RemoteXAppAudio({environment:f.env});
   f.attachCapture=()=>{
     f.track={onended:null,onmute:null,readyState:'live',enabled:true,stop(){f.stops++;this.readyState='ended';}};
-    f.audio.stream={getTracks:()=>[f.track],getAudioTracks:()=>[f.track]};f.audio.context={state:'running',close(){f.contextClosed++;return Promise.resolve();}};
+    f.audio.stream={getTracks:()=>[f.track],getAudioTracks:()=>[f.track]};f.audio.context={state:'running',close(){f.contextClosed++;this.state='closed';return Promise.resolve();}};
   };
   f.tick=()=>{for(const fn of f.intervals.values())fn();};
   return f;
@@ -252,7 +252,7 @@ test('capture retirement pauses its ACK deadline while suspended, final disposal
   assert.equal(f.contextClosed,1);assert.equal(f.audio.retirements.size,0);
 });
 
-test('disposal during Worklet loading fences late speaker activation without constructing a node',async()=>{
+test('disposal during Worklet loading fences late activation and reports unresolved native work',async()=>{
   const f=fixture();await f.audio.ready;let loaded,constructed=0;
   f.audio.env.AudioContext=class {
     constructor(){this.sampleRate=48000;this.state='running';this.audioWorklet={addModule:()=>new Promise(resolve=>{loaded=resolve;})};}
@@ -262,7 +262,18 @@ test('disposal during Worklet loading fences late speaker activation without con
   };
   f.audio.env.AudioWorkletNode=class {constructor(){constructed++;}};
   const interest=await f.audio.acquire({id:'app',sessionGeneration:1});
-  const activation=interest.setSpeaker(true),rejected=assert.rejects(activation,/retired/);await f.audio.dispose();loaded();
+  const activation=interest.setSpeaker(true),rejected=assert.rejects(activation,/retired/);
+  await assert.rejects(f.audio.dispose(),/native operation retirement incomplete/);loaded();
   await rejected;
   assert.equal(constructed,0);assert.equal(f.contextClosed,1);assert.equal(interest.released,true);
+});
+
+test('disposal bounds an unresolved native close and late completion releases its Context record',async()=>{
+ const f=graphFixture();await f.audio.ready;f.audio.playback=f.node();let closed,calls=0;
+ const context=f.audio.context;
+ context.close=()=>{calls++;return new Promise(resolve=>{closed=()=>{context.state='closed';resolve();};});};
+ f.audio.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
+ const done=f.audio.dispose();f.nodes[0].ack();await assert.rejects(done,/audio-context-close-timeout/);
+ assert.equal(calls,1);assert.equal(f.audio.closed,true);assert.equal(f.audio.contextOps.contexts.size,1);
+ assert.equal(f.audio.dispose(),done);closed();await turn();assert.equal(f.audio.contextOps.contexts.size,0);
 });

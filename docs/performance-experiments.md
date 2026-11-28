@@ -1153,3 +1153,14 @@ Native clients remain one after live owner retirement/idle; this minimal
 headless diagnostic-GC control has no audio and does not qualify the complete
 SDK/Pulse recovery or production resource envelope. The linked experiment
 retains source/report hashes and the earlier measurements.
+
+P19's SDK 0.38 graph follow-up separately passes ten actual processor throws
+with one Context/source, positive native baseline1/2/1 and retired0/0/0 in a live
+page. A whole-Context rebuild control still retains12/14/12 despite fresh sound.
+This is an open graph-retirement blocker, not acceptance of complete recovery
+or long-duration allocation. The linked P19 records retain both scoped outcomes.
+
+A minimal matched follow-up isolates the graph in an owned same-origin iframe:
+six direct closed-Context cycles retain6/6/6, while six owned-frame retirements
+reach0/0/0 with unchanged Worklet processing. This is a measured ownership
+mechanism, not yet an integrated SDK graph fix or completed release gate.

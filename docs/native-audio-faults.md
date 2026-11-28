@@ -137,3 +137,15 @@ without automatically creating another capture. Explicit actions restored real
 remote mic tone. Raw evidence and the excluded transient-unit fixture failure
 remain private. These are runtime fault results, not human UAT, physical-device
 qualification or proof that every fault class in the inventory was exercised.
+
+## Development graph controls (not full fault acceptance)
+
+SDK 0.38 models cover module/resume/close flight bounds, quarantine, late results,
+source-preserving suspend/rebind and explicit cancellation. A real
+[node-isolation lane](../tests/native-audio/results-graph-node-recovery-20261128.json)
+passes initial module 404/retry, suspension and ten actual processor throws with
+one device request and native counts returning to zero on owner retirement.
+The separate [whole-Context lane](../tests/native-audio/results-graph-retirement-failure-20261128.json)
+retains native objects despite fresh sound. This failure remains open; `closed`
+is not terminal processing proof. These cases refine playback, device/processor,
+resource and retirement classes rather than add a twenty-fifth fault category.

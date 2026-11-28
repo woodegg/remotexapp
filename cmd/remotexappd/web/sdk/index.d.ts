@@ -376,6 +376,8 @@ export interface RemoteXAudioSnapshot {
   lastDisconnect?:RemoteXAppDisconnect;
   connection:'idle'|'connected'|'recovering'|'blocked'|'failed';protocol?:string|null;connectionId?:string|null;
   speakerOwner:boolean;micOwner:boolean;playbackBlocked?:boolean;reason?:string;
+  /** Local graph diagnostics; a connected mux alone does not prove playback/capture readiness. */
+  contextState?:'none'|'running'|'suspended'|'closed'|'interrupted';contextReason?:string;
   routes:RemoteXAudioRouteState[];receivedBytes?:number;sentBytes?:number;droppedFrames?:number;
   playback?:{underrunBlocks:number;droppedFrames:number;peak:number;queuedFrames:number};
   microphone?:{level:number;droppedFrames:number};

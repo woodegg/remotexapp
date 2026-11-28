@@ -276,7 +276,7 @@ export class AudioCoordinator {
     return {runtime:r.runtime,generation:r.generation,slot:r.slot,speaker:r.speaker,mic:r.mic,
     requested:{speaker:r.speaker,microphone:r.micRequested}, microphoneActionRequired:actionRequired,
     microphonePending:!!(r.micRequested && !actionRequired && !actualMic),
-    actualSpeaker:r.actualSpeaker,actualMic,reason:r.reason,refs:r.refs.size,domain:r.domain || null}; }
+    actualSpeaker:!!(r.actualSpeaker && r.speaker && this.player?.ready),actualMic,reason:r.reason,refs:r.refs.size,domain:r.domain || null}; }
   _broadcast() {
     const routes = [...this.routes.values()].map(r=>this._routeState(r));
     const wanted=routes.some(r=>r.requested.speaker||r.requested.microphone);

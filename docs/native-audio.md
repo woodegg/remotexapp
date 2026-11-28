@@ -250,6 +250,22 @@ Native object release must be tested in a live browser with test-owned refs
 removed; closed track state and mock close call counts alone do not prove it.
 
 
+## Development graph recovery (SDK 0.38)
+
+See [the graph lifecycle contract](native-self-recovery.md#audio-graph-recovery-development)
+for source-preserving resume/rebuild and bounded native operations. Failed module
+loads and closed Contexts are retired before a replacement; processor errors
+reconcile valid intent without a new device request solely for graph failure.
+Browser operation timeout is not cancellation. Unresolved native work remains
+quarantined, late settlement can wake recovery, and disposal reports unproven
+retirement. No automatic permission prompt or cancellation replay is permitted.
+
+`actualSpeaker` requires an authorized route and a ready playback owner; graph
+failure cannot report effective playback merely because the media WSS is open.
+Local `contextState`/`contextReason` supplement shared route/transport state.
+Models pass; real browser/native-resource, mixed faults and full production
+qualification remain separate gates.
+
 ## Document-scoped bootstrap (SDK 0.37 / worker v6)
 
 The #110 follow-up supersedes one native SharedWorker connection per audio
@@ -261,3 +277,10 @@ One bounded inert bootstrap may remain until document retirement. Owner cleanup
 still stops tracks and retires native processors/Contexts; last media interest
 still releases the WSS. Other owners and tabs are not terminated to reclaim a
 local wrapper. Worker v6 names isolate the bootstrap protocol from v5 peers.
+
+The latest development graph controls distinguish isolated processor repair from
+whole-Context retirement. Ten actual processor throws preserve the same source
+and Context and retire nine sampled native audio classes to zero; the separate
+whole-Context rebuild control retains native objects. See the
+[graph qualification blocker](native-self-recovery.md#graph-qualification-blocker).
+Context `closed` is not terminal-render proof; final qualification remains blocked.

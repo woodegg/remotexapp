@@ -1,9 +1,12 @@
 import {connectAudioWorker} from './audio-worker-hub.js';
 import {AudioIntentJournal} from './audio-intent-journal.js';
+import {AudioContextOperations} from './audio-context-operations.js';
 
 const boundPort = Symbol();
 const resumeSpeaker = Symbol();
 const resumeMicrophone = Symbol();
+// DOMException.code is a legacy number, not an SDK diagnostic string.
+const contextCode = error => typeof error?.code==='string' && error.code.startsWith('audio-context-') ? error.code : null;
 
 /** Independent audio interests: no Viewer attachment, App start or keepalive. */
 export class RemoteXAppAudio extends EventTarget {
@@ -17,6 +20,9 @@ export class RemoteXAppAudio extends EventTarget {
     this.workerKey = "remotexapp-audio-v8:"+this.base;
     this.stats = {connection:'idle',speakerOwner:false,micOwner:false,routes:[]};
     this.retirements = new Set(); this.retirementErrors = [];
+    this.contextOps=new AudioContextOperations(environment,(_context,_kind,late)=>{
+      if(late && this.graphReason && !this.closed){this.graphWake=true;this.graphRetryAfter=0;this._recoverGraph();}
+    },3000,this.base);
     this.journal = new AudioIntentJournal(environment,this.base);
     this.journal.subscribe(()=>this._journalChanged());
     this._openWorker();
@@ -26,11 +32,13 @@ export class RemoteXAppAudio extends EventTarget {
       if(this.port && this.workerGeneration!==this._workerGeneration())this._fail('audio-worker-superseded');
       if (this.port && now-this.lastWorkerMessage>10000) this._fail('audio-worker-unresponsive');
       this._journalChanged();
+      this._recoverGraph();
       if (!this.port && this.interests.size && now >= (this.workerRetryAfter || 0) && !this.workerExhausted) this._recoverWorker();
     },1000);
     this._pagehide = event => { if (event.persisted) this._suspend(); else void this.dispose().catch(()=>{}); };
     this._suspend = () => { this._fenceCapture(); this._post({op:'suspend'}); };
     this._wake = () => {
+      this._recoverGraph();
       if(this.port && this.workerGeneration!==this._workerGeneration())this._fail('audio-worker-superseded');
       if (this.port) { this._post({op:'wake'}); this._post({op:'capture-eligible'}); this._journalChanged(); }
       else if (this.interests.size) this._recoverWorker();
@@ -181,8 +189,10 @@ export class RemoteXAppAudio extends EventTarget {
       if (kind==='microphone' && ![...this.interests.values()].some(i=>i[resumeMicrophone])) this._captureFailed('microphone-owner-disabled');
     }
     this.activating++;
-    const preparing = enabled ? (kind==='speaker'?this._preparePlayback():this._context()) : Promise.resolve();
-    preparing.catch(()=>{});
+    const gesture=this.env.navigator?.userActivation?.isActive===true;
+    const allowed=()=>!interest.released && !this.closed && this._wanted(interest,kind) && interest.operations[kind]===revision;
+    const preparing = enabled ? (kind==='speaker'?this._preparePlayback({gesture,allowed}):this._context({gesture})) : Promise.resolve();
+    preparing.catch(error=>{if(allowed() && !this.graphReason)this._graphFault(contextCode(error) || 'audio-context-unavailable');});
     try {
       const state = await this.journal.publish(interest.runtime,interest.generation,kind,enabled);
       if(interest.released || this.closed)throw Error('Audio context retired');
@@ -265,31 +275,152 @@ export class RemoteXAppAudio extends EventTarget {
     if (this.stream) this._captureFailed('microphone-owner-suspended');
     else this._stopCapture();
   }
-  async _context() {
+  _graphIntent(kind) {
+    return [...this.interests.values()].some(i=>!i.released && this._wanted(i,kind) && (()=>{
+      const state=this.journal.read(i.runtime,i.generation,kind);
+      return state.available && state.participating && state.epoch===i.stamps[kind]?.epoch;
+    })());
+  }
+  _graphFault(reason,{retire=false} = {}) {
+    if(this.closed)return;
+    this.graphReason=reason;if(retire)this.graphInvalid=true;
+    const token=this.captureToken || this.pendingCaptureToken;
+    this._fenceCapture();
+    this.playback?.port.postMessage({op:'reset'});
+    this._post({op:'playback-ready',ready:false});
+    if(token)this._post({op:'capture-failed',token,reason,retainedSource:this._liveSource()});
+  }
+  _processorError(kind,node,context) {
+    if(this.closed || this[kind]!==node || this.context!==context)return;
+    const reason='audio-'+kind+'-processor-failed';
+    if(kind==='capture'){
+      const token=this.captureToken || this.pendingCaptureToken;
+      this._fenceCapture();this.captureSource?.disconnect();this.captureSource=null;
+      if(token)this._post({op:'capture-failed',token,reason,retainedSource:this._liveSource()});
+    }else this._post({op:'playback-ready',ready:false});
+    this[kind]=null;
+    node.onprocessorerror=null;node.port.onmessage=null;node.disconnect();node.port.close();
+    // The native processorerror already stopped this processor. Replacing the
+    // whole Context would unnecessarily terminate its healthy sibling graph.
+    if(!this.graphInvalid)this.graphReason=reason;
+    this._recoverGraph();
+  }
+  _recoverGraph() {
+    if(this.closed || this.revoking || this.activating || this.graphRecovery ||
+       Date.now()<(this.graphRetryAfter || 0))return;
+    const speaker=this._graphIntent('speaker'),mic=this._graphIntent('microphone');
+    if(!this.graphInvalid && (!this.graphReason || !speaker && !mic))return;
+    this.graphWake=false;
+    this.graphRecovery=Promise.resolve().then(async()=>{
+      if(this.graphInvalid)await this._discardGraph();
+      if(this.closed || this.revoking)return;
+      if(this._graphIntent('speaker'))await this._preparePlayback();
+      else if(this._graphIntent('microphone'))await this._context();
+      else return;
+      this.graphReason=null;this.graphBackoff=0;this._post({op:'capture-eligible'});
+    });
+    this.graphRecovery.catch(error=>{
+      if(this.closed)return;
+      this.graphReason=contextCode(error) || error.message;
+      this.graphBackoff=Math.min(30000,Math.max(1000,(this.graphBackoff || 500)*2));
+      this.graphRetryAfter=Date.now()+this.graphBackoff;this._emit();
+    }).finally(()=>{
+      this.graphRecovery=null;
+      if(this.graphWake){this.graphWake=false;this.graphRetryAfter=0;this._recoverGraph();}
+    });
+  }
+  _discardGraph() {
+    if(this.graphDisposal)return this.graphDisposal;
+    const context=this.context;
+    if(!context){this.graphInvalid=false;return Promise.resolve();}
+    const playback=this.playback,capture=this.capture,output=this.output,source=this.captureSource;
+    this.contextOps.retire(context);
+    if(output)output.gain.value=0;
+    context.onstatechange=null;
+    const disposal=this.graphDisposal=(async()=>{
+      await this.contextOps.run(context,'close',()=>context.close());
+      if(context.state!=='closed')throw Error('audio-context-close-incomplete');
+      for(const record of [...this.retirements])if(record.context===context)record.finish(true);
+      for(const node of new Set([playback,capture].filter(Boolean))){
+        node.onprocessorerror=null;node.port.onmessage=null;node.disconnect();node.port.close();
+      }
+      source?.disconnect();output?.disconnect();
+      if(this.context===context){this.context=this.output=this.playback=this.capture=this.captureSource=this.module=null;}
+      if(!this.contextOps.forget(context) && !this.closed)this.graphQuarantine=context;
+      this.graphInvalid=false;
+    })();
+    // Observe the finally branch as well: no detached rejected cleanup Promise.
+    disposal.finally(()=>{if(this.graphDisposal===disposal)this.graphDisposal=null;}).catch(()=>{});
+    return disposal;
+  }
+  async _context({gesture=false} = {}) {
     if (this.closed || this.revoking) throw Error('Audio controller disposed');
+    if(this.graphInvalid || this.context?.state==='closed' || this.retirements.size>=2) {
+      this._graphFault('audio-context-replaced',{retire:true});await this._discardGraph();
+    }
+    if(this.graphQuarantine){
+      if(!this.contextOps.forget(this.graphQuarantine))throw Object.assign(Error('audio-context-operation-pending'),{code:'audio-context-operation-pending'});
+      this.graphQuarantine=null;
+    }
+    if(this.closed || this.revoking)throw Error('Audio context retired');
     if (!this.context) {
+      if(!this.contextOps.canCreate()){
+        this.graphReason='audio-context-resource-blocked';
+        throw Object.assign(Error(this.graphReason),{code:this.graphReason});
+      }
       const context = this.context = new this.env.AudioContext({sampleRate:48000,latencyHint:'interactive'});
-      if (context.sampleRate !== 48000) { await context.close(); this.context = null; throw Error('48 kHz audio context unavailable'); }
-      this.module = context.audioWorklet.addModule(this.base+'/sdk/audio-worklet.js');
+      if (context.sampleRate !== 48000) {this.graphInvalid=true;await this._discardGraph();throw Error('48 kHz audio context unavailable');}
+      this.module=this.contextOps.run(context,'module',()=>context.audioWorklet.addModule(this.base+'/sdk/audio-worklet.js')).catch(error=>{
+        const code=contextCode(error) || 'audio-context-module-failed';
+        throw Object.assign(Error(code),{code,cause:error});
+      });
+      this.module.catch(()=>{});
       this.output = context.createGain(); this.output.connect(context.destination);
-      context.onstatechange = () => { if (this.closed || this.context !== context) return; this._post({op:'playback-ready',ready:context.state==='running' && !!this.playback}); if (this.stream && context.state !== 'running') this._captureFailed('audio-context-suspended'); };
+      context.onstatechange = () => {
+        if(this.closed || this.context!==context)return;
+        if(context.state==='running'){
+          this._post({op:'playback-ready',ready:!!this.playback && !this.graphInvalid});
+          if(this.graphReason)this._recoverGraph();
+        }else {
+          this._post({op:'playback-ready',ready:false});
+          if(this.stream || this._graphIntent('speaker') || this._graphIntent('microphone'))this._graphFault('audio-context-'+context.state,{retire:context.state==='closed'});
+        }
+      };
     }
     const context = this.context;
+    const recovering=!!this.graphReason;
     // resume() is called synchronously from the original speaker/mic gesture.
-    const resumed = context.resume(); await this.module; await resumed;
-    if (this.closed || this.context !== context) throw Error('Audio context retired');
+    const resumed=context.state==='running'?Promise.resolve():this.contextOps.run(context,'resume',()=>context.resume(),{gesture});
+    try {await Promise.all([this.module,resumed]);}
+    catch(error){
+      if(!this.closed && this.context===context){
+        const code=contextCode(error),retire=context.state==='closed' || code?.startsWith('audio-context-module');
+        this._graphFault(code || 'audio-context-resume-failed',{retire});
+        if(retire)await this._discardGraph();
+      }
+      throw error;
+    }
+    if (this.closed || this.context !== context || this.graphInvalid) throw Error('Audio context retired');
     if (context.state !== 'running') throw Error('Audio playback requires a user gesture');
+    this.graphReason=null;
+    if(recovering)this._post({op:'capture-eligible'});
     return context;
   }
-  async _preparePlayback() {
-    const context = await this._context();
-    if (!this.playback) {
+  async _preparePlayback({gesture=false,allowed=()=>this._graphIntent('speaker')} = {}) {
+    const context = await this._context({gesture});
+    if(this.context!==context || context.state!=='running' || this.graphInvalid || !allowed())return;
+    try {if (!this.playback) {
       this.playback = new this.env.AudioWorkletNode(context,'remotexapp-playback-v1',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2]});
+      const node=this.playback;
+      node.onprocessorerror=()=>this._processorError('playback',node,context);
       this.playback.port.onmessage = ({data}) => {
         if (data.type === 'credit') this._post({op:'playback-credit'});
         if (data.type === 'stats') { this.playbackStats = data; this._emit(); }
       };
       this.playback.connect(this.output);
+    }}catch(error){
+      this._graphFault('audio-playback-graph-failed',{retire:true});
+      throw Object.assign(Error('audio-playback-graph-failed'),{code:'audio-playback-graph-failed',cause:error});
     }
     this._post({op:'playback-ready',ready:true});
   }
@@ -338,7 +469,7 @@ export class RemoteXAppAudio extends EventTarget {
       try {
         const permission=await this._permission();
         if (!this._micInterest(request) || epoch!==this.captureEpoch || this.closed) return;
-        const reusable=this._liveSource() && !!this.capture;
+        const reusable=this._liveSource();
         if(permission==='denied' || (permission==='prompt' && !canPrompt)) {
           this._stopCapture();this._post({op:'capture-failed',token,reason:'microphone-permission-required'});return;
         }
@@ -360,9 +491,13 @@ export class RemoteXAppAudio extends EventTarget {
             for(const track of stream.getTracks())track.stop();return;
           }
           this.stream=stream;
+        }
+        if(!this.capture) {
           this.capture=new this.env.AudioWorkletNode(context,'remotexapp-capture-v1',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[1]});
-          this.captureSource=context.createMediaStreamSource(stream);this.captureSource.connect(this.capture);this.capture.connect(context.destination);
-          for(const track of stream.getTracks()){
+          const node=this.capture;
+          node.onprocessorerror=()=>this._processorError('capture',node,context);
+          this.captureSource=context.createMediaStreamSource(this.stream);this.captureSource.connect(this.capture);this.capture.connect(context.destination);
+          for(const track of this.stream.getTracks()){
             track.enabled=false;track.onended=()=>this._captureFailed('microphone-device-ended');
             track.onmute=()=>{const old=this.captureToken;this._fenceCapture({disableTrack:false});if(old)this._post({op:'capture-failed',token:old,reason:'microphone-device-muted',retainedSource:true});};
             track.onunmute=()=>this._wake();
@@ -371,7 +506,11 @@ export class RemoteXAppAudio extends EventTarget {
         this._wireCapture(token,epoch);this._post({op:'capture-ready',token});
       } catch(error) {
         if(stream && stream!==this.stream)for(const track of stream.getTracks())track.stop();
-        if(epoch===this.captureEpoch){this._stopCapture();this._post({op:'capture-failed',token,reason:error.name==='NotAllowedError'?'microphone-permission-denied':'microphone-unavailable'});}
+        if(epoch===this.captureEpoch){
+          if(contextCode(error))this._graphFault(contextCode(error));
+          else if(this._liveSource() && error.name!=='NotAllowedError')this._graphFault('audio-capture-graph-failed',{retire:true});
+          else {this._stopCapture();this._post({op:'capture-failed',token,reason:error.name==='NotAllowedError'?'microphone-permission-denied':'microphone-unavailable'});}
+        }
       }
     })();
     this.captureRequest=acquire;
@@ -396,27 +535,34 @@ export class RemoteXAppAudio extends EventTarget {
   _retireProcessor(node) {
     const context = this.context;
     let resolve, timer;
-    const record = {done:new Promise(r=>{resolve=r;}), arm:()=>{
+    const record = {context,node,done:new Promise(r=>{resolve=r;}), arm:()=>{
       timer ??= this.env.setTimeout(()=>finish(false),1000);
     }};
     const changed = () => {
       if (context?.state === 'running') record.arm();
-      else if (context?.state === 'closed') finish(false);
+      else if (context?.state === 'closed') finish(true);
       else if (!this.closed) { this.env.clearTimeout(timer); timer = undefined; }
     };
     const finish = acknowledged => {
       if (!this.retirements.delete(record)) return;
       this.env.clearTimeout(timer);
       context?.removeEventListener?.('statechange',changed);
-      node.port.onmessage = null; node.disconnect(); node.port.close();
-      if (!acknowledged) this.retirementErrors.push(Error('Audio processor retirement timed out'));
+      node.onprocessorerror=null;node.port.onmessage = null; node.disconnect(); node.port.close();
+      if (!acknowledged) {
+        this.retirementErrors.push(Error('Audio processor retirement timed out'));
+        if(this.retirementErrors.length>8)this.retirementErrors.shift();
+        this.retirementErrorCount=(this.retirementErrorCount || 0)+1;
+        if(!this.closed){this._graphFault('audio-processor-retirement-timeout',{retire:true});this._recoverGraph();}
+      }
       resolve();
     };
+    record.finish=finish;
     this.retirements.add(record);
     node.port.onmessage = ({data}) => { if (data.type === 'disposed') finish(true); };
     context?.addEventListener?.('statechange',changed);
     node.port.postMessage({op:'dispose'});
-    if (this.closed || context?.state === 'running') record.arm();
+    if(context?.state==='closed')finish(true);
+    else if (this.closed || context?.state === 'running') record.arm();
     return record.done;
   }
   _message(message) {
@@ -427,6 +573,9 @@ export class RemoteXAppAudio extends EventTarget {
     if (message.type === 'stop-capture') { if (!message.token || message.token===this.captureToken || message.token===this.pendingCaptureToken) this._stopCapture(); return; }
     if (message.type === 'capture-delivery') {
       if (this.captureToken !== message.token || !this.capture) return;
+      if(message.delivery && (this.context?.state!=='running' || this.graphInvalid)){
+        this._graphFault('audio-context-unavailable',{retire:this.context?.state==='closed'});return;
+      }
       if(message.delivery && this.stream.getAudioTracks().some(track=>track.muted)) {
         const token=this.captureToken;this._fenceCapture({disableTrack:false});this._post({op:'capture-failed',token,reason:'microphone-device-muted',retainedSource:true});return;
       }
@@ -460,7 +609,7 @@ export class RemoteXAppAudio extends EventTarget {
         lastDisconnect = {...lastDisconnect,recoveredAt,durationMs:Math.max(0,recoveredAt-lastDisconnect.at)};
       }
       this.stats = {...message,...(lastDisconnect ? {lastDisconnect} : {})};
-      if (!this.activating && !this.rebind && !this.requests.size && message.routes.every(r=>!r.speaker&&!r.mic) && !this.stream && this.context?.state === 'running') { this.playback?.port.postMessage({op:'reset'}); void this.context.suspend(); }
+      if (!this.activating && !this.rebind && !this.requests.size && !this._graphIntent('speaker') && !this._graphIntent('microphone') && message.routes.every(r=>!r.speaker&&!r.mic) && !this.stream && this.context?.state === 'running') { this.playback?.port.postMessage({op:'reset'}); void this.context.suspend().catch(()=>{}); }
       this._emit();
     }
   }
@@ -470,7 +619,10 @@ export class RemoteXAppAudio extends EventTarget {
     this._pauseCapture();
     this.playback?.port.postMessage({op:'reset'});
   }
-  _emit() { this.dispatchEvent(new CustomEvent('statechange',{detail:{...this.stats,playback:this.playbackStats,microphone:this.captureStats}})); }
+  _emit() {
+    this.stats={...this.stats,contextState:this.context?.state || 'none',contextReason:this.graphReason || ''};
+    this.dispatchEvent(new CustomEvent('statechange',{detail:{...this.stats,playback:this.playbackStats,microphone:this.captureStats}}));
+  }
   _fail(reason) {
     if (!this.port) return;
     const replay=[...this.interests.values()].some(i=>i[resumeSpeaker]||i[resumeMicrophone]);
@@ -520,7 +672,8 @@ export class RemoteXAppAudio extends EventTarget {
     if (this.output) this.output.gain.value = 0;
     this._pauseCapture(); this._closeWorker('Audio controller disposed'); this.env.clearInterval(this.watchdog);
     if (this.playback) this._retireProcessor(this.playback);
-    const context = this.context, output = this.output;
+    const context = this.context, output = this.output, quarantine=this.graphQuarantine;
+    this.graphQuarantine=null;
     this.context = this.output = this.playback = this.module = null;
     this.env.removeEventListener('pagehide',this._pagehide);
     this.env.removeEventListener('pageshow',this._wake);
@@ -537,8 +690,17 @@ export class RemoteXAppAudio extends EventTarget {
     void (async()=>{
       try { await Promise.all([this.journalRetirement,...[...this.retirements].map(record=>record.done)]); }
       finally {
-        try { if (context) { context.onstatechange = null; if (context.state !== 'closed') await context.close(); } }
-        finally { output?.disconnect(); }
+        try {
+          if(context){
+            context.onstatechange=null;
+            this.contextOps.retire(context);
+            await this.contextOps.run(context,'close',()=>context.close());
+            if(context.state!=='closed')throw Error('Audio context close incomplete');
+            if(!this.contextOps.forget(context))throw Error('Audio native operation retirement incomplete');
+          }
+          if(quarantine && !this.contextOps.forget(quarantine))throw Error('Audio native operation retirement incomplete');
+        }
+        finally { output?.disconnect();this.contextOps.detach(); }
       }
       if (this.retirementErrors.length) throw new AggregateError(this.retirementErrors,'Audio retirement incomplete');
     })().then(resolve,reject);

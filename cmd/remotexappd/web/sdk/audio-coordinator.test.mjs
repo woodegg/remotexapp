@@ -36,9 +36,23 @@ function fixture(){
 async function ready(peer){await peer.request('init',{base:'https://audio.test',workerProtocol:8});}
 async function acquire(peer,ref,runtime='app'){await peer.request('acquire',{ref,runtime,generation:1});}
 
+test('a server speaker route ACK is not effective playback until an eligible graph is ready',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a');
+  const route=await a.request('speaker',{ref:'a',enabled:true});
+  assert.equal(route.speaker,true);assert.equal(route.actualSpeaker,false);assert.equal(a.state().playbackBlocked,true);
+  a.send('playback-ready',{ready:true});await f.coordinator.serial;
+  assert.equal(a.state().routes[0].actualSpeaker,true);
+  await a.request('microphone',{ref:'a',enabled:true});const capture=f.coordinator.capture;
+  a.send('playback-ready',{ready:false});await f.coordinator.serial;
+  assert.equal(a.state().routes[0].actualSpeaker,false);assert.equal(a.state().routes[0].actualMic,true);
+  assert.equal(f.coordinator.capture,capture);assert.equal(f.sockets.length,1);
+ }finally{f.cleanup();}
+});
+
 test('native cookie refresh retains valid audio intent under the same ingress principal',async()=>{
  const f=fixture();f.principal='2'.repeat(64);f.login='';try{
-  const a=f.peer();await ready(a);await acquire(a,'a');
+  const a=f.peer();await ready(a);a.send('playback-ready',{ready:true});await acquire(a,'a');
   await a.request('speaker',{ref:'a',enabled:true});await a.request('microphone',{ref:'a',enabled:true});
   const capture=f.coordinator.capture, oldDelivery=capture.delivery;
   f.scope='e'.repeat(64);f.coordinator.lastRenew=0;
@@ -97,7 +111,7 @@ test('an old on or delayed owner cancellation cannot undo a newer shared off/on 
 
 test('offline initialization and first speaker intent recover without another enable call',async()=>{
  const f=fixture();try{
-  f.offline=true;const a=f.peer();await ready(a);await acquire(a,'a');assert.equal(f.http.length,0);
+  f.offline=true;const a=f.peer();await ready(a);a.send('playback-ready',{ready:true});await acquire(a,'a');assert.equal(f.http.length,0);
   const state=await a.request('speaker',{ref:'a',enabled:true});assert.equal(state.requested.speaker,true);assert.equal(state.actualSpeaker,false);
   f.offline=false;f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;
   assert.equal(a.state().routes[0].actualSpeaker,true);assert.equal(f.sockets.length,1);
@@ -211,7 +225,7 @@ test('route quota, auth failure, logout and session release remain explicit',asy
 
 test('device loss while a mic route ACK is pending retires that writer and preserves speaker',async()=>{
  const f=fixture();try{
-  const a=f.peer();await ready(a);await acquire(a,'a');await a.request('speaker',{ref:'a',enabled:true});
+  const a=f.peer();await ready(a);a.send('playback-ready',{ready:true});await acquire(a,'a');await a.request('speaker',{ref:'a',enabled:true});
   await a.request('microphone',{ref:'a',enabled:true});await acquire(a,'b','app-b');
   f.holdMic=true;const enabling=a.request('microphone',{ref:'b',enabled:true});await turn();assert.ok(f.held);
   a.send('capture-failed',{token:f.coordinator.capture.token,reason:'microphone-device-ended'});
@@ -237,7 +251,7 @@ test('a device ending immediately after permission cannot deliver to its preauth
 
 test('Manager restart recovers enabled audio through one fresh socket under the verified login',async()=>{
  const f=fixture();try{
-  const a=f.peer(),b=f.peer();await ready(a);await ready(b);await acquire(a,'a');await acquire(b,'b');
+  const a=f.peer(),b=f.peer();await ready(a);a.send('playback-ready',{ready:true});await ready(b);await acquire(a,'a');await acquire(b,'b');
   await a.request('speaker',{ref:'a',enabled:true});await a.request('microphone',{ref:'a',enabled:true});
   f.service='f'.repeat(64);f.scope='e'.repeat(64);f.coordinator.lastRenew=0;
   a.send('wake');b.send('wake');await f.coordinator.serial;
@@ -254,7 +268,7 @@ test('Manager restart recovers enabled audio through one fresh socket under the 
 test('ingress-authorized audio without a login header recovers after loss and Manager restart',async()=>{
  const f=fixture();f.login='';
  try{
-  const a=f.peer();await ready(a);await acquire(a,'a');
+  const a=f.peer();await ready(a);a.send('playback-ready',{ready:true});await acquire(a,'a');
   await a.request('speaker',{ref:'a',enabled:true});await a.request('microphone',{ref:'a',enabled:true});
   const capture=f.coordinator.capture;
   for(let i=0;i<3;i++){
@@ -338,7 +352,7 @@ test('playback credits cover each enabled speaker without starving multiplexed b
 
 test('one unavailable domain does not disconnect another App or stop its microphone',async()=>{
  const f=fixture();try{
-  const a=f.peer();await ready(a);await acquire(a,'a','app-a');await acquire(a,'b','app-b');
+  const a=f.peer();await ready(a);a.send('playback-ready',{ready:true});await acquire(a,'a','app-a');await acquire(a,'b','app-b');
   for(const ref of ['a','b']){await a.request('speaker',{ref,enabled:true});await a.request('microphone',{ref,enabled:true});}
   const socket=f.sockets[0],capture=f.coordinator.capture;
   f.unavailableRuntime='app-a';socket.onmessage({data:JSON.stringify({type:'state',slot:1,speaker:false,mic:false,reason:'domain-retired'})});
@@ -355,7 +369,7 @@ test('one unavailable domain does not disconnect another App or stop its microph
 
 test('audio ownership contention defers speaker without making a duplicate connection',async()=>{
   const f=fixture();try {
-    const a=f.peer();await ready(a);await acquire(a,'a');
+    const a=f.peer();await ready(a);a.send('playback-ready',{ready:true});await acquire(a,'a');
     f.busy=true;
     const pending=await a.request('speaker',{ref:'a',enabled:true});
     assert.equal(pending.actualSpeaker,false);

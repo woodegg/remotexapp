@@ -185,6 +185,20 @@ while no Worker is available. Integrated models are passing development evidence
 real repeated exits, multi-owner recovery and native resource review remain
 qualification gates. See [the bootstrap contract](native-self-recovery.md#worker-bootstrap-recovery-development-worker-8).
 
+AUD-006 graph recovery separates a valid source from failed Context/processor
+lifetimes. Resume/rebuild only under current intent and retire unusable graphs
+before replacement. Native operation timeouts do not cancel browser work: join
+bounded module/resume/close flights, allow one real-gesture resume of an earlier
+automatic attempt, quarantine unretired work and wake after late settlement.
+New owners share a document/Manager quarantine guard when two retired graphs
+remain unproven; existing healthy graphs are not replaced. Explicit cancellation
+fences late graph/device results. Bound close/disposal and
+error history; report unresolved native retirement. `actualSpeaker` additionally
+requires a ready playback owner, with optional local `contextState`/`contextReason`
+diagnostics. Models are implemented; real graph/native-resource and full gates
+in [the recovery contract](native-self-recovery.md#audio-graph-recovery-development)
+remain required before acceptance.
+
 AUD-003 verification uses the [audio fault inventory](native-audio-faults.md)
 to distinguish display, transport, service, Worker, capture, runtime and identity
 fences. A changed service epoch must be observed directly; fresh sound and remote

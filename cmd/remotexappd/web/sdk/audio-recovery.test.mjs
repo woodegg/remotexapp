@@ -24,7 +24,7 @@ function fixture(t){
    return {ok:true,json:async()=>action==='context'?{scope:f.scope,service:f.service,principal:f.principal,login:'',protocol:'pcm-s16le-48k-v1'}:action==='grant'||action==='route'?{token:'e'.repeat(64),domain:'d'.repeat(32)}:{ok:true}};
   }});}
  f.makeDoc=()=>{
-  const doc={captures:0,bootstraps:0,streams:[],listeners:new Map(),timers:new Map(),permission:Object.assign(new EventTarget(),{state:'granted'})};f.docs.push(doc);
+  const doc={captures:0,bootstraps:0,streams:[],contexts:[],listeners:new Map(),timers:new Map(),permission:Object.assign(new EventTarget(),{state:'granted'})};f.docs.push(doc);
   const env={location:{href:'https://audio.test/',origin:'https://audio.test'},crypto:webcrypto,isSecureContext:true,MessageChannel,setTimeout,clearTimeout,
    setInterval(fn){const key=++sequence;doc.timers.set(key,fn);return key;},clearInterval(key){doc.timers.delete(key);},document:Object.assign(new EventTarget(),{visibilityState:'visible'}),
    addEventListener(name,fn){if(!doc.listeners.has(name))doc.listeners.set(name,new Set());doc.listeners.get(name).add(fn);},removeEventListener(name,fn){doc.listeners.get(name)?.delete(fn);},
@@ -41,7 +41,7 @@ function fixture(t){
    }
   };
   env.AudioContext=class extends EventTarget {
-   constructor(){super();this.state='running';this.sampleRate=48000;this.destination={};this.audioWorklet={addModule:async()=>{}};}
+   constructor(){super();doc.contextAttempts=(doc.contextAttempts || 0)+1;if(doc.contextFailures>0){doc.contextFailures--;throw new DOMException('controlled Context construction failure','NotSupportedError');}doc.contexts.push(this);this.state='running';this.sampleRate=48000;this.destination={};this.audioWorklet={addModule:async()=>{if(doc.moduleFailures>0){doc.moduleFailures--;throw new DOMException('controlled module failure','AbortError');}if(doc.loadModule)return doc.loadModule(this);}};}
    createGain(){return {gain:{value:1},connect(){},disconnect(){}};}
    createMediaStreamSource(){return {connect(){},disconnect(){}};}
    async resume(){this.state='running';this.onstatechange?.();this.dispatchEvent(new Event('statechange'));}
@@ -274,4 +274,108 @@ test('browser focus mute after background device release does not deadlock a sti
  assert.equal(track.enabled,true);track.muted=false;track.onunmute();
  await f.tick();await until(()=>f.route(doc)?.actualMic);
  assert.equal(f.gum,1);assert.equal(doc.audio.stream,source);
+});
+
+test('a temporarily suspended Context resumes valid speaker and mic intent without stopping its source',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream,processor=doc.audio.capture,context=doc.audio.context;
+ await context.suspend();await until(()=>!f.route(doc)?.actualMic);
+ assert.equal(source.getAudioTracks()[0].readyState,'live');assert.equal(f.gum,1);
+ await f.tick();await until(()=>f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+ assert.equal(doc.audio.context,context);assert.equal(doc.audio.stream,source);assert.equal(doc.audio.capture,processor);assert.equal(f.gum,1);
+});
+
+test('a transient Context construction failure does not strand the first speaker intent',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});doc.contextFailures=1;
+ await assert.rejects(interest.setSpeaker(true),/controlled Context construction failure/);
+ assert.equal(doc.contexts.length,0);await f.tick();await until(()=>f.route(doc)?.actualSpeaker);
+ assert.equal(doc.contextAttempts,2);assert.equal(doc.contexts.length,1);assert.equal(f.gum,0);
+});
+
+test('an externally closed Context rebuilds both graphs around the same live microphone source',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream,processor=doc.audio.capture,context=doc.audio.context;
+ await context.close();await until(()=>!f.route(doc)?.actualMic);
+ await f.tick();await until(()=>f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+ assert.notEqual(doc.audio.context,context);assert.notEqual(doc.audio.capture,processor);
+ assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);assert.equal(processor.closed,true);
+ assert.equal(doc.audio.contextOps.contexts.size,1);assert.equal(doc.audio.retirements.size,0);
+});
+
+test('an initial rejected Worklet module is retired and valid speaker intent retries on a fresh Context',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});doc.moduleFailures=1;
+ await assert.rejects(interest.setSpeaker(true),/audio-context-module-failed/);
+ assert.equal(doc.contexts.length,1);assert.equal(doc.contexts[0].state,'closed');
+ await f.tick();await until(()=>f.route(doc)?.actualSpeaker);
+ assert.equal(doc.contexts.length,2);assert.equal(f.gum,0);assert.equal(doc.audio.contextOps.contexts.size,1);
+});
+
+test('processor errors replace only the failed node and stale old errors cannot retire its healthy sibling',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream;
+ for(let i=0;i<10;i++){
+  const old=doc.audio.context,kind=i%2?'playback':'capture',other=i%2?'capture':'playback',sibling=doc.audio[other],node=doc.audio[kind],late=node.onprocessorerror;
+  late();await until(()=>doc.audio[kind]!==node&&doc.audio[kind]&&f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+  const current=doc.audio.context;late();await turn();assert.equal(doc.audio.context,current);
+  assert.equal(current,old);assert.equal(doc.audio[other],sibling);
+  assert.equal(node.closed,true);assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);
+  assert.equal(doc.audio.contextOps.contexts.size,1);
+ }
+ assert.equal(doc.contexts.filter(c=>c.state!=='closed').length,1);
+});
+
+test('a timed-out native close prevents new graphs, preserves local cancellation and can finish later',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const old=doc.audio.context,source=doc.audio.stream;let closeCalls=0,closed;
+ old.close=()=>{closeCalls++;return new Promise(resolve=>{closed=()=>{old.state='closed';resolve();};});};
+ doc.audio._graphFault('controlled-close-required',{retire:true});doc.audio._recoverGraph();
+ await until(()=>doc.audio.graphReason==='audio-context-close-timeout');
+ for(let i=0;i<20;i++){doc.audio.graphRetryAfter=0;await f.tick();}
+ assert.equal(closeCalls,1);assert.equal(doc.contexts.length,1);assert.equal(doc.audio.stream,source);
+ assert.equal(source.getAudioTracks()[0].enabled,false);assert.equal(f.gum,1);
+ await interest.setMicrophone(false);await interest.setSpeaker(false);assert.equal(doc.audio.stream,null);
+ closed();doc.audio.graphRetryAfter=0;await f.tick();await until(()=>!doc.audio.graphInvalid&&!doc.audio.graphDisposal);
+ assert.equal(doc.contexts.length,1);assert.equal(old.state,'closed');assert.equal(doc.audio.contextOps.contexts.size,0);
+});
+
+test('a hung module is quarantined after close and cannot multiply Contexts before late settlement',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});let loaded;
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
+ doc.loadModule=()=>new Promise(resolve=>{loaded=resolve;});
+ await assert.rejects(interest.setSpeaker(true),/audio-context-module-timeout/);
+ assert.equal(doc.contexts[0].state,'closed');assert.equal(doc.audio.graphQuarantine,doc.contexts[0]);
+ for(let i=0;i<20;i++){doc.audio.graphRetryAfter=0;await f.tick();}
+ assert.equal(doc.contexts.length,1);assert.equal(f.gum,0);
+ doc.loadModule=null;loaded();doc.audio.graphRetryAfter=0;
+ await f.tick();await until(()=>f.route(doc)?.actualSpeaker);
+ assert.equal(doc.contexts.length,2);assert.equal(doc.audio.contextOps.contexts.size,1);
+});
+
+test('off while native module work is quarantined prevents late graph and playback construction',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});let loaded;
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
+ doc.loadModule=()=>new Promise(resolve=>{loaded=resolve;});
+ await assert.rejects(interest.setSpeaker(true),/audio-context-module-timeout/);
+ await interest.setSpeaker(false);doc.loadModule=null;loaded();await turn();await f.tick();
+ assert.equal(doc.contexts.length,1);assert.equal(doc.audio.playback,null);assert.equal(f.nodes.length,0);
+ assert.equal(f.gum,0);
+});
+
+test('a real gesture can resume a prior automatic policy block without repeated native pending promises',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const context=doc.audio.context,source=doc.audio.stream;let calls=0,unblock;
+ context.resume=()=>{calls++;if(calls===1)return new Promise(resolve=>{unblock=resolve;});context.state='running';context.onstatechange?.();unblock();return Promise.resolve();};
+ await context.suspend();await f.tick();await until(()=>doc.audio.graphReason==='audio-context-resume-timeout');
+ for(let i=0;i<20;i++){doc.audio.graphRetryAfter=0;await f.tick();}
+ assert.equal(calls,1);assert.equal(source.getAudioTracks()[0].readyState,'live');
+ doc.env.navigator.userActivation={isActive:true};await interest.setSpeaker(true);
+ await f.tick();await until(()=>f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+ assert.equal(calls,2);assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);assert.equal(doc.contexts.length,1);
 });

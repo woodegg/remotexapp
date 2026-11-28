@@ -31,6 +31,17 @@ it does not request another mic permission prompt. Pin and reload SDK/Worker/
 worklet assets together; the v8 internal contract is incompatible with v6.
 Full candidate, fault and resource qualification remains required before adoption.
 
+SDK 0.38 development also reconciles suspended/closed Contexts and failed audio
+processors without discarding a still-valid microphone source. Do not recreate
+Hosts to repair a graph. Render `actualSpeaker` only as eligible playback graph
+and route readiness, with `playbackBlocked` and optional local `contextState` /
+`contextReason` for policy/graph diagnostics; physical audibility needs its own
+check. Native module/resume/close operations have bounded observation and may
+remain quarantined until their real completion. Await disposal and surface
+incomplete native retirement rather than reporting successful cleanup. These
+changes still require full candidate/fault/resource qualification.
+
+
 Load the SDK served by the matching Manager's authenticated `/sdk/index.js`,
 under its proxy prefix if one is configured. Record the
 Core commit and archive SHA-256, served SDK version, native component digest
@@ -639,3 +650,10 @@ The SDK does not prompt for new read access during that manual action. Render
 write-accepted as unverified rather than success. Real browser/OS focus and
 clipboard synchronizers remain environment prerequisites; SDK state is not a
 substitute for actual paste/readback testing.
+
+The current SDK 0.38 development graph repair is not ready for adoption:
+isolated processor recovery has scoped real-browser/native-retirement evidence,
+but complete Context replacement still has a reproduced native-retention defect.
+Keep the [qualification blocker](native-self-recovery.md#graph-qualification-blocker)
+with the version decision; connected sound and `contextState: 'closed'` do not
+accept resource cleanup or the complete release.

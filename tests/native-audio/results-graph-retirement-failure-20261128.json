@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "remaining-native-retirement-defect-reproduced",
+  "releaseQualified": false,
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 8,
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headless": false,
+    "sandboxEnabled": true,
+    "nativeCDP": true,
+    "realKasmPulse": true,
+    "syntheticMic": true,
+    "testOnlyWorkletSubclass": true,
+    "diagnosticGC": true
+  },
+  "functionalCasesPassed": 14,
+  "measuredActiveNative": {
+    "AudioContext": 12,
+    "AudioWorkletNode": 14,
+    "blink::AudioWorkletMessagingProxy": 12
+  },
+  "cause": "Closing the whole Context before healthy processors terminate preserves browser-native active-lifetime roots. Functional recovery and closed Context state are not proof of native retirement.",
+  "sourceSHA256": {
+    "remotexapp-audio.js": "3b1304e097488c56cd7e41f19d8b817553d536707416e400dd976341e9421c6d",
+    "audio-context-operations.js": "b6269b7c839b12eb3d808a3671d7ebbd262701ca7b8e2d79e890b9446cd0bca6",
+    "audio-worklet.js": "d0ca3c748bceb3807d4408bec068ade5a0e13a0e0225d60506e8262aac1d5726"
+  },
+  "limits": [
+    "The first driver expected two MessagingProxies; that expectation was wrong. A fresh positive baseline measures one per Context. The12Contexts/14Nodes retention still independently proves this defect.",
+    "Node-isolation repair is a separate scoped result; full graph termination and already-closed Context disposition remain incomplete."
+  ]
+}

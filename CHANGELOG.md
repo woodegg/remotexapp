@@ -57,6 +57,20 @@ Target: `0.17.6`. SDK `0.38.0`.
   native-client mechanism control pass. Full fault/resource qualification remains
   required, including short-run anonymous PSS growth and known graph failures.
 
+- Recover native audio graph failures under still-valid intent: resume a suspended
+  Context without retiring its live source, close unusable graphs before rebuilding,
+  discard failed Worklet module state, and replace only the failed processor.
+  Bound native module/resume/close flights, quarantine unresolved work and fence late
+  completions; an uncancelled native operation cannot justify unlimited replacement
+  graphs. A shared document/Manager guard gates new owners after two unproven
+  graph retirements. Disposal has a close deadline and reports unresolved native work honestly.
+  A server route ACK alone no longer reports `actualSpeaker` without an eligible
+  ready playback graph. Add `contextState`/`contextReason` diagnostics. Model tests
+  pass, and a scoped real node-isolation control returns native audio objects to
+  zero on retirement. A separate whole-Context control retains native objects
+  despite sound recovery; full graph retirement remains OPEN and blocks final
+  recovery/resource qualification.
+
 - Unregister the native display adapter's keyboard blur listener before
   removing its input. A browser-retained detached input must not keep retired
   RFB frame buffers alive. This repair requires a new immutable Kasm client

@@ -5888,3 +5888,32 @@ switch remain successful with no Worker; returned inactive state claims no
 remote delivery. Models cover repeated silent exits, budget and cancellation.
 Real repeated-exit, multi-document, native-retainer and full production gates in
 [native-self-recovery.md](native-self-recovery.md) remain incomplete.
+
+## 2026-11-28 — Preserve source intent while replacing an unusable audio graph
+
+The actual-SDK graph baseline reproduces cached failed module loading, reuse of
+closed Contexts and source retirement on temporary suspension. These are graph
+lifecycle faults, separate from Worker replacement. SDK 0.38 now fences PCM on
+suspension, resumes under valid intent and isolates failed processors before considering complete graph replacement.
+Retain an authorized live source; current permission/intent/writer checks and a
+fresh processor delivery ACK still precede capture delivery. Processor callbacks
+are graph-qualified; late old errors cannot retire a replacement. Explicit off
+fences late construction and capture. A server route ACK without ready playback
+is no longer `actualSpeaker`; local graph diagnostics are additive.
+
+A native module/resume/close timeout does not cancel the native operation. Track
+and join bounded flights, permit one real-gesture retry of an earlier automatic
+resume and quarantine unresolved work rather than allocate endless graphs. A document/Manager quarantine pool gates
+new owners after two unproven retirements, preventing Host recreation from
+bypassing the native operation bound; healthy existing graphs remain usable.
+Late settlement must wake even during another reconciliation. Final disposal
+bounds close, detaches owner callbacks and reports incomplete native work; late
+closed-graph settlement releases its record. A measured whole-Context control rejects using closed state as terminal
+processing evidence: twelve native Contexts survive despite functional recovery.
+Healthy processors must terminate before SDK-owned close; already-closed Context
+cleanup remains unresolved. Native processorerror permits isolated failed-node
+replacement without closing its healthy sibling. A missing render ACK remains
+an error, not a successful native retirement. Keep eight recent retirement errors plus a
+total count. This supersedes unconditional source stopping on Context suspension
+and indefinite close waits; cancellation/identity/runtime fences are unchanged.
+Model passage does not accept real native cleanup or the full production gates.

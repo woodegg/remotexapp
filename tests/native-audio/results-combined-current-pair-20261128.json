@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "passed-scoped-current-pair-combined-preflight",
+  "releaseQualified": false,
+  "implementationCommit": "7a65d460fdeb7c39ad028d10747438ef66a781f3",
+  "runtimeCoreSHA256": "c50d7184399cfb8a0d7f2f09ebeb452cb2f14b3efa4b2b488953025534bac5d7",
+  "componentManifestSHA256": "8e2c5874368e25286e15b0a73403c0fb30f81c2aa45b65c000a865294e07e84f",
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 8,
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headless": false,
+    "sandboxEnabled": true,
+    "nativeCDP": true,
+    "networkDomainEnabled": false,
+    "focusEmulation": false,
+    "newManagerAndAllCoreHelpers": true,
+    "embeddedSDK": true,
+    "sourceOverride": false,
+    "nativeClipboardV4": true,
+    "transport": "WSS",
+    "archivedUnchangedDrivers": true,
+    "trustedIngressIdentity": true,
+    "extraLoginHeader": false,
+    "syntheticMic": "Changeable private Pulse pipe source; no fake audio device/file",
+    "speakerReadback": "Actual private browser Pulse output monitor",
+    "freshPostFaultFrequencyMarkers": true,
+    "browserPermission": "Explicit test grants and actual denial/grant transitions, not physical user dialogs",
+    "periodicGC": false,
+    "resourceOrNaturalAcceptance": false
+  },
+  "checks": [
+    {
+      "name": "full-current-pair-baseline",
+      "status": "passed",
+      "sameSource": true,
+      "captureRequests": 1,
+      "requested": {
+        "speaker": true,
+        "microphone": true
+      },
+      "freshClipboardBothDirections": true,
+      "runtimeGenerationUnchanged": true,
+      "microphoneWindows": [
+        {
+          "frames": 24000,
+          "peak": 9002,
+          "rms": 6364.842005010808,
+          "expectedHz": 660,
+          "markerEnergyFraction": 0.9999999508776632
+        }
+      ],
+      "browserOutputWindows": [
+        {
+          "frames": 24000,
+          "peak": 9003,
+          "rms": 6365.64225402669,
+          "expectedHz": 440,
+          "markerEnergyFraction": 0.9999999850299781
+        }
+      ]
+    },
+    {
+      "name": "actual-Manager-restart-preserves-all-three-intents",
+      "status": "passed",
+      "sameSource": true,
+      "captureRequests": 1,
+      "requested": {
+        "speaker": true,
+        "microphone": true
+      },
+      "freshClipboardBothDirections": true,
+      "runtimeGenerationUnchanged": true,
+      "microphoneWindows": [
+        {
+          "frames": 24000,
+          "peak": 9001,
+          "rms": 6364.250001309398,
+          "expectedHz": 880,
+          "markerEnergyFraction": 0.999999935828975
+        }
+      ],
+      "browserOutputWindows": [
+        {
+          "frames": 24000,
+          "peak": 9003,
+          "rms": 6323.074802426691,
+          "expectedHz": 550,
+          "markerEnergyFraction": 0.7479293189002195
+        },
+        {
+          "frames": 24000,
+          "peak": 9003,
+          "rms": 6365.489767095694,
+          "expectedHz": 550,
+          "markerEnergyFraction": 0.9999999828988175
+        }
+      ]
+    },
+    {
+      "name": "actual-Manager-long-outage-preserves-all-three-intents",
+      "status": "passed",
+      "sameSource": true,
+      "captureRequests": 1,
+      "requested": {
+        "speaker": true,
+        "microphone": true
+      },
+      "freshClipboardBothDirections": true,
+      "runtimeGenerationUnchanged": true,
+      "microphoneWindows": [
+        {
+          "frames": 24000,
+          "peak": 9000,
+          "rms": 6363.665741968225,
+          "expectedHz": 1100,
+          "markerEnergyFraction": 0.9999999341720037
+        }
+      ],
+      "browserOutputWindows": [
+        {
+          "frames": 24000,
+          "peak": 9699,
+          "rms": 6322.859301603587,
+          "expectedHz": 660,
+          "markerEnergyFraction": 0.4181055060462474
+        },
+        {
+          "frames": 24000,
+          "peak": 9002,
+          "rms": 6365.359172603696,
+          "expectedHz": 660,
+          "markerEnergyFraction": 0.9999999799017919
+        }
+      ]
+    },
+    {
+      "name": "native-cookie-loss-same-principal-combined-recovery",
+      "status": "passed",
+      "sameSource": true,
+      "captureRequests": 1,
+      "requested": {
+        "speaker": true,
+        "microphone": true
+      },
+      "freshClipboardBothDirections": true,
+      "runtimeGenerationUnchanged": true,
+      "microphoneWindows": [
+        {
+          "frames": 24000,
+          "peak": 8999,
+          "rms": 6363.071316982076,
+          "expectedHz": 1320,
+          "markerEnergyFraction": 0.9999999506269399
+        }
+      ],
+      "browserOutputWindows": [
+        {
+          "frames": 24000,
+          "peak": 9003,
+          "rms": 6347.7065080002185,
+          "expectedHz": 770,
+          "markerEnergyFraction": 0.969576295852679
+        }
+      ]
+    },
+    {
+      "name": "actual-Worker-exit-combined-recovery",
+      "status": "passed",
+      "sameSource": true,
+      "captureRequests": 1,
+      "requested": {
+        "speaker": true,
+        "microphone": true
+      },
+      "freshClipboardBothDirections": true,
+      "runtimeGenerationUnchanged": true,
+      "microphoneWindows": [
+        {
+          "frames": 24000,
+          "peak": 8999,
+          "rms": 6362.559526538828,
+          "expectedHz": 1540,
+          "markerEnergyFraction": 0.9999999690228771
+        }
+      ],
+      "browserOutputWindows": [
+        {
+          "frames": 24000,
+          "peak": 9761,
+          "rms": 6355.691345282588,
+          "expectedHz": 880,
+          "markerEnergyFraction": 0.9334388805739439
+        }
+      ]
+    },
+    {
+      "name": "actual-Pulse-microphone-disappear-and-reappear",
+      "status": "passed",
+      "sameSource": false,
+      "captureRequests": 3,
+      "requested": {
+        "speaker": true,
+        "microphone": true
+      },
+      "freshClipboardBothDirections": true,
+      "runtimeGenerationUnchanged": true,
+      "microphoneWindows": [
+        {
+          "frames": 24000,
+          "peak": 8998,
+          "rms": 6362.216670017612,
+          "expectedHz": 1760,
+          "markerEnergyFraction": 0.9999999868554525
+        }
+      ],
+      "browserOutputWindows": [
+        {
+          "frames": 24000,
+          "peak": 9005,
+          "rms": 6356.525874075529,
+          "expectedHz": 990,
+          "markerEnergyFraction": 0.8126982114797068
+        }
+      ]
+    },
+    {
+      "name": "permission-revoke-then-granted-automatic-reacquisition",
+      "status": "passed",
+      "sameSource": false,
+      "captureRequests": 4,
+      "requested": {
+        "speaker": true,
+        "microphone": true
+      },
+      "freshClipboardBothDirections": true,
+      "runtimeGenerationUnchanged": true,
+      "microphoneWindows": [
+        {
+          "frames": 24000,
+          "peak": 8998,
+          "rms": 6362.131699261656,
+          "expectedHz": 1980,
+          "markerEnergyFraction": 0.9999999933849396
+        }
+      ],
+      "browserOutputWindows": [
+        {
+          "frames": 24000,
+          "peak": 9001,
+          "rms": 6355.671857610728,
+          "expectedHz": 1100,
+          "markerEnergyFraction": 0.5159862926790417
+        },
+        {
+          "frames": 24000,
+          "peak": 9001,
+          "rms": 6364.368314753109,
+          "expectedHz": 1100,
+          "markerEnergyFraction": 0.9999999726672918
+        }
+      ]
+    },
+    {
+      "name": "explicit-mic-off-survives-service-epoch-no-new-capture",
+      "status": "passed",
+      "captureRequests": 4,
+      "additionalCaptureAfterExplicitOff": false
+    }
+  ],
+  "captureRequestMeaning": "Counts getUserMedia attempts, including failures while the device is absent; not simultaneous active devices. No re-enable call manufactures automatic recovery.",
+  "recoveredReasons": {
+    "route": "",
+    "shared": ""
+  },
+  "pageErrors": [],
+  "rawReportSHA256": "f452773cdaac91e000833a6abe5b78832893368394b59e9b4fd20fda7b0ffd4a",
+  "independentMeasurementControl": {
+    "noSDK": true,
+    "browser": "Chrome/158.0.8127.88",
+    "checks": 4,
+    "recaptureNeededWithoutSDK": true,
+    "cleanup": true,
+    "rawReportSHA256": "afa28378f8cfab8dfc35dcdad6a1fc9b0cc48744e0ccf462d6ceae37f7c6bf3f"
+  },
+  "preRepairObservation": {
+    "sourceCommit": "9f608cfb0feb628bb6f3c0da89d3e344b73ac7dc",
+    "actualMic": true,
+    "reason": "microphone-permission-required",
+    "rawReadOnlyObservationSHA256": "1c876da2c28d45979ce17e93d89b385df9037f30bccab45066b6a478e061ee0b"
+  },
+  "focusedRegression": {
+    "tests": 49,
+    "skipped": 0,
+    "todo": 0,
+    "redLogSHA256": "386877fc5733c6b6d54606dd776100de5cfb4da34c396b21372b6090f9b5f18d",
+    "greenLogSHA256": "1cd4161cc18cfeccf76d123ea992d15753825ad94715df51762aa2f03fc6ac11",
+    "preservesOtherUnavailableTarget": true,
+    "requiresCurrentDeliveryACK": true
+  },
+  "sourceSHA256": {
+    "cmd/remotexappd/web/sdk/audio-coordinator.js": "dd25d66b409ec565abb6b9e3c07aab664ff074739be53e414f33b8f66903e1dc",
+    "cmd/remotexappd/web/sdk/audio-coordinator.test.mjs": "3aec4c0738ca5a201abda0046443fc5730db3a7b6853a1b11ecde9678c6e96a6",
+    "tests/native-audio/headed_cdp.py": "b8cb78f5c21789ec8870c4db12102ce1fb33df1009a45b8398a735c65bad8a61",
+    "tests/native-audio/virtual_pulse.py": "52c7e5bd5ebaa03f4156844ebe24a056838a4f95fb7d4f5008d82b382581a573",
+    "tests/native-audio/browser-virtual-pulse.py": "cda80c3b4e124889bf63f93c838ea78c277bc1e46c7b00b80d98f6da49984a55"
+  },
+  "remaining": [
+    "Complete real multi-document/multi-App and 24-class mixed fault audit",
+    "Remaining native clipboard input/cancellation/slow receiver/old-pair boundaries",
+    "Earlier short anonymous PSS growth root audit; whole-process/heap/native/FD/queue review",
+    "Eight-hour natural and separate at-least-90-minute/1000-operation stress",
+    "Other platforms, native transports, final exact artifact/review and one complete human UAT"
+  ],
+  "cleanup": {
+    "ownAppsStopped": true,
+    "ownManagerAndEdgeStopped": true,
+    "ownUnitFileRemoved": true,
+    "dedicatedFixtureStopped": true,
+    "originalPublicUATPreserved": true,
+    "rawCleanupSHA256": "775aeb8433936b0dd34133a6059f54b0b44e408a95a65763552ae55bd80c0871",
+    "ownedBrowserProfileRemoved": true,
+    "noMarkedOwnedHostBrowserPulseXvfb": true
+  }
+}

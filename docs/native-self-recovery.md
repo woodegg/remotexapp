@@ -55,13 +55,15 @@ release. The final diagnostic GC is separate from the fault interval.
 
 ## Current-pair combined preflight (development)
 
-The current Core/helpers, embedded SDK and native clipboard v4 component have
-now been combined with a real headed sandboxed Chrome, X11 and private virtual
-Pulse devices. Separate short controls verify service restart/long outage,
-cookie loss and Worker exit with fresh clipboard plus two-way audio. A later
-device/permission control restores fresh data without re-enabling the requests,
-then verifies explicit mic off survives a service restart. These are scoped
-development controls, not the complete multi-document or 24-class audit.
+The [eight-case current-pair control](../tests/native-audio/results-combined-current-pair-20261128.json)
+combines the committed Core/helpers, embedded SDK and native clipboard v4 component
+with real headed sandboxed Chrome, X11 and private virtual Pulse devices. One
+successful attempt verifies service restart/long outage, cookie loss, Worker
+exit and device/permission recovery with fresh clipboard plus two-way audio,
+then explicit mic off across a service restart. Earlier incomplete attempts and
+invalid device/capture-count assertions remain separate, rather than being
+concatenated into that run. These are scoped development controls, not the
+complete multi-document or 24-class audit.
 
 Synthetic mic frequency changes after each fault; remote mic readback and the
 actual browser output monitor must match the new markers. An unchanged peak or
@@ -76,7 +78,7 @@ delivery recovered. Development code now clears a nonterminal target's reason
 only when all its requested effects are effective, including the current mic
 delivery ACK. Another unavailable target keeps its reason; the shared failure
 clears only when connected routes have settled. Disconnect history remains
-separate. Fresh signal, full current-artifact proof, resource and long-duration
+separate. Complete fault coverage on the current artifact, resource and long-duration
 qualification are still required.
 
 ## Worker bootstrap recovery (development Worker 8)

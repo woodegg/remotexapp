@@ -103,6 +103,39 @@ test('storage notifications wake reconciliation without exposing stored content 
   await a.dispose();assert.equal(f.events.size,0);
 });
 
+test('same-document explicit off wakes every live peer without relying on a native storage event',async()=>{
+  const f=fixture(),a=f.create(),b=f.create();let aCalls=0,bCalls=0,otherCalls=0;
+  const other=new AudioIntentJournal(f.env,'/other');
+  a.subscribe(()=>aCalls++);b.subscribe(()=>bCalls++);other.subscribe(()=>otherCalls++);
+  await a.publish('app',1,'microphone',true);await b.publish('app',1,'microphone',true);
+  const before=aCalls;await b.publish('app',1,'microphone',false);
+  assert(aCalls>before);assert.equal(aCalls,bCalls);assert.equal(otherCalls,0);
+  assert.equal(a.read('app',1,'microphone').participating,false);
+  await a.dispose();const retired=aCalls;
+  await b.publish('app',1,'microphone',true);
+  assert.equal(aCalls,retired);await b.dispose();await other.dispose();
+  assert.equal(f.events.size,0);
+});
+
+test('a failed observer cannot make a committed intent publication appear unavailable',async()=>{
+  const f=fixture(),a=f.create(),b=f.create(),errors=[];
+  f.env.reportError=error=>errors.push(error.message);
+  b.subscribe(()=>{throw Error('observer failed');});
+  const state=await a.publish('app',1,'speaker',true);
+  assert.equal(state.available,true);assert.equal(a.read('app',1,'speaker').participating,true);
+  assert.deepEqual(errors,['observer failed']);await b.dispose();await a.dispose();
+});
+
+test('a newly created peer observes a previous last owner delayed logout',async()=>{
+  const f=fixture(),a=f.create();await a.publish('app',1,'microphone',true);
+  let unlock;const gate=new Promise(r=>unlock=r),locks=f.env.navigator.locks;
+  f.env.navigator.locks={request:async(k,o,fn)=>{await gate;return locks.request(k,o,fn);}};
+  const retiring=a.dispose({logout:true}),b=f.create();let calls=0;b.subscribe(()=>calls++);
+  unlock();await retiring;
+  assert.equal(calls,1);assert.equal(b.read('app',1,'microphone').enabled,false);
+  await b.dispose();assert.equal(f.events.size,0);
+});
+
 test('a browser SecurityError while accessing localStorage fails closed',async()=>{
   const f=fixture(),a=f.create();Object.defineProperty(f.env,'localStorage',{get(){throw new DOMException('blocked','SecurityError');}});
   assert.equal(a.read('app',1,'microphone').available,false);

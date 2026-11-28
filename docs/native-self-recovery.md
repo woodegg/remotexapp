@@ -51,6 +51,10 @@ and cancellation, not permission assumptions or a blind repeated enable call.
   switch epochs and participating live owner identifiers. Explicit off invalidates
   all older participation; an old page cannot resurrect a request after a later
   off/on from another page. The journal alone never authorizes media capture.
+  Notify independent owners in the writing document as well as other documents:
+  browser `storage` events exclude the whole writer document. Coalesce local
+  notifications and detach retired owners; observer failures must not turn an
+  already committed switch into a reported failed publication.
 - Publish explicit intent with a monotonic revision. The Worker ignores stale
   commands and checks the revision again after each asynchronous context,
   capture and route operation. Synchronous local off fences current capture

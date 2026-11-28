@@ -1,6 +1,7 @@
 // Shared switch ordering, never media authority. A live owner's local intent,
 // browser permission and fresh runtime grants are still required for capture.
 const VERSION = 1, MAX_ENTRIES = 128, MAX_PARTICIPANTS = 32, MAX_LENGTH = 262144, LOCK_WAIT_MS = 2000;
+const documents = new WeakMap();
 const kinds = new Set(['speaker','microphone']);
 const identifier = value => typeof value === 'string' && /^[a-zA-Z0-9_.-]{1,128}$/.test(value);
 const integer = value => Number.isSafeInteger(value) && value >= 0;
@@ -37,8 +38,27 @@ export class AudioIntentJournal {
     this.key = 'remotexapp.audio-intents.v1:' + url.href.replace(/\/$/,'');
     this.owner = env.crypto.randomUUID(); this.closed = false;
     this.listeners = new Set();
+    let scopes = documents.get(env);
+    if (!scopes) documents.set(env,scopes = new Map());
+    this.documentScopes = scopes;
+    this.peers = scopes.get(this.key);
+    if (!this.peers) scopes.set(this.key,this.peers = new Set());
+    this.peers.add(this);
     this.changed = event => { if (!this.closed && (event.key === this.key || event.key === null)) for (const fn of this.listeners) fn(); };
     env.addEventListener?.('storage',this.changed);
+  }
+  _notify() {
+    // Native storage events exclude every owner in the writing document, not
+    // only the writer. Wake same-document peers too, coalescing bursts.
+    if (this.closed || this.notificationPending || !this.listeners.size) return;
+    this.notificationPending = true;
+    queueMicrotask(()=>{
+      this.notificationPending = false;
+      if (this.closed) return;
+      for (const fn of this.listeners) {
+        try { fn(); } catch (error) { this.env.reportError?.(error); }
+      }
+    });
   }
   _view(entry) {
     return {available:true,enabled:!!entry?.enabled,participating:!!entry?.enabled && entry.participants.includes(this.owner),
@@ -80,6 +100,7 @@ export class AudioIntentJournal {
           const encoded = JSON.stringify(state);
           if (encoded.length > MAX_LENGTH) return unavailable();
           this.env.localStorage.setItem(this.key,encoded);
+          for (const peer of documents.get(this.env)?.get(this.key) || []) peer._notify();
         }
         const {changed,...view} = result;
         return view;
@@ -126,6 +147,9 @@ export class AudioIntentJournal {
   dispose({logout=false} = {}) {
     if (this.retirement) return this.retirement;
     this.closed = true; this.listeners.clear(); this.env.removeEventListener?.('storage',this.changed);
+    this.peers.delete(this);
+    if (!this.peers.size) this.documentScopes.delete(this.key);
+    if (!this.documentScopes.size) documents.delete(this.env);
     return this.retirement = this._update(state=>{
       if (!state.entries.some(e=>logout ? e.enabled || e.participants.length : e.participants.includes(this.owner))) {
         return {available:true,enabled:false,participating:false,revision:state.revision,changed:false};

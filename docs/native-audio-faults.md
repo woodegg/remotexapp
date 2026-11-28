@@ -1,13 +1,19 @@
 # Native audio faults and recovery
 
-This is a fault inventory for the Core 0.17.6 / SDK 0.37 source contract, not a
-claim that every failure has automatic recovery or that an incident's cause is
-known. The owner has selected the [self-recovery implementation](native-self-recovery.md)
+The table preserves the Core 0.17.6 / SDK 0.37 baseline contract; development
+SDK 0.38 / Worker 7 prospectively supersedes selected manual-resume boundaries.
+It is not a claim that every failure has automatic recovery or that an incident's
+cause is known. The owner has selected the [self-recovery implementation](native-self-recovery.md)
 to supersede several current manual-resume boundaries; it is not yet qualified.
 See [audio ownership](native-audio.md) and
 [integration intent](integration-intent-recovery.md). Physical device faults,
 browser policies, ingress failures and SDK defects can produce the same silence.
 A WebSocket close code, including 1006, does not identify which layer failed.
+
+The [new real-browser silent-exit control](../tests/native-audio/results-worker-silent-exit-20261128.json)
+passes a first rebind with fresh data and the original capture, then reproduces
+a terminal block on the second exit despite a healthy backend and no live
+Worker. This is an open recovery defect, not a successful fault-class audit.
 
 Development update under #119: the transport implementation has removed the
 twelve-second forced source retirement described in the original inventory

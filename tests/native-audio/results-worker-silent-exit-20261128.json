@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "remaining-defect-reproduced",
+  "releaseQualified": false,
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 7,
+  "sdkSourceCommit": "7fe67de187e9228ea2c4f36e692d141a1e0e639d",
+  "runtimeCoreCommit": "00c97b4dd2262dc083075e23609feb26398fd437",
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headless": false,
+    "sandboxEnabled": true,
+    "nativeCDP": true,
+    "realSharedWorkerSelfClose": true,
+    "realKasmPulse": true,
+    "syntheticMicrophone": true,
+    "playbackSink": "none",
+    "developmentSDKOverride": true
+  },
+  "firstSilentExit": {
+    "status": "passed-development-control",
+    "recoveryObservedAtSeconds": 18.08740390499588,
+    "sameSourceAndProcessor": true,
+    "deviceRequests": 1,
+    "freshMicReadback": true,
+    "freshSpeakerPeak": 0.2593994140625,
+    "newWorkerTarget": true
+  },
+  "secondSilentExit": {
+    "status": "failed-recovery",
+    "blockedObservedAtSeconds": 18.06119241192937,
+    "workerExhausted": true,
+    "liveWorkerTargets": 0,
+    "backendAvailable": true,
+    "sourceRetainedButDisabled": true,
+    "deviceRequests": 1
+  },
+  "cause": "The cached document bootstrap cannot attach a new logical port after the Worker silently exits. The first init timeout moves to the second name; after the next real exit the fixed replacement limit blocks recovery even though no Worker remains. This development bound still needs repair.",
+  "sourceSHA256": {
+    "audio-coordinator.js": "cc0d96ee7dd5258e297a5086e6aeab6f2e42e8ee0ff49e00a795480784307c34",
+    "remotexapp-audio.js": "14c53f99ea0702016640da3c1a3ae38f8dff71ae6fd47c1eaba0606dd0ca4b97",
+    "audio-worklet.js": "d0ca3c748bceb3807d4408bec068ade5a0e13a0e0225d60506e8262aac1d5726",
+    "audio-worker-hub.js": "7b6ee9bdf02cae047b0e168550b9c4a9b9fa8fb4dcd3ced68d3421e583f8d10b"
+  },
+  "cleanup": "passed; owned App/browser/profile/display and units retired; dedicated fixture stopped; original public UAT preserved",
+  "limits": [
+    "This is a scoped development control on archived Core; no new-backend scope correlation or final artifact qualification.",
+    "One successful real Worker rebind does not prove repeated exit recovery.",
+    "No physical hardware, OS sleep, whole-process allocation, natural soak or combination-stress acceptance."
+  ]
+}

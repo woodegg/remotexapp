@@ -18,6 +18,13 @@ qualification of the new state machine. Repeated silent Worker exits and the
 remaining fault/resource gates are still open; do not start final qualification
 on an unfinished state machine.
 
+A [real Chrome silent-exit control](../tests/native-audio/results-worker-silent-exit-20261128.json)
+now confirms one Worker replacement reuses the same source and processor with
+fresh speaker/mic data, but the next actual exit reaches the fixed replacement
+limit while no Worker remains alive. The cached bootstrap/replacement bound must
+be repaired before this contract can be accepted. That failed second recovery
+is retained, not counted as passage of the fault class.
+
 ## Contract
 
 The live client sets requested speaker/microphone/connection intent. SDK and
@@ -120,8 +127,8 @@ the same live source/processor, no extra device request and fresh speaker/mic da
 after reconnect. This uses an unchanged archived Core plus a development SDK,
 without focus emulation or background timer overrides; it does not qualify new
 backend scope correlation or long-duration allocation. This is partial
-implementation: actual Worker/source replacement,
-permission-driven reacquisition and full qualification are still outstanding.
+implementation: actual repeated Worker/source and permission-fault qualification
+and the full acceptance gates are still outstanding.
 
 Keep separate failure classes: retryable connection/service/device/domain loss;
 blocked browser permission/playback/capability; terminal owner/identity/runtime

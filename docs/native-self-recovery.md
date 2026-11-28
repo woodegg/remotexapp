@@ -16,8 +16,11 @@ The host displays requested, recovering, active, blocked and retired states; it
 does not resend enable on every reconnect or maintain its own recovery loop.
 
 Service/transport/Worker replacement must not permanently discard a still-valid
-request. A still-live mic can be retained through a short cut; expiration of
-that capture ends the old device/frames, not the user's request. Automatic
+request. Separate capture-source lifetime from transport lifetime. Prefer
+retaining a valid live track through an interruption, disabling delivery and,
+where appropriate, the track while offline. Do not stop a valid source solely
+because a connection epoch changed or a twelve-second timer expired. A real
+capture end retires the old device/frames, not the user's request. Automatic
 reacquisition is permitted only for a live, unreleased authorized owner whose
 current request is still enabled, with current browser microphone permission
 `granted` and fresh current-runtime route authorization. Recovery must not open
@@ -56,6 +59,11 @@ and cancellation, not permission assumptions or a blind repeated enable call.
   reacquiring a device. Recheck after the promise resolves; stop every late stream
   if permission, owner, intent or epoch changed. Source recovery must have at most
   one in-flight acquisition and one live capture for its coordination scope.
+- Reuse a still-live source/processor across transport or Worker replacement
+  only after rebinding the current capture token and a fresh delivery fence.
+  Do not replay queued frames or retain an old peer's token in a callback. A
+  new source is needed only when the old track/graph is genuinely unusable;
+  explicit off/logout/permission or owner retirement still stops it immediately.
 - Distinguish a requested route, server writer authorization and effective mic
   delivery. Automatic recovery must check fresh target/writer eligibility before
   opening a device and must not report actualMic until capture is ready and the

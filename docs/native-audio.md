@@ -12,6 +12,9 @@ acceptance, post-merge qualification and publication remain separate.
 
 ## Ownership and compatibility
 
+For failure causes, the distinct epoch fences, automatic-recovery limits and
+isolated fault-injection steps, see [audio faults and recovery](native-audio-faults.md).
+
 Core 0.17.5 / SDK 0.35.0 implements
 [integration intent recovery](integration-intent-recovery.md). Fresh accepted
 requests and runtime grants permit transient recovery without a login-session

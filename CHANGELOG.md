@@ -13,6 +13,11 @@ implementation; move them to a version section when publishing a release.
 
 Target: `0.17.6`. SDK `0.37.0`.
 
+- Document audio failure classes and distinct epoch recovery boundaries. Add
+  strict A-B-A clipboard reproductions with genuine-echo controls. The stale
+  echo defect remains open in #117; its four desired-behavior assertions are
+  reported as TODO until repaired, rather than claimed as passing regressions.
+
 - Unregister the native display adapter's keyboard blur listener before
   removing its input. A browser-retained detached input must not keep retired
   RFB frame buffers alive. This repair requires a new immutable Kasm client

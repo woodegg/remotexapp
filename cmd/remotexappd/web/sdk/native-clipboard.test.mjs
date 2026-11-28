@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {NativeClipboard} from './native-clipboard.js';
+// #117 remains unfixed. CI reports these desired-behavior assertions as TODO;
+// set REMOTEXAPP_TEST_CLIPBOARD_ABA=1 for a strict, nonzero red reproduction.
+const knownABA = process.env.REMOTEXAPP_TEST_CLIPBOARD_ABA === '1' ? {} :
+  {todo:'Issue #117: stale lastSent suppresses a later legitimate remote copy'};
 const turn = () => new Promise(resolve => setImmediate(resolve));
 const deferred = () => { let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject}; };
 function fixture(t) {
@@ -284,4 +288,45 @@ test('normalized rich writes without browser receipt support remain uncertain un
   s.offer(richText('remote','<b>remote</b>'));await s.sync();assert.equal(s.phase,'clipboard-uncertain');
   s.conflict=false;f.nav.clipboard.write=write;f.io.payload=s.baseline;
   s.offer(richText('exact','<b>exact</b>'));await s.sync();assert.equal(s.phase,'copied-to-local');
+});
+
+test('a genuine upload echo is ignored but a distinct later remote copy is delivered',async t=>{
+  const f=fixture(t),c=await f.start(),s=c.clipboard;
+  f.io.text='A';await s.sync();s.offer('A');await s.sync();
+  assert.deepEqual(c.sent,['A']);assert.deepEqual(f.io.writes,[]);
+  s.offer('B');await s.sync();
+  assert.equal(f.io.text,'B');assert.deepEqual(f.io.writes,['B']);
+  for(let i=0;i<10;i++)await s.sync();
+  assert.deepEqual(c.sent,['A']);assert.deepEqual(f.io.writes,['B']);
+});
+
+test('a legitimate remote text A-B-A is not an old local upload echo',knownABA,async t=>{
+  const f=fixture(t),c=await f.start(),s=c.clipboard;
+  f.io.text='A';await s.sync();s.offer('A');await s.sync();
+  s.offer('B');await s.sync();assert.equal(f.io.text,'B');
+  s.offer('A');await s.sync();
+  assert.equal(f.io.text,'A','a new remote A must replace local B');
+  assert.deepEqual(c.sent,['A'],'remote delivery must not echo back as an upload');
+});
+
+for(const format of ['HTML','PNG + text'])test(`a legitimate remote ${format} A-B-A is delivered`,knownABA,async t=>{
+  const f=richFixture(t),c=await f.start(f.client),s=c.clipboard;
+  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64');
+  // This is a state-machine/representation identity test, not PNG decoding.
+  const payload=value=>format==='HTML' ? richText(value,`<b>${value}</b>`) :
+    clipboardPayload([{type:'image/png',data:png},{type:'text/plain',data:new TextEncoder().encode(value)}]);
+  const a=payload('A'),b=payload('B');
+  f.io.payload=a;await s.sync();s.offer(a);await s.sync();
+  assert.equal(f.io.richWrites.length,0,'the actual upload echo must stay suppressed');
+  s.offer(b);await s.sync();assert(sameClipboard(f.io.payload,b));
+  s.offer(a);await s.sync();
+  assert(sameClipboard(f.io.payload,a),'the new remote offer must be delivered');
+  assert.equal(c.sent.length,1,'remote delivery must not create an upload loop');
+});
+
+test('paste after remote A-B-A cannot upload the stale intermediate B',knownABA,async t=>{
+  const f=fixture(t),c=await f.start(),s=c.clipboard;
+  f.io.text='A';await s.sync();s.offer('B');await s.sync();
+  s.offer('A');await s.sync();await s.paste();
+  assert.equal(c.sent.at(-1),'A','paste must not overwrite the newest remote A with stale B');
 });

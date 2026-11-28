@@ -20,6 +20,7 @@ function fixture(t){
   fetch:async(url,options)=>{
    if(f.offline)throw TypeError('network unavailable');const action=url.split('/').at(-1),body=JSON.parse(options.body);f.events.push('http:'+action);
    if(f.accessDenied)return {ok:false,status:401,json:async()=>({error:'current ingress access required'})};
+   if(action==='route'&&body.runtime===f.retired)return {ok:false,status:410,json:async()=>({error:'runtime generation retired'})};
    if(action==='route'&&body.runtime===f.unavailable)return {ok:false,status:409,json:async()=>({error:'session audio unavailable'})};
    return {ok:true,json:async()=>action==='context'?{scope:f.scope,service:f.service,principal:f.principal,login:'',protocol:'pcm-s16le-48k-v1'}:action==='grant'||action==='route'?{token:'e'.repeat(64),domain:'d'.repeat(32)}:{ok:true}};
   }});}
@@ -30,7 +31,7 @@ function fixture(t){
    addEventListener(name,fn){if(!doc.listeners.has(name))doc.listeners.set(name,new Set());doc.listeners.get(name).add(fn);},removeEventListener(name,fn){doc.listeners.get(name)?.delete(fn);},
    localStorage:{getItem:key=>f.values.get(key)??null,setItem(key,value){f.values.set(key,value);for(const other of f.docs)if(other!==doc)queueMicrotask(()=>{for(const fn of other.listeners.get('storage')||[])fn({key});});}},
    navigator:{locks:{request(_key,options,fn){const run=fn || options,p=locks.then(run);locks=p.catch(()=>{});return p;}},permissions:{query:async()=>doc.permission},mediaDevices:Object.assign(new EventTarget(),{getUserMedia:async()=>{
-    doc.captures++;f.gum++;f.events.push('device');if(doc.failDevice)throw new DOMException('device unavailable','NotFoundError');
+    doc.captures++;f.gum++;f.events.push('device');if(doc.holdDevice)await doc.holdDevice;if(doc.failDevice)throw new DOMException('device unavailable','NotFoundError');
     const track={readyState:'live',muted:false,enabled:true,stop(){this.readyState='ended';}},stream={getTracks:()=>[track],getAudioTracks:()=>[track]};doc.streams.push(stream);return stream;
    }})}};
   env.SharedWorker=class {
@@ -90,6 +91,66 @@ test('owner/coordinator/journal/worklet model rebinds a live source after Worker
  f.killWorker();await until(()=>doc.audio.port&&f.route(doc)?.actualMic&&f.sockets.length===2);
  assert.equal(doc.audio.stream,source);assert.equal(doc.audio.capture,node);assert.equal(f.gum,1);
  assert.equal(source.getAudioTracks()[0].enabled,true);assert.equal(interest.released,false);
+});
+
+test('runtime retirement fences local replay and journal participation before a Worker replacement',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const core=[...f.cores.values()][0].coordinator,route=[...core.routes.values()][0];
+ core._serverMessage({type:'state',slot:route.slot,speaker:false,mic:false,reason:'generation-retired'});
+ await until(()=>interest.released);
+ assert.equal(doc.audio.interests.size,0);await until(()=>!doc.audio.journal.read('app',1,'microphone').participating);
+ assert.equal(doc.audio.stream,null);assert.equal(doc.streams[0].getAudioTracks()[0].readyState,'ended');
+ const captures=f.gum;f.killWorker();await until(()=>!doc.audio.port);
+ await doc.audio._ensureWorker();await f.tick();assert.equal(doc.audio.interests.size,0);assert.equal(f.gum,captures);
+ assert.equal([...f.cores.values()][0].coordinator.routes.size,0);
+ await assert.rejects(interest.setMicrophone(true),/released/);
+});
+
+test('route HTTP 410 retires only the old generation and keeps another live capture route',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),old=await doc.audio.acquire({id:'old',sessionGeneration:1}),live=await doc.audio.acquire({id:'live',sessionGeneration:1});
+ await old.setSpeaker(true);await old.setMicrophone(true);await live.setSpeaker(true);await live.setMicrophone(true);
+ await until(()=>doc.audio.stats.routes.length===2&&doc.audio.stats.routes.every(r=>r.actualMic));
+ const source=doc.audio.stream;f.retired='old';
+ const core=[...f.cores.values()][0].coordinator,route=[...core.routes.values()].find(r=>r.runtime==='old');
+ route.applied='';await core._sync();core._broadcast();
+ await until(()=>old.released);
+ assert.equal(live.released,false);assert.equal(doc.audio.interests.size,1);assert.equal(doc.audio.stream,source);
+ await until(()=>!doc.audio.journal.read('old',1,'microphone').participating);
+ f.killWorker();await until(()=>doc.audio.port&&doc.audio.stats.routes.length===1&&doc.audio.stats.routes[0].actualMic);
+ assert.equal(doc.audio.stats.routes[0].runtime,'live');assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);
+ assert.equal(doc.audio.journal.read('live',1,'microphone').participating,true);
+});
+
+test('runtime retirement reaches both documents and fences a late native device result',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),other=f.makeDoc();
+ const first=await doc.audio.acquire({id:'app',sessionGeneration:1}),second=await other.audio.acquire({id:'app',sessionGeneration:1});
+ await first.setSpeaker(true);await second.setSpeaker(true);
+ let deliver;doc.holdDevice=new Promise(resolve=>{deliver=resolve;});
+ const enabling=first.setMicrophone(true);enabling.catch(()=>{});await until(()=>f.gum===1);
+ const core=[...f.cores.values()][0].coordinator,route=[...core.routes.values()][0];
+ core._serverMessage({type:'state',slot:route.slot,speaker:false,mic:false,reason:'generation-retired'});
+ await until(()=>first.released&&second.released);deliver();await enabling.catch(()=>{});
+ await until(()=>doc.streams.length===1);await turn();
+ assert.equal(doc.streams[0].getAudioTracks()[0].readyState,'ended');assert.equal(doc.audio.stream,null);
+ await until(()=>!doc.audio.journal.read('app',1,'microphone').participating&&!other.audio.journal.read('app',1,'speaker').participating);
+ assert.equal(doc.audio.interests.size,0);assert.equal(other.audio.interests.size,0);
+ assert.equal(f.gum,1);assert.equal(core.capture,null);
+});
+
+test('rebind skips an authoritatively retired target without failing healthy target initialization',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),sleeping=f.makeDoc();
+ const old=await doc.audio.acquire({id:'old',sessionGeneration:1}),live=await doc.audio.acquire({id:'live',sessionGeneration:1});
+ await sleeping.audio.acquire({id:'old',sessionGeneration:1});
+ await old.setSpeaker(true);await live.setSpeaker(true);await live.setMicrophone(true);await until(()=>doc.audio.stats.routes.some(r=>r.actualMic));
+ const source=doc.audio.stream,core=[...f.cores.values()][0].coordinator;
+ // Hold the other document's old ref to model a peer not processing the
+ // terminal notification yet, while this document has lost its logical port.
+ sleeping.audio._retireRuntime=()=>{};doc.audio._fenceCapture();doc.audio._closeWorker('fixture-logical-port-cut');await core.serial;
+ const route=core.routes.get('old:1');core._serverMessage({type:'state',slot:route.slot,speaker:false,mic:false,reason:'generation-retired'});
+ await doc.audio._ensureWorker();await until(()=>doc.audio.stats.routes.some(r=>r.runtime==='live'&&r.actualMic));
+ assert.equal(old.released,true);assert.equal(live.released,false);assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);
+ assert.equal(doc.audio.interests.size,1);
 });
 
 test('repeated silent exits require a fresh native bootstrap and retain the same live source and processor',async t=>{

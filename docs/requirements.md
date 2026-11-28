@@ -199,6 +199,14 @@ diagnostics. Models are implemented; real graph/native-resource and full gates
 in [the recovery contract](native-self-recovery.md#audio-graph-recovery-development)
 remain required before acceptance.
 
+AUD-006 requires an authoritative runtime-generation retirement to revoke local
+replay and journal participation, not only mark a Worker route inactive. Notify
+all participating owners, fence late acquisition/commands/ACKs and reject reuse
+of released interests. Keep unaffected runtimes and their valid capture usable.
+Worker replacement must not reconstruct retired interests. Model regressions
+cover push/HTTP retirement, two documents and delayed device completion; real
+fault and final candidate gates remain separate.
+
 AUD-006 additionally owns the graph execution environment. Construct Context
 and processors in an SDK-owned same-origin child while the parent retains intent,
 transport, permissions and MediaStream. Graceful termination waits for render

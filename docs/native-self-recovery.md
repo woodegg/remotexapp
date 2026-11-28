@@ -320,6 +320,17 @@ substitute for that audit.
 | Incomplete retirement | Join terminal cleanup, bound deadlines, report failure and fence every late callback. |
 | Connected-silent / host intent | Trace actual PCM and requested/effective state; distinguish external mute/routing from a transport or SDK defect. |
 
+Runtime retirement is terminal for that exact runtime/generation. An HTTP 410
+or server generation-retired state fences the Worker route and its ref intents,
+then notifies only its participating document owners. Each owner synchronously
+releases matching handles and local replay flags, leaves that target's journal
+participation and rejects late device/enable results. Repeated stale commands or
+ACKs cannot re-enable the retired route. Other runtime interests keep their
+intent and any still-usable shared capture. A Worker replacement must not
+reacquire a retired local interest. The
+[development model regressions](../tests/native-audio/results-runtime-intent-retirement-20261128.json) are separate
+from real runtime-stop and final-artifact qualification.
+
 ## Clipboard
 
 Remove permanent payload-based echo suppression. A remote A after B is a new

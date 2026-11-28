@@ -11,6 +11,13 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Retire local audio interests and journal participation when the server confirms
+  a runtime generation is gone. Worker replacement cannot replay that target;
+  stale commands/ACKs cannot reactivate it, and other live audio routes retain
+  their capture source. Development model regressions cover HTTP 410, push
+  retirement, two documents and a delayed microphone result; real fault and
+  final candidate qualification remain separate.
+
 Target: `0.17.6`. SDK `0.38.0`.
 
 - Fix native clipboard A-B-A delivery by removing permanent uploaded-payload

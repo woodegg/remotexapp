@@ -668,3 +668,10 @@ Always await cleanup and distinguish a recovered owned-realm termination from
 an unproven missing ACK. Scoped real Context replacement/native retirement now
 passes; full policy/mixed-fault/long-duration/candidate qualification is still
 required. Do not adopt this development tuple as a formally qualified release.
+
+SDK 0.38 development also releases an audio interest when its exact runtime
+generation is authoritatively retired. The host must acquire a fresh interest
+for a newly opened runtime, rather than reuse that released handle or repeatedly
+enable it. SDK/Worker own retirement propagation, local replay cancellation and
+late microphone fencing; the host does not need another recovery loop. Other
+live runtime interests remain independent. Real fault qualification is pending.

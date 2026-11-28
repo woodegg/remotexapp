@@ -89,7 +89,8 @@ export class RemoteXAppAudio extends EventTarget {
       if (current) this.binding = current;
       for (const interest of this.interests.values()) {
         currentPort();
-        await this._request('acquire',{ref:interest.ref,runtime:interest.runtime,generation:interest.generation});
+        try {await this._request('acquire',{ref:interest.ref,runtime:interest.runtime,generation:interest.generation});}
+        catch(error){if(interest.released)continue;throw error;}
         currentPort();
         if (interest.released) await this._request('release',{ref:interest.ref});
         else interest[boundPort] = port;
@@ -641,6 +642,7 @@ export class RemoteXAppAudio extends EventTarget {
     if (message.type === 'remove-playback') { this.playback?.port.postMessage({op:'remove',slot:message.slot}); return; }
     if (message.type === 'reset-playback') { this.playback?.port.postMessage({op:'reset'}); return; }
     if (message.type === 'binding') { this.binding = message.binding; return; }
+    if (message.type === 'runtime-retired') { this._retireRuntime(message.runtime,message.generation); return; }
     if (message.type === 'retired') this._retireInterests();
     if (message.type === 'state') {
       if(message.captureReady && !message.micOwner && this.stream && !this.captureToken && !this.captureRequest)this._stopCapture();
@@ -663,6 +665,20 @@ export class RemoteXAppAudio extends EventTarget {
     this.interests.clear();
     this._pauseCapture();
     this.playback?.port.postMessage({op:'reset'});
+  }
+  _retireRuntime(runtime,generation) {
+    const interests=[...this.interests.values()].filter(i=>i.runtime===runtime && i.generation===generation);
+    if(!interests.length)return;
+    // Fence local replay synchronously, including pending intent/acquisition.
+    // The Worker has already retired this route. Its ref release needs no RPC
+    // reply or network round trip, and cannot retire another runtime's source.
+    for(const interest of interests){
+      interest.released=true;interest[resumeSpeaker]=interest[resumeMicrophone]=false;
+      this.interests.delete(interest.ref);
+      if(interest[boundPort]===this.port)this._post({op:'release',ref:interest.ref});
+    }
+    void this.journal.leave(runtime,generation);
+    if(![...this.interests.values()].some(i=>i[resumeMicrophone]))this._captureFailed('microphone-intent-retired');
   }
   _emit() {
     this.stats={...this.stats,contextState:this.context?.state || 'none',contextReason:this.graphReason || ''};

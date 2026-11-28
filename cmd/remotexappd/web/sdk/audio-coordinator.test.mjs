@@ -312,6 +312,22 @@ test('a late context response cannot undo Speaker off during recovery',async()=>
  }finally{f.cleanup();}
 });
 
+test('a retired runtime rejects new refs and stale commands or ACKs cannot restore its route',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'old');f.retiredRuntime='app';
+  const retired=await a.request('speaker',{ref:'old',enabled:true});
+  assert.equal(retired.reason,'generation-retired');
+  assert.ok(a.messages.some(m=>m.type==='runtime-retired'&&m.runtime==='app'&&m.generation===1));
+  const before=f.http.length,route=f.coordinator.routes.get('app:1');
+  await a.request('microphone',{ref:'old',enabled:true});await a.request('speaker',{ref:'old',enabled:true});
+  f.coordinator._serverMessage({type:'state',slot:route.slot,speaker:true,mic:true});
+  assert.equal(route.speaker,false);assert.equal(route.mic,false);assert.equal(route.actualSpeaker,false);assert.equal(route.actualMic,false);
+  assert.equal(f.http.length,before);assert.equal(a.messages.filter(m=>m.type==='capture').length,0);
+  await assert.rejects(acquire(a,'stale'),/generation retired/);
+  assert.equal(route.refs.size,1);
+ }finally{f.cleanup();}
+});
+
 test('worker heartbeats continue while a permission prompt is pending',async()=>{
  const f=fixture();try{
   const a=f.peer();await ready(a);await acquire(a,'a');a.port.allowCapture=false;

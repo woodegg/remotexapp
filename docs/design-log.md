@@ -5942,3 +5942,17 @@ errors still preserve their healthy sibling and current Context.
 Scoped headed SDK/Kasm/Pulse now passes repeated Context and processor faults
 with one parent capture and native retirement. Policy/activation, pending native
 operations/cancellation and complete production gates remain separate evidence.
+
+## 2026-11-28 — Propagate terminal runtime retirement to document intent
+
+A Worker-only retired flag does not revoke a document's replay journal. Worker
+replacement could reconstruct that obsolete interest and try the old target
+again. Generation-retired push and route HTTP 410 now share a terminal route
+transition: fence speaker/microphone ref intents, reject stale commands and
+ACKs, and notify every participating document owner for that exact target.
+Documents synchronously release matching handles and replay flags, remove their
+journal participation and fence pending device results. Another live target
+retains its intent and usable capture source; a domain outage or replacement
+is not runtime-generation retirement. No new host recovery loop or server
+authentication boundary is introduced. This completes the local half of the
+existing terminal-runtime invariant; real faults remain a separate gate.

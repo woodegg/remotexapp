@@ -28,6 +28,10 @@ export class AudioCoordinator {
     if (data.op === 'wake') { this._tick(); return; }
     if (data.op === 'suspend' && this.capture?.peer === peer) this._stopCapture('microphone-owner-suspended');
     const ref = peer.refs.get(data.ref);
+    if (ref?.route.retired && ['speaker','microphone','restore-speaker'].includes(data.op)) {
+      if(data.request)this._send(peer,{reply:data.request,value:this._routeState(ref.route)});
+      return;
+    }
     if (ref && data.intent && ['speaker','microphone','forget-intent'].includes(data.op)) {
       const kind = data.op==='forget-intent'?data.kind:data.op, state=data.intent;
       const previous=ref.route[kind+'Stamp'];
@@ -209,6 +213,10 @@ export class AudioCoordinator {
       if (!/^[a-zA-Z0-9_.-]{1,128}$/.test(data.runtime || '') || !Number.isSafeInteger(data.generation) || data.generation < 1 || typeof data.ref !== 'string' || data.ref.length > 64 || peer.refs.has(data.ref)) throw Error('Invalid audio interest');
       const key = data.runtime+':'+data.generation;
       let route = this.routes.get(key);
+      if(route?.retired){
+        this._send(peer,{type:'runtime-retired',runtime:route.runtime,generation:route.generation});
+        throw Error('Audio runtime generation retired');
+      }
       if (!route) {
         const used = new Set([...this.routes.values()].map(r=>r.slot)); let slot = 1; while (used.has(slot)) slot++;
         if (slot > 8) throw Error('Audio session capacity reached');
@@ -382,12 +390,13 @@ export class AudioCoordinator {
   }
   _serverMessage(message) {
     const route = [...this.routes.values()].find(r=>r.slot===message.slot);
-    if (route && message.type==='state') {
+    if (route && !route.retired && message.type==='state') {
       route.actualSpeaker = !!message.speaker && route.speaker; route.actualMic = !!message.mic;
       if (message.domain) route.domain = message.domain;
       if (message.reason && message.reason!=='reconfigured' && message.reason!=='disabled') {
         route.reason = message.reason; route.applied = '';
-        if (['domain-retired','generation-retired'].includes(message.reason)) { route.mic = false; if (message.reason==='generation-retired') { route.speaker = route.micRequested = false; route.retired = true; } }
+        if (message.reason==='domain-retired') route.mic = false;
+        if (message.reason==='generation-retired') this._retireRoute(route);
         if (message.reason.startsWith('mic-')) {route.mic = false;route.micRetryAfter=Date.now()+5000;}
       }
       if (!route.actualSpeaker && this.player) this._send(this.player,{type:'remove-playback',slot:route.slot});
@@ -397,6 +406,15 @@ export class AudioCoordinator {
     // Do not stop a just-approved capture while an in-flight reconfiguration
     // emits the old slot's disabled state ahead of the new acknowledgment.
     this._releaseCaptureIfUnused(); this._broadcast();
+  }
+  _retireRoute(route) {
+    if(route.retired)return;
+    this._muteSpeaker(route,'generation-retired');
+    route.retired=true;route.mic=route.micRequested=route.actualMic=false;route.applied='';
+    for(const ref of route.refs)ref.speakerIntent=ref.micIntent=false;
+    for(const peer of new Set([...route.refs].map(ref=>ref.peer))) {
+      this._send(peer,{type:'runtime-retired',runtime:route.runtime,generation:route.generation});
+    }
   }
   async _syncRoute(route) {
     if (!this.connection) { route.applied = ''; return; }
@@ -412,9 +430,7 @@ export class AudioCoordinator {
     try { grant = await this._api('route',this._body({runtime:route.runtime,generation:route.generation})); }
     catch (error) {
       if (error.status === 410) {
-        this._muteSpeaker(route,'generation-retired');
-        route.retired = true;
-        route.mic = route.micRequested = false; route.actualSpeaker = route.actualMic = false; route.applied = '';
+        this._retireRoute(route);
         this._releaseCaptureIfUnused(); return;
       }
       if (error.status!==409) throw error;

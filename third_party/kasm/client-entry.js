@@ -12,6 +12,7 @@ export default class NativeDisplay extends EventTarget {
   static capabilities = Object.freeze({programmaticInput:true, displayControls:true, readOnly:true, keyboardPolicy:true, clipboardText:true, clipboardAutomatic:true, clipboardRich:true, clipboardMaxBytes:MAX_RICH_CLIPBOARD_BYTES, statistics:true, latency:true, udpLoss:true, turn:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP, udp:typeof REMOTEXAPP_UDP !== 'undefined' && REMOTEXAPP_UDP});
   #rfb;
   #input;
+  #inputBlur;
   #renderedFrames = 0;
   #udpPaintBaseline = 0;
   #latency;
@@ -51,7 +52,8 @@ export default class NativeDisplay extends EventTarget {
       this.#clipboardInput.cancel();
       cancelKeys?.(codes);
     };
-    this.#input.addEventListener('blur', () => this.#clipboardInput.cancel());
+    this.#inputBlur = () => this.#clipboardInput.cancel();
+    this.#input.addEventListener('blur', this.#inputBlur);
     rfb._remoteXAppFenceResponse = (payload, flags) => this.#latency.fence(payload, flags);
     rfb.addEventListener('disconnect', () => this.#latency.dispose(), {once:true});
     // Upstream initializes this in its full UI. The standalone adapter owns
@@ -163,6 +165,11 @@ export default class NativeDisplay extends EventTarget {
     clearTimeout(this.#firstFrameTimer);
     this.#clipboardInput.cancel();
     this.#latency.dispose();
+    // A browser can retain a detached input as a pending animation-event
+    // target. Release our listener before removing it: the constructor's
+    // shared lexical context otherwise keeps the retired RFB buffers alive.
+    this.#input?.removeEventListener('blur', this.#inputBlur);
+    this.#inputBlur = null;
     this.#rfb?.disconnect();
     this.#rfb = null;
     this.#input?.remove();

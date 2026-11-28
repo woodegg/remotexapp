@@ -45,6 +45,13 @@ when an embedded host panel changes size. It batches layout per animation
 frame and releases its observer and scheduled work on disconnect. Remote
 framebuffer resize requests continue through the existing authorization path.
 
+The standalone adapter also unregisters its own keyboard blur listener before
+detaching the input (#115). Some browser event queues retain a removed input;
+an anonymous constructor listener could then retain the old RFB and its frame
+buffers through its lexical context. This is separate from patch 0025's global
+listeners/channels and the SDK's audio Worker lifetime. Build and select a new
+component; changing Core/SDK alone cannot repair an existing runtime pin.
+
 Source inputs:
 
 | Input | Immutable source |

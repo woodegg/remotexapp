@@ -13,6 +13,11 @@ implementation; move them to a version section when publishing a release.
 
 Target: `0.17.6`. SDK `0.37.0`.
 
+- Unregister the native display adapter's keyboard blur listener before
+  removing its input. A browser-retained detached input must not keep retired
+  RFB frame buffers alive. This repair requires a new immutable Kasm client
+  component; an SDK-only upgrade does not change existing runtime pins.
+
 - Reuse one document-scoped native audio Worker connection per Manager/worker
   generation, with independent disposable MessageChannels for audio owners.
   Worker protocol v6 separates this bootstrap from earlier direct-peer clients;

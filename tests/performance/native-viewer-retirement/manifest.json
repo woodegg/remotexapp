@@ -1,9 +1,9 @@
 {
   "experiment": "P18",
   "primaryVariable": "native client channel/listener retirement",
-  "resultSHA256": "fedb87391f2cd8f7f59c1fe649ef7ac5f04abdb62716012f4f2b9686e15398f4",
+  "resultSHA256": "510c2b2cb401fe8725fa3290805ec60c733f081c2a017158aca35414558bb930",
   "harness": "tests/kasm-native/browser-recovery-cycles.mjs",
-  "harnessSHA256": "8fafa6978642d0ff9409589becc9fad926c95841ae07885495c771149caff713",
+  "harnessSHA256": "b27b840f7aeabc7546198bc5065df0ea545bfa74eda11a74a28c6003b4815a17",
   "patch": "third_party/kasm/patches/0025-client-close-window-channels.patch",
   "patchSHA256": "ad95ba814aaa88e474d4b93e1ed4c1684d290e455707c5829e345fd1157163fe",
   "unchanged": [
@@ -11,5 +11,14 @@
     "explicit background ownership and real paint per cycle",
     "existing isolated non-test Manager/display"
   ],
-  "qualifiedScope": "short collected browser DOM/listener retirement; source/component identities and original failed probes retained in results"
+  "qualifiedScope": "short collected browser DOM/listener retirement; source/component identities and original failed probes retained in results",
+  "inputListenerFollowUpSourceSHA256": {
+    "third_party/kasm/client-entry.js": "c1228ce03fdac89fb2b3930a8bc60d01171299a788eb3a668e4885f703991381",
+    "third_party/kasm/tests/adapter-protocols.test.mjs": "43c6734dff0bd1eb61b98e9dade4a63a80fa53b4eebfa470eba2dfb95bcc2d9d",
+    "tests/kasm-native/host-browser.mjs": "b500c092d7f0e76e07fff41599b1783ae82efca26696cf3dfbba8c3fa6b09f14",
+    "tests/kasm-native/browser-recovery-cycles.mjs": "b27b840f7aeabc7546198bc5065df0ea545bfa74eda11a74a28c6003b4815a17",
+    "tests/kasm-native/native-frame-resources.mjs": "55e146c35962b4a5ac74a7ded62740b8673f2d1ced890a1d41b637e968301e6c",
+    "tests/kasm-native/native-frame-resources.test.mjs": "9eca8d194560a96d06304457c0e5730294797b2bc0b546f4bb95d7e64da76939"
+  },
+  "historicalHarnessSHA256": "8fafa6978642d0ff9409589becc9fad926c95841ae07885495c771149caff713"
 }

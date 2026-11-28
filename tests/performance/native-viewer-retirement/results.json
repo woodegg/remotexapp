@@ -187,5 +187,223 @@
     "disposableFaultContainersStopped": true,
     "originalManagerAndDisplayIdentitiesPreserved": true,
     "projectLocalUATRetainedByAuthorization": true
+  },
+  "inputListenerFollowUp20261127": {
+    "issue": 115,
+    "state": "Identified listener repair passes deterministic/source mechanisms and actual new-component forty/fifty-owner controls; exact post-merge archive and human/release gates remain separate.",
+    "scope": "Extends the original P18 accepted channel/global-listener scope; does not rewrite historical samples.",
+    "baseline": {
+      "coreCommit": "3576fb4e87181a2b21ea4befc9c9d4f875795e38",
+      "componentManifestSHA256": "1ae06be0fe9b1ae3312f40b0515cbbb5ae4691e6e89314f52beb1f6a865a38af",
+      "browser": "Chrome/158.0.8127.36",
+      "viewersPerOwner": 3,
+      "completedOwnersAtSamples": [
+        1,
+        26,
+        50,
+        50
+      ],
+      "arrayBufferBackingBytes": [
+        17541360,
+        455915360,
+        876754400,
+        876754400
+      ],
+      "snapshotSHA256": [
+        "aabe4fa3f775567136c4d4d85b7ef29cc285559625d557a03767fec088a8a165",
+        "4e118988e0a9b6fe2261ffd6df23023420e72a4ea385235b4b0458cad2a0ca5e",
+        "2bb0abab0ca142b4b2e1ab41c1468af4c3a45f756c111713d6724258cd3e849b",
+        "1db2c8497752edf40c2b2c1ca5df463516d88e9c7ca51a832371721bb9985f61"
+      ],
+      "retainer": "Document animation controller \u2192 detached native keyboard input \u2192 adapter blur listener \u2192 constructor rfb context \u2192 retired RFB/frame buffers",
+      "lastSampleScope": "After eighty-second live-page idle, not page-close cleanup",
+      "resourceReviewPassed": false,
+      "retiredRFBCountAfter50": 150
+    },
+    "deterministicControl": {
+      "oldRetainedListenerCount": 2,
+      "newRetainedListenerCount": 1,
+      "unrelatedListenerPreserved": true,
+      "staleBlurCannotCallRetiredAdapter": true,
+      "repeatedDisconnectSafe": true
+    },
+    "newPairQualification": {
+      "scope": "Public enhanced retirement harness on Core3576/new component dc3; not an exact new post-merge Core qualification",
+      "browser": "Microsoft Edge 158.0.4370.33 unknown",
+      "component": {
+        "manifestSHA256": "dc3ea416d068569781cfcd999d597da9709634d0d4b83cedf69bc35abaaf6bc5",
+        "clientSHA256": "208c8b8d16cc605d7082085ec716d7021f656f16b9b2e512674f3d0c3f042f99"
+      },
+      "result": "passed",
+      "checks": [
+        {
+          "name": "twenty painted mount/release cycles return to one explicit background owner and zero Viewer DOM/audio",
+          "result": "passed"
+        },
+        {
+          "name": "twenty additional cycles retain the same collected DOM/listener baseline",
+          "result": "passed"
+        },
+        {
+          "name": "logout releases the final owner and leaves no SDK-owned windows or handles",
+          "result": "passed"
+        }
+      ],
+      "active": {
+        "frameBufferOwners": 1,
+        "arrayBufferBackingBytes": 5838528,
+        "heapSHA256": "38878fc8464e0020e4be17659c819597881a98ffd9e32889fb5cb8e3705e66f1"
+      },
+      "before": {
+        "frame": {
+          "frameBufferOwners": 0,
+          "arrayBufferBackingBytes": 3200,
+          "heapSHA256": "37eb1383f869016f9c7636278f05e92d3c43c9bc4c71113b7b751e4cfd254523"
+        },
+        "dom": {
+          "documents": 1,
+          "nodes": 156,
+          "jsEventListeners": 20
+        },
+        "heap": 1768040,
+        "owners": {
+          "views": 0,
+          "sessions": 1,
+          "handles": 1,
+          "canvases": 0,
+          "audio": "idle"
+        }
+      },
+      "after": {
+        "frame": {
+          "frameBufferOwners": 0,
+          "arrayBufferBackingBytes": 3200,
+          "heapSHA256": "a9e39bf4b1a098e99952bcafe1ec9525963252bfc224dc8e49b276eddc769a30"
+        },
+        "dom": {
+          "documents": 1,
+          "nodes": 156,
+          "jsEventListeners": 20
+        },
+        "heap": 2335268,
+        "owners": {
+          "views": 0,
+          "sessions": 1,
+          "handles": 1,
+          "canvases": 0,
+          "audio": "idle"
+        }
+      },
+      "afterRepeat": {
+        "frame": {
+          "frameBufferOwners": 0,
+          "arrayBufferBackingBytes": 3200,
+          "heapSHA256": "9e3fb33cb5117730b710e8ae0bcd4ccf9f346a8f4399803b80ab25d3ab40fd95"
+        },
+        "dom": {
+          "documents": 1,
+          "nodes": 156,
+          "jsEventListeners": 20
+        },
+        "heap": 2349500,
+        "owners": {
+          "views": 0,
+          "sessions": 1,
+          "handles": 1,
+          "canvases": 0,
+          "audio": "idle"
+        }
+      },
+      "rawSHA256": "05da9966652c7436d12bb187d65adea32eb427938837194d5fb9d1a5ac43e18a"
+    },
+    "sourceMechanismControl": {
+      "scope": "Actual adapter constructor/input/clipboard-gate/latency modules, stub RFB 4MiB buffer and 51 deliberately held distinct native inputs; not real server/served component qualification",
+      "browser": "Chrome/158.0.8127.36",
+      "retiredOwners": 51,
+      "baseline": {
+        "sourceSHA256": "7d4bfa0418ddd83dc275d8dc51a02ba0da942595352a424bb56211cbc9198a5c",
+        "retiredRFBCount": 51,
+        "arrayBufferBackingBytes": 213909504,
+        "heapSHA256": "ea462f0c99bf075c1d18152b1fd3863dcbdda8b30c6be7b08c97ca3ae1059058"
+      },
+      "candidate": {
+        "sourceSHA256": "c1228ce03fdac89fb2b3930a8bc60d01171299a788eb3a668e4885f703991381",
+        "retiredRFBCount": 0,
+        "arrayBufferBackingBytes": 0,
+        "heapSHA256": "be960e9e415cae30004de327e52c8a70b8bef37491040e68c8cb1e472ea900a4"
+      },
+      "rawSHA256": "2bbdeb45ec575823661f903427c54d388dd73b451c0324e955d3da4876594a63",
+      "rejectedControl": "Initial minimal control retained the same keeper input repeatedly; it did not satisfy the intended retention precondition. The selected control asserts 51 distinct inputs."
+    },
+    "suppliedBrowserFiftyOwnerControl": {
+      "scope": "Same Core3576/SDK0.37 and newly built immutable component, independent from earlier natural hour; synthetic audio, no physical capture and no OS RSS/PSS claim",
+      "browser": "Chrome/158.0.8127.36",
+      "componentManifestSHA256": "dc3ea416d068569781cfcd999d597da9709634d0d4b83cedf69bc35abaaf6bc5",
+      "completedOwners": 50,
+      "viewersPerOwner": 3,
+      "actualAudioChecks": 11,
+      "idleSeconds": 80.00007859407924,
+      "displayResources": {
+        "empty": {
+          "frameBufferOwners": 0,
+          "arrayBufferBackingBytes": 0,
+          "heapSHA256": "1a460bac5edf663181dce97e57139f5245bd0b692c02a1717e115f05ea219600"
+        },
+        "fixture-only": {
+          "frameBufferOwners": 0,
+          "arrayBufferBackingBytes": 0,
+          "heapSHA256": "80734e6adef012546a57abaaabccd82a6ced062fe995e0c30a4619f55c6421d4"
+        },
+        "capture-off-0": {
+          "frameBufferOwners": 3,
+          "arrayBufferBackingBytes": 18008188,
+          "heapSHA256": "f3bb381274f5d1b3002b8f1816cc5a92a865c93a52172c08761cccfec34e1297"
+        },
+        "cycle-0": {
+          "frameBufferOwners": 0,
+          "arrayBufferBackingBytes": 6400,
+          "heapSHA256": "b49480fabff292b75271562b297cc5090f9918a5388c2828c355a709c77851f9"
+        },
+        "capture-off-25": {
+          "frameBufferOwners": 3,
+          "arrayBufferBackingBytes": 18022844,
+          "heapSHA256": "d65604ec9cc8ed9242c6f438292f4a9dbeb5afdddf2ec77854b24b61cff9dc9d"
+        },
+        "cycle-25": {
+          "frameBufferOwners": 0,
+          "arrayBufferBackingBytes": 6400,
+          "heapSHA256": "c4ce2041141ad66927a8eb6cd3da49b6076efdb76958ff49f21590ff09312300"
+        },
+        "capture-off-49": {
+          "frameBufferOwners": 3,
+          "arrayBufferBackingBytes": 18022844,
+          "heapSHA256": "7cb3cdc87895521cfdc2344326b78f8ba6e8ac062f7944ebd4a8e673b81a2146"
+        },
+        "cycle-49": {
+          "frameBufferOwners": 0,
+          "arrayBufferBackingBytes": 6400,
+          "heapSHA256": "ee37c799e904b1677247d76faf9faf59dbc442d4644def02ac600ac131fdc742"
+        },
+        "idle-retired": {
+          "frameBufferOwners": 0,
+          "arrayBufferBackingBytes": 6400,
+          "heapSHA256": "c246c19a0675370832863b93f65db2e92c6c0c9753f0b29d10583785f372eb5d"
+        },
+        "fixture-retired": {
+          "frameBufferOwners": 0,
+          "arrayBufferBackingBytes": 6400,
+          "heapSHA256": "0d07de99aa823979e8b82f447824f68e74cdd4bb663eb983b16019d1fe93c5c6"
+        }
+      },
+      "finalNativeAudio": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "ownedAppsStopped": true,
+      "ownedContextClosed": true,
+      "originalPagesPreserved": true,
+      "rawSHA256": "ed85cd7caefa0871163204b178c174bd08c6bb42004b1f84e52627916fd37b41"
+    }
   }
 }

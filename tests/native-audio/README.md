@@ -338,5 +338,9 @@ A diagnostic notification restores both new remote markers with the same source
 and one device request. The timestamp fault is not physical OSsleep, and that
 manual counterfactual is not automatic repaired-artifact qualification. Three
 composed regressions cover fresh delivery/Worklet PCM, off during reconciliation,
-and a late pending device result. New immutable native proof and the separate
-speaker-quality/natural/stress gates remain required.
+and a late pending device result. The repaired immutable development Core passes
+a seven-check native three-gap/background control and a separate seven-check
+HTTP503/timeout/late-positive-ACK/off/actual401-recovery control. The old401 case
+now restores actual data without a host re-enable. These are separate attempts;
+the speaker-quality, complete fault matrix, natural/stress and final candidate
+gates remain open.

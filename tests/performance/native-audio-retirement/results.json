@@ -648,5 +648,48 @@
       }
     },
     "releaseQualified": false
+  },
+  "ownedGraphRealmDevelopment": {
+    "status": "passed-scoped-development-controls",
+    "releaseQualified": false,
+    "checks": {
+      "wholeGraphAndNode": 23,
+      "policyAndLateOperations": 8
+    },
+    "primaryRetired": {
+      "AudioContext": 0,
+      "AudioWorkletNode": 0,
+      "blink::AudioWorkletMessagingProxy": 0,
+      "MediaStreamAudioSourceNode": 0,
+      "MediaStream": 0,
+      "MediaStreamTrack": 0,
+      "GainNode": 0,
+      "AudioWorklet": 0,
+      "AudioDestinationNode": 0
+    },
+    "policyImmediate": {
+      "AudioContext": 0,
+      "AudioWorkletNode": 0,
+      "blink::AudioWorkletMessagingProxy": 0,
+      "MediaStreamAudioSourceNode": 0,
+      "MediaStream": 1,
+      "MediaStreamTrack": 1,
+      "GainNode": 0,
+      "AudioWorklet": 0,
+      "AudioDestinationNode": 0
+    },
+    "policyIdle": {
+      "AudioContext": 0,
+      "AudioWorkletNode": 0,
+      "blink::AudioWorkletMessagingProxy": 0,
+      "MediaStreamAudioSourceNode": 0,
+      "MediaStream": 0,
+      "MediaStreamTrack": 0,
+      "GainNode": 0,
+      "AudioWorklet": 0,
+      "AudioDestinationNode": 0
+    },
+    "policyIdleSeconds": 80.00042252999265,
+    "evidenceSHA256": "4aa933df83fdc0b8e11099cbd21460db68d7245450872a42e0404ebacf30d166"
   }
 }

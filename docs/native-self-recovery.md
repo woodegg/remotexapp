@@ -76,8 +76,10 @@ A source and its processing graph have separate lifetimes. Suspend fences PCM an
 attempts to resume an already authorized Context; it does not stop a valid track.
 A failed module retires the unusable graph before replacement and preserves
 valid intent. A processor error replaces only that failed node; its healthy
-sibling and Context remain usable. Whole-Context replacement/retirement is still
-a known implementation blocker, described below. Rebuild
+sibling and Context remain usable. Whole-Context replacement uses the
+[owned graph boundary](#owned-graph-execution-environment-sdk-038-development)
+described below; the earlier Context-only implementation failed native retirement.
+Rebuild
 capture only after current intent, permission and writer checks, and require a
 fresh processor delivery ACK. An old processor's delayed error cannot invalidate
 a newer graph. Playback-node construction failure also enters this reconciliation.
@@ -85,12 +87,10 @@ a newer graph. Playback-node construction failure also enters this reconciliatio
 A native `addModule`, `resume` or `close` Promise may remain pending after the
 SDK's three-second observation deadline. Join that native flight rather than
 creating another for every retry. One additional resume is permitted for a real
-user gesture that can unblock an earlier automatic autoplay attempt. A closed
-graph with unresolved native operations remains quarantined; it cannot authorize
-unlimited new Contexts. A shared document/Manager quarantine pool also gates new
-owners once two retired graphs remain unproven, rather than letting Host
-recreation bypass the limit. Existing healthy graphs continue; late native
-completion releases the pool slot. Late settlement wakes recovery, including when the wake
+user gesture that can unblock an earlier automatic autoplay attempt. A graph with unresolved native operations cannot justify unlimited parallel
+operations. Owned realm retirement detaches its obsolete operation observations;
+without that ownership proof unresolved work stays quarantined. Existing healthy
+graphs continue; late completion of an observation in a live realm can wake it. Late settlement wakes recovery, including when the wake
 arrives during another reconciliation. Close/retirement failure is reported,
 not treated as successful native cleanup. Pending operation records detach owner
 callbacks on disposal and release closed Contexts when late native work settles.
@@ -100,9 +100,10 @@ Explicit off/logout/retirement must prevent late construction or device opening.
 Automatic graph recovery checks current participation and never prompts. Bound
 retirement error history to eight records plus a total counter. A Context
 reported closed is **not** terminal render evidence. Healthy processors must
-terminate before SDK-owned Context close; native release after an already-closed
-Context remains under investigation. A missing ACK is an error, not successful
-retirement.
+terminate before SDK-owned Context close; an already-closed graph instead needs its
+owned execution environment retired, with native release measured in browser
+qualification. A missing ACK without positively retired ownership is incomplete;
+record a recovered realm fallback separately from an acknowledged render.
 
 `actualSpeaker` now requires both an acknowledged server route and an eligible
 ready playback owner. It cannot prove the user's physical output is audible.
@@ -142,49 +143,57 @@ states that granted permission avoids a permission prompt but does not guarantee
 device acquisition. Device and context failures therefore need bounded recovery
 and cancellation, not permission assumptions or a blind repeated enable call.
 
-## Graph qualification blocker
+## Owned graph execution environment (SDK 0.38 development)
 
-The [node-isolation control](../tests/native-audio/results-graph-node-recovery-20261128.json)
-passes a real module 404/retry, suspension and ten actual processor throws in
-headed Chrome/Kasm/Pulse. It reuses one source/Context/getUserMedia call; nine
-native audio classes match their positive baseline after faults and reach zero
-only after awaited owner retirement in the still-live page. The test-only
-Worklet subclass delegates normal processing to production code and throws on
-an owned fixture message. Stock production Worklet bytes contain no fault hook.
+The [earlier whole-Context control](../tests/native-audio/results-graph-retirement-failure-20261128.json)
+retains twelve native Contexts, fourteen WorkletNodes and twelve MessagingProxies
+while sound recovers. That failed implementation remains recorded. A matched
+[mechanism control](../tests/native-audio/results-closed-context-frame-20261128.json)
+then shows that retiring an owned same-origin graph execution environment removes
+those native roots; direct Context close alone does not. Current implementation
+uses that ownership boundary rather than treating `closed` as retirement proof.
 
-A [separate whole-Context control](../tests/native-audio/results-graph-retirement-failure-20261128.json)
-passes functional data recovery but retains twelve native Contexts, fourteen
-WorkletNodes and twelve MessagingProxies after diagnostic GC. Do not close a
-healthy processor's Context before terminal processing and then treat `closed`
-as native cleanup proof. Current full-graph retirement still needs repair and
-the already-closed case needs an evidenced disposition. The first driver also
-expected two proxies; a fresh positive baseline measures one per Context. That
-harness correction does not remove the independently measured retention.
+The parent audio controller owns the journal, requested state, Worker connection,
+permission observations and MediaStream. It synchronously creates an inert,
+hidden same-origin iframe with an initial inherited about:blank document; Context
+and WorkletNode constructors belong to that child realm. No navigation, new
+credential, endpoint, permission request or host recovery loop is introduced.
+The graph's document identity and connection are observed so removal/navigation
+can be detected even when the destroyed child cannot deliver state events.
 
-This remaining defect blocks final qualification. Passing models, the
-node-isolation lane or earlier Worker controls cannot accept it, nor the complete
-24-class audit, natural soak, combined stress or immutable UAT candidate.
+Normal teardown mutes output, disconnects the source graph, posts processor
+termination, joins render acknowledgements and closes the Context. An already
+closed graph cannot run that acknowledgement; a stuck graph may exceed a bounded
+wait. In those cases retire the **owned graph realm**, clear parent callbacks,
+ports and node/document references, and finish retirement using that ownership
+boundary. This does not reload or retire the embedding application. A still-valid
+parent microphone source can feed a replacement graph only after current intent,
+permission/writer checks and a fresh delivery acknowledgement.
 
-## Measured direction for complete graph ownership
+A browser-native Promise is not declared fulfilled by a JavaScript timeout.
+After owned realm destruction the SDK detaches the obsolete observation, rejects
+its owner wait and releases Context/controller references from the native
+callback scope. Late native completion cannot wake, overwrite or retire a newer
+graph. Per-live-graph native operations remain bounded; an unavailable/blocked
+realm fails honestly rather than falling back to an unowned parent Context.
+Only a positively retired owned realm permits this alternative termination
+proof. Missing acknowledgement without such a boundary remains incomplete.
 
-A [matched closed-Context mechanism control](../tests/native-audio/results-closed-context-frame-20261128.json)
-reproduces six retained Contexts/nodes/proxies in direct construction, then
-returns all three native classes to zero over six equal cycles when the graph
-belongs to a same-origin SDK-owned iframe and that frame is retired. Production
-Worklet processing bytes are unchanged. The page/browser stay alive; destroying
-the owned graph execution environment is the proposed product lifecycle, not a
-test-only page exit used to hide retention. This is a minimal headless diagnostic
-control, not an integrated SDK fix or full audio acceptance.
-
-Investigate this as the native lifetime boundary while the parent SDK keeps
-intent, permissions, transport and its live microphone source. Processor errors
-still replace only the failed node. Graph failure may retire/recreate the owned
-execution environment without reloading the host or stopping a valid parent
-source. Integration must prove same-origin/CSP and autoplay behavior, parent
-source continuity, late native operations, cancellation and final native/DOM
-retirement in real served SDK tests. No new host recovery loop or user action
-may be inferred from the prototype. The whole-graph blocker remains open until
-that implementation and the full evidence pass.
+A scoped headed Chrome/Kasm/Pulse control now covers real module rejection and
+retry, suspension, ten complete Context replacements and ten actual processor
+throws. The microphone remains parent-owned, has one device request, and produces
+fresh remote readback after each recovery. Active Context/node/proxy counts match
+1/2/1; after awaited owner disposal all sampled audio classes return to zero and
+no SDK audio realm remains. This development control is not the new-backend,
+full policy/fault/resource, natural-soak, combined-stress or final artifact gate.
+The failed controls are retained. The separate
+[policy and late-operation control](../tests/native-audio/results-owned-realm-recovery-20261128.json)
+also covers same-origin script/frame CSP, a genuinely delayed module fetch,
+an unresolved close wrapper, late completion, cancellation and ignored processor
+termination. Its immediate sample retains one stopped Stream/Track, matching a
+no-SDK control; all nine audio classes reach zero after eighty seconds of live
+idle. Neither diagnostic-GC lane replaces complete policy/fault/long-duration
+qualification or the new backend/candidate gates.
 
 ## Ownership and ordering
 

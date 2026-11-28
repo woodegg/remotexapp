@@ -57,6 +57,13 @@ function fixture(t){
    }
    connect(){}disconnect(){}
   };
+  doc.frames=[];
+  env.document.body={append(frame){frame.isConnected=true;}};
+  env.document.createElement=()=>{
+   const frame={isConnected:false,contexts:[],setAttribute(){},remove(){this.isConnected=false;for(const context of this.contexts)context.state='closed';}};
+   frame.contentWindow={document:{},get AudioContext(){return class extends env.AudioContext{constructor(...args){super(...args);frame.contexts.push(this);}};},get AudioWorkletNode(){return env.AudioWorkletNode;}};
+   doc.frames.push(frame);return frame;
+  };
   doc.env=env;doc.audio=new RemoteXAppAudio({environment:env});return doc;
  };
  f.tick=async()=>{for(const core of f.cores.values())core.coordinator._tick();for(const doc of f.docs)for(const fn of doc.timers.values())fn();await turn();await turn();};
@@ -304,6 +311,43 @@ test('an externally closed Context rebuilds both graphs around the same live mic
  assert.equal(doc.audio.contextOps.contexts.size,1);assert.equal(doc.audio.retirements.size,0);
 });
 
+test('twenty whole-Context replacements keep one owned realm and the same parent capture source',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream;
+ for(let i=0;i<20;i++){
+  const old=doc.audio.context;await old.close();await f.tick();
+  await until(()=>doc.audio.context!==old&&f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+  assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);
+  assert.equal(doc.frames.filter(frame=>frame.isConnected).length,1);
+  assert.equal(doc.audio.contextOps.contexts.size,1);assert.equal(doc.audio.contextOps.retired.size,0);
+  assert.equal(doc.audio.retirements.size,0);
+ }
+ await doc.audio.dispose();assert.equal(doc.frames.filter(frame=>frame.isConnected).length,0);
+ assert.equal(doc.audio.contextOps.contexts.size,0);assert.equal(source.getAudioTracks()[0].readyState,'ended');
+});
+
+test('watchdog notices a removed graph realm without relying on a child statechange event',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const old=doc.audio.context,source=doc.audio.stream;
+ doc.frames[0].remove();await f.tick();await until(()=>doc.audio.context!==old&&f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+ assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);assert.equal(doc.frames.filter(frame=>frame.isConnected).length,1);
+});
+
+test('off during a stuck close prevents a new realm and late old close completion cannot resume capture',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const old=doc.audio.context;let closing,closeCalls=0;
+ old.close=()=>{closeCalls++;return new Promise(resolve=>{closing=resolve;});};
+ doc.audio._graphFault('controlled-close-required',{retire:true});doc.audio._recoverGraph();await until(()=>!!closing);
+ await interest.setMicrophone(false);await interest.setSpeaker(false);
+ await until(()=>!doc.audio.graphInvalid&&!doc.audio.graphDisposal);
+ assert.equal(doc.frames.length,1);assert.equal(doc.frames[0].isConnected,false);assert.equal(doc.audio.stream,null);
+ closing();await turn();await f.tick();assert.equal(doc.frames.length,1);assert.equal(f.gum,1);assert.equal(closeCalls,1);
+});
+
 test('an initial rejected Worklet module is retired and valid speaker intent retries on a fresh Context',async t=>{
  const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});doc.moduleFailures=1;
  await assert.rejects(interest.setSpeaker(true),/audio-context-module-failed/);
@@ -327,33 +371,33 @@ test('processor errors replace only the failed node and stale old errors cannot 
  assert.equal(doc.contexts.filter(c=>c.state!=='closed').length,1);
 });
 
-test('a timed-out native close prevents new graphs, preserves local cancellation and can finish later',async t=>{
+test('a timed-out native close retires its owned realm and late completion cannot undo fresh recovery',async t=>{
  const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
  doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
  await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
  const old=doc.audio.context,source=doc.audio.stream;let closeCalls=0,closed;
  old.close=()=>{closeCalls++;return new Promise(resolve=>{closed=()=>{old.state='closed';resolve();};});};
  doc.audio._graphFault('controlled-close-required',{retire:true});doc.audio._recoverGraph();
- await until(()=>doc.audio.graphReason==='audio-context-close-timeout');
- for(let i=0;i<20;i++){doc.audio.graphRetryAfter=0;await f.tick();}
- assert.equal(closeCalls,1);assert.equal(doc.contexts.length,1);assert.equal(doc.audio.stream,source);
- assert.equal(source.getAudioTracks()[0].enabled,false);assert.equal(f.gum,1);
+ await until(()=>doc.contexts.length===2&&f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+ const current=doc.audio.context;
+ assert.equal(closeCalls,1);assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);
+ assert.equal(doc.frames[0].isConnected,false);assert.equal(old.state,'closed');
+ closed();await turn();assert.equal(doc.audio.context,current);assert.equal(doc.audio.contextOps.contexts.size,1);
  await interest.setMicrophone(false);await interest.setSpeaker(false);assert.equal(doc.audio.stream,null);
- closed();doc.audio.graphRetryAfter=0;await f.tick();await until(()=>!doc.audio.graphInvalid&&!doc.audio.graphDisposal);
- assert.equal(doc.contexts.length,1);assert.equal(old.state,'closed');assert.equal(doc.audio.contextOps.contexts.size,0);
 });
 
-test('a hung module is quarantined after close and cannot multiply Contexts before late settlement',async t=>{
+test('a hung module is detached with its owned realm and current intent can recover before its late settlement',async t=>{
  const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});let loaded;
  doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
  doc.loadModule=()=>new Promise(resolve=>{loaded=resolve;});
  await assert.rejects(interest.setSpeaker(true),/audio-context-module-timeout/);
- assert.equal(doc.contexts[0].state,'closed');assert.equal(doc.audio.graphQuarantine,doc.contexts[0]);
- for(let i=0;i<20;i++){doc.audio.graphRetryAfter=0;await f.tick();}
- assert.equal(doc.contexts.length,1);assert.equal(f.gum,0);
- doc.loadModule=null;loaded();doc.audio.graphRetryAfter=0;
+ assert.equal(doc.contexts[0].state,'closed');assert.equal(doc.frames[0].isConnected,false);
+ assert.equal(doc.audio.contextOps.contexts.size,0);assert.equal(f.gum,0);
+ doc.loadModule=null;doc.audio.graphRetryAfter=0;
  await f.tick();await until(()=>f.route(doc)?.actualSpeaker);
  assert.equal(doc.contexts.length,2);assert.equal(doc.audio.contextOps.contexts.size,1);
+ const current=doc.audio.context;loaded();await turn();assert.equal(doc.audio.context,current);
+ assert.equal(doc.frames.filter(frame=>frame.isConnected).length,1);
 });
 
 test('off while native module work is quarantined prevents late graph and playback construction',async t=>{

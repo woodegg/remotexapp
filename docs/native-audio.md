@@ -278,9 +278,19 @@ still stops tracks and retires native processors/Contexts; last media interest
 still releases the WSS. Other owners and tabs are not terminated to reclaim a
 local wrapper. Worker v6 names isolate the bootstrap protocol from v5 peers.
 
-The latest development graph controls distinguish isolated processor repair from
+The development graph controls distinguish isolated processor repair from
 whole-Context retirement. Ten actual processor throws preserve the same source
-and Context and retire nine sampled native audio classes to zero; the separate
-whole-Context rebuild control retains native objects. See the
-[graph qualification blocker](native-self-recovery.md#graph-qualification-blocker).
-Context `closed` is not terminal-render proof; final qualification remains blocked.
+and Context and retire nine sampled native audio classes to zero. The earlier
+Context-only rebuild control retains native objects and remains recorded as a
+failed implementation. Context `closed` is not terminal-render proof.
+
+SDK 0.38 now implements the measured same-origin graph-realm boundary: Context
+and processor construction happen in an SDK-owned hidden child; parent intent,
+permissions, transport and live capture survive replacement. Normal render ACK
+remains the graceful path. Closed/stuck graphs retire their owned execution
+environment and detach obsolete callbacks; they do not reload the host or claim
+a native Promise resolved. Current scoped headed control passes complete Context
+replacement with one parent capture and native audio retirement. See the
+[owned graph contract](native-self-recovery.md#owned-graph-execution-environment-sdk-038-development)
+for limits and remaining production qualification. The earlier failed graph
+control is historical evidence, not the current implementation's disposition.

@@ -1,6 +1,7 @@
 import {connectAudioWorker} from './audio-worker-hub.js';
 import {AudioIntentJournal} from './audio-intent-journal.js';
 import {AudioContextOperations} from './audio-context-operations.js';
+import {AudioGraphRealm} from './audio-graph-realm.js';
 
 const boundPort = Symbol();
 const resumeSpeaker = Symbol();
@@ -32,12 +33,14 @@ export class RemoteXAppAudio extends EventTarget {
       if(this.port && this.workerGeneration!==this._workerGeneration())this._fail('audio-worker-superseded');
       if (this.port && now-this.lastWorkerMessage>10000) this._fail('audio-worker-unresponsive');
       this._journalChanged();
+      this._observeGraph();
       this._recoverGraph();
       if (!this.port && this.interests.size && now >= (this.workerRetryAfter || 0) && !this.workerExhausted) this._recoverWorker();
     },1000);
     this._pagehide = event => { if (event.persisted) this._suspend(); else void this.dispose().catch(()=>{}); };
     this._suspend = () => { this._fenceCapture(); this._post({op:'suspend'}); };
     this._wake = () => {
+      this._observeGraph();
       this._recoverGraph();
       if(this.port && this.workerGeneration!==this._workerGeneration())this._fail('audio-worker-superseded');
       if (this.port) { this._post({op:'wake'}); this._post({op:'capture-eligible'}); this._journalChanged(); }
@@ -290,6 +293,11 @@ export class RemoteXAppAudio extends EventTarget {
     this._post({op:'playback-ready',ready:false});
     if(token)this._post({op:'capture-failed',token,reason,retainedSource:this._liveSource()});
   }
+  _observeGraph() {
+    if(this.closed || !this.context || this.graphInvalid)return;
+    if(this.graphRealm && !this.graphRealm.live || this.context.state==='closed')this._graphFault('audio-context-realm-lost',{retire:true});
+    else if(this.context.state!=='running' && !this.graphReason && (this._graphIntent('speaker') || this._graphIntent('microphone')))this._graphFault('audio-context-'+this.context.state);
+  }
   _processorError(kind,node,context) {
     if(this.closed || this[kind]!==node || this.context!==context)return;
     const reason='audio-'+kind+'-processor-failed';
@@ -332,26 +340,53 @@ export class RemoteXAppAudio extends EventTarget {
   _discardGraph() {
     if(this.graphDisposal)return this.graphDisposal;
     const context=this.context;
-    if(!context){this.graphInvalid=false;return Promise.resolve();}
-    const playback=this.playback,capture=this.capture,output=this.output,source=this.captureSource;
-    this.contextOps.retire(context);
-    if(output)output.gain.value=0;
-    context.onstatechange=null;
+    const realm=this.graphRealm;
+    if(!context){realm?.retire();this.graphRealm=null;this.graphInvalid=false;return Promise.resolve();}
+    const graph={context,realm,output:this.output,source:this.captureSource,nodes:[this.playback,this.capture].filter(Boolean)};
+    this.playback=this.capture=this.captureSource=null;
     const disposal=this.graphDisposal=(async()=>{
-      await this.contextOps.run(context,'close',()=>context.close());
-      if(context.state!=='closed')throw Error('audio-context-close-incomplete');
-      for(const record of [...this.retirements])if(record.context===context)record.finish(true);
-      for(const node of new Set([playback,capture].filter(Boolean))){
-        node.onprocessorerror=null;node.port.onmessage=null;node.disconnect();node.port.close();
-      }
-      source?.disconnect();output?.disconnect();
-      if(this.context===context){this.context=this.output=this.playback=this.capture=this.captureSource=this.module=null;}
-      if(!this.contextOps.forget(context) && !this.closed)this.graphQuarantine=context;
+      const pending=await this._releaseGraph(graph);
+      if(this.context===context){this.context=this.output=this.module=this.graphRealm=null;}
+      if(pending && !this.closed)this.graphQuarantine=context;
       this.graphInvalid=false;
     })();
     // Observe the finally branch as well: no detached rejected cleanup Promise.
     disposal.finally(()=>{if(this.graphDisposal===disposal)this.graphDisposal=null;}).catch(()=>{});
     return disposal;
+  }
+  async _releaseGraph({context,realm,output,source,nodes=[]}) {
+    if(!context){realm?.retire();return false;}
+    this.contextOps.retire(context);context.onstatechange=null;
+    if(output)output.gain.value=0;
+    source?.disconnect();
+    const records=new Set([...this.retirements].filter(r=>r.context===context));
+    for(const node of new Set(nodes))records.add(this._retireProcessor(node,{context,realm}));
+    let failure;
+    try {
+      if(context.state!=='closed'){
+        for(const record of records)record.arm();
+        if(context.state==='suspended' && records.size)this.contextOps.run(context,'resume',()=>context.resume()).catch(()=>{});
+        await Promise.all([...records].map(record=>record.done));
+        await this.contextOps.run(context,'close',()=>context.close());
+      }
+    }catch(error){failure=error;}
+    finally {
+      if(realm){
+        // closed is not native retirement proof. Destroy the owned execution
+        // environment even when its Worklet can no longer execute a render ACK.
+        realm.retire();this.contextOps.releaseRealm(context,realm);
+        for(const record of records)record.finish('realm-retired');
+        this.retirementErrors=this.retirementErrors.filter(error=>error.realm!==realm);
+        if(failure || [...records].some(r=>r.proof!==true))this.graphRetirementFallbacks=(this.graphRetirementFallbacks || 0)+1;
+      }
+      output?.disconnect();
+    }
+    if(!realm){
+      if(failure)throw failure;
+      if(context.state!=='closed')throw Error('audio-context-close-incomplete');
+      if(!this.contextOps.forget(context))return true;
+    }
+    return false;
   }
   async _context({gesture=false} = {}) {
     if (this.closed || this.revoking) throw Error('Audio controller disposed');
@@ -368,7 +403,11 @@ export class RemoteXAppAudio extends EventTarget {
         this.graphReason='audio-context-resource-blocked';
         throw Object.assign(Error(this.graphReason),{code:this.graphReason});
       }
-      const context = this.context = new this.env.AudioContext({sampleRate:48000,latencyHint:'interactive'});
+      let context;
+      try {
+        this.graphRealm=new AudioGraphRealm(this.env);
+        context=this.context=this.graphRealm.context({sampleRate:48000,latencyHint:'interactive'});
+      }catch(error){this.graphRealm?.retire();this.graphRealm=null;throw error;}
       if (context.sampleRate !== 48000) {this.graphInvalid=true;await this._discardGraph();throw Error('48 kHz audio context unavailable');}
       this.module=this.contextOps.run(context,'module',()=>context.audioWorklet.addModule(this.base+'/sdk/audio-worklet.js')).catch(error=>{
         const code=contextCode(error) || 'audio-context-module-failed';
@@ -410,7 +449,7 @@ export class RemoteXAppAudio extends EventTarget {
     const context = await this._context({gesture});
     if(this.context!==context || context.state!=='running' || this.graphInvalid || !allowed())return;
     try {if (!this.playback) {
-      this.playback = new this.env.AudioWorkletNode(context,'remotexapp-playback-v1',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2]});
+      this.playback = this.graphRealm.node(context,'remotexapp-playback-v1',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2]});
       const node=this.playback;
       node.onprocessorerror=()=>this._processorError('playback',node,context);
       this.playback.port.onmessage = ({data}) => {
@@ -457,6 +496,15 @@ export class RemoteXAppAudio extends EventTarget {
     };
     this.capture.port.postMessage({op:'rebind'});
   }
+  _wireSourceEvents(stream) {
+    // Parent-owned track handlers must not share the capture-construction
+    // scope, which contains a child Context and processor that can retire.
+    for(const track of stream.getTracks()){
+      track.enabled=false;track.onended=()=>this._captureFailed('microphone-device-ended');
+      track.onmute=()=>{const old=this.captureToken;this._fenceCapture({disableTrack:false});if(old)this._post({op:'capture-failed',token:old,reason:'microphone-device-muted',retainedSource:true});};
+      track.onunmute=()=>this._wake();
+    }
+  }
   async _startCapture(token,request={}) {
     const interest=this._micInterest(request);
     if (!interest) {this._post({op:'capture-failed',token,reason:'microphone-intent-retired'});return;}
@@ -491,17 +539,13 @@ export class RemoteXAppAudio extends EventTarget {
             for(const track of stream.getTracks())track.stop();return;
           }
           this.stream=stream;
+          this._wireSourceEvents(stream);
         }
         if(!this.capture) {
-          this.capture=new this.env.AudioWorkletNode(context,'remotexapp-capture-v1',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[1]});
+          this.capture=this.graphRealm.node(context,'remotexapp-capture-v1',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[1]});
           const node=this.capture;
           node.onprocessorerror=()=>this._processorError('capture',node,context);
           this.captureSource=context.createMediaStreamSource(this.stream);this.captureSource.connect(this.capture);this.capture.connect(context.destination);
-          for(const track of this.stream.getTracks()){
-            track.enabled=false;track.onended=()=>this._captureFailed('microphone-device-ended');
-            track.onmute=()=>{const old=this.captureToken;this._fenceCapture({disableTrack:false});if(old)this._post({op:'capture-failed',token:old,reason:'microphone-device-muted',retainedSource:true});};
-            track.onunmute=()=>this._wake();
-          }
         }
         this._wireCapture(token,epoch);this._post({op:'capture-ready',token});
       } catch(error) {
@@ -532,38 +576,39 @@ export class RemoteXAppAudio extends EventTarget {
     if (this.capture) this._retireProcessor(this.capture);
     this.stream = this.capture = this.captureSource = null; this.captureToken = this.pendingCaptureToken = null;
   }
-  _retireProcessor(node) {
-    const context = this.context;
+  _retireProcessor(node,{context=this.context,realm=this.graphRealm} = {}) {
+    for(const record of this.retirements)if(record.node===node)return record;
     let resolve, timer;
-    const record = {context,node,done:new Promise(r=>{resolve=r;}), arm:()=>{
+    const record = {context,realm,node,done:new Promise(r=>{resolve=r;}), arm:()=>{
       timer ??= this.env.setTimeout(()=>finish(false),1000);
     }};
     const changed = () => {
       if (context?.state === 'running') record.arm();
-      else if (context?.state === 'closed') finish(true);
+      else if (context?.state === 'closed') {if(!realm)finish(false);else record.arm();}
       else if (!this.closed) { this.env.clearTimeout(timer); timer = undefined; }
     };
     const finish = acknowledged => {
       if (!this.retirements.delete(record)) return;
       this.env.clearTimeout(timer);
       context?.removeEventListener?.('statechange',changed);
+      record.proof=acknowledged;
       node.onprocessorerror=null;node.port.onmessage = null; node.disconnect(); node.port.close();
       if (!acknowledged) {
-        this.retirementErrors.push(Error('Audio processor retirement timed out'));
+        this.retirementErrors.push(Object.assign(Error('Audio processor retirement timed out'),{realm}));
         if(this.retirementErrors.length>8)this.retirementErrors.shift();
         this.retirementErrorCount=(this.retirementErrorCount || 0)+1;
         if(!this.closed){this._graphFault('audio-processor-retirement-timeout',{retire:true});this._recoverGraph();}
       }
-      resolve();
+      resolve(acknowledged);
     };
     record.finish=finish;
     this.retirements.add(record);
     node.port.onmessage = ({data}) => { if (data.type === 'disposed') finish(true); };
     context?.addEventListener?.('statechange',changed);
     node.port.postMessage({op:'dispose'});
-    if(context?.state==='closed')finish(true);
+    if(context?.state==='closed' && !realm)finish(false);
     else if (this.closed || context?.state === 'running') record.arm();
-    return record.done;
+    return record;
   }
   _message(message) {
     this.lastWorkerMessage = Date.now();
@@ -669,12 +714,12 @@ export class RemoteXAppAudio extends EventTarget {
     this.journalRetirement ||= this.journal.dispose();
     this.permission?.removeEventListener?.('change',this.permissionChanged);
     this.env.navigator?.mediaDevices?.removeEventListener?.('devicechange',this._wake);
+    const graph={context:this.context,realm:this.graphRealm,output:this.output,source:this.captureSource,nodes:[this.capture,this.playback].filter(Boolean)};
     if (this.output) this.output.gain.value = 0;
     this._pauseCapture(); this._closeWorker('Audio controller disposed'); this.env.clearInterval(this.watchdog);
-    if (this.playback) this._retireProcessor(this.playback);
-    const context = this.context, output = this.output, quarantine=this.graphQuarantine;
+    const quarantine=this.graphQuarantine;
     this.graphQuarantine=null;
-    this.context = this.output = this.playback = this.module = null;
+    this.context = this.output = this.playback = this.module = this.graphRealm = null;
     this.env.removeEventListener('pagehide',this._pagehide);
     this.env.removeEventListener('pageshow',this._wake);
     this.env.removeEventListener('online',this._wake);
@@ -682,26 +727,13 @@ export class RemoteXAppAudio extends EventTarget {
     this.env.document?.removeEventListener('freeze',this._suspend);
     this.env.document?.removeEventListener('resume',this._wake);
     for (const interest of this.interests.values()) interest.released = true; this.interests.clear();
-    // A suspended graph cannot execute process(false). Drain only the existing
-    // muted graph, after capture revocation; never ask for a device or gesture.
-    // resume may remain pending under autoplay policy, so it is not awaited.
-    for (const retirement of this.retirements) retirement.arm();
-    if (context?.state === 'suspended' && this.retirements.size) void context.resume().catch(()=>{});
     void (async()=>{
-      try { await Promise.all([this.journalRetirement,...[...this.retirements].map(record=>record.done)]); }
+      let pending;
+      try {await Promise.all([this.journalRetirement,this._releaseGraph(graph).then(value=>{pending=value;})]);}
       finally {
-        try {
-          if(context){
-            context.onstatechange=null;
-            this.contextOps.retire(context);
-            await this.contextOps.run(context,'close',()=>context.close());
-            if(context.state!=='closed')throw Error('Audio context close incomplete');
-            if(!this.contextOps.forget(context))throw Error('Audio native operation retirement incomplete');
-          }
-          if(quarantine && !this.contextOps.forget(quarantine))throw Error('Audio native operation retirement incomplete');
-        }
-        finally { output?.disconnect();this.contextOps.detach(); }
+        this.contextOps.detach();
       }
+      if(pending || quarantine && !this.contextOps.forget(quarantine))throw Error('Audio native operation retirement incomplete');
       if (this.retirementErrors.length) throw new AggregateError(this.retirementErrors,'Audio retirement incomplete');
     })().then(resolve,reject);
     return this.disposal;

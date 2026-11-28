@@ -3,6 +3,29 @@
 const failure = kind => Object.assign(Error('audio-context-'+kind+'-timeout'),{code:'audio-context-'+kind+'-timeout'});
 const quarantine = Symbol.for('remotexapp.audio-context-quarantine.v1');
 
+// Keep the native callback outside run(): after realm retirement it must not
+// retain run's Context, start closure or owning controller through its scope.
+function flight(env,kind,gesture,context,notify,timeoutMs) {
+  let resolve,reject;
+  const record={pending:true,gesture,context,notify,wait:new Promise((yes,no)=>{resolve=yes;reject=no;})};
+  record.wait.catch(()=>{});
+  const timer=env.setTimeout(()=>{record.timedOut=true;reject(failure(kind));},timeoutMs);
+  record.finish=(error,value)=>{
+    record.pending=false;env.clearTimeout(timer);
+    if(record.detached)return;
+    record.error=error;record.value=value;
+    if(error)reject(error);else resolve(value);
+    const current=record.context,completed=record.notify;record.context=record.notify=null;
+    try {completed?.(current,kind,!!record.timedOut);}catch(error){env.reportError?.(error);}
+  };
+  record.detach=()=>{
+    record.detached=true;record.context=record.notify=record.error=record.value=null;env.clearTimeout(timer);
+    reject(Object.assign(Error('audio-context-realm-retired'),{code:'audio-context-realm-retired'}));
+  };
+  record.observe=promise=>Promise.resolve(promise).then(value=>record.finish(null,value),error=>record.finish(error));
+  return record;
+}
+
 export class AudioContextOperations {
   constructor(environment, settled = () => {}, timeoutMs = 3000, scope = '') {
     this.env=environment;this.settled=settled;this.timeoutMs=timeoutMs;this.contexts=new Map();
@@ -18,23 +41,13 @@ export class AudioContextOperations {
     if(pending.length && !(kind==='resume' && gesture && pending.length===1 && !pending[0].gesture))return pending.at(-1).wait;
     if(!pending.length && kind==='module' && last)return last.error?Promise.reject(last.error):Promise.resolve(last.value);
     if(!pending.length && kind==='close' && context.state==='closed')return Promise.resolve();
-    let resolve,reject;
-    const record={pending:true,gesture,wait:new Promise((yes,no)=>{resolve=yes;reject=no;})};
-    record.wait.catch(()=>{});
+    const record=flight(this.env,kind,gesture,context,(current,operation,late)=>{
+      this.forget(current);this.settled(current,operation,late);
+    },this.timeoutMs);
     kinds.set(kind,[...pending,record]);
-    const timer=this.env.setTimeout(()=>{record.timedOut=true;reject(failure(kind));},this.timeoutMs);
-    const finish=(error,value)=>{
-      record.pending=false;record.error=error;record.value=value;
-      this.env.clearTimeout(timer);
-      if(error)reject(error);else resolve(value);
-      // Late completion after owner disposal must release the closed graph
-      // even though its owner-facing wait already timed out and detached.
-      this.forget(context);
-      try {this.settled(context,kind,!!record.timedOut);}catch(error){this.env.reportError?.(error);}
-    };
     // Invoke start synchronously so resume retains the original gesture.
-    try {Promise.resolve(start()).then(value=>finish(null,value),error=>finish(error));}
-    catch(error){finish(error);}
+    try {record.observe(start());}
+    catch(error){record.finish(error);}
     return record.wait;
   }
   pending(context) {
@@ -57,6 +70,15 @@ export class AudioContextOperations {
     const pool=this.pools.get(this.scope);
     for(const record of [...(pool || [])])record.operations.forget(record.context);
     return (this.pools.get(this.scope)?.size || 0)<2;
+  }
+  releaseRealm(context,realm) {
+    if(!realm?.retired)throw Error('Audio graph realm is still live');
+    for(const records of this.contexts.get(context)?.values() || [])for(const record of records)record.detach();
+    this.contexts.delete(context);
+    const pool=this.pools.get(this.scope),entry=this.retired.get(context);
+    if(entry)pool?.delete(entry);
+    this.retired.delete(context);
+    if(pool && !pool.size)this.pools.delete(this.scope);
   }
   detach() { this.settled=()=>{}; }
 }

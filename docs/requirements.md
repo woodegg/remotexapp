@@ -199,6 +199,16 @@ diagnostics. Models are implemented; real graph/native-resource and full gates
 in [the recovery contract](native-self-recovery.md#audio-graph-recovery-development)
 remain required before acceptance.
 
+AUD-006 additionally owns the graph execution environment. Construct Context
+and processors in an SDK-owned same-origin child while the parent retains intent,
+transport, permissions and MediaStream. Graceful termination waits for render
+ACK; a closed/stuck graph can retire that owned realm, detach obsolete native
+observations and rebuild only under valid current intent. Neither `closed` nor a
+Promise timeout alone proves native cleanup. Detect lost/navigated graph documents,
+fence late callbacks and prove no additional device request solely for graph
+replacement. Scoped real Context/processor recovery and native retirement pass;
+full policy/fault/long-duration/exact-candidate qualification remains pending.
+
 AUD-003 verification uses the [audio fault inventory](native-audio-faults.md)
 to distinguish display, transport, service, Worker, capture, runtime and identity
 fences. A changed service epoch must be observed directly; fresh sound and remote

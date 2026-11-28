@@ -145,7 +145,12 @@ source-preserving suspend/rebind and explicit cancellation. A real
 [node-isolation lane](../tests/native-audio/results-graph-node-recovery-20261128.json)
 passes initial module 404/retry, suspension and ten actual processor throws with
 one device request and native counts returning to zero on owner retirement.
-The separate [whole-Context lane](../tests/native-audio/results-graph-retirement-failure-20261128.json)
-retains native objects despite fresh sound. This failure remains open; `closed`
-is not terminal processing proof. These cases refine playback, device/processor,
-resource and retirement classes rather than add a twenty-fifth fault category.
+The earlier [Context-only lane](../tests/native-audio/results-graph-retirement-failure-20261128.json)
+retains native objects despite fresh sound. Its failure remains recorded;
+`closed` is not terminal processing proof. The subsequent
+[SDK-owned realm controls](../tests/native-audio/results-owned-realm-recovery-20261128.json)
+pass ten actual whole-Context replacements, ten processor throws and separate
+policy/late-operation boundaries. After same-page idle all nine sampled native
+audio classes are zero. These controls refine playback, device/processor,
+resource and retirement classes rather than add a twenty-fifth fault category;
+the complete fault-class audit and long-duration qualification remain pending.

@@ -71,6 +71,16 @@ Target: `0.17.6`. SDK `0.38.0`.
   despite sound recovery; full graph retirement remains OPEN and blocks final
   recovery/resource qualification.
 
+- Own each native audio graph in an SDK-created same-origin execution realm.
+  Keep intent, transport, permissions and the live microphone source in the parent.
+  Normal retirement still waits for terminal processing; a closed or unresponsive
+  graph can instead retire its owned realm. Detach pending operation callbacks and
+  cancel owner waits only after that boundary is retired. Rebuild around valid
+  parent capture without another device request solely for graph replacement.
+  Detect removed/navigated graph documents without depending on child events.
+  Scoped headed Chrome recovery/native retirement now passes; complete fault,
+  policy, long-duration and immutable candidate qualification remain required.
+
 - Unregister the native display adapter's keyboard blur listener before
   removing its input. A browser-retained detached input must not keep retired
   RFB frame buffers alive. This repair requires a new immutable Kasm client

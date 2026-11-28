@@ -1156,11 +1156,20 @@ retains source/report hashes and the earlier measurements.
 
 P19's SDK 0.38 graph follow-up separately passes ten actual processor throws
 with one Context/source, positive native baseline1/2/1 and retired0/0/0 in a live
-page. A whole-Context rebuild control still retains12/14/12 despite fresh sound.
-This is an open graph-retirement blocker, not acceptance of complete recovery
-or long-duration allocation. The linked P19 records retain both scoped outcomes.
+page. The earlier Context-only rebuild control retains12/14/12 despite fresh
+sound. The linked P19 records retain both scoped outcomes as measured.
 
 A minimal matched follow-up isolates the graph in an owned same-origin iframe:
 six direct closed-Context cycles retain6/6/6, while six owned-frame retirements
 reach0/0/0 with unchanged Worklet processing. This is a measured ownership
-mechanism, not yet an integrated SDK graph fix or completed release gate.
+mechanism rather than SDK integration or a completed release gate.
+
+The subsequent integrated SDK-owned realm control passes 23 checks including
+ten whole-Context replacements and ten processor throws, with one parent capture
+and all nine sampled native audio classes zero after disposal. A separate
+eight-check policy/late-operation lane reaches the same zero endpoint after
+eighty seconds of live idle. Its immediate stopped Stream/Track retention matches
+a no-SDK capture control, which releases both after ten seconds. These scoped
+diagnostic-GC results do not replace the new-backend, complete fault matrix,
+long-duration allocation or exact-candidate qualification. See P19 for hashes,
+scope and the preserved earlier failures.

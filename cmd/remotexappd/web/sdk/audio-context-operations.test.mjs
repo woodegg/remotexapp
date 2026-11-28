@@ -77,3 +77,14 @@ test('retired pending graphs bound new owners in the same document scope and lat
  assert.equal(f.ops.retired.size,0);assert.equal(other.retired.size,0);assert.equal(f.ops.pools.size,0);
  assert.equal(new AudioContextOperations(f.ops.env).canCreate(),true);
 });
+
+test('owned realm retirement detaches pending native callbacks and cannot wake or retain their old Context',async()=>{
+ const f=fixture();let loaded;
+ const pending=f.ops.run(f.context,'module',()=>new Promise(resolve=>{loaded=resolve;}));
+ const record=f.ops.contexts.get(f.context).get('module')[0];f.ops.retire(f.context);
+ assert.throws(()=>f.ops.releaseRealm(f.context,{retired:false}),/still live/);
+ f.ops.releaseRealm(f.context,{retired:true});await assert.rejects(pending,/realm-retired/);
+ assert.equal(record.context,null);assert.equal(record.notify,null);assert.equal(f.ops.contexts.size,0);
+ assert.equal(f.ops.pools.size,0);assert.equal(f.timers.size,0);
+ loaded();await turn();assert.equal(f.events.length,0);assert.equal(record.error,null);
+});

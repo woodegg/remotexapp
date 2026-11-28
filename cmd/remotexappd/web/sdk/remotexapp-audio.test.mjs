@@ -20,6 +20,11 @@ function fixture() {
   f.values=new Map();f.permission=Object.assign(new EventTarget(),{state:'granted'});
   f.env.localStorage={getItem:k=>f.values.get(k)??null,setItem:(k,v)=>f.values.set(k,v)};
   f.env.navigator={locks:{request:(_key,options,fn)=>Promise.resolve().then(fn || options)},permissions:{query:async()=>f.permission},mediaDevices:new EventTarget()};
+  f.frames=[];f.env.document=Object.assign(new EventTarget(),{body:{append(frame){frame.isConnected=true;}},createElement(){
+    const frame={isConnected:false,contexts:[],setAttribute(){},remove(){this.isConnected=false;for(const context of this.contexts)context.state='closed';}};
+    frame.contentWindow={document:{},get AudioContext(){return class extends f.env.AudioContext{constructor(...args){super(...args);frame.contexts.push(this);}};},get AudioWorkletNode(){return f.env.AudioWorkletNode;}};
+    f.frames.push(frame);return frame;
+  }});
   f.audio=new RemoteXAppAudio({environment:f.env});
   f.attachCapture=()=>{
     f.track={onended:null,onmute:null,readyState:'live',enabled:true,stop(){f.stops++;this.readyState='ended';}};
@@ -246,13 +251,13 @@ test('capture retirement pauses its ACK deadline while suspended, final disposal
   context.state='suspended';context.dispatchEvent(new Event('statechange'));
   assert.equal(timers.size,0);assert.equal(f.resumes,0);
   context.resume=()=>new Promise(()=>{});
-  const done=f.audio.dispose();await turn();assert.equal(timers.size,1);
+  const done=f.audio.dispose();await turn();assert.equal(timers.size,2); // ACK deadline plus one native resume observation.
   for(const fn of timers.values())fn();
   await assert.rejects(done,/retirement incomplete/);
   assert.equal(f.contextClosed,1);assert.equal(f.audio.retirements.size,0);
 });
 
-test('disposal during Worklet loading fences late activation and reports unresolved native work',async()=>{
+test('disposal during Worklet loading retires the owned realm and fences late activation',async()=>{
   const f=fixture();await f.audio.ready;let loaded,constructed=0;
   f.audio.env.AudioContext=class {
     constructor(){this.sampleRate=48000;this.state='running';this.audioWorklet={addModule:()=>new Promise(resolve=>{loaded=resolve;})};}
@@ -263,7 +268,8 @@ test('disposal during Worklet loading fences late activation and reports unresol
   f.audio.env.AudioWorkletNode=class {constructor(){constructed++;}};
   const interest=await f.audio.acquire({id:'app',sessionGeneration:1});
   const activation=interest.setSpeaker(true),rejected=assert.rejects(activation,/retired/);
-  await assert.rejects(f.audio.dispose(),/native operation retirement incomplete/);loaded();
+  await f.audio.dispose();assert.equal(f.frames.filter(frame=>frame.isConnected).length,0);
+  assert.equal(f.audio.contextOps.contexts.size,0);loaded();
   await rejected;
   assert.equal(constructed,0);assert.equal(f.contextClosed,1);assert.equal(interest.released,true);
 });

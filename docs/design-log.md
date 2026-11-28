@@ -5917,3 +5917,28 @@ an error, not a successful native retirement. Keep eight recent retirement error
 total count. This supersedes unconditional source stopping on Context suspension
 and indefinite close waits; cancellation/identity/runtime fences are unchanged.
 Model passage does not accept real native cleanup or the full production gates.
+
+## 2026-11-28 — Give the audio graph an owned execution lifetime
+
+Closing a Context while healthy Worklets still hold active-lifetime roots does
+not retire native objects. The failed full-graph control retains12/14/12 even
+with sound recovery. A matched six-cycle mechanism instead returns0/0/0 when the
+SDK owns and retires the graph's same-origin execution realm. Use this measured
+boundary in SDK 0.38: create Context and WorkletNode in an inert owned child while
+parent intent, Worker transport, permission state and live MediaStream persist.
+No new origin, login header or host recovery loop is required.
+
+Graceful retirement keeps terminal render acknowledgement and muted drain.
+Already-closed or stuck graphs may retire their owned execution environment;
+this proves a different lifetime boundary rather than claiming `closed` or a
+native Promise timeout was a render ACK. Drop obsolete Context/controller
+references from callback scopes and detach owner waits only after that boundary
+is retired. Late native completion cannot affect a replacement. Observe graph
+document identity/connection rather than relying solely on a destroyed child's
+events. Parent track callbacks use a separate scope without child graph objects.
+This supersedes the failed Context-only full-graph path; isolated processor
+errors still preserve their healthy sibling and current Context.
+
+Scoped headed SDK/Kasm/Pulse now passes repeated Context and processor faults
+with one parent capture and native retirement. Policy/activation, pending native
+operations/cancellation and complete production gates remain separate evidence.

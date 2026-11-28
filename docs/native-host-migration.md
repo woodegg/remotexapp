@@ -651,9 +651,20 @@ write-accepted as unverified rather than success. Real browser/OS focus and
 clipboard synchronizers remain environment prerequisites; SDK state is not a
 substitute for actual paste/readback testing.
 
-The current SDK 0.38 development graph repair is not ready for adoption:
-isolated processor recovery has scoped real-browser/native-retirement evidence,
-but complete Context replacement still has a reproduced native-retention defect.
-Keep the [qualification blocker](native-self-recovery.md#graph-qualification-blocker)
-with the version decision; connected sound and `contextState: 'closed'` do not
-accept resource cleanup or the complete release.
+The current SDK 0.38 development graph repair is not ready for adoption.
+The earlier Context-only replacement has a reproduced native-retention defect;
+connected sound and `contextState: 'closed'` do not accept resource cleanup or
+the complete release. Keep the
+[current qualification scope](native-self-recovery.md#owned-graph-execution-environment-sdk-038-development)
+with the version decision.
+
+The subsequent SDK 0.38 development graph-realm implementation supersedes that
+failed Context-only teardown. The SDK owns a same-origin, hidden audio execution
+environment; intent, media transport and permission/capture ownership stay in
+the parent. Recreating a graph does not require recreating a Host or another
+microphone prompt. Permit the SDK's same-origin child execution and delegated
+playback in the embedding policy; it introduces no new origin or login endpoint.
+Always await cleanup and distinguish a recovered owned-realm termination from
+an unproven missing ACK. Scoped real Context replacement/native retirement now
+passes; full policy/mixed-fault/long-duration/candidate qualification is still
+required. Do not adopt this development tuple as a formally qualified release.

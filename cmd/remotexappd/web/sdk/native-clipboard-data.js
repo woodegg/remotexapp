@@ -1,4 +1,5 @@
 import {CLIPBOARD_FORMATS, clipboardPayload, textPayload, payloadText, sameClipboard} from '../../../../third_party/kasm/clipboard-payload.mjs';
+export {clipboardTransferTimeout} from '../../../../third_party/kasm/clipboard-payload.mjs';
 
 export function richBrowserClipboard() {
   return !!(globalThis.navigator?.clipboard?.read && globalThis.navigator?.clipboard?.write &&

@@ -1,5 +1,6 @@
 // Harness for the applied reader, with an observable clipboard mutation boundary.
 #include <rfb/NativeClipboard.h>
+#include <rfb/NativeClipboardOrder.h>
 #include <vector>
 #include <string>
 #include <stdexcept>
@@ -16,6 +17,10 @@ struct Stream {
 };
 struct Handler {
   unsigned mutations=0, announced=0, total=0;
+  unsigned admissions=0, finishes=0, ack=0; uint64_t revision=7; bool allowed=true;
+  NativeClipboardOrder order; char status=0;
+  bool acceptBinaryClipboard(){admissions++;const auto r=order.admit(revision,allowed);status=r.status;ack=r.request;return status=='S'||status=='L';}
+  void finishBinaryClipboard(){finishes++;if(order.finish())revision++;}
   void clearBinaryClipboard(){mutations++;total=0;}
   void addBinaryClipboard(const char*,const unsigned char*,unsigned size,unsigned){mutations++;total+=size;}
   void handleClipboardAnnounceBinary(unsigned n,const char[][32]){mutations++;announced=n;}
@@ -29,6 +34,13 @@ int main(){
  std::vector<unsigned char> good{3};item(good,"text/plain",{'a'});item(good,"text/html",{'<','b','>'});item(good,"image/png",{137,80,78,71});
  for(size_t i=0;i<good.size();i++)rejected(std::vector<unsigned char>(good.begin(),good.begin()+i));
  Stream s;s.bytes=good;Handler h;SMsgReader r{&s,&h};r.readBinaryClipboard();assert(h.announced==3&&h.total==8&&h.mutations==5);
+ // The applied reader must consult admission after complete staging and before
+ // touching old connection buffers or selection ownership.
+ s.at=0;h=Handler();h.total=42;h.order.subscribed=true;h.order.arm('A',1,6);r.readBinaryClipboard();
+ assert(s.at==good.size()&&h.status=='F'&&h.ack==1&&h.mutations==0&&h.total==42&&h.finishes==0);
+ s.at=0;h.order.arm('A',2,7);r.readBinaryClipboard();assert(h.status=='S'&&h.mutations==5&&h.total==8&&h.finishes==1&&h.revision==8);
+ s.at=0;h.mutations=0;h.order.arm('A',3,7);r.readBinaryClipboard();assert(h.status=='F'&&h.mutations==0&&h.revision==8);
+ s.at=0;h=Handler();h.allowed=false;r.readBinaryClipboard();assert(h.status=='E'&&h.mutations==0);
  for(const char* type:{"text/rtf","text/plain"}){std::vector<unsigned char> b{2};item(b,"text/plain",{'a'});item(b,type,{'b'});rejected(b);}
  for(const std::vector<unsigned char> bad:{std::vector<unsigned char>{0},std::vector<unsigned char>{255},std::vector<unsigned char>{0xed,0xa0,0x80}}){std::vector<unsigned char>b{2};item(b,"image/png",{1});item(b,"text/html",bad);rejected(b);}
  std::vector<unsigned char> boundary{2};item(boundary,"text/plain",std::vector<unsigned char>(NATIVE_CLIPBOARD_LIMIT-1,'a'));item(boundary,"text/html",{'x'});

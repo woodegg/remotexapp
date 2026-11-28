@@ -36,3 +36,12 @@ test('Shift+Insert uses the same ordering gate',async t=>{
  gate.key(65505,'ShiftLeft',true);gate.key(65379,'Insert',true);gate.key(65379,'Insert',false);
  assert.equal(sent.length,1);p.resolve(true);await tick();assert.equal(sent.length,3);
 });
+
+test('large-transfer waits remain bounded and a suspension gap cannot replay old paste keys',async t=>{
+ let clock=Date.now();t.mock.method(Date,'now',()=>clock);
+ const p=deferred(),{gate,sent}=fixture(t,()=>p.promise);
+ gate.key(65507,'ControlLeft',true);gate.key(118,'KeyV',true);
+ clock+=120001;p.resolve(true);await tick();
+ assert.equal(sent.some(event=>event[1]==='KeyV'),false);
+ assert.ok(sent.some(event=>event[1]==='ControlLeft'&&!event[2]));assert.equal(gate.queue,null);
+});

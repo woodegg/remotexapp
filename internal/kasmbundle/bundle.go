@@ -22,9 +22,15 @@ const RichUDPProtocol = "kasm-udp-clipboard-v2"
 const RoutedUDPProtocol = "kasm-routed-udp-clipboard-v2"
 const LargeRichProtocol = "kasm-wss-clipboard-v3"
 const LargeRoutedUDPProtocol = "kasm-routed-udp-clipboard-v3"
+const OrderedRichProtocol = "kasm-wss-clipboard-v4"
+const OrderedRoutedUDPProtocol = "kasm-routed-udp-clipboard-v4"
+
+func SupportsOrderedClipboard(protocol string) bool {
+	return protocol == OrderedRichProtocol || protocol == OrderedRoutedUDPProtocol
+}
 
 func SupportsLargeClipboard(protocol string) bool {
-	return protocol == LargeRichProtocol || protocol == LargeRoutedUDPProtocol
+	return SupportsOrderedClipboard(protocol) || protocol == LargeRichProtocol || protocol == LargeRoutedUDPProtocol
 }
 
 func SupportsRichClipboard(protocol string) bool {
@@ -32,7 +38,7 @@ func SupportsRichClipboard(protocol string) bool {
 }
 
 func SupportsRoutedUDP(protocol string) bool {
-	return protocol == RoutedUDPProtocol || protocol == LargeRoutedUDPProtocol
+	return protocol == RoutedUDPProtocol || protocol == LargeRoutedUDPProtocol || protocol == OrderedRoutedUDPProtocol
 }
 
 func SupportsUDP(protocol string) bool {

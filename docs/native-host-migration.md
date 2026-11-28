@@ -680,3 +680,33 @@ now verifies actual stop, old-target HTTP 410 and Worker rebind without disturbi
 another capture route, along with cookie/service/access recovery and observed
 identity-change fencing. Complete fault, long-duration and final-candidate
 qualification remain pending; this is not an adoption-ready formal tuple.
+
+## Adopt conditional clipboard admission (SDK 0.38 development)
+
+KNC-013 closes a separate passive-upload race: an X11 copy may change the
+destination before its remote offer reaches the browser. SDK checks alone cannot
+make that upload atomic. A new immutable `kasm-wss-clipboard-v4` or
+`kasm-routed-udp-clipboard-v4` server/client pair compares the observed destination
+revision before native mutation. Core understands those protocols; runtime
+`nativeClipboard: 'rich-v2'` still means text/HTML/PNG with a 10 MiB aggregate cap.
+Restarting Manager alone adopts the existing component pin. Explicitly upgrade
+or recreate the runtime to use the new pair, following generation fencing.
+
+The host continues requesting clipboard directions through `configureClipboard`.
+`capabilities.clipboardConditional` and `getClipboardState().ordering`
+(`ready`, `waiting`, `unavailable`, `unsupported`) describe native ordering support/readiness.
+Render requested and effective directions separately. With an older component,
+requested automatic upload has effective `manual`; automatic download and
+explicit copy/paste source choices remain available. The host does not implement
+revision tracking, retries or another clipboard transport.
+
+`clipboard-conflict` preserves the remote copy and asks for an explicit source
+choice. `clipboard-uncertain` means the outcome cannot be proved and is not
+replayed. A native admission acknowledgement proves neither application paste
+nor browser/OS clipboard delivery; actual readback remains part of qualification.
+`submitting` exposes a pending native transfer. Its size-based 10–50 second
+budget is separate from five-second browser I/O. A timeout remains uncertain and
+is not retried as another copy. Blur/freeze/off cancel pending paste keys and
+resume establishes a fresh focused baseline. The existing browser-local receipt, permission, focus and normalization rules
+remain. This implementation and its full native/long-duration/candidate gates
+are still in development; do not treat it as a published adoption tuple.

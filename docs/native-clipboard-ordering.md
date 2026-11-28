@@ -3,8 +3,10 @@
 Issue [#119](https://github.com/woodegg/remotexapp/issues/119) includes the
 unannounced-remote/concurrent-upload window separately from the repaired
 [A-B-A echo defect](../tests/kasm-native/CLIPBOARD-ABA.md). This document selects
-the destination-ordering invariant. The wire extension, immutable component,
-implementation and native qualification are **not complete**.
+the destination-ordering invariant. Development implements the wire extension, conditional admission, SDK
+baseline/acknowledgement handling and portable regressions. The current immutable
+component build, real X11 qualification and complete release gates remain
+**pending**; this is not a published or UAT-qualified contract.
 
 ## Why an SDK offer check is insufficient
 
@@ -59,17 +61,46 @@ the same serialized native event-loop turn. Checking after clearing buffers is
 too late. Preserve clipboard permissions and existing 10 MiB text/HTML/PNG bounds;
 no file/folder transfer is introduced.
 
-A versioned private RFB Fence extension is the current encoding candidate. It
-could reuse the reliable ordered channel for capability/revision messages and
-correlated conditional admission around the existing rich transaction. A new
+A versioned private RFB Fence extension is now implemented for the reliable
+ordered channel's capability/revision messages and correlated conditional
+admission around the existing rich transaction. A new
 server's handshake response must differ from the old server's ordinary echoed
 Fence, so echo is never mistaken for support. Conditional state must be bounded
 and cancelled on disconnect or explicit replacement, without interfering with
 latency probes or leaving a later manual upload accidentally conditional.
 Native tests must prove this encoding and admission ordering before it is
-accepted; an ordinary Fence round trip alone is not the repair.
+accepted; an ordinary Fence round trip alone is not the repair. Revision advances
+immediately at ownership change; one sixteen-millisecond timer per connection
+coalesces metadata to the latest revision without an event queue. Each outgoing
+snapshot also carries its own valid revision before its payload. At most one
+metadata notification is unacknowledged per connection; further owner changes
+coalesce into the latest counter until the client processes it. A frozen or slow
+document cannot build a queue of revision notifications. Do not stamp a
+delayed cached payload with a later selection's revision.
 
-Publish a new immutable server/client pair and manifest capability. The SDK must
+The development v4 pair uses one fixed-size armed admission per connection.
+Complete validation precedes comparison; an accepted response additionally
+requires revision advance and confirmed X11 CLIPBOARD ownership. Conditional
+uploads require an explicit expected revision. Only an explicit source-choice
+call uses unconditional admission; a missing revision is never treated as one.
+SDK `ordering` reports `ready`, `waiting`, `unavailable` or `unsupported`, with no raw revision
+or clipboard content in state. Normalized local baseline and native destination
+baseline are committed separately. Late native admission after cancellation
+cannot recreate the owner's old baseline or intent.
+
+Browser clipboard I/O retains its five-second observation bound. Native transfer
+admission gets a separate size-based budget: ten seconds plus one second per
+256 KiB, up to fifty seconds at 10 MiB. This is a wait budget, not a throughput
+guarantee. Explicit paste can wait for an existing transfer and its own submission;
+the input gate remains bounded by 128 events and 120 seconds, releases modifiers
+on cancellation and checks elapsed time before replay. A suspended event loop
+cannot make a late ACK, browser result or paste key valid merely because its
+timer callback has not run. Freeze retires clipboard work; a still-focused
+Viewer rebaselines on resume without clearing requested modes.
+
+Publish a new immutable server/client pair and manifest capability. Development
+recipes emit `kasm-wss-clipboard-v4` or `kasm-routed-udp-clipboard-v4` while retaining
+the rich-v2 10 MiB runtime limit. The SDK must
 not claim conditional automatic upload safety on an older component. Expose an
 honest directional manual fallback while retaining supported remote-to-local
 automatic operation and explicit transfer. Core pin validation, SDK types,

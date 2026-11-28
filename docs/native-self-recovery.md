@@ -372,8 +372,13 @@ normalization baseline: an actual matching echo is a no-op, a concurrent local
 change is preserved, and a new remote offer replaces an older pending offer.
 Keep format/size/receipt/focus/generation protections. Test delayed delivery,
 concurrent changes and real browser/X11 old/new controls before qualification.
-Investigate the separately observed unannounced-remote/concurrent-upload window;
-do not declare it repaired merely because A-B-A now passes.
+The separate unannounced-remote/concurrent-upload window now has a
+[development native admission implementation](native-clipboard-ordering.md).
+The SDK captures the baseline destination revision before browser reads and
+commits it only after native admission or a matching remote snapshot. Old pins
+expose passive upload as manual; explicit source choice and supported automatic
+download remain. Complete native X11/INCR/multi-owner and final qualification are
+still required; do not declare it repaired merely because A-B-A or models pass.
 
 ## Completion gates
 

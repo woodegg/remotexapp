@@ -16,11 +16,23 @@ function fixture(t) {
   const clients=[];
   const create=()=>{
     const client=new EventTarget();client.container=new EventTarget();client.state='ready';
-    client.capabilities={clipboard:true,clipboardAutomatic:true,clipboardMaxBytes:65536};
+    client.capabilities={clipboard:true,clipboardAutomatic:true,clipboardConditional:true,clipboardMaxBytes:65536};
     client.sent=[];client.events=[];client.cancelled=0;
-    client._display={sendClipboardText:text=>client.sent.push(text),cancelClipboardPaste:()=>client.cancelled++};
+    client.destination={revision:1,selection:'initial remote'};
+    const stamp=()=>client.destination.revision.toString(16).padStart(16,'0');
+    client._display={get clipboardRevision(){return stamp();},sendClipboardText:text=>{client.sent.push(text);client.destination.selection=text;client.destination.revision++;},cancelClipboardPaste:()=>client.cancelled++,
+      submitClipboard:async(items,expected)=>{
+        if(expected===undefined)throw Object.assign(Error('clipboard-ordering-unavailable'),{code:'clipboard-ordering-unavailable'});
+        if(expected!==null&&expected!==stamp())throw Object.assign(Error('clipboard-conflict'),{code:'clipboard-conflict'});
+        const revision=client.destination.revision;
+        if(client.capabilities.clipboardRich)client._display.sendClipboard(items);
+        else client._display.sendClipboardText(new TextDecoder().decode(items[0].data));
+        client.destination.selection=items;client.destination.revision=revision+1;return {revision:stamp()};
+      }};
     client.addEventListener('clipboardstatechange',e=>client.events.push(e.detail));
     const clipboard=new NativeClipboard(client,code=>Object.assign(new Error(code),{code}));
+    const offer=clipboard.offer.bind(clipboard);
+    clipboard.offer=value=>{client.destination.revision++;client.destination.selection=value;return offer(value,stamp());};
     client.clipboard=clipboard;clients.push(client);return client;
   };
   t.after(()=>{for(const client of clients)client.clipboard.dispose();for(const [key,value] of Object.entries(old)){if(value)Object.defineProperty(globalThis,key,value);else delete globalThis[key];}});
@@ -48,6 +60,61 @@ test('native bidirectional sync, echo suppression and payload-free snapshots',as
   s.offer('远端\n文本');await s.sync();assert.deepEqual(f.io.writes,['远端\n文本']);
   await s.sync();assert.equal(c.sent.length,1);
   assert.equal(JSON.stringify(c.events).includes('中文'),false);assert.equal(JSON.stringify(c.events).includes('远端'),false);
+});
+
+test('an unannounced remote owner change during local read cannot be overwritten by automatic upload',async t=>{
+  const f=fixture(t),c=await f.start(),s=c.clipboard,read=deferred();
+  f.nav.clipboard.readText=()=>read.promise;
+  const pending=s.sync();await turn();
+  c.destination.revision++;c.destination.selection='new remote selection with delayed offer';
+  f.io.text='new local copy';read.resolve(f.io.text);await pending;
+  assert.equal(c.destination.selection,'new remote selection with delayed offer');
+  assert.deepEqual(c.sent,[]);assert.equal(s.phase,'clipboard-conflict');
+  assert.deepEqual(s.snapshot().requested,{toRemote:'auto',toLocal:'auto'});
+});
+
+test('old component retains automatic download and explicit paste while passive upload falls back to manual',async t=>{
+  const f=fixture(t),c=f.create();c.capabilities.clipboardConditional=false;await f.start(c);
+  assert.equal(c.clipboard.effective('toRemote'),'manual');assert.equal(c.clipboard.effective('toLocal'),'auto');
+  f.io.text='new local';await c.clipboard.sync();assert.deepEqual(c.sent,[]);
+  assert.equal(await c.clipboard.paste(),true);assert.deepEqual(c.sent,['new local']);
+  c.clipboard.offer('remote choice');await c.clipboard.sync();assert.equal(f.io.text,'remote choice');
+});
+
+test('capability arriving after baseline acquires a safe fresh revision without unconditional automatic upload',async t=>{
+  const f=fixture(t),c=f.create();let available=false;
+  Object.defineProperty(c._display,'clipboardRevision',{get:()=>available?c.destination.revision.toString(16).padStart(16,'0'):null});
+  await f.start(c);f.io.text='changed before negotiation';available=true;await c.clipboard.sync();
+  assert.deepEqual(c.sent,[]);f.io.text='fresh after baseline';await c.clipboard.sync();assert.deepEqual(c.sent,['fresh after baseline']);
+});
+
+test('a delayed snapshot is not relabelled after a newer selection without transferable content',async t=>{
+  const f=fixture(t),c=await f.start(),s=c.clipboard;
+  s.offer('old snapshot');c.destination.revision++;c.destination.selection='new unsupported owner';
+  await s.sync();assert.equal(f.io.text,'baseline');assert.deepEqual(c.sent,[]);
+  s.offer('fresh supported snapshot');await s.sync();assert.equal(f.io.text,'fresh supported snapshot');
+});
+
+test('off during native admission fences a late accepted revision without resurrecting the baseline',async t=>{
+  const f=fixture(t),c=await f.start(),s=c.clipboard,ack=deferred();
+  c._display.submitClipboard=()=>ack.promise;f.io.text='local choice';const pending=s.sync();await turn();
+  await s.configure({toRemote:'off',toLocal:'off'});ack.resolve({revision:'0000000000000002'});await pending;
+  assert.equal(s.baseline,undefined);assert.equal(s.baselineRemoteRevision,undefined);
+  assert.deepEqual(s.snapshot().requested,{toRemote:'off',toLocal:'off'});assert.deepEqual(c.sent,[]);
+});
+
+test('elapsed browser read cannot upload after a clock gap even before its timer callback runs',async t=>{
+  let clock=Date.now();t.mock.method(Date,'now',()=>clock);
+  const f=fixture(t),c=await f.start(),read=deferred();f.nav.clipboard.readText=()=>read.promise;
+  const pending=c.clipboard.sync();await turn();clock+=6000;read.resolve('expired source');await pending;
+  assert.deepEqual(c.sent,[]);assert.equal(c.clipboard.phase,'clipboard-timeout');
+});
+
+test('freeze retires clipboard work and resume rebaselines only the still-focused Viewer',async t=>{
+  const f=fixture(t),c=await f.start();c.container.contains=target=>target===c.container;f.doc.activeElement=c.container;
+  f.doc.dispatchEvent(new Event('freeze'));assert.equal(c.clipboard.eligible(),false);
+  f.io.text='changed while frozen';f.doc.dispatchEvent(new Event('resume'));await c.clipboard.sync();
+  assert.equal(c.clipboard.eligible(),true);assert.deepEqual(c.sent,[]);
 });
 test('directions are independent; conflicts stop automatic mutation until explicit paste choice',async t=>{
   const f=fixture(t),c=await f.start(),s=c.clipboard;

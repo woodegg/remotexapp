@@ -1,0 +1,21 @@
+{
+  "experiment": "P21",
+  "outcome": "pending",
+  "status": "Planned native destination-ordering and resource experiment; portable regressions pass but no native concurrency/performance acceptance.",
+  "primaryVariable": "Native clipboard destination admission/metadata strategy on otherwise fixed runtime and synthetic clipboard inputs",
+  "proven": {
+    "portableFocusedTests": 137,
+    "skips": 0,
+    "todos": 0,
+    "scope": "SDK/adapter/native admission models; not actual X11 concurrency or resource measurement"
+  },
+  "nativeMeasurements": null,
+  "required": [
+    "Actual unannounced X11-owner race and delayed INCR with unchanged destination on conflict",
+    "Same-owner/A-B-A and simultaneous Viewer admission with actual data readback",
+    "One outstanding notification under frozen or slow receiver and exact bounded queue/resource counts",
+    "At most 10MiB submission; slow-link transfer stays within finite size budget without late paste replay",
+    "Natural interval and separate combined-stress PSS/AnonPSS/SwapPss/heap/DOM/FD/resource review"
+  ],
+  "releaseQualified": false
+}

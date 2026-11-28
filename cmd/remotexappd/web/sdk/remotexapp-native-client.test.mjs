@@ -5,7 +5,7 @@ import { RemoteXAppNativeClient } from './remotexapp-native-client.js';
 globalThis.CustomEvent ||= class extends Event { constructor(type,options) { super(type); this.detail = options?.detail; } };
 globalThis.location = new URL('https://viewer.example.test/remotexapps/app/kiosk.html');
 
-function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, clipboardAutomatic = false, rich = false, richMode = 'rich-v1', componentRich = rich, componentLimit = richMode === 'rich-v2' ? 10485760 : 2097152, clipboardLogin, statistics = false, udp = false, turn = false, latency = false, udpLoss = false, controls = false, readOnly = false, reconnect = false, heartbeatIntervalMs, ownerDocument } = {}) {
+function fixture({ ready = true, frame = true, timeout = 200, clipboard = false, clipboardAutomatic = false, clipboardConditional = false, rich = false, richMode = 'rich-v1', componentRich = rich, componentLimit = richMode === 'rich-v2' ? 10485760 : 2097152, clipboardLogin, statistics = false, udp = false, turn = false, latency = false, udpLoss = false, controls = false, readOnly = false, reconnect = false, heartbeatIntervalMs, ownerDocument } = {}) {
   const state = { id:'app', displayProvider:'kasm', displayComponentDigest:'a'.repeat(64), sessionGeneration:3, sessionState:'running', applicationStatus:{ generation:3, state:ready ? 'ready' : 'starting' } };
   if (udp) state.nativeTransport={available:true,grantRequired:true,policy:'prefer-udp'};
   if (controls) state.nativeTransport={available:udp,grantRequired:true,policy:udp?'prefer-udp':'wss-only',readOnly:true};
@@ -15,7 +15,7 @@ function fixture({ ready = true, frame = true, timeout = 200, clipboard = false,
   state.nativeClipboard = rich ? richMode : clipboard ? "text" : undefined;
   let display, reads = 0;
   class Display extends EventTarget {
-    static capabilities = {programmaticInput:controls,displayControls:controls,readOnly:controls,keyboardPolicy:true,clipboardText:true,clipboardAutomatic,clipboardRich:componentRich,clipboardMaxBytes:componentRich?componentLimit:65536,statistics,udp,turn,latency,udpLoss};
+    static capabilities = {programmaticInput:controls,displayControls:controls,readOnly:controls,keyboardPolicy:true,clipboardText:true,clipboardAutomatic,clipboardConditional,clipboardRich:componentRich,clipboardMaxBytes:componentRich?componentLimit:65536,statistics,udp,turn,latency,udpLoss};
     counters = {receivedBytes:100, sentBytes:20, bufferedBytes:0, renderedFrames:2, width:1024, height:768};
     getStats() { return this.counters; }
     sendText(text) {this.sent.push(text);return {status:'submitted',count:[...text].length};}
@@ -27,6 +27,13 @@ function fixture({ ready = true, frame = true, timeout = 200, clipboard = false,
     sent = [];
     sendClipboardText(text) { this.sent.push(text); }
     sendClipboard(items) { this.sent.push(items); }
+    clipboardVersion = 1;
+    get clipboardRevision() { return this.clipboardVersion.toString(16).padStart(16,'0'); }
+    async submitClipboard(items, expected) {
+      if(expected!==null&&expected!==this.clipboardRevision)throw Object.assign(Error('clipboard-conflict'),{code:'clipboard-conflict'});
+      if(rich)this.sendClipboard(items);else this.sendClipboardText(new TextDecoder().decode(items[0].data));
+      this.clipboardVersion++;return {revision:this.clipboardRevision};
+    }
     keyboardPolicy = {profile:"unknown",mode:"local",bindings:[]};
     configureKeyboard(settings) { this.keyboardPolicy = settings;return true; }
     configureTransport(value) {this.preferUDP=value;}
@@ -614,7 +621,8 @@ test('public directional configuration, native paste callback and reset are conn
   navigator.clipboard.readText=async()=> 'fresh paste';
   const f=fixture({clipboard:true,clipboardAutomatic:true});await f.viewer.connect('app');t.after(()=>f.viewer.dispose());
   await f.viewer.configureClipboard({toRemote:'auto',toLocal:'off'});
-  assert.equal(f.viewer.getClipboardState().effective.toRemote,'auto');
+  assert.equal(f.viewer.getClipboardState().effective.toRemote,'manual');
+  assert.equal(f.viewer.getClipboardState().ordering,'unsupported');
   f.viewer.focus();assert.equal(await f.display.options.prepareClipboardPaste(),true);
   assert.deepEqual(f.display.sent,['fresh paste']);
   await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-disabled'});
@@ -631,6 +639,19 @@ test('manual calls respect another tab clipboard lock without starting a browser
   const f=fixture({clipboard:true});await f.viewer.connect('app');t.after(()=>f.viewer.dispose());f.viewer.enableClipboard();
   f.display.dispatchEvent(new CustomEvent('clipboard',{detail:{text:'remote'}}));
   await assert.rejects(f.viewer.copyClipboardToLocal(),{code:'clipboard-busy'});assert.equal(writes,0);
+});
+
+test('ordered native capability exposes automatic upload and commits a manual admission revision',async t=>{
+  clipboardBrowser(t,{readText:async()=> 'fresh chosen source'});
+  navigator.permissions={query:async()=>({state:'granted'})};navigator.locks={request:async(_name,_options,fn)=>fn({})};
+  const f=fixture({clipboard:true,clipboardAutomatic:true,clipboardConditional:true});
+  await f.viewer.connect('app');t.after(()=>f.viewer.dispose());
+  await f.viewer.configureClipboard({toRemote:'auto',toLocal:'auto'});f.viewer.focus();await f.viewer._clipboardSync.sync();
+  assert.equal(f.viewer.capabilities.clipboardConditional,true);assert.equal(f.viewer.getClipboardState().effective.toRemote,'auto');
+  assert.equal(f.viewer.getClipboardState().ordering,'ready');
+  assert.deepEqual(await f.viewer.copyClipboardToRemote(),{status:'submitted'});
+  assert.deepEqual(f.display.sent,['fresh chosen source']);
+  assert.equal(f.viewer._clipboardSync.baselineRemoteRevision,f.display.clipboardRevision);
 });
 
 

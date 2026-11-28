@@ -180,3 +180,10 @@ offer has not arrived before an automatic upload. The selected
 comparison at native transaction admission, before any clipboard buffer or X11
 selection mutation. This needs a newly qualified immutable component/capability;
 it is not implemented or accepted by the earlier receipt/normalization tests.
+
+SDK 0.38 development now implements that admission exchange and reports
+`ordering` separately from desired/effective directions. New v4 pairs retain the
+10 MiB aggregate limit. Older component pins preserve automatic download and
+explicit source choice but cannot provide safe passive automatic upload, which
+falls back to effective manual. Native selection/concurrency and final candidate
+qualification remain open; existing receipt tests do not substitute for them.

@@ -5981,3 +5981,28 @@ selections; content equality is not a revision. Keep consent/focus/permission,
 verified local delivery, format/size bounds and explicit source choice. Require
 an honest capability/manual fallback on old components. This selects the
 invariant, not a completed wire implementation or qualified native component.
+
+## 2026-11-28 — Implement bounded native clipboard revision admission
+
+Implement KNC-013 through a versioned private Fence exchange around the existing
+staged rich upload. Reject stale admission before clearing connection buffers or
+taking X11 ownership. Keep one fixed-size armed transaction, correlated replies
+and finite client waits; a missing revision cannot mean unconditional write.
+Accepted completion requires revision advance and actual X11 clipboard ownership.
+Coalesce owner-change metadata with one timer and bind cached outgoing snapshots
+to their generation revision. Parent SDK baseline/consent fences remain distinct
+from native destination ordering. Preserve explicit source choice on old pairs,
+but report passive upload as manual there; automatic download remains supported.
+New immutable v4 pairs retain rich-v2 runtime format/10 MiB bounds. Portable
+model and native admission tests do not qualify the complete component or actual
+X11 concurrency; those gates remain open before long-duration acceptance.
+
+The same development exchange bounds metadata by one unacknowledged revision
+notification per connection; a single timer/coalesced counter cannot accumulate
+while a document is frozen. Native transfer observation scales with the bounded
+payload (10–50 seconds) rather than inheriting the five-second browser I/O limit.
+Paste remains bounded by 128 queued input events/120 seconds across an existing
+and a fresh transfer. Check elapsed deadlines before accepting results or keys,
+even when browser suspension delayed timer callbacks. Freeze retires clipboard
+work and a still-focused resume acquires a fresh baseline. These are selected
+lifetime/backpressure invariants, not proof of native slow-link qualification.

@@ -11,6 +11,15 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Add development native clipboard destination ordering on new immutable v4
+  Kasm pairs. A complete automatic upload compares its baseline revision before
+  any native clipboard buffer/selection mutation; stale submissions preserve the
+  remote copy. Bind outgoing snapshots to their own revision, coalesce metadata,
+  and bound correlated admission, timeout and late replies. SDK 0.38 reports
+  ordering capability/state; old pairs retain automatic download and explicit
+  paste/manual transfer while passive upload falls back to manual. Native X11,
+  complete concurrency and final artifact qualification remain pending.
+
 - Return terminal audio-route HTTP 410 for stopped/stopping App sessions and
   runtimes even while their old generation metadata remains. Previously HTTP
   409 classified an explicitly retired target as a temporary domain outage.

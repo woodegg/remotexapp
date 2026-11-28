@@ -281,7 +281,7 @@ func TestNativeAudioPinRequiresSchemaSixAndCannotImplicitlyUpgrade(t *testing.T)
 
 func TestNativeRichClipboardPreservesPinnedTextCompatibility(t *testing.T) {
 	old := testfixture.KasmProtocol(t, "kasm-wss-text-v1")
-	for _, protocol := range []string{kasmbundle.RichProtocol, kasmbundle.RichUDPProtocol, kasmbundle.RoutedUDPProtocol, kasmbundle.LargeRichProtocol, kasmbundle.LargeRoutedUDPProtocol} {
+	for _, protocol := range []string{kasmbundle.RichProtocol, kasmbundle.RichUDPProtocol, kasmbundle.RoutedUDPProtocol, kasmbundle.LargeRichProtocol, kasmbundle.LargeRoutedUDPProtocol, kasmbundle.OrderedRichProtocol, kasmbundle.OrderedRoutedUDPProtocol} {
 		pin := testfixture.KasmProtocol(t, protocol)
 		cfg := config{displayProvider: "kasm", vncLauncher: "direct", kasmBundle: pin.Directory, nativeClipboard: true}
 		if err := cfg.configureDisplayProvider(); err != nil {
@@ -290,7 +290,7 @@ func TestNativeRichClipboardPreservesPinnedTextCompatibility(t *testing.T) {
 		m := manager{cfg: cfg}
 		c := m.newRuntimeComponents()
 		mode, limit := "rich-v1", "2097152"
-		if strings.HasSuffix(protocol, "-v3") {
+		if kasmbundle.SupportsLargeClipboard(protocol) {
 			mode, limit = "rich-v2", "10485760"
 		}
 		if c.NativeClipboard != mode || c.NativeUDP != strings.Contains(protocol, "-udp-") {

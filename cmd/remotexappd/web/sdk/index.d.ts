@@ -158,7 +158,7 @@ export interface NativeClipboardState {
   requested:{toRemote:NativeClipboardMode;toLocal:NativeClipboardMode};
   effective:{toRemote:NativeClipboardMode;toLocal:NativeClipboardMode};
   permissions:{read:string;write:string}; active:boolean; phase:string;
-  formats:string[]; maxBytes:number; automaticSupported:boolean;
+  formats:string[]; maxBytes:number; automaticSupported:boolean; ordering:'unsupported'|'waiting'|'ready'|'unavailable';
 }
 export class RemoteXAppNativeClient extends EventTarget {
   constructor(options:RemoteXNativeViewerOptions);
@@ -169,7 +169,7 @@ export class RemoteXAppNativeClient extends EventTarget {
   readonly state:'disconnected'|'connecting'|'reconnecting'|'ready'|'failed'|'disposed';
   readonly instance?:RemoteXAppInstance;
   readonly capabilities:{readonly display:'kasm-wss-v1';readonly pointer:boolean;readonly keyboard:boolean;
-    readonly clipboard:boolean;readonly clipboardAutomatic?:boolean;readonly clipboardRich?:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly statistics:boolean;readonly programmaticText:boolean;readonly programmaticKeys?:boolean;readonly displayControls?:boolean;readonly remoteResize?:boolean;readonly readOnly?:boolean;readonly latency?:boolean;readonly udpLoss?:boolean;readonly audio:false;readonly udp:boolean};
+    readonly clipboard:boolean;readonly clipboardAutomatic?:boolean;readonly clipboardConditional?:boolean;readonly clipboardRich?:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly statistics:boolean;readonly programmaticText:boolean;readonly programmaticKeys?:boolean;readonly displayControls?:boolean;readonly remoteResize?:boolean;readonly readOnly?:boolean;readonly latency?:boolean;readonly udpLoss?:boolean;readonly audio:false;readonly udp:boolean};
   readonly keyboardPolicy:NativeKeyboardPolicy|null;
   readonly clipboardEnabled:boolean;
   getStats():RemoteXAppNativeStats;

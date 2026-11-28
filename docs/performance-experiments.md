@@ -1,5 +1,11 @@
 # Performance experiments
 
+P21 [native clipboard destination ordering](../tests/performance/native-clipboard-ordering/README.md)
+is planned under #119. It defines native concurrent-copy, frozen-receiver,
+slow-link and resource acceptance before measurement. Its pending records are
+separate from the completed register below; portable regression counts and a
+compiled component are not native/performance acceptance.
+
 ## Rules
 
 Performance hypotheses are tested one at a time. An experiment must:

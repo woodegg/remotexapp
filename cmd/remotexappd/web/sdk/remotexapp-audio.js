@@ -29,7 +29,13 @@ export class RemoteXAppAudio extends EventTarget {
     this._openWorker();
     this.watchdog = environment.setInterval(()=>{
       const now = Date.now(), suspended = now-this.lastWatchdogTick>5000; this.lastWatchdogTick = now;
-      if (suspended) { this.lastWorkerMessage = now; this._fenceCapture(); this._wake(); return; }
+      if (suspended) {
+        this.lastWorkerMessage = now;
+        const token=this.captureToken || this.pendingCaptureToken;
+        this._fenceCapture();
+        if(token)this._post({op:'capture-failed',token,reason:'microphone-owner-resumed',retainedSource:this._liveSource()});
+        this._wake(); return;
+      }
       if(this.port && this.workerGeneration!==this._workerGeneration())this._fail('audio-worker-superseded');
       if (this.port && now-this.lastWorkerMessage>10000) this._fail('audio-worker-unresponsive');
       this._journalChanged();

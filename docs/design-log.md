@@ -6069,3 +6069,23 @@ the owner remains responsive. Count actual Chrome capture streams separately
 from the synthetic Pulse remap module's own source-output; do not count that
 filter as a second browser capture. The real old-pair diagnostic and red model
 regression are distinct from repaired native and long-duration qualification.
+
+## 2026-11-28 — Reconcile a locally fenced capture after delayed scheduling
+
+Actual access-recovery testing restores nonzero microphone packets briefly,
+then the document disables its track and clears its token while the coordinator
+still reports delivery. A deterministic delayed-watchdog control reproduces the
+same native failure with a valid synthetic input and both remote mic targets
+silent. Sending the missing capture-failure notification and wake restores both
+new markers with the original source and one device request.
+
+Refine AUD-003: detecting a delayed document timer may fence local delivery, but
+must also notify the coordinator using its current capture/pending token before
+wake. The coordinator then retires the old delivery authority and obtains a
+fresh delivery nonce. Reuse a still-valid source under current intent, permission
+and route authorization; do not stop the device merely to repair scheduling.
+Local epoch invalidation without shared reconciliation cannot be recovery.
+Explicit off and a late pending device acquisition remain cancellation fences.
+This differs from actual document freeze, which must stop the old source before
+another document takes ownership. Native counterfactual proof is diagnostic;
+new immutable-artifact and natural/stress gates remain separate.

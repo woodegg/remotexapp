@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "releaseQualified": false,
+  "status": "old-native-root-reproduced-and-counterfactual-proved-repair-model-passed-new-native-pending",
+  "reproducedProductCommit": "98be104d0803f85eb26517d105621b096143b37c",
+  "reproducedCoreSHA256": "f8de68f018853cf54ed2a76db6645c45590eb1486f33aee0e887f9101c99a893",
+  "componentManifestSHA256": "8e2c5874368e25286e15b0a73403c0fb30f81c2aa45b65c000a865294e07e84f",
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 8,
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headed": true,
+    "sandbox": true,
+    "runtimeSourceOverride": false,
+    "faultInjection": "Set the original document watchdog last-tick timestamp6seconds behind actual time; the actual installed SDK interval runs the branch. This is not physical OSsleep.",
+    "networkDomain": false,
+    "focusEmulation": false,
+    "syntheticPulseInput": true,
+    "actualKasmAndTwoAppDomains": true,
+    "counterfactualRepair": "Diagnostic one-time notification of the current capture fence to the coordinator, then normal SDK wake; not a shipped SDK fix or automatic new-artifact qualification."
+  },
+  "oldNativeFailure": {
+    "captureRequests": 1,
+    "sameSource": true,
+    "track": [
+      {
+        "enabled": false,
+        "state": "live",
+        "muted": false
+      }
+    ],
+    "localTokenCleared": true,
+    "sharedEffectiveMic": true,
+    "privateInput": {
+      "frames": 24000,
+      "peak": 9000,
+      "rms": 6363.901780092671,
+      "expectedHz": 2200,
+      "markerEnergyFraction": 0.9999999985138291
+    },
+    "actualTargetReadbacks": [
+      {
+        "frames": 24000,
+        "peak": 0,
+        "rms": 0.0,
+        "expectedHz": 2200,
+        "markerEnergyFraction": 0
+      },
+      {
+        "frames": 24000,
+        "peak": 0,
+        "rms": 0.0,
+        "expectedHz": 2200,
+        "markerEnergyFraction": 0
+      }
+    ]
+  },
+  "counterfactual": {
+    "freshMic": [
+      [
+        {
+          "frames": 24000,
+          "peak": 8999,
+          "rms": 6362.52095134075,
+          "expectedHz": 2420,
+          "markerEnergyFraction": 0.9999999681854407
+        }
+      ],
+      [
+        {
+          "frames": 24000,
+          "peak": 8999,
+          "rms": 6362.52095134075,
+          "expectedHz": 2420,
+          "markerEnergyFraction": 0.9999999681854405
+        }
+      ]
+    ],
+    "requests": 1,
+    "sameSource": true
+  },
+  "rootCause": "Document watchdog clears local token/epoch and disables its track, but sends only wake/eligibility. The coordinator still has ready delivery and does not issue a fresh capture token. Old processor callbacks are then fenced forever.",
+  "repair": "Notify capture-failed using the current capture/pending token and valid-source eligibility before wake; reconcile fresh delivery and rewire the same valid source/processor. Off and late device results stay fenced.",
+  "modelCases": [
+    "Fresh token and actual Worklet microphone packet after delayed watchdog, same source/processor and one device request",
+    "Off during recovery prevents restoration and preserves speaker",
+    "Pending device acquisition plus watchdog plus off stops late stream without a second acquisition"
+  ],
+  "focusedAudioRecoveryTests": 60,
+  "fullCheck": "passed-isolated-nonroot",
+  "newArtifactNativeProof": "pending",
+  "separateUnresolvedScopes": [
+    "Matched idle-lane final speaker distortion still needs downlink-layer attribution.",
+    "Old actual401restore loop has brief positive frames then silence; new-artifact uninstrumented repeat remains required.",
+    "Full24class/natural8h/90min1000stress/resources/finalartifact/UAT remain open."
+  ],
+  "privateEvidenceSHA256": {
+    "oldWatchdogNative": "185829c08feef8e7a239dc393a21b81bfb58cb2562d1568b46f5516ffe713ca3",
+    "oldWatchdogDriver": "559df512ac2b53c1808b2b29c654a492e6b6d493fee14a785d03ed5fb8dc3393",
+    "old401Uninstrumented": "e1f310939f259a443cfe4c24c36f016d1ea4af3c78240b0090085e3f846642f8",
+    "old401LayerTrace": "994589137a94ce9f6e13cfe0f0bee833ab475014eb835da6b2b5bfe32e52b95b",
+    "modelRed": "c8d9838e7838fb61bcfc39dd9769dbebfad5b0fc1c0fa6656fa48e77ec26db52",
+    "modelGreen": "f0fd56c953a4ec09cdacc650fd9a661b69cf82e28bdecf2aef3ac9a638bf939b",
+    "fullCheck": "326a44340376f48e620f5ac09ff541c6fad967d78481e61a3ee60c37e15cb733"
+  },
+  "repairSourceSHA256": {
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "702c4dff9413378a72352725bd2fb9de009bce8b0338e13fa763de94b356d6bf",
+    "cmd/remotexappd/web/sdk/audio-recovery.test.mjs": "de7cc9e9368edf487a5c52964aa758dff387b0714807fa5fabc5f0d7738e65f2"
+  }
+}

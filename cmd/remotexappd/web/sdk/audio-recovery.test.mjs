@@ -484,3 +484,43 @@ test('a real gesture can resume a prior automatic policy block without repeated 
  await f.tick();await until(()=>f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
  assert.equal(calls,2);assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);assert.equal(doc.contexts.length,1);
 });
+
+test('late document watchdog reconciles a fenced live source with fresh delivery and real worklet PCM',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream,node=doc.audio.capture,oldToken=doc.audio.captureToken;
+ doc.audio.lastWatchdogTick=Date.now()-6000;
+ for(const tick of doc.timers.values())tick();
+ await until(()=>doc.audio.captureToken && doc.audio.captureToken!==oldToken && f.route(doc)?.actualMic);
+ assert.equal(doc.audio.stream,source);assert.equal(doc.audio.capture,node);assert.equal(f.gum,1);
+ assert.equal(source.getAudioTracks()[0].enabled,true);
+ const socket=f.sockets.at(-1),before=socket.sent.filter(frame=>frame instanceof ArrayBuffer).length;
+ for(let i=0;i<8;i++)node.processor.process([[new Float32Array(128).fill(.25)]],[[new Float32Array(128)]]);
+ await until(()=>socket.sent.filter(frame=>frame instanceof ArrayBuffer).length>before);
+ const packet=socket.sent.filter(frame=>frame instanceof ArrayBuffer).at(-1);
+ assert.equal(new Uint8Array(packet)[1],2);assert.equal(new Uint8Array(packet)[3],0);
+});
+
+test('explicit mic off during late-watchdog recovery fences its pending restoration',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream;
+ doc.audio.lastWatchdogTick=Date.now()-6000;for(const tick of doc.timers.values())tick();
+ await interest.setMicrophone(false);await f.tick();await turn();
+ assert.equal(f.gum,1);assert.equal(source.getAudioTracks()[0].readyState,'ended');
+ assert.equal(f.route(doc).requested.microphone,false);assert.equal(f.route(doc).actualMic,false);
+ assert.equal(f.route(doc).actualSpeaker,true);
+});
+
+test('watchdog recovery during pending device acquisition cannot reopen mic after off',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);
+ let finishDevice;doc.holdDevice=new Promise(resolve=>{finishDevice=resolve;});
+ const enabling=interest.setMicrophone(true);enabling.catch(()=>{});await until(()=>f.gum===1);
+ doc.audio.lastWatchdogTick=Date.now()-6000;for(const tick of doc.timers.values())tick();
+ await interest.setMicrophone(false);finishDevice();await enabling.catch(()=>{});
+ await until(()=>doc.streams.length===1);await f.tick();await turn();
+ assert.equal(f.gum,1);assert.equal(doc.streams[0].getAudioTracks()[0].readyState,'ended');
+ assert.equal(doc.audio.stream,null);assert.equal(f.route(doc).requested.microphone,false);
+ assert.equal(f.route(doc).actualMic,false);assert.equal(f.route(doc).actualSpeaker,true);
+});

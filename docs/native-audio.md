@@ -311,3 +311,11 @@ source before handing ownership to another eligible participant. Requested
 intent remains available for authorized recovery. A hidden but running tab
 keeps its existing source. This differs from a transport outage in a responsive
 owner, where retaining a valid live source avoids unnecessary device requests.
+
+A delayed document watchdog tick fences local delivery and notifies the shared
+coordinator before waking reconciliation. This invalidates the old delivery
+nonce at both ends, then rebinds a valid live source and processor under current
+intent, permission and route grants. Merely clearing the local token/epoch can
+leave a disabled track behind a coordinator that still reports effective mic.
+Timer lateness alone does not require a new device request; off, revoked access,
+ended sources and actual document suspension retain their separate boundaries.

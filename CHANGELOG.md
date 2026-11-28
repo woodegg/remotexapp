@@ -11,6 +11,12 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Reconcile capture after a delayed document watchdog tick. Previously the SDK
+  fenced its local processor epoch without notifying the coordinator, leaving
+  a disabled live track behind a misleading effective microphone state. Notify
+  the coordinator before wake so it issues fresh authorized delivery and rebinds
+  the existing valid source/processor. Off and late device results remain fenced.
+
 - Stop the old document's microphone source synchronously on actual page
   freeze/BFCache suspension before coordinator handoff. Preserve requested
   intent for an eligible owner or resumed document; ordinary background tabs

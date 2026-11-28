@@ -330,3 +330,13 @@ speaker readback, so the whole attempt remains failed. Observed short-run memory
 decreases are not a leak-free claim. Preserve the failed signal windows and
 trace remote Pulse, actual transmitted PCM and browser output before assigning
 the distortion to a product component or changing the spectral assertion.
+
+[Delayed-watchdog delivery control](results-watchdog-delivery-20261128.json)
+reproduces a local/coordination mismatch in actual SDK/Kasm/Pulse: the document
+fences a live source while the shared coordinator still reports effective mic.
+A diagnostic notification restores both new remote markers with the same source
+and one device request. The timestamp fault is not physical OSsleep, and that
+manual counterfactual is not automatic repaired-artifact qualification. Three
+composed regressions cover fresh delivery/Worklet PCM, off during reconciliation,
+and a late pending device result. New immutable native proof and the separate
+speaker-quality/natural/stress gates remain required.

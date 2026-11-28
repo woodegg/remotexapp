@@ -81,6 +81,32 @@ clears only when connected routes have settled. Disconnect history remains
 separate. Complete fault coverage on the current artifact, resource and long-duration
 qualification are still required.
 
+## Actual multi-document ownership and hung Workers (development)
+
+[Two separate current-pair controls](../tests/native-audio/results-multidoc-worker-hang-20261128.json)
+extend the preflight above without changing its implementation source. One
+eight-case run uses two real documents, three Viewers and Mousepad/KWrite
+domains. They share one audio WSS and capture while only selected mic targets
+receive new signal. Cutting one selected Viewer preserves its duplicate,
+another App, the audio channel and the capture. Foreground switches verify
+both clipboard directions on both Apps. Closing the original capture owner
+automatically hands speaker/mic to the live, participating, already-authorized
+document. A per-App mic off leaves the other target live; retiring that last mic
+target stops capture while the other speaker continues. Final owner disposal
+releases the audio channel and capture.
+
+A separate five-case run enters actual infinite loops in the native Workers,
+rather than calling `self.close()` or inventing an error event. The first hang
+recovers new data with the original source in about thirty seconds in this
+local control, including expiry of the old audio lease. This is an observation,
+not a recovery-time SLA. Both names hung then reach honest bounded failure:
+four native SharedWorker clients/six ports in the live-page diagnostic endpoint,
+no new capture, and explicit mic off still commits/stops locally. A later
+live-page retirement snapshot has zero of all nine sampled native audio classes.
+Diagnostic GC occurs after the fault/off interval; neither control is natural
+soak or whole-browser allocation evidence. Earlier anonymous PSS growth, the
+remaining 24-class/mixed cases and final candidate gates remain open.
+
 ## Worker bootstrap recovery (development Worker 8)
 
 A silent exit need not emit `SharedWorker.onerror`. A new logical MessageChannel

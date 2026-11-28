@@ -1160,6 +1160,14 @@ headless diagnostic-GC control has no audio and does not qualify the complete
 SDK/Pulse recovery or production resource envelope. The linked experiment
 retains source/report hashes and the earlier measurements.
 
+A separate current-pair headed SDK/Kasm/Pulse busy-loop control restores fresh
+data after the first real Worker hang. Both hung names retain four native
+SharedWorker clients/six ports and explicit off still stops capture; final
+live-page retirement has zero of the nine sampled audio classes. A separate
+two-document/two-App run verifies shared audio and authorized owner handoff.
+These fault diagnostics extend the linked P20 evidence, not its minimal
+baseline or the unresolved whole-browser anonymous-PSS/natural/stress gates.
+
 P19's SDK 0.38 graph follow-up separately passes ten actual processor throws
 with one Context/source, positive native baseline1/2/1 and retired0/0/0 in a live
 page. The earlier Context-only rebuild control retains12/14/12 despite fresh

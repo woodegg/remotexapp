@@ -190,6 +190,14 @@ while no Worker is available. Integrated models are passing development evidence
 real repeated exits, multi-owner recovery and native resource review remain
 qualification gates. See [the bootstrap contract](native-self-recovery.md#worker-bootstrap-recovery-development-worker-8).
 
+Scoped [current-pair multi-document and real-hang controls](../tests/native-audio/results-multidoc-worker-hang-20261128.json)
+now verify selected mic targets, one shared channel/capture, authorized owner
+handoff, per-App off and terminal runtime isolation. Actual busy loops verify
+one-name replacement, bounded failure with both names hung and explicit off;
+native endpoints remain separate from whole-process memory qualification.
+These controls do not close the complete 24-class, long-duration or final
+candidate gates.
+
 AUD-006 graph recovery separates a valid source from failed Context/processor
 lifetimes. Resume/rebuild only under current intent and retire unusable graphs
 before replacement. Native operation timeouts do not cancel browser work: join

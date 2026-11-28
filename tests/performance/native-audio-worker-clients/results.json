@@ -219,5 +219,17 @@
     "workerProtocol": 8,
     "singleName": true,
     "releaseQualified": false
+  },
+  "currentPairActualHangControl": {
+    "evidence": "tests/native-audio/results-multidoc-worker-hang-20261128.json",
+    "evidenceSHA256": "1514b8e1dd3bf0b101afbb3bbbd109b9ed7a6e64080b7db35eff70506030369f",
+    "productCommit": "7a65d460fdeb7c39ad028d10747438ef66a781f3",
+    "nativeSharedWorkerClients": 4,
+    "nativeMessagePorts": 6,
+    "actualWorkerTargets": 2,
+    "sourcePreservedOnFirstHang": true,
+    "explicitOffWhileBothHung": true,
+    "finalNineAudioClassesZero": true,
+    "scope": "Full SDK/Kasm/Pulse actual fault diagnostic endpoint; separate from accepted minimal no-audio baseline and whole-process/natural/final-release qualification."
   }
 }

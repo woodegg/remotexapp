@@ -81,3 +81,20 @@ sandbox and diagnostic GC snapshots are explicit limits of this control; the
 separate real headed SDK/Kasm/Pulse repeated-exit control and long-duration,
 multi-owner, resource and release gates still apply. The earlier accepted
 measurements and failed Worker 7 evidence are retained.
+
+## Actual hung-Worker current-pair control (2026-11-28)
+
+[Current-pair fault evidence](../../native-audio/results-multidoc-worker-hang-20261128.json)
+adds actual busy-loop failure with the served SDK, real Kasm and private Pulse.
+The first hung Worker is replaced while preserving capture and restoring new
+data. Two hung names reach bounded failure with four native SharedWorker
+clients and six MessagePorts at a live-page diagnostic endpoint. Explicit off
+still commits and stops capture; final owner retirement returns the nine sampled
+audio classes to zero. Six ports include the full SDK graph/owner path and are
+not the earlier minimal no-audio one-port endpoint. Do not compare them as equal
+workloads or infer whole-browser allocation from their counts.
+
+A separate two-document/two-App ownership control verifies one audio channel,
+one capture, selected routes and authorized handoff. Neither run replaces the
+unresolved earlier anonymous-PSS review, natural/stress gates or exact final
+candidate acceptance. Prior accepted minimal results remain unchanged.

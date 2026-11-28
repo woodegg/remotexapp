@@ -1,0 +1,439 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "releaseQualified": false,
+  "status": "passed-two-separate-scoped-controls",
+  "implementationCommit": "7a65d460fdeb7c39ad028d10747438ef66a781f3",
+  "runtimeCoreSHA256": "c50d7184399cfb8a0d7f2f09ebeb452cb2f14b3efa4b2b488953025534bac5d7",
+  "componentManifestSHA256": "8e2c5874368e25286e15b0a73403c0fb30f81c2aa45b65c000a865294e07e84f",
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 8,
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headless": false,
+    "sandboxEnabled": true,
+    "nativeCDP": true,
+    "networkDomainEnabled": false,
+    "focusEmulation": false,
+    "embeddedSDK": true,
+    "sourceOverride": false,
+    "transport": "WSS",
+    "syntheticAudio": "Changeable private Pulse pipe source and actual browser output monitor",
+    "extraLoginHeader": false,
+    "periodicGC": false,
+    "diagnosticGC": "After actual hang/off interval only, at bounded-client and final live-page retirement endpoints",
+    "attemptsNotConcatenated": true,
+    "multiDocument": {
+      "realDocuments": 2,
+      "realViewers": 3,
+      "AppTemplates": [
+        "mousepad",
+        "kwrite"
+      ]
+    },
+    "hang": "Actual infinite JS loops in both owned native SharedWorker names; console confirms entry before recovery. These are distinct from self.close or an error event."
+  },
+  "multiDocument": {
+    "checks": [
+      {
+        "name": "two-documents-three-Viewers-two-templates-share-one-audio-channel-and-only-selected-mic",
+        "status": "passed",
+        "micA": [
+          {
+            "frames": 24000,
+            "peak": 9001,
+            "rms": 6363.632309338616,
+            "expectedHz": 880,
+            "markerEnergyFraction": 0.6652749173571261
+          },
+          {
+            "frames": 24000,
+            "peak": 9012,
+            "rms": 6363.484468826808,
+            "expectedHz": 880,
+            "markerEnergyFraction": 0.08614039127283214
+          },
+          {
+            "frames": 24000,
+            "peak": 9001,
+            "rms": 6235.811008344597,
+            "expectedHz": 880,
+            "markerEnergyFraction": 0.45454966137981445
+          },
+          {
+            "frames": 24000,
+            "peak": 9001,
+            "rms": 6364.257986108828,
+            "expectedHz": 880,
+            "markerEnergyFraction": 0.9999999376132145
+          }
+        ],
+        "micB": {
+          "frames": 24000,
+          "peak": 0,
+          "rms": 0.0,
+          "expectedHz": 880,
+          "markerEnergyFraction": 0
+        },
+        "captureRequests": [
+          1,
+          0
+        ],
+        "audioSocketUnchanged": true
+      },
+      {
+        "name": "two-selected-App-domains-share-original-capture-and-play-independent-speakers",
+        "status": "passed",
+        "microphone": [
+          [
+            {
+              "frames": 24000,
+              "peak": 9000,
+              "rms": 6363.62713035315,
+              "expectedHz": 1100,
+              "markerEnergyFraction": 0.9999999348680974
+            }
+          ],
+          [
+            {
+              "frames": 24000,
+              "peak": 9000,
+              "rms": 6363.62713035315,
+              "expectedHz": 1100,
+              "markerEnergyFraction": 0.9999999348680974
+            }
+          ]
+        ],
+        "browserOutput": [
+          [
+            {
+              "frames": 24000,
+              "peak": 9003,
+              "rms": 6352.118047729566,
+              "expectedHz": 440,
+              "markerEnergyFraction": 0.9957554054190424
+            }
+          ],
+          [
+            {
+              "frames": 24000,
+              "peak": 9002,
+              "rms": 6360.29349907822,
+              "expectedHz": 660,
+              "markerEnergyFraction": 0.9984173618562476
+            }
+          ]
+        ],
+        "captureRequests": [
+          1,
+          0
+        ]
+      },
+      {
+        "name": "selected-Viewer-cut-leaves-duplicate-Viewer-other-App-audio-and-capture-untouched",
+        "status": "passed",
+        "preMutationAmbiguityRejected": true,
+        "invalidSelectorRejected": true,
+        "microphone": [
+          [
+            {
+              "frames": 24000,
+              "peak": 8999,
+              "rms": 6363.083646020222,
+              "expectedHz": 1320,
+              "markerEnergyFraction": 0.9999999506422536
+            }
+          ],
+          [
+            {
+              "frames": 24000,
+              "peak": 8999,
+              "rms": 6363.083646020222,
+              "expectedHz": 1320,
+              "markerEnergyFraction": 0.9999999506422536
+            }
+          ]
+        ],
+        "sourcePreserved": true,
+        "audioSocketUnchanged": true
+      },
+      {
+        "name": "real-foreground-owner-switches-deliver-fresh-bidirectional-clipboard-to-each-App",
+        "status": "passed",
+        "readbackBothDirections": true,
+        "templates": [
+          "mousepad",
+          "kwrite"
+        ]
+      },
+      {
+        "name": "closing-capture-owner-automatically-hands-off-to-authorized-participating-document",
+        "status": "passed",
+        "newOwnerCaptureRequests": 1,
+        "oneActualPulseCapture": true,
+        "microphone": [
+          [
+            {
+              "frames": 24000,
+              "peak": 8999,
+              "rms": 6362.568775600779,
+              "expectedHz": 1540,
+              "markerEnergyFraction": 0.9999999682767197
+            }
+          ],
+          [
+            {
+              "frames": 24000,
+              "peak": 8999,
+              "rms": 6362.578870532765,
+              "expectedHz": 1540,
+              "markerEnergyFraction": 0.5958426322690974
+            },
+            {
+              "frames": 24000,
+              "peak": 9079,
+              "rms": 6361.919744427908,
+              "expectedHz": 1540,
+              "markerEnergyFraction": 0.9016869525371711
+            }
+          ]
+        ],
+        "browserOutput": [
+          [
+            {
+              "frames": 24000,
+              "peak": 9002,
+              "rms": 6328.632443328495,
+              "expectedHz": 880,
+              "markerEnergyFraction": 0.9886382106701085
+            }
+          ],
+          [
+            {
+              "frames": 24000,
+              "peak": 9001,
+              "rms": 6243.958728109383,
+              "expectedHz": 990,
+              "markerEnergyFraction": 0.9624354797228145
+            }
+          ]
+        ],
+        "sharedConnectionPreserved": true
+      },
+      {
+        "name": "per-App-microphone-off-fences-only-that-target-while-other-App-stays-live",
+        "status": "passed",
+        "disabledTarget": {
+          "frames": 24000,
+          "peak": 0,
+          "rms": 0.0,
+          "expectedHz": 1760,
+          "markerEnergyFraction": 0
+        },
+        "enabledTarget": [
+          {
+            "frames": 24000,
+            "peak": 9054,
+            "rms": 6362.648319525317,
+            "expectedHz": 1760,
+            "markerEnergyFraction": 0.8356554604175487
+          }
+        ],
+        "captureRequests": 1
+      },
+      {
+        "name": "actual-runtime-retirement-stops-last-requested-mic-preserves-other-speaker",
+        "status": "passed",
+        "browserOutput": [
+          {
+            "frames": 24000,
+            "peak": 9734,
+            "rms": 6269.835283562081,
+            "expectedHz": 1210,
+            "markerEnergyFraction": 0.3892912059400213
+          },
+          {
+            "frames": 24000,
+            "peak": 9033,
+            "rms": 6244.546421261649,
+            "expectedHz": 1210,
+            "markerEnergyFraction": 0.1797271119046717
+          },
+          {
+            "frames": 24000,
+            "peak": 9731,
+            "rms": 6218.176272512839,
+            "expectedHz": 1210,
+            "markerEnergyFraction": 0.24547225816780271
+          },
+          {
+            "frames": 24000,
+            "peak": 9000,
+            "rms": 6364.070141786885,
+            "expectedHz": 1210,
+            "markerEnergyFraction": 0.9999999700665899
+          }
+        ],
+        "noActualPulseCapture": true
+      },
+      {
+        "name": "final-owner-disposal-releases-audio-channel-and-capture",
+        "status": "passed"
+      }
+    ],
+    "pageErrors": [],
+    "rawReportSHA256": "78fa2f22d1017c2d0910b7647b00db85a2fad8cf642066f78a8749787dca2d5a"
+  },
+  "hungWorkers": {
+    "firstRecoverySeconds": 29.81440505303908,
+    "checks": [
+      {
+        "name": "actual-hang-control-baseline",
+        "status": "passed",
+        "microphoneWindows": [
+          {
+            "frames": 24000,
+            "peak": 9001,
+            "rms": 6364.844335488497,
+            "expectedHz": 660,
+            "markerEnergyFraction": 0.9999999510498797
+          }
+        ],
+        "browserOutputWindows": [
+          {
+            "frames": 24000,
+            "peak": 9003,
+            "rms": 6365.629112438534,
+            "expectedHz": 440,
+            "markerEnergyFraction": 0.9999999850726284
+          }
+        ],
+        "freshClipboardBothDirections": true,
+        "runtimeGenerationUnchanged": true,
+        "sourcePreserved": true,
+        "captureRequests": 1,
+        "requested": {
+          "speaker": true,
+          "microphone": true
+        }
+      },
+      {
+        "name": "one-actual-hung-Worker-replacement-preserves-source-and-restores-fresh-data",
+        "status": "passed",
+        "microphoneWindows": [
+          {
+            "frames": 24000,
+            "peak": 9001,
+            "rms": 6364.263608194065,
+            "expectedHz": 880,
+            "markerEnergyFraction": 0.9999999395568715
+          }
+        ],
+        "browserOutputWindows": [
+          {
+            "frames": 24000,
+            "peak": 9003,
+            "rms": 6358.59136267617,
+            "expectedHz": 550,
+            "markerEnergyFraction": 0.44738334827412335
+          },
+          {
+            "frames": 24000,
+            "peak": 9003,
+            "rms": 6358.809480633934,
+            "expectedHz": 550,
+            "markerEnergyFraction": 0.4796243387595633
+          },
+          {
+            "frames": 24000,
+            "peak": 9002,
+            "rms": 6365.488657106381,
+            "expectedHz": 550,
+            "markerEnergyFraction": 0.9999999823390822
+          }
+        ],
+        "freshClipboardBothDirections": true,
+        "runtimeGenerationUnchanged": true,
+        "sourcePreserved": true,
+        "captureRequests": 1,
+        "requested": {
+          "speaker": true,
+          "microphone": true
+        }
+      },
+      {
+        "name": "two-real-hung-Worker-names-reach-honest-bounded-failure-without-recapture",
+        "status": "passed",
+        "actualWorkerTargets": 2,
+        "state": {
+          "connection": "blocked",
+          "reason": "audio-worker-capacity",
+          "actualMic": false,
+          "requestedMic": true,
+          "sourceHeld": true,
+          "captureRequests": 1,
+          "workerExhausted": true
+        }
+      },
+      {
+        "name": "explicit-off-commits-and-stops-capture-with-both-Workers-hung",
+        "status": "passed",
+        "captureRequests": 1,
+        "noAutomaticRecaptureDuringSeconds": 12
+      },
+      {
+        "name": "actual-hung-bootstrap-native-client-count-is-bounded",
+        "status": "passed",
+        "counts": {
+          "SharedWorker": 4,
+          "MessagePort": 6
+        },
+        "maximumSharedWorkers": 4
+      }
+    ],
+    "nativeBootstrapCounts": {
+      "SharedWorker": 4,
+      "MessagePort": 6
+    },
+    "finalLivePageNativeAudioCounts": {
+      "AudioContext": 0,
+      "AudioWorkletNode": 0,
+      "blink::AudioWorkletMessagingProxy": 0,
+      "MediaStreamAudioSourceNode": 0,
+      "MediaStream": 0,
+      "MediaStreamTrack": 0,
+      "GainNode": 0,
+      "AudioWorklet": 0,
+      "AudioDestinationNode": 0
+    },
+    "pageErrors": [],
+    "rawReportSHA256": "74bba6e3c9d9237b0fda962760c5440f3956832f95da8fd82f554662c5cdf49b",
+    "rawNineClassReviewSHA256": "8cb05ecb5db0ce8cf011952a3ef3967a25902b8a2bddc26b6a5eb343cdbf9591"
+  },
+  "remaining": [
+    "Complete24class positive/terminal and combined audit, permission/browser/embedding variants",
+    "Remaining native clipboard input/expiry/cancel/slow-receiver/old-pair boundaries",
+    "Earlier short anonymous PSS growth root audit and whole-browser/server allocation review",
+    "Eight-hour natural and separate at-least90minute/1000operation stress",
+    "All platforms/transports, final exact artifact/review and one complete human UAT"
+  ],
+  "sourceSHA256": {
+    "cmd/remotexappd/web/sdk/audio-coordinator.js": "dd25d66b409ec565abb6b9e3c07aab664ff074739be53e414f33b8f66903e1dc",
+    "cmd/remotexappd/web/sdk/audio-worker-hub.js": "285d0b7e26f72a548f6f852b3b245b1862feea8436c8f734e3e4c8d391f234bc",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "dba08376d2463424a0901b1811035dc702bd662b88a45b923cc2dd08846d1fa8",
+    "cmd/remotexappd/web/sdk/audio-intent-journal.js": "0dfcd3ec148dc3f506e0b990bb44ca0396c98601275b41c96634082edc26492b",
+    "tests/native-audio/headed_cdp.py": "b8cb78f5c21789ec8870c4db12102ce1fb33df1009a45b8398a735c65bad8a61",
+    "tests/native-audio/virtual_pulse.py": "52c7e5bd5ebaa03f4156844ebe24a056838a4f95fb7d4f5008d82b382581a573"
+  },
+  "cleanup": {
+    "ownAppsStopped": true,
+    "ownManagerAndEdgeStopped": true,
+    "ownUnitFileRemoved": true,
+    "dedicatedFixtureStopped": true,
+    "originalPublicUATPreserved": true,
+    "ownedBrowserProfilesRemoved": true,
+    "noMarkedOwnedHostChromePulseXvfb": true,
+    "rawRuntimeCleanupSHA256": "fb10fb667208d574495555ef3f948d00e0215ec0d90e0dc0775817ad5a4822f2",
+    "rawHostCleanupSHA256": "ced334b969d04d72387cf0004dda9c809f47dcfdb8ed05cf622d0b44acbf6bfb"
+  }
+}

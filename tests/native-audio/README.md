@@ -267,3 +267,23 @@ That positive recapture is a measurement control, not automatic SDK recovery.
 Only synthetic prompt handling is automated; physical-device and real user
 permission-dialog acceptance remain separate. These short controls are neither
 long-duration resource evidence nor full product qualification.
+
+## Current-pair multi-document and actual-hang controls
+
+[Recorded results](results-multidoc-worker-hang-20261128.json) bind two separate
+current Core/embedded SDK/native-component runs. The eight-case ownership run
+uses two documents, three Viewers and two App templates; it checks selected mic
+routes, independent speakers, exact Viewer cuts, actual clipboard focus,
+authorized capture-owner handoff, per-App off, runtime retirement and cleanup.
+Validate a test controller's socket selector before closing anything: an
+ambiguous duplicate-Viewer request must fail without cutting both connections.
+
+The five-case hang run enters a real infinite loop in each owned native
+SharedWorker, confirming entry through the inspector before observing recovery.
+Keep the inspector session alive during the fault; don't replace a hang with a
+timeout that terminates evaluation, `self.close()` or a synthetic error callback.
+An available second name restores fresh data with the valid original source.
+Two hung names must instead remain bounded and allow explicit off without a
+responsive Worker. Take any native-client/retirement diagnostic snapshots only
+after the fault interval and record them separately from natural observations.
+These scoped results do not qualify every fault class or whole-process memory.

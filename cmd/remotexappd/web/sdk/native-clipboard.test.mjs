@@ -1,10 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {NativeClipboard} from './native-clipboard.js';
-// #117 remains unfixed. CI reports these desired-behavior assertions as TODO;
-// set REMOTEXAPP_TEST_CLIPBOARD_ABA=1 for a strict, nonzero red reproduction.
-const knownABA = process.env.REMOTEXAPP_TEST_CLIPBOARD_ABA === '1' ? {} :
-  {todo:'Issue #117: stale lastSent suppresses a later legitimate remote copy'};
 const turn = () => new Promise(resolve => setImmediate(resolve));
 const deferred = () => { let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject}; };
 function fixture(t) {
@@ -300,7 +296,7 @@ test('a genuine upload echo is ignored but a distinct later remote copy is deliv
   assert.deepEqual(c.sent,['A']);assert.deepEqual(f.io.writes,['B']);
 });
 
-test('a legitimate remote text A-B-A is not an old local upload echo',knownABA,async t=>{
+test('a legitimate remote text A-B-A is not an old local upload echo',async t=>{
   const f=fixture(t),c=await f.start(),s=c.clipboard;
   f.io.text='A';await s.sync();s.offer('A');await s.sync();
   s.offer('B');await s.sync();assert.equal(f.io.text,'B');
@@ -309,7 +305,7 @@ test('a legitimate remote text A-B-A is not an old local upload echo',knownABA,a
   assert.deepEqual(c.sent,['A'],'remote delivery must not echo back as an upload');
 });
 
-for(const format of ['HTML','PNG + text'])test(`a legitimate remote ${format} A-B-A is delivered`,knownABA,async t=>{
+for(const format of ['HTML','PNG + text'])test(`a legitimate remote ${format} A-B-A is delivered`,async t=>{
   const f=richFixture(t),c=await f.start(f.client),s=c.clipboard;
   const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=','base64');
   // This is a state-machine/representation identity test, not PNG decoding.
@@ -324,9 +320,41 @@ for(const format of ['HTML','PNG + text'])test(`a legitimate remote ${format} A-
   assert.equal(c.sent.length,1,'remote delivery must not create an upload loop');
 });
 
-test('paste after remote A-B-A cannot upload the stale intermediate B',knownABA,async t=>{
+test('paste after remote A-B-A cannot upload the stale intermediate B',async t=>{
   const f=fixture(t),c=await f.start(),s=c.clipboard;
   f.io.text='A';await s.sync();s.offer('B');await s.sync();
   s.offer('A');await s.sync();await s.paste();
   assert.equal(c.sent.at(-1),'A','paste must not overwrite the newest remote A with stale B');
+});
+
+test('rapid remote B-A replaces the pending B even when A was uploaded earlier',async t=>{
+  const f=fixture(t),c=await f.start(),s=c.clipboard;
+  f.io.text='A';await s.sync();s.offer('B');s.offer('A');await s.sync();
+  assert.equal(f.io.text,'A');assert.deepEqual(f.io.writes,[]);assert.deepEqual(c.sent,['A']);
+});
+
+test('remote A arriving during delivery of B is delivered after B without an upload loop',async t=>{
+  const f=fixture(t),c=await f.start(),s=c.clipboard,write=deferred(),original=f.nav.clipboard.writeText;
+  f.io.text='A';await s.sync();
+  f.nav.clipboard.writeText=async text=>{await original(text);await write.promise;};
+  s.offer('B');const pending=s.sync();await turn();assert.equal(f.io.text,'B');
+  s.offer('A');f.nav.clipboard.writeText=original;write.resolve();await pending;await s.sync();
+  assert.equal(f.io.text,'A');assert.deepEqual(f.io.writes,['B','A']);assert.deepEqual(c.sent,['A']);
+});
+
+test('a delayed same-value offer cannot overwrite a distinct concurrent local copy',async t=>{
+  const f=fixture(t),c=await f.start(),s=c.clipboard;
+  f.io.text='A';await s.sync();f.io.text='new local';s.offer('A');await s.sync();
+  assert.equal(s.phase,'conflict');assert.equal(f.io.text,'new local');
+  assert.deepEqual(f.io.writes,[]);assert.deepEqual(c.sent,['A']);
+});
+
+test('one hundred remote A-B-A cycles preserve the newest copy without replaying uploads',async t=>{
+  const f=fixture(t),c=await f.start(),s=c.clipboard;
+  f.io.text='A';await s.sync();
+  for(let i=0;i<100;i++){
+    s.offer('B');await s.sync();assert.equal(f.io.text,'B');
+    s.offer('A');await s.sync();assert.equal(f.io.text,'A');
+  }
+  assert.equal(f.io.writes.length,200);assert.deepEqual(c.sent,['A']);
 });

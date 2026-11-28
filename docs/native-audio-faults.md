@@ -2,7 +2,9 @@
 
 This is a fault inventory for the Core 0.17.6 / SDK 0.37 source contract, not a
 claim that every failure has automatic recovery or that an incident's cause is
-known. See [audio ownership](native-audio.md) and
+known. The owner has selected the [self-recovery implementation](native-self-recovery.md)
+to supersede several current manual-resume boundaries; it is not yet qualified.
+See [audio ownership](native-audio.md) and
 [integration intent](integration-intent-recovery.md). Physical device faults,
 browser policies, ingress failures and SDK defects can produce the same silence.
 A WebSocket close code, including 1006, does not identify which layer failed.
@@ -95,8 +97,9 @@ required; retained requested flags and a connected counter are insufficient.
 ## Clipboard diagnostic boundary
 
 [Issue #117](https://github.com/woodegg/remotexapp/issues/117) records a distinct
-clipboard stale-echo defect. It does not explain audio epoch failures. See the
-[strict A-B-A reproduction](../tests/kasm-native/CLIPBOARD-ABA.md). A successful
+clipboard stale-echo defect now repaired in development, with final qualification
+pending. It does not explain audio epoch failures. See the
+[mandatory A-B-A regressions](../tests/kasm-native/CLIPBOARD-ABA.md). A successful
 sequential clipboard test or natural audio soak does not close that regression.
 
 ## Recorded execution

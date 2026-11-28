@@ -1,39 +1,39 @@
-# Native clipboard A-B-A known failure
+# Native clipboard A-B-A regression
 
-Issue [#117](https://github.com/woodegg/remotexapp/issues/117) tracks this unfixed
-SDK state-machine defect. The tests use actual `NativeClipboard` with synthetic
-browser/display APIs and content; they do not mutate an OS clipboard or prove
-the cause of a particular WeChat incident. No timing sleeps or large payloads
-are needed to reproduce it.
+Issue [#117](https://github.com/woodegg/remotexapp/issues/117) records the original
+SDK stale-echo defect; [#119](https://github.com/woodegg/remotexapp/issues/119) now
+owns systematic repair/qualification. Tests use actual NativeClipboard with
+synthetic browser/display APIs and content. They do not mutate an OS clipboard
+or prove a particular WeChat incident's cause.
 
-1. Acquire the focused clipboard baseline and enable both directions.
-2. Copy local A; sync uploads A. Its immediate server echo is correctly ignored.
+1. Enable both directions and acquire the focused baseline.
+2. Copy local A; sync uploads A. An immediate actual echo is a no-op.
 3. Copy remote B; sync writes B locally.
-4. Copy remote A again. Expected: local becomes A, without an upload loop.
-   Current: `lastSent` still contains the earlier A, so `offer()` ignores the
-   legitimate new A. Local stays B.
-5. Explicit paste can now upload the stale B and overwrite remote A.
+4. Copy remote A again. Expected: local becomes A without an upload loop.
+   The old lastSent marker ignored this new A, leaving local B.
+5. A later explicit paste could upload stale B and overwrite remote A.
 
-The stable tests are in
-[`native-clipboard.test.mjs`](../../cmd/remotexappd/web/sdk/native-clipboard.test.mjs).
-They assert the **desired** behavior for plain text, HTML plus text, PNG plus
-text and the subsequent paste. PNG is a representation-identity control, not
-image decoding, normalization or a physical browser image test. A separate
-passing control checks genuine echo suppression and later distinct delivery.
-
-Run the unresolved assertions as strict red tests:
+The development repair removes permanent payload-based echo suppression. Actual
+local-value/baseline comparison suppresses no-op echoes and protects concurrent
+local copies; a new remote A replaces an older pending B. Run the mandatory tests:
 
 ```sh
-REMOTEXAPP_TEST_CLIPBOARD_ABA=1 node --test \
-  cmd/remotexappd/web/sdk/native-clipboard.test.mjs
+node --test cmd/remotexappd/web/sdk/native-clipboard.test.mjs \
+  cmd/remotexappd/web/sdk/native-clipboard-data.test.mjs
 ```
 
-On the unfixed implementation this exits nonzero with four failed desired
-assertions. Without the variable, the regular suite reports those four as TODO,
-not successful regressions; existing controls still fail normally if broken.
-This keeps the defect visible without falsely changing its status to fixed or
-breaking unrelated CI work. A repair must remove `knownABA`/the TODO options,
-pass the strict assertions, retain ordinary echo suppression and test delayed
-self-echo, focus/reset/reconnect, concurrent changes and real browser/X11
-delivery. Do not weaken the assertions to expect B or classify every later
-same-value copy as an old echo.
+There are no A-B-A TODOs or opt-in flags now. The original d4eecb4 reproduction
+had four desired assertions marked TODO by default and a strict environment flag
+that produced four failures. That historical mode is not the current gate.
+Current cases cover text, HTML plus text, PNG plus text, the subsequent paste,
+rapid B/A offers, A arriving during B's delivery, a conflicting new local copy
+and 100 repeated remote cycles. The genuine-echo controls must still pass.
+PNG here tests representation identity, not decoding or a physical image copy.
+
+[Real Chrome/X11 old/new control](../native-audio/results-clipboard-aba-20261128.json)
+reproduces stale overwrite on the original SDK and passes on the development
+module with 20 further cycles. It deliberately uses the same archived Core/Kasm
+pair while changing the served SDK; it is not exact-release qualification.
+Final immutable-candidate browser/format/normalization/size/multi-owner and
+combined-fault qualification remains part of #119. Do not weaken assertions to
+expect stale B or infer that the distinct concurrent-upload race is fixed.

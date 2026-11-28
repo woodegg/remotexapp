@@ -13,10 +13,16 @@ implementation; move them to a version section when publishing a release.
 
 Target: `0.17.6`. SDK `0.37.0`.
 
-- Document audio failure classes and distinct epoch recovery boundaries. Add
-  strict A-B-A clipboard reproductions with genuine-echo controls. The stale
-  echo defect remains open in #117; its four desired-behavior assertions are
-  reported as TODO until repaired, rather than claimed as passing regressions.
+- Fix native clipboard A-B-A delivery by removing permanent uploaded-payload
+  echo suppression. Compare the current local value and baseline instead;
+  preserve concurrent local changes and let a newer offer replace an older
+  pending offer. Mandatory text/rich/paste/delayed/cycle regressions and a real
+  Chrome/X11 old-versus-new control cover the repair. Full release qualification
+  remains pending under #117 / #119.
+- Select systematic native integration recovery under #119. The implementation
+  and qualification plan covers granted-permission mic reacquisition, shared
+  intent fencing, bounded recovery and combined long-duration/stress gates.
+  Audio state-machine integration is still in development.
 
 - Unregister the native display adapter's keyboard blur listener before
   removing its input. A browser-retained detached input must not keep retired

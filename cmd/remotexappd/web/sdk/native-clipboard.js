@@ -1,5 +1,4 @@
 import {clipboardFormats, richBrowserClipboard, validateClipboard, readClipboard, writeAndVerifyClipboard, sendClipboard, sameLocalClipboard} from './native-clipboard-data.js';
-import {sameClipboard} from '../../../../third_party/kasm/clipboard-payload.mjs';
 // Native clipboard policy. Payloads are bounded, ephemeral and never emitted.
 const modes = new Set(['off', 'manual', 'auto']);
 const coordinatorKey = Symbol.for('remotexapp.native-clipboard.owner.v1');
@@ -72,7 +71,6 @@ export class NativeClipboard {
     this.timer = null;
     this.baseline = undefined;
     this.remote = undefined;
-    this.lastSent = undefined;
     this.conflict = false;
     // An already-started browser call owns busy until it actually settles.
     this.client._display?.cancelClipboardPaste?.();
@@ -165,9 +163,12 @@ export class NativeClipboard {
   }
   offer(text) {
     try { text = this.valid(text); } catch (error) { this.emit(error.code); return; }
-    if (!this.eligible() || this.effective('toLocal') !== 'auto' || text.bytes === 0 || sameClipboard(text, this.lastSent)) return;
+    if (!this.eligible() || this.effective('toLocal') !== 'auto' || text.bytes === 0) return;
     // Do not replay an offer observed during baseline acquisition or a conflict.
     if (this.baseline === undefined || this.conflict) return;
+    // A payload is not a transaction identity: remote A after B is a new copy,
+    // even if this Viewer uploaded A earlier. sync compares against the actual
+    // local value/baseline to suppress echoes and preserve concurrent changes.
     this.remote = text;
     this.schedule(0);
   }
@@ -210,7 +211,7 @@ export class NativeClipboard {
         this.remote = undefined;
         if (paste) {
           // A paste is an explicit source choice, including after refocusing.
-          if (text.bytes) { sendClipboard(this.client._display, text, this.client.capabilities); this.lastSent = text; }
+          if (text.bytes) { sendClipboard(this.client._display, text, this.client.capabilities); }
           this.baseline = text; this.conflict = false;
           this.emit(text.bytes ? 'submitted' : 'empty-noop');
           return {revision, empty:!text.bytes};
@@ -236,7 +237,6 @@ export class NativeClipboard {
           if (changed && text.bytes && !text.localOnly && this.effective('toRemote') === 'auto') {
             this.check(revision);
             sendClipboard(this.client._display, text, this.client.capabilities);
-            this.lastSent = text;
             this.emit('submitted');
           }
           this.baseline = text;

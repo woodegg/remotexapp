@@ -5768,3 +5768,28 @@ Qualify actual backing-store/RFB retirement independently from Worker/audio
 counts, and retain failed or partial resource observations. This decision
 does not attribute or repair the separate no-SDK native clipboard readback
 failure in #111.
+
+
+## 2026-11-28 — Reconcile live integration intent through recoverable faults
+
+The owner selected systematic repairs and one complete UAT after qualification
+in [#119](https://github.com/woodegg/remotexapp/issues/119). The
+[self-recovery plan](native-self-recovery.md) prospectively supersedes the
+2026-11-24 rule that every ended mic capture needs another click. Under a live
+participating owner, current granted browser permission and fresh runtime
+access, SDK recovery may reacquire a device without prompting. Off/logout,
+permission revocation and identity/runtime fences still stop old delivery.
+
+Use shared switch epochs and bounded owner participation metadata to prevent a
+stale page resurrecting audio after another tab's off/on or Worker replacement.
+This metadata is not a grant, content, device fingerprint or persisted capture
+permission. A fresh document starts off. Bounded retry, proper native retirement
+and separate eight-hour natural/ninety-minute combination-stress gates are
+required; implementation is not qualified merely by the policy change.
+
+For #117, remove uploaded-payload equality as a permanent remote-offer veto.
+A new remote A after B is valid even when A was uploaded before. Current local
+value/baseline comparison handles no-op echoes and concurrent local conflicts.
+Development unit and real Chrome/X11 old/new controls pass; final-candidate
+qualification remains outstanding. Kasm already fences stale X11 snapshot owners
+and revisions; no second legacy clipboard path is introduced by this repair.

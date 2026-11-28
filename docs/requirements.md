@@ -147,6 +147,17 @@ Review/merge, actual embedding-host and post-merge release qualification remain 
 | AUD-004 | Audio resource retirement belongs to the SDK. Playback/capture processors accept terminal disposal, discard PCM and return false after a terminal render acknowledgement. Audio dispose returns one idempotent Promise; Host dispose/logout join local retirement and Context close. Stop capture tracks and invalidate pending capture authority synchronously. A suspended capture-only retirement waits for an explicit resume; final disposal may drain only its existing muted graph without capturing or restoring intent. Bound the final terminal wait and reject incomplete cleanup rather than claiming success. | Reproduce #104 on exact Edge 157, compare six active cycles and native Context/Worklet/Proxy counts; verify public Host cleanup, capture-only resume, suspended drain, late permission, off/logout/multi-owner and repeated disposal. Natural/fault resource sampling, fifty retirements and eighty-second live idle are separate from diagnostic GC and physical-device UAT. |
 | AUD-005 | Keep native SharedWorker client handles bounded during same-document Host recreation without retiring another owner's audio. Worker v6 uses one document/Manager/generation bootstrap and independent transferable MessageChannels; normal owner disposal closes only its logical channel. No capture, Context or audio WSS survives its last enabled interest. One inert document bootstrap is permitted until document retirement; it is not a media interest or authorization grant. | #110 / #112 development: verify fifty same-page retirements while another peer remains usable, all-off native endpoints, multi-document isolation, Worker loss and generation recovery; real served SDK/native/Pulse qualification remains separate. |
 
+AUD-006 is selected for implementation in [Issue #119](https://github.com/woodegg/remotexapp/issues/119)
+and [the self-recovery plan](native-self-recovery.md): reconcile still-valid
+speaker/mic intent across service, transport and Worker replacement. Reacquire
+only under a live participating owner, granted browser permission and fresh
+runtime authorization; never prompt automatically or resurrect off/logout/old
+identity/runtime authority. Bound retries and shared metadata and test mixed
+faults and long-duration resource behavior before UAT. This prospectively
+supersedes AUD-003's mandatory extra click after every expired/replaced capture,
+not its cancellation, access or generation fences. Implementation/qualification
+are incomplete; legacy evidence does not accept the new policy.
+
 AUD-003 verification uses the [audio fault inventory](native-audio-faults.md)
 to distinguish display, transport, service, Worker, capture, runtime and identity
 fences. A changed service epoch must be observed directly; fresh sound and remote
@@ -209,11 +220,12 @@ rich clipboard capabilities for the native provider.
 | KNC-011 | Keep explicitly requested native clipboard directions on the same logical Viewer across reconnect to the same runtime generation and component with fresh accepted grants. A separate login-session header is optional; an observed optional login change still fences old consent. Retire old operations and offers, recheck browser permission and establish a fresh local baseline after focus. A host must render requested mode separately from active ownership and recovery or permission state. | Implemented for local UAT. Cut the Viewer transport, restart the Manager and verify same-generation recovery, focus pauses, independent Viewer or tab choices, no old payload replay and authorization loss on logout or runtime replacement. |
 | KNC-012 | Report copied-to-local only after verified delivery. Bind normalized rich readback to an ephemeral browser-local write receipt where supported; otherwise require exact content equality. Never consume empty, stale or a distinct concurrent local copy as a successful normalized baseline. Uncertain writes are not replayed; requested directions remain intact and explicit source choice can resolve uncertainty. Keep receipt metadata bounded, private and out of remote representations, diagnostics and content budgets. Manual write without existing read permission reports write-accepted and never requests read access implicitly. | #111 / #107 / #112 development: deterministic post-write local-copy, empty/stale write, marker loss, normalization, permission/blur/off/timeout, rich/type/size bounds and real browser readback; browser/OS clipboard admission failures require separate environment attribution. |
 
-KNC-003 known-defect coverage: [Issue #117](https://github.com/woodegg/remotexapp/issues/117)
+KNC-003 repair under development: [Issue #117](https://github.com/woodegg/remotexapp/issues/117)
 records a stale upload-echo marker suppressing legitimate remote A-B-A. The
 [strict reproduction](../tests/kasm-native/CLIPBOARD-ABA.md) asserts delivery and
-no stale paste for text, HTML and PNG-plus-text. These assertions remain known
-failures, not evidence of accepted echo correctness or a fix.
+no stale paste for text, HTML and PNG-plus-text. The assertions are now mandatory and pass in development, including delayed
+offers and repeated cycles. Real Chrome/X11 old/new controls reproduce the
+original loss and validate the repair; final-candidate qualification is pending.
 
 ## Selected Core 0.15.0 — managed desktop self-recovery
 

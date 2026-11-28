@@ -317,25 +317,54 @@ test('speaker restore requires the same login and respects a newer explicit canc
   }finally{f.cleanup();}
 });
 
-test('microphone recovery stops on owner loss or expired time while retaining the request',async t=>{
- for(const fault of ['owner gone','window elapsed'])await t.test(fault,async sub=>{
-  sub.mock.timers.enable({apis:['setTimeout']});
-  const f=fixture();try{
-   const a=f.peer();
-   f.login='';
-   await ready(a);await acquire(a,'a');await a.request('microphone',{ref:'a',enabled:true});
-   f.sockets[0].close();await turn();
-   if(fault==='owner gone'){a.send('dispose');await f.coordinator.serial;}
-   if(fault==='window elapsed'){
-    sub.mock.timers.tick(12000);
-    assert.equal(a.state().routes[0].requested.microphone,true);
-    assert.equal(a.state().routes[0].microphoneActionRequired,true);
-   }
-   assert.equal(f.coordinator.capture,null);
-   assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
-   assert.ok(a.messages.some(m=>m.type==='stop-capture'));
-  }finally{f.cleanup();sub.mock.timers.reset();}
- });
+test('microphone owner loss during an outage still terminates its source',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a');await a.request('microphone',{ref:'a',enabled:true});
+  f.sockets[0].close();await turn();a.send('dispose');await f.coordinator.serial;
+  assert.equal(f.coordinator.capture,null);
+  assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
+  assert.ok(a.messages.some(m=>m.type==='stop-capture'));
+ }finally{f.cleanup();}
+});
+
+test('two-minute outage retains a heartbeating live source and resumes only fresh delivery',async t=>{
+ t.mock.timers.enable({apis:['setTimeout']});
+ const original=Date.now;let now=100000;Date.now=()=>now;
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a');await a.request('microphone',{ref:'a',enabled:true});
+  const capture=f.coordinator.capture, previousDelivery=capture.delivery;
+  f.offline=true;f.sockets[0].close();await turn();
+  for(let second=0;second<120;second++){
+   now+=1000;a.send('pong');t.mock.timers.tick(1000);f.coordinator._tick();await f.coordinator.serial;await turn();
+   assert.equal(f.coordinator.capture,capture,'source retired during transport outage');
+   assert.equal(capture.delivery,null);assert.equal(a.state().routes[0].actualMic,false);
+  }
+  assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
+  assert.equal(a.messages.filter(m=>m.type==='stop-capture').length,0);
+  f.offline=false;f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;
+  assert.equal(f.coordinator.capture,capture);assert.equal(a.state().routes[0].actualMic,true);
+  assert.notEqual(capture.delivery,previousDelivery);assert.equal(f.sockets.length,2);
+  const pcm=new Int16Array(960).fill(123).buffer;
+  a.send('microphone-frame',{token:capture.token,delivery:previousDelivery,pcm});
+  assert.equal(f.sockets[1].sent.filter(m=>m instanceof ArrayBuffer).length,0);
+  a.send('microphone-frame',{token:capture.token,delivery:capture.delivery,pcm});
+  assert.equal(f.sockets[1].sent.filter(m=>m instanceof ArrayBuffer).length,1);
+  await a.request('microphone',{ref:'a',enabled:false});assert.equal(f.coordinator.capture,null);
+ }finally{f.cleanup();Date.now=original;t.mock.timers.reset();}
+});
+
+test('capture retained through connection ownership contention is never delivered before fresh authorization',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);await acquire(a,'a');await a.request('microphone',{ref:'a',enabled:true});
+  const capture=f.coordinator.capture;f.sockets[0].close();await turn();f.busy=true;
+  f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;
+  assert.equal(f.coordinator.capture,capture);assert.equal(capture.delivery,null);
+  assert.equal(a.state().routes[0].actualMic,false);assert.equal(f.sockets.length,1);
+  await turn(); // Allow the first tick's finally to release its one-operation guard.
+  f.busy=false;f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;
+  assert.equal(a.state().routes[0].actualMic,true);assert.equal(f.sockets.length,2);
+  assert.equal(a.messages.filter(m=>m.type==='capture').length,1);
+ }finally{f.cleanup();}
 });
 
 test('explicit audio off succeeds locally while reconnection HTTP is unavailable',async()=>{

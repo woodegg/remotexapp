@@ -149,6 +149,21 @@ function graphFixture() {
   return f;
 }
 
+test('transport delivery fencing disables a live track without retiring its source',async()=>{
+  const f=graphFixture();await f.audio.ready;f.attach();
+  f.track.readyState='live';f.track.enabled=true;f.track.muted=false;
+  f.audio.stream.getAudioTracks=()=>[f.track];f.audio.captureToken='current-token';
+  const source=f.audio.stream,node=f.audio.capture;
+  f.audio._message({type:'capture-delivery',token:'current-token',delivery:null});
+  assert.equal(f.track.enabled,false);assert.equal(f.stops,0);assert.equal(f.audio.stream,source);
+  assert.deepEqual(node.messages.at(-1),{op:'delivery',delivery:null});
+  f.audio._message({type:'capture-delivery',token:'old-token',delivery:'old-delivery'});
+  assert.equal(f.track.enabled,false);
+  f.audio._message({type:'capture-delivery',token:'current-token',delivery:'fresh-delivery'});
+  assert.equal(f.track.enabled,true);assert.equal(f.stops,0);assert.equal(f.audio.capture,node);
+  const disposed=f.audio.dispose();node.ack();await disposed;assert.equal(f.stops,1);
+});
+
 test('audio disposal synchronously fences capture then joins terminal ACKs and context close',async()=>{
   const f=graphFixture();await f.audio.ready;f.attach();f.audio.playback=f.node();
   const oldEpoch=f.audio.captureEpoch;

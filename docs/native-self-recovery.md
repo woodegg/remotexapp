@@ -95,6 +95,14 @@ without it retain conservative same-service scope-change handling. No extra
 login header is required. Under scope pressure reclaim only inactive scopes with
 no pending grants; never evict an active channel or reservation to hide a quota.
 
+The transport-level implementation now retains a ready source beyond the old
+twelve-second cutoff while owner heartbeats and requested mic routes remain.
+It fences delivery and disables the live track during the interruption; a fresh
+route and delivery nonce can resume it without another device request. Unit
+controls include a simulated two-minute outage and temporary connection
+contention. This is partial implementation: actual Worker/source replacement,
+permission-driven reacquisition and full qualification are still outstanding.
+
 Keep separate failure classes: retryable connection/service/device/domain loss;
 blocked browser permission/playback/capability; terminal owner/identity/runtime
 retirement; and explicit user cancellation. Initialization failure must not leave

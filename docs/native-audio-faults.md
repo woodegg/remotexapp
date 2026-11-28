@@ -9,6 +9,15 @@ See [audio ownership](native-audio.md) and
 browser policies, ingress failures and SDK defects can produce the same silence.
 A WebSocket close code, including 1006, does not identify which layer failed.
 
+Development update under #119: the transport implementation has removed the
+twelve-second forced source retirement described in the original inventory
+below. A still-live source with responsive owner and requested mic routes is
+retained with delivery fenced and its track disabled; fresh authorization and
+delivery fencing can resume it. Native-cookie refresh also differs from an
+observed principal change. These partial repairs do not qualify the remaining
+Worker, device/permission, combined fault or long-duration gates. The linked
+self-recovery plan defines the replacement behavior and outstanding evidence.
+
 ## Epochs are different fences
 
 | Fence | What changes it | Correct response |

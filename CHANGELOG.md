@@ -30,6 +30,12 @@ Target: `0.17.6`. SDK `0.37.0`.
   This adds no credential, required login header or configuration. Under scope
   pressure, reclaim only idle scopes without live connections or pending grants;
   active/reserved capacity still returns a bounded quota error.
+- Retain an already live microphone source through long transport outages while
+  its owner remains responsive and requested routes remain enabled. Fence PCM
+  delivery and disable its track while disconnected; fresh authorization and a
+  fresh delivery nonce resume it without another device request. Explicit off,
+  logout, owner loss and authorization failure still retire capture. Worker
+  replacement and ended-source automatic reacquisition remain in development.
 
 - Unregister the native display adapter's keyboard blur listener before
   removing its input. A browser-retained detached input must not keep retired

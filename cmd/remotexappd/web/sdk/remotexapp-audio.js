@@ -299,6 +299,7 @@ export class RemoteXAppAudio extends EventTarget {
         this._captureFailed('microphone-device-unavailable');
         return;
       }
+      for (const track of this.stream.getAudioTracks()) track.enabled = !!message.delivery;
       this.capture.port.postMessage({op:'delivery',delivery:message.delivery});
       return;
     }

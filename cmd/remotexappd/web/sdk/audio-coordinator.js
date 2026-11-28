@@ -1,5 +1,3 @@
-const microphoneRecoveryMs = 12000;
-
 // One coordinator per canonical Manager origin/base, browser storage partition
 // and worker protocol. A server-issued cookie binds the current login epoch.
 export class AudioCoordinator {
@@ -98,13 +96,13 @@ export class AudioCoordinator {
     if (this.connection || !this.lastDisconnect) this.lastDisconnect = {at:Date.now(),code:reason,httpStatus:null};
     this._disconnect(reason);
     const capture = this.capture;
-    if (allowCaptureRecovery && capture?.ready &&
+    const retainSource = allowCaptureRecovery && capture?.ready &&
         this.ports.has(capture.peer.port) && Date.now()-capture.peer.seen <= 5000 &&
-        [...this.routes.values()].some(route=>route.mic)) {
-      if (!capture.recoveryTimer) capture.recoveryTimer = this.env.setTimeout(()=>{
-        if (this.capture === capture) this._stopCapture('microphone-recovery-expired');
-      },microphoneRecoveryMs);
-    } else this._stopCapture(reason);
+        [...this.routes.values()].some(route=>route.mic);
+    // A transport lease is not the lifetime of an already-authorized source.
+    // _disconnect fenced delivery; retain only while its live owner and
+    // requested routes survive. Owner loss/off still stops it.
+    if (!retainSource) this._stopCapture(reason);
     this.reason = reason;
     this._broadcast();
   }
@@ -210,7 +208,6 @@ export class AudioCoordinator {
   _stopCapture(reason) {
     const capture = this.capture; this.capture = null;
     if (capture) {
-      this.env.clearTimeout(capture.recoveryTimer);
       capture.reject?.(Error(reason));
       this._send(capture.peer,{type:'stop-capture',reason});
     }
@@ -223,10 +220,6 @@ export class AudioCoordinator {
     const delivery = enabled ? capture.delivery || this.env.crypto.randomUUID() : null;
     if (delivery === (capture.delivery || null)) return;
     capture.delivery = delivery;
-    if (delivery) {
-      this.env.clearTimeout(capture.recoveryTimer);
-      capture.recoveryTimer = null;
-    }
     this._send(capture.peer,{type:'capture-delivery',token:capture.token,delivery});
   }
   _releaseCaptureIfUnused() { if (![...this.routes.values()].some(r=>r.mic)) this._stopCapture('all-microphones-disabled'); }
@@ -241,7 +234,6 @@ export class AudioCoordinator {
       this.busySince ??= now;
       this.retryAfter = now+1000;
       this.reason = 'audio-connection-owned';
-      if (this.capture && !this.capture.recoveryTimer) this._stopCapture('audio-connection-owned');
       this._broadcast();
       return;
     }

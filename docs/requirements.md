@@ -170,7 +170,12 @@ SDK 0.38 / Worker 8 integrates the ordered journal with the audio runtime in
 development. Fresh target writer eligibility precedes device acquisition;
 `actualMic` requires a ready source and current processor delivery acknowledgement.
 Requested mic remains distinct from `microphonePending` and browser-action
-requirements. Temporary access rejection parks intent without old capture;
+requirements. Recovered target reasons clear only after all of that target's
+requested effects are effective, including current microphone delivery ACK;
+source readiness alone is insufficient. Pending/retired targets and unrelated
+failures retain their reasons. Clear the shared failure only when its connected
+routes have settled; retain disconnect history separately. Temporary access
+rejection parks intent without old capture;
 fresh observed identity changes and explicit logout still retire it. Worker
 rebind and ended-source recovery are covered by integrated module models;
 repeated silent exits, real browser/fault/resource and final acceptance gates

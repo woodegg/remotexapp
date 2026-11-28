@@ -53,6 +53,32 @@ matrix nor multiple real documents, physical hardware, OS sleep, long-duration
 allocation, new native clipboard component, production build matrix or immutable
 release. The final diagnostic GC is separate from the fault interval.
 
+## Current-pair combined preflight (development)
+
+The current Core/helpers, embedded SDK and native clipboard v4 component have
+now been combined with a real headed sandboxed Chrome, X11 and private virtual
+Pulse devices. Separate short controls verify service restart/long outage,
+cookie loss and Worker exit with fresh clipboard plus two-way audio. A later
+device/permission control restores fresh data without re-enabling the requests,
+then verifies explicit mic off survives a service restart. These are scoped
+development controls, not the complete multi-document or 24-class audit.
+
+Synthetic mic frequency changes after each fault; remote mic readback and the
+actual browser output monitor must match the new markers. An unchanged peak or
+constant fake WAV cannot distinguish buffered data from recovery. A standalone
+no-SDK browser control checks the measurement path independently. Device removal
+can leave a browser track reported live but silent, so neither a track flag nor
+a required capture-count increase proves the outcome. Keep incomplete attempts
+and invalid fixture assumptions distinct from product failures.
+
+The actual permission control also exposed a stale route reason after effective
+delivery recovered. Development code now clears a nonterminal target's reason
+only when all its requested effects are effective, including the current mic
+delivery ACK. Another unavailable target keeps its reason; the shared failure
+clears only when connected routes have settled. Disconnect history remains
+separate. Fresh signal, full current-artifact proof, resource and long-duration
+qualification are still required.
+
 ## Worker bootstrap recovery (development Worker 8)
 
 A silent exit need not emit `SharedWorker.onerror`. A new logical MessageChannel

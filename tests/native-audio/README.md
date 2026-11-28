@@ -236,3 +236,34 @@ the final live-page native endpoint. This is a minimal no-audio mechanism probe
 with diagnostic GC; it is separate from headed SDK/Pulse recovery, natural soak,
 combined stress and final artifact qualification. See P20 for exact measured
 bytes and limitations.
+
+## Headed virtual-device measurement control
+
+Run as a non-root test UID with PulseAudio, pactl, parec, xauth, Xvfb, a
+sandbox-capable Chrome and the Python `websockets` dependency used by
+`retirement_cdp.py`. Keep output directories outside Git:
+
+```sh
+python3 tests/native-audio/virtual_pulse.py --output /private/pulse-control
+python3 tests/native-audio/browser-virtual-pulse.py \
+  --browser /path/to/chrome --output /private/browser-pulse-control
+```
+
+`VirtualPulse` owns a separate socket/cookie/config/state, a paced pipe input
+and a null output monitor. It loads no hardware modules and changes no account
+audio settings. Pass its environment only to owned browser/clients. Source
+removal/recreation changes the actual virtual device. A new marker frequency
+after a fault verifies fresh data at the remote mic or actual browser output,
+separately from route ACK, Worklet statistics and transport flags. PCM collection
+has a deadline; the writer keeps no unbounded backlog when its device vanishes.
+The helper removes its own private runtime after reaping its daemon/writer.
+
+`headed_cdp.py` supplies an owned sandboxed Chrome and Xvfb, reads the complete
+display readiness line, bounds exception history and never enables Network or
+focus emulation. The standalone browser control serves one static loopback page
+with no SDK. It checks three new mic-to-output frequencies and actual virtual
+input removal/restore, recording whether Chrome itself needs a new capture.
+That positive recapture is a measurement control, not automatic SDK recovery.
+Only synthetic prompt handling is automated; physical-device and real user
+permission-dialog acceptance remain separate. These short controls are neither
+long-duration resource evidence nor full product qualification.

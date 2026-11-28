@@ -6026,3 +6026,15 @@ When incremental native staging yields, format/byte policy may change. Revalidat
 current policy immediately before admission, in the same final event-loop turn;
 parsed earlier headers are not lasting permission. Mid-transfer policy rejection
 must leave the prior destination and connection cache untouched.
+
+## 2026-11-28 — Retire recovered audio reasons at effective delivery
+
+The current-pair headed Chrome/Pulse permission control restores fresh mic and
+speaker data but retains `microphone-permission-required` on the active route.
+Treat that reason as a current failure, not a substitute for disconnect history.
+Clear a nonterminal target's reason only after all its requested effects are
+effective: playback has an eligible graph and mic has its current delivery ACK.
+Keep another pending/retired target's reason; clear the shared failure only
+when all connected routes have settled. Never infer physical audibility or
+silence recovery from the flags alone. This refines AUD-006's honest state
+contract without changing capture permission, retries, intent or authority.

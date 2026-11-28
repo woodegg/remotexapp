@@ -11,6 +11,13 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Clear recovered audio failure reasons only after every requested effect for
+  that target is effective, including the current microphone delivery ACK.
+  Preserve pending and retired targets' reasons and disconnect history. Real
+  device/permission recovery exposed the stale permission message; focused
+  regressions also keep another unavailable App's failure visible. Full
+  combined/native and final qualification remain separate gates.
+
 - Repair development native clipboard partial-upload stalls: resume bounded
   staging without blocking the desktop event loop, preserve final atomic
   revision admission, and close incomplete transactions at an absolute native

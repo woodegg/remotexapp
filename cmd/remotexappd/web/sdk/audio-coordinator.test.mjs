@@ -50,6 +50,38 @@ test('a server speaker route ACK is not effective playback until an eligible gra
  }finally{f.cleanup();}
 });
 
+test('automatic permission recovery clears current failure reasons only after fresh delivery, preserving other failed targets',async()=>{
+ const f=fixture();try{
+  const a=f.peer();await ready(a);a.send('playback-ready',{ready:true});await acquire(a,'a');
+  await a.request('speaker',{ref:'a',enabled:true});a.port.allowCapture=false;
+  const initial=a.request('microphone',{ref:'a',enabled:true});await turn();
+  a.send('capture-failed',{token:f.coordinator.capture.token,reason:'microphone-permission-required'});
+  await assert.rejects(initial,/microphone-permission-required/);await f.coordinator.serial;
+  assert.equal(a.state().routes[0].actualMic,false);
+  assert.equal(a.state().routes[0].reason,'microphone-permission-required');
+  assert.equal(a.state().reason,'microphone-permission-required');
+  await acquire(a,'other','other');f.unavailableRuntime='other';
+  await a.request('speaker',{ref:'other',enabled:true});
+  a.port.allowCapture=true;a.port.allowDelivery=false;
+  a.send('capture-eligible');await f.coordinator.serial;
+  const capture=f.coordinator.capture;assert(capture?.ready && capture.delivery);
+  let target=a.state().routes.find(r=>r.runtime==='app');
+  assert.equal(target.actualMic,false);assert.equal(target.microphonePending,true);
+  assert.equal(target.reason,'microphone-permission-required');
+  a.send('capture-delivery-ready',{token:capture.token,delivery:'obsolete'});
+  assert.equal(a.state().routes.find(r=>r.runtime==='app').reason,'microphone-permission-required');
+  a.send('capture-delivery-ready',{token:capture.token,delivery:capture.delivery});
+  target=a.state().routes.find(r=>r.runtime==='app');
+  assert.equal(target.actualMic,true);assert.equal(target.reason,'');
+  assert.equal(a.state().routes.find(r=>r.runtime==='other').reason,'session-audio-unavailable');
+  // The shared failure is not declared recovered while another target fails.
+  assert.equal(a.state().reason,'microphone-permission-required');
+  await turn();f.unavailableRuntime=null;f.coordinator.retryAfter=0;f.coordinator._tick();await f.coordinator.serial;
+  assert(a.state().routes.every(r=>r.actualSpeaker && !r.reason));
+  assert.equal(a.state().reason,'');
+ }finally{f.cleanup();}
+});
+
 test('native cookie refresh retains valid audio intent under the same ingress principal',async()=>{
  const f=fixture();f.principal='2'.repeat(64);f.login='';try{
   const a=f.peer();await ready(a);a.send('playback-ready',{ready:true});await acquire(a,'a');

@@ -286,7 +286,16 @@ export class AudioCoordinator {
     microphonePending:!!(r.micRequested && !actionRequired && !actualMic),
     actualSpeaker:!!(r.actualSpeaker && r.speaker && this.player?.ready),actualMic,reason:r.reason,refs:r.refs.size,domain:r.domain || null}; }
   _broadcast() {
-    const routes = [...this.routes.values()].map(r=>this._routeState(r));
+    const settled = state => (!state.requested.speaker || state.actualSpeaker) &&
+      (!state.requested.microphone || state.actualMic);
+    const routes = [...this.routes.values()].map(route=>{
+      const state=this._routeState(route);
+      // Capture readiness alone is not recovery: require current delivery ACK
+      // and every requested effect. Keep other pending/retired route reasons.
+      if(!route.retired && settled(state))route.reason=state.reason='';
+      return state;
+    });
+    if(this.connection && routes.every(state=>!state.reason && settled(state)))this.reason='';
     const wanted=routes.some(r=>r.requested.speaker||r.requested.microphone);
     const connection=this.connection?'connected':wanted?(this.accessBlocked?'blocked':'recovering'):'idle';
     for (const peer of this.ports.values()) this._send(peer,{type:'state',connection,protocol:this.connection?'WSS / PCM16 48 kHz':null,playbackBlocked:routes.some(r=>r.speaker)&&!this.player,connectionId:this.connection,speakerOwner:this.player===peer,micOwner:this.capture?.peer===peer,captureReady:!!(this.capture?.ready && this.capture.delivering),reason:this.reason,lastDisconnect:this.lastDisconnect,routes,receivedBytes:this.received,sentBytes:this.sent,droppedFrames:this.dropped});

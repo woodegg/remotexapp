@@ -312,3 +312,13 @@ does not prove that process allocations returned to their initial size. Record
 GC-only OS endpoints before taking heap snapshots, since native heap-profiler
 allocation can itself change the measured memory footprint. These tools and
 short controls do not substitute for natural soak or stress qualification.
+
+[Terminal-handle and document-freeze follow-up](results-terminal-handle-freeze-20261128.json)
+records two actual old-pair reproductions and the current repair's separate
+native controls. Retaining a released interest no longer roots its logical port;
+real background freeze no longer leaves the old device open during handoff.
+The eight-case combined run includes actual Pulse domain epoch replacement,
+fresh microphone/browser-output data and final cleanup. The separate native
+endpoint follows one Worker exit, not twenty exits or a long memory study.
+Full check/build/coverage and hosted CI pass; natural/stress and final candidate
+acceptance remain open.

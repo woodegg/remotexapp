@@ -234,11 +234,20 @@
   },
   "retainedTerminalHandleFollowup": {
     "evidence": "tests/native-audio/results-terminal-handle-freeze-20261128.json",
-    "evidenceSHA256": "9a54d76842e3c69e4d9d6e57665de183221d9eb522f1c7cd2263e724dc9a7f57",
+    "evidenceSHA256": "72d51c1c7dee3eeb0ea7c003659e450b161daa887ebc88b53176f377f70070f2",
     "oldNativeClients": 1,
     "oldNativePorts": 2,
     "extraPortRoot": "Public retained released interest private binding",
-    "newNativeQualification": "pending",
+    "newNativeQualification": {
+      "sourceCommit": "98be104d0803f85eb26517d105621b096143b37c",
+      "oneActualWorkerExit": true,
+      "livePageAfterRetire": {
+        "SharedWorker": 1,
+        "MessagePort": 1,
+        "nineAudioClasses": 0
+      },
+      "wholeProcessOrLongDurationQualified": false
+    },
     "scope": "Full SDK/actual audio control; does not rewrite the minimal no-audio baseline or qualify whole-process memory."
   }
 }

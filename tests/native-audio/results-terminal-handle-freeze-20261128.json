@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "issue": 119,
   "releaseQualified": false,
-  "status": "native-old-pair-reproduced-model-repair-passed-new-native-pending",
+  "status": "passed-two-repaired-native-controls-not-release-qualified",
   "reproducedProductCommit": "7a65d460fdeb7c39ad028d10747438ef66a781f3",
   "coreSHA256": "c50d7184399cfb8a0d7f2f09ebeb452cb2f14b3efa4b2b488953025534bac5d7",
   "componentManifestSHA256": "8e2c5874368e25286e15b0a73403c0fb30f81c2aa45b65c000a865294e07e84f",
@@ -37,7 +37,28 @@
     "modelRedFailures": 6,
     "modelGreenAudioAndRecoveryTests": 57,
     "relatedJournalHubHostTests": 40,
-    "repairedNativeEndpoint": "pending"
+    "repairedNativeEndpoint": {
+      "status": "passed-scoped-native-control",
+      "actualWorkerExits": 1,
+      "captureRequests": 1,
+      "sourceAndProcessorPreserved": true,
+      "sameLivePageAfterRetirement": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0,
+        "SharedWorker": 1,
+        "MessagePort": 1,
+        "MediaStreamAudioSourceNode": 0,
+        "MediaStream": 0,
+        "MediaStreamTrack": 0,
+        "GainNode": 0,
+        "AudioWorklet": 0,
+        "AudioDestinationNode": 0
+      },
+      "pageErrors": [],
+      "profileRemoved": true,
+      "longDurationOrTwentyExitQualification": false
+    }
   },
   "freeze": {
     "actualBackgroundBeforeLifecycleFreeze": true,
@@ -48,7 +69,21 @@
     "mechanism": "The old document disables track delivery but cannot process the coordinator stop message while frozen; its capture stays open alongside the new owner.",
     "modelRedFailures": 1,
     "repair": "Stop local capture synchronously before posting suspend; retain intent. Ordinary hidden running tabs do not take this path.",
-    "repairedNativeEndpoint": "pending"
+    "repairedNativeEndpoint": {
+      "status": "passed-with-seven-other-checks-in-one-attempt",
+      "frozenChromeRecordStreams": 1,
+      "resumedChromeRecordStreams": 1,
+      "requestedCaptureCounts": [
+        1,
+        1
+      ],
+      "peerFreshMicAndClipboard": true,
+      "allFinalBrowserCaptureReleased": true,
+      "pageErrors": [
+        [],
+        []
+      ]
+    }
   },
   "otherScopedOldPairEvidence": {
     "audioOnlyWSSCut": true,
@@ -78,10 +113,78 @@
     "freezeModelRed": "06c6dd03ebec022dda1305bb8e4c1c284772c0157c5e6074d0ba0aac5a8d5e3a",
     "freezeAndPortModelGreen": "a2b69ed582346b84ed2f890e4188651a397dd069049a3ec6ed875763bf9701ad",
     "relatedModelGreen": "8ddd055fbe4a4e3ba7f0127cae0a0fe80ff56c93b24a692f73e7a3a59ec3c80c",
-    "supplementalNativeResult": "bd387097bdb39de6fa25b94e72b57c9ffff61f56ba3a49fc70fee72ab05d4bd5"
+    "supplementalNativeResult": "bd387097bdb39de6fa25b94e72b57c9ffff61f56ba3a49fc70fee72ab05d4bd5",
+    "repairNativeResult": "3b0fa92c9cd275520701a351275f410c8482c180c7c7cfcacdb61292f4e13d9c",
+    "repairNativeHeap": "5fb59e7b5e54e2c2d98c63cd1ae0daca6569426cb22a60431dd4a98798229483",
+    "repairNativeDriver": "3c69cc2b80a0aa9af1a7c3c282d622b805fce41123292a9a33b78691db02190f",
+    "repairNativeFirstAttempt": "e88336dcb79373f1911fdc7e98c84382ec4994adbedfc71deee4b69498835506",
+    "repairSupplementalResult": "16bff6b72c585382e9405f9c4b8aeb298eccac128f17a85acd666420d029cd4b",
+    "repairSupplementalDriver": "b98b9894b3026c7f8e4f77eeee5e8285f37e61132e2d89fef12657f8e1656945",
+    "repairFullCheck": "4f4dcdf57b586e7d72042afd53b5d0c7a7e3c29d10204500690d77b48f0eab02",
+    "repairBuildLog": "5a21ea4249a48c93c4473664ffc0567eb2aa0f8caef23910cfc51758232a90fa",
+    "repairCoverageLog": "0079947ed1d92d667f9c6dccabce16852e6055870027683899bc075826f7948a",
+    "repairCoverageResult": "4646474b143ee3a2c29e01420a3da17873faa2e4b4c5e85cbab4bc1eb5372483"
   },
   "repairSourceSHA256": {
     "cmd/remotexappd/web/sdk/remotexapp-audio.js": "ef387909bb50dfb62bd23c5c81ed910101a4ab90d486a1773c11d8c7bf562b88",
     "cmd/remotexappd/web/sdk/remotexapp-audio.test.mjs": "ab0e16226f9872d05fa39ea3208d41306c40d510e28d3bf2511c132a4d593647"
+  },
+  "repairProductCommit": "98be104d0803f85eb26517d105621b096143b37c",
+  "repairRuntimeCoreSHA256": "f8de68f018853cf54ed2a76db6645c45590eb1486f33aee0e887f9101c99a893",
+  "currentPairSupplementalChecks": [
+    {
+      "name": "two-documents-three-Viewers-two-templates-share-one-audio-channel-and-only-selected-mic",
+      "status": "passed"
+    },
+    {
+      "name": "two-selected-App-domains-share-original-capture-and-play-independent-speakers",
+      "status": "passed"
+    },
+    {
+      "name": "isolated-audio-WSS-cut-recovers-fresh-both-targets-preserves-all-Viewers-and-original-capture",
+      "status": "passed"
+    },
+    {
+      "name": "paused-one-App-Pulse-preserves-other-App-and-restored-domain-delivers-new-data",
+      "status": "passed"
+    },
+    {
+      "name": "actual-Pulse-crash-replaces-domain-epoch-at-same-generation-and-automatically-regrants",
+      "status": "passed"
+    },
+    {
+      "name": "actual-background-owner-freeze-handoffs-and-resume-does-not-create-overlapping-capture",
+      "status": "passed"
+    },
+    {
+      "name": "both-direction-real-clipboard-remains-functional-after-combined-audio-faults",
+      "status": "passed"
+    },
+    {
+      "name": "final-two-document-retirement-releases-mux-and-actual-capture",
+      "status": "passed"
+    }
+  ],
+  "attemptLimits": [
+    "The first repair-native attempt stopped at final speaker readback before native diagnostics. Its two-second playback did not span all five half-second readback windows and could end during sampling. The successful attempt keeps a ten-second source throughout those windows, retains every observed window and uses the unchanged0.8 energy assertion. This is a measurement repair, not gap-free playback qualification.",
+    "The repaired native terminal-handle endpoint follows one actual Worker exit; prior original full20exit and continuous controls remain separate.",
+    "Earlier three-lane resource attempt remains failed; none of its data is concatenated with repaired native controls."
+  ],
+  "verification": {
+    "fullCheck": "passed in private TMP mount namespace as non-root; existing host X11 preserved",
+    "defaultCGOBuild": "all four Core programs passed",
+    "coverage": {
+      "passed": true,
+      "sdkLines": 92.2,
+      "sdkBranches": 86.07,
+      "sdkFunctions": 87.73
+    },
+    "hostedCI": {
+      "run": 46158419850,
+      "sourceCommit": "98be104d0803f85eb26517d105621b096143b37c",
+      "status": "passed"
+    },
+    "currentPairNaturalEightHours": "not-started",
+    "currentPairLongStress": "not-started"
   }
 }

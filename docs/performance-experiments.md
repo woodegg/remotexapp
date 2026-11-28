@@ -1191,6 +1191,7 @@ scope and the preserved earlier failures.
 The 2026-11-28 full-SDK P20 follow-up additionally reproduces a logical port
 retained by a caller's terminal audio handle: one bootstrap plus that logical
 port remains after disposal. Six red model regressions cover its detachment
-and late-result fences. Repaired native endpoints and whole-process/natural
-qualification are pending; the accepted minimal no-audio baseline remains
-unchanged. See the linked P20 follow-up evidence and scope.
+and late-result fences. The repaired live-page native endpoint follows one actual Worker exit and
+returns to one client/one port with nine audio classes zero; whole-process,
+repeated-exit and natural qualification remain pending. The accepted minimal
+no-audio baseline is unchanged. See the linked P20 follow-up evidence and scope.

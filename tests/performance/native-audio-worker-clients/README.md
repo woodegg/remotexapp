@@ -110,5 +110,11 @@ have one client/two ports and zero of the nine sampled native audio classes.
 The timed controls are not resource acceptance: these endpoints fail the
 one-port retirement gate. Six red model regressions and the targeted repair
 cover release, dispose, logout, runtime retirement and late acknowledgements.
-Repaired native endpoints and full natural/stress qualification remain pending.
-The accepted minimal no-audio baseline above is unchanged.
+The repaired actual SDK/native/Pulse control follows one real Worker exit and
+returns to one client/one port with all nine sampled audio classes zero while
+the page stays alive and the caller keeps its terminal handle. A separate
+eight-check two-document/two-App run verifies actual suspension handoff with
+one Chrome capture, domain epoch replacement, fresh data and final cleanup.
+Neither control qualifies twenty repeated exits, whole-process memory or full
+natural/stress acceptance. The accepted minimal no-audio baseline above is
+unchanged.

@@ -294,3 +294,20 @@ replacement with one parent capture and native audio retirement. See the
 [owned graph contract](native-self-recovery.md#owned-graph-execution-environment-sdk-038-development)
 for limits and remaining production qualification. The earlier failed graph
 control is historical evidence, not the current implementation's disposition.
+
+### Retained terminal audio handles
+
+A caller can retain an audio interest after `release()`, Host disposal, logout
+or authoritative runtime retirement to inspect its `released` state. The SDK
+must clear the handle's internal logical Worker port and replay/application
+state at that boundary. A late operation result cannot reattach that state or
+continue microphone restoration. Releasing one handle preserves other live
+interests. The inert document Worker bootstrap has a separate lifetime and
+carries no media or capture authority. Native heap inspection must distinguish
+that permitted bootstrap from a logical port retained by a terminal handle.
+
+Actual document freeze or BFCache suspension stops that document's microphone
+source before handing ownership to another eligible participant. Requested
+intent remains available for authorized recovery. A hidden but running tab
+keeps its existing source. This differs from a transport outage in a responsive
+owner, where retaining a valid live source avoids unnecessary device requests.

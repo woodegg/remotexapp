@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "releaseQualified": false,
+  "status": "native-old-pair-reproduced-model-repair-passed-new-native-pending",
+  "reproducedProductCommit": "7a65d460fdeb7c39ad028d10747438ef66a781f3",
+  "coreSHA256": "c50d7184399cfb8a0d7f2f09ebeb452cb2f14b3efa4b2b488953025534bac5d7",
+  "componentManifestSHA256": "8e2c5874368e25286e15b0a73403c0fb30f81c2aa45b65c000a865294e07e84f",
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 8,
+  "browser": "Chrome/158.0.8127.88",
+  "method": {
+    "headed": true,
+    "sandboxEnabled": true,
+    "networkDomainEnabled": false,
+    "focusEmulation": false,
+    "productSourceOverride": false,
+    "transport": "WSS",
+    "syntheticSource": "Private native-clock Pulse input; remap filter is not a browser capture. Prototype source hash retained below."
+  },
+  "terminalHandle": {
+    "oldCurrentPairCases": [
+      "continuous-audio-no-exit",
+      "twenty-actual-Worker-exits-with-observer-churn"
+    ],
+    "timedSeconds": 500,
+    "warmupSeconds": 120,
+    "naturalIdleBeforeGCSeconds": 60,
+    "periodicGC": false,
+    "finalSameLivePageNativeCounts": {
+      "SharedWorker": 1,
+      "MessagePort": 2,
+      "nineAudioClasses": 0
+    },
+    "shortestStrongRetainer": "Window -> integrationUAT -> interest -> private bound-port symbol -> logical MessagePort",
+    "separateBootstrapRoot": "Native SharedWorkerClient -> SharedWorker -> its MessagePort",
+    "modelRedFailures": 6,
+    "modelGreenAudioAndRecoveryTests": 57,
+    "relatedJournalHubHostTests": 40,
+    "repairedNativeEndpoint": "pending"
+  },
+  "freeze": {
+    "actualBackgroundBeforeLifecycleFreeze": true,
+    "beforeChromeRecordStreams": 1,
+    "duringFrozenOwnerHandoffChromeRecordStreams": 2,
+    "afterResumeChromeRecordStreams": 1,
+    "separateSyntheticRemapSourceOutput": 1,
+    "mechanism": "The old document disables track delivery but cannot process the coordinator stop message while frozen; its capture stays open alongside the new owner.",
+    "modelRedFailures": 1,
+    "repair": "Stop local capture synchronously before posting suspend; retain intent. Ordinary hidden running tabs do not take this path.",
+    "repairedNativeEndpoint": "pending"
+  },
+  "otherScopedOldPairEvidence": {
+    "audioOnlyWSSCut": true,
+    "onePulsePauseRestoreWithHealthyPeer": true,
+    "actualPulseCrashAndDomainEpochChangeAtSameRuntimeGeneration": true,
+    "freshMicAndBrowserSpeakerReadback": true,
+    "wholeSupplementalAttemptPassed": false,
+    "failure": "Original count included the synthetic remap filter and stopped at freeze; the follow-up native diagnostic independently establishes two actual Chrome RecordStreams."
+  },
+  "resourceLimits": [
+    "One persistent-observer lane failed on a driver KeyError during temporarily absent route state after nine successful exits; not accepted.",
+    "Other two lanes reached all twenty timed checks but failed final two-port assertion; not accepted as memory qualification.",
+    "No entire 24-class, natural-eight-hour, combined-stress, platform, immutable final-candidate or human UAT acceptance.",
+    "Model/feature controls do not establish the cause of browser main-process growth."
+  ],
+  "privateEvidenceSHA256": {
+    "idleNativeResult": "f3af9956831a17d8b261eae31e2ebdd69c7eca106c9e581ddd41c98894ce663a",
+    "cutNativeResult": "78722291453195e06aca79f03692fa9310fad7b324878781dd31f5465b30a83c",
+    "idleNativeHeap": "a25a47fd6ae3c11ebfbc3bad048c1b381e195ba989554427de9af87b7a0deb73",
+    "idlePortRetainerReview": "5a0f723623d29d72ffb14d18334a279c2f87a2a456b742119c8fc0cecfd40399",
+    "resourceDriver": "1042c682458afdc520df9846060b4bbc068be937e341b1eb8f6faa41c7b8380b",
+    "syntheticSource": "53f79d46d4dba7889c5a99e5f7bb14536514dacb345abb946469cc241d34613b",
+    "portModelRed": "718e33c8cbe9b2b0cf3c85852ad82fbe156279e0fc98c8d0fe1536e07cd05315",
+    "portModelGreen": "34b0ec6f0ec200f1c8d59b45de6c5e8e2010d153914a19e0285aa931a14d2eb4",
+    "freezeNativeDiagnostic": "f90e1c6c9ae3fed2fa32a2cd290fd3f5c9b1e90c0467420bd172cea0ce5bc90d",
+    "freezeDriver": "2043738ae5b690dcd1755efca43bb63ec870be2df5d92eca0248501f16b5277a",
+    "freezeModelRed": "06c6dd03ebec022dda1305bb8e4c1c284772c0157c5e6074d0ba0aac5a8d5e3a",
+    "freezeAndPortModelGreen": "a2b69ed582346b84ed2f890e4188651a397dd069049a3ec6ed875763bf9701ad",
+    "relatedModelGreen": "8ddd055fbe4a4e3ba7f0127cae0a0fe80ff56c93b24a692f73e7a3a59ec3c80c",
+    "supplementalNativeResult": "bd387097bdb39de6fa25b94e72b57c9ffff61f56ba3a49fc70fee72ab05d4bd5"
+  },
+  "repairSourceSHA256": {
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "ef387909bb50dfb62bd23c5c81ed910101a4ab90d486a1773c11d8c7bf562b88",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.test.mjs": "ab0e16226f9872d05fa39ea3208d41306c40d510e28d3bf2511c132a4d593647"
+  }
+}

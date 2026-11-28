@@ -11,6 +11,18 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
+- Stop the old document's microphone source synchronously on actual page
+  freeze/BFCache suspension before coordinator handoff. Preserve requested
+  intent for an eligible owner or resumed document; ordinary background tabs
+  keep their existing source. The previous freeze fence disabled delivery but
+  retained the device until the frozen document could receive a stop message.
+
+- Detach logical Worker ports and replay state from released audio handles,
+  including controller disposal, logout and runtime retirement. Applications
+  may retain those terminal handles without retaining their closed channels.
+  Fence late explicit and automatic results so they cannot restore the retired
+  references; another live audio interest keeps its existing channel.
+
 - Clear recovered audio failure reasons only after every requested effect for
   that target is effective, including the current microphone delivery ACK.
   Preserve pending and retired targets' reasons and disconnect history. Real

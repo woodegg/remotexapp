@@ -283,3 +283,85 @@ test('disposal bounds an unresolved native close and late completion releases it
  assert.equal(calls,1);assert.equal(f.audio.closed,true);assert.equal(f.audio.contextOps.contexts.size,1);
  assert.equal(f.audio.dispose(),done);closed();await turn();assert.equal(f.audio.contextOps.contexts.size,0);
 });
+
+test('retained released audio handles detach logical ports without closing a live peer',async()=>{
+  const f=fixture();
+  try {
+    const retired=await f.audio.acquire({id:'app',sessionGeneration:1});
+    const peer=await f.audio.acquire({id:'other',sessionGeneration:1});
+    f.audio._preparePlayback=async()=>{};
+    await retired.setSpeaker(true);
+    const port=f.audio.port;
+    await retired.release();
+    assert.equal(Object.getOwnPropertySymbols(retired).some(key=>retired[key]===port),false);
+    assert.deepEqual(retired.applied,{});
+    assert.equal(f.audio.port,port);
+    assert.equal(f.closedPorts,0);
+    assert.equal((await peer.setSpeaker(true)).speaker,true);
+  }finally{await f.audio.dispose();}
+});
+
+for(const boundary of ['dispose','logout','runtime'])test(`retained audio handle detaches its port at ${boundary}`,async()=>{
+  const f=fixture();
+  try {
+    const interest=await f.audio.acquire({id:'app',sessionGeneration:1});
+    f.audio._preparePlayback=async()=>{};
+    await interest.setSpeaker(true);
+    const port=f.audio.port;
+    if(boundary==='runtime')f.audio._retireRuntime('app',1);
+    else await f.audio[boundary]();
+    assert.equal(interest.released,true);
+    assert.equal(Object.getOwnPropertySymbols(interest).some(key=>interest[key]===port),false);
+    assert.deepEqual(interest.applied,{});
+    await assert.rejects(interest.setSpeaker(true),/released/);
+  }finally{await f.audio.dispose();}
+});
+
+test('late explicit audio result cannot reattach a released handle to its port',async()=>{
+  const f=fixture();
+  try {
+    const interest=await f.audio.acquire({id:'app',sessionGeneration:1});
+    f.audio._preparePlayback=async()=>{};
+    let settle;
+    f.audio._set=()=>new Promise(resolve=>{settle=resolve;});
+    const pending=interest.setSpeaker(true);
+    const rejected=assert.rejects(pending,/retired/);
+    while(!settle)await turn();
+    await interest.release();
+    settle({speaker:true});await rejected;
+    assert.deepEqual(interest.applied,{});
+  }finally{await f.audio.dispose();}
+});
+
+test('late automatic replay cannot reattach a disposed handle or continue to microphone',async()=>{
+  const f=fixture();
+  try {
+    const interest=await f.audio.acquire({id:'app',sessionGeneration:1});
+    f.audio._preparePlayback=async()=>{};f.audio._context=async()=>({});
+    await interest.setSpeaker(true);await interest.setMicrophone(true);
+    interest.applied={};let settle,calls=0;
+    f.audio._set=()=>{calls++;return new Promise(resolve=>{settle=resolve;});};
+    const pending=f.audio._replayInterest(interest);
+    while(!settle)await turn();
+    await f.audio.dispose();settle({speaker:true});await pending;
+    assert.equal(calls,1);
+    assert.deepEqual(interest.applied,{});
+  }finally{await f.audio.dispose();}
+});
+
+test('document freeze stops its actual capture before handing off while retaining requested intent',async()=>{
+  const f=fixture();
+  try {
+    const interest=await f.audio.acquire({id:'app',sessionGeneration:1});
+    f.audio._context=async()=>({});await interest.setMicrophone(true);
+    f.attachCapture();f.audio.captureToken='frozen-owner';
+    f.audio._suspend();
+    assert.equal(f.stops,1);
+    assert.equal(f.audio.stream,null);
+    assert.equal(f.track.readyState,'ended');
+    assert.equal(interest.released,false);
+    assert.equal(f.audio._wanted(interest,'microphone'),true);
+    assert.equal(f.messages.findLast(m=>m.op==='capture-failed').reason,'microphone-owner-suspended');
+    assert.equal(f.messages.at(-1).op,'suspend');
+  }finally{await f.audio.dispose();}
+});

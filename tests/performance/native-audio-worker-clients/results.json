@@ -231,5 +231,14 @@
     "explicitOffWhileBothHung": true,
     "finalNineAudioClassesZero": true,
     "scope": "Full SDK/Kasm/Pulse actual fault diagnostic endpoint; separate from accepted minimal no-audio baseline and whole-process/natural/final-release qualification."
+  },
+  "retainedTerminalHandleFollowup": {
+    "evidence": "tests/native-audio/results-terminal-handle-freeze-20261128.json",
+    "evidenceSHA256": "9a54d76842e3c69e4d9d6e57665de183221d9eb522f1c7cd2263e724dc9a7f57",
+    "oldNativeClients": 1,
+    "oldNativePorts": 2,
+    "extraPortRoot": "Public retained released interest private binding",
+    "newNativeQualification": "pending",
+    "scope": "Full SDK/actual audio control; does not rewrite the minimal no-audio baseline or qualify whole-process memory."
   }
 }

@@ -98,3 +98,17 @@ A separate two-document/two-App ownership control verifies one audio channel,
 one capture, selected routes and authorized handoff. Neither run replaces the
 unresolved earlier anonymous-PSS review, natural/stress gates or exact final
 candidate acceptance. Prior accepted minimal results remain unchanged.
+
+## Retained terminal-handle follow-up (2026-11-28)
+
+The [full SDK follow-up](../../native-audio/results-terminal-handle-freeze-20261128.json)
+finds one additional logical MessagePort after real audio use and Host disposal
+while the caller retains its public interest handle. A strong heap path leads
+through the handle's private binding; the other port belongs to the permitted
+native bootstrap. Both the continuous-audio and twenty-Worker-exit endpoints
+have one client/two ports and zero of the nine sampled native audio classes.
+The timed controls are not resource acceptance: these endpoints fail the
+one-port retirement gate. Six red model regressions and the targeted repair
+cover release, dispose, logout, runtime retirement and late acknowledgements.
+Repaired native endpoints and full natural/stress qualification remain pending.
+The accepted minimal no-audio baseline above is unchanged.

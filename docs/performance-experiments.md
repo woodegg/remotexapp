@@ -1187,3 +1187,10 @@ a no-SDK capture control, which releases both after ten seconds. These scoped
 diagnostic-GC results do not replace the new-backend, complete fault matrix,
 long-duration allocation or exact-candidate qualification. See P19 for hashes,
 scope and the preserved earlier failures.
+
+The 2026-11-28 full-SDK P20 follow-up additionally reproduces a logical port
+retained by a caller's terminal audio handle: one bootstrap plus that logical
+port remains after disposal. Six red model regressions cover its detachment
+and late-result fences. Repaired native endpoints and whole-process/natural
+qualification are pending; the accepted minimal no-audio baseline remains
+unchanged. See the linked P20 follow-up evidence and scope.

@@ -287,3 +287,28 @@ Two hung names must instead remain bounded and allow explicit off without a
 responsive Worker. Take any native-client/retirement diagnostic snapshots only
 after the fault interval and record them separately from natural observations.
 These scoped results do not qualify every fault class or whole-process memory.
+
+## Owned process-family resource accounting
+
+`process_resources.py` samples a Linux process family qualified by root PID,
+start time, UID and the expected profile argument. It includes descendants and,
+when explicitly requested, detached crash handlers carrying that private
+profile's marker. Unrelated same-UID browsers are excluded. Process records
+include roles, PSS, anonymous PSS, SwapPSS, RSS, FD/thread counts and cgroups;
+family totals are accompanied by exit, unreadable and membership-change flags.
+Discard incomplete samples from equal-endpoint comparisons instead of counting
+missing processes as zero. Keep raw process identities and paths outside Git.
+
+Run its actual-process ownership checks with:
+
+```sh
+python3 -m unittest discover -s tests/native-audio -p test_process_resources.py -v
+```
+
+Compare cold startup, warmup, timed operation, natural idle and final diagnostic
+GC separately. Use matched blank-browser, minimal Worker and full SDK controls
+before attributing growth to a product component. A native object count of zero
+does not prove that process allocations returned to their initial size. Record
+GC-only OS endpoints before taking heap snapshots, since native heap-profiler
+allocation can itself change the measured memory footprint. These tools and
+short controls do not substitute for natural soak or stress qualification.

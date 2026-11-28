@@ -38,7 +38,7 @@ export class RemoteXAppAudio extends EventTarget {
       if (!this.port && this.interests.size && now >= (this.workerRetryAfter || 0) && !this.workerExhausted) this._recoverWorker();
     },1000);
     this._pagehide = event => { if (event.persisted) this._suspend(); else void this.dispose().catch(()=>{}); };
-    this._suspend = () => { this._fenceCapture(); this._post({op:'suspend'}); };
+    this._suspend = () => { this._pauseCapture(); this._post({op:'suspend'}); };
     this._wake = () => {
       this._observeGraph();
       this._recoverGraph();
@@ -171,11 +171,12 @@ export class RemoteXAppAudio extends EventTarget {
       setMicrophone:(enabled,{takeover=false}={})=>this._changeIntent(interest,'microphone',enabled,takeover),
       release:()=>{
         if (interest.released) return Promise.resolve();
-        interest.released = true; this.interests.delete(ref);
+        const bound = this.port && this.port === interest[boundPort];
+        this._forgetInterest(interest); this.interests.delete(ref);
         const last = ![...this.interests.values()].some(i=>i.runtime===interest.runtime && i.generation===interest.generation);
         const leaving = last ? this.journal.leave(interest.runtime,interest.generation) : Promise.resolve();
         if (![...this.interests.values()].some(i=>i[resumeMicrophone])) this._captureFailed('microphone-owner-disabled');
-        return Promise.all([leaving,this.port === interest[boundPort] ? this._request('release',{ref}) : Promise.resolve()]).then(()=>{});
+        return Promise.all([leaving,bound ? this._request('release',{ref}) : Promise.resolve()]).then(()=>{});
       }
     };
     this.interests.set(ref,interest);await this._replayInterest(interest);return interest;
@@ -216,8 +217,11 @@ export class RemoteXAppAudio extends EventTarget {
       if (interest.operations[kind]!==revision) return this._inactive(interest);
       const current = this.journal.read(interest.runtime,interest.generation,kind);
       if (!current.available || current.enabled!==enabled || current.epoch!==state.epoch || (enabled && !current.participating)) return this._inactive(interest);
+      const port = this.port;
       const value = await this._set(interest,kind,{enabled,intent:current,takeover:!!takeover});
-      interest.applied[kind]={port:this.port,epoch:current.epoch,enabled};return value;
+      if(interest.released || this.closed)throw Error('Audio context retired');
+      if(this.port!==port || interest.operations[kind]!==revision)return this._inactive(interest);
+      interest.applied[kind]={port,epoch:current.epoch,enabled};return value;
     } finally {
       for (const i of this._locals(interest)) if (i.operations[kind]===revision) i.pending[kind]=false;
       if (kind==='microphone') interest.promptCapture=false;
@@ -231,8 +235,10 @@ export class RemoteXAppAudio extends EventTarget {
       const state=this.journal.read(interest.runtime,interest.generation,kind), stamp=interest.stamps[kind];
       if (!state.available || !state.participating || !stamp || state.epoch!==stamp.epoch) continue;
       if (interest.applied[kind]?.port===this.port && interest.applied[kind].epoch===state.epoch) continue;
+      const port=this.port;
       await this._set(interest,kind,{enabled:true,intent:state,automatic:true});
-      interest.applied[kind]={port:this.port,epoch:state.epoch,enabled:true};
+      if(interest.released || this.closed || this.port!==port || interest[boundPort]!==port)return;
+      interest.applied[kind]={port,epoch:state.epoch,enabled:true};
     }
   }
   _journalChanged() {
@@ -660,8 +666,15 @@ export class RemoteXAppAudio extends EventTarget {
       this._emit();
     }
   }
+  _forgetInterest(interest) {
+    interest.released=true;
+    interest[boundPort]=null;
+    interest[resumeSpeaker]=interest[resumeMicrophone]=false;
+    interest.applied={};interest.stamps={};interest.pending={};interest.operations={};
+    interest.promptCapture=false;
+  }
   _retireInterests() {
-    for (const interest of this.interests.values()) interest.released = true;
+    for (const interest of this.interests.values()) this._forgetInterest(interest);
     this.interests.clear();
     this._pauseCapture();
     this.playback?.port.postMessage({op:'reset'});
@@ -673,9 +686,10 @@ export class RemoteXAppAudio extends EventTarget {
     // The Worker has already retired this route. Its ref release needs no RPC
     // reply or network round trip, and cannot retire another runtime's source.
     for(const interest of interests){
-      interest.released=true;interest[resumeSpeaker]=interest[resumeMicrophone]=false;
+      const bound=this.port && interest[boundPort]===this.port;
+      this._forgetInterest(interest);
       this.interests.delete(interest.ref);
-      if(interest[boundPort]===this.port)this._post({op:'release',ref:interest.ref});
+      if(bound)this._post({op:'release',ref:interest.ref});
     }
     void this.journal.leave(runtime,generation);
     if(![...this.interests.values()].some(i=>i[resumeMicrophone]))this._captureFailed('microphone-intent-retired');
@@ -742,7 +756,7 @@ export class RemoteXAppAudio extends EventTarget {
     this.env.document?.removeEventListener('visibilitychange',this._wake);
     this.env.document?.removeEventListener('freeze',this._suspend);
     this.env.document?.removeEventListener('resume',this._wake);
-    for (const interest of this.interests.values()) interest.released = true; this.interests.clear();
+    for (const interest of this.interests.values()) this._forgetInterest(interest); this.interests.clear();
     void (async()=>{
       let pending;
       try {await Promise.all([this.journalRetirement,this._releaseGraph(graph).then(value=>{pending=value;})]);}

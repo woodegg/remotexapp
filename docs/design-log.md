@@ -6038,3 +6038,34 @@ Keep another pending/retired target's reason; clear the shared failure only
 when all connected routes have settled. Never infer physical audibility or
 silence recovery from the flags alone. This refines AUD-006's honest state
 contract without changing capture permission, retries, intent or authority.
+
+## 2026-11-28 — Detach retired public audio handles from logical ports
+
+The current-pair resource control retains an extra native MessagePort through
+`integrationUAT.interest` and its private bound-port field after Host disposal.
+This is distinct from the permitted inert document bootstrap. A caller may keep
+a released handle for terminal status; requiring the caller to delete it would
+move SDK cleanup into host code. Refine AUD-005: clear bound-port, applied intent
+and local replay state synchronously at every handle retirement boundary. Send
+any necessary release using the previously checked current binding, without
+closing another live interest's shared logical channel. Recheck retirement and
+binding after asynchronous explicit/replay acknowledgements before recording
+application state. Retained terminal metadata must carry no replay or capture
+authority. Six red regressions reproduce the old behavior; actual native-resource
+and final qualification remain separate from these model checks.
+
+## 2026-11-28 — Stop capture before document suspension handoff
+
+Actual background-then-freeze inspection shows two Chrome RecordStreams while
+the original document is frozen: its delivery-disabled source remains open and
+the eligible peer has acquired a second source. The old coordinator stop message
+cannot run in a frozen document. Refine AUD-003 suspension handling: synchronously
+stop local capture in the document's freeze/persisted-pagehide handler, then
+notify the coordinator. Retain requested intent and existing permission rules;
+resume or another participating owner can obtain currently authorized delivery.
+A merely hidden, running tab does not enter this suspension path. Delivery
+fencing with source retention still applies to transport/Worker disruption while
+the owner remains responsive. Count actual Chrome capture streams separately
+from the synthetic Pulse remap module's own source-output; do not count that
+filter as a second browser capture. The real old-pair diagnostic and red model
+regression are distinct from repaired native and long-duration qualification.

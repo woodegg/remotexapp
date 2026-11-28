@@ -189,9 +189,10 @@ function update(w){
     if(clipboard?.requested[direction] && control !== document.activeElement)control.value=clipboard.requested[direction];
   }
   const clipLimit=clipboard?.maxBytes >= 1024*1024 ? `${clipboard.maxBytes/(1024*1024)} MiB` : `${(clipboard?.maxBytes || 0)/1024} KiB`;
-  const clipPhase = {'copied-to-local':'已验证写入本机', 'write-accepted':'浏览器已接受写入，尚未验证', 'clipboard-uncertain':'写入结果不确定，请选择复制方向'}[clipboard?.phase] || clipboard?.phase;
+  const clipPhase = {'copied-to-local':'已验证写入本机', 'write-accepted':'浏览器已接受写入，尚未验证',submitting:'正在提交远端剪贴板', 'clipboard-uncertain':'写入结果不确定，请选择复制方向', 'clipboard-conflict':'两端复制冲突，已保留远端内容，请选择复制方向'}[clipboard?.phase] || clipboard?.phase;
+  const ordering = {ready:'目标版本校验已就绪',waiting:'等待目标版本校验',unavailable:'目标版本校验不可用，自动上传退回手动',unsupported:'旧组件：自动上传退回手动'}[clipboard?.ordering] || '';
   w.clipState.textContent=clipboard
-    ? `设置 ${clipboard.requested.toRemote} / ${clipboard.requested.toLocal} · ${clipboard.active ? '活动' : '暂停'} · ${clipPhase} · ${clipLimit}`
+    ? `设置 ${clipboard.requested.toRemote} / ${clipboard.requested.toLocal} · 生效 ${clipboard.effective.toRemote} / ${clipboard.effective.toLocal} · ${clipboard.active ? '活动' : '暂停'} · ${clipPhase} · ${ordering} · ${clipLimit}`
     : '未连接';
   const describe=incident=>incident?[
     new Date(incident.at).toLocaleTimeString(),incident.code,incident.httpStatus,

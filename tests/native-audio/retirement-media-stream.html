@@ -1,0 +1,16 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Native capture retirement control</title>
+<button>Capture and stop synthetic microphone</button>
+<script>
+window.lab = {done:0, error:null, last:null};
+document.querySelector('button').onclick = async () => {
+  try {
+    let stream = await navigator.mediaDevices.getUserMedia({audio:true, video:false});
+    stream.getTracks().forEach(track => track.stop());
+    lab.last = {active:stream.active, ended:stream.getTracks().every(track => track.readyState === 'ended')};
+    stream = null;
+    lab.done++;
+  } catch (error) { lab.error = error.message; }
+};
+</script>

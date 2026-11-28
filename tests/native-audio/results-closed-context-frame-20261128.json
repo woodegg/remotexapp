@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "passed-mechanism-control-not-integrated",
+  "releaseQualified": false,
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headless": true,
+    "sandboxEnabled": false,
+    "playwright": true,
+    "cycles": 6,
+    "diagnosticGC": true,
+    "audio": "synthetic playback frames, no microphone or full SDK",
+    "variable": "Create Context and WorkletNode in a same-origin owned iframe, remove the owned iframe after Context close; unchanged production Worklet"
+  },
+  "controls": {
+    "direct": {
+      "baseline": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "retired": {
+        "AudioContext": 6,
+        "AudioWorkletNode": 6,
+        "blink::AudioWorkletMessagingProxy": 6
+      },
+      "idle": {
+        "AudioContext": 6,
+        "AudioWorkletNode": 6,
+        "blink::AudioWorkletMessagingProxy": 6
+      },
+      "delta": {
+        "AudioContext": 6,
+        "AudioWorkletNode": 6,
+        "blink::AudioWorkletMessagingProxy": 6
+      },
+      "rawReportSHA256": "c4bd2d5f21c209af391faf681c55202521f0843c0703b0f0da9a027885ba78c7"
+    },
+    "frame": {
+      "baseline": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "retired": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "idle": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "delta": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0
+      },
+      "rawReportSHA256": "91aefbe09e168551ceb0d73d4fc1c0b882f09c8f3eba7e845dd2da079d840276"
+    }
+  },
+  "sourceSHA256": {
+    "cmd/remotexappd/web/sdk/audio-worklet.js": "d0ca3c748bceb3807d4408bec068ade5a0e13a0e0225d60506e8262aac1d5726",
+    "tests/native-audio/retirement-minimal.html": "234df5a9cf600f5a7bef7a256d32735af4e8cf593aa13ec4a1f431b334b92156",
+    "tests/native-audio/retirement-frame.html": "e2239a0cc8bde3faa9928088b355a43f5d802c789eed5ea2b0d774a5732c68dc",
+    "tests/native-audio/browser-retirement.py": "6b1845cdbf78aee9454129c6bf0123bc8ff64d7e3115c155173b6fa813407db0"
+  },
+  "limits": [
+    "Mechanism prototype only; current SDK does not yet own its audio graphs this way.",
+    "Parent-owned live microphone continuity, playback user activation, permissions, CSP, pending native operations, mixed faults and final native retirement still need SDK integration and real qualification.",
+    "No natural soak, whole-process allocation or final release acceptance."
+  ]
+}

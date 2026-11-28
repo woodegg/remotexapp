@@ -17,12 +17,37 @@
     "tests/native-audio/retirement-host.html": "86900336a05a331f00fa1577f5eb5e53ded26f6528ac0c51c632a5eb5d1f14c7",
     "tests/native-audio/retirement-host.mjs": "17c1fa3a44b15d4a726e8c267133483c1b55c1d04232a2d5a87c0d8d5081eed8"
   },
-  "resultSHA256": "1ee2e0ac79a3ae146332b7b2775f512d84ec9d4cce18672e7f5b7a69785ae101",
+  "resultSHA256": "c42e7e5ec54df2b8b028079141904658191f243f406d8b74a254bbcc3c5b75e0",
   "unchanged": [
     "worker protocol v5 and PCM wire format",
     "microphone permissions and capture epoch fencing",
     "per-stream queues and credits",
     "Manager grants, Kasm component and UDP routing"
   ],
-  "qualifiedScope": "controlled and three-hour implementation audio-resource retirement, fifty cycles and live idle; exact candidate/UAT separate"
+  "qualifiedScope": "controlled and three-hour implementation audio-resource retirement, fifty cycles and live idle; exact candidate/UAT separate",
+  "developmentGraphSourceSHA256": {
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "61f5fb3efd5aad13af74c4302c08de38d690362bcc27eab2377d8c519373e729",
+    "cmd/remotexappd/web/sdk/audio-context-operations.js": "b6269b7c839b12eb3d808a3671d7ebbd262701ca7b8e2d79e890b9446cd0bca6",
+    "cmd/remotexappd/web/sdk/audio-coordinator.js": "89d88de2e7997dd00263135361dc21d3143320a7cfc66fb9d8291ccfa7135a9d",
+    "cmd/remotexappd/web/sdk/audio-worklet.js": "d0ca3c748bceb3807d4408bec068ade5a0e13a0e0225d60506e8262aac1d5726",
+    "tests/native-audio/stage-graph-fault-worklet.py": "4b1edca7db35409158882224e60956686a13f049cbac6449a48086a401fdec38"
+  },
+  "developmentFaultWorkletSHA256": "c6b593fee1642fe4de6090843a788888d9417c58a345092f3bfb7619b1ec6988",
+  "closedContextFrameSourceSHA256": {
+    "cmd/remotexappd/web/sdk/audio-worklet.js": "d0ca3c748bceb3807d4408bec068ade5a0e13a0e0225d60506e8262aac1d5726",
+    "tests/native-audio/retirement-minimal.html": "234df5a9cf600f5a7bef7a256d32735af4e8cf593aa13ec4a1f431b334b92156",
+    "tests/native-audio/retirement-frame.html": "e2239a0cc8bde3faa9928088b355a43f5d802c789eed5ea2b0d774a5732c68dc",
+    "tests/native-audio/browser-retirement.py": "6b1845cdbf78aee9454129c6bf0123bc8ff64d7e3115c155173b6fa813407db0"
+  },
+  "ownedGraphRealmSourceSHA256": {
+    "cmd/remotexappd/web/sdk/audio-graph-realm.js": "1d78635aa146891a70f9370029eff335a661e22b635e08aeb314a2acdb51b198",
+    "cmd/remotexappd/web/sdk/audio-context-operations.js": "fae185ab4633148110e06fb372c6c08c7a0744c8e3a1d1f39ed7d5feb2c402f7",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "86e69c4af23444a9119f1b1a80daeb29baede35976d0c5a01274cf41e605acf9",
+    "cmd/remotexappd/web/sdk/audio-worklet.js": "d0ca3c748bceb3807d4408bec068ade5a0e13a0e0225d60506e8262aac1d5726",
+    "cmd/remotexappd/web/sdk/audio-coordinator.js": "89d88de2e7997dd00263135361dc21d3143320a7cfc66fb9d8291ccfa7135a9d",
+    "tests/native-audio/stage-graph-fault-worklet.py": "bfb4dbe9ebeb0d2c2255573dfa49604094904094c139e3a7aa2402d6f56d9fbd",
+    "tests/native-audio/browser-retirement.py": "b2316df514c7cdccd2ca7832119c958c43c7b89ab20cbd47711087d502d21d55",
+    "tests/native-audio/retirement-media-stream.html": "a081dc975462339af8bdef449075e1c89d0d0ece05d7a17ba536585d4f160cf9"
+  },
+  "ownedGraphRealmEvidenceSHA256": "4aa933df83fdc0b8e11099cbd21460db68d7245450872a42e0404ebacf30d166"
 }

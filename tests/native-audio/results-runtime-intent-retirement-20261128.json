@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "passed-model-regressions-only",
+  "releaseQualified": false,
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 8,
+  "baselineCommit": "3a1f3ad",
+  "cases": [
+    "Runtime generation-retired push releases local interests/journal; a subsequent Worker cannot replay them",
+    "HTTP 410 releases only old target; another live target rebinds with the same source/getUserMedia1",
+    "Two documents receive retirement and a late device result is immediately stopped",
+    "Rebind skips a target authoritatively retired while its document was disconnected, retaining healthy initialization",
+    "Stale commands/ACKs and new refs cannot reactivate a retired Worker route"
+  ],
+  "reproduction": {
+    "firstTwoRedCases": 2,
+    "firstTwoRedLogSHA256": "bff8cac9b2cbcd2a38e36ffaafe0a7b7e71e0cf98a0520c38c1fb2e4f995954e",
+    "rebindRedLogSHA256": "eed46cbab063adce049ae604be84cbcfee94a57262a79e16256adcf6157adfcf",
+    "rebindPartialImplementation": "Before notifying a reconnecting owner, terminal acquire rejection also fails initialization of healthy targets"
+  },
+  "verification": {
+    "combinedFocusedTests": 157,
+    "failures": 0,
+    "skips": 0,
+    "todos": 0,
+    "logSHA256": "0e8442c49f94b9396704ccdef9ca7d27e61172660d7502b9cbc9d59728f8b570",
+    "sourceSHA256": {
+      "cmd/remotexappd/web/sdk/audio-coordinator.js": "3e83b53d84dae4d81db7023e7ee7e3ce7884424c1d1700b5445504d2fbb72102",
+      "cmd/remotexappd/web/sdk/remotexapp-audio.js": "dba08376d2463424a0901b1811035dc702bd662b88a45b923cc2dd08846d1fa8",
+      "cmd/remotexappd/web/sdk/audio-recovery.test.mjs": "41b3a9d04dde180c896827c4698503889802064160088dc7d19eb2d5eebdd1de",
+      "cmd/remotexappd/web/sdk/audio-coordinator.test.mjs": "2cb788c8e2398bbdd4d4ebb7869a6cd2cc8606e88a2243e1cc8dc1c0e939dab6"
+    }
+  },
+  "scope": [
+    "Actual SDK/coordinator/journal/worklet code with synthetic browser/HTTP/Worker/device APIs",
+    "No real process restart or browser/OS device qualification from these models",
+    "Final real 24-class/mixed-fault/candidate gates remain pending"
+  ]
+}

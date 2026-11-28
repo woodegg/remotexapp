@@ -9,12 +9,28 @@
     "tests/native-audio/browser-worker-hub-retirement.py": "6b2c0617441b3ca57b3719a50f89ea8ed527b956459aa6c1cd7b9af679fe47bf",
     "tests/native-audio/worker-hub-retirement.html": "e3223d4139d5b50b2d0eefd89f1b8ed8dcd57693628444706aea51729ca88cc7"
   },
-  "resultSHA256": "278ab41c0a8d6d11bc90d09bcf1ff1c415f7d571d1a57a5d41d526c62a5d248c",
+  "resultSHA256": "fc109f2e1d51434324d424f338a94a7753a6403fb684282c61adcd78ec77651c",
   "initialMechanismSourceSHA256": {
     "cmd/remotexappd/web/sdk/audio-worker-hub.js": "4e27b8cd4afc6d40dc0bf1cba428f25f72c795c39d54d2ce1098572071ffad06",
     "cmd/remotexappd/web/sdk/audio-worker.js": "cfdfbb1b992609e6b9bea2dce9f558bd2d56144fc0b92e17f1bd096859be22ce",
     "cmd/remotexappd/web/sdk/remotexapp-audio.js": "17161f053ff9eebd1b941b775f4d48034b6d257e98d8a663c233f2b3ffb7d218",
     "tests/native-audio/browser-worker-hub-retirement.py": "6b2c0617441b3ca57b3719a50f89ea8ed527b956459aa6c1cd7b9af679fe47bf",
     "tests/native-audio/worker-hub-retirement.html": "e3223d4139d5b50b2d0eefd89f1b8ed8dcd57693628444706aea51729ca88cc7"
-  }
+  },
+  "worker8SilentExitSourceSHA256": {
+    "cmd/remotexappd/web/sdk/audio-worker-hub.js": "285d0b7e26f72a548f6f852b3b245b1862feea8436c8f734e3e4c8d391f234bc",
+    "tests/native-audio/browser-worker-hub-retirement.py": "ddc51623048a79ab4d0236db01f8330b7c58cc9058f19ad42bd2ea2791c20509",
+    "tests/native-audio/worker-hub-silent-recovery.html": "bda575793de013da325c4e61afc6116a925ca9f9384ea74cc43730fa09fe193c"
+  },
+  "currentPairActualHangEvidenceSHA256": "1514b8e1dd3bf0b101afbb3bbbd109b9ed7a6e64080b7db35eff70506030369f",
+  "currentPairActualHangSourceSHA256": {
+    "cmd/remotexappd/web/sdk/audio-coordinator.js": "dd25d66b409ec565abb6b9e3c07aab664ff074739be53e414f33b8f66903e1dc",
+    "cmd/remotexappd/web/sdk/audio-worker-hub.js": "285d0b7e26f72a548f6f852b3b245b1862feea8436c8f734e3e4c8d391f234bc",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "dba08376d2463424a0901b1811035dc702bd662b88a45b923cc2dd08846d1fa8",
+    "cmd/remotexappd/web/sdk/audio-intent-journal.js": "0dfcd3ec148dc3f506e0b990bb44ca0396c98601275b41c96634082edc26492b",
+    "tests/native-audio/headed_cdp.py": "b8cb78f5c21789ec8870c4db12102ce1fb33df1009a45b8398a735c65bad8a61",
+    "tests/native-audio/virtual_pulse.py": "52c7e5bd5ebaa03f4156844ebe24a056838a4f95fb7d4f5008d82b382581a573"
+  },
+  "terminalHandleFollowupEvidenceSHA256": "72d51c1c7dee3eeb0ea7c003659e450b161daa887ebc88b53176f377f70070f2",
+  "currentPairRepeatedExitResourceEvidenceSHA256": "02b40495bf6270e4b7fc3af52153fd8f1583282179557b0c0ad0eb3996f6c72a"
 }

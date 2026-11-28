@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "issue": 117,
+  "parentIssue": 119,
+  "status": "passed",
+  "method": {
+    "browser": "Chrome158.0.8127.88",
+    "realOwnedX11Display": true,
+    "headless": false,
+    "realRemoteX11": true,
+    "sameArchivedCoreAndComponent": true,
+    "runtimeSourceCommit": "00c97b4dd2262dc083075e23609feb26398fd437",
+    "baselineSDKSourceCommit": "00c97b4dd2262dc083075e23609feb26398fd437",
+    "developmentSDKOverride": true,
+    "repairedModuleSHA256": "e23ff57e1291f05a9ae3893610af5a595d9d2c7ee0ea31a00fa318b43b4b380e"
+  },
+  "cases": [
+    {
+      "lane": "old",
+      "status": "defect-reproduced",
+      "latestRemoteSuppressed": true,
+      "pasteOverwritesWithStaleB": true
+    },
+    {
+      "lane": "fixed",
+      "status": "passed",
+      "latestRemoteDelivered": true,
+      "pastePreservesA": true,
+      "extraRemoteCycles": 20,
+      "noPageErrors": true
+    }
+  ],
+  "releaseQualified": false,
+  "limits": [
+    "Synthetic plain text and real paste; rich variants separately covered by unit tests.",
+    "No app-specific production incident attribution.",
+    "Development SDK override is not an exact release candidate."
+  ]
+}

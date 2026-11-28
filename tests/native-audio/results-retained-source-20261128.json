@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "passed-development-control",
+  "releaseQualified": false,
+  "sdkSourceCommit": "84f61ca09612b622d3fd4829cfe5a1c3c5688db1",
+  "runtimeCoreCommit": "00c97b4dd2262dc083075e23609feb26398fd437",
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headless": false,
+    "sandboxEnabled": true,
+    "ownedXvfb": true,
+    "realKasmAndPulse": true,
+    "nativeCDPDriver": true,
+    "focusEmulation": false,
+    "normalBackgroundScheduling": true,
+    "realVisibilityPreflight": true,
+    "syntheticMicrophone": true,
+    "playbackSink": "none",
+    "developmentSDKOverride": true
+  },
+  "baseline": {
+    "lane": "old",
+    "status": "defect-reproduced",
+    "forcedCaptureRetirement": true,
+    "requestedMic": true,
+    "actualMicAfterReconnect": false,
+    "manualActionRequired": true
+  },
+  "repaired": {
+    "status": "passed",
+    "outageLowerBoundSeconds": 124.63304652203806,
+    "backgroundSamples": 50,
+    "newConnection": true,
+    "sameSourceAndProcessor": true,
+    "captureRequests": 1,
+    "allDisconnectedSamplesFenced": true,
+    "speakerPeak": 0.2593994140625,
+    "micWindows": [
+      {
+        "bytes": 48000,
+        "peak": 6500
+      },
+      {
+        "bytes": 48000,
+        "peak": 6501
+      }
+    ],
+    "noPageErrors": true
+  },
+  "loadedModuleSHA256": {
+    "audio-coordinator.js": "9ab291260257cc421f27a0d8cfde8830915a9047d086464d3bb8f922b510a95a",
+    "remotexapp-audio.js": "8a2e545960131922c9aff3a53ff9f6236c5141e477207aa47ede8070cc0e17fb",
+    "audio-worklet.js": "36aa54b8804b5219887fdbefe9ed9498689ff01133bfc2c583c5e24f798abe00"
+  },
+  "cleanup": "passed; owned Apps, browsers/profiles, display and units retired; dedicated fixture stopped; original public UAT preserved",
+  "excludedAttempts": [
+    "Visibility not genuinely hidden under automation focus emulation; excluded, not concatenated.",
+    "Native driver old-lane profile cleanup race; excluded and cleaned."
+  ],
+  "limits": [
+    "Development transport control on unchanged archived Core; does not qualify the new backend principal correlation end-to-end.",
+    "No actual Worker replacement or ended-source automatic reacquisition in this control.",
+    "No physical audio hardware, OS sleep, clipboard combination, eight-hour resource or pressure qualification.",
+    "Raw combined elapsed includes post-reconnect data checks; outage lower bound comes from the final disconnected sample."
+  ]
+}

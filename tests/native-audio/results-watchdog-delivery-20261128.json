@@ -1,0 +1,237 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "releaseQualified": false,
+  "status": "passed-two-separate-repaired-native-controls-not-release-qualified",
+  "reproducedProductCommit": "98be104d0803f85eb26517d105621b096143b37c",
+  "reproducedCoreSHA256": "f8de68f018853cf54ed2a76db6645c45590eb1486f33aee0e887f9101c99a893",
+  "componentManifestSHA256": "8e2c5874368e25286e15b0a73403c0fb30f81c2aa45b65c000a865294e07e84f",
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 8,
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headed": true,
+    "sandbox": true,
+    "runtimeSourceOverride": false,
+    "faultInjection": "Set the original document watchdog last-tick timestamp6seconds behind actual time; the actual installed SDK interval runs the branch. This is not physical OSsleep.",
+    "networkDomain": false,
+    "focusEmulation": false,
+    "syntheticPulseInput": true,
+    "actualKasmAndTwoAppDomains": true,
+    "counterfactualRepair": "Diagnostic one-time notification of the current capture fence to the coordinator, then normal SDK wake; not a shipped SDK fix or automatic new-artifact qualification."
+  },
+  "oldNativeFailure": {
+    "captureRequests": 1,
+    "sameSource": true,
+    "track": [
+      {
+        "enabled": false,
+        "state": "live",
+        "muted": false
+      }
+    ],
+    "localTokenCleared": true,
+    "sharedEffectiveMic": true,
+    "privateInput": {
+      "frames": 24000,
+      "peak": 9000,
+      "rms": 6363.901780092671,
+      "expectedHz": 2200,
+      "markerEnergyFraction": 0.9999999985138291
+    },
+    "actualTargetReadbacks": [
+      {
+        "frames": 24000,
+        "peak": 0,
+        "rms": 0.0,
+        "expectedHz": 2200,
+        "markerEnergyFraction": 0
+      },
+      {
+        "frames": 24000,
+        "peak": 0,
+        "rms": 0.0,
+        "expectedHz": 2200,
+        "markerEnergyFraction": 0
+      }
+    ]
+  },
+  "counterfactual": {
+    "freshMic": [
+      [
+        {
+          "frames": 24000,
+          "peak": 8999,
+          "rms": 6362.52095134075,
+          "expectedHz": 2420,
+          "markerEnergyFraction": 0.9999999681854407
+        }
+      ],
+      [
+        {
+          "frames": 24000,
+          "peak": 8999,
+          "rms": 6362.52095134075,
+          "expectedHz": 2420,
+          "markerEnergyFraction": 0.9999999681854405
+        }
+      ]
+    ],
+    "requests": 1,
+    "sameSource": true
+  },
+  "rootCause": "Document watchdog clears local token/epoch and disables its track, but sends only wake/eligibility. The coordinator still has ready delivery and does not issue a fresh capture token. Old processor callbacks are then fenced forever.",
+  "repair": "Notify capture-failed using the current capture/pending token and valid-source eligibility before wake; reconcile fresh delivery and rewire the same valid source/processor. Off and late device results stay fenced.",
+  "modelCases": [
+    "Fresh token and actual Worklet microphone packet after delayed watchdog, same source/processor and one device request",
+    "Off during recovery prevents restoration and preserves speaker",
+    "Pending device acquisition plus watchdog plus off stops late stream without a second acquisition"
+  ],
+  "focusedAudioRecoveryTests": 60,
+  "fullCheck": "passed-isolated-nonroot",
+  "newArtifactNativeProof": {
+    "watchdogControl": {
+      "checks": [
+        {
+          "name": "two-documents-three-Viewers-two-templates-share-one-audio-channel-and-only-selected-mic",
+          "status": "passed"
+        },
+        {
+          "name": "two-selected-App-domains-share-original-capture-and-play-independent-speakers",
+          "status": "passed"
+        },
+        {
+          "name": "automatic-current-delivery-after-document-watchdog-gap-1",
+          "status": "passed"
+        },
+        {
+          "name": "automatic-current-delivery-after-document-watchdog-gap-2",
+          "status": "passed"
+        },
+        {
+          "name": "automatic-current-delivery-after-document-watchdog-gap-3",
+          "status": "passed"
+        },
+        {
+          "name": "independent-speakers-remain-functional-after-three-watchdog-reconciliations",
+          "status": "passed"
+        },
+        {
+          "name": "final-owners-release-mux-and-Chrome-capture-after-automatic-watchdog-recovery",
+          "status": "passed"
+        }
+      ],
+      "actualWatchdogGaps": 3,
+      "backgroundIncluded": true,
+      "sameSourceProcessorAndAudioWSS": true,
+      "oneCaptureRequest": true,
+      "manualRepairNotifications": false,
+      "pageErrors": [
+        [],
+        []
+      ]
+    },
+    "separateHTTPAndLateACKControl": {
+      "checks": [
+        {
+          "name": "two-documents-three-Viewers-two-templates-share-one-audio-channel-and-only-selected-mic",
+          "status": "passed"
+        },
+        {
+          "name": "two-selected-App-domains-share-original-capture-and-play-independent-speakers",
+          "status": "passed"
+        },
+        {
+          "name": "actual-context-http503-automatically-recovers-existing-intent-without-new-capture",
+          "status": "passed"
+        },
+        {
+          "name": "actual-context-timeout-automatically-recovers-existing-intent-without-new-capture",
+          "status": "passed"
+        },
+        {
+          "name": "pending-positive-route-ACK-and-late-replay-cannot-defeat-explicit-target-off",
+          "status": "passed"
+        },
+        {
+          "name": "actual401-stops-capture-no-reacquire-while-denied-restored-same-principal-recovers",
+          "status": "passed"
+        },
+        {
+          "name": "final-owners-retire-after-control-faults-without-media-channel-or-browser-capture",
+          "status": "passed"
+        }
+      ],
+      "originalFailed401NowPasses": true,
+      "noSDKMethodProbeDuring401": true,
+      "accessRecovery": {
+        "name": "actual401-stops-capture-no-reacquire-while-denied-restored-same-principal-recovers",
+        "status": "passed",
+        "freshMic": [
+          {
+            "frames": 24000,
+            "peak": 8998,
+            "rms": 6362.156774796054,
+            "expectedHz": 2200,
+            "markerEnergyFraction": 0.999999988025815
+          }
+        ],
+        "newCaptureRequests": 1,
+        "epochBefore": 1,
+        "epochAfter": 5,
+        "captureRequests": [
+          2,
+          0
+        ],
+        "oneActualChromeCapture": true
+      },
+      "pageErrors": [
+        [],
+        []
+      ]
+    },
+    "attemptsNotConcatenated": true
+  },
+  "separateUnresolvedScopes": [
+    "Matched500second idle-lane final speaker failure is separate. New layered sampling finds clean remote/wire PCM but gaps before parent playback; exact credit/scheduling cause and repair remain under investigation.",
+    "Complete24class/clipboardboundaries/natural8h/90min1000stress/platform/transport/resources/finalartifact/adoption/workbench/UAT remain open."
+  ],
+  "privateEvidenceSHA256": {
+    "oldWatchdogNative": "185829c08feef8e7a239dc393a21b81bfb58cb2562d1568b46f5516ffe713ca3",
+    "oldWatchdogDriver": "559df512ac2b53c1808b2b29c654a492e6b6d493fee14a785d03ed5fb8dc3393",
+    "old401Uninstrumented": "e1f310939f259a443cfe4c24c36f016d1ea4af3c78240b0090085e3f846642f8",
+    "old401LayerTrace": "994589137a94ce9f6e13cfe0f0bee833ab475014eb835da6b2b5bfe32e52b95b",
+    "modelRed": "c8d9838e7838fb61bcfc39dd9769dbebfad5b0fc1c0fa6656fa48e77ec26db52",
+    "modelGreen": "f0fd56c953a4ec09cdacc650fd9a661b69cf82e28bdecf2aef3ac9a638bf939b",
+    "fullCheck": "326a44340376f48e620f5ac09ff541c6fad967d78481e61a3ee60c37e15cb733",
+    "repairWatchdogNative": "149e34e5c996a47328a5020334712ecea02c2fa4db9b6acfbe6f18c2d48d83b5",
+    "repairWatchdogDriver": "8979cfc44b56849fbe2f0bfa3ef05129af398d08e90c0cbca0f00387559b47ff",
+    "repairHTTPAndACKNative": "d84d2bde6fd96511482d6631d6b698e9238b7ff72468aeda1d074678a697f38f",
+    "repairHTTPAndACKDriver": "7602afed675be45c2f298acf8e53c23463338b3455d3377770878cb3a2eb8136",
+    "repairBuild": "a0cb19da78475929fd34b7b7cda8ee0150f22a8823b4b87c5990aa9de5cab272",
+    "repairCoverage": "80df7549911ebbef2f4dd6fa90f2920b70238304bce3a1163d4765f26d874e17"
+  },
+  "repairSourceSHA256": {
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "702c4dff9413378a72352725bd2fb9de009bce8b0338e13fa763de94b356d6bf",
+    "cmd/remotexappd/web/sdk/audio-recovery.test.mjs": "de7cc9e9368edf487a5c52964aa758dff387b0714807fa5fabc5f0d7738e65f2"
+  },
+  "repairProductCommit": "038e6f8e9d2e98c85170710bbe888e54eb760963",
+  "repairCoreSHA256": "03ed7254d5ddad2404d5fbea080cf2a6cef25ce5382e3c82afadc20b1a4e240c",
+  "verification": {
+    "focusedTests": 60,
+    "fullCheck": "passed-privateTmp-nonroot",
+    "fourDefaultCGOBinaries": "passed",
+    "coverage": {
+      "passed": true,
+      "lines": 92.2,
+      "branches": 86.16,
+      "functions": 87.73
+    },
+    "hostedCI": {
+      "run": 46161837020,
+      "status": "passed",
+      "commit": "038e6f8e9d2e98c85170710bbe888e54eb760963"
+    },
+    "finalExactCandidate": "pending"
+  }
+}

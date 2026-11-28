@@ -1,5 +1,11 @@
 # Performance experiments
 
+P21 [native clipboard destination ordering](../tests/performance/native-clipboard-ordering/README.md)
+is planned under #119. It defines native concurrent-copy, frozen-receiver,
+slow-link and resource acceptance before measurement. Its pending records are
+separate from the completed register below; portable regression counts and a
+compiled component are not native/performance acceptance.
+
 ## Rules
 
 Performance hypotheses are tested one at a time. An experiment must:
@@ -1076,6 +1082,12 @@ final detach. It does not alter P14's resource comparison.
 
 ## P17: bounded playback credits per speaker
 
+The [2026-11-28 scheduling follow-up](../tests/performance/native-audio-burst/README.md#2026-11-28-scheduling-follow-up-development)
+records a distinct UI relay limit and development direct-port repair. It retains
+the accepted allocation result; new native/resource/long-duration and microphone
+media qualification remain incomplete.
+
+
 The deterministic [native audio burst experiment](../tests/performance/native-audio-burst/README.md)
 compares commit `299e0d4a1901ec0003efc3f15055c2372e34b024` with the selected
 per-speaker allowance. The primary variable is aggregate credits; packet format,
@@ -1146,3 +1158,46 @@ compares fifty direct native clients with disposable logical MessageChannels
 on one document bootstrap. Another peer remains usable. Chrome 149 and a
 supplied Chrome 158 control keep native client counts bounded; full served
 SDK/Pulse, immutable candidate and human UAT remain separate.
+
+Worker 8's additional P20 control performs fifty actual silent exits and
+incarnation-qualified same-name bootstrap probes in Chrome 158.0.8127.88.
+Native clients remain one after live owner retirement/idle; this minimal
+headless diagnostic-GC control has no audio and does not qualify the complete
+SDK/Pulse recovery or production resource envelope. The linked experiment
+retains source/report hashes and the earlier measurements.
+
+A separate current-pair headed SDK/Kasm/Pulse busy-loop control restores fresh
+data after the first real Worker hang. Both hung names retain four native
+SharedWorker clients/six ports and explicit off still stops capture; final
+live-page retirement has zero of the nine sampled audio classes. A separate
+two-document/two-App run verifies shared audio and authorized owner handoff.
+These fault diagnostics extend the linked P20 evidence, not its minimal
+baseline or the unresolved whole-browser anonymous-PSS/natural/stress gates.
+
+P19's SDK 0.38 graph follow-up separately passes ten actual processor throws
+with one Context/source, positive native baseline1/2/1 and retired0/0/0 in a live
+page. The earlier Context-only rebuild control retains12/14/12 despite fresh
+sound. The linked P19 records retain both scoped outcomes as measured.
+
+A minimal matched follow-up isolates the graph in an owned same-origin iframe:
+six direct closed-Context cycles retain6/6/6, while six owned-frame retirements
+reach0/0/0 with unchanged Worklet processing. This is a measured ownership
+mechanism rather than SDK integration or a completed release gate.
+
+The subsequent integrated SDK-owned realm control passes 23 checks including
+ten whole-Context replacements and ten processor throws, with one parent capture
+and all nine sampled native audio classes zero after disposal. A separate
+eight-check policy/late-operation lane reaches the same zero endpoint after
+eighty seconds of live idle. Its immediate stopped Stream/Track retention matches
+a no-SDK capture control, which releases both after ten seconds. These scoped
+diagnostic-GC results do not replace the new-backend, complete fault matrix,
+long-duration allocation or exact-candidate qualification. See P19 for hashes,
+scope and the preserved earlier failures.
+
+The 2026-11-28 full-SDK P20 follow-up additionally reproduces a logical port
+retained by a caller's terminal audio handle: one bootstrap plus that logical
+port remains after disposal. Six red model regressions cover its detachment
+and late-result fences. The repaired live-page native endpoint follows one actual Worker exit and
+returns to one client/one port with nine audio classes zero; whole-process,
+repeated-exit and natural qualification remain pending. The accepted minimal
+no-audio baseline is unchanged. See the linked P20 follow-up evidence and scope.

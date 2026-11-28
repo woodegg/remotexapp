@@ -123,3 +123,88 @@ The complete server ranges and before/after Manager groups are in results.json.
 This qualifies the implementation bytes, not an exact post-merge artifact,
 whole-browser leak freedom, physical media, actual OS sleep, UDP/TURN or downstream
 adoption. Candidate archive qualification and human UAT remain separate.
+
+## SDK 0.38 graph development follow-up (2026-11-28)
+
+[Isolated processor recovery](../../native-audio/results-graph-node-recovery-20261128.json)
+passes a real module 404/retry, suspension and ten actual Worklet throws in
+headed sandboxed Chrome 158.0.8127.88 with real Kasm/Pulse, a synthetic mic and
+sink:none. One source and Context survive; device requests remain one. Baseline
+and post-fault native Context/WorkletNode/MessagingProxy counts are 1/2/1; after
+awaited owner disposal they are 0/0/0 in the same live page. MediaStream source,
+stream, track, Gain, Worklet and destination counts also return to zero. GC is
+explicitly diagnostic; this is not a natural soak, new backend or immutable
+release qualification.
+
+Stage only a private test Worklet; never install its hook as a production asset:
+
+```sh
+python3 tests/native-audio/stage-graph-fault-worklet.py \
+  --output /private/fixture/audio-worklet.js
+```
+
+The helper reproduces the measured staged bytes. A subclass delegates normal
+processing to the production class; an owned `fixtureThrow:true` port message
+causes an actual processor exception on the next render. Test each capture and
+playback role, check fresh remote mic readback and speaker tone after recovery,
+then inspect native snapshots before closing the page/browser. Keep controller,
+addresses and raw heaps outside Git.
+
+A [separate whole-Context control](../../native-audio/results-graph-retirement-failure-20261128.json)
+passes functional checks but retains12/14/12 native Contexts/nodes/proxies.
+Its first proxy expectation was incorrect; the fresh positive baseline1/2/1
+corrects that expectation without excusing the measured retention. Closing
+before healthy processors terminate violates P19's retirement requirement.
+This records the failed Context-only implementation; neither its models nor
+the isolated-node pass accept complete resource recovery. The later owned-realm
+implementation below supersedes that teardown. Earlier accepted P19
+measurements remain unchanged in scope.
+
+A further [matched closed-Context control](../../native-audio/results-closed-context-frame-20261128.json)
+uses the unchanged production Worklet. Six ordinary direct cycles retain6/6/6;
+six cycles constructed in a same-origin owned frame and followed by frame
+retirement reach0/0/0. Reproduce the mechanism by staging the stock Worklet and
+`retirement-frame.html`, then running `browser-retirement.py --page retirement-frame.html`
+with the same six-cycle settings and a private output directory. This headless,
+diagnostic-GC prototype tests the mechanism, rather than SDK integration.
+Do not relabel the prior SDK graph failure passed.
+
+## SDK-owned graph realm controls (2026-11-28)
+
+The [integrated evidence](../../native-audio/results-owned-realm-recovery-20261128.json)
+adds 23 headed, sandboxed Chrome checks with the real served development SDK,
+Kasm Viewer and Pulse: module rejection/retry, suspension, ten actual Context
+closes and ten actual processor throws. The parent microphone source survives
+with one device request and fresh remote data after each repeated fault.
+Active native Context/node/proxy counts stay 1/2/1; after awaited owner disposal
+all nine sampled audio classes return to zero in the same live page.
+
+A separate eight-check audio-only lane permits only same-origin scripts and
+frames. It exercises an actual delayed module fetch, obsolete callbacks,
+an intentionally unresolved close wrapper, off during recovery and processors
+that actually ignore disposal. The wrapper models a pending close Promise;
+it is not an observed browser-native close failure. Missing ACKs are recorded
+and recovered by verified owned-realm retirement. No host reload is used.
+
+That lane's immediate final sample contains one stopped native Stream/Track.
+A no-SDK control reproduces the same temporary retention, then reaches zero
+after ten seconds of same-page idle. The SDK policy lane reaches zero for all
+nine audio classes after 80.0004 seconds of same-page idle. A strong heap path
+through the browser's UserMedia promise tracker supports this distinction.
+Documents, DOM nodes and listeners are reported separately; they are not all
+zero. These diagnostic-GC controls do not qualify whole-browser allocation,
+the new Core, physical media, every embedding policy, long-duration stress,
+an immutable release or human UAT.
+
+Reproduce the no-SDK counter-control with the public harness:
+
+```sh
+python3 tests/native-audio/browser-retirement.py \
+  --browser /path/to/chrome --directory tests/native-audio \
+  --page retirement-media-stream.html --synthetic-mic --native-streams \
+  --cycles 1 --expect released --output /private/capture-control
+```
+
+Stage `--ignore-dispose` only in a private fault Worklet when testing missing
+terminal acknowledgements. Its generated hash and the ordinary throw-only
+Worklet hash are distinct in the evidence. Neither hook is a production asset.

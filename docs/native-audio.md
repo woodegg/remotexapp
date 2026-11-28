@@ -12,6 +12,23 @@ acceptance, post-merge qualification and publication remain separate.
 
 ## Ownership and compatibility
 
+Development SDK 0.38 / Worker 8 implements the selected
+[self-recovery contract](native-self-recovery.md): the owner expresses intent
+once, and valid intent may survive Worker replacement or reacquire an ended
+source when current permission is granted and a fresh target writer is reserved.
+The initial browser permission remains explicit; automatic recovery never
+prompts. A ready source and a current processor delivery ACK are both required
+for `actualMic`. `microphonePending` reports setup/recovery separately from
+`microphoneActionRequired`. Temporary access rejection stops capture and parks
+intent; an observed identity change retires old interests. This supersedes
+the older manual-resume statements below for this new SDK only. Its real browser,
+full fault/resource and release qualification are not complete. Twenty actual
+silent exits now pass a scoped headed SDK control; see the self-recovery plan
+for the separate resource observation and remaining graph defects.
+
+For failure causes, the distinct epoch fences, automatic-recovery limits and
+isolated fault-injection steps, see [audio faults and recovery](native-audio-faults.md).
+
 Core 0.17.5 / SDK 0.35.0 implements
 [integration intent recovery](integration-intent-recovery.md). Fresh accepted
 requests and runtime grants permit transient recovery without a login-session
@@ -131,6 +148,21 @@ private audio domain. Browsers cannot supply backend socket paths, URLs or
 commands. Stop/generation retirement removes corresponding routes and grants;
 other sessions on the shared channel continue.
 
+The development self-recovery implementation adds `principal` to the context
+and Worker binding: a 64-character opaque correlation derived from the existing
+authenticated principal and stable Manager namespace. It survives native-cookie
+refresh and service restart, allowing a live SDK owner to distinguish those
+events from an observed account change. It is not a credential or proof of a
+distinct login session. With `auth-mode=none` it represents only the configured
+development trust domain; the Manager cannot infer a Cloudflare user's identity
+that ingress does not pass. Explicit host logout remains a revocation boundary.
+No new header or setting is required. Previously observed principal/login
+bindings changing or disappearing fence old intent; older servers without a
+principal correlation retain conservative same-service scope-change behavior.
+At the 64-scope cap, only inactive scopes with no pending unexpired grants may
+be reclaimed. Live connections/reservations remain protected and can exhaust
+capacity honestly. This development contract is not full AUD-006 qualification.
+
 Fresh authenticated HTTP renewal is required within 30 seconds, normally every
 10 seconds. Audio packets and Ping/Pong do not renew authorization. Explicit SDK
 logout revokes the epoch. Out-of-band identity-provider logout is observed when
@@ -218,6 +250,22 @@ Native object release must be tested in a live browser with test-owned refs
 removed; closed track state and mock close call counts alone do not prove it.
 
 
+## Development graph recovery (SDK 0.38)
+
+See [the graph lifecycle contract](native-self-recovery.md#audio-graph-recovery-development)
+for source-preserving resume/rebuild and bounded native operations. Failed module
+loads and closed Contexts are retired before a replacement; processor errors
+reconcile valid intent without a new device request solely for graph failure.
+Browser operation timeout is not cancellation. Unresolved native work remains
+quarantined, late settlement can wake recovery, and disposal reports unproven
+retirement. No automatic permission prompt or cancellation replay is permitted.
+
+`actualSpeaker` requires an authorized route and a ready playback owner; graph
+failure cannot report effective playback merely because the media WSS is open.
+Local `contextState`/`contextReason` supplement shared route/transport state.
+Models pass; real browser/native-resource, mixed faults and full production
+qualification remain separate gates.
+
 ## Document-scoped bootstrap (SDK 0.37 / worker v6)
 
 The #110 follow-up supersedes one native SharedWorker connection per audio
@@ -229,3 +277,45 @@ One bounded inert bootstrap may remain until document retirement. Owner cleanup
 still stops tracks and retires native processors/Contexts; last media interest
 still releases the WSS. Other owners and tabs are not terminated to reclaim a
 local wrapper. Worker v6 names isolate the bootstrap protocol from v5 peers.
+
+The development graph controls distinguish isolated processor repair from
+whole-Context retirement. Ten actual processor throws preserve the same source
+and Context and retire nine sampled native audio classes to zero. The earlier
+Context-only rebuild control retains native objects and remains recorded as a
+failed implementation. Context `closed` is not terminal-render proof.
+
+SDK 0.38 now implements the measured same-origin graph-realm boundary: Context
+and processor construction happen in an SDK-owned hidden child; parent intent,
+permissions, transport and live capture survive replacement. Normal render ACK
+remains the graceful path. Closed/stuck graphs retire their owned execution
+environment and detach obsolete callbacks; they do not reload the host or claim
+a native Promise resolved. Current scoped headed control passes complete Context
+replacement with one parent capture and native audio retirement. See the
+[owned graph contract](native-self-recovery.md#owned-graph-execution-environment-sdk-038-development)
+for limits and remaining production qualification. The earlier failed graph
+control is historical evidence, not the current implementation's disposition.
+
+### Retained terminal audio handles
+
+A caller can retain an audio interest after `release()`, Host disposal, logout
+or authoritative runtime retirement to inspect its `released` state. The SDK
+must clear the handle's internal logical Worker port and replay/application
+state at that boundary. A late operation result cannot reattach that state or
+continue microphone restoration. Releasing one handle preserves other live
+interests. The inert document Worker bootstrap has a separate lifetime and
+carries no media or capture authority. Native heap inspection must distinguish
+that permitted bootstrap from a logical port retained by a terminal handle.
+
+Actual document freeze or BFCache suspension stops that document's microphone
+source before handing ownership to another eligible participant. Requested
+intent remains available for authorized recovery. A hidden but running tab
+keeps its existing source. This differs from a transport outage in a responsive
+owner, where retaining a valid live source avoids unnecessary device requests.
+
+A delayed document watchdog tick fences local delivery and notifies the shared
+coordinator before waking reconciliation. This invalidates the old delivery
+nonce at both ends, then rebinds a valid live source and processor under current
+intent, permission and route grants. Merely clearing the local token/epoch can
+leave a disabled track behind a coordinator that still reports effective mic.
+Timer lateness alone does not require a new device request; off, revoked access,
+ended sources and actual document suspension retain their separate boundaries.

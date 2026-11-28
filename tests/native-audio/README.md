@@ -228,3 +228,157 @@ for the direct-client negative control. Fifty logical retirements preserve a
 live peer; native endpoints are measured before page/browser close. This
 mechanism probe creates no audio and cannot substitute for full SDK/Pulse or
 post-merge candidate tests. See [P20](../performance/native-audio-worker-clients/README.md).
+
+Use `--silent-exits --cycles 50` on the same Worker hub harness for actual
+`self.close()`/same-name recovery with a confirmed fresh incarnation on every
+cycle. The current logical owner remains usable and all owners retire before
+the final live-page native endpoint. This is a minimal no-audio mechanism probe
+with diagnostic GC; it is separate from headed SDK/Pulse recovery, natural soak,
+combined stress and final artifact qualification. See P20 for exact measured
+bytes and limitations.
+
+## Headed virtual-device measurement control
+
+Run as a non-root test UID with PulseAudio, pactl, parec, xauth, Xvfb, a
+sandbox-capable Chrome and the Python `websockets` dependency used by
+`retirement_cdp.py`. Keep output directories outside Git:
+
+```sh
+python3 tests/native-audio/virtual_pulse.py --output /private/pulse-control
+python3 tests/native-audio/browser-virtual-pulse.py \
+  --browser /path/to/chrome --output /private/browser-pulse-control
+```
+
+`VirtualPulse` owns a separate socket/cookie/config/state, a paced pipe input
+and a null output monitor. It loads no hardware modules and changes no account
+audio settings. Pass its environment only to owned browser/clients. Source
+removal/recreation changes the actual virtual device. A new marker frequency
+after a fault verifies fresh data at the remote mic or actual browser output,
+separately from route ACK, Worklet statistics and transport flags. PCM collection
+has a deadline; the writer keeps no unbounded backlog when its device vanishes.
+The helper removes its own private runtime after reaping its daemon/writer.
+
+`headed_cdp.py` supplies an owned sandboxed Chrome and Xvfb, reads the complete
+display readiness line, bounds exception history and never enables Network or
+focus emulation. The standalone browser control serves one static loopback page
+with no SDK. It checks three new mic-to-output frequencies and actual virtual
+input removal/restore, recording whether Chrome itself needs a new capture.
+That positive recapture is a measurement control, not automatic SDK recovery.
+Only synthetic prompt handling is automated; physical-device and real user
+permission-dialog acceptance remain separate. These short controls are neither
+long-duration resource evidence nor full product qualification.
+
+## Current-pair multi-document and actual-hang controls
+
+[Recorded results](results-multidoc-worker-hang-20261128.json) bind two separate
+current Core/embedded SDK/native-component runs. The eight-case ownership run
+uses two documents, three Viewers and two App templates; it checks selected mic
+routes, independent speakers, exact Viewer cuts, actual clipboard focus,
+authorized capture-owner handoff, per-App off, runtime retirement and cleanup.
+Validate a test controller's socket selector before closing anything: an
+ambiguous duplicate-Viewer request must fail without cutting both connections.
+
+The five-case hang run enters a real infinite loop in each owned native
+SharedWorker, confirming entry through the inspector before observing recovery.
+Keep the inspector session alive during the fault; don't replace a hang with a
+timeout that terminates evaluation, `self.close()` or a synthetic error callback.
+An available second name restores fresh data with the valid original source.
+Two hung names must instead remain bounded and allow explicit off without a
+responsive Worker. Take any native-client/retirement diagnostic snapshots only
+after the fault interval and record them separately from natural observations.
+These scoped results do not qualify every fault class or whole-process memory.
+
+## Owned process-family resource accounting
+
+`process_resources.py` samples a Linux process family qualified by root PID,
+start time, UID and the expected profile argument. It includes descendants and,
+when explicitly requested, detached crash handlers carrying that private
+profile's marker. Unrelated same-UID browsers are excluded. Process records
+include roles, PSS, anonymous PSS, SwapPSS, RSS, FD/thread counts and cgroups;
+family totals are accompanied by exit, unreadable and membership-change flags.
+Discard incomplete samples from equal-endpoint comparisons instead of counting
+missing processes as zero. Keep raw process identities and paths outside Git.
+
+Run its actual-process ownership checks with:
+
+```sh
+python3 -m unittest discover -s tests/native-audio -p test_process_resources.py -v
+```
+
+Compare cold startup, warmup, timed operation, natural idle and final diagnostic
+GC separately. Use matched blank-browser, minimal Worker and full SDK controls
+before attributing growth to a product component. A native object count of zero
+does not prove that process allocations returned to their initial size. Record
+GC-only OS endpoints before taking heap snapshots, since native heap-profiler
+allocation can itself change the measured memory footprint. These tools and
+short controls do not substitute for natural soak or stress qualification.
+
+[Terminal-handle and document-freeze follow-up](results-terminal-handle-freeze-20261128.json)
+records two actual old-pair reproductions and the current repair's separate
+native controls. Retaining a released interest no longer roots its logical port;
+real background freeze no longer leaves the old device open during handoff.
+The eight-case combined run includes actual Pulse domain epoch replacement,
+fresh microphone/browser-output data and final cleanup. The separate native
+endpoint follows one Worker exit, not twenty exits or a long memory study.
+Full check/build/coverage and hosted CI pass; natural/stress and final candidate
+acceptance remain open.
+
+The [matched three-profile resource follow-up](results-matched-audio-resources-20261128.json)
+keeps cold/warm/timed/idle/GC-only/native endpoints distinct. Two twenty-exit
+lanes pass fresh-data and native retirement checks; the idle lane fails final
+speaker readback, so the whole attempt remains failed. Observed short-run memory
+decreases are not a leak-free claim. Preserve the failed signal windows and
+trace remote Pulse, actual transmitted PCM and browser output before assigning
+the distortion to a product component or changing the spectral assertion.
+
+[Delayed-watchdog delivery control](results-watchdog-delivery-20261128.json)
+reproduces a local/coordination mismatch in actual SDK/Kasm/Pulse: the document
+fences a live source while the shared coordinator still reports effective mic.
+A diagnostic notification restores both new remote markers with the same source
+and one device request. The timestamp fault is not physical OSsleep, and that
+manual counterfactual is not automatic repaired-artifact qualification. Three
+composed regressions cover fresh delivery/Worklet PCM, off during reconciliation,
+and a late pending device result. The repaired immutable development Core passes
+a seven-check native three-gap/background control and a separate seven-check
+HTTP503/timeout/late-positive-ACK/off/actual401-recovery control. The old401 case
+now restores actual data without a host re-enable. These are separate attempts;
+the speaker-quality, complete fault matrix, natural/stress and final candidate
+gates remain open.
+
+## Playback scheduling diagnosis (development)
+
+[Bounded native scheduling controls](results-speaker-scheduling-20261128.json)
+separate actual WSS PCM, coordinator forwarding, render output and the browser
+output monitor. Valid speaker frames can arrive while playback credit is zero.
+A real 240 ms parent task delays the current media relay and returned credits;
+the eight-frame bound then drops data. Persistent output monitoring alone does
+not remove the condition. A temporary direct Worker/Worklet media port removes
+the observed relay drops in the matched stall cases with the same queue bound,
+but does not repair every observed output window. It is diagnostic instrumentation,
+not a shipped architecture or qualified fix.
+
+Keep no-SDK controls distinct. Native generated tones remain complete across
+these UI stalls with either parent or hidden child Contexts and both tested
+output sample specifications. A no-SDK duplex capture control also has an impaired
+window, then recovers. That evidence prevents assigning every gap to the SDK,
+without dismissing the independently observed relay drops. Render and output
+windows overlap but are not sample-identity aligned. Startup, nominal load,
+scheduling overload, persistent failure and recovered fresh data need separate
+assertions. Preserve the unchanged failed signal windows and the accepted P17
+bounds; no whole-attempt pass or production-quality claim follows from these
+short diagnostics.
+
+The development repair uses Worker 9 and a separate playback media port. Eight
+regressions cover direct credits/data, replaced ports/reset epochs, terminal
+cleanup and actual MessageChannels while the document control receiver is held.
+The composed regression fails on the archived old product; current module/full
+checks pass. No repaired native artifact is qualified yet. Microphone media and
+full binding/handoff/native-resource/combined-duration gates remain required.
+
+The current 105-test audio model suite additionally verifies a failed media
+channel automatically binds a fresh endpoint to the same live node, without a
+new source or audio WSS. Two red controls exposed the missing failure recovery
+and off-race guard before repair. Explicit speaker off prevents reopening; old
+failure notifications cannot replace the current binding. Full isolated check
+and coverage pass. Current native evidence still belongs to the previous
+Worker 8 artifact; Worker 9 native qualification is pending.

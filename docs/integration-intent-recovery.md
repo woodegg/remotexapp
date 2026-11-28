@@ -1,6 +1,10 @@
 # Integration intent and connection recovery
 
-Core 0.17.5 / SDK 0.35.0 implements this contract.
+Core 0.17.5 / SDK 0.35.0 implements the historical contract below.
+The owner selected [automatic self-recovery](native-self-recovery.md) on
+2026-11-28 in #119, including reacquisition under already-granted microphone
+permission. That implementation/qualification is in progress; this historical
+manual-resume rule is not the new target or a claim that the new target shipped.
 Issue [#98](https://github.com/woodegg/remotexapp/issues/98) supersedes the
 mandatory login-continuity condition introduced for recovery in Core 0.17.4.
 

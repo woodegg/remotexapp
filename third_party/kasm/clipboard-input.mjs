@@ -1,5 +1,6 @@
 // Order a native paste after the SDK's fresh clipboard submission. Bounded
 // pending input, no payloads, no browser APIs, no replay after retirement.
+import {MAX_CLIPBOARD_TRANSFER_TIMEOUT_MS} from './clipboard-payload.mjs';
 export class ClipboardInputGate {
   constructor({send, prepare}) {
     this.send = send;
@@ -25,10 +26,12 @@ export class ClipboardInputGate {
     }
     if (!pending) { this.deliver(keysym,code,down); return; }
     const epoch = this.epoch;
+    const expires = Date.now() + 2 * (MAX_CLIPBOARD_TRANSFER_TIMEOUT_MS + 10000);
     this.queue = [[keysym,code,down]];
-    this.timer = setTimeout(() => { if (epoch === this.epoch) this.cancel(); }, 5000);
+    this.timer = setTimeout(() => { if (epoch === this.epoch) this.cancel(); }, expires - Date.now());
     Promise.resolve(pending).then(allowed => {
       if (epoch !== this.epoch) return;
+      if (Date.now() >= expires) { this.cancel(); return; }
       if (!allowed) { this.cancel(); return; }
       clearTimeout(this.timer);
       const events = this.queue; this.queue = null;

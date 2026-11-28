@@ -1,0 +1,20 @@
+{
+  "experiment": "P21",
+  "status": "planned-inputs-not-qualified",
+  "primaryVariable": "Native clipboard destination admission/metadata strategy on otherwise fixed runtime and synthetic clipboard inputs",
+  "sourceSHA256": {
+    "third_party/kasm/clipboard-order.mjs": "043184fecd9621a4a4447707ee16ce35087ffa3fc72ae49b1825245fe087b13a",
+    "third_party/kasm/clipboard-input.mjs": "a5d8776af822116254644936e1d0c813eefa781c1ada91ba36412b8c951b55cb",
+    "third_party/kasm/clipboard-payload.mjs": "d4c911158fe7bf06eee032c929ac8feedc878dd3c925e24634fddead4868a19c",
+    "third_party/kasm/patches/0029-server-clipboard-ordering.patch": "d49df2369546d1fa19b52473d084de616cfe395426456fdd14783ab19b8599d0",
+    "cmd/remotexappd/web/sdk/native-clipboard.js": "871f69ff07da2ac9928d27d8c2343d358bf29a0ba52fddebfe2eb400d76aa86a",
+    "third_party/kasm/patches/0030-server-nonblocking-clipboard.patch": "e67b07227824b82ba24d560447a1b667a2663b8bab87855affdb0160bfb09e48"
+  },
+  "resultSHA256": "13f82c78f12cb34e6295a5926718ba110bbae364d31100192ca81b9be1fc4e07",
+  "unchanged": [
+    "RFB reliable ordered transport",
+    "10MiB text/HTML/PNG format budget",
+    "Ingress authority/runtime-generation fences",
+    "Audio wire protocol and requested-state ownership"
+  ]
+}

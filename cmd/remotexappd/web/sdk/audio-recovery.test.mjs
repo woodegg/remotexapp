@@ -1,0 +1,573 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {webcrypto} from 'node:crypto';
+import {MessageChannel} from 'node:worker_threads';
+import vm from 'node:vm';
+import {readFileSync} from 'node:fs';
+import {AudioCoordinator} from './audio-coordinator.js';
+import {RemoteXAppAudio} from './remotexapp-audio.js';
+const turn=()=>new Promise(resolve=>setImmediate(resolve));
+async function until(fn){const end=performance.now()+3000;while(performance.now()<end){if(fn())return;await new Promise(resolve=>setTimeout(resolve,2));}throw Error('state did not settle');}
+function fixture(t){
+ const f={docs:[],cores:new Map(),sockets:[],nodes:[],values:new Map(),service:'b'.repeat(64),scope:'a'.repeat(64),principal:'c'.repeat(64),events:[],gum:0};let sequence=0,locks=Promise.resolve();
+ class Socket {
+  constructor(){this.readyState=1;this.bufferedAmount=0;this.sent=[];f.sockets.push(this);queueMicrotask(()=>this.onmessage?.({data:JSON.stringify({type:'connected',connection:'connection-'+(++sequence)})}));}
+  send(data){this.sent.push(data);if(typeof data!=='string')return;const cmd=JSON.parse(data);f.events.push('route:'+cmd.op);
+   queueMicrotask(()=>this.onmessage?.({data:JSON.stringify({type:cmd.op==='unsubscribe'?'ack':'state',request:cmd.request,slot:cmd.slot,speaker:!!cmd.speaker,mic:!!cmd.mic&&!f.conflict,reason:cmd.mic&&f.conflict?'mic-conflict':'',domain:'d'.repeat(32)})}));}
+  close(){if(this.readyState===3)return;this.readyState=3;queueMicrotask(()=>this.onclose?.());}
+ }
+ function coordinator(){return new AudioCoordinator({crypto:webcrypto,location:{origin:'https://audio.test'},WebSocket:Socket,setInterval:()=>0,setTimeout,clearTimeout,
+  fetch:async(url,options)=>{
+   if(f.offline)throw TypeError('network unavailable');const action=url.split('/').at(-1),body=JSON.parse(options.body);f.events.push('http:'+action);
+   if(f.accessDenied)return {ok:false,status:401,json:async()=>({error:'current ingress access required'})};
+   if(action==='route'&&body.runtime===f.retired)return {ok:false,status:410,json:async()=>({error:'runtime generation retired'})};
+   if(action==='route'&&body.runtime===f.unavailable)return {ok:false,status:409,json:async()=>({error:'session audio unavailable'})};
+   return {ok:true,json:async()=>action==='context'?{scope:f.scope,service:f.service,principal:f.principal,login:'',protocol:'pcm-s16le-48k-v1'}:action==='grant'||action==='route'?{token:'e'.repeat(64),domain:'d'.repeat(32)}:{ok:true}};
+  }});}
+ f.makeDoc=()=>{
+  const doc={captures:0,bootstraps:0,streams:[],contexts:[],listeners:new Map(),timers:new Map(),permission:Object.assign(new EventTarget(),{state:'granted'})};f.docs.push(doc);
+  const env={location:{href:'https://audio.test/',origin:'https://audio.test'},crypto:webcrypto,isSecureContext:true,MessageChannel,setTimeout,clearTimeout,
+   setInterval(fn){const key=++sequence;doc.timers.set(key,fn);return key;},clearInterval(key){doc.timers.delete(key);},document:Object.assign(new EventTarget(),{visibilityState:'visible'}),
+   addEventListener(name,fn){if(!doc.listeners.has(name))doc.listeners.set(name,new Set());doc.listeners.get(name).add(fn);},removeEventListener(name,fn){doc.listeners.get(name)?.delete(fn);},
+   localStorage:{getItem:key=>f.values.get(key)??null,setItem(key,value){f.values.set(key,value);for(const other of f.docs)if(other!==doc)queueMicrotask(()=>{for(const fn of other.listeners.get('storage')||[])fn({key});});}},
+   navigator:{locks:{request(_key,options,fn){const run=fn || options,p=locks.then(run);locks=p.catch(()=>{});return p;}},permissions:{query:async()=>doc.permission},mediaDevices:Object.assign(new EventTarget(),{getUserMedia:async()=>{
+    doc.captures++;f.gum++;f.events.push('device');if(doc.holdDevice)await doc.holdDevice;if(doc.failDevice)throw new DOMException('device unavailable','NotFoundError');
+    const track={readyState:'live',muted:false,enabled:true,stop(){this.readyState='ended';}},stream={getTracks:()=>[track],getAudioTracks:()=>[track]};doc.streams.push(stream);return stream;
+   }})}};
+  env.SharedWorker=class {
+   constructor(_url,{name}){
+    doc.bootstraps++;
+    let core=f.cores.get(name);if(!core){core={coordinator:coordinator(),clients:[]};f.cores.set(name,core);}core.clients.push(this);
+    this.port={start(){},close(){},postMessage:({port})=>{if(core.terminated || f.hangWorkers)port.close();else core.coordinator.add(port);}};
+   }
+  };
+  env.AudioContext=class extends EventTarget {
+   constructor(){super();doc.contextAttempts=(doc.contextAttempts || 0)+1;if(doc.contextFailures>0){doc.contextFailures--;throw new DOMException('controlled Context construction failure','NotSupportedError');}doc.contexts.push(this);this.state='running';this.sampleRate=48000;this.destination={};this.audioWorklet={addModule:async()=>{if(doc.moduleFailures>0){doc.moduleFailures--;throw new DOMException('controlled module failure','AbortError');}if(doc.loadModule)return doc.loadModule(this);}};}
+   createGain(){return {gain:{value:1},connect(){},disconnect(){}};}
+   createMediaStreamSource(){return {connect(){},disconnect(){}};}
+   async resume(){this.state='running';this.onstatechange?.();this.dispatchEvent(new Event('statechange'));}
+   async suspend(){this.state='suspended';this.onstatechange?.();this.dispatchEvent(new Event('statechange'));}
+   async close(){this.state='closed';this.onstatechange?.();this.dispatchEvent(new Event('statechange'));}
+  };
+  const classes=new Map();class Base{constructor(){this.port={};}}
+  vm.runInNewContext(readFileSync(new URL('./audio-worklet.js',import.meta.url),'utf8'),{AudioWorkletProcessor:Base,registerProcessor:(name,Class)=>classes.set(name,Class),Float32Array,Int16Array,ArrayBuffer,Math,Map});
+  env.AudioWorkletNode=class {
+   constructor(_context,name){this.processor=new(classes.get(name))();this.name=name;this.closed=false;f.nodes.push(this);
+    this.port={postMessage:data=>queueMicrotask(()=>{this.processor.port.onmessage?.({data});if(data.op==='dispose')this.processor.process([],[[new Float32Array(128)]]);}),close:()=>{this.closed=true;}};
+    this.processor.port.postMessage=data=>queueMicrotask(()=>this.port.onmessage?.({data}));
+   }
+   connect(){}disconnect(){}
+  };
+  doc.frames=[];
+  env.document.body={append(frame){frame.isConnected=true;}};
+  env.document.createElement=()=>{
+   const frame={isConnected:false,contexts:[],setAttribute(){},remove(){this.isConnected=false;for(const context of this.contexts)context.state='closed';}};
+   frame.contentWindow={document:{},get AudioContext(){return class extends env.AudioContext{constructor(...args){super(...args);frame.contexts.push(this);}};},get AudioWorkletNode(){return env.AudioWorkletNode;}};
+   doc.frames.push(frame);return frame;
+  };
+  doc.env=env;doc.audio=new RemoteXAppAudio({environment:env});return doc;
+ };
+ f.tick=async()=>{for(const core of f.cores.values())core.coordinator._tick();for(const doc of f.docs)for(const fn of doc.timers.values())fn();await turn();await turn();};
+ f.killWorker=({silent=false}={})=>{
+  const old=[...f.cores.entries()];f.cores.clear();for(const [,core] of old){
+   core.terminated=true;
+   core.coordinator._disconnect('actual-worker-exit-model');for(const peer of core.coordinator.ports.values())peer.port.close();core.coordinator.ports.clear();core.coordinator._stopCapture('actual-worker-exit-model');
+   if(!silent)for(const worker of core.clients)worker.onerror?.();
+  }
+ };
+ f.route=doc=>doc.audio.stats.routes[0];
+ t.after(async()=>{
+  await Promise.all(f.docs.map(doc=>doc.audio.dispose()));await turn();
+  for(const core of f.cores.values()){core.coordinator._retire('test-complete');for(const peer of core.coordinator.ports.values())peer.port.close();core.coordinator.ports.clear();}
+ });
+ return f;
+}
+
+test('owner/coordinator/journal/worklet model rebinds a live source after Worker replacement',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ assert.equal(f.gum,1);assert(f.events.indexOf('route:subscribe')<f.events.indexOf('device'));
+ const source=doc.audio.stream,node=doc.audio.capture;
+ f.killWorker();await until(()=>doc.audio.port&&f.route(doc)?.actualMic&&f.sockets.length===2);
+ assert.equal(doc.audio.stream,source);assert.equal(doc.audio.capture,node);assert.equal(f.gum,1);
+ assert.equal(source.getAudioTracks()[0].enabled,true);assert.equal(interest.released,false);
+});
+
+test('runtime retirement fences local replay and journal participation before a Worker replacement',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const core=[...f.cores.values()][0].coordinator,route=[...core.routes.values()][0];
+ core._serverMessage({type:'state',slot:route.slot,speaker:false,mic:false,reason:'generation-retired'});
+ await until(()=>interest.released);
+ assert.equal(doc.audio.interests.size,0);await until(()=>!doc.audio.journal.read('app',1,'microphone').participating);
+ assert.equal(doc.audio.stream,null);assert.equal(doc.streams[0].getAudioTracks()[0].readyState,'ended');
+ const captures=f.gum;f.killWorker();await until(()=>!doc.audio.port);
+ await doc.audio._ensureWorker();await f.tick();assert.equal(doc.audio.interests.size,0);assert.equal(f.gum,captures);
+ assert.equal([...f.cores.values()][0].coordinator.routes.size,0);
+ await assert.rejects(interest.setMicrophone(true),/released/);
+});
+
+test('route HTTP 410 retires only the old generation and keeps another live capture route',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),old=await doc.audio.acquire({id:'old',sessionGeneration:1}),live=await doc.audio.acquire({id:'live',sessionGeneration:1});
+ await old.setSpeaker(true);await old.setMicrophone(true);await live.setSpeaker(true);await live.setMicrophone(true);
+ await until(()=>doc.audio.stats.routes.length===2&&doc.audio.stats.routes.every(r=>r.actualMic));
+ const source=doc.audio.stream;f.retired='old';
+ const core=[...f.cores.values()][0].coordinator,route=[...core.routes.values()].find(r=>r.runtime==='old');
+ route.applied='';await core._sync();core._broadcast();
+ await until(()=>old.released);
+ assert.equal(live.released,false);assert.equal(doc.audio.interests.size,1);assert.equal(doc.audio.stream,source);
+ await until(()=>!doc.audio.journal.read('old',1,'microphone').participating);
+ f.killWorker();await until(()=>doc.audio.port&&doc.audio.stats.routes.length===1&&doc.audio.stats.routes[0].actualMic);
+ assert.equal(doc.audio.stats.routes[0].runtime,'live');assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);
+ assert.equal(doc.audio.journal.read('live',1,'microphone').participating,true);
+});
+
+test('runtime retirement reaches both documents and fences a late native device result',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),other=f.makeDoc();
+ const first=await doc.audio.acquire({id:'app',sessionGeneration:1}),second=await other.audio.acquire({id:'app',sessionGeneration:1});
+ await first.setSpeaker(true);await second.setSpeaker(true);
+ let deliver;doc.holdDevice=new Promise(resolve=>{deliver=resolve;});
+ const enabling=first.setMicrophone(true);enabling.catch(()=>{});await until(()=>f.gum===1);
+ const core=[...f.cores.values()][0].coordinator,route=[...core.routes.values()][0];
+ core._serverMessage({type:'state',slot:route.slot,speaker:false,mic:false,reason:'generation-retired'});
+ await until(()=>first.released&&second.released);deliver();await enabling.catch(()=>{});
+ await until(()=>doc.streams.length===1);await turn();
+ assert.equal(doc.streams[0].getAudioTracks()[0].readyState,'ended');assert.equal(doc.audio.stream,null);
+ await until(()=>!doc.audio.journal.read('app',1,'microphone').participating&&!other.audio.journal.read('app',1,'speaker').participating);
+ assert.equal(doc.audio.interests.size,0);assert.equal(other.audio.interests.size,0);
+ assert.equal(f.gum,1);assert.equal(core.capture,null);
+});
+
+test('rebind skips an authoritatively retired target without failing healthy target initialization',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),sleeping=f.makeDoc();
+ const old=await doc.audio.acquire({id:'old',sessionGeneration:1}),live=await doc.audio.acquire({id:'live',sessionGeneration:1});
+ await sleeping.audio.acquire({id:'old',sessionGeneration:1});
+ await old.setSpeaker(true);await live.setSpeaker(true);await live.setMicrophone(true);await until(()=>doc.audio.stats.routes.some(r=>r.actualMic));
+ const source=doc.audio.stream,core=[...f.cores.values()][0].coordinator;
+ // Hold the other document's old ref to model a peer not processing the
+ // terminal notification yet, while this document has lost its logical port.
+ sleeping.audio._retireRuntime=()=>{};doc.audio._fenceCapture();doc.audio._closeWorker('fixture-logical-port-cut');await core.serial;
+ const route=core.routes.get('old:1');core._serverMessage({type:'state',slot:route.slot,speaker:false,mic:false,reason:'generation-retired'});
+ await doc.audio._ensureWorker();await until(()=>doc.audio.stats.routes.some(r=>r.runtime==='live'&&r.actualMic));
+ assert.equal(old.released,true);assert.equal(live.released,false);assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);
+ assert.equal(doc.audio.interests.size,1);
+});
+
+test('repeated silent exits require a fresh native bootstrap and retain the same live source and processor',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ // Shorten only the init deadline; an old native bootstrap deliberately drops
+ // attached ports after silent termination instead of resurrecting its Worker.
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===7000?25:ms);
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream,node=doc.audio.capture;
+ for(let i=0;i<20;i++){
+  f.killWorker({silent:true});assert.equal(doc.audio.port!==null,true,'silent exit has no native error callback');
+  doc.audio._fail('audio-worker-unresponsive');
+  await until(()=>doc.audio.port&&f.route(doc)?.actualMic&&f.sockets.length===i+2);
+  assert.equal(doc.audio.stream,source);assert.equal(doc.audio.capture,node);assert.equal(f.gum,1);
+  assert.equal(doc.audio.workerGeneration,0);assert.equal(doc.audio.workerExhausted,undefined);
+  const hubs=doc.env[Symbol.for('remotexapp.audio-worker-hubs.v8')];
+  assert.equal(hubs.size,1);assert.equal([...hubs.values()][0].clients.size,1);
+  assert.equal(f.cores.size,1);assert.equal([...f.cores.values()][0].clients.length,1);
+ }
+ assert.equal(interest.released,false);assert.equal(source.getAudioTracks()[0].enabled,true);
+});
+
+test('two unresponsive recovery names block within four native bootstraps and an explicit off still cancels intent',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===7000?25:ms);
+ await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream;
+ f.killWorker({silent:true});f.hangWorkers=true;doc.audio._fail('audio-worker-unresponsive');
+ await until(()=>doc.audio.workerExhausted && doc.audio.stats.connection==='blocked');
+ assert.equal(doc.bootstraps,4);assert.equal(f.gum,1);assert.equal(source.getAudioTracks()[0].enabled,false);
+ for(let i=0;i<20;i++){doc.audio._wake();await f.tick();}
+ assert.equal(doc.bootstraps,4);assert.equal(f.gum,1);
+ await interest.setMicrophone(false);assert.equal(doc.audio.stream,null);
+ assert.equal(doc.audio.journal.read('app',1,'microphone').enabled,false);
+});
+
+test('off during a silent-exit rebind prevents microphone replay and releases the retained source',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===7000?25:ms);
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ f.killWorker({silent:true});doc.audio._fail('audio-worker-unresponsive');
+ await interest.setMicrophone(false);
+ await until(()=>doc.audio.port&&f.route(doc)?.actualSpeaker&&f.sockets.length===2);
+ assert.equal(f.route(doc).requested.microphone,false);assert.equal(f.route(doc).actualMic,false);
+ assert.equal(doc.audio.stream,null);assert.equal(f.gum,1);
+});
+
+test('two participating documents rebind a silently dead Worker without retaining an unused source',async t=>{
+ const f=fixture(t),a=f.makeDoc(),b=f.makeDoc();
+ for(const doc of [a,b])doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===7000?25:ms);
+ const first=await a.audio.acquire({id:'app',sessionGeneration:1}),second=await b.audio.acquire({id:'app',sessionGeneration:1});
+ await first.setMicrophone(true);await second.setMicrophone(true);await until(()=>f.route(a)?.actualMic&&f.route(b)?.actualMic);
+ assert.equal(f.gum,1);
+ for(let i=0;i<5;i++){
+  f.killWorker({silent:true});a.audio._fail('audio-worker-unresponsive');b.audio._fail('audio-worker-unresponsive');
+  await until(()=>a.audio.port&&b.audio.port&&f.route(a)?.actualMic&&f.route(b)?.actualMic&&f.sockets.length===i+2);
+  assert.equal([...a.streams,...b.streams].filter(s=>s.getAudioTracks()[0].readyState==='live').length,1);
+  assert.equal(f.cores.size,1);
+ }
+ assert.equal(first.released,false);assert.equal(second.released,false);
+});
+
+test('ended capture is reacquired automatically under granted permission after fresh route authorization',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const old=doc.audio.stream.getAudioTracks()[0];old.readyState='ended';old.onended();
+ await until(()=>!f.route(doc)?.actualMic);assert.equal(f.route(doc).requested.microphone,true);
+ for(const core of f.cores.values())for(const peer of core.coordinator.ports.values())peer.captureRetryAfter=0;
+ await f.tick();await until(()=>f.route(doc)?.actualMic);
+ assert.equal(f.gum,2);assert.notEqual(doc.audio.stream.getAudioTracks()[0],old);
+ assert(f.events.lastIndexOf('http:route')<f.events.lastIndexOf('device'));
+});
+
+test('permission revocation blocks capture, a grant resumes valid intent, and explicit off forbids later recovery',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ doc.permission.state='prompt';doc.permission.dispatchEvent(new Event('change'));
+ await until(()=>!f.route(doc)?.actualMic);await f.tick();assert.equal(f.gum,1);
+ doc.permission.state='granted';doc.permission.dispatchEvent(new Event('change'));
+ await f.tick();await until(()=>f.route(doc)?.actualMic);assert.equal(f.gum,2);
+ await interest.setMicrophone(false);await until(()=>!f.route(doc)?.requested.microphone);
+ doc.permission.dispatchEvent(new Event('change'));f.killWorker();await f.tick();
+ assert.equal(f.gum,2);assert.equal(doc.audio.stream,null);
+});
+
+test('other-document off/on invalidates old participation even across Worker loss',async t=>{
+ const f=fixture(t),a=f.makeDoc(),b=f.makeDoc();
+ const first=await a.audio.acquire({id:'app',sessionGeneration:1}),second=await b.audio.acquire({id:'app',sessionGeneration:1});
+ await first.setMicrophone(true);await until(()=>f.route(a)?.actualMic);
+ await second.setMicrophone(false);await second.setMicrophone(true);await until(()=>f.route(b)?.actualMic);
+ await until(()=>a.audio.stream===null);
+ const oldCount=a.captures;f.killWorker();await until(()=>f.route(b)?.actualMic&&f.sockets.length>=2);
+ assert.equal(a.captures,oldCount);assert.equal(a.audio.stream,null);assert.equal(b.captures,1);
+});
+
+test('an unavailable domain recovers without a device reopen or changing a healthy peer delivery fence',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),a=await doc.audio.acquire({id:'app',sessionGeneration:1}),b=await doc.audio.acquire({id:'other',sessionGeneration:1});
+ await a.setMicrophone(true);await b.setMicrophone(true);await until(()=>doc.audio.stats.routes.every(r=>r.actualMic));
+ const core=[...f.cores.values()][0].coordinator,token=core.capture.delivery;
+ f.unavailable='app';core._serverMessage({type:'state',slot:1,speaker:false,mic:false,reason:'domain-retired'});
+ await f.tick();await until(()=>doc.audio.stats.routes.find(r=>r.runtime==='app')?.reason==='session-audio-unavailable');
+ assert.equal(core.capture.delivery,token);assert.equal(f.gum,1);
+ assert.equal(doc.audio.stats.routes.find(r=>r.runtime==='other').actualMic,true);
+ f.unavailable=null;core.routes.get('app:1').micRetryAfter=0;
+ await f.tick();await until(()=>doc.audio.stats.routes.every(r=>r.actualMic));
+ assert.equal(f.gum,1);assert.equal(core.capture.delivery,token);
+});
+
+test('device recovery cannot replay a switch turned off while acquisition is pending',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const old=doc.audio.stream.getAudioTracks()[0];old.readyState='ended';old.onended();await until(()=>!f.route(doc)?.actualMic);
+ let grant;doc.env.navigator.mediaDevices.getUserMedia=()=>new Promise(r=>{grant=r;});
+ const core=[...f.cores.values()][0].coordinator;for(const peer of core.ports.values())peer.captureRetryAfter=0;
+ await f.tick();await until(()=>!!grant);
+ const off=interest.setMicrophone(false);await turn();
+ const track={readyState:'live',stop(){this.readyState='ended';}};
+ grant({getTracks:()=>[track],getAudioTracks:()=>[track]});await off;
+ await until(()=>track.readyState==='ended');assert.equal(doc.audio.stream,null);
+ assert.equal(f.route(doc).requested.microphone,false);assert.equal(f.route(doc).actualMic,false);
+});
+
+test('temporary access rejection preserves intent but stops capture until fresh same-principal access',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ f.accessDenied=true;f.sockets[0].close();
+ await until(()=>!f.route(doc)?.actualMic);for(const core of f.cores.values())core.coordinator.retryAfter=0;
+ await f.tick();await until(()=>doc.audio.stats.connection==='blocked');
+ assert.equal(doc.audio.stream,null);assert.equal(interest.released,false);assert.equal(f.route(doc).requested.microphone,true);
+ f.accessDenied=false;for(const core of f.cores.values())core.coordinator.retryAfter=0;
+ await f.tick();await until(()=>f.route(doc)?.actualMic);assert.equal(f.gum,2);assert.equal(interest.released,false);
+});
+
+test('fresh access for a different observed principal retires old intent instead of reacquiring a device',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ f.sockets[0].close();f.principal='f'.repeat(64);f.service='e'.repeat(64);f.scope='d'.repeat(64);
+ await turn();
+ for(const core of f.cores.values())core.coordinator.retryAfter=0;
+ await f.tick();await until(()=>interest.released);assert.equal(f.gum,1);assert.equal(doc.audio.stream,null);
+});
+
+test('temporary track mute waits for actual unmute and reuses the source without a device reopen',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const stream=doc.audio.stream,node=doc.audio.capture,track=stream.getAudioTracks()[0];
+ track.muted=true;track.onmute();await until(()=>!f.route(doc)?.actualMic);
+ await f.tick();assert.equal(doc.audio.stream,stream);assert.equal(track.readyState,'live');assert.equal(track.enabled,true);assert.equal(f.gum,1);
+ track.muted=false;track.onunmute();await f.tick();await until(()=>f.route(doc)?.actualMic);
+ assert.equal(f.gum,1);assert.equal(doc.audio.stream,stream);assert.equal(doc.audio.capture,node);
+});
+
+test('local off cancels every same-owner reference even when shared metadata is unreadable',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),a=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await a.setMicrophone(true);const b=await doc.audio.acquire({id:'app',sessionGeneration:1});await b.setMicrophone(true);
+ await until(()=>f.route(doc)?.actualMic);
+ f.values.set(doc.audio.journal.key,'corrupt');await a.setMicrophone(false);
+ await until(()=>!f.route(doc)?.requested.microphone);assert.equal(doc.audio.stream,null);
+ f.killWorker();await f.tick();assert.equal(f.gum,1);
+});
+
+test('off during the post-acquisition permission check stops the late stream before constructing a processor',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const old=doc.audio.stream.getAudioTracks()[0];old.readyState='ended';old.onended();await until(()=>!f.route(doc)?.actualMic);
+ let checks=0,checked;doc.audio._permission=async()=>++checks===2?new Promise(resolve=>{checked=resolve;}):'granted';
+ const fresh={readyState:'live',stop(){this.readyState='ended';}};
+ doc.env.navigator.mediaDevices.getUserMedia=async()=>({getTracks:()=>[fresh],getAudioTracks:()=>[fresh]});
+ const core=[...f.cores.values()][0].coordinator;for(const peer of core.ports.values())peer.captureRetryAfter=0;
+ const before=f.nodes.length;await f.tick();await until(()=>!!checked);
+ const off=interest.setMicrophone(false);await until(()=>!f.route(doc)?.requested.microphone);
+ checked('granted');await off;await until(()=>fresh.readyState==='ended');
+ assert.equal(doc.audio.stream,null);assert.equal(f.nodes.length,before);
+});
+
+test('browser focus mute after background device release does not deadlock a still-live source disabled by the SDK',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream,track=source.getAudioTracks()[0];let enabled=track.enabled;
+ Object.defineProperty(track,'enabled',{get:()=>enabled,set:value=>{
+  enabled=value;
+  if(value && doc.env.document.visibilityState==='hidden')queueMicrotask(()=>{track.muted=true;track.onmute?.();});
+ }});
+ doc.env.document.visibilityState='hidden';f.sockets[0].close();await until(()=>!f.route(doc)?.actualMic);
+ for(const core of f.cores.values())core.coordinator.retryAfter=0;
+ await f.tick();await until(()=>track.muted);assert.equal(track.enabled,true);assert.equal(f.gum,1);
+ doc.env.document.visibilityState='visible';
+ // Model the UA's unmute-on-view transition only while the track is enabled.
+ assert.equal(track.enabled,true);track.muted=false;track.onunmute();
+ await f.tick();await until(()=>f.route(doc)?.actualMic);
+ assert.equal(f.gum,1);assert.equal(doc.audio.stream,source);
+});
+
+test('a temporarily suspended Context resumes valid speaker and mic intent without stopping its source',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream,processor=doc.audio.capture,context=doc.audio.context;
+ await context.suspend();await until(()=>!f.route(doc)?.actualMic);
+ assert.equal(source.getAudioTracks()[0].readyState,'live');assert.equal(f.gum,1);
+ await f.tick();await until(()=>f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+ assert.equal(doc.audio.context,context);assert.equal(doc.audio.stream,source);assert.equal(doc.audio.capture,processor);assert.equal(f.gum,1);
+});
+
+test('a transient Context construction failure does not strand the first speaker intent',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});doc.contextFailures=1;
+ await assert.rejects(interest.setSpeaker(true),/controlled Context construction failure/);
+ assert.equal(doc.contexts.length,0);await f.tick();await until(()=>f.route(doc)?.actualSpeaker);
+ assert.equal(doc.contextAttempts,2);assert.equal(doc.contexts.length,1);assert.equal(f.gum,0);
+});
+
+test('an externally closed Context rebuilds both graphs around the same live microphone source',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream,processor=doc.audio.capture,context=doc.audio.context;
+ await context.close();await until(()=>!f.route(doc)?.actualMic);
+ await f.tick();await until(()=>f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+ assert.notEqual(doc.audio.context,context);assert.notEqual(doc.audio.capture,processor);
+ assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);assert.equal(processor.closed,true);
+ assert.equal(doc.audio.contextOps.contexts.size,1);assert.equal(doc.audio.retirements.size,0);
+});
+
+test('twenty whole-Context replacements keep one owned realm and the same parent capture source',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream;
+ for(let i=0;i<20;i++){
+  const old=doc.audio.context;await old.close();await f.tick();
+  await until(()=>doc.audio.context!==old&&f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+  assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);
+  assert.equal(doc.frames.filter(frame=>frame.isConnected).length,1);
+  assert.equal(doc.audio.contextOps.contexts.size,1);assert.equal(doc.audio.contextOps.retired.size,0);
+  assert.equal(doc.audio.retirements.size,0);
+ }
+ await doc.audio.dispose();assert.equal(doc.frames.filter(frame=>frame.isConnected).length,0);
+ assert.equal(doc.audio.contextOps.contexts.size,0);assert.equal(source.getAudioTracks()[0].readyState,'ended');
+});
+
+test('watchdog notices a removed graph realm without relying on a child statechange event',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const old=doc.audio.context,source=doc.audio.stream;
+ doc.frames[0].remove();await f.tick();await until(()=>doc.audio.context!==old&&f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+ assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);assert.equal(doc.frames.filter(frame=>frame.isConnected).length,1);
+});
+
+test('off during a stuck close prevents a new realm and late old close completion cannot resume capture',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const old=doc.audio.context;let closing,closeCalls=0;
+ old.close=()=>{closeCalls++;return new Promise(resolve=>{closing=resolve;});};
+ doc.audio._graphFault('controlled-close-required',{retire:true});doc.audio._recoverGraph();await until(()=>!!closing);
+ await interest.setMicrophone(false);await interest.setSpeaker(false);
+ await until(()=>!doc.audio.graphInvalid&&!doc.audio.graphDisposal);
+ assert.equal(doc.frames.length,1);assert.equal(doc.frames[0].isConnected,false);assert.equal(doc.audio.stream,null);
+ closing();await turn();await f.tick();assert.equal(doc.frames.length,1);assert.equal(f.gum,1);assert.equal(closeCalls,1);
+});
+
+test('an initial rejected Worklet module is retired and valid speaker intent retries on a fresh Context',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});doc.moduleFailures=1;
+ await assert.rejects(interest.setSpeaker(true),/audio-context-module-failed/);
+ assert.equal(doc.contexts.length,1);assert.equal(doc.contexts[0].state,'closed');
+ await f.tick();await until(()=>f.route(doc)?.actualSpeaker);
+ assert.equal(doc.contexts.length,2);assert.equal(f.gum,0);assert.equal(doc.audio.contextOps.contexts.size,1);
+});
+
+test('processor errors replace only the failed node and stale old errors cannot retire its healthy sibling',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream;
+ for(let i=0;i<10;i++){
+  const old=doc.audio.context,kind=i%2?'playback':'capture',other=i%2?'capture':'playback',sibling=doc.audio[other],node=doc.audio[kind],late=node.onprocessorerror;
+  late();await until(()=>doc.audio[kind]!==node&&doc.audio[kind]&&f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+  const current=doc.audio.context;late();await turn();assert.equal(doc.audio.context,current);
+  assert.equal(current,old);assert.equal(doc.audio[other],sibling);
+  assert.equal(node.closed,true);assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);
+  assert.equal(doc.audio.contextOps.contexts.size,1);
+ }
+ assert.equal(doc.contexts.filter(c=>c.state!=='closed').length,1);
+});
+
+test('a timed-out native close retires its owned realm and late completion cannot undo fresh recovery',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const old=doc.audio.context,source=doc.audio.stream;let closeCalls=0,closed;
+ old.close=()=>{closeCalls++;return new Promise(resolve=>{closed=()=>{old.state='closed';resolve();};});};
+ doc.audio._graphFault('controlled-close-required',{retire:true});doc.audio._recoverGraph();
+ await until(()=>doc.contexts.length===2&&f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+ const current=doc.audio.context;
+ assert.equal(closeCalls,1);assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);
+ assert.equal(doc.frames[0].isConnected,false);assert.equal(old.state,'closed');
+ closed();await turn();assert.equal(doc.audio.context,current);assert.equal(doc.audio.contextOps.contexts.size,1);
+ await interest.setMicrophone(false);await interest.setSpeaker(false);assert.equal(doc.audio.stream,null);
+});
+
+test('a hung module is detached with its owned realm and current intent can recover before its late settlement',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});let loaded;
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
+ doc.loadModule=()=>new Promise(resolve=>{loaded=resolve;});
+ await assert.rejects(interest.setSpeaker(true),/audio-context-module-timeout/);
+ assert.equal(doc.contexts[0].state,'closed');assert.equal(doc.frames[0].isConnected,false);
+ assert.equal(doc.audio.contextOps.contexts.size,0);assert.equal(f.gum,0);
+ doc.loadModule=null;doc.audio.graphRetryAfter=0;
+ await f.tick();await until(()=>f.route(doc)?.actualSpeaker);
+ assert.equal(doc.contexts.length,2);assert.equal(doc.audio.contextOps.contexts.size,1);
+ const current=doc.audio.context;loaded();await turn();assert.equal(doc.audio.context,current);
+ assert.equal(doc.frames.filter(frame=>frame.isConnected).length,1);
+});
+
+test('off while native module work is quarantined prevents late graph and playback construction',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});let loaded;
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
+ doc.loadModule=()=>new Promise(resolve=>{loaded=resolve;});
+ await assert.rejects(interest.setSpeaker(true),/audio-context-module-timeout/);
+ await interest.setSpeaker(false);doc.loadModule=null;loaded();await turn();await f.tick();
+ assert.equal(doc.contexts.length,1);assert.equal(doc.audio.playback,null);assert.equal(f.nodes.length,0);
+ assert.equal(f.gum,0);
+});
+
+test('a real gesture can resume a prior automatic policy block without repeated native pending promises',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ doc.env.setTimeout=(fn,ms)=>setTimeout(fn,ms===3000?25:ms);
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const context=doc.audio.context,source=doc.audio.stream;let calls=0,unblock;
+ context.resume=()=>{calls++;if(calls===1)return new Promise(resolve=>{unblock=resolve;});context.state='running';context.onstatechange?.();unblock();return Promise.resolve();};
+ await context.suspend();await f.tick();await until(()=>doc.audio.graphReason==='audio-context-resume-timeout');
+ for(let i=0;i<20;i++){doc.audio.graphRetryAfter=0;await f.tick();}
+ assert.equal(calls,1);assert.equal(source.getAudioTracks()[0].readyState,'live');
+ doc.env.navigator.userActivation={isActive:true};await interest.setSpeaker(true);
+ await f.tick();await until(()=>f.route(doc)?.actualMic&&f.route(doc)?.actualSpeaker);
+ assert.equal(calls,2);assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);assert.equal(doc.contexts.length,1);
+});
+
+test('late document watchdog reconciles a fenced live source with fresh delivery and real worklet PCM',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream,node=doc.audio.capture,oldToken=doc.audio.captureToken;
+ doc.audio.lastWatchdogTick=Date.now()-6000;
+ for(const tick of doc.timers.values())tick();
+ await until(()=>doc.audio.captureToken && doc.audio.captureToken!==oldToken && f.route(doc)?.actualMic);
+ assert.equal(doc.audio.stream,source);assert.equal(doc.audio.capture,node);assert.equal(f.gum,1);
+ assert.equal(source.getAudioTracks()[0].enabled,true);
+ const socket=f.sockets.at(-1),before=socket.sent.filter(frame=>frame instanceof ArrayBuffer).length;
+ for(let i=0;i<8;i++)node.processor.process([[new Float32Array(128).fill(.25)]],[[new Float32Array(128)]]);
+ await until(()=>socket.sent.filter(frame=>frame instanceof ArrayBuffer).length>before);
+ const packet=socket.sent.filter(frame=>frame instanceof ArrayBuffer).at(-1);
+ assert.equal(new Uint8Array(packet)[1],2);assert.equal(new Uint8Array(packet)[3],0);
+});
+
+test('explicit mic off during late-watchdog recovery fences its pending restoration',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const source=doc.audio.stream;
+ doc.audio.lastWatchdogTick=Date.now()-6000;for(const tick of doc.timers.values())tick();
+ await interest.setMicrophone(false);await f.tick();await turn();
+ assert.equal(f.gum,1);assert.equal(source.getAudioTracks()[0].readyState,'ended');
+ assert.equal(f.route(doc).requested.microphone,false);assert.equal(f.route(doc).actualMic,false);
+ assert.equal(f.route(doc).actualSpeaker,true);
+});
+
+test('watchdog recovery during pending device acquisition cannot reopen mic after off',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);
+ let finishDevice;doc.holdDevice=new Promise(resolve=>{finishDevice=resolve;});
+ const enabling=interest.setMicrophone(true);enabling.catch(()=>{});await until(()=>f.gum===1);
+ doc.audio.lastWatchdogTick=Date.now()-6000;for(const tick of doc.timers.values())tick();
+ await interest.setMicrophone(false);finishDevice();await enabling.catch(()=>{});
+ await until(()=>doc.streams.length===1);await f.tick();await turn();
+ assert.equal(f.gum,1);assert.equal(doc.streams[0].getAudioTracks()[0].readyState,'ended');
+ assert.equal(doc.audio.stream,null);assert.equal(f.route(doc).requested.microphone,false);
+ assert.equal(f.route(doc).actualMic,false);assert.equal(f.route(doc).actualSpeaker,true);
+});
+
+test('actual playback MessageChannels keep PCM and credits moving while the document control receiver is held',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await until(()=>f.route(doc)?.actualSpeaker);
+ const core=[...f.cores.values()][0].coordinator,node=doc.audio.playback,route=[...core.routes.values()][0];
+ await until(()=>!!core.player?.playbackMedia && !!node.processor.mediaEpoch);
+ const control=doc.audio.port,receive=control.onmessage,held=[];
+ control.onmessage=e=>held.push(e);
+ try {
+  for(let cycle=0;cycle<3;cycle++){
+   for(let i=0;i<8;i++){
+    const bytes=new ArrayBuffer(3848),head=new DataView(bytes);head.setUint8(0,1);head.setUint8(1,1);head.setUint8(2,route.slot);new Int16Array(bytes,8).fill(8192+cycle*8192);core._speaker(bytes);
+   }
+   await until(()=>node.processor.streams.get(route.slot)?.queue.length===8);
+   for(let i=0;i<60;i++){
+    const output=[new Float32Array(128),new Float32Array(128)];node.processor.process([],[output]);assert.equal(output[0][0],.25+cycle*.25);
+   }
+   await until(()=>core.player.credits===8);
+  }
+  assert.equal(core.dropped,0);assert.equal(held.filter(e=>e.data.type==='playback').length,0);
+ }finally{control.onmessage=receive;for(const e of held)receive(e);}
+});
+
+test('playback media channel failure rebinds the current node without reopening capture or the mux',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const core=[...f.cores.values()][0].coordinator,node=doc.audio.playback,source=doc.audio.stream;
+ await until(()=>!!core.player?.playbackMedia && !!node.processor.mediaEpoch);
+ const old=core.player.playbackMedia;old.port.onmessageerror();
+ await until(()=>!!core.player?.playbackMedia && core.player.playbackMedia.binding!==old.binding && !!node.processor.mediaEpoch);
+ assert.equal(doc.audio.playback,node);assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);assert.equal(f.sockets.length,1);
+ const current=core.player.playbackMedia;
+ doc.audio._message({type:'playback-media-failed',binding:old.binding});assert.equal(core.player.playbackMedia,current);
+ const route=[...core.routes.values()][0],bytes=new ArrayBuffer(3848),head=new DataView(bytes);head.setUint8(0,1);head.setUint8(1,1);head.setUint8(2,route.slot);new Int16Array(bytes,8).fill(8192);core._speaker(bytes);
+ await until(()=>node.processor.streams.get(route.slot)?.queue.length===1);
+ const output=[new Float32Array(128),new Float32Array(128)];node.processor.process([],[output]);assert.equal(output[0][0],.25);
+});
+
+test('a playback media fault after explicit speaker off cannot re-enable it or disrupt the live mic',async t=>{
+ const f=fixture(t),doc=f.makeDoc(),interest=await doc.audio.acquire({id:'app',sessionGeneration:1});
+ await interest.setSpeaker(true);await interest.setMicrophone(true);await until(()=>f.route(doc)?.actualMic);
+ const core=[...f.cores.values()][0].coordinator,peer=core.player,node=doc.audio.playback,source=doc.audio.stream;
+ await until(()=>!!peer.playbackMedia && !!node.processor.mediaEpoch);const old=peer.playbackMedia;
+ await interest.setSpeaker(false);old.port.onmessageerror();await until(()=>!node.mediaBinding);
+ assert.equal(peer.playbackMedia,null);assert.equal(core.player,null);assert.equal(doc.audio.playback,node);
+ assert.equal(doc.audio.stream,source);assert.equal(f.gum,1);assert.equal(f.route(doc).requested.speaker,false);assert.equal(f.route(doc).actualMic,true);
+});

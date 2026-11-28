@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "reproduced-native-partial-upload-event-loop-stall",
+  "releaseQualified": false,
+  "implementationCommit": "c0d35e0d9068d74112e73520bd39007b05ff0264",
+  "componentManifestSHA256": "e8dd4bc1c8ee9472b9f6d1dd6860b308f7d2b59db17c47191d58ef1d1f8c3910",
+  "browser": "Chrome/158.0.8127.88",
+  "method": {
+    "headed": true,
+    "sandboxEnabled": true,
+    "nativeCDP": true,
+    "embeddedSDK": true,
+    "syntheticDataOnly": true,
+    "realX11": true,
+    "realWSS": true,
+    "heldTransaction": "Send the first 24 bytes of a rich clipboard body, retain its tail in the owned browser, then attempt an independent X11 clipboard owner change."
+  },
+  "passedControls": [
+    {
+      "name": "new-v4-handshake-and-auto-mode",
+      "status": "passed"
+    },
+    {
+      "name": "actual-A-B-A-bidirectional-readback",
+      "status": "passed"
+    },
+    {
+      "name": "delayed-unannounced-X11-owner-during-browser-read-conflicts-without-overwrite",
+      "status": "passed"
+    },
+    {
+      "name": "explicit-source-choice-after-conflict",
+      "status": "passed"
+    },
+    {
+      "name": "native-stale-admission-preserves-X11-destination",
+      "status": "passed"
+    },
+    {
+      "name": "actual-INCR-snapshot-readback",
+      "status": "passed"
+    },
+    {
+      "name": "simultaneous-two-Viewers-one-accept-one-conflict",
+      "status": "passed"
+    }
+  ],
+  "observation": {
+    "x11OwnerCompletedBeforeRelease": false,
+    "writerElapsedSeconds": 1.5517647139495239,
+    "admission": "accepted",
+    "destinationPreserved": true
+  },
+  "cause": "SMsgReader stages the entire rich body using synchronous InStream reads from the single native X11 event loop. An incomplete upload blocks unrelated X11 owner requests until its tail arrives. This does not prove a stale owner revision was admitted: the new owner could not finish its request until the old upload completed.",
+  "requiredRepair": "Resume one bounded transaction incrementally with nonblocking availability checks; yield while incomplete, preserve complete validation and final atomic revision admission, enforce an absolute native deadline and release staging on disconnect.",
+  "evidenceSHA256": {
+    "nativeResult": "9c5bc6e900dde3f9e38ce74fbd1e6f6fcd28e8330856a857ecb2cc484768ec83",
+    "driver": "7f6d4d9a6ca83bf0ebe58e63053eaff7ce9d8a14cf7dfbf44817e4b789c31075",
+    "componentBuildLog": "94a661e930b67ecc5202416233ae621f08489c0515145e7cbe23bd6fb794800d"
+  },
+  "remaining": [
+    "Same-case native nonblocking repair proof",
+    "Frozen/slow receiver metadata bounds",
+    "Same-owner/large/slow-link and policy cases",
+    "Full fault/resource/natural/stress/final-candidate gates"
+  ]
+}

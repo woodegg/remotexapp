@@ -5768,3 +5768,344 @@ Qualify actual backing-store/RFB retirement independently from Worker/audio
 counts, and retain failed or partial resource observations. This decision
 does not attribute or repair the separate no-SDK native clipboard readback
 failure in #111.
+
+
+## 2026-11-28 — Reconcile live integration intent through recoverable faults
+
+The owner selected systematic repairs and one complete UAT after qualification
+in [#119](https://github.com/woodegg/remotexapp/issues/119). The
+[self-recovery plan](native-self-recovery.md) prospectively supersedes the
+2026-11-24 rule that every ended mic capture needs another click. Under a live
+participating owner, current granted browser permission and fresh runtime
+access, SDK recovery may reacquire a device without prompting. Off/logout,
+permission revocation and identity/runtime fences still stop old delivery.
+
+Use shared switch epochs and bounded owner participation metadata to prevent a
+stale page resurrecting audio after another tab's off/on or Worker replacement.
+This metadata is not a grant, content, device fingerprint or persisted capture
+permission. A fresh document starts off. Bounded retry, proper native retirement
+and separate eight-hour natural/ninety-minute combination-stress gates are
+required; implementation is not qualified merely by the policy change.
+
+For #117, remove uploaded-payload equality as a permanent remote-offer veto.
+A new remote A after B is valid even when A was uploaded before. Current local
+value/baseline comparison handles no-op echoes and concurrent local conflicts.
+Development unit and real Chrome/X11 old/new controls pass; final-candidate
+qualification remains outstanding. Kasm already fences stale X11 snapshot owners
+and revisions; no second legacy clipboard path is introduced by this repair.
+
+## 2026-11-28 — Separate native-cookie refresh from ingress-principal replacement
+
+Under #119, a same-service native-cookie scope change must not permanently
+discard valid audio intent merely because the browser forgot that cookie.
+Add an opaque principal correlation to the context/Worker binding, derived
+from the existing authenticated request principal and stable Manager namespace.
+Fresh cookie scopes and service epochs can then reconcile under the same
+observed principal. Changed or lost previously observed principal/login bindings
+still retire old interests, including across service restart. Older servers
+without correlation retain conservative same-service scope-change behavior.
+
+This supersedes only the scope-equality inference in the earlier recovery
+contract. It does not create an authentication credential or a new required
+login header, distinguish a new login of the same account, or infer an identity
+that ingress never supplied. Explicit host logout and fresh request/grant
+authorization remain necessary. Development-mode correlation describes its
+configured trust domain, not a Cloudflare account.
+
+Repeated forgotten cookies can otherwise strand new contexts at the 64-scope
+cap for twenty-four hours. At capacity evict the least recently used inactive
+scope with no unexpired grant; protect every active channel and reservation.
+Exhaustion of genuinely reserved capacity remains a quota error. Focused
+backend/SDK tests cover scope refresh, principal isolation, old-server fallback,
+grant rejection and pressure boundaries; end-to-end and full self-recovery
+qualification remain separate gates.
+
+## 2026-11-28 — Keep source lifetime independent from a disconnected transport lease
+
+The twelve-second capture retirement rule is superseded for an already live
+source whose owner remains responsive and mic targets stay requested. An audio
+WSS/service interruption fences delivery and disables the source track; it does
+not by itself invalidate that device or require a new permission operation.
+Fresh connection/runtime authorization and a new delivery nonce permit reuse.
+Do not replay old PCM. Explicit off/logout, owner loss, failed authorization and
+genuinely ended capture retain their own fences; this transport repair does not
+authorize a replacement device or a new Worker owner by itself.
+
+The [real transport control](../tests/native-audio/results-retained-source-20261128.json)
+checks the source/processor identity and actual speaker/mic data across a long
+cut and genuine background interval. A valid background test must first prove
+visible/hidden transitions without forced-focus emulation or scheduling
+overrides. Keep failed visibility/cleanup attempts separate; an extended
+disconnection control is not the natural soak, combined stress, physical-device
+acceptance or whole-process allocation review required by #119.
+
+## 2026-11-28 — Reconcile ordered audio intent before reporting effective delivery
+
+SDK 0.38 / Worker 7 carries bounded journal switch epochs into the live audio
+owner and coordinator. An emergency cancellation removes only that owner's
+participation; a committed global off is ordered by its actual journal revision.
+Never borrow a later on's revision for an older off, or allow a late on to cross
+the latest off/on epoch. Independent module copies in one document share the
+notification registry. A fresh document does not inherit capture authority.
+
+Reserve the current runtime writer before acquiring a device. A server route ACK
+is authorization, not proof that a browser source or processor is sending.
+Require source readiness and the processor's fresh delivery ACK before effective
+mic/PCM; reject stale ACKs/frames. Domain loss and speaker-only route changes
+must not reset a healthy peer's delivery fence. Ended-source recovery needs live
+participation, current granted permission and fresh routing. Initial permission
+can prompt only in the explicit enable path; off/logout/revocation fence late
+acquisition and a valid source can instead be rebound to a new Worker token.
+
+Audio interest initialization no longer waits for a Manager HTTP context.
+Temporary access rejection stops capture and parks intent; fresh accepted access
+must still match the previously observed binding. Changed identity and explicit
+logout remain terminal for old interests. This supersedes the earlier treatment
+of every context rejection as permanent interest retirement, and adds no new
+credential or required login header. Model regressions do not close repeated
+silent Worker exit, real browser, native retirement or long-duration gates.
+
+## 2026-11-28 — Bound native probes by confirmed Worker incarnation
+
+The Worker 7 real Chrome control recovered the first `self.close()` but blocked
+on the second with no live Worker and a healthy backend. A cached native
+bootstrap cannot deliver a new logical port to a silently terminated global.
+This supersedes the fixed lifetime replacement limit, retaining its purpose of
+bounding native SharedWorkerClient retention. Worker 8 first retries the cached
+logical channel, then probes a fresh native bootstrap under the same name. A
+random ephemeral init `workerId` confirms a new incarnation before its probe
+budget resets; same or unknown IDs and native errors do not reset it. Competing
+probes reuse the newest bootstrap, stale init completions are rejected and two
+nonresponsive names bound native clients to four. A permanently unresponsive
+pair reports blocked instead of creating unlimited names. No new authentication
+or server authority is attached to that correlation ID.
+
+Live-source hints prefer an already held source only among currently authorized
+participants. They do not authorize capture. Existing watchdog/wake callbacks
+reconcile preferred-name changes; a responsive unselected owner retires its held
+source after another capture becomes ready. A local off and its committed shared
+switch remain successful with no Worker; returned inactive state claims no
+remote delivery. Models cover repeated silent exits, budget and cancellation.
+Real repeated-exit, multi-document, native-retainer and full production gates in
+[native-self-recovery.md](native-self-recovery.md) remain incomplete.
+
+## 2026-11-28 — Preserve source intent while replacing an unusable audio graph
+
+The actual-SDK graph baseline reproduces cached failed module loading, reuse of
+closed Contexts and source retirement on temporary suspension. These are graph
+lifecycle faults, separate from Worker replacement. SDK 0.38 now fences PCM on
+suspension, resumes under valid intent and isolates failed processors before considering complete graph replacement.
+Retain an authorized live source; current permission/intent/writer checks and a
+fresh processor delivery ACK still precede capture delivery. Processor callbacks
+are graph-qualified; late old errors cannot retire a replacement. Explicit off
+fences late construction and capture. A server route ACK without ready playback
+is no longer `actualSpeaker`; local graph diagnostics are additive.
+
+A native module/resume/close timeout does not cancel the native operation. Track
+and join bounded flights, permit one real-gesture retry of an earlier automatic
+resume and quarantine unresolved work rather than allocate endless graphs. A document/Manager quarantine pool gates
+new owners after two unproven retirements, preventing Host recreation from
+bypassing the native operation bound; healthy existing graphs remain usable.
+Late settlement must wake even during another reconciliation. Final disposal
+bounds close, detaches owner callbacks and reports incomplete native work; late
+closed-graph settlement releases its record. A measured whole-Context control rejects using closed state as terminal
+processing evidence: twelve native Contexts survive despite functional recovery.
+Healthy processors must terminate before SDK-owned close; already-closed Context
+cleanup remains unresolved. Native processorerror permits isolated failed-node
+replacement without closing its healthy sibling. A missing render ACK remains
+an error, not a successful native retirement. Keep eight recent retirement errors plus a
+total count. This supersedes unconditional source stopping on Context suspension
+and indefinite close waits; cancellation/identity/runtime fences are unchanged.
+Model passage does not accept real native cleanup or the full production gates.
+
+## 2026-11-28 — Give the audio graph an owned execution lifetime
+
+Closing a Context while healthy Worklets still hold active-lifetime roots does
+not retire native objects. The failed full-graph control retains12/14/12 even
+with sound recovery. A matched six-cycle mechanism instead returns0/0/0 when the
+SDK owns and retires the graph's same-origin execution realm. Use this measured
+boundary in SDK 0.38: create Context and WorkletNode in an inert owned child while
+parent intent, Worker transport, permission state and live MediaStream persist.
+No new origin, login header or host recovery loop is required.
+
+Graceful retirement keeps terminal render acknowledgement and muted drain.
+Already-closed or stuck graphs may retire their owned execution environment;
+this proves a different lifetime boundary rather than claiming `closed` or a
+native Promise timeout was a render ACK. Drop obsolete Context/controller
+references from callback scopes and detach owner waits only after that boundary
+is retired. Late native completion cannot affect a replacement. Observe graph
+document identity/connection rather than relying solely on a destroyed child's
+events. Parent track callbacks use a separate scope without child graph objects.
+This supersedes the failed Context-only full-graph path; isolated processor
+errors still preserve their healthy sibling and current Context.
+
+Scoped headed SDK/Kasm/Pulse now passes repeated Context and processor faults
+with one parent capture and native retirement. Policy/activation, pending native
+operations/cancellation and complete production gates remain separate evidence.
+
+## 2026-11-28 — Propagate terminal runtime retirement to document intent
+
+A Worker-only retired flag does not revoke a document's replay journal. Worker
+replacement could reconstruct that obsolete interest and try the old target
+again. Generation-retired push and route HTTP 410 now share a terminal route
+transition: fence speaker/microphone ref intents, reject stale commands and
+ACKs, and notify every participating document owner for that exact target.
+Documents synchronously release matching handles and replay flags, remove their
+journal participation and fence pending device results. Another live target
+retains its intent and usable capture source; a domain outage or replacement
+is not runtime-generation retirement. No new host recovery loop or server
+authentication boundary is introduced. This completes the local half of the
+existing terminal-runtime invariant; real faults remain a separate gate.
+
+## 2026-11-28 — Classify retained stopped audio targets as terminal
+
+The new-Manager browser control proves a second half of this boundary: actual
+stop correctly pushes generation retirement, but a subsequent old-target acquire
+gets recoverable HTTP 409 because the stopped record still holds that generation.
+Return HTTP 410 for stopped/stopping runtime or session records. A later explicit
+start allocates a new generation; old audio authority must not wait for it to
+advance. Preserve recoverable domain/endpoint failures and graceful shutdown
+review rather than treating every unavailable domain as terminal. This refines
+the backend classification supporting the existing terminal-runtime invariant;
+the failed browser attempt and red HTTP cases remain separate evidence.
+
+## 2026-11-28 — Compare clipboard destination revision at native admission
+
+Select [KNC-013 destination ordering](native-clipboard-ordering.md) for the
+separate unannounced-remote/concurrent-upload defect. A last-offer SDK check or
+transport round trip cannot prove that X11 ownership stayed unchanged. Compare
+the observed destination revision atomically before any native clipboard-buffer
+or selection mutation, preserving the complete staged transaction on conflict.
+Advance revision before asynchronous snapshot discovery, including unsupported
+selections; content equality is not a revision. Keep consent/focus/permission,
+verified local delivery, format/size bounds and explicit source choice. Require
+an honest capability/manual fallback on old components. This selects the
+invariant, not a completed wire implementation or qualified native component.
+
+## 2026-11-28 — Implement bounded native clipboard revision admission
+
+Implement KNC-013 through a versioned private Fence exchange around the existing
+staged rich upload. Reject stale admission before clearing connection buffers or
+taking X11 ownership. Keep one fixed-size armed transaction, correlated replies
+and finite client waits; a missing revision cannot mean unconditional write.
+Accepted completion requires revision advance and actual X11 clipboard ownership.
+Coalesce owner-change metadata with one timer and bind cached outgoing snapshots
+to their generation revision. Parent SDK baseline/consent fences remain distinct
+from native destination ordering. Preserve explicit source choice on old pairs,
+but report passive upload as manual there; automatic download remains supported.
+New immutable v4 pairs retain rich-v2 runtime format/10 MiB bounds. Portable
+model and native admission tests do not qualify the complete component or actual
+X11 concurrency; those gates remain open before long-duration acceptance.
+
+The same development exchange bounds metadata by one unacknowledged revision
+notification per connection; a single timer/coalesced counter cannot accumulate
+while a document is frozen. Native transfer observation scales with the bounded
+payload (10–50 seconds) rather than inheriting the five-second browser I/O limit.
+Paste remains bounded by 128 queued input events/120 seconds across an existing
+and a fresh transfer. Check elapsed deadlines before accepting results or keys,
+even when browser suspension delayed timer callbacks. Freeze retires clipboard
+work and a still-focused resume acquires a fresh baseline. These are selected
+lifetime/backpressure invariants, not proof of native slow-link qualification.
+
+## 2026-11-28 — Yield during incomplete native rich clipboard uploads
+
+The real split-body control in KNC-013 blocks unrelated X11 owner changes until
+its tail arrives. Synchronous staging protects atomicity but cannot protect
+shared-desktop responsiveness. Supersede that staging mechanism with one
+incremental bounded transaction per connection: check availability without
+waiting, yield on partial input, then validate and compare/mutate only after the
+whole body arrives. Propagate incomplete processing to the native dispatch loop
+so buffered partial headers cannot spin. A fifty-second absolute native deadline
+and connection-owned timer close incomplete transfers without resetting on
+progress; completion/disconnect releases staging. Preserve clipboard permissions,
+10 MiB bounds, correlated admission and old-pair fallback. Native reproduction,
+repair proof and complete performance gates remain distinct requirements. Small
+upstream message readers are outside this bounded replacement.
+
+When incremental native staging yields, format/byte policy may change. Revalidate
+current policy immediately before admission, in the same final event-loop turn;
+parsed earlier headers are not lasting permission. Mid-transfer policy rejection
+must leave the prior destination and connection cache untouched.
+
+## 2026-11-28 — Retire recovered audio reasons at effective delivery
+
+The current-pair headed Chrome/Pulse permission control restores fresh mic and
+speaker data but retains `microphone-permission-required` on the active route.
+Treat that reason as a current failure, not a substitute for disconnect history.
+Clear a nonterminal target's reason only after all its requested effects are
+effective: playback has an eligible graph and mic has its current delivery ACK.
+Keep another pending/retired target's reason; clear the shared failure only
+when all connected routes have settled. Never infer physical audibility or
+silence recovery from the flags alone. This refines AUD-006's honest state
+contract without changing capture permission, retries, intent or authority.
+
+## 2026-11-28 — Detach retired public audio handles from logical ports
+
+The current-pair resource control retains an extra native MessagePort through
+`integrationUAT.interest` and its private bound-port field after Host disposal.
+This is distinct from the permitted inert document bootstrap. A caller may keep
+a released handle for terminal status; requiring the caller to delete it would
+move SDK cleanup into host code. Refine AUD-005: clear bound-port, applied intent
+and local replay state synchronously at every handle retirement boundary. Send
+any necessary release using the previously checked current binding, without
+closing another live interest's shared logical channel. Recheck retirement and
+binding after asynchronous explicit/replay acknowledgements before recording
+application state. Retained terminal metadata must carry no replay or capture
+authority. Six red regressions reproduce the old behavior; actual native-resource
+and final qualification remain separate from these model checks.
+
+## 2026-11-28 — Stop capture before document suspension handoff
+
+Actual background-then-freeze inspection shows two Chrome RecordStreams while
+the original document is frozen: its delivery-disabled source remains open and
+the eligible peer has acquired a second source. The old coordinator stop message
+cannot run in a frozen document. Refine AUD-003 suspension handling: synchronously
+stop local capture in the document's freeze/persisted-pagehide handler, then
+notify the coordinator. Retain requested intent and existing permission rules;
+resume or another participating owner can obtain currently authorized delivery.
+A merely hidden, running tab does not enter this suspension path. Delivery
+fencing with source retention still applies to transport/Worker disruption while
+the owner remains responsive. Count actual Chrome capture streams separately
+from the synthetic Pulse remap module's own source-output; do not count that
+filter as a second browser capture. The real old-pair diagnostic and red model
+regression are distinct from repaired native and long-duration qualification.
+
+## 2026-11-28 — Reconcile a locally fenced capture after delayed scheduling
+
+Actual access-recovery testing restores nonzero microphone packets briefly,
+then the document disables its track and clears its token while the coordinator
+still reports delivery. A deterministic delayed-watchdog control reproduces the
+same native failure with a valid synthetic input and both remote mic targets
+silent. Sending the missing capture-failure notification and wake restores both
+new markers with the original source and one device request.
+
+Refine AUD-003: detecting a delayed document timer may fence local delivery, but
+must also notify the coordinator using its current capture/pending token before
+wake. The coordinator then retires the old delivery authority and obtains a
+fresh delivery nonce. Reuse a still-valid source under current intent, permission
+and route authorization; do not stop the device merely to repair scheduling.
+Local epoch invalidation without shared reconciliation cannot be recovery.
+Explicit off and a late pending device acquisition remain cancellation fences.
+This differs from actual document freeze, which must stop the old source before
+another document takes ownership. Native counterfactual proof is diagnostic;
+new immutable-artifact and natural/stress gates remain separate.
+
+## 2026-11-28 — Separate playback media from document control scheduling
+
+The actual same-Context crossover keeps SDK transports, capture and processors
+live while switching only the audible source. A 240 ms document task leaves the
+native oscillator complete but starves the SDK playback relay; normal-load and
+post-fault SDK windows recover fresh sound. Earlier direct-port diagnostics with
+the same queue bounds remove the observed UI-related relay drop bursts. A
+separate no-SDK duplex failure prevents attributing all output gaps to this one
+mechanism. Preserve every failed window and the [scoped evidence](../tests/native-audio/results-speaker-scheduling-20261128.json).
+
+Refine AUD-006 prospectively for development Worker 9: transfer playback PCM and
+consumed credits through a separately owned Worker/Worklet MessageChannel. The
+parent keeps intent, permission, graph/device ownership and terminal processing
+acknowledgements. Bind/reset epochs fence old callbacks, frames and credits;
+replacement, per-App off and retirement must not affect healthy peers or leak
+ports. Do not increase the accepted P17 eight-frame/per-speaker and 64-credit
+aggregate bounds. This supersedes the parent playback-relay mechanism only when
+new artifact and full qualification pass. Microphone media needs corresponding
+source/delivery fencing; that part and final acceptance remain incomplete.

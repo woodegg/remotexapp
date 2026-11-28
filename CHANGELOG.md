@@ -11,7 +11,136 @@ implementation; move them to a version section when publishing a release.
 
 ## Unreleased
 
-Target: `0.17.6`. SDK `0.37.0`.
+- Develop a direct Worker/Worklet playback media channel so PCM and consumed-frame
+  credits do not depend on the parent UI task queue. Keep per-speaker queues at
+  eight frames and the aggregate allowance at 64. Bind/reset epochs reject old
+  credits and queued frames; release and processor retirement close media ports.
+  Worker 9 isolates this development contract. Microphone media, native artifact,
+  resource, fault and long-duration qualification remain in progress.
+
+- Reconcile capture after a delayed document watchdog tick. Previously the SDK
+  fenced its local processor epoch without notifying the coordinator, leaving
+  a disabled live track behind a misleading effective microphone state. Notify
+  the coordinator before wake so it issues fresh authorized delivery and rebinds
+  the existing valid source/processor. Off and late device results remain fenced.
+
+- Stop the old document's microphone source synchronously on actual page
+  freeze/BFCache suspension before coordinator handoff. Preserve requested
+  intent for an eligible owner or resumed document; ordinary background tabs
+  keep their existing source. The previous freeze fence disabled delivery but
+  retained the device until the frozen document could receive a stop message.
+
+- Detach logical Worker ports and replay state from released audio handles,
+  including controller disposal, logout and runtime retirement. Applications
+  may retain those terminal handles without retaining their closed channels.
+  Fence late explicit and automatic results so they cannot restore the retired
+  references; another live audio interest keeps its existing channel.
+
+- Clear recovered audio failure reasons only after every requested effect for
+  that target is effective, including the current microphone delivery ACK.
+  Preserve pending and retired targets' reasons and disconnect history. Real
+  device/permission recovery exposed the stale permission message; focused
+  regressions also keep another unavailable App's failure visible. Full
+  combined/native and final qualification remain separate gates.
+
+- Repair development native clipboard partial-upload stalls: resume bounded
+  staging without blocking the desktop event loop, preserve final atomic
+  revision admission, and close incomplete transactions at an absolute native
+  deadline. The original real split-body failure is retained; scoped native
+  concurrency/rich-format/slow-payload/permission controls pass. Full combined
+  fault, resource and exact-candidate gates remain pending.
+
+- Add development native clipboard destination ordering on new immutable v4
+  Kasm pairs. A complete automatic upload compares its baseline revision before
+  any native clipboard buffer/selection mutation; stale submissions preserve the
+  remote copy. Bind outgoing snapshots to their own revision, coalesce metadata,
+  and bound correlated admission, timeout and late replies. SDK 0.38 reports
+  ordering capability/state; old pairs retain automatic download and explicit
+  paste/manual transfer while passive upload falls back to manual. Native X11,
+  complete concurrency and final artifact qualification remain pending.
+
+- Return terminal audio-route HTTP 410 for stopped/stopping App sessions and
+  runtimes even while their old generation metadata remains. Previously HTTP
+  409 classified an explicitly retired target as a temporary domain outage.
+  Actual new-Manager testing reproduced the gap; transient domain failures
+  retain their recoverable classification.
+
+- Retire local audio interests and journal participation when the server confirms
+  a runtime generation is gone. Worker replacement cannot replay that target;
+  stale commands/ACKs cannot reactivate it, and other live audio routes retain
+  their capture source. Development model regressions cover HTTP 410, push
+  retirement, two documents and a delayed microphone result; real fault and
+  final candidate qualification remain separate.
+
+Target: `0.17.6`. SDK `0.38.0`.
+
+- Fix native clipboard A-B-A delivery by removing permanent uploaded-payload
+  echo suppression. Compare the current local value and baseline instead;
+  preserve concurrent local changes and let a newer offer replace an older
+  pending offer. Mandatory text/rich/paste/delayed/cycle regressions and a real
+  Chrome/X11 old-versus-new control cover the repair. Full release qualification
+  remains pending under #117 / #119.
+- Select systematic native integration recovery under #119. The implementation
+  and qualification plan covers granted-permission mic reacquisition, shared
+  intent fencing, bounded recovery and combined long-duration/stress gates.
+  SDK 0.38 / Worker 8 state-machine integration is in development; production
+  qualification is incomplete.
+- Distinguish native audio cookie refresh from an observed ingress-principal
+  change. Context responses add a Manager-scoped principal correlation; current
+  SDK owners can keep valid intent across a refreshed cookie scope, while changed
+  or lost previously observed identity/login bindings fence old interests.
+  This adds no credential, required login header or configuration. Under scope
+  pressure, reclaim only idle scopes without live connections or pending grants;
+  active/reserved capacity still returns a bounded quota error.
+- Retain an already live microphone source through long transport outages while
+  its owner remains responsive and requested routes remain enabled. Fence PCM
+  delivery and disable its track while disconnected; fresh authorization and a
+  fresh delivery nonce resume it without another device request. Explicit off,
+  logout, owner loss and authorization failure still retire capture. Worker
+  replacement and ended-source automatic reacquisition remain in development.
+- Integrate shared speaker/mic intent ordering into SDK 0.38 / Worker 8, including
+  stale-command rejection across off/on, same-document and cross-document
+  participation, source reuse on Worker rebind and permitted device recovery.
+  Reserve the target writer before opening a device and require the capture
+  processor's fresh delivery acknowledgement before reporting `actualMic` or
+  forwarding PCM. Temporary access rejection parks intent and stops capture;
+  fresh observed identity changes still retire old interests. Initialize and
+  acquire local audio interests without an HTTP dependency. Model regressions
+  pass; repeated silent Worker exit, full browser/fault/resource qualification
+  and the final UAT gates remain incomplete.
+
+- Repair repeated silent audio Worker replacement with bounded same-name native
+  bootstrap probes and an ephemeral incarnation identifier in Worker 8. Confirmed
+  new incarnations reset their probe budget; same/unknown live incarnations do
+  not. Coalesce competing probes, reject stale init replies, retain the source
+  where valid and allow a committed off while Worker recovery is unavailable.
+  Repeated-exit models, twenty headed audio exits and a separate fifty-exit
+  native-client mechanism control pass. Full fault/resource qualification remains
+  required, including short-run anonymous PSS growth and known graph failures.
+
+- Recover native audio graph failures under still-valid intent: resume a suspended
+  Context without retiring its live source, close unusable graphs before rebuilding,
+  discard failed Worklet module state, and replace only the failed processor.
+  Bound native module/resume/close flights, quarantine unresolved work and fence late
+  completions; an uncancelled native operation cannot justify unlimited replacement
+  graphs. A shared document/Manager guard gates new owners after two unproven
+  graph retirements. Disposal has a close deadline and reports unresolved native work honestly.
+  A server route ACK alone no longer reports `actualSpeaker` without an eligible
+  ready playback graph. Add `contextState`/`contextReason` diagnostics. Model tests
+  pass, and a scoped real node-isolation control returns native audio objects to
+  zero on retirement. A separate whole-Context control retains native objects
+  despite sound recovery; full graph retirement remains OPEN and blocks final
+  recovery/resource qualification.
+
+- Own each native audio graph in an SDK-created same-origin execution realm.
+  Keep intent, transport, permissions and the live microphone source in the parent.
+  Normal retirement still waits for terminal processing; a closed or unresponsive
+  graph can instead retire its owned realm. Detach pending operation callbacks and
+  cancel owner waits only after that boundary is retired. Rebuild around valid
+  parent capture without another device request solely for graph replacement.
+  Detect removed/navigated graph documents without depending on child events.
+  Scoped headed Chrome recovery/native retirement now passes; complete fault,
+  policy, long-duration and immutable candidate qualification remain required.
 
 - Unregister the native display adapter's keyboard blur listener before
   removing its input. A browser-retained detached input must not keep retired

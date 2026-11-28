@@ -35,5 +35,10 @@
     "No real browser scheduling or WAN emulation",
     "No playback latency or acoustic-quality acceptance",
     "Existing per-stream eight-frame worklet bound is unchanged"
-  ]
+  ],
+  "schedulingFollowup": {
+    "evidence": "tests/native-audio/results-speaker-scheduling-20261128.json",
+    "evidenceSHA256": "73e5eaf27d66dc26c8071aca52878e85c6c3f392460bd9a40d97b1c770c5fa32",
+    "scope": "Actual currentWorker8 diagnostics and developmentWorker9 playback models; not native repair or final qualification. OriginalP17 allocation result unchanged."
+  }
 }

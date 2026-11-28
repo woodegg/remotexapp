@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "passed-scoped-native-ordering-and-partial-upload-repair",
+  "releaseQualified": false,
+  "sourceCommit": "77c51fefe9f7d9f1d10bec300823859f126b10da",
+  "componentManifestSHA256": "ac171a308edc82a9e1e134d160e6d3cbff3e1bde5780e899c0d6393e22231933",
+  "sdkVersion": "0.38.0",
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headed": true,
+    "sandboxEnabled": true,
+    "nativeCDP": true,
+    "embeddedSDK": true,
+    "actualWSSAndX11": true,
+    "syntheticDataOnly": true,
+    "separateDiagnosticFaultLane": true,
+    "naturalSoak": false,
+    "actualAudioDataQualifiedHere": false,
+    "periodicGC": false
+  },
+  "cases": [
+    {
+      "name": "new-v4-handshake-and-auto-mode",
+      "status": "passed"
+    },
+    {
+      "name": "actual-A-B-A-bidirectional-readback",
+      "status": "passed"
+    },
+    {
+      "name": "delayed-unannounced-X11-owner-during-browser-read-conflicts-without-overwrite",
+      "status": "passed",
+      "noRemoteOfferBeforeAdmission": true,
+      "destinationReadback": true
+    },
+    {
+      "name": "explicit-source-choice-after-conflict",
+      "status": "passed",
+      "result": "submitted"
+    },
+    {
+      "name": "native-stale-admission-preserves-X11-destination",
+      "status": "passed"
+    },
+    {
+      "name": "actual-INCR-snapshot-readback",
+      "status": "passed",
+      "bytes": 524288,
+      "completedTransfers": 1
+    },
+    {
+      "name": "simultaneous-two-Viewers-one-accept-one-conflict",
+      "status": "passed",
+      "accepted": 1,
+      "conflicts": 1,
+      "destinationReadback": true
+    },
+    {
+      "name": "split-upload-owner-change-remains-responsive-and-conflicts",
+      "status": "passed",
+      "x11OwnerCompletedBeforeRelease": true,
+      "writerElapsedSeconds": 0.18333500798325986,
+      "admission": "clipboard-conflict",
+      "destinationPreserved": true
+    },
+    {
+      "name": "unacknowledged-two-Viewer-metadata-storm-bounded",
+      "status": "passed",
+      "ownerChanges": 1000,
+      "notificationsWhileACKsWithheld": 2,
+      "expectedMaximumPerConnection": 1,
+      "freshRevisionAfterResume": true
+    },
+    {
+      "name": "actual-freeze-resume-retains-intent-and-restores-two-Viewers",
+      "status": "passed",
+      "requestedModesRetained": true,
+      "orderingReadyAfterResume": true,
+      "transitions": [
+        {
+          "state": "disconnected",
+          "elapsedMs": 0,
+          "code": "display-disconnected"
+        },
+        {
+          "state": "reconnecting",
+          "elapsedMs": 0
+        },
+        {
+          "state": "disconnected",
+          "elapsedMs": 3,
+          "code": "display-disconnected"
+        },
+        {
+          "state": "reconnecting",
+          "elapsedMs": 3
+        },
+        {
+          "state": "disconnected",
+          "elapsedMs": 1290
+        },
+        {
+          "state": "connecting",
+          "elapsedMs": 1290
+        },
+        {
+          "state": "disconnected",
+          "elapsedMs": 1297
+        },
+        {
+          "state": "connecting",
+          "elapsedMs": 1297
+        },
+        {
+          "state": "ready",
+          "elapsedMs": 2108
+        },
+        {
+          "state": "ready",
+          "elapsedMs": 3296
+        }
+      ]
+    },
+    {
+      "name": "actual-exact-10MiB-conditional-upload-and-X11-readback",
+      "status": "passed",
+      "bytes": 10485760
+    },
+    {
+      "name": "one-byte-oversize-preserves-native-destination",
+      "status": "passed"
+    }
+  ],
+  "sameSplitCase": {
+    "x11OwnerCompletedBeforeRelease": true,
+    "writerElapsedSeconds": 0.18333500798325986,
+    "admission": "clipboard-conflict",
+    "destinationPreserved": true
+  },
+  "limitations": [
+    "Scoped native development control; not final source/candidate or the whole 24-class gate.",
+    "Later incremental-staging current-policy revalidation has separate red/green ASan models; this older frozen component does not contain that follow-up.",
+    "Freeze test retains manual modes; full automatic/focus/multi-document and audio combinations remain separate.",
+    "One accepted 10MiB local transfer is not WAN throughput or allocation qualification.",
+    "Browser call cancellation cannot make OS clipboard compare-and-set atomic.",
+    "Actual WeChat incident not captured."
+  ],
+  "evidenceSHA256": {
+    "run.py": "6ebd8c6306cbde32c59be7144c80f4a574c376f4b02f78892e7972cfef75c8af",
+    "results.json": "3d18e4c057a0668364f3f392e8f1b0e5ad36f0b39c2e94977c8683aa24ab8fbe",
+    "run.log": "159b3e882f785437b7e66a486cd177529f744fc81589f4cf1e33352cb59dd37f",
+    "build-pins.json": "e70336e0a1b145fcd06053fe35160276328aa4f0f38663e8fcf6a02b568c94bf",
+    "memory-fixture.json": "6d0a77849952b68bbf26c4f851870f3e24d1646105289a314ea834021490d3ae"
+  },
+  "cleanup": {
+    "browserProfileRemoved": true,
+    "xvfbExited": true,
+    "ownedAppsStoppedByDriver": true,
+    "dedicatedRuntimeServiceCleanup": "Tracked privately; not inferred from process exit."
+  }
+}

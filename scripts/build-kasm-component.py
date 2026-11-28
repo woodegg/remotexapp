@@ -91,6 +91,7 @@ def build(inputs, work, platform='ubuntu', transport='wss'):
     shutil.copyfile(COMPONENT / 'udp.mjs', client / 'core/remotexapp-udp.mjs')
     shutil.copyfile(COMPONENT / 'latency.mjs', client / 'core/remotexapp-latency.mjs')
     shutil.copyfile(COMPONENT / 'clipboard-input.mjs', client / 'core/remotexapp-clipboard-input.mjs')
+    shutil.copyfile(COMPONENT / 'clipboard-order.mjs', client / 'core/remotexapp-clipboard-order.mjs')
     shutil.copyfile(COMPONENT / 'native-input.mjs', client / 'core/remotexapp-native-input.mjs')
     run(['node', '--test', *[str(p) for p in sorted((COMPONENT / 'tests').glob('*.test.mjs'))]], client,
         env=dict(os.environ, KASM_CLIENT_SOURCE=str(client), KASM_SERVER_SOURCE=str(server), KASM_TRANSPORT=transport))
@@ -117,6 +118,7 @@ def package(inputs, work, output, platform='ubuntu', transport='wss'):
     copy(COMPONENT / 'udp.mjs', 'sources/udp.mjs')
     copy(COMPONENT / 'latency.mjs', 'sources/latency.mjs')
     copy(COMPONENT / 'clipboard-input.mjs', 'sources/clipboard-input.mjs')
+    copy(COMPONENT / 'clipboard-order.mjs', 'sources/clipboard-order.mjs')
     copy(COMPONENT / 'native-input.mjs', 'sources/native-input.mjs')
     for test in sorted((COMPONENT / 'tests').glob('*')):
         if test.suffix not in ('.mjs', '.cpp'):
@@ -155,7 +157,7 @@ def package(inputs, work, output, platform='ubuntu', transport='wss'):
                        for name in ['c++','cmake','node','npm']}}
     (output / 'SOURCE.json').write_text(json.dumps(source, indent=2)+'\n')
     files = {str(p.relative_to(output)):digest(p) for p in sorted(output.rglob('*')) if p.is_file()}
-    manifest = {'schemaVersion':1, 'protocol':'kasm-routed-udp-clipboard-v3' if transport == 'udp' else 'kasm-wss-clipboard-v3', 'serverCommit':SERVER,
+    manifest = {'schemaVersion':1, 'protocol':'kasm-routed-udp-clipboard-v4' if transport == 'udp' else 'kasm-wss-clipboard-v4', 'serverCommit':SERVER,
                 'clientCommit':CLIENT, 'binary':'bin/Xkasmvnc', 'client':'web/client.js', 'files':files}
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
     print('Kasm component manifest SHA256:', digest(output / 'manifest.json'))

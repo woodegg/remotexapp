@@ -1,0 +1,893 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "passed-scoped-development-controls",
+  "releaseQualified": false,
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 8,
+  "runtimeCoreCommit": "00c97b4dd2262dc083075e23609feb26398fd437",
+  "method": {
+    "browser": "Chrome/158.0.8127.88",
+    "headless": false,
+    "sandboxEnabled": true,
+    "nativeCDP": true,
+    "syntheticMic": true,
+    "playbackSink": "none",
+    "realPulse": true,
+    "developmentSDKOverride": true,
+    "testOnlyWorkletSubclass": true,
+    "diagnosticGC": "Baseline, post-fault and post-retirement only; not natural soak"
+  },
+  "wholeGraphAndNode": {
+    "checks": [
+      {
+        "name": "actual-addModule-404-then-automatic-retry",
+        "status": "passed",
+        "moduleAttempts": 2,
+        "deviceRequests": 0
+      },
+      {
+        "name": "baseline",
+        "status": "passed"
+      },
+      {
+        "name": "actual-Context-suspend",
+        "status": "passed",
+        "elapsedSeconds": 4.079078000970185,
+        "sameSource": true,
+        "sameProcessor": true,
+        "sameContext": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-Context-close-1",
+        "status": "passed",
+        "elapsedSeconds": 4.096958204987459,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": false,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-Context-close-2",
+        "status": "passed",
+        "elapsedSeconds": 3.9686394069576636,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": false,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-Context-close-3",
+        "status": "passed",
+        "elapsedSeconds": 4.094305970007554,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": false,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-Context-close-4",
+        "status": "passed",
+        "elapsedSeconds": 3.8350514610065147,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": false,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-Context-close-5",
+        "status": "passed",
+        "elapsedSeconds": 4.041872027912177,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": false,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-Context-close-6",
+        "status": "passed",
+        "elapsedSeconds": 3.9857654670486227,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": false,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-Context-close-7",
+        "status": "passed",
+        "elapsedSeconds": 4.023319271043874,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": false,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-Context-close-8",
+        "status": "passed",
+        "elapsedSeconds": 4.086146454908885,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": false,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-Context-close-9",
+        "status": "passed",
+        "elapsedSeconds": 3.9121685919817537,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": false,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-Context-close-10",
+        "status": "passed",
+        "elapsedSeconds": 4.138647813000716,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": false,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-processor-throw-1",
+        "status": "passed",
+        "elapsedSeconds": 3.6631025669630617,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-processor-throw-2",
+        "status": "passed",
+        "elapsedSeconds": 3.585359666030854,
+        "sameSource": true,
+        "sameProcessor": true,
+        "sameContext": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-processor-throw-3",
+        "status": "passed",
+        "elapsedSeconds": 3.7460316389333457,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-processor-throw-4",
+        "status": "passed",
+        "elapsedSeconds": 3.7011871240101755,
+        "sameSource": true,
+        "sameProcessor": true,
+        "sameContext": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-processor-throw-5",
+        "status": "passed",
+        "elapsedSeconds": 3.6006623699795455,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-processor-throw-6",
+        "status": "passed",
+        "elapsedSeconds": 3.5723389548948035,
+        "sameSource": true,
+        "sameProcessor": true,
+        "sameContext": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-processor-throw-7",
+        "status": "passed",
+        "elapsedSeconds": 3.6869077859446406,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-processor-throw-8",
+        "status": "passed",
+        "elapsedSeconds": 3.8457188960164785,
+        "sameSource": true,
+        "sameProcessor": true,
+        "sameContext": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-processor-throw-9",
+        "status": "passed",
+        "elapsedSeconds": 3.9271977139869705,
+        "sameSource": true,
+        "sameProcessor": false,
+        "sameContext": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "actual-processor-throw-10",
+        "status": "passed",
+        "elapsedSeconds": 3.896031077951193,
+        "sameSource": true,
+        "sameProcessor": true,
+        "sameContext": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "parentStream": true,
+        "contexts": 1,
+        "retirements": 0,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      }
+    ],
+    "native": {
+      "baseline": {
+        "AudioContext": 1,
+        "AudioWorkletNode": 2,
+        "blink::AudioWorkletMessagingProxy": 1,
+        "MediaStreamAudioSourceNode": 1,
+        "MediaStream": 1,
+        "MediaStreamTrack": 1,
+        "GainNode": 1,
+        "AudioWorklet": 1,
+        "AudioDestinationNode": 1
+      },
+      "active": {
+        "AudioContext": 1,
+        "AudioWorkletNode": 2,
+        "blink::AudioWorkletMessagingProxy": 1,
+        "MediaStreamAudioSourceNode": 1,
+        "MediaStream": 1,
+        "MediaStreamTrack": 1,
+        "GainNode": 1,
+        "AudioWorklet": 1,
+        "AudioDestinationNode": 1
+      },
+      "retired": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0,
+        "MediaStreamAudioSourceNode": 0,
+        "MediaStream": 0,
+        "MediaStreamTrack": 0,
+        "GainNode": 0,
+        "AudioWorklet": 0,
+        "AudioDestinationNode": 0
+      }
+    },
+    "activeDOM": {
+      "documents": 2,
+      "nodes": 97,
+      "jsEventListeners": 107
+    },
+    "retiredDOM": {
+      "documents": 2,
+      "nodes": 88,
+      "jsEventListeners": 21
+    },
+    "retiredAudioFrames": 0,
+    "pageErrors": [],
+    "cleanup": {
+      "status": "passed",
+      "browserProfileRemoved": true,
+      "xvfbExited": true,
+      "ownUnitsStopped": true,
+      "dedicatedFixtureStopped": true,
+      "originalUATPreserved": true
+    },
+    "rawReportSHA256": "dd1ddc5ee88bfcd797cb68f3ff79c0744f244dc20242226c69505a33aa7e75c2",
+    "rawCleanupSHA256": "342f6334c98db843fdf63748d998792d5184abf543b5cdf1fd1a7d24fa9fb576",
+    "freshDataChecks": [
+      {
+        "name": "baseline",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-Context-suspend",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-Context-close-1",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-Context-close-2",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-Context-close-3",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-Context-close-4",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-Context-close-5",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-Context-close-6",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-Context-close-7",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-Context-close-8",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-Context-close-9",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-Context-close-10",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-processor-throw-1",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-processor-throw-2",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-processor-throw-3",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-processor-throw-4",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-processor-throw-5",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-processor-throw-6",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-processor-throw-7",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-processor-throw-8",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-processor-throw-9",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-processor-throw-10",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      }
+    ]
+  },
+  "policyAndLateOperations": {
+    "checks": [
+      {
+        "name": "actual-addModule-404-then-automatic-retry",
+        "status": "passed",
+        "moduleAttempts": 2,
+        "deviceRequests": 0
+      },
+      {
+        "name": "baseline",
+        "status": "passed"
+      },
+      {
+        "name": "actual-delayed-module-fetch-then-realm-recovery",
+        "status": "passed",
+        "sameSource": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "contexts": 1,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "late-module-response-cannot-rebind-retired-realm",
+        "status": "passed",
+        "sameSource": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "contexts": 1,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "unresolved-close-promise-then-realm-recovery",
+        "status": "passed",
+        "sameSource": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "contexts": 1,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "late-close-completion-cannot-retire-current-realm",
+        "status": "passed",
+        "sameSource": true,
+        "requests": 1,
+        "childContext": true,
+        "parentContext": false,
+        "contexts": 1,
+        "frames": 1,
+        "speakerPeak": 0.2593994140625
+      },
+      {
+        "name": "off-during-pending-close-forbids-late-capture",
+        "status": "passed",
+        "requests": 1,
+        "source": false,
+        "context": false,
+        "frames": 0
+      },
+      {
+        "name": "explicit-new-intent-after-off",
+        "status": "passed",
+        "requests": 2
+      }
+    ],
+    "native": {
+      "baseline": {
+        "AudioContext": 1,
+        "AudioWorkletNode": 2,
+        "blink::AudioWorkletMessagingProxy": 1,
+        "MediaStreamAudioSourceNode": 1,
+        "MediaStream": 1,
+        "MediaStreamTrack": 1,
+        "GainNode": 1,
+        "AudioWorklet": 1,
+        "AudioDestinationNode": 1
+      },
+      "active": {
+        "AudioContext": 1,
+        "AudioWorkletNode": 2,
+        "blink::AudioWorkletMessagingProxy": 1,
+        "MediaStreamAudioSourceNode": 1,
+        "MediaStream": 1,
+        "MediaStreamTrack": 1,
+        "GainNode": 1,
+        "AudioWorklet": 1,
+        "AudioDestinationNode": 1
+      },
+      "retired": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0,
+        "MediaStreamAudioSourceNode": 0,
+        "MediaStream": 1,
+        "MediaStreamTrack": 1,
+        "GainNode": 0,
+        "AudioWorklet": 0,
+        "AudioDestinationNode": 0
+      },
+      "idle": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0,
+        "MediaStreamAudioSourceNode": 0,
+        "MediaStream": 0,
+        "MediaStreamTrack": 0,
+        "GainNode": 0,
+        "AudioWorklet": 0,
+        "AudioDestinationNode": 0
+      }
+    },
+    "activeDOM": {
+      "documents": 3,
+      "nodes": 89,
+      "jsEventListeners": 42
+    },
+    "retiredDOM": {
+      "documents": 2,
+      "nodes": 84,
+      "jsEventListeners": 20
+    },
+    "retiredAudioFrames": 0,
+    "pageErrors": [],
+    "cleanup": {
+      "status": "passed",
+      "browserProfileRemoved": true,
+      "xvfbExited": true,
+      "ownUnitsStopped": true,
+      "dedicatedFixtureStopped": true,
+      "originalUATPreserved": true
+    },
+    "rawReportSHA256": "b7c07b13bf7bee149addd6cd4e0c1e453aafa4a1be4440860906a770f09a16b2",
+    "rawCleanupSHA256": "0683c70337de35bdca3355f537de489a6c4a1ce485571e05796eb95fc60d54a8",
+    "freshDataChecks": [
+      {
+        "name": "baseline",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "actual-delayed-module-fetch-then-realm-recovery",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "late-module-response-cannot-rebind-retired-realm",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "unresolved-close-promise-then-realm-recovery",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6500,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      },
+      {
+        "name": "late-close-completion-cannot-retire-current-realm",
+        "remoteMicWindows": 2,
+        "remoteMicMinPeak": 6501,
+        "remoteMicWindowBytes": [
+          48000,
+          48000
+        ]
+      }
+    ],
+    "idleSeconds": 80.00042252999265,
+    "idleDOM": {
+      "documents": 2,
+      "nodes": 84,
+      "jsEventListeners": 20
+    },
+    "missingAckRetirement": {
+      "fallbacks": 4,
+      "ackTimeouts": 2,
+      "unresolvedErrors": 0,
+      "contexts": 0
+    }
+  },
+  "noSDKCaptureControl": {
+    "browser": "158.0.8127.88",
+    "headless": true,
+    "sandboxEnabled": false,
+    "syntheticMic": true,
+    "contextCreated": false,
+    "stoppedStream": {
+      "active": false,
+      "ended": true
+    },
+    "baseline": {
+      "AudioContext": 0,
+      "AudioWorkletNode": 0,
+      "blink::AudioWorkletMessagingProxy": 0,
+      "MediaStream": 0,
+      "MediaStreamTrack": 0
+    },
+    "immediate": {
+      "AudioContext": 0,
+      "AudioWorkletNode": 0,
+      "blink::AudioWorkletMessagingProxy": 0,
+      "MediaStream": 1,
+      "MediaStreamTrack": 1
+    },
+    "samePageIdle": {
+      "AudioContext": 0,
+      "AudioWorkletNode": 0,
+      "blink::AudioWorkletMessagingProxy": 0,
+      "MediaStream": 0,
+      "MediaStreamTrack": 0
+    },
+    "idleSecondsBeforeSnapshot": 10,
+    "rawReportSHA256": "73f82f0e39d21c0e4227a58b4d396006a6cd8215d4a0e6cc42962a1e7f929e92"
+  },
+  "interpretation": [
+    "The earlier Context-only failure remains a failed control; these inputs use an SDK-owned graph realm.",
+    "Normal cleanup joins terminal rendering; closed/stuck graphs retire their owned realm, without reloading the embedding page.",
+    "Primary 23 checks cover module rejection/retry, suspension, ten actual Context closes and ten actual processor throws; source/device requests stay one with fresh data.",
+    "Policy lane is audio-only under self script/frame CSP; its close hang is an intentionally unresolved wrapper Promise, not proof of an OS close failure.",
+    "Delayed native module fetch is actual; request cancellation is recorded. Both real processors ignore disposal for the missing-ACK boundary.",
+    "Policy immediate sample retains one stopped native Stream/Track; a no-SDK capture matches this temporary retention. All nine audio classes are zero after 80 seconds in the same live policy page.",
+    "The shortest strong retained-stream root goes through a browser UserMedia promise tracker. Idle counters and no-SDK control qualify temporary retention only, not general browser leak freedom.",
+    "DOM documents/nodes/listeners are reported separately, not claimed zero. Owned audio frames are zero.",
+    "Final explicit re-enable in the policy lane checks route/delivery readiness; fresh Pulse/speaker checks belong to preceding same-source cases and primary repeated-fault cases."
+  ],
+  "remaining": [
+    "New Core browser principal/cookie/epoch qualification",
+    "Complete 24-class and mixed-fault matrix",
+    "Eight-hour natural run and separate ninety-minute / at least 1000-operation stress",
+    "PSS/anonymous PSS/SwapPss/RSS and complete native/resource review",
+    "Physical devices, real OS sleep, other browser policies, downstream adoption",
+    "Exact final artifact and single complete human UAT"
+  ],
+  "sourceSHA256": {
+    "cmd/remotexappd/web/sdk/audio-graph-realm.js": "1d78635aa146891a70f9370029eff335a661e22b635e08aeb314a2acdb51b198",
+    "cmd/remotexappd/web/sdk/audio-context-operations.js": "fae185ab4633148110e06fb372c6c08c7a0744c8e3a1d1f39ed7d5feb2c402f7",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "86e69c4af23444a9119f1b1a80daeb29baede35976d0c5a01274cf41e605acf9",
+    "cmd/remotexappd/web/sdk/audio-worklet.js": "d0ca3c748bceb3807d4408bec068ade5a0e13a0e0225d60506e8262aac1d5726",
+    "cmd/remotexappd/web/sdk/audio-coordinator.js": "89d88de2e7997dd00263135361dc21d3143320a7cfc66fb9d8291ccfa7135a9d",
+    "tests/native-audio/stage-graph-fault-worklet.py": "bfb4dbe9ebeb0d2c2255573dfa49604094904094c139e3a7aa2402d6f56d9fbd",
+    "tests/native-audio/browser-retirement.py": "b2316df514c7cdccd2ca7832119c958c43c7b89ab20cbd47711087d502d21d55",
+    "tests/native-audio/retirement-media-stream.html": "a081dc975462339af8bdef449075e1c89d0d0ece05d7a17ba536585d4f160cf9"
+  },
+  "faultWorklets": {
+    "wholeGraphAndNode": "c6b593fee1642fe4de6090843a788888d9417c58a345092f3bfb7619b1ec6988",
+    "policyAndLateOperations": "3986b4c1a3c9e1fc41ac717f7cbb0303456e3f13b92fa8411c1e23e4e42e7598"
+  }
+}

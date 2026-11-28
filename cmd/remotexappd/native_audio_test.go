@@ -35,6 +35,30 @@ func audioTestServer(t *testing.T, a *audioService) *httptest.Server {
 	t.Cleanup(server.Close)
 	return server
 }
+
+func TestAudioTerminalRuntimeReturnsGoneInsteadOfRecoverableDomainConflict(t *testing.T) {
+	for _, test := range []struct {
+		name, state, session string
+		want                 int
+	}{
+		{"stopped-session", "server-ready", "stopped", http.StatusGone},
+		{"stopping-session", "ready", "stopping", http.StatusGone},
+		{"stopped-runtime", "stopped", "stopped", http.StatusGone},
+		{"stopping-runtime", "stopping", "running", http.StatusGone},
+		{"temporary-session-failure", "server-ready", "failed", http.StatusConflict},
+		{"temporarily-unavailable-domain", "ready", "running", http.StatusConflict},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			m := &manager{instances: map[string]*instance{"app": {ID: "app", State: test.state, SessionState: test.session, SessionGeneration: 2}}}
+			a := newAudioService("terminal-runtime-test", m.resolveAudioDomain)
+			server := audioTestServer(t, a)
+			status, _ := audioPost(t, audioTestClient(t), server.URL, "route", "alice", audioRequest{Runtime: "app", Generation: 2})
+			if status != test.want {
+				t.Fatalf("route status=%d, want %d for runtime=%s session=%s", status, test.want, test.state, test.session)
+			}
+		})
+	}
+}
 func audioTestClient(t *testing.T) *http.Client {
 	t.Helper()
 	jar, _ := cookiejar.New(nil)
@@ -80,6 +104,103 @@ func audioDial(t *testing.T, client *http.Client, server *httptest.Server, token
 	t.Cleanup(func() { c.Close() })
 	return c, 101
 }
+
+func TestAudioPrincipalCorrelationSurvivesCookieAndServiceEpochs(t *testing.T) {
+	resolve := func(string, int64) (sessionaudio.Record, error) { return sessionaudio.Record{}, nil }
+	a := newAudioService("stable-manager", resolve)
+	server := audioTestServer(t, a)
+	client := audioTestClient(t)
+	status, first := audioPost(t, client, server.URL, "context", "alice", audioRequest{})
+	principal, _ := first["principal"].(string)
+	if status != http.StatusOK || len(principal) != 64 {
+		t.Fatalf("missing principal correlation: %v", first)
+	}
+	// Losing only the native cookie creates a scope, not a different principal.
+	client.Jar, _ = cookiejar.New(nil)
+	status, refreshed := audioPost(t, client, server.URL, "context", "alice", audioRequest{})
+	if status != http.StatusOK || refreshed["principal"] != principal || refreshed["scope"] == first["scope"] || refreshed["service"] != first["service"] {
+		t.Fatalf("cookie epoch correlation failed: %v", refreshed)
+	}
+	restarted := audioTestServer(t, newAudioService("stable-manager", resolve))
+	status, afterRestart := audioPost(t, client, restarted.URL, "context", "alice", audioRequest{})
+	if status != http.StatusOK || afterRestart["principal"] != principal || afterRestart["service"] == first["service"] {
+		t.Fatalf("service epoch correlation failed: %v", afterRestart)
+	}
+	_, otherPrincipal := audioPost(t, client, restarted.URL, "context", "bob", audioRequest{})
+	if otherPrincipal["principal"] == principal {
+		t.Fatal("different authenticated principal retained old correlation")
+	}
+	otherManager := audioTestServer(t, newAudioService("other-manager", resolve))
+	_, otherNamespace := audioPost(t, client, otherManager.URL, "context", "alice", audioRequest{})
+	if otherNamespace["principal"] == principal {
+		t.Fatal("different Manager retained old correlation")
+	}
+	// A correlation value alone never substitutes for scope/cookie authority.
+	if status, _ = audioPost(t, client, server.URL, "grant", "alice", audioRequest{Scope: principal, Client: "client-a"}); status != http.StatusForbidden {
+		t.Fatal("principal correlation accepted as authority")
+	}
+}
+
+func TestAudioScopePressureReclaimsOnlyUnownedScopes(t *testing.T) {
+	a := newAudioService("scope-pressure", func(string, int64) (sessionaudio.Record, error) { return sessionaudio.Record{}, nil })
+	server := audioTestServer(t, a)
+	client := audioTestClient(t)
+	for i := 0; i < audioMaxScopes*3; i++ {
+		client.Jar, _ = cookiejar.New(nil)
+		if status, result := audioPost(t, client, server.URL, "context", "alice", audioRequest{}); status != http.StatusOK {
+			t.Fatalf("forgotten idle cookie stranded new context at %d: %v", i, result)
+		}
+	}
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if len(a.scopes) != audioMaxScopes {
+		t.Fatalf("scope cap changed: %d", len(a.scopes))
+	}
+	var eligible [32]byte
+	for key, scope := range a.scopes {
+		eligible = key
+		scope.seen = time.Now().Add(-time.Hour)
+		scope.connection = &audioConnection{}
+	}
+	// One younger inactive scope is the only legal eviction candidate.
+	a.scopes[eligible].connection = nil
+	a.scopes[eligible].seen = time.Now()
+	if !a.makeScopeRoomLocked() || len(a.scopes) != audioMaxScopes-1 || a.scopes[eligible] != nil {
+		t.Fatal("scope pressure evicted an active connection or failed to reclaim idle scope")
+	}
+	a.scopes[eligible] = &audioScope{id: "pending", seen: time.Now()}
+	grantKey := [32]byte{1}
+	a.grants[grantKey] = &audioGrant{scope: a.scopes[eligible], expires: time.Now().Add(time.Minute)}
+	if a.makeScopeRoomLocked() || len(a.scopes) != audioMaxScopes {
+		t.Fatal("scope pressure evicted live/pending authority")
+	}
+	a.grants[grantKey].expires = time.Now().Add(-time.Second)
+	a.pruneLocked()
+	if !a.makeScopeRoomLocked() || a.scopes[eligible] != nil {
+		t.Fatal("expired grant permanently pinned an orphan scope")
+	}
+}
+
+func TestAudioScopePressureReturnsQuotaWhenAllScopesAreReserved(t *testing.T) {
+	a := newAudioService("reserved-scope-pressure", func(string, int64) (sessionaudio.Record, error) { return sessionaudio.Record{}, nil })
+	server := audioTestServer(t, a)
+	client := audioTestClient(t)
+	for i := 0; i < audioMaxScopes; i++ {
+		client.Jar, _ = cookiejar.New(nil)
+		status, current := audioPost(t, client, server.URL, "context", "alice", audioRequest{})
+		if status != http.StatusOK {
+			t.Fatal(current)
+		}
+		if status, grant := audioPost(t, client, server.URL, "grant", "alice", audioRequest{Scope: current["scope"].(string), Client: "pending-client"}); status != http.StatusOK {
+			t.Fatal(grant)
+		}
+	}
+	client.Jar, _ = cookiejar.New(nil)
+	if status, _ := audioPost(t, client, server.URL, "context", "alice", audioRequest{}); status != http.StatusTooManyRequests {
+		t.Fatal("scope pressure displaced pending clients")
+	}
+}
+
 func TestAudioScopeReplayPrincipalLogoutAndExpiry(t *testing.T) {
 	a := newAudioService("test", func(string, int64) (sessionaudio.Record, error) { return sessionaudio.Record{}, nil })
 	server := audioTestServer(t, a)

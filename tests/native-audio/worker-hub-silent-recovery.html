@@ -1,0 +1,11 @@
+<!doctype html><meta charset="utf-8"><title>Owned repeated Worker incarnation control</title><script type="module">
+import {connectAudioWorker} from './audio-worker-hub.js';
+const source=`const id=crypto.randomUUID();self.onconnect=({ports})=>{const attach=p=>{p.onmessage=({data})=>{p.postMessage(data==='init'?id:data);if(data==='exit')setTimeout(()=>self.close(),0);if(data==='dispose'){p.onmessage=null;p.close();}};p.start();};const bootstrap=ports[0];bootstrap.onmessage=({data})=>{if(data.op==='attach')attach(data.port);};bootstrap.start();};`;
+const url=URL.createObjectURL(new Blob([source],{type:'text/javascript'})),name='owned-silent-recovery';
+const connect=options=>connectAudioWorker(window,url,name,options);
+const exchange=(c,value,timeout=3000)=>new Promise((resolve,reject)=>{const timer=setTimeout(()=>{c.port.onmessage=null;reject(Error('timeout'));},timeout);c.port.onmessage=({data})=>{clearTimeout(timer);c.port.onmessage=null;resolve(data);};c.port.start();c.port.postMessage(value);});
+const retire=c=>{c.port.onmessage=null;c.port.close();c.release();};
+let keeper=connect(),id=await exchange(keeper,'init');keeper.confirm(id);
+window.lab={done:0,keeper,async cycles(count){for(let i=0;i<count;i++){await exchange(this.keeper,'exit');await new Promise(r=>setTimeout(r,80));let cached=connect();let timedOut=false;try{await exchange(cached,'init',75);}catch{timedOut=true;}if(!timedOut)throw Error('cached bootstrap unexpectedly recreated a terminated global');const next=connect({probeOf:cached}),nextId=await exchange(next,'init');if(nextId===id)throw Error('same incarnation');next.confirm(nextId);retire(this.keeper);retire(cached);this.keeper=next;id=nextId;this.done++;}},async checkKeeper(){return await exchange(this.keeper,'alive')==='alive';},async retireKeeper(){await exchange(this.keeper,'dispose');retire(this.keeper);this.keeper=null;}};
+keeper=null;
+</script>

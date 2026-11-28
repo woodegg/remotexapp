@@ -61,6 +61,7 @@ def rebuild(parent, expected, work, output):
                'server-messages.mjs':'remotexapp-server-messages.mjs',
                'udp.mjs':'remotexapp-udp.mjs', 'latency.mjs':'remotexapp-latency.mjs',
                'clipboard-input.mjs':'remotexapp-clipboard-input.mjs',
+               'clipboard-order.mjs':'remotexapp-clipboard-order.mjs',
                'native-input.mjs':'remotexapp-native-input.mjs'}
     for name, target in modules.items():
         shutil.copyfile(recipe.COMPONENT / name, client / 'core' / target)

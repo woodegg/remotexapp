@@ -21,14 +21,16 @@ def main():
     parser.add_argument('--cycles', type=int, default=50)
     parser.add_argument('--idle-seconds', type=int, default=5)
     parser.add_argument('--legacy', action='store_true')
+    parser.add_argument('--silent-exits', action='store_true', help='Repeat actual Worker self.close and same-name bootstrap recovery (no audio)')
     args = parser.parse_args()
     assert args.cycles > 0 and args.idle_seconds >= 0
+    assert not (args.legacy and args.silent_exits), 'Silent-exit recovery requires the current hub contract'
     args.output.mkdir(parents=True, exist_ok=True, mode=0o700)
     root = Path(__file__).resolve().parents[2]
     spec = importlib.util.spec_from_file_location('retirement_snapshot', Path(__file__).with_name('browser-retirement.py'))
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    report = {'status':'preparing', 'legacy':args.legacy, 'cycles':args.cycles,
+    report = {'status':'preparing', 'legacy':args.legacy, 'silentExits':args.silent_exits, 'cycles':args.cycles,
         'idleSeconds':args.idle_seconds, 'noAudio':True, 'noNetworkDebugger':True,
         'hubSourceSHA256':hashlib.sha256((root/'cmd/remotexappd/web/sdk/audio-worker-hub.js').read_bytes()).hexdigest(),
         'launcherSHA256':hashlib.sha256(args.browser.read_bytes()).hexdigest(), 'counts':{}}
@@ -53,7 +55,9 @@ def main():
 
     with tempfile.TemporaryDirectory(prefix='worker-hub-',dir=args.output) as directory:
         stage = Path(directory)
-        shutil.copy2(Path(__file__).with_name('worker-hub-retirement.html'),stage/'index.html')
+        page_name = 'worker-hub-silent-recovery.html' if args.silent_exits else 'worker-hub-retirement.html'
+        shutil.copy2(Path(__file__).with_name(page_name),stage/'index.html')
+        report['pageSourceSHA256'] = hashlib.sha256((stage/'index.html').read_bytes()).hexdigest()
         shutil.copy2(root/'cmd/remotexappd/web/sdk/audio-worker-hub.js',stage/'audio-worker-hub.js')
         server = http.server.ThreadingHTTPServer(('127.0.0.1',0),functools.partial(QuietHandler,directory=directory))
         thread = threading.Thread(target=server.serve_forever,daemon=True);thread.start()

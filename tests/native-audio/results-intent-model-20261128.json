@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "passed-development-module-models",
+  "releaseQualified": false,
+  "actualBrowserE2E": false,
+  "sdkVersion": "0.38.0",
+  "workerProtocol": 7,
+  "baseCommit": "892f220f250e66aa5197832234035d81fb2effd7",
+  "sourceWasDevelopmentWorktree": true,
+  "cases": [
+    "owner/coordinator/journal/worklet model rebinds a live source after Worker replacement",
+    "ended capture is reacquired automatically under granted permission after fresh route authorization",
+    "permission revocation blocks capture, a grant resumes valid intent, and explicit off forbids later recovery",
+    "other-document off/on invalidates old participation even across Worker loss",
+    "an unavailable domain recovers without a device reopen or changing a healthy peer delivery fence",
+    "device recovery cannot replay a switch turned off while acquisition is pending",
+    "temporary access rejection preserves intent but stops capture until fresh same-principal access",
+    "fresh access for a different observed principal retires old intent instead of reacquiring a device",
+    "temporary track mute waits for actual unmute and reuses the source without a device reopen",
+    "local off cancels every same-owner reference even when shared metadata is unreadable",
+    "off during the post-acquisition permission check stops the late stream before constructing a processor",
+    "browser focus mute after background device release does not deadlock a still-live source disabled by the SDK"
+  ],
+  "method": {
+    "owner": "RemoteXAppAudio",
+    "coordinator": "AudioCoordinator",
+    "journal": "AudioIntentJournal",
+    "processor": "actual audio-worklet.js evaluated in a VM",
+    "channels": "real Node MessageChannels",
+    "backend": "mocked Manager HTTP and WSS route acknowledgements",
+    "permissionsDevices": "controlled model; no physical devices"
+  },
+  "focusedAudioTests": 67,
+  "sourceFilesSHA256": {
+    "remotexapp-audio.js": "14c53f99ea0702016640da3c1a3ae38f8dff71ae6fd47c1eaba0606dd0ca4b97",
+    "audio-coordinator.js": "cc0d96ee7dd5258e297a5086e6aeab6f2e42e8ee0ff49e00a795480784307c34",
+    "audio-worklet.js": "d0ca3c748bceb3807d4408bec068ade5a0e13a0e0225d60506e8262aac1d5726",
+    "audio-worker-hub.js": "7b6ee9bdf02cae047b0e168550b9c4a9b9fa8fb4dcd3ced68d3421e583f8d10b",
+    "audio-intent-journal.js": "0dfcd3ec148dc3f506e0b990bb44ca0396c98601275b41c96634082edc26492b"
+  },
+  "limits": [
+    "Models do not qualify actual browser Worker self.close, physical devices, OS suspension, authenticated public ingress or native allocation.",
+    "Repeated silent Worker exit and recovery bootstrap policy remain incomplete.",
+    "AudioContext failure/rebuild and incomplete native retirement still need fault qualification.",
+    "Full24-class, clipboard concurrent-upload ordering,8h natural/90min stress and exact final candidate gates remain open."
+  ]
+}

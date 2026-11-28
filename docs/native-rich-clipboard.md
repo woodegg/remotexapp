@@ -171,3 +171,19 @@ Custom formats follow the [Clipboard API representation model](https://www.w3.or
 and [Chromium's custom-format API](https://developer.chrome.com/blog/web-custom-formats-for-the-async-clipboard-api).
 No claim is made that another browser supports custom receipts; feature-detect
 it and retain exact verification or explicit uncertainty.
+
+## Concurrent destination ordering (development)
+
+The repaired SDK A-B-A echo comparison does not close an X11 owner change whose
+offer has not arrived before an automatic upload. The selected
+[destination-ordering design](native-clipboard-ordering.md) requires a revision
+comparison at native transaction admission, before any clipboard buffer or X11
+selection mutation. This needs a newly qualified immutable component/capability;
+it is not implemented or accepted by the earlier receipt/normalization tests.
+
+SDK 0.38 development now implements that admission exchange and reports
+`ordering` separately from desired/effective directions. New v4 pairs retain the
+10 MiB aggregate limit. Older component pins preserve automatic download and
+explicit source choice but cannot provide safe passive automatic upload, which
+falls back to effective manual. Native selection/concurrency and final candidate
+qualification remain open; existing receipt tests do not substitute for them.

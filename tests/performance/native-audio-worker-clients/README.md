@@ -55,3 +55,77 @@ Accepted scope is bounded native client construction in these controls. Actual
 served SDK/Worker pairing, cross-tab speaker/mic continuity, Worker failover,
 full resource trends, immutable archive and human UAT are separate gates.
 Do not interpret counts as whole-browser RSS/PSS or zero-cost idle behavior.
+
+## Worker 8 repeated silent-exit control (2026-11-28)
+
+The [Worker 7 real SDK control](../../native-audio/results-worker-silent-exit-20261128.json)
+reproduced a second-exit recovery block. Worker 8 adds a same-name native
+bootstrap probe after a cached logical init timeout, qualified by the new
+Worker's random incarnation ID. An unknown or unchanged incarnation cannot
+reset that budget. This replaces the fixed lifetime failover-name limit while
+preserving the native-client bound.
+
+```sh
+python3 tests/native-audio/browser-worker-hub-retirement.py \
+  --browser /path/to/chrome --output /private/silent-exits \
+  --silent-exits --cycles 50
+```
+
+The actual product hub now passes fifty actual `self.close()`/recovery cycles
+under one name in Chrome 158.0.8127.88. Every cached logical init must time out;
+a fresh bootstrap must report a distinct incarnation. Native snapshots retain
+one SharedWorker client/two ports with the live logical owner and one client/one
+port after owner retirement and live idle. Playback/capture native counts are
+zero because this mechanism probe creates no audio. Headless mode, disabled
+sandbox and diagnostic GC snapshots are explicit limits of this control; the
+separate real headed SDK/Kasm/Pulse repeated-exit control and long-duration,
+multi-owner, resource and release gates still apply. The earlier accepted
+measurements and failed Worker 7 evidence are retained.
+
+## Actual hung-Worker current-pair control (2026-11-28)
+
+[Current-pair fault evidence](../../native-audio/results-multidoc-worker-hang-20261128.json)
+adds actual busy-loop failure with the served SDK, real Kasm and private Pulse.
+The first hung Worker is replaced while preserving capture and restoring new
+data. Two hung names reach bounded failure with four native SharedWorker
+clients and six MessagePorts at a live-page diagnostic endpoint. Explicit off
+still commits and stops capture; final owner retirement returns the nine sampled
+audio classes to zero. Six ports include the full SDK graph/owner path and are
+not the earlier minimal no-audio one-port endpoint. Do not compare them as equal
+workloads or infer whole-browser allocation from their counts.
+
+A separate two-document/two-App ownership control verifies one audio channel,
+one capture, selected routes and authorized handoff. Neither run replaces the
+unresolved earlier anonymous-PSS review, natural/stress gates or exact final
+candidate acceptance. Prior accepted minimal results remain unchanged.
+
+## Retained terminal-handle follow-up (2026-11-28)
+
+The [full SDK follow-up](../../native-audio/results-terminal-handle-freeze-20261128.json)
+finds one additional logical MessagePort after real audio use and Host disposal
+while the caller retains its public interest handle. A strong heap path leads
+through the handle's private binding; the other port belongs to the permitted
+native bootstrap. Both the continuous-audio and twenty-Worker-exit endpoints
+have one client/two ports and zero of the nine sampled native audio classes.
+The timed controls are not resource acceptance: these endpoints fail the
+one-port retirement gate. Six red model regressions and the targeted repair
+cover release, dispose, logout, runtime retirement and late acknowledgements.
+The repaired actual SDK/native/Pulse control follows one real Worker exit and
+returns to one client/one port with all nine sampled audio classes zero while
+the page stays alive and the caller keeps its terminal handle. A separate
+eight-check two-document/two-App run verifies actual suspension handoff with
+one Chrome capture, domain epoch replacement, fresh data and final cleanup.
+Neither control qualifies twenty repeated exits, whole-process memory or full
+natural/stress acceptance. The accepted minimal no-audio baseline above is
+unchanged.
+
+A later [matched three-profile resource control](../../native-audio/results-matched-audio-resources-20261128.json)
+uses that repaired product. Both actual-Worker-exit lanes complete twenty exits
+with new mic data and the original source/processor/capture request; each returns
+to one bootstrap/one port/nine audio classes zero. The no-exit lane completes its
+twenty mic checks and the same native endpoint but fails final browser-speaker
+readback. **The entire matched attempt is failed**, despite the two scoped
+repeated-exit passes. All observed PCM windows are retained. Warmed anonymous-PSS
+endpoint decreases in these short samples do not qualify long-term allocation;
+common blank-browser allocation is not attributed to a particular subsystem.
+Natural/stress, steady-PCM attribution and final acceptance remain open.

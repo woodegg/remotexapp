@@ -1,0 +1,295 @@
+--- /dev/null
++++ b/common/rfb/NativeClipboardRead.h
+@@ -0,0 +1,22 @@
++// One bounded incremental clipboard transaction per authenticated connection.
++#ifndef REMOTEXAPP_NATIVE_CLIPBOARD_READ_H
++#define REMOTEXAPP_NATIVE_CLIPBOARD_READ_H
++#include <chrono>
++#include <vector>
++struct NativeClipboardRead {
++  using Clock = std::chrono::steady_clock;
++  bool active = false;
++  unsigned phase = 0, count = 0, index = 0, mimeLength = 0;
++  unsigned total = 0, seen = 0, offset = 0;
++  char mimes[3][32] = {};
++  std::vector<unsigned char> data[3];
++  Clock::time_point started;
++  void begin() { if (!active) { active = true; started = Clock::now(); } }
++  unsigned remainingMs() const {
++    if (!active) return 0;
++    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - started).count();
++    return elapsed >= 50000 ? 0 : 50000 - (unsigned)elapsed;
++  }
++  void reset() { *this = NativeClipboardRead(); }
++};
++#endif
+--- a/common/rfb/SMsgReader.h
++++ b/common/rfb/SMsgReader.h
+@@ -23,6 +23,7 @@
+ 
+ #ifndef __RFB_SMSGREADER_H__
+ #define __RFB_SMSGREADER_H__
++#include <rfb/NativeClipboardRead.h>
+ 
+ namespace rdr { class InStream; }
+ 
+@@ -37,7 +38,9 @@
+     void readClientInit();
+ 
+     // readMsg() reads a message, calling the handler as appropriate.
+-    void readMsg();
++    bool readMsg();
++    bool clipboardPending() const { return clipboardRead.active; }
++    unsigned clipboardReadRemainingMs() const { return clipboardRead.remainingMs(); }
+ 
+     rdr::InStream* getInStream() { return is; }
+ 
+@@ -58,7 +61,7 @@
+     void readExtendedClipboard(rdr::S32 len);
+     void readRequestStats();
+     void readFrameStats();
+-    void readBinaryClipboard();
++    bool readBinaryClipboard();
+     void readKeepAlive();
+ 
+     void readQEMUMessage();
+@@ -71,6 +74,7 @@
+     void readVideoEncodersRequest() const;
+     void readDirectMouseEvent();
+ 
++    NativeClipboardRead clipboardRead;
+     SMsgHandler* handler;
+     rdr::InStream* is;
+   };
+--- a/common/rfb/SMsgReader.cxx
++++ b/common/rfb/SMsgReader.cxx
+@@ -49,8 +49,9 @@
+   handler->clientInit(shared);
+ }
+ 
+-void SMsgReader::readMsg()
+-{
++bool SMsgReader::readMsg()
++{
++  if (clipboardRead.active) return readBinaryClipboard();
+   const int msgType = is->readU8();
+   switch (msgType) {
+   case msgTypeSetPixelFormat:
+@@ -81,8 +82,7 @@
+     readFrameStats();
+     break;
+   case msgTypeBinaryClipboard:
+-    readBinaryClipboard();
+-    break;
++    return readBinaryClipboard();
+   case msgTypeKeyEvent:
+     readKeyEvent();
+     break;
+@@ -117,6 +117,7 @@
+     fprintf(stderr, "unknown message type %d\n", msgType);
+     throw Exception("unknown message type");
+   }
++  return true;
+ }
+ 
+ void SMsgReader::readSetPixelFormat()
+@@ -266,38 +267,75 @@
+   vlog.error("Client sent old cuttext msg, ignoring");
+ }
+ 
+-// Stage the complete transaction before changing selection ownership.
+-void SMsgReader::readBinaryClipboard()
+-{
+-  const rdr::U8 count = is->readU8();
+-  if (!count || count > 3) throw Exception("Invalid native clipboard count");
+-  char mimes[3][32] = {};
+-  std::vector<rdr::U8> data[3];
+-  unsigned total = 0, seen = 0;
+-  for (unsigned i = 0; i < count; i++) {
+-    const unsigned n = is->readU8();
+-    if (n < 9 || n > 10) throw Exception("Invalid native clipboard MIME");
+-    is->readBytes(mimes[i], n);
+-    const int type = nativeClipboardMime(mimes[i]);
+-    if (strlen(mimes[i]) != n || type < 0 || (seen & (1U << type)) || !nativeClipboardAllowed(rfb::Server::DLP_Clip_Types, mimes[i]))
+-      throw Exception("Unsupported native clipboard MIME");
+-    seen |= 1U << type;
+-    const rdr::U32 length = is->readU32();
+-    if (length > NATIVE_CLIPBOARD_LIMIT - total) throw Exception("Native clipboard exceeds byte limit");
+-    total += length;
+-    if (rfb::Server::DLP_ClipAcceptMax && total > (unsigned)rfb::Server::DLP_ClipAcceptMax)
+-      throw Exception("Native clipboard exceeds byte limit");
+-    data[i].resize(length);
+-    if (length) is->readBytes(data[i].data(), length);
+-    if (type != 2 && !nativeClipboardUTF8(data[i].data(), length))
+-      throw Exception("Native clipboard is not valid UTF-8 text");
+-  }
+-  if (!handler->acceptBinaryClipboard()) return;
+-  handler->clearBinaryClipboard();
+-  for (unsigned i = 0; i < count; i++)
+-    handler->addBinaryClipboard(mimes[i], data[i].data(), data[i].size(), 0);
+-  handler->handleClipboardAnnounceBinary(count, mimes);
+-  handler->finishBinaryClipboard();
++// Stage incrementally without blocking the shared X11 event loop. Never expose
++// partial data; validate the complete bounded transaction before admission.
++bool SMsgReader::readBinaryClipboard()
++{
++  NativeClipboardRead& tx = clipboardRead;
++  tx.begin();
++  for (;;) {
++    if (!tx.remainingMs()) throw Exception("Native clipboard transfer timed out");
++    if (tx.phase == 0) {
++      if (!is->checkNoWait(1)) return false;
++      tx.count = is->readU8();
++      if (!tx.count || tx.count > 3) throw Exception("Invalid native clipboard count");
++      tx.phase = 1;
++    }
++    if (tx.phase == 1) {
++      if (!is->checkNoWait(1)) return false;
++      tx.mimeLength = is->readU8();
++      if (tx.mimeLength < 9 || tx.mimeLength > 10) throw Exception("Invalid native clipboard MIME");
++      tx.phase = 2;
++    }
++    if (tx.phase == 2) {
++      if (!is->checkNoWait(tx.mimeLength)) return false;
++      char* mime = tx.mimes[tx.index];
++      is->readBytes(mime, tx.mimeLength);
++      const int type = nativeClipboardMime(mime);
++      if (strlen(mime) != tx.mimeLength || type < 0 || (tx.seen & (1U << type)) || !nativeClipboardAllowed(rfb::Server::DLP_Clip_Types, mime))
++        throw Exception("Unsupported native clipboard MIME");
++      tx.seen |= 1U << type;
++      tx.phase = 3;
++    }
++    if (tx.phase == 3) {
++      if (!is->checkNoWait(4)) return false;
++      const rdr::U32 length = is->readU32();
++      if (length > NATIVE_CLIPBOARD_LIMIT - tx.total) throw Exception("Native clipboard exceeds byte limit");
++      tx.total += length;
++      if (rfb::Server::DLP_ClipAcceptMax && tx.total > (unsigned)rfb::Server::DLP_ClipAcceptMax)
++        throw Exception("Native clipboard exceeds byte limit");
++      tx.data[tx.index].resize(length); tx.offset = 0; tx.phase = 4;
++    }
++    if (tx.phase == 4) {
++      auto& data = tx.data[tx.index];
++      while (tx.offset < data.size()) {
++        if (!tx.remainingMs()) throw Exception("Native clipboard transfer timed out");
++        if (!is->checkNoWait(1)) return false;
++        const size_t size = std::min(data.size() - tx.offset, is->avail());
++        is->readBytes(data.data() + tx.offset, size); tx.offset += size;
++      }
++      if (nativeClipboardMime(tx.mimes[tx.index]) != 2 && !nativeClipboardUTF8(data.data(), data.size()))
++        throw Exception("Native clipboard is not valid UTF-8 text");
++      if (++tx.index < tx.count) { tx.phase = 1; continue; }
++      if (!tx.remainingMs()) throw Exception("Native clipboard transfer timed out");
++      // Policy may have changed while an incomplete body yielded to X11.
++      if (rfb::Server::DLP_ClipAcceptMax && tx.total > (unsigned)rfb::Server::DLP_ClipAcceptMax)
++        throw Exception("Native clipboard exceeds current byte limit");
++      for (unsigned i = 0; i < tx.count; i++)
++        if (!nativeClipboardAllowed(rfb::Server::DLP_Clip_Types, tx.mimes[i]))
++          throw Exception("Native clipboard MIME no longer allowed");
++      // No event-loop re-entry between this revision comparison and commit.
++      if (handler->acceptBinaryClipboard()) {
++        handler->clearBinaryClipboard();
++        for (unsigned i = 0; i < tx.count; i++)
++          handler->addBinaryClipboard(tx.mimes[i], tx.data[i].data(), tx.data[i].size(), 0);
++        handler->handleClipboardAnnounceBinary(tx.count, tx.mimes);
++        handler->finishBinaryClipboard();
++      }
++      tx.reset();
++      return true;
++    }
++  }
+ }
+ 
+ void SMsgReader::readExtendedClipboard(rdr::S32 len)
+--- a/common/rfb/SConnection.h
++++ b/common/rfb/SConnection.h
+@@ -60,7 +60,7 @@
+ 
+     // processMsg() should be called whenever there is data to read on the
+     // InStream.  You must have called initialiseProtocol() first.
+-    void processMsg();
++    bool processMsg();
+ 
+     // approveConnection() is called to either accept or reject the connection.
+     // If accept is false, the reason string gives the reason for the
+--- a/common/rfb/SConnection.cxx
++++ b/common/rfb/SConnection.cxx
+@@ -87,14 +87,14 @@
+   state_ = RFBSTATE_PROTOCOL_VERSION;
+ }
+ 
+-void SConnection::processMsg()
++bool SConnection::processMsg()
+ {
+   switch (state_) {
+   case RFBSTATE_PROTOCOL_VERSION: processVersionMsg();      break;
+   case RFBSTATE_SECURITY_TYPE:    processSecurityTypeMsg(); break;
+   case RFBSTATE_SECURITY:         processSecurityMsg();     break;
+   case RFBSTATE_INITIALISATION:   processInitMsg();         break;
+-  case RFBSTATE_NORMAL:           reader_->readMsg();       break;
++  case RFBSTATE_NORMAL:           return reader_->readMsg();
+   case RFBSTATE_QUERYING:
+     throw Exception("SConnection::processMsg: bogus data from client while "
+                     "querying");
+@@ -103,6 +103,7 @@
+   default:
+     throw Exception("SConnection::processMsg: invalid state");
+   }
++  return true;
+ }
+ 
+ void SConnection::processVersionMsg()
+--- a/common/rfb/VNCSConnectionST.h
++++ b/common/rfb/VNCSConnectionST.h
+@@ -327,6 +327,7 @@
+     Timer kbdLogTimer;
+     Timer binclipTimer;
+     Timer clipboardOrderTimer;
++    Timer clipboardReadTimer;
+     bool nativeClipboardRejected = false;
+     NativeClipboardOrder clipboardOrder;
+     rdr::U64 clipboardCommitRevision = 0;
+--- a/common/rfb/VNCSConnectionST.cxx
++++ b/common/rfb/VNCSConnectionST.cxx
+@@ -28,6 +28,7 @@
+ #include <rfb/ServerCore.h>
+ #include <rfb/NativeClipboard.h>
+ #include <rfb/SMsgWriter.h>
++#include <rfb/SMsgReader.h>
+ #include <rfb/VNCServerST.h>
+ #include <rfb/VNCSConnectionST.h>
+ #include <rfb/screenTypes.h>
+@@ -65,7 +66,7 @@
+     inProcessMessages(false), encodingsReceived(false),
+     pendingSyncFence(false), syncFence(false), fenceFlags(0),
+     fenceDataLen(0), fenceData(nullptr), congestionTimer(this),
+-    losslessTimer(this), kbdLogTimer(this), binclipTimer(this), clipboardOrderTimer(this),
++    losslessTimer(this), kbdLogTimer(this), binclipTimer(this), clipboardOrderTimer(this), clipboardReadTimer(this),
+     server(server_), updates(false),
+     updateRenderedCursor(false), removeRenderedCursor(false),
+     continuousUpdates(false), encodeManager(this, &VNCServerST::encCache, FFmpeg::get(), encoder_probe),
+@@ -240,7 +241,13 @@
+         pendingSyncFence = false;
+       }
+ 
+-      processMsg();
++      const bool complete = processMsg();
++      if (reader() && reader()->clipboardPending()) {
++        if (!clipboardReadTimer.isStarted()) clipboardReadTimer.start(reader()->clipboardReadRemainingMs());
++      } else clipboardReadTimer.stop();
++      // A partial body must yield to other clients/X11, not spin on a short
++      // buffered header or wait synchronously for the rest of the upload.
++      if (!complete) break;
+ 
+       if (syncFence) {
+         writer()->writeFence(fenceFlags, fenceDataLen, fenceData);
+@@ -1321,6 +1328,9 @@
+       flushKeylog(sock->getPeerAddress());
+     else if (t == &binclipTimer)
+       writeBinaryClipboard();
++    else if (t == &clipboardReadTimer) {
++      close("Native clipboard transfer timed out");
++    }
+     else if (t == &clipboardOrderTimer && clipboardOrder.subscribed && clipboardOrderingAllowed()) {
+       if (clipboardOrder.notify(server->nativeClipboardRevision())) clipboardOrderReply('V', 0);
+     }

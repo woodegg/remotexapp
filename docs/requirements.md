@@ -143,9 +143,116 @@ Review/merge, actual embedding-host and post-merge release qualification remain 
 | KNA-011 | On a ready Fence-capable native Viewer the browser SDK schedules one periodic RFB Fence probe over the existing WSS. Default to 15000 ms per Viewer. Accept 0 to disable and positive integer browser timer intervals of at least 5000 ms. Retire timers on channel replacement, disconnect or disposal and attempt at most one overdue probe when a visible document resumes. This transport work consumes no App activity, audio intent or grant renewal. | Per-Viewer option, default and opt-out, passive stats, hidden/wake behavior, generation replacement/cleanup, older components, and real routed WSS followed across reconnect |
 | KNA-012 | Native Viewer retirement removes adapter-owned input listeners before detaching the input. A browser-retained detached input must not retain the retired adapter/RFB through that listener, and cleanup must preserve unrelated listeners and live peers. Existing component pins remain immutable; select a newly built pair for this repair. | #115: retained-input negative/positive controls, live blur cancellation and repeated disconnect, actual RFB/backing-store retainer review and new-component repeated Viewer/resource qualification. Worker/audio endpoint bounds alone do not qualify Viewer frame-buffer retirement. |
 | AUD-002 | Develop opt-in per-session audio domains and controls over one scoped mux connection, same-session multi-Tab deduplication, explicit multi-target mic with per-target writer ownership; default off. Connection lifetime accepted: connect when at least one App's speaker or mic is enabled, share within the scope, release when all are off; App launch alone does not connect and silence does not disconnect. | R3 design accepted 2026-10-25; full D3 implementation selected 2026-11-01 in #45/#49. Standalone automation and cleanup are qualified for [candidate 7926949](../tests/native-audio/qualification-7926949.md); the owner reported the current standalone audio UAT passed on 2026-11-01, without supplying a per-device/browser/region checklist. Actual embedding-host and post-merge release qualification remain separate. See [native audio contract](native-audio.md). The UAT workbench must distinguish local device observations from remote audio acceptance, support same/different-runtime comparison, cancel local capture on panel close/page retirement and fence late permission results; export only content-free observations and explicitly unexecuted remote cases while audio is unavailable. Verify first enable, additional subscription, partial disable, final disable and enabled-but-silent behavior, plus real playback/readback, permission/owner/worker/outage tests, including permission/device loss while a route acknowledgment is pending, silent worker termination, and Manager epoch replacement without automatic capture; see [audio model](kasm-native-architecture.md#audio-model) |
-| AUD-003 | Continue requested native audio on the same live SDK owner and runtime generation across display or audio transport interruption using current ingress access and fresh Manager grants. A separate login-session header is optional. Preserve requested microphone intent independently of capture eligibility through requested.microphone and microphoneActionRequired. The built-in Host Workbench renders requested switch values separately from actual activity and exposes an explicit microphone resume action. An explicit off succeeds locally during outages and cancels pending restoration. Keep healthy audio independent of Viewer reconnect and workspace focus. A valid microphone backlog must not close shared audio because its arrival rate exceeds its production rate. Retain the five-frame drop-oldest writer queue rather than accumulating old PCM or replacing the socket. For a short audio outage, retain only the explicitly enabled, still-live microphone capture under the same owner, current browser permission and fresh Manager route authorization. Drop queued outage audio. A replaced track, revoked permission, released owner, new login or runtime replacement requires fresh user authorization. | Implemented for local UAT. Independently cut display and audio, restart the Manager, exercise browser suspension and device or permission loss, disabled and retired routes, shared channel and two tabs. Assert actual sound, no replay and exact microphone target. |
+| AUD-003 | Continue requested native audio on the same live SDK owner and runtime generation across display or audio transport interruption using current ingress access and fresh Manager grants. A separate login-session header is optional. Preserve requested microphone intent independently of capture eligibility through requested.microphone and microphoneActionRequired. The built-in Host Workbench renders requested switch values separately from actual activity and exposes an explicit microphone resume action. An explicit off succeeds locally during outages and cancels pending restoration. Keep healthy audio independent of Viewer reconnect and workspace focus. A delayed document watchdog must notify the coordinator when fencing local delivery, then obtain a fresh delivery nonce and rebind a valid source/processor; local epoch invalidation alone must not leave a permanently silent effective mic. Actual document freeze/BFCache suspension stops its local capture before owner handoff while preserving requested intent; ordinary hidden running tabs retain capture. A valid microphone backlog must not close shared audio because its arrival rate exceeds its production rate. Retain the five-frame drop-oldest writer queue rather than accumulating old PCM or replacing the socket. For a short audio outage, retain only the explicitly enabled, still-live microphone capture under the same owner, current browser permission and fresh Manager route authorization. Drop queued outage audio. A replaced track, revoked permission, released owner, new login or runtime replacement requires fresh user authorization. | Implemented for local UAT. Independently cut display and audio, restart the Manager, exercise browser suspension and device or permission loss, disabled and retired routes, shared channel and two tabs. Assert actual sound, no replay and exact microphone target. |
 | AUD-004 | Audio resource retirement belongs to the SDK. Playback/capture processors accept terminal disposal, discard PCM and return false after a terminal render acknowledgement. Audio dispose returns one idempotent Promise; Host dispose/logout join local retirement and Context close. Stop capture tracks and invalidate pending capture authority synchronously. A suspended capture-only retirement waits for an explicit resume; final disposal may drain only its existing muted graph without capturing or restoring intent. Bound the final terminal wait and reject incomplete cleanup rather than claiming success. | Reproduce #104 on exact Edge 157, compare six active cycles and native Context/Worklet/Proxy counts; verify public Host cleanup, capture-only resume, suspended drain, late permission, off/logout/multi-owner and repeated disposal. Natural/fault resource sampling, fifty retirements and eighty-second live idle are separate from diagnostic GC and physical-device UAT. |
-| AUD-005 | Keep native SharedWorker client handles bounded during same-document Host recreation without retiring another owner's audio. Worker v6 uses one document/Manager/generation bootstrap and independent transferable MessageChannels; normal owner disposal closes only its logical channel. No capture, Context or audio WSS survives its last enabled interest. One inert document bootstrap is permitted until document retirement; it is not a media interest or authorization grant. | #110 / #112 development: verify fifty same-page retirements while another peer remains usable, all-off native endpoints, multi-document isolation, Worker loss and generation recovery; real served SDK/native/Pulse qualification remains separate. |
+| AUD-005 | Keep native SharedWorker client handles bounded during same-document Host recreation without retiring another owner's audio. Worker v6 uses one document/Manager/generation bootstrap and independent transferable MessageChannels; normal owner disposal closes only its logical channel. Retained terminal audio handles must detach their bound logical port and replay state on release, controller disposal, logout or runtime retirement; late results cannot reattach them. No capture, Context or audio WSS survives its last enabled interest. One inert document bootstrap is permitted until document retirement; it is not a media interest or authorization grant. | #110 / #112 / #119 development: verify fifty same-page retirements while another peer remains usable, all-off native endpoints, retained released handles and late results, multi-document isolation, Worker loss and generation recovery; real served SDK/native/Pulse qualification remains separate. |
+
+AUD-006 is selected for implementation in [Issue #119](https://github.com/woodegg/remotexapp/issues/119)
+and [the self-recovery plan](native-self-recovery.md): reconcile still-valid
+speaker/mic intent across service, transport and Worker replacement. Reacquire
+only under a live participating owner, granted browser permission and fresh
+runtime authorization; never prompt automatically or resurrect off/logout/old
+identity/runtime authority. Bound retries and shared metadata and test mixed
+faults and long-duration resource behavior before UAT. This prospectively
+supersedes AUD-003's mandatory extra click after every expired/replaced capture,
+not its cancellation, access or generation fences. Implementation/qualification
+are incomplete; legacy evidence does not accept the new policy.
+
+AUD-006 development Worker 9 separates playback media from the document control
+queue. Use a bounded direct Worker/Worklet MessageChannel for frames and consumed
+credits; keep intent, browser permission, graph/device ownership and retirement
+in the document controller. Bind a new endpoint to the current processor/Worker,
+reject replaced-port and reset-epoch frames/credits, preserve per-App mute and
+close both endpoints at retirement. A current channel failure must rebind a
+still-valid node without new capture or audio WSS; off or a replaced binding
+must fence that recovery. Eight frames per speaker and the aggregate
+64-credit cap remain unchanged. The analogous microphone media path and full
+native/resource/fault qualification remain incomplete. A diagnostic or model
+pass does not accept a release. See the [layered controls](../tests/native-audio/results-speaker-scheduling-20261128.json).
+
+AUD-006 also distinguishes refreshed native cookies from authenticated-principal
+changes. The context supplies an opaque Manager-scoped principal correlation,
+stable across service/cookie epochs; it does not authorize requests or identify
+a distinct login of the same account. SDK recovery fences a changed or lost
+previously observed binding and retains conservative handling of older servers
+without this field. Scope-pressure reclamation may remove only inactive scopes
+without unexpired grants, preserving active and reserved authority and the cap.
+
+SDK 0.38 / Worker 8 integrates the ordered journal with the audio runtime in
+development. Fresh target writer eligibility precedes device acquisition;
+`actualMic` requires a ready source and current processor delivery acknowledgement.
+Requested mic remains distinct from `microphonePending` and browser-action
+requirements. Recovered target reasons clear only after all of that target's
+requested effects are effective, including current microphone delivery ACK;
+source readiness alone is insufficient. Pending/retired targets and unrelated
+failures retain their reasons. Clear the shared failure only when its connected
+routes have settled; retain disconnect history separately. Temporary access
+rejection parks intent without old capture;
+fresh observed identity changes and explicit logout still retire it. Worker
+rebind and ended-source recovery are covered by integrated module models;
+repeated silent exits, real browser/fault/resource and final acceptance gates
+are still incomplete. Do not qualify the policy from those models alone.
+
+AUD-006 Worker 8 requires repeated silent-exit recovery without consuming an
+unbounded namespace or native client count. A confirmed ephemeral incarnation
+change permits another same-name bootstrap probe; an error or timeout alone
+cannot erase its budget. Bound two nonresponsive names to four native bootstrap
+clients, coalesce probes, reject stale replies and preserve explicit cancellation
+while no Worker is available. Integrated models are passing development evidence;
+real repeated exits, multi-owner recovery and native resource review remain
+qualification gates. See [the bootstrap contract](native-self-recovery.md#worker-bootstrap-recovery-development-worker-8).
+
+Scoped [current-pair multi-document and real-hang controls](../tests/native-audio/results-multidoc-worker-hang-20261128.json)
+now verify selected mic targets, one shared channel/capture, authorized owner
+handoff, per-App off and terminal runtime isolation. Actual busy loops verify
+one-name replacement, bounded failure with both names hung and explicit off;
+native endpoints remain separate from whole-process memory qualification.
+These controls do not close the complete 24-class, long-duration or final
+candidate gates.
+
+AUD-006 graph recovery separates a valid source from failed Context/processor
+lifetimes. Resume/rebuild only under current intent and retire unusable graphs
+before replacement. Native operation timeouts do not cancel browser work: join
+bounded module/resume/close flights, allow one real-gesture resume of an earlier
+automatic attempt, quarantine unretired work and wake after late settlement.
+New owners share a document/Manager quarantine guard when two retired graphs
+remain unproven; existing healthy graphs are not replaced. Explicit cancellation
+fences late graph/device results. Bound close/disposal and
+error history; report unresolved native retirement. `actualSpeaker` additionally
+requires a ready playback owner, with optional local `contextState`/`contextReason`
+diagnostics. Models are implemented; real graph/native-resource and full gates
+in [the recovery contract](native-self-recovery.md#audio-graph-recovery-development)
+remain required before acceptance.
+
+AUD-006 requires an authoritative runtime-generation retirement to revoke local
+replay and journal participation, not only mark a Worker route inactive. Notify
+all participating owners, fence late acquisition/commands/ACKs and reject reuse
+of released interests. Keep unaffected runtimes and their valid capture usable.
+Worker replacement must not reconstruct retired interests. The backend returns
+terminal route HTTP 410 for retained stopped/stopping runtime/session records,
+without waiting for an explicit later start to advance the generation counter;
+temporary domain failure remains a recoverable conflict. Model regressions
+cover push/HTTP retirement, two documents and delayed device completion; real
+fault and final candidate gates remain separate.
+
+AUD-006 additionally owns the graph execution environment. Construct Context
+and processors in an SDK-owned same-origin child while the parent retains intent,
+transport, permissions and MediaStream. Graceful termination waits for render
+ACK; a closed/stuck graph can retire that owned realm, detach obsolete native
+observations and rebuild only under valid current intent. Neither `closed` nor a
+Promise timeout alone proves native cleanup. Detect lost/navigated graph documents,
+fence late callbacks and prove no additional device request solely for graph
+replacement. Scoped real Context/processor recovery and native retirement pass;
+full policy/fault/long-duration/exact-candidate qualification remains pending.
+
+AUD-003 verification uses the [audio fault inventory](native-audio-faults.md)
+to distinguish display, transport, service, Worker, capture, runtime and identity
+fences. A changed service epoch must be observed directly; fresh sound and remote
+mic data, retained intent and no unauthorized capture are separate assertions.
+[Real service/Worker fault results](../tests/native-audio/results-epoch-recovery-20261128.json)
+record the exact runtime source and limits. This test clarification does not
+extend microphone recovery beyond the current
+12-second live-capture window or change identity/runtime retirement rules.
 
 AUD-002 clarification: server-initiated retirement of the final enabled App
 (including vacancy shutdown) releases the shared audio WSS on the next
@@ -199,6 +306,14 @@ rich clipboard capabilities for the native provider.
 | KNC-010 | For a stable X11 clipboard selection advertising both file markers and a valid inline PNG, transfer only the bounded PNG bytes. Ignore file paths, file objects, URI lists and any alternate text or HTML in that selection. Use a 10 MiB aggregate transfer limit on new paired components and retain the 2 MiB and 64 KiB limits on the corresponding existing pins. Treat an oversized but verifiably unchanged local browser clipboard as ineligible for upload without disabling remote-to-local synchronization. Preserve local content on ownership or source conflict. | Implemented for the new component. Qualify staged file-plus-PNG and file-only selections, compare decoded pixels, exercise Chrome PNG readback above the transfer bound and follow with a new text copy in another Viewer. Verify bounds, race handling and no file/path exposure. |
 | KNC-011 | Keep explicitly requested native clipboard directions on the same logical Viewer across reconnect to the same runtime generation and component with fresh accepted grants. A separate login-session header is optional; an observed optional login change still fences old consent. Retire old operations and offers, recheck browser permission and establish a fresh local baseline after focus. A host must render requested mode separately from active ownership and recovery or permission state. | Implemented for local UAT. Cut the Viewer transport, restart the Manager and verify same-generation recovery, focus pauses, independent Viewer or tab choices, no old payload replay and authorization loss on logout or runtime replacement. |
 | KNC-012 | Report copied-to-local only after verified delivery. Bind normalized rich readback to an ephemeral browser-local write receipt where supported; otherwise require exact content equality. Never consume empty, stale or a distinct concurrent local copy as a successful normalized baseline. Uncertain writes are not replayed; requested directions remain intact and explicit source choice can resolve uncertainty. Keep receipt metadata bounded, private and out of remote representations, diagnostics and content budgets. Manual write without existing read permission reports write-accepted and never requests read access implicitly. | #111 / #107 / #112 development: deterministic post-write local-copy, empty/stale write, marker loss, normalization, permission/blur/off/timeout, rich/type/size bounds and real browser readback; browser/OS clipboard admission failures require separate environment attribution. |
+| KNC-013 | Admit automatic uploads only against the observed native destination revision, checked before any clipboard-buffer or X11 ownership mutation. Advance revision before asynchronous snapshot discovery, including unsupported selections. Bound and correlate admission/acknowledgement, reject stale transactions atomically, fence timeout/late results, and retain explicit source choice. Never infer transaction identity from content equality or claim safe conditional automatic upload on an unsupported component. Incomplete native uploads must yield the shared X11 event loop, retain at most one bounded staged transaction per connection, and enforce an absolute deadline without partial mutation. | #119 development implementation, v4 build, portable regressions and18 scoped real X11/browser controls; [destination ordering design](native-clipboard-ordering.md). Full old-pair/shared-owner/cancellation/combined-fault/resource/natural/stress/final-artifact qualification remains pending. |
+
+KNC-003 repair under development: [Issue #117](https://github.com/woodegg/remotexapp/issues/117)
+records a stale upload-echo marker suppressing legitimate remote A-B-A. The
+[strict reproduction](../tests/kasm-native/CLIPBOARD-ABA.md) asserts delivery and
+no stale paste for text, HTML and PNG-plus-text. The assertions are now mandatory and pass in development, including delayed
+offers and repeated cycles. Real Chrome/X11 old/new controls reproduce the
+original loss and validate the repair; final-candidate qualification is pending.
 
 ## Selected Core 0.15.0 — managed desktop self-recovery
 

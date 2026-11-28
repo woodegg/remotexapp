@@ -541,5 +541,155 @@
     "Physical devices, OS sleep and UDP/TURN not qualified by this audio retirement matrix",
     "Source-module baseline and public bundled SDK results are separate lanes",
     "Early probes are retained observations; the manifest binds the expanded current harness without retroactively claiming its hash for earlier probes"
-  ]
+  ],
+  "developmentGraphNodeRecovery": {
+    "status": "passed-scoped-development-control",
+    "releaseQualified": false,
+    "browser": "Chrome/158.0.8127.88",
+    "processorThrows": 10,
+    "deviceRequests": 1,
+    "sameSourceAndContext": true,
+    "nativeCounts": {
+      "baseline": {
+        "AudioContext": 1,
+        "AudioWorkletNode": 2,
+        "blink::AudioWorkletMessagingProxy": 1,
+        "MediaStreamAudioSourceNode": 1,
+        "MediaStream": 1,
+        "MediaStreamTrack": 1,
+        "GainNode": 1,
+        "AudioWorklet": 1,
+        "AudioDestinationNode": 1
+      },
+      "active": {
+        "AudioContext": 1,
+        "AudioWorkletNode": 2,
+        "blink::AudioWorkletMessagingProxy": 1,
+        "MediaStreamAudioSourceNode": 1,
+        "MediaStream": 1,
+        "MediaStreamTrack": 1,
+        "GainNode": 1,
+        "AudioWorklet": 1,
+        "AudioDestinationNode": 1
+      },
+      "retired": {
+        "AudioContext": 0,
+        "AudioWorkletNode": 0,
+        "blink::AudioWorkletMessagingProxy": 0,
+        "MediaStreamAudioSourceNode": 0,
+        "MediaStream": 0,
+        "MediaStreamTrack": 0,
+        "GainNode": 0,
+        "AudioWorklet": 0,
+        "AudioDestinationNode": 0
+      }
+    },
+    "faultWorkletSHA256": "c6b593fee1642fe4de6090843a788888d9417c58a345092f3bfb7619b1ec6988",
+    "rawReportSHA256": "12a5fb9f29ccd05bdb7e4b6bf0547624d8724df5148ce8972e633a25e354fd98"
+  },
+  "developmentWholeGraphFailure": {
+    "status": "remaining-native-retirement-defect-reproduced",
+    "nativeCounts": {
+      "AudioContext": 12,
+      "AudioWorkletNode": 14,
+      "blink::AudioWorkletMessagingProxy": 12
+    },
+    "rawReportSHA256": "532e813e43719bbabb96123643e24039328ab2038d9f00250716356d4131dce9"
+  },
+  "closedContextOwnedFrameMechanism": {
+    "status": "passed-mechanism-control-not-integrated",
+    "cycles": 6,
+    "controls": {
+      "direct": {
+        "baseline": {
+          "AudioContext": 0,
+          "AudioWorkletNode": 0,
+          "blink::AudioWorkletMessagingProxy": 0
+        },
+        "retired": {
+          "AudioContext": 6,
+          "AudioWorkletNode": 6,
+          "blink::AudioWorkletMessagingProxy": 6
+        },
+        "idle": {
+          "AudioContext": 6,
+          "AudioWorkletNode": 6,
+          "blink::AudioWorkletMessagingProxy": 6
+        },
+        "delta": {
+          "AudioContext": 6,
+          "AudioWorkletNode": 6,
+          "blink::AudioWorkletMessagingProxy": 6
+        },
+        "rawReportSHA256": "c4bd2d5f21c209af391faf681c55202521f0843c0703b0f0da9a027885ba78c7"
+      },
+      "frame": {
+        "baseline": {
+          "AudioContext": 0,
+          "AudioWorkletNode": 0,
+          "blink::AudioWorkletMessagingProxy": 0
+        },
+        "retired": {
+          "AudioContext": 0,
+          "AudioWorkletNode": 0,
+          "blink::AudioWorkletMessagingProxy": 0
+        },
+        "idle": {
+          "AudioContext": 0,
+          "AudioWorkletNode": 0,
+          "blink::AudioWorkletMessagingProxy": 0
+        },
+        "delta": {
+          "AudioContext": 0,
+          "AudioWorkletNode": 0,
+          "blink::AudioWorkletMessagingProxy": 0
+        },
+        "rawReportSHA256": "91aefbe09e168551ceb0d73d4fc1c0b882f09c8f3eba7e845dd2da079d840276"
+      }
+    },
+    "releaseQualified": false
+  },
+  "ownedGraphRealmDevelopment": {
+    "status": "passed-scoped-development-controls",
+    "releaseQualified": false,
+    "checks": {
+      "wholeGraphAndNode": 23,
+      "policyAndLateOperations": 8
+    },
+    "primaryRetired": {
+      "AudioContext": 0,
+      "AudioWorkletNode": 0,
+      "blink::AudioWorkletMessagingProxy": 0,
+      "MediaStreamAudioSourceNode": 0,
+      "MediaStream": 0,
+      "MediaStreamTrack": 0,
+      "GainNode": 0,
+      "AudioWorklet": 0,
+      "AudioDestinationNode": 0
+    },
+    "policyImmediate": {
+      "AudioContext": 0,
+      "AudioWorkletNode": 0,
+      "blink::AudioWorkletMessagingProxy": 0,
+      "MediaStreamAudioSourceNode": 0,
+      "MediaStream": 1,
+      "MediaStreamTrack": 1,
+      "GainNode": 0,
+      "AudioWorklet": 0,
+      "AudioDestinationNode": 0
+    },
+    "policyIdle": {
+      "AudioContext": 0,
+      "AudioWorkletNode": 0,
+      "blink::AudioWorkletMessagingProxy": 0,
+      "MediaStreamAudioSourceNode": 0,
+      "MediaStream": 0,
+      "MediaStreamTrack": 0,
+      "GainNode": 0,
+      "AudioWorklet": 0,
+      "AudioDestinationNode": 0
+    },
+    "policyIdleSeconds": 80.00042252999265,
+    "evidenceSHA256": "4aa933df83fdc0b8e11099cbd21460db68d7245450872a42e0404ebacf30d166"
+  }
 }

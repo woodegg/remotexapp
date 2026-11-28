@@ -1,4 +1,4 @@
-export const SDK_VERSION: '0.37.0';
+export const SDK_VERSION: '0.38.0';
 
 export interface RemoteXAppClipboardSkipped { skipped:true; reason:'empty-clipboard'; }
 
@@ -158,7 +158,7 @@ export interface NativeClipboardState {
   requested:{toRemote:NativeClipboardMode;toLocal:NativeClipboardMode};
   effective:{toRemote:NativeClipboardMode;toLocal:NativeClipboardMode};
   permissions:{read:string;write:string}; active:boolean; phase:string;
-  formats:string[]; maxBytes:number; automaticSupported:boolean;
+  formats:string[]; maxBytes:number; automaticSupported:boolean; ordering:'unsupported'|'waiting'|'ready'|'unavailable';
 }
 export class RemoteXAppNativeClient extends EventTarget {
   constructor(options:RemoteXNativeViewerOptions);
@@ -169,7 +169,7 @@ export class RemoteXAppNativeClient extends EventTarget {
   readonly state:'disconnected'|'connecting'|'reconnecting'|'ready'|'failed'|'disposed';
   readonly instance?:RemoteXAppInstance;
   readonly capabilities:{readonly display:'kasm-wss-v1';readonly pointer:boolean;readonly keyboard:boolean;
-    readonly clipboard:boolean;readonly clipboardAutomatic?:boolean;readonly clipboardRich?:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly statistics:boolean;readonly programmaticText:boolean;readonly programmaticKeys?:boolean;readonly displayControls?:boolean;readonly remoteResize?:boolean;readonly readOnly?:boolean;readonly latency?:boolean;readonly udpLoss?:boolean;readonly audio:false;readonly udp:boolean};
+    readonly clipboard:boolean;readonly clipboardAutomatic?:boolean;readonly clipboardConditional?:boolean;readonly clipboardRich?:boolean;readonly keyboardPolicy:boolean;readonly clipboardMaxBytes:number;readonly statistics:boolean;readonly programmaticText:boolean;readonly programmaticKeys?:boolean;readonly displayControls?:boolean;readonly remoteResize?:boolean;readonly readOnly?:boolean;readonly latency?:boolean;readonly udpLoss?:boolean;readonly audio:false;readonly udp:boolean};
   readonly keyboardPolicy:NativeKeyboardPolicy|null;
   readonly clipboardEnabled:boolean;
   getStats():RemoteXAppNativeStats;
@@ -370,11 +370,14 @@ export interface RemoteXAudioRouteState {
   runtime:string;generation:number;slot:number;refs:number;domain:string|null;
   speaker:boolean;mic:boolean;actualSpeaker:boolean;actualMic:boolean;reason:string;
   requested:{speaker:boolean;microphone:boolean};microphoneActionRequired:boolean;
+  microphonePending:boolean;
 }
 export interface RemoteXAudioSnapshot {
   lastDisconnect?:RemoteXAppDisconnect;
-  connection:'idle'|'connected'|'recovering'|'failed';protocol?:string|null;connectionId?:string|null;
+  connection:'idle'|'connected'|'recovering'|'blocked'|'failed';protocol?:string|null;connectionId?:string|null;
   speakerOwner:boolean;micOwner:boolean;playbackBlocked?:boolean;reason?:string;
+  /** Local graph diagnostics; a connected mux alone does not prove playback/capture readiness. */
+  contextState?:'none'|'running'|'suspended'|'closed'|'interrupted';contextReason?:string;
   routes:RemoteXAudioRouteState[];receivedBytes?:number;sentBytes?:number;droppedFrames?:number;
   playback?:{underrunBlocks:number;droppedFrames:number;peak:number;queuedFrames:number};
   microphone?:{level:number;droppedFrames:number};
@@ -383,7 +386,7 @@ export interface RemoteXAudioInterest {
   readonly runtime:string;readonly generation:number;readonly ref:string;readonly released:boolean;
   /** Enable from a browser user gesture; the switch is shared by this session's tabs. */
   setSpeaker(enabled:boolean):Promise<RemoteXAudioRouteState>;
-  /** Permission and ownership are explicit. Fault recovery never reopens capture. */
+  /** Initial permission is explicit. Recovery may reacquire only for live intent, granted permission and fresh runtime authorization. */
   setMicrophone(enabled:boolean,options?:{takeover?:boolean}):Promise<RemoteXAudioRouteState>;
   release():Promise<void>;
 }

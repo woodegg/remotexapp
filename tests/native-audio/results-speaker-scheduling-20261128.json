@@ -1,0 +1,2252 @@
+{
+  "schemaVersion": 1,
+  "issue": 119,
+  "status": "diagnostic-only-causal-UI-relay-loss-and-separate-output-loss-unresolved",
+  "releaseQualified": false,
+  "productCommit": "038e6f8e9d2e98c85170710bbe888e54eb760963",
+  "coreSHA256": "03ed7254d5ddad2404d5fbea080cf2a6cef25ce5382e3c82afadc20b1a4e240c",
+  "componentManifestSHA256": "8e2c5874368e25286e15b0a73403c0fb30f81c2aa45b65c000a865294e07e84f",
+  "queueBounds": {
+    "framesPerSpeaker": 8,
+    "aggregateMaximum": 64,
+    "changed": false
+  },
+  "experiments": [
+    {
+      "name": "speaker-layers-r3",
+      "scope": "Three matched profiles: transient output monitor, persistent output monitor, persistent plus one actual240ms UIstall. Samequeue8 and unchangedSDK. Bounded rawlayers and credit timing. Not natural8h, fault matrix or resource acceptance. SDKservedbytesunchanged, diagnosticmethodwrappersrestored.",
+      "status": "diagnostic-completed-not-product-qualification",
+      "lanes": [
+        {
+          "lane": "speaker-0",
+          "status": "diagnostic-complete-not-qualified",
+          "profileRemoved": true,
+          "pageErrors": [],
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "persistentOutputMonitor": false,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 114,
+              "coordinatorSpeakerDrops": 1,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 49.799999952316284,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999980531178,
+                "wire": 0.9892568217613723,
+                "parent": 0.7193175637666696,
+                "browser": 0.7031545577854521
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 19,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 3
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 29,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              }
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "persistentOutputMonitor": false,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 101,
+              "coordinatorSpeakerDrops": 1,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 72.0,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624035,
+                "wire": 0.9999999979624038,
+                "parent": 0.8867488584789218,
+                "browser": 0.36482884023909445
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 63,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 7
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 63,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              }
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "persistentOutputMonitor": false,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 104,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 30.0,
+              "wholeWindowToneEnergy": {
+                "remote": 0.999999997962403,
+                "wire": 0.9999999979624031,
+                "parent": 0.9999999979624031,
+                "browser": 0.9999999690215876
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 63,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 7
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 63,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              }
+            }
+          ]
+        },
+        {
+          "lane": "speaker-1",
+          "status": "diagnostic-complete-not-qualified",
+          "profileRemoved": false,
+          "pageErrors": [],
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 106,
+              "coordinatorSpeakerDrops": 2,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 50.0,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999980531178,
+                "wire": 0.9999999980531168,
+                "parent": 0.4281502902571173,
+                "browser": 0.4678057897452407
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 7,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 7,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              }
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 102,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 42.700000047683716,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624035,
+                "wire": 0.9999999979624038,
+                "parent": 0.9999999979624037,
+                "browser": 0.8670092793606716
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 114,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 114,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              }
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 101,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 48.299999952316284,
+              "wholeWindowToneEnergy": {
+                "remote": 0.999999997962403,
+                "wire": 0.999999997962403,
+                "parent": 0.999999997962403,
+                "browser": 0.999999968846482
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 114,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 114,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              }
+            }
+          ]
+        },
+        {
+          "lane": "speaker-2",
+          "status": "diagnostic-complete-not-qualified",
+          "profileRemoved": true,
+          "pageErrors": [],
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 104,
+              "coordinatorSpeakerDrops": 4,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 102.60000002384186,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9878534747423512,
+                "wire": 0.9835609966481621,
+                "parent": 0.4115923250910745,
+                "browser": 0.46371307730662664
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 17,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 4
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 17,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 8
+              }
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": true,
+              "observedUIStallMs": 242.5,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 102,
+              "coordinatorSpeakerDrops": 12,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 263.7000000476837,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624037,
+                "wire": 0.9999999979624037,
+                "parent": 0.7501096110391603,
+                "browser": 0.43889756221184667
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 137,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 7
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 183,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 2
+              }
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 101,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 50.299999952316284,
+              "wholeWindowToneEnergy": {
+                "remote": 0.999999997962403,
+                "wire": 0.999999997962403,
+                "parent": 0.999999997962403,
+                "browser": 0.9999999686433585
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 205,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 5
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 205,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "speaker-direct-r4",
+      "scope": "Causal diagnostic: standardUIrelay vs directWorkerWorklet media vs directplus240msUIstall. SameactualSDKsourceArchive/queue8; directruntimeinstrumentation is NOT shippedfix/qualification. Allpersistentoutputmonitors. Bounded rawlayers andcredit timing. Not natural8h, fault matrix or resource acceptance. SDKservedbytesunchanged, diagnosticmethodwrappersrestored.",
+      "status": "diagnostic-completed-not-product-qualification",
+      "lanes": [
+        {
+          "lane": "speaker-0",
+          "status": "diagnostic-complete-not-qualified",
+          "profileRemoved": true,
+          "pageErrors": [],
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 100,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 45.800000071525574,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999980531181,
+                "wire": 0.9999999980531191,
+                "parent": 0.9999999980531191,
+                "browser": 0.604284197883429
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 7,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 5
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 7,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 5
+              }
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 100,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 30.600000023841858,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624038,
+                "wire": 0.9999999979624035,
+                "parent": 0.9999999979624035,
+                "browser": 0.9999999701273239
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 7,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 7
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 7,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 7
+              }
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 102,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 50.40000009536743,
+              "wholeWindowToneEnergy": {
+                "remote": 0.999999997962404,
+                "wire": 0.9999999979624046,
+                "parent": 0.9999999979624046,
+                "browser": 0.9877137200331658
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 7,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 7,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 5
+              }
+            }
+          ]
+        },
+        {
+          "lane": "speaker-1",
+          "status": "diagnostic-complete-not-qualified",
+          "profileRemoved": true,
+          "pageErrors": [],
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": true,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 100,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 33.200000047683716,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999980531181,
+                "wire": 0.8657169017084951,
+                "parent": 0.8657169017084951,
+                "browser": 0.7060215437054196
+              },
+              "consumerIngressMeaning": "Worker direct-send PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 4,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 2
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 4,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 2
+              }
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": true,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 101,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 28.0,
+              "wholeWindowToneEnergy": {
+                "remote": 0.999999997962404,
+                "wire": 0.9999999979624038,
+                "parent": 0.9999999979624038,
+                "browser": 0.9999999707354102
+              },
+              "consumerIngressMeaning": "Worker direct-send PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 29,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 29,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              }
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": true,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 102,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 33.5,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624031,
+                "wire": 0.9999999979624046,
+                "parent": 0.9999999979624046,
+                "browser": 0.9999999687855726
+              },
+              "consumerIngressMeaning": "Worker direct-send PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 29,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 29,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              }
+            }
+          ]
+        },
+        {
+          "lane": "speaker-2",
+          "status": "diagnostic-complete-not-qualified",
+          "profileRemoved": true,
+          "pageErrors": [],
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": true,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 102,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 45,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999980531175,
+                "wire": 0.956939993445018,
+                "parent": 0.956939993445018,
+                "browser": 0.949481770743701
+              },
+              "consumerIngressMeaning": "Worker direct-send PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 5,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 3
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 5,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 3
+              }
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": true,
+              "actualUIStall": true,
+              "observedUIStallMs": 240.0,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 101,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 34.10000002384186,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624034,
+                "wire": 0.999999997962404,
+                "parent": 0.999999997962404,
+                "browser": 0.999999970740295
+              },
+              "consumerIngressMeaning": "Worker direct-send PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 22,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 22,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              }
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": true,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 102,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 37.89999997615814,
+              "wholeWindowToneEnergy": {
+                "remote": 0.999999997962404,
+                "wire": 0.9999999979624044,
+                "parent": 0.9999999979624044,
+                "browser": 0.9999999685700678
+              },
+              "consumerIngressMeaning": "Worker direct-send PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 22,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 22,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "speaker-direct-r5",
+      "scope": "Causal diagnostic: standardUIrelay+two240msUIstalls vs directWorkerWorklet+sameactualstalls vs standardnostall. MicrophoneactualremotePCMalsorecorded. SameactualSDKsourceArchive/queue8; directruntimeinstrumentation is NOT shippedfix/qualification. Allpersistentoutputmonitors. Bounded rawlayers andcredit timing. Not natural8h, fault matrix or resource acceptance. SDKservedbytesunchanged, diagnosticmethodwrappersrestored.",
+      "status": "diagnostic-completed-not-product-qualification",
+      "lanes": [
+        {
+          "lane": "speaker-0",
+          "status": "diagnostic-complete-not-qualified",
+          "profileRemoved": true,
+          "pageErrors": [],
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 124,
+              "coordinatorSpeakerDrops": 1,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 60.89999997615814,
+              "wholeWindowToneEnergy": {
+                "remote": 0.999999998053118,
+                "wire": 0.7613367497988119,
+                "parent": 0.75345199004071,
+                "browser": 0.6864189094050198
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 9,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 4
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 9,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              },
+              "actualRemoteMicToneEnergy": 0.9636071944072557
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": true,
+              "observedUIStallMs": 240.0,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 117,
+              "coordinatorSpeakerDrops": 10,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 245.70000004768372,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624042,
+                "wire": 0.9999999979624035,
+                "parent": 0.9999999979624035,
+                "browser": 0.6289567807381278
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 69,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 5
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 112,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 2
+              },
+              "actualRemoteMicToneEnergy": 0.5279619701762177
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": true,
+              "observedUIStallMs": 245.5,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 144,
+              "coordinatorSpeakerDrops": 7,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 247.79999995231628,
+              "wholeWindowToneEnergy": {
+                "remote": 0.999999997962404,
+                "wire": 0.9999999979624035,
+                "parent": 0.6336761517012216,
+                "browser": 0.558325137590672
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 116,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 2
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 190,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 5
+              },
+              "actualRemoteMicToneEnergy": 0.9999999402709715
+            }
+          ]
+        },
+        {
+          "lane": "speaker-1",
+          "status": "diagnostic-complete-not-qualified",
+          "profileRemoved": true,
+          "pageErrors": [],
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": true,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 115,
+              "coordinatorSpeakerDrops": 1,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 58.0,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999980531176,
+                "wire": 0.9899059916819497,
+                "parent": 0.734437748277504,
+                "browser": 0.07391552646870556
+              },
+              "consumerIngressMeaning": "Worker direct-send PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 7,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 1
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 13,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              },
+              "actualRemoteMicToneEnergy": 0.09433084792553689
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": true,
+              "actualUIStall": true,
+              "observedUIStallMs": 240.0,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 115,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 41.299999952316284,
+              "wholeWindowToneEnergy": {
+                "remote": 0.999999997962404,
+                "wire": 0.9999999979624035,
+                "parent": 0.9999999979624035,
+                "browser": 0.4329646757046359
+              },
+              "consumerIngressMeaning": "Worker direct-send PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 13,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 5
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 13,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 5
+              },
+              "actualRemoteMicToneEnergy": 0.5434367239256619
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": true,
+              "actualUIStall": true,
+              "observedUIStallMs": 241.0,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 140,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 42.299999952316284,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624044,
+                "wire": 0.999999997962404,
+                "parent": 0.999999997962404,
+                "browser": 0.9344515575588612
+              },
+              "consumerIngressMeaning": "Worker direct-send PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 13,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 5
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 13,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              },
+              "actualRemoteMicToneEnergy": 0.9999999374099482
+            }
+          ]
+        },
+        {
+          "lane": "speaker-2",
+          "status": "diagnostic-complete-not-qualified",
+          "profileRemoved": true,
+          "pageErrors": [],
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 132,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 51.39999997615814,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999980531181,
+                "wire": 0.9909302136548093,
+                "parent": 0.9900977801304436,
+                "browser": 0.529461714126574
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 12,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 3
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 19,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 4
+              },
+              "actualRemoteMicToneEnergy": 0.9999999580730613
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 111,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 41.5,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624037,
+                "wire": 0.9999999979624035,
+                "parent": 0.9999999979624035,
+                "browser": 0.999999971438788
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 50,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 5
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 50,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 5
+              },
+              "actualRemoteMicToneEnergy": 0.9999999580706269
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 143,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 42.199999928474426,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624044,
+                "wire": 0.9999999979624044,
+                "parent": 0.9999999979624044,
+                "browser": 0.7577029744883992
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 50,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 4
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 50,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 5
+              },
+              "actualRemoteMicToneEnergy": 0.9999999578322332
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "speaker-render-r6",
+      "scope": "Actualrender-layers diagnostic with unchangedqueue8 andbounded2.5sWorkletoutputprobe: standardUIrelay+two240msUIstalls vs directWorkerWorklet+sameactualstalls vs standardnostall. MicrophoneactualremotePCMalsorecorded. SameactualSDKsourceArchive/queue8; directruntimeinstrumentation is NOT shippedfix/qualification. Allpersistentoutputmonitors. Bounded rawlayers andcredit timing. Not natural8h, fault matrix or resource acceptance. SDKservedbytesunchanged, diagnosticmethodwrappersrestored.",
+      "status": "diagnostic-completed-not-product-qualification",
+      "lanes": [
+        {
+          "lane": "speaker-0",
+          "status": "diagnostic-complete-not-qualified",
+          "profileRemoved": true,
+          "pageErrors": [],
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 112,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 76.10000002384186,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999980531181,
+                "wire": 0.9645387231708104,
+                "parent": 0.9645387231708104,
+                "browser": 0.6976523694903665,
+                "actualRender": 0.9417100447222001
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 5,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 2
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 5,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 5
+              },
+              "actualRemoteMicToneEnergy": 0.618267025006131,
+              "renderFrameGaps": [],
+              "renderWindowSeconds": 2.5
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": true,
+              "observedUIStallMs": 240.0,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 114,
+              "coordinatorSpeakerDrops": 10,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 242.19999992847443,
+              "wholeWindowToneEnergy": {
+                "remote": 0.999999997962404,
+                "wire": 0.9999999979624038,
+                "parent": 0.9999999979624038,
+                "browser": 0.44395660222133876,
+                "actualRender": 0.5432865487749576
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 52,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 5
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 93,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 1
+              },
+              "actualRemoteMicToneEnergy": 0.6587935726233922,
+              "renderFrameGaps": [],
+              "renderWindowSeconds": 2.5
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": true,
+              "observedUIStallMs": 240,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 126,
+              "coordinatorSpeakerDrops": 14,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 238.19999992847443,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624031,
+                "wire": 0.9999999979624035,
+                "parent": 0.5342441556681083,
+                "browser": 0.5065930056917355,
+                "actualRender": 0.46169988930293293
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 111,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 155,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 3
+              },
+              "actualRemoteMicToneEnergy": 0.8409746449198199,
+              "renderFrameGaps": [],
+              "renderWindowSeconds": 2.5
+            }
+          ]
+        },
+        {
+          "lane": "speaker-1",
+          "status": "diagnostic-complete-not-qualified",
+          "profileRemoved": true,
+          "pageErrors": [],
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": true,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 127,
+              "coordinatorSpeakerDrops": 1,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 58.0,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999980531178,
+                "wire": 0.9999999980531168,
+                "parent": 0.9999999980531168,
+                "browser": 0.08133144199947083,
+                "actualRender": 0.9966203223506123
+              },
+              "consumerIngressMeaning": "Worker direct-send PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 7,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 2
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 14,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              },
+              "actualRemoteMicToneEnergy": 0.31176119115928347,
+              "renderFrameGaps": [],
+              "renderWindowSeconds": 2.5
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": true,
+              "actualUIStall": true,
+              "observedUIStallMs": 240.0,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 114,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 35.60000002384186,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624035,
+                "wire": 0.9999999979624038,
+                "parent": 0.9999999979624038,
+                "browser": 0.9446849628834975,
+                "actualRender": 0.9999999979624041
+              },
+              "consumerIngressMeaning": "Worker direct-send PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 65,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 65,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 7
+              },
+              "actualRemoteMicToneEnergy": 0.5452821093316133,
+              "renderFrameGaps": [],
+              "renderWindowSeconds": 2.5
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": true,
+              "actualUIStall": true,
+              "observedUIStallMs": 240.0,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 114,
+              "coordinatorSpeakerDrops": 6,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 67.90000009536743,
+              "wholeWindowToneEnergy": {
+                "remote": 0.999999997962404,
+                "wire": 0.796957688367893,
+                "parent": 0.3040770932302,
+                "browser": 0.14852902665806952,
+                "actualRender": 0.33786317581994935
+              },
+              "consumerIngressMeaning": "Worker direct-send PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 65,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 65,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 7
+              },
+              "actualRemoteMicToneEnergy": 0.709313859912906,
+              "renderFrameGaps": [],
+              "renderWindowSeconds": 2.5
+            }
+          ]
+        },
+        {
+          "lane": "speaker-2",
+          "status": "diagnostic-complete-not-qualified",
+          "profileRemoved": true,
+          "pageErrors": [],
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 126,
+              "coordinatorSpeakerDrops": 2,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 79.09999990463257,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999980531181,
+                "wire": 0.9999999980531168,
+                "parent": 0.9999999980531168,
+                "browser": 0.8086291034730251,
+                "actualRender": 0.9374977335726717
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 2,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 1
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 8,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 5
+              },
+              "actualRemoteMicToneEnergy": 0.8750066254900983,
+              "renderFrameGaps": [],
+              "renderWindowSeconds": 2.5
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 109,
+              "coordinatorSpeakerDrops": 0,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 49.300000071525574,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624034,
+                "wire": 0.9900755111577179,
+                "parent": 0.9900755111577179,
+                "browser": 0.9838468682555993,
+                "actualRender": 0.9879386214117876
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 54,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 54,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 6
+              },
+              "actualRemoteMicToneEnergy": 0.7689180169847446,
+              "renderFrameGaps": [],
+              "renderWindowSeconds": 2.5
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "persistentOutputMonitor": true,
+              "runtimeDirectMediaProbe": false,
+              "actualUIStall": false,
+              "observedUIStallMs": null,
+              "wireSequenceGaps": 0,
+              "observedSpeakerFrames": 120,
+              "coordinatorSpeakerDrops": 6,
+              "allDropsAtZeroCreditWithCurrentReadyRoute": true,
+              "maximumObservedCreditGapMs": 111.69999992847443,
+              "wholeWindowToneEnergy": {
+                "remote": 0.9999999979624044,
+                "wire": 0.9999999979624034,
+                "parent": 0.6360976640861612,
+                "browser": 0.48887514821248773,
+                "actualRender": 0.5678949108596193
+              },
+              "consumerIngressMeaning": "Parent relay PCM",
+              "workletStatsBefore": {
+                "type": "stats",
+                "underrunBlocks": 54,
+                "droppedFrames": 0,
+                "peak": 0,
+                "queuedFrames": 6
+              },
+              "workletStatsAfter": {
+                "type": "stats",
+                "underrunBlocks": 54,
+                "droppedFrames": 0,
+                "peak": 0.274658203125,
+                "queuedFrames": 7
+              },
+              "actualRemoteMicToneEnergy": 0.7138815554642611,
+              "renderFrameGaps": [],
+              "renderWindowSeconds": 2.5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "native-output-stall-r1",
+      "scope": "Actual browser Oscillator to private Pulse output; noSDK/noWorker/noWSS. ParentContext/childContext/default44100vs48000spec matched240msUIstall. Not product qualification.",
+      "status": "diagnostic-completed-not-product-qualification",
+      "lanes": [
+        {
+          "status": "diagnostic-complete-not-qualification",
+          "noSDK": true,
+          "childRealm": false,
+          "profileRemoved": true,
+          "pageErrors": [],
+          "configuredRate48000": false,
+          "microphoneEnabled": false,
+          "separateMicContext": false,
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "actualUIStall": false,
+              "actualUIStallMs": null,
+              "toneEnergy": 0.9999999402401859,
+              "outputSampleSpecifications": [
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.0,
+              "toneEnergy": 0.9999999687140567,
+              "outputSampleSpecifications": [
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.0,
+              "toneEnergy": 0.9999999613834781,
+              "outputSampleSpecifications": [
+                "float32le 2ch 44100Hz"
+              ]
+            }
+          ]
+        },
+        {
+          "status": "diagnostic-complete-not-qualification",
+          "noSDK": true,
+          "childRealm": true,
+          "profileRemoved": true,
+          "pageErrors": [],
+          "configuredRate48000": false,
+          "microphoneEnabled": false,
+          "separateMicContext": false,
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "actualUIStall": false,
+              "actualUIStallMs": null,
+              "toneEnergy": 0.9999999402310144,
+              "outputSampleSpecifications": [
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.10000002384186,
+              "toneEnergy": 0.9999999692217035,
+              "outputSampleSpecifications": [
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.0,
+              "toneEnergy": 0.9999999613458733,
+              "outputSampleSpecifications": [
+                "float32le 2ch 44100Hz"
+              ]
+            }
+          ]
+        },
+        {
+          "status": "diagnostic-complete-not-qualification",
+          "noSDK": true,
+          "childRealm": true,
+          "profileRemoved": true,
+          "pageErrors": [],
+          "configuredRate48000": true,
+          "microphoneEnabled": false,
+          "separateMicContext": false,
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "actualUIStall": false,
+              "actualUIStallMs": null,
+              "toneEnergy": 0.9999999630825643,
+              "outputSampleSpecifications": [
+                "float32le 2ch 48000Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.0,
+              "toneEnergy": 0.9999999952143159,
+              "outputSampleSpecifications": [
+                "float32le 2ch 48000Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.0,
+              "toneEnergy": 0.9999999894231414,
+              "outputSampleSpecifications": [
+                "float32le 2ch 48000Hz"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "native-worklet-stall-r2",
+      "scope": "Actual native AudioWorklet-generated tone to privatePulse output; noSDK/noWorker/noWSS/noperframeIPC. ParentContext/childContext/default44100vs48000spec matched240msUIstall. Not product qualification.",
+      "status": "diagnostic-completed-not-product-qualification",
+      "lanes": [
+        {
+          "status": "diagnostic-complete-not-qualification",
+          "noSDK": true,
+          "childRealm": false,
+          "profileRemoved": true,
+          "pageErrors": [],
+          "configuredRate48000": false,
+          "microphoneEnabled": false,
+          "separateMicContext": false,
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "actualUIStall": false,
+              "actualUIStallMs": null,
+              "toneEnergy": 0.9999999733865477,
+              "outputSampleSpecifications": [
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "actualUIStall": true,
+              "actualUIStallMs": 240,
+              "toneEnergy": 0.9999999690706999,
+              "outputSampleSpecifications": [
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.0,
+              "toneEnergy": 0.999999968298697,
+              "outputSampleSpecifications": [
+                "float32le 2ch 44100Hz"
+              ]
+            }
+          ]
+        },
+        {
+          "status": "diagnostic-complete-not-qualification",
+          "noSDK": true,
+          "childRealm": true,
+          "profileRemoved": true,
+          "pageErrors": [],
+          "configuredRate48000": false,
+          "microphoneEnabled": false,
+          "separateMicContext": false,
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "actualUIStall": false,
+              "actualUIStallMs": null,
+              "toneEnergy": 0.9999999726240076,
+              "outputSampleSpecifications": [
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "actualUIStall": true,
+              "actualUIStallMs": 240,
+              "toneEnergy": 0.9999999701837913,
+              "outputSampleSpecifications": [
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.0,
+              "toneEnergy": 0.9999999682605933,
+              "outputSampleSpecifications": [
+                "float32le 2ch 44100Hz"
+              ]
+            }
+          ]
+        },
+        {
+          "status": "diagnostic-complete-not-qualification",
+          "noSDK": true,
+          "childRealm": true,
+          "profileRemoved": true,
+          "pageErrors": [],
+          "configuredRate48000": true,
+          "microphoneEnabled": false,
+          "separateMicContext": false,
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "actualUIStall": false,
+              "actualUIStallMs": null,
+              "toneEnergy": 0.9999999959556232,
+              "outputSampleSpecifications": [
+                "float32le 2ch 48000Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.0,
+              "toneEnergy": 0.9999999960440727,
+              "outputSampleSpecifications": [
+                "float32le 2ch 48000Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.0,
+              "toneEnergy": 0.999999996044073,
+              "outputSampleSpecifications": [
+                "float32le 2ch 48000Hz"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "native-duplex-stall-r3",
+      "scope": "Native noSDK/noWorker/noWSS duplex control: toneonly vs actualmiccaptureWorklet+tone sameContext vs separateMicContext. Actualoriginalcaptureprocessor/code/credits, virtualclocksource. Allchildrealms. ParentContext/childContext/default44100vs48000spec matched240msUIstall. Not product qualification.",
+      "status": "diagnostic-completed-not-product-qualification",
+      "lanes": [
+        {
+          "status": "diagnostic-complete-not-qualification",
+          "noSDK": true,
+          "childRealm": true,
+          "profileRemoved": true,
+          "pageErrors": [],
+          "configuredRate48000": false,
+          "microphoneEnabled": false,
+          "separateMicContext": false,
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "actualUIStall": false,
+              "actualUIStallMs": null,
+              "toneEnergy": 0.9999999733865491,
+              "outputSampleSpecifications": [
+                "s16le 1ch 48000Hz",
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "actualUIStall": true,
+              "actualUIStallMs": 242.10000002384186,
+              "toneEnergy": 0.9768172433828661,
+              "outputSampleSpecifications": [
+                "s16le 1ch 48000Hz",
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "actualUIStall": true,
+              "actualUIStallMs": 240,
+              "toneEnergy": 0.9999999678346098,
+              "outputSampleSpecifications": [
+                "s16le 1ch 48000Hz",
+                "float32le 2ch 44100Hz"
+              ]
+            }
+          ]
+        },
+        {
+          "status": "diagnostic-complete-not-qualification",
+          "noSDK": true,
+          "childRealm": true,
+          "profileRemoved": true,
+          "pageErrors": [],
+          "configuredRate48000": false,
+          "microphoneEnabled": true,
+          "separateMicContext": false,
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "actualUIStall": false,
+              "actualUIStallMs": null,
+              "toneEnergy": 0.9999999729320861,
+              "outputSampleSpecifications": [
+                "s16le 1ch 48000Hz",
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.0,
+              "toneEnergy": 0.8167524763938114,
+              "outputSampleSpecifications": [
+                "s16le 1ch 48000Hz",
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.10000002384186,
+              "toneEnergy": 0.999999969384242,
+              "outputSampleSpecifications": [
+                "s16le 1ch 48000Hz",
+                "float32le 2ch 44100Hz"
+              ]
+            }
+          ]
+        },
+        {
+          "status": "diagnostic-complete-not-qualification",
+          "noSDK": true,
+          "childRealm": true,
+          "profileRemoved": true,
+          "pageErrors": [],
+          "configuredRate48000": false,
+          "microphoneEnabled": true,
+          "separateMicContext": true,
+          "phases": [
+            {
+              "offsetSeconds": 3,
+              "frequencyHz": 990,
+              "actualUIStall": false,
+              "actualUIStallMs": null,
+              "toneEnergy": 0.9999999714418931,
+              "outputSampleSpecifications": [
+                "s16le 1ch 48000Hz",
+                "float32le 2ch 44100Hz",
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 20,
+              "frequencyHz": 1210,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.0,
+              "toneEnergy": 0.7609284477051054,
+              "outputSampleSpecifications": [
+                "s16le 1ch 48000Hz",
+                "float32le 2ch 44100Hz",
+                "float32le 2ch 44100Hz"
+              ]
+            },
+            {
+              "offsetSeconds": 40,
+              "frequencyHz": 1430,
+              "actualUIStall": true,
+              "actualUIStallMs": 240.0,
+              "toneEnergy": 0.9999999680939555,
+              "outputSampleSpecifications": [
+                "s16le 1ch 48000Hz",
+                "float32le 2ch 44100Hz"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "speaker-crossover-r7",
+      "scope": "OneactualSDKbrowser crossover: SDKPCM vs nativeOscillator over SAMEContext/sink/actualmic, withallSDKtransports/Workletsstillactive. Gainonlyaudibleselect; same240msUIstallonbothsources. NoSDKbehaviorfixorincreasedqueue. SameactualSDKsourceArchive/queue8; directruntimeinstrumentation is NOT shippedfix/qualification. Allpersistentoutputmonitors. Bounded rawlayers andcredit timing. Not natural8h, fault matrix or resource acceptance. SDKservedbytesunchanged, diagnosticmethodwrappersrestored.",
+      "status": "diagnostic-complete-not-qualified",
+      "profileRemoved": true,
+      "pageErrors": [],
+      "phases": [
+        {
+          "offsetSeconds": 3,
+          "audibleSource": "SDK-PCM",
+          "actualUIStall": false,
+          "outputToneEnergy": 0.3055192471882641,
+          "wireToneEnergy": 0.9999999980531191,
+          "coordinatorSpeakerDrops": 0
+        },
+        {
+          "offsetSeconds": 20,
+          "audibleSource": "native-oscillator",
+          "actualUIStall": false,
+          "outputToneEnergy": 0.9999999725688379,
+          "wireToneEnergy": 0.9999999979624037,
+          "coordinatorSpeakerDrops": 0
+        },
+        {
+          "offsetSeconds": 35,
+          "audibleSource": "SDK-PCM",
+          "actualUIStall": false,
+          "outputToneEnergy": 0.9999999680893604,
+          "wireToneEnergy": 0.9999999979624046,
+          "coordinatorSpeakerDrops": 0
+        },
+        {
+          "offsetSeconds": 50,
+          "audibleSource": "native-oscillator",
+          "actualUIStall": true,
+          "outputToneEnergy": 0.9999999558687245,
+          "wireToneEnergy": 0.9999999983816946,
+          "coordinatorSpeakerDrops": 7
+        },
+        {
+          "offsetSeconds": 65,
+          "audibleSource": "SDK-PCM",
+          "actualUIStall": true,
+          "outputToneEnergy": 0.7251542096018039,
+          "wireToneEnergy": 0.999999997962404,
+          "coordinatorSpeakerDrops": 10
+        },
+        {
+          "offsetSeconds": 80,
+          "audibleSource": "native-oscillator",
+          "actualUIStall": false,
+          "outputToneEnergy": 0.999999971931072,
+          "wireToneEnergy": 0.999999997962404,
+          "coordinatorSpeakerDrops": 0
+        },
+        {
+          "offsetSeconds": 95,
+          "audibleSource": "SDK-PCM",
+          "actualUIStall": false,
+          "outputToneEnergy": 0.9999999829749144,
+          "wireToneEnergy": 0.9999999980531168,
+          "coordinatorSpeakerDrops": 0
+        }
+      ]
+    }
+  ],
+  "privateEvidenceSHA256": {
+    "speaker-layers-r3/speaker-0/results.json": "a2fb7f642e600325385610328d50d371f41cc922498152b5820c41e14817a9dd",
+    "speaker-layers-r3/speaker-1/results.json": "d17b559a7a7538119cd85a1af79c16896d5f548f933911ce967791ee4808e810",
+    "speaker-layers-r3/speaker-2/results.json": "da845ab44357fef5905bdaf01be6ed646cf25e09d93c486407958c0ce3c47ee2",
+    "speaker-layers-r3/capture_raw.py": "49a5bcf7d46ff6f7242cfb502a5beafe5ef3ba4942077226c69a16d98fc5c3ce",
+    "speaker-layers-r3/clock_pulse.py": "53f79d46d4dba7889c5a99e5f7bb14536514dacb345abb946469cc241d34613b",
+    "speaker-layers-r3/continuous_monitor.py": "c676ff72d3a0fc6c32591a9cc4fcb3bf4a133873fe4fcc0bbe50c1b78b2e16ee",
+    "speaker-layers-r3/run.py": "4d1c80c388862b50c250fd3d25424d51dda2dc9dbb861112ed0440e264ac1b7e",
+    "speaker-layers-r3/credit-probe.js": "c2d648488c8e7d9255a4037c4f600cd7e21eee676518f02203405c8c935cd44d",
+    "speaker-layers-r3/parent-probe.js": "75864ff277aebd9ec9a26d1026b87e84f8305f0c9f8c90f4ee5184844efaab47",
+    "speaker-layers-r3/wire-probe.js": "633a2069a33c2dc00db5c75997473d42ccebcada789ab7a0865068a6096a5e2e",
+    "speaker-layers-r3/job.json": "1cc5099ace73f30c4ce4e8e4cacd663a923fb60d8734fff87bae19bcc7bbb3d0",
+    "speaker-layers-r3/speaker-0/20-browser.pcm": "72ee4ad0ff4b49a0d244280b89119c0b2bba5a4e13d60276bbb59cc76618f6fa",
+    "speaker-layers-r3/speaker-0/20-parent.pcm": "daba2406842d587b4eac2d883292e232629330ad52298e2a5545500474b84817",
+    "speaker-layers-r3/speaker-0/20-remote.pcm": "d82e81179ad1baeb3a27c2d4d3678874b62ea8511622e937ccb754e70270a73e",
+    "speaker-layers-r3/speaker-0/20-wire.pcm": "32e32e62173d1c7a1a17bb56a9fdc3ae7263286a7ab042531a40e2aa95d23a89",
+    "speaker-layers-r3/speaker-0/3-browser.pcm": "b7587179f295afd9bb215761d366bf048b041ee069c7e28e9a1c95952c4eba7a",
+    "speaker-layers-r3/speaker-0/3-parent.pcm": "560c255446686e73d675e4e2c7bcef98319347e4dea0d4493fcef3ab79cd3c5f",
+    "speaker-layers-r3/speaker-0/3-remote.pcm": "a5696616e8cad7a8a44e9bb651ff5a3779d330bbc847a51125cb6c84626d39d6",
+    "speaker-layers-r3/speaker-0/3-wire.pcm": "6f825ebc25525ab951b6fd6277c147581f6db55c0de976e13fe38dd1bbf439a2",
+    "speaker-layers-r3/speaker-0/40-browser.pcm": "41b86f14e0029cc7ea7c1952f8f4fc297baa9e61f391fec7e90b0786f7f483ec",
+    "speaker-layers-r3/speaker-0/40-parent.pcm": "c100d5319033b51c43dd01f83e799741b406b380d1457e7635a8452367ad98ef",
+    "speaker-layers-r3/speaker-0/40-remote.pcm": "d1e35de0ffdd76e1d57d99bc975fbfd76592b21a000a169addedf0884f292c07",
+    "speaker-layers-r3/speaker-0/40-wire.pcm": "c100d5319033b51c43dd01f83e799741b406b380d1457e7635a8452367ad98ef",
+    "speaker-layers-r3/speaker-1/20-browser.pcm": "7b7958794c91705a63afcdf43a0746b7a95588fba30f7479f81ac1f3aca9ab89",
+    "speaker-layers-r3/speaker-1/20-parent.pcm": "b04f1a67807aa332e604d6c6af8e299b8fe6b59ad14ad6d8a11d71083670be3b",
+    "speaker-layers-r3/speaker-1/20-remote.pcm": "2ced82f3c3b27b2584688722363a987856aa884f2b1c3a77c6ec66e5729257f8",
+    "speaker-layers-r3/speaker-1/20-wire.pcm": "d9dbccb59e902c727da1861d87b5577f3b7f7523b0a203fb1761455c61aea5a2",
+    "speaker-layers-r3/speaker-1/3-browser.pcm": "ae7d37e2f52abcfca587c931af687fc90ebed9d5c1b4d99548413bae2245ce23",
+    "speaker-layers-r3/speaker-1/3-parent.pcm": "85f0e3f00dd77eaeed58d69e73b52bb28a6cbd99866ab096c6f170974fdb186a",
+    "speaker-layers-r3/speaker-1/3-remote.pcm": "a5696616e8cad7a8a44e9bb651ff5a3779d330bbc847a51125cb6c84626d39d6",
+    "speaker-layers-r3/speaker-1/3-wire.pcm": "5cdb7cf9cf94e829dc6277c3209eb4841aee1052ea2f8062c840980977c9c155",
+    "speaker-layers-r3/speaker-1/40-browser.pcm": "dce79f77a17990aaad13ac9c13b7d9dc63f302b61d372069af1d2b58a5f3ea79",
+    "speaker-layers-r3/speaker-1/40-parent.pcm": "422d2022fbdf33d78025dc1d38bc06a1a702e66bc4d4e64cf51f2f674cc0d8d1",
+    "speaker-layers-r3/speaker-1/40-remote.pcm": "21bb595712fa0b0ec88e8140860b4fd3d7eadf8d8264371c3cb3ae5eb72294ad",
+    "speaker-layers-r3/speaker-1/40-wire.pcm": "422d2022fbdf33d78025dc1d38bc06a1a702e66bc4d4e64cf51f2f674cc0d8d1",
+    "speaker-layers-r3/speaker-2/20-browser.pcm": "1ec25d32dfb7e33d547bebdb721baa988622a8e651a4e7c046755e7416340196",
+    "speaker-layers-r3/speaker-2/20-parent.pcm": "79bfae58f3bcbe894be47bca63bd9455d5389c7724733d363be9209287bf7cc9",
+    "speaker-layers-r3/speaker-2/20-remote.pcm": "3728be02041c3810c9f4ccc614abbd1293520940e4c648a2554fdd15844688d5",
+    "speaker-layers-r3/speaker-2/20-wire.pcm": "19bb62e38a5e52c62ea99925cb380be4f59ef3374dd0fb8a41ad24c67e19d3fa",
+    "speaker-layers-r3/speaker-2/3-browser.pcm": "0e71690dfb7944a3bac175c809f154c33db1234afc03ca798e9877b799409932",
+    "speaker-layers-r3/speaker-2/3-parent.pcm": "5e122a0ba0d4e12c405ddb20d5919ba0ec6e23b97b36973d48060e083d4184a7",
+    "speaker-layers-r3/speaker-2/3-remote.pcm": "009ec2f122d2e0a8a47aadf255055c7aa916ad3f30ab33f9bfda9ffc99a30570",
+    "speaker-layers-r3/speaker-2/3-wire.pcm": "8037a98958c40cc6cb31fcac29925d15a7202d23b0f33da6cc5cb88f00a21c55",
+    "speaker-layers-r3/speaker-2/40-browser.pcm": "672b49b212c3384cbbc7733bfc1be11e20bcfb15daa5fa22e2210f415b12ffac",
+    "speaker-layers-r3/speaker-2/40-parent.pcm": "6d6c459e9e7c7295822ab5e9aaccba929b15e8a95b5c2a837e53a25af029e3f1",
+    "speaker-layers-r3/speaker-2/40-remote.pcm": "a8690fedd32ac9d5310b3b60310a10238ad2da437689ca28980280c40ad15c0d",
+    "speaker-layers-r3/speaker-2/40-wire.pcm": "6d6c459e9e7c7295822ab5e9aaccba929b15e8a95b5c2a837e53a25af029e3f1",
+    "speaker-direct-r4/speaker-0/results.json": "e39db96d647328b7955ec30818a0dc4fcea0e0720cd6ce45d0da447f399c63ee",
+    "speaker-direct-r4/speaker-1/results.json": "ec7a1a7d3d8eaf54d24d03678d94b6028b8c2b719725fa11831358cbdcb6e1e9",
+    "speaker-direct-r4/speaker-2/results.json": "54d66763781a5ad33ae567b6adcad62f4e248e149d12e3db634ad5aa5d849c7d",
+    "speaker-direct-r4/capture_raw.py": "49a5bcf7d46ff6f7242cfb502a5beafe5ef3ba4942077226c69a16d98fc5c3ce",
+    "speaker-direct-r4/clock_pulse.py": "53f79d46d4dba7889c5a99e5f7bb14536514dacb345abb946469cc241d34613b",
+    "speaker-direct-r4/continuous_monitor.py": "c676ff72d3a0fc6c32591a9cc4fcb3bf4a133873fe4fcc0bbe50c1b78b2e16ee",
+    "speaker-direct-r4/run.py": "778ba71b767696cb8e45cb4d7a78926a46c07417c13747c2de540914a99e9893",
+    "speaker-direct-r4/credit-probe.js": "c2d648488c8e7d9255a4037c4f600cd7e21eee676518f02203405c8c935cd44d",
+    "speaker-direct-r4/diagnostic-playback.js": "b0681b9bc1e253fb7ae6a31a7764868a828aaee76726a47508df03ac1dc33740",
+    "speaker-direct-r4/direct-parent.js": "ac8d3f3b99d3007de1c88a945073e9d44bf259058eba9cada949d38e70ac33af",
+    "speaker-direct-r4/direct-worker.js": "e3ab67b1ac57ed71f8912301dfeff7784725d3689b80683d728e198d9eb017bc",
+    "speaker-direct-r4/parent-probe.js": "75864ff277aebd9ec9a26d1026b87e84f8305f0c9f8c90f4ee5184844efaab47",
+    "speaker-direct-r4/wire-probe.js": "633a2069a33c2dc00db5c75997473d42ccebcada789ab7a0865068a6096a5e2e",
+    "speaker-direct-r4/job.json": "ac9a9a99869b77e841eb8ffed5bb84dcef06396f8405c74b1b2143c21aab4291",
+    "speaker-direct-r4/speaker-0/20-browser.pcm": "6a119477c7b8a38ce93e82a5b5c17ebeaa0597291c1bb49a6b8482b2dd9ac79d",
+    "speaker-direct-r4/speaker-0/20-parent.pcm": "7114266d989cd29365bc0f5c08ff8a08d29867162bf2c08677f09b2b2f0ff1f3",
+    "speaker-direct-r4/speaker-0/20-remote.pcm": "e74c5ac588f93fa32e6129273d6bf6d7e4b53fce3d56a3915662f356a30db121",
+    "speaker-direct-r4/speaker-0/20-wire.pcm": "7114266d989cd29365bc0f5c08ff8a08d29867162bf2c08677f09b2b2f0ff1f3",
+    "speaker-direct-r4/speaker-0/3-browser.pcm": "17682617110192dd8ee49628d624ac696ec0b79e92f06712b47541afafcdb394",
+    "speaker-direct-r4/speaker-0/3-parent.pcm": "979ef1f17666d27c636797d4ed42135628b45b7d4fca02ae917e9b8e02ad3ca8",
+    "speaker-direct-r4/speaker-0/3-remote.pcm": "e2db05e695344b5e722f5a789ecf740a30c8e09f44290432b9ed73f64fc89392",
+    "speaker-direct-r4/speaker-0/3-wire.pcm": "979ef1f17666d27c636797d4ed42135628b45b7d4fca02ae917e9b8e02ad3ca8",
+    "speaker-direct-r4/speaker-0/40-browser.pcm": "0eb9e3e21ece6e01026717a4fe23a05b1a762eaea23321a0e3d55df915389835",
+    "speaker-direct-r4/speaker-0/40-parent.pcm": "15294ab7291f2ed4115d9d0f849a2d675bc54748548b0cdbdc019355b0e2efac",
+    "speaker-direct-r4/speaker-0/40-remote.pcm": "8d97f01746ace8cc399cef0f4b609bd554b39bf242dc06c9b75b9096b4329eaa",
+    "speaker-direct-r4/speaker-0/40-wire.pcm": "15294ab7291f2ed4115d9d0f849a2d675bc54748548b0cdbdc019355b0e2efac",
+    "speaker-direct-r4/speaker-1/20-browser.pcm": "54a493a0475b5c1329658cf7b010e8b96890664b64706e7390ff2999f6bd21da",
+    "speaker-direct-r4/speaker-1/20-parent.pcm": "85585b19e47accce0a0ccfb928af67941b372a832a677064e9aeff6150b63e58",
+    "speaker-direct-r4/speaker-1/20-remote.pcm": "9eff56ecc4a25f0df4dc40a7c674229755ee08dd3800ad0b93eff3722f12e03b",
+    "speaker-direct-r4/speaker-1/20-wire.pcm": "85585b19e47accce0a0ccfb928af67941b372a832a677064e9aeff6150b63e58",
+    "speaker-direct-r4/speaker-1/3-browser.pcm": "401d3c14e5395c15665120814184f52fbf567ae51b5b3372bcca76ea60b37eba",
+    "speaker-direct-r4/speaker-1/3-parent.pcm": "c78dd758977737a7b603a91c4e462d269237619ac5fc22fc4da94065724e836c",
+    "speaker-direct-r4/speaker-1/3-remote.pcm": "fc351c7646ec148fd647df815996ac4c4d78898feb8058742570c464f0f21696",
+    "speaker-direct-r4/speaker-1/3-wire.pcm": "c78dd758977737a7b603a91c4e462d269237619ac5fc22fc4da94065724e836c",
+    "speaker-direct-r4/speaker-1/40-browser.pcm": "0fdd21c83f169ccef3b0c6e5bde95b5ec35e93610b85754b07f73a004315567f",
+    "speaker-direct-r4/speaker-1/40-parent.pcm": "c8ee2ccf92ce6a3a49f511825869014c730c621c998186e5186f39a1cef6e985",
+    "speaker-direct-r4/speaker-1/40-remote.pcm": "910e87b803d5c0a5b9b41be72b663c254ebb34b1acd5cc95911146d9cf857f26",
+    "speaker-direct-r4/speaker-1/40-wire.pcm": "c8ee2ccf92ce6a3a49f511825869014c730c621c998186e5186f39a1cef6e985",
+    "speaker-direct-r4/speaker-2/20-browser.pcm": "cc0e74e35403be9ff954608385383029d13502c3ba4ead9cc170436d6d99b2d4",
+    "speaker-direct-r4/speaker-2/20-parent.pcm": "1ff418e1d6447589c4fd9b131e9adb2e2cfa483b2a058d53a0b7d29dd6c45a9f",
+    "speaker-direct-r4/speaker-2/20-remote.pcm": "bdc72b93e68bb3f88cc1a1ec92304f04b9e6aaaf454b79779692b701044f6260",
+    "speaker-direct-r4/speaker-2/20-wire.pcm": "1ff418e1d6447589c4fd9b131e9adb2e2cfa483b2a058d53a0b7d29dd6c45a9f",
+    "speaker-direct-r4/speaker-2/3-browser.pcm": "61204af100905630f0cbd97ffca17a0f6b76fb25b9de59c8b677b2e00052b6fa",
+    "speaker-direct-r4/speaker-2/3-parent.pcm": "99c18c69a6bbca45bacfe2dbe91ddf7b5df6fd4b6fe493dbd81ef623bb28793d",
+    "speaker-direct-r4/speaker-2/3-remote.pcm": "e59d434965f689bf7da8ed64c6dede334c9568199d1bd067e43faa97ec7a98ea",
+    "speaker-direct-r4/speaker-2/3-wire.pcm": "99c18c69a6bbca45bacfe2dbe91ddf7b5df6fd4b6fe493dbd81ef623bb28793d",
+    "speaker-direct-r4/speaker-2/40-browser.pcm": "4f7f23edc9c1c5632945f731302edfd8c46041cc6969222260f5444b84ff6d7b",
+    "speaker-direct-r4/speaker-2/40-parent.pcm": "6ae41b24a06171c372177e144c055a29ea5d004199e8c136c2bc568884a349a7",
+    "speaker-direct-r4/speaker-2/40-remote.pcm": "66529b3047e9692dd05f19cfea3788f8cfc0169619b01e0b718cd4b50fbaf38f",
+    "speaker-direct-r4/speaker-2/40-wire.pcm": "6ae41b24a06171c372177e144c055a29ea5d004199e8c136c2bc568884a349a7",
+    "speaker-direct-r5/speaker-0/results.json": "c297b518a240a884c1b032527e98451c2cdde3b44c96bd0c8d8317008b5d5f8f",
+    "speaker-direct-r5/speaker-1/results.json": "6229b01c3bfb5aeaac70ae22b5086d162695ad26546ea11a0ac5baa461c0e413",
+    "speaker-direct-r5/speaker-2/results.json": "2b8b97a8d5af67180b260d0fb2835b10020d9848e00029debd24f834e02bf492",
+    "speaker-direct-r5/capture_raw.py": "49a5bcf7d46ff6f7242cfb502a5beafe5ef3ba4942077226c69a16d98fc5c3ce",
+    "speaker-direct-r5/clock_pulse.py": "53f79d46d4dba7889c5a99e5f7bb14536514dacb345abb946469cc241d34613b",
+    "speaker-direct-r5/continuous_monitor.py": "c676ff72d3a0fc6c32591a9cc4fcb3bf4a133873fe4fcc0bbe50c1b78b2e16ee",
+    "speaker-direct-r5/run.py": "6152d16df8de5d5b97717f687c400825b9a71d5af158ac884ddf72648db9ece0",
+    "speaker-direct-r5/credit-probe.js": "c2d648488c8e7d9255a4037c4f600cd7e21eee676518f02203405c8c935cd44d",
+    "speaker-direct-r5/diagnostic-playback.js": "b0681b9bc1e253fb7ae6a31a7764868a828aaee76726a47508df03ac1dc33740",
+    "speaker-direct-r5/direct-parent.js": "ac8d3f3b99d3007de1c88a945073e9d44bf259058eba9cada949d38e70ac33af",
+    "speaker-direct-r5/direct-worker.js": "e3ab67b1ac57ed71f8912301dfeff7784725d3689b80683d728e198d9eb017bc",
+    "speaker-direct-r5/parent-probe.js": "75864ff277aebd9ec9a26d1026b87e84f8305f0c9f8c90f4ee5184844efaab47",
+    "speaker-direct-r5/wire-probe.js": "633a2069a33c2dc00db5c75997473d42ccebcada789ab7a0865068a6096a5e2e",
+    "speaker-direct-r5/job.json": "8a9480127d26cffa9ec191e7c388d59b5c60c16f6617e937ea707ca8c9e74275",
+    "speaker-direct-r5/speaker-0/20-browser.pcm": "545307f304b6728772e4c4f98911f44b43720c2fa65449ab93f5678aea98a7b9",
+    "speaker-direct-r5/speaker-0/20-parent.pcm": "7114266d989cd29365bc0f5c08ff8a08d29867162bf2c08677f09b2b2f0ff1f3",
+    "speaker-direct-r5/speaker-0/20-remote.pcm": "226dbc33e45a64b46225b0a1180a395f3b8ab3f14925bab1535a1a4efc3ed11d",
+    "speaker-direct-r5/speaker-0/20-remoteMic.pcm": "9dd09e7ea3e1f7096b50f4a5bb1e50f9f27314028e3e2a9dc6a670e73ade3c54",
+    "speaker-direct-r5/speaker-0/20-wire.pcm": "7114266d989cd29365bc0f5c08ff8a08d29867162bf2c08677f09b2b2f0ff1f3",
+    "speaker-direct-r5/speaker-0/3-browser.pcm": "4a0e3d8e26c8f47e7acec7fd7b2301a655e7889b298f8cd2a4d416edebd3c4dc",
+    "speaker-direct-r5/speaker-0/3-parent.pcm": "561f5abc1e7bcdace9fa82f9622184be7ba299b2ef4f3809203425e6859df6c2",
+    "speaker-direct-r5/speaker-0/3-remote.pcm": "da6bfd516a4501c1e038ba49dc6887210a44ce091e144af4ffeb49a1fb624cb5",
+    "speaker-direct-r5/speaker-0/3-remoteMic.pcm": "acfe83c28d264769b3166fbd3f5a599fe6686a0dee685f95bb113d29f3429300",
+    "speaker-direct-r5/speaker-0/3-wire.pcm": "081ea72897057cfc825a09823317677e9144ca40fd06d55c37fd7276b4c1e80b",
+    "speaker-direct-r5/speaker-0/40-browser.pcm": "877aece0256473b1a140d5db3bfeb92f4a3ca4dd6222c97cb529b400198ed90b",
+    "speaker-direct-r5/speaker-0/40-parent.pcm": "f1f752d45126ecee0df1bb2619cba0fe8d46eb16b88c42427d01c2116b8aea64",
+    "speaker-direct-r5/speaker-0/40-remote.pcm": "ea296f50d84bf621c6f97fa0975438066bbc7f5b20c357e33bc22c317d68c405",
+    "speaker-direct-r5/speaker-0/40-remoteMic.pcm": "8801e263794985c2a444bff19e72654958b40e4765c8a84a079ce687df9a7729",
+    "speaker-direct-r5/speaker-0/40-wire.pcm": "655f19ff8a3de0d413c883c9f7647e0ffa5efd77b0d8154eb3ec0a1552624c56",
+    "speaker-direct-r5/speaker-1/20-browser.pcm": "23897ddbe543ae26bf8549b5c3c9240dbefb8f509c681d981974f8b4b2fa7d01",
+    "speaker-direct-r5/speaker-1/20-parent.pcm": "aeaeba23138ba6cf83f8fd518f416dd18acb5627b2f7ca221cec0be8fe7a341c",
+    "speaker-direct-r5/speaker-1/20-remote.pcm": "78fa5eb465eb8d6d9cc267e096529f9dd1dcbed267733b68febb7a702d0e1b31",
+    "speaker-direct-r5/speaker-1/20-remoteMic.pcm": "7cad332a998190b0ea323fabf96754a166e8216eaf7ed8bd470e5972293e4e22",
+    "speaker-direct-r5/speaker-1/20-wire.pcm": "aeaeba23138ba6cf83f8fd518f416dd18acb5627b2f7ca221cec0be8fe7a341c",
+    "speaker-direct-r5/speaker-1/3-browser.pcm": "f2d4da1b4f08a796ac25414f2d74e74417e41c022550251a76e20b052dcae20e",
+    "speaker-direct-r5/speaker-1/3-parent.pcm": "52af55e079259bfaf3f9ae88bb03a992ac6f9ff23bdbfb83720d4682cff6490d",
+    "speaker-direct-r5/speaker-1/3-remote.pcm": "090e732e4d49879064a51a574dbc5bf2c2220d76cbc069631d3215fe878350ab",
+    "speaker-direct-r5/speaker-1/3-remoteMic.pcm": "92e651076e43dd13516d7619db7dffb04281ec4c4698b17f2132dc291b8fd018",
+    "speaker-direct-r5/speaker-1/3-wire.pcm": "66687943897254e85c644f8950fbd08eebec09de61b3dd19ad08b90438b1ee6d",
+    "speaker-direct-r5/speaker-1/40-browser.pcm": "8aea8073b963ea7d92bfe7337dede7ff7e0845f967fd4b72a35536aa71e07466",
+    "speaker-direct-r5/speaker-1/40-parent.pcm": "812387daa9de6fe24a40a0509173e3ec03916c9c9645de6eba2518d968406dab",
+    "speaker-direct-r5/speaker-1/40-remote.pcm": "71ae278bc14c12de3075cdc1ab2d4b35a28738110704efda5439482840445d56",
+    "speaker-direct-r5/speaker-1/40-remoteMic.pcm": "507e9e50b2a154f61690305a06e6e95d64a91552e23a46e124b63efe0fb4404b",
+    "speaker-direct-r5/speaker-1/40-wire.pcm": "812387daa9de6fe24a40a0509173e3ec03916c9c9645de6eba2518d968406dab",
+    "speaker-direct-r5/speaker-2/20-browser.pcm": "33d941293e6e21da71b3b198d15f5e7b56c409393c71ad106e8d29922d75f88a",
+    "speaker-direct-r5/speaker-2/20-parent.pcm": "aeaeba23138ba6cf83f8fd518f416dd18acb5627b2f7ca221cec0be8fe7a341c",
+    "speaker-direct-r5/speaker-2/20-remote.pcm": "3728be02041c3810c9f4ccc614abbd1293520940e4c648a2554fdd15844688d5",
+    "speaker-direct-r5/speaker-2/20-remoteMic.pcm": "a209dac7a73b82c481de25532d398b63266b7608301fe4bb2e60d5ae87b55c6d",
+    "speaker-direct-r5/speaker-2/20-wire.pcm": "aeaeba23138ba6cf83f8fd518f416dd18acb5627b2f7ca221cec0be8fe7a341c",
+    "speaker-direct-r5/speaker-2/3-browser.pcm": "fe25ff210211c2fd262fd536c38cac71eb44ace39a26e69840af1bcdcdbb3b53",
+    "speaker-direct-r5/speaker-2/3-parent.pcm": "cead511c7e87e63af8220c6a5a5d11b680573dc06fc104a15221cec65f20df9b",
+    "speaker-direct-r5/speaker-2/3-remote.pcm": "3a83cf4859e63b21766be826de76f3e35f5f37fe593a046f46e89b953b9d5d5b",
+    "speaker-direct-r5/speaker-2/3-remoteMic.pcm": "7771a408668e20c2c7aaf1fad6d5bc81647ca56396be939b1d8c02d56cef5890",
+    "speaker-direct-r5/speaker-2/3-wire.pcm": "1bc2872aaf3617b7648af26f6f1d13f78b6bb3ff63cbf01a50d9a88ab294a920",
+    "speaker-direct-r5/speaker-2/40-browser.pcm": "651aa9387a8a9ed15081ac9ac6bea55264ba19ad63b73510545a92508955cbc3",
+    "speaker-direct-r5/speaker-2/40-parent.pcm": "6ae41b24a06171c372177e144c055a29ea5d004199e8c136c2bc568884a349a7",
+    "speaker-direct-r5/speaker-2/40-remote.pcm": "9ab2e75306bf9ed79575c3bac70c808522fdd8855917305016f29e6829577705",
+    "speaker-direct-r5/speaker-2/40-remoteMic.pcm": "97c4f491ac342ccc281830c3ae50b6156dd53dbbcbbd37062d604ec5b464f2c7",
+    "speaker-direct-r5/speaker-2/40-wire.pcm": "6ae41b24a06171c372177e144c055a29ea5d004199e8c136c2bc568884a349a7",
+    "speaker-render-r6/speaker-0/results.json": "3d851549fb8b656d0af732d6c373940a512f3f8bd92bac5defb5ab64718da955",
+    "speaker-render-r6/speaker-1/results.json": "73660300d9db69b34095306ffdf3a7d81ac45e90d02849219e7ff847fb8b6a2d",
+    "speaker-render-r6/speaker-2/results.json": "4ef25b9149efcc46481f38ec54726470d8466ed5c2ea4325c06985aa4a8cfa4a",
+    "speaker-render-r6/capture_raw.py": "49a5bcf7d46ff6f7242cfb502a5beafe5ef3ba4942077226c69a16d98fc5c3ce",
+    "speaker-render-r6/clock_pulse.py": "53f79d46d4dba7889c5a99e5f7bb14536514dacb345abb946469cc241d34613b",
+    "speaker-render-r6/continuous_monitor.py": "c676ff72d3a0fc6c32591a9cc4fcb3bf4a133873fe4fcc0bbe50c1b78b2e16ee",
+    "speaker-render-r6/run.py": "73462037e5ca84d32ff466c50e55fb533e8a53b4e03f6cfa9277e48aafb00a67",
+    "speaker-render-r6/credit-probe.js": "c2d648488c8e7d9255a4037c4f600cd7e21eee676518f02203405c8c935cd44d",
+    "speaker-render-r6/diagnostic-playback.js": "baacbf30a1ea819b6c6b8c1f38b91bceaf6829d41af4a7faf1bfd013a03c47e2",
+    "speaker-render-r6/direct-parent.js": "c1241fd073a3484f39d7068dfc40d223367da8f6b0c7778760653c688134bdf9",
+    "speaker-render-r6/direct-worker.js": "1b1216a88ecb115c8f754751b5afff9872ffc0c52116a3f8fd5ab70ae6fea3a0",
+    "speaker-render-r6/parent-probe.js": "75864ff277aebd9ec9a26d1026b87e84f8305f0c9f8c90f4ee5184844efaab47",
+    "speaker-render-r6/wire-probe.js": "633a2069a33c2dc00db5c75997473d42ccebcada789ab7a0865068a6096a5e2e",
+    "speaker-render-r6/job.json": "5c71a50cac0bffe5db6bac02c41b84e5f23b1953dce89ea13937f7620468bb90",
+    "speaker-render-r6/speaker-0/20-browser.pcm": "7deac15d3005e2db8e968331091bcc977ec1741ba87dfa570a3ceeb7e8d91ede",
+    "speaker-render-r6/speaker-0/20-parent.pcm": "85585b19e47accce0a0ccfb928af67941b372a832a677064e9aeff6150b63e58",
+    "speaker-render-r6/speaker-0/20-remote.pcm": "9eff56ecc4a25f0df4dc40a7c674229755ee08dd3800ad0b93eff3722f12e03b",
+    "speaker-render-r6/speaker-0/20-remoteMic.pcm": "6d2a7bf574692aeea6afc7ec5105f2c22888812be351fc8b575f6ccdb00ad9c8",
+    "speaker-render-r6/speaker-0/20-render.pcm": "b28d652c63c5537afedc926bb7b1fa3a5590b39d910aea956028c0721fd72490",
+    "speaker-render-r6/speaker-0/20-wire.pcm": "85585b19e47accce0a0ccfb928af67941b372a832a677064e9aeff6150b63e58",
+    "speaker-render-r6/speaker-0/3-browser.pcm": "f6f7591f32c7ae53c42bea3abdb7c1a04627a7ab290ef9263b1fe6e72da39045",
+    "speaker-render-r6/speaker-0/3-parent.pcm": "65729b15c3ea3901482a6150aa551b386b6532e86fd22a22c65be6dd8949eaf3",
+    "speaker-render-r6/speaker-0/3-remote.pcm": "3f4a33ee23f9d89de8413b1d678bcc07a273df9b96e897663069e961cad625aa",
+    "speaker-render-r6/speaker-0/3-remoteMic.pcm": "52565b9d45746743594e19aec1f175f1b5cc1d1564a3a6a5b8f9c5085b5c007c",
+    "speaker-render-r6/speaker-0/3-render.pcm": "a1e95113af7ff3454f6694f020fb8945fa68dbcf142c5c20c966ce8ebdcbe3b1",
+    "speaker-render-r6/speaker-0/3-wire.pcm": "65729b15c3ea3901482a6150aa551b386b6532e86fd22a22c65be6dd8949eaf3",
+    "speaker-render-r6/speaker-0/40-browser.pcm": "092cb0d648efc2ed7048a71992b546dbba5215951d06ab9417c1f831c2806fc9",
+    "speaker-render-r6/speaker-0/40-parent.pcm": "3a863d627c9a930f1fc6a36e86efddd85110c77e80645ed7f86fc3b21dae9c77",
+    "speaker-render-r6/speaker-0/40-remote.pcm": "41c0e2d0d01c53a3b0f98da264d16dfe796043332d53433b807983005c32a962",
+    "speaker-render-r6/speaker-0/40-remoteMic.pcm": "2906c7240762a42741a70e21b2a994db6b0ef8460ecf74b78a67af6be5af4efa",
+    "speaker-render-r6/speaker-0/40-render.pcm": "8e3c32178a87c92a0da1477541ed28ef1db7861af5fcba2acdc9dfc4dd044957",
+    "speaker-render-r6/speaker-0/40-wire.pcm": "c37ff70b5c9cb6aa1b896fb947ff0cc91e6f953f16799e06e74bd8d211856a3c",
+    "speaker-render-r6/speaker-1/20-browser.pcm": "344fd72059cdcc39bd958197a26e14606563777a1eba0218674716bd6aefa1cb",
+    "speaker-render-r6/speaker-1/20-parent.pcm": "d9dbccb59e902c727da1861d87b5577f3b7f7523b0a203fb1761455c61aea5a2",
+    "speaker-render-r6/speaker-1/20-remote.pcm": "d82e81179ad1baeb3a27c2d4d3678874b62ea8511622e937ccb754e70270a73e",
+    "speaker-render-r6/speaker-1/20-remoteMic.pcm": "e5e49a337f52e6f25d33192841ec02e5baa106cb0e044205dc4ee29d1a7d096d",
+    "speaker-render-r6/speaker-1/20-render.pcm": "e4859c0c9025448c9fadf7a374c517946430de3b78a4c907fc90bebc0205196f",
+    "speaker-render-r6/speaker-1/20-wire.pcm": "d9dbccb59e902c727da1861d87b5577f3b7f7523b0a203fb1761455c61aea5a2",
+    "speaker-render-r6/speaker-1/3-browser.pcm": "27ff5fe728c03f3d979f3069dd904d17207e4e76108fcf3fc78557cc80aa3785",
+    "speaker-render-r6/speaker-1/3-parent.pcm": "5cdb7cf9cf94e829dc6277c3209eb4841aee1052ea2f8062c840980977c9c155",
+    "speaker-render-r6/speaker-1/3-remote.pcm": "92807be357fe6cbb9997ec23ee3aba533241bb62f67903863167bbb601273c21",
+    "speaker-render-r6/speaker-1/3-remoteMic.pcm": "79fd1511cde2a4ebefc95003902d14017fd331875835685c412d8fb1ee091e05",
+    "speaker-render-r6/speaker-1/3-render.pcm": "12621c026624c430f5faa281fa621aacc7c60b4dcfed0a61d265eedda18aa555",
+    "speaker-render-r6/speaker-1/3-wire.pcm": "5cdb7cf9cf94e829dc6277c3209eb4841aee1052ea2f8062c840980977c9c155",
+    "speaker-render-r6/speaker-1/40-browser.pcm": "81a01435987caf53a312a99518594ec20b320a7ed96a85827e37510be9b9c196",
+    "speaker-render-r6/speaker-1/40-parent.pcm": "c426099f88e201f0967fcf5fe61ee7e151019c7b06617838f483b087be6ad622",
+    "speaker-render-r6/speaker-1/40-remote.pcm": "8d97f01746ace8cc399cef0f4b609bd554b39bf242dc06c9b75b9096b4329eaa",
+    "speaker-render-r6/speaker-1/40-remoteMic.pcm": "773f5c4b6cb4f1b4ef40abaadcd810dc002d8e4f42c51d56b95733b596c35eae",
+    "speaker-render-r6/speaker-1/40-render.pcm": "ee84ca8f624bb6b8d2fc8fef8c92e0182b6a54d3f5a4838c7fdfc7bdf00121ad",
+    "speaker-render-r6/speaker-1/40-wire.pcm": "9c8d0ab62a019d2295d9c3fe1f8afdc2263d6d8fc84e1dd290ffbbb5fd4a09fa",
+    "speaker-render-r6/speaker-2/20-browser.pcm": "ac8bc00c23539c35cc29a82e43d546d937e8d13e4b9d80133755cfb827912d3e",
+    "speaker-render-r6/speaker-2/20-parent.pcm": "0f1b52edbc5edddf59ca026635920ef4ddcca7da236ed4926c496b5543470dd2",
+    "speaker-render-r6/speaker-2/20-remote.pcm": "bc0ae3265a6ab463742a38829981d3a22e7a5fd2cd370033e10e134dbe4c2578",
+    "speaker-render-r6/speaker-2/20-remoteMic.pcm": "f2cc87a9641ac93638a22cc6f982802a5541af313907c87bbbefa98d49fe645d",
+    "speaker-render-r6/speaker-2/20-render.pcm": "0cd5b22f726fd2e3f06b567d4ebe06c32bd36a1a6ad85be5efcb6eb51508e644",
+    "speaker-render-r6/speaker-2/20-wire.pcm": "0f1b52edbc5edddf59ca026635920ef4ddcca7da236ed4926c496b5543470dd2",
+    "speaker-render-r6/speaker-2/3-browser.pcm": "4764392474a007817fb3477d41d36b8443ba5cbf2465529e6105a2314179e907",
+    "speaker-render-r6/speaker-2/3-parent.pcm": "5cdb7cf9cf94e829dc6277c3209eb4841aee1052ea2f8062c840980977c9c155",
+    "speaker-render-r6/speaker-2/3-remote.pcm": "e2db05e695344b5e722f5a789ecf740a30c8e09f44290432b9ed73f64fc89392",
+    "speaker-render-r6/speaker-2/3-remoteMic.pcm": "289c5585175a2f29b6a889efcd3929d1e087880f8120f0c12b720532b8cc4d14",
+    "speaker-render-r6/speaker-2/3-render.pcm": "9b1d31f6fd3543a3dd239d0517adfeb2ebcd1b0e235103a55d98948e7a35ddf3",
+    "speaker-render-r6/speaker-2/3-wire.pcm": "5cdb7cf9cf94e829dc6277c3209eb4841aee1052ea2f8062c840980977c9c155",
+    "speaker-render-r6/speaker-2/40-browser.pcm": "5239412150862ac89a21190a648a4ca96349ac555eb523e37fd6960500f66806",
+    "speaker-render-r6/speaker-2/40-parent.pcm": "1165dfc29d34f996f9f7a00e0a524105281ab70579f2fee3817943514d615b90",
+    "speaker-render-r6/speaker-2/40-remote.pcm": "634e756f2250266fde974a41b02e2ae0bd9e70abb1c22baae3cd365fbc9a494a",
+    "speaker-render-r6/speaker-2/40-remoteMic.pcm": "c736b746cc1fa8b357e2e708ee6be54915db89bca7fe43602f502265c75c6818",
+    "speaker-render-r6/speaker-2/40-render.pcm": "c49bef5c6eda3619a33ea9a76bf631e2cf2a2d1eb9217f96cc16437aebcab52c",
+    "speaker-render-r6/speaker-2/40-wire.pcm": "995b554122fe33e98c184c55d20ad8a4809c7ea9b7ca6d43bf9e1ccf19616e75",
+    "native-output-stall-r1/0/results.json": "23c1c73b7638ee59e7fcf08a51de3858ed765a5254c8077b0c6bfb84b28096b2",
+    "native-output-stall-r1/1/results.json": "906e7771d39271ed55ed5898b875ff3d1d4da127ae86f5cd68f457747ce2f716",
+    "native-output-stall-r1/2/results.json": "c0d11f0b633293fa846339aa363b3f39dc520da660de5ca3969e22d177856008",
+    "native-output-stall-r1/run.py": "7f10fe9de02b9080b51ad1d62fa7ae9df351dff9dada1d76364fd280340120f5",
+    "native-output-stall-r1/job.json": "652cc76269d6595a2f2a02f4f9623ad0d3b8d4d585d04f3c75ef8db98060b684",
+    "native-output-stall-r1/0/20.pcm": "e5bb6c4a471c3b8d8399f0852c70ca0bc01b08aa437b0646e1ed658716f6938a",
+    "native-output-stall-r1/0/3.pcm": "066e4ab64f57a6363bcf5e77bf441e09d85dcba5742a2fea17f5d0b47068feaf",
+    "native-output-stall-r1/0/40.pcm": "a36ad7bb68a5b6532e556b8e4e066d8256be13174408b6f2cc4db6bfda405c35",
+    "native-output-stall-r1/1/20.pcm": "94e956fba0c47872004c503ffd89b9c263794df48ebed322ff524f31ec7e38c5",
+    "native-output-stall-r1/1/3.pcm": "f1594ae1cb1ec7a5b3efbbc112897400a17510bcd14cac99ee6cfb4258b7efe0",
+    "native-output-stall-r1/1/40.pcm": "8d9c0e8226882db83e2146deef6d3451116bff8df63434bc786706a7369d5985",
+    "native-output-stall-r1/2/20.pcm": "9b10584aab8807fed41fe8c2f4d54c1773fdbbd446b77d824fbc8c0999d01027",
+    "native-output-stall-r1/2/3.pcm": "f7acb67e538c4e17e720da7817daaa9b6370565578066a49f4cba6b0b793fbc4",
+    "native-output-stall-r1/2/40.pcm": "958b150641201ef50482185b1d9a89ef0939f43ed0f9b201ca047a97d265e5d8",
+    "native-worklet-stall-r2/0/results.json": "9edf1cec0b11e25ae16b27f56e9857a02319fd09ed06662f51ed11559821aefe",
+    "native-worklet-stall-r2/1/results.json": "2be67f692bca0b5d4d7e61ce720f4fb5b833a5a671ee858370e7f85244b5fc0b",
+    "native-worklet-stall-r2/2/results.json": "a50c6cd9adecb438483364ac926aa53fbdf37fed050e3dc062b15c6362b2e17f",
+    "native-worklet-stall-r2/run.py": "1668f7e7747928545878de25fbf93c7044eccd55d728ea564c3e0ae96c408c81",
+    "native-worklet-stall-r2/tone-worklet.js": "b1457c3d735bcb9acc8af3db4f481c228ffa5c6bbe1eb9822c0423328e3f0b3e",
+    "native-worklet-stall-r2/job.json": "8acce714f4bdfcfd2878821a6f7955fb21d6800fe5840638eacfda0e7c0d382d",
+    "native-worklet-stall-r2/0/20.pcm": "31a3a1752cbac6d587d58c39211a9625c9ade26d0ac3fca89de2c506cc5665a3",
+    "native-worklet-stall-r2/0/3.pcm": "018c76886a7a8e5c47698a56bb66aeb0d0e6febff0fc2ca866ea77500e51ad8c",
+    "native-worklet-stall-r2/0/40.pcm": "98258db379e23051498bccd6b46e2777aab3bcfb25a247c9c596cce6eeff95dd",
+    "native-worklet-stall-r2/1/20.pcm": "a344779786f013ccf7ac9c3a5419b66e4b472d9bb0b1a5c7c612bb452c4a46e5",
+    "native-worklet-stall-r2/1/3.pcm": "cc8b7cc07e6c077eb2ee680745ab682804349aa7f674cb5799f5421669f6dcf3",
+    "native-worklet-stall-r2/1/40.pcm": "b2ba55f76c3b7c50ea7fa26dcf761976b022528413963e16d01cfe71babc8896",
+    "native-worklet-stall-r2/2/20.pcm": "1dbae23b8abedec84abd601c94cbfdd0a76a7163f6472c1ef63930a85ed51f17",
+    "native-worklet-stall-r2/2/3.pcm": "73df70d4e4e0684277c8992855dfeb266b15e89629479c66fa59f3441a092eb7",
+    "native-worklet-stall-r2/2/40.pcm": "f4931ce51e2566451eec3bdec266aa86bced186f72dd549043df20937e7afc23",
+    "native-duplex-stall-r3/0/results.json": "5de5bd7999819e67cb9de5d2fa06961691f3eabe519c3e10aea53eef562097b4",
+    "native-duplex-stall-r3/1/results.json": "1928fec7ffd68ca4d7d8043ff227c79f772695dac13af13225e00e16e2067cef",
+    "native-duplex-stall-r3/2/results.json": "67a810ee66ed9bf913393cf4671c7f2233fcfb96ca51ae5c7320e6fd1f75401e",
+    "native-duplex-stall-r3/run.py": "2c9a92f9431613e7ede4430cbbea32b99ffed362af2c9073e0b1e0119e8eb3cb",
+    "native-duplex-stall-r3/tone-worklet.js": "2a6483200eafd15e0c3fccb675148d8fe44ca5a659a0e7e3ffe884cd74947ff4",
+    "native-duplex-stall-r3/job.json": "197fc97d4dfbb3ff77755610a4cb31657f2b52b2d66b92feae579dcfc7b2e471",
+    "native-duplex-stall-r3/0/20.pcm": "619ee3d77f1ac6bad31d7cca2fd02a831cf6c512e990d886ff313bfbfffd75a7",
+    "native-duplex-stall-r3/0/3.pcm": "0382967eeeddcdb188102b717f3c6a3512f68c326f36fa9bd1798b8240f10c8c",
+    "native-duplex-stall-r3/0/40.pcm": "d16fa8b02910a2a1c469ee88a6d855349a3c62de618477517f0203bccfcc80e1",
+    "native-duplex-stall-r3/1/20.pcm": "4f1815eaaafadef9ab79f5d84bcefe2e1b91b10b7b2804093680579a3d9983a1",
+    "native-duplex-stall-r3/1/3.pcm": "19257fbd08ffeff98465c5fe63f98dda7a301da919bc83df9e12a650a50ab651",
+    "native-duplex-stall-r3/1/40.pcm": "785b8d976b0505527c81d8d72c6c113dedc2340f2f8cdd6e5431a80f66a418c6",
+    "native-duplex-stall-r3/2/20.pcm": "f897229699d8262f0df7fbd226b10869507b39599fe18522a2bb89b22a2b0747",
+    "native-duplex-stall-r3/2/3.pcm": "39f26742f1da14c56e713d3193714734e6fcfb899445550f25d99246f49475b3",
+    "native-duplex-stall-r3/2/40.pcm": "c1bb4c5ca7867b56e3d33fd7390e8ad69fd6d0bfa4b948aaf6bc245907bc18d3",
+    "speaker-crossover-r7/job.json": "f7280e8a438ff4e12f7832ad8d8816507624977db569f81dc2c659bac096cafb",
+    "speaker-crossover-r7/run.py": "624fe1964e4f5ea6d76058299075ebe4303f10d6cc760dbcbb7d8127f3428bc1",
+    "speaker-crossover-r7/speaker-0/results.json": "ff3c34b17b7533c7df3a754c0f96b50db8e17e8a1fe28cc3276032c3b4c6bc04",
+    "speaker-crossover-r7/speaker-0/3-remote.pcm": "9c4814ae76acb8bd4d76c802677e10d8072b05b912e57be9303a4ac265de36ce",
+    "speaker-crossover-r7/speaker-0/3-wire.pcm": "979ef1f17666d27c636797d4ed42135628b45b7d4fca02ae917e9b8e02ad3ca8",
+    "speaker-crossover-r7/speaker-0/3-parent.pcm": "979ef1f17666d27c636797d4ed42135628b45b7d4fca02ae917e9b8e02ad3ca8",
+    "speaker-crossover-r7/speaker-0/3-browser.pcm": "7d33ccc7d7b8dc04d62e0210fec72e51d354510c44e04355910b6d70b0b6227a",
+    "speaker-crossover-r7/speaker-0/3-remoteMic.pcm": "dac03e600375a6551c0185f8a0e0ec2e02e42b0bcd483c4030c125318e1cf6a9",
+    "speaker-crossover-r7/speaker-0/20-remote.pcm": "106495bd2086f6664c0b30862c75d187f278a31e5c824bb645ee19ce5b2ce473",
+    "speaker-crossover-r7/speaker-0/20-wire.pcm": "2a16f355ac29a2154cabdfa85f247895eca86a6eb4e88d9e2dfeda441b39ba6a",
+    "speaker-crossover-r7/speaker-0/20-parent.pcm": "2a16f355ac29a2154cabdfa85f247895eca86a6eb4e88d9e2dfeda441b39ba6a",
+    "speaker-crossover-r7/speaker-0/20-browser.pcm": "e14b45e1e91ad7dd7dd251ea5978c9e2b1fd96a56175083855ce4febb1320990",
+    "speaker-crossover-r7/speaker-0/20-remoteMic.pcm": "92d96f03e295d32bfbb171e376239575b02309a25d83fc4f833e13aff43bab8b",
+    "speaker-crossover-r7/speaker-0/35-remote.pcm": "8d97f01746ace8cc399cef0f4b609bd554b39bf242dc06c9b75b9096b4329eaa",
+    "speaker-crossover-r7/speaker-0/35-wire.pcm": "15294ab7291f2ed4115d9d0f849a2d675bc54748548b0cdbdc019355b0e2efac",
+    "speaker-crossover-r7/speaker-0/35-parent.pcm": "15294ab7291f2ed4115d9d0f849a2d675bc54748548b0cdbdc019355b0e2efac",
+    "speaker-crossover-r7/speaker-0/35-browser.pcm": "ed95e16853e95ce765987700dbda3a6322f75c9fa3d3421a8003ae2905b860fd",
+    "speaker-crossover-r7/speaker-0/35-remoteMic.pcm": "1271a506c9ddac58631995753952d2a8144ed443aceb43e0cf7ef19a9f0dc2ff",
+    "speaker-crossover-r7/speaker-0/50-remote.pcm": "3436e5cca39547ae3182e6fc5a90bbde5d98b132bda548ba7a6787a9bfa55938",
+    "speaker-crossover-r7/speaker-0/50-wire.pcm": "9db8e3b0ed97ca53692c9a7583bd974cad74b42b38797dd6b64aa9b2286c15a4",
+    "speaker-crossover-r7/speaker-0/50-parent.pcm": "9db8e3b0ed97ca53692c9a7583bd974cad74b42b38797dd6b64aa9b2286c15a4",
+    "speaker-crossover-r7/speaker-0/50-browser.pcm": "37e20c11bec4bac156d1e1546f343cad9498c98ce23b00250349300aa4a67458",
+    "speaker-crossover-r7/speaker-0/50-remoteMic.pcm": "fe03d39c7a46f2cdc58143641b43c9326c94ebe9019621f32486b2297f7edd4f",
+    "speaker-crossover-r7/speaker-0/65-remote.pcm": "96485e6d42d1b0f42ca33358e25d57ce2ec2dbdc37efb982e91ccf56ff06e26e",
+    "speaker-crossover-r7/speaker-0/65-wire.pcm": "23e84b956e650faea4283ea3c585ba0c35d8afae8d59bdaece868da18a2ee785",
+    "speaker-crossover-r7/speaker-0/65-parent.pcm": "3ec5a73a7c85a447f7969a62efd761a457363e83693b8542f6ee31a69dc4fd43",
+    "speaker-crossover-r7/speaker-0/65-browser.pcm": "d895a549ade47dcb96b82387a191bb68cc025ef32f61e7f7f6cb79ae58330911",
+    "speaker-crossover-r7/speaker-0/65-remoteMic.pcm": "dbfdf1b4199dcaed859f3e9205937243af3794f9f4d921d54b3b2f0f56198a10",
+    "speaker-crossover-r7/speaker-0/80-remote.pcm": "d0c729f23a3b67a9fd231f290d87446ffac1329c343574ff93487c5e64802103",
+    "speaker-crossover-r7/speaker-0/80-wire.pcm": "67dfbbcb24dac7898c3ee57d33c83f48ae028fc74868be82e03d6dc181fef31c",
+    "speaker-crossover-r7/speaker-0/80-parent.pcm": "67dfbbcb24dac7898c3ee57d33c83f48ae028fc74868be82e03d6dc181fef31c",
+    "speaker-crossover-r7/speaker-0/80-browser.pcm": "52bcd8bdbeb5b0fec091fa5d4343cc2197c11d8638a9a49f8cbed5d5d6d3e465",
+    "speaker-crossover-r7/speaker-0/80-remoteMic.pcm": "d34b47cfde6d41c15dd2d6cca77576d109844f7d53ea4c12a4b1ddc95d62d066",
+    "speaker-crossover-r7/speaker-0/95-remote.pcm": "04853ae15bd42b4bad9f69b8c37866a5ddd386db09c3795c5744ec895bbc13d4",
+    "speaker-crossover-r7/speaker-0/95-wire.pcm": "87323fcf597052420d4ee302eed4668f720acb3233c10771afc6ae8cccf90cc8",
+    "speaker-crossover-r7/speaker-0/95-parent.pcm": "87323fcf597052420d4ee302eed4668f720acb3233c10771afc6ae8cccf90cc8",
+    "speaker-crossover-r7/speaker-0/95-browser.pcm": "0b0ab005242c5f65028dddcddc181e190baaa85fd57a56585e08cb115f91f3ce",
+    "speaker-crossover-r7/speaker-0/95-remoteMic.pcm": "11c9971bccec06ceec1c8774954fb63b498f940fd968116983b701094c6a6694",
+    "watchdog-gates-r1/playback-media-red.log": "0d2ad748fff649a1254098487603000a9b342ce9d0eae4bcb6acf7bc358fe91f",
+    "playback-media-gates-r1/composed-old-red.log": "21224494f1d1251546a187bc4e66c471a4a081b74c942b4d46c241fa8a233801",
+    "playback-media-gates-r1/check.log": "c6fbfd3fdae2a784cf7831c28bf06ea112adaefa9e91ccdd14c3a1134a9c3b2d",
+    "playback-media-gates-r1/media-fault-red.log": "b89d4e47d8ec8851ad8ce9f0d3cabffe0ebfd1179b4c7476e60e1299aa23e48c",
+    "playback-media-gates-r1/focused-media-fault-green.log": "3d6cdc7bee9b5b7fd77555527e9c3bf97094b8098372252e558f97b2db5d562c",
+    "playback-media-gates-r1/check-media.log": "a089efa19b2b72b3cad322b276d387f313548a0b5f59cfd3bb4b8903d936e571",
+    "playback-media-gates-r1/coverage-media.log": "f9c6339a9c2db5117fdf94e85de405493ad04a37b18bc36144b13b0c373a92fa"
+  },
+  "findings": [
+    "Actual coordinator speaker drops occur with zero playback credit despite a current ready player/authorized route. WSS sequence continuity alone does not prove PCM continuity upstream of packet assignment.",
+    "Persistent output monitoring does not eliminate the condition. A real240ms parent task can delay the existing two-hop relay/credit path and cause bounded drops with eight credits.",
+    "Same-round direct Worker/Worklet media with unchanged eight-frame queue removes the two observed stall-related coordinator drop bursts. It does not eliminate every early or later loss, and no production implementation is selected or qualified from this alone.",
+    "One bounded direct render probe is near-complete while browser output is substantially distorted; render/output windows overlap but are not sample-identity aligned, so this is a layer lead, not a complete remaining root cause.",
+    "NoSDK Oscillator and native generated-Worklet controls both remain near-complete across the tested UI stalls for default44100 and explicit48000 output specifications. Neither hidden child realm nor sample-rate conversion alone explains the failure.",
+    "NoSDK actual duplex capture/Worklet control also shows an impaired output window and later fresh recovery, including with separate mic Context. Therefore all output loss cannot be attributed solely to the SDK relay. Private virtual-device/runtime scheduling remains a separate causal investigation.",
+    "Onebrowser sameContext/sink/actualmic crossover keeps SDK channels/processors active and changes only the audible gain. Native oscillator under the same240msUIstall remainscomplete; SDKPCM under its stall has10relay drops/output0.7252; subsequent native and SDKPCM windows bothrecovercomplete without re-enable. This confirms a UIrelay contribution without assigning all startup/noSDKduplex output losses to it."
+  ],
+  "limits": [
+    "Fresh profiles, actual headed Chrome158, private synthetic devices and current project fixture only. No physical devices, full24class audit, natural8h,90min1000operation stress or resource acceptance.",
+    "Runtime direct-media diagnostic wrappers and an extra processor are counterfactual instrumentation, not immutable repaired SDK qualification.",
+    "PCM2s capture windows, capped100-frame ingress records and2.5s render probes are not all sample-identity aligned; spectral/credit results retain their distinct scopes.",
+    "Several short startup and later windows fail the unchanged0.8 whole-window tone threshold. No failed study is relabeled passed, no threshold/buffer increase, and no historicalP17 acceptance is rewritten."
+  ],
+  "developmentRepair": {
+    "status": "playback-module-models-passed-native-and-microphone-media-pending",
+    "workerProtocol": 9,
+    "publicAPISignatureChanges": false,
+    "serverPCMProtocolChanged": false,
+    "queueBoundsChanged": false,
+    "modelCases": [
+      "direct-consumed-credits-without-UI-relay",
+      "replaced-endpoint-and-old-reset-credit-fences",
+      "media-port-vs-local-control-terminal-disposal",
+      "old-binding-frames-rejected",
+      "actual-MessageChannels-24frames-and-credits-while-document-control-receiver-held",
+      "malformed-media-input-does-not-disrupt-live-binding",
+      "media-channel-fault-automatically-rebinds-same-node-source-mux",
+      "fault-after-explicit-off-does-not-reopen-playback-or-disrupt-mic"
+    ],
+    "oldProductComposedRegression": "fails-on-archived-a2e5ee2",
+    "fullCheck": "passed-privateTmp-nonroot-current-media-fault-repair",
+    "nativeRepairedArtifactProof": "pending",
+    "remaining": "Microphone media still uses parent relay. Explicit playback suspension/resume/handoff needs new direct-plane controls; new immutable artifact/native ports/fault matrix/resources/natural8h/stress/exact candidate remain unqualified.",
+    "focusedTests": 105,
+    "coverage": {
+      "passed": true,
+      "lines": 92.27,
+      "branches": 86.19,
+      "functions": 87.86
+    },
+    "faultRedGreen": "two-current-channel-fault-regressions-fail-before-repair-and-pass-after"
+  },
+  "repairSourceSHA256": {
+    "cmd/remotexappd/web/sdk/audio-coordinator.js": "d609b787fe0c0fc2c3dbab8b2ef29647712bc5fbb71881f367fe7504d9cfffe2",
+    "cmd/remotexappd/web/sdk/audio-worklet.js": "b70d4d053bbf3162629990853142a546b27f0c079f75138956855758b1ef7788",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.js": "3600442749590e6ed1ff90f0ae69a8febc17b76fdec8c7ef9f6340eab326d0df",
+    "cmd/remotexappd/web/sdk/audio-coordinator.test.mjs": "f4a0e9c15c0b5ccf9f05395662210db8a71905914cab897bd9c829938266e687",
+    "cmd/remotexappd/web/sdk/audio-worklet.test.mjs": "dd7767931caff71812c92bdec64f470c7f51d89005a9055614f450830a55dd2d",
+    "cmd/remotexappd/web/sdk/audio-recovery.test.mjs": "2f32609761859847f5eb88b8224f8d1444a8535c1a820fc602c23cf1ece0a60a",
+    "cmd/remotexappd/web/sdk/remotexapp-audio.test.mjs": "43f7a0458e1a447f1b110644f48f3a487bad8b2c3a345cbc0d4e64496bf6a2ae"
+  }
+}

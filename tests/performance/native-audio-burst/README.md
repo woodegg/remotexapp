@@ -31,3 +31,15 @@ network latency or physical audio-quality benchmark. Live WAN observations are
 reported separately in the [native audio qualification](../../native-audio/README.md).
 The earlier development observation was stopped after contention was found;
 its partial duration does not qualify the repaired candidate.
+
+## 2026-11-28 scheduling follow-up (development)
+
+[Actual layered controls](../../native-audio/results-speaker-scheduling-20261128.json)
+show that the accepted allocation bound does not isolate PCM/credit delivery
+from a stalled parent UI. A same-Context audible-source crossover and direct-port
+counterfactual identify that relay contribution, while independent native duplex
+controls retain a separate output-loss question. Development Worker 9 moves
+playback media/credits to a separate port with binding/reset fences and unchanged
+eight-frame/per-speaker and64 aggregate bounds. Module evidence is separate from
+new immutable native/resource/long-duration acceptance; microphone media remains
+in progress. Preserve the original deterministic measurement and result.

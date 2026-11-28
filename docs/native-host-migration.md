@@ -18,6 +18,30 @@ and component pins. See the
 
 ## Choose the exact migration target
 
+The development target is Core 0.17.6 / SDK 0.38 / audio Worker 8 under
+[the systematic recovery plan](native-self-recovery.md). It is not yet a
+qualified release or final UAT candidate. Initial speaker/mic enables remain
+user actions; the host should keep the same live interest and render requested
+state rather than resend enables after every connection event. The SDK journal
+orders shared off/on, and recovery uses current permission and fresh writer
+authorization. Render `microphonePending` as setup/recovery, `actualMic` as
+acknowledged delivery readiness, and `microphoneActionRequired` as a browser
+block. `connection: 'blocked'` may instead mean current ingress access is needed;
+it does not request another mic permission prompt. Pin and reload SDK/Worker/
+worklet assets together; the v8 internal contract is incompatible with v6.
+Full candidate, fault and resource qualification remains required before adoption.
+
+SDK 0.38 development also reconciles suspended/closed Contexts and failed audio
+processors without discarding a still-valid microphone source. Do not recreate
+Hosts to repair a graph. Render `actualSpeaker` only as eligible playback graph
+and route readiness, with `playbackBlocked` and optional local `contextState` /
+`contextReason` for policy/graph diagnostics; physical audibility needs its own
+check. Native module/resume/close operations have bounded observation and may
+remain quarantined until their real completion. Await disposal and surface
+incomplete native retirement rather than reporting successful cleanup. These
+changes still require full candidate/fault/resource qualification.
+
+
 Load the SDK served by the matching Manager's authenticated `/sdk/index.js`,
 under its proxy prefix if one is configured. Record the
 Core commit and archive SHA-256, served SDK version, native component digest
@@ -626,3 +650,63 @@ The SDK does not prompt for new read access during that manual action. Render
 write-accepted as unverified rather than success. Real browser/OS focus and
 clipboard synchronizers remain environment prerequisites; SDK state is not a
 substitute for actual paste/readback testing.
+
+The current SDK 0.38 development graph repair is not ready for adoption.
+The earlier Context-only replacement has a reproduced native-retention defect;
+connected sound and `contextState: 'closed'` do not accept resource cleanup or
+the complete release. Keep the
+[current qualification scope](native-self-recovery.md#owned-graph-execution-environment-sdk-038-development)
+with the version decision.
+
+The subsequent SDK 0.38 development graph-realm implementation supersedes that
+failed Context-only teardown. The SDK owns a same-origin, hidden audio execution
+environment; intent, media transport and permission/capture ownership stay in
+the parent. Recreating a graph does not require recreating a Host or another
+microphone prompt. Permit the SDK's same-origin child execution and delegated
+playback in the embedding policy; it introduces no new origin or login endpoint.
+Always await cleanup and distinguish a recovered owned-realm termination from
+an unproven missing ACK. Scoped real Context replacement/native retirement now
+passes; full policy/mixed-fault/long-duration/candidate qualification is still
+required. Do not adopt this development tuple as a formally qualified release.
+
+SDK 0.38 development also releases an audio interest when its exact runtime
+generation is authoritatively retired. The host must acquire a fresh interest
+for a newly opened runtime, rather than reuse that released handle or repeatedly
+enable it. SDK/Worker own retirement propagation, local replay cancellation and
+late microphone fencing; the host does not need another recovery loop. Other
+live runtime interests remain independent. A
+[scoped new-Manager control](../tests/native-audio/results-new-manager-recovery-20261128.json)
+now verifies actual stop, old-target HTTP 410 and Worker rebind without disturbing
+another capture route, along with cookie/service/access recovery and observed
+identity-change fencing. Complete fault, long-duration and final-candidate
+qualification remain pending; this is not an adoption-ready formal tuple.
+
+## Adopt conditional clipboard admission (SDK 0.38 development)
+
+KNC-013 closes a separate passive-upload race: an X11 copy may change the
+destination before its remote offer reaches the browser. SDK checks alone cannot
+make that upload atomic. A new immutable `kasm-wss-clipboard-v4` or
+`kasm-routed-udp-clipboard-v4` server/client pair compares the observed destination
+revision before native mutation. Core understands those protocols; runtime
+`nativeClipboard: 'rich-v2'` still means text/HTML/PNG with a 10 MiB aggregate cap.
+Restarting Manager alone adopts the existing component pin. Explicitly upgrade
+or recreate the runtime to use the new pair, following generation fencing.
+
+The host continues requesting clipboard directions through `configureClipboard`.
+`capabilities.clipboardConditional` and `getClipboardState().ordering`
+(`ready`, `waiting`, `unavailable`, `unsupported`) describe native ordering support/readiness.
+Render requested and effective directions separately. With an older component,
+requested automatic upload has effective `manual`; automatic download and
+explicit copy/paste source choices remain available. The host does not implement
+revision tracking, retries or another clipboard transport.
+
+`clipboard-conflict` preserves the remote copy and asks for an explicit source
+choice. `clipboard-uncertain` means the outcome cannot be proved and is not
+replayed. A native admission acknowledgement proves neither application paste
+nor browser/OS clipboard delivery; actual readback remains part of qualification.
+`submitting` exposes a pending native transfer. Its size-based 10–50 second
+budget is separate from five-second browser I/O. A timeout remains uncertain and
+is not retried as another copy. Blur/freeze/off cancel pending paste keys and
+resume establishes a fresh focused baseline. The existing browser-local receipt, permission, focus and normalization rules
+remain. This implementation and its full native/long-duration/candidate gates
+are still in development; do not treat it as a published adoption tuple.

@@ -1,7 +1,7 @@
-import {clipboardFormats, richBrowserClipboard, validateClipboard, readClipboard, writeAndVerifyClipboard, sendClipboard, sameLocalClipboard} from './native-clipboard-data.js';
-import {sameClipboard} from '../../../../third_party/kasm/clipboard-payload.mjs';
+import {clipboardFormats, richBrowserClipboard, validateClipboard, readClipboard, writeAndVerifyClipboard, sendClipboard, sameLocalClipboard, clipboardTransferTimeout} from './native-clipboard-data.js';
 // Native clipboard policy. Payloads are bounded, ephemeral and never emitted.
 const modes = new Set(['off', 'manual', 'auto']);
+const destinationRevision = value => typeof value === 'string' && /^[0-9a-f]{16}$/.test(value) && value !== '0000000000000000';
 const coordinatorKey = Symbol.for('remotexapp.native-clipboard.owner.v1');
 function coordinator() {
   let scope = globalThis;
@@ -36,6 +36,9 @@ export class NativeClipboard {
     listen(globalThis, 'blur', () => this.deactivate());
     listen(globalThis.document, 'visibilitychange', () => { if (document.hidden) this.deactivate(); });
     listen(globalThis, 'pagehide', () => this.deactivate());
+    listen(globalThis.document, 'freeze', () => this.deactivate());
+    const resume = () => { if (client.container.contains?.(globalThis.document?.activeElement)) this.activate(); };
+    listen(globalThis.document, 'resume', resume); listen(globalThis, 'focus', resume);
   }
   fail(code) { return this.error(code); }
   valid(value) {
@@ -50,16 +53,22 @@ export class NativeClipboard {
     const mode = this.requested[direction];
     if (!this.client.capabilities.clipboard || this.client.state !== 'ready') return 'off';
     if (mode !== 'auto') return mode;
-    const supported = this.client.capabilities.clipboardAutomatic && globalThis.navigator?.locks?.request &&
-      globalThis.navigator?.clipboard?.readText && globalThis.navigator?.clipboard?.writeText &&
-      (!this.client.capabilities.clipboardRich || richBrowserClipboard());
+    const supported = this.automaticSupported() && (direction !== 'toRemote' || this.orderedDestination());
     return supported && this.permissions.read === 'granted' &&
       (direction !== 'toLocal' || this.permissions.write === 'granted') ? 'auto' : 'manual';
   }
+  automaticSupported() {
+    return this.client.capabilities.clipboardAutomatic && globalThis.navigator?.locks?.request &&
+      globalThis.navigator?.clipboard?.readText && globalThis.navigator?.clipboard?.writeText &&
+      (!this.client.capabilities.clipboardRich || richBrowserClipboard());
+  }
+  orderedDestination() { return this.client.capabilities.clipboardConditional && typeof this.client._display?.submitClipboard === 'function' && destinationRevision(this.client._display.clipboardRevision); }
+  explicitPaste() { return this.requested.toRemote === 'auto' && this.automaticSupported() && this.permissions.read === 'granted'; }
   snapshot() {
     return {requested:{...this.requested}, effective:{toRemote:this.effective('toRemote'),toLocal:this.effective('toLocal')},
       permissions:{...this.permissions}, active:this.eligible(), phase:this.phase,
       formats:clipboardFormats(this.client.capabilities), maxBytes:this.client.capabilities.clipboardMaxBytes,
+      ordering:this.client.capabilities.clipboardConditional ? this.orderedDestination() ? 'ready' : this.client._display?.clipboardOrderingState === 'unavailable' ? 'unavailable' : 'waiting' : 'unsupported',
       automaticSupported:!!(this.client.capabilities.clipboardAutomatic && globalThis.navigator?.locks?.request && globalThis.navigator?.permissions?.query && (!this.client.capabilities.clipboardRich || richBrowserClipboard()))};
   }
   emit(phase = this.phase) {
@@ -72,7 +81,7 @@ export class NativeClipboard {
     this.timer = null;
     this.baseline = undefined;
     this.remote = undefined;
-    this.lastSent = undefined;
+    this.baselineRemoteRevision = this.remoteRevision = undefined;
     this.conflict = false;
     // An already-started browser call owns busy until it actually settles.
     this.client._display?.cancelClipboardPaste?.();
@@ -163,12 +172,17 @@ export class NativeClipboard {
   check(revision) {
     if (revision !== this.revision || !this.eligible()) throw this.fail('clipboard-cancelled');
   }
-  offer(text) {
+  offer(text, revision = text?.revision) {
     try { text = this.valid(text); } catch (error) { this.emit(error.code); return; }
-    if (!this.eligible() || this.effective('toLocal') !== 'auto' || text.bytes === 0 || sameClipboard(text, this.lastSent)) return;
+    if (!this.eligible() || this.effective('toLocal') !== 'auto' || text.bytes === 0) return;
     // Do not replay an offer observed during baseline acquisition or a conflict.
     if (this.baseline === undefined || this.conflict) return;
+    if (this.client.capabilities.clipboardConditional && !destinationRevision(revision)) return;
+    // A payload is not a transaction identity: remote A after B is a new copy,
+    // even if this Viewer uploaded A earlier. sync compares against the actual
+    // local value/baseline to suppress echoes and preserve concurrent changes.
     this.remote = text;
+    this.remoteRevision = revision;
     this.schedule(0);
   }
   schedule(delay = 250) {
@@ -178,7 +192,7 @@ export class NativeClipboard {
   }
   async sync({paste = false} = {}) {
     if (paste && this.requested.toRemote !== 'auto') return null;
-    if (paste && this.effective('toRemote') !== 'auto') throw this.fail('clipboard-permission-required');
+    if (paste && !this.explicitPaste()) throw this.fail('clipboard-permission-required');
     if (!paste && !Object.keys(this.requested).some(d => this.effective(d) === 'auto')) return;
     if (this.busy) {
       if (paste) throw this.fail('clipboard-busy');
@@ -191,52 +205,78 @@ export class NativeClipboard {
     const operation = {done:new Promise(resolve => { settled = resolve; })};
     this.busy = operation;
     let startedWrite = false, timedOut = false;
-    const timer = setTimeout(() => {
+    let timer, expires;
+    const deadline = ms => { clearTimeout(timer); expires = Date.now() + ms; timer = setTimeout(() => {
       timedOut = true;
       if (revision === this.revision) {
         this.retire(); this.conflict = true;
         this.emit(startedWrite ? 'clipboard-uncertain' : 'clipboard-timeout');
       }
-    }, 5000);
+    }, ms); };
+    deadline(5000);
+    const current = () => {
+      this.check(revision);
+      if (Date.now() >= expires) throw this.fail(startedWrite ? 'clipboard-uncertain' : 'clipboard-timeout');
+    };
     try {
       // Same-origin tabs/frames serialize clipboard calls, including a write
       // completing after blur. No payload or fingerprint travels through a lock.
       return await navigator.locks.request('remotexapp-native-clipboard', {ifAvailable:true}, async lock => {
-        this.check(revision);
+        current();
         if (!lock) { if (paste) throw this.fail('clipboard-busy'); return; }
+        const display = this.client._display, observedRevision = display.clipboardRevision;
         const text = await readClipboard(this.client.capabilities, {allowLocalOnly:!paste});
-        this.check(revision);
-        const remote = this.remote;
+        current();
+        let remote = this.remote;
+        const remoteRevision = this.remoteRevision;
         this.remote = undefined;
+        this.remoteRevision = undefined;
+        if (remote !== undefined && this.client.capabilities.clipboardConditional && remoteRevision !== display.clipboardRevision) remote = undefined;
         if (paste) {
           // A paste is an explicit source choice, including after refocusing.
-          if (text.bytes) { sendClipboard(this.client._display, text, this.client.capabilities); this.lastSent = text; }
+          if (text.bytes) {
+            if (this.orderedDestination()) {
+              startedWrite = true;
+              deadline(clipboardTransferTimeout(text.bytes) + 1000); this.emit('submitting');
+              const accepted = await display.submitClipboard(text.items, null);
+              current(); this.baselineRemoteRevision = accepted.revision;
+            } else sendClipboard(display, text, this.client.capabilities);
+          }
           this.baseline = text; this.conflict = false;
           this.emit(text.bytes ? 'submitted' : 'empty-noop');
           return {revision, empty:!text.bytes};
         }
-        if (this.baseline === undefined) { this.baseline = text; this.emit('watching'); return; }
+        if (this.baseline === undefined || this.client.capabilities.clipboardConditional && !destinationRevision(this.baselineRemoteRevision) && this.orderedDestination()) {
+          this.baseline = text; this.baselineRemoteRevision = observedRevision; this.emit('watching'); return;
+        }
         const changed = !sameLocalClipboard(text, this.baseline);
+        if (remote !== undefined && sameLocalClipboard(remote, text)) {
+          this.baseline = text; this.baselineRemoteRevision = remoteRevision; return;
+        }
         if (remote !== undefined && !sameLocalClipboard(remote, text) && changed) {
           this.conflict = true; this.emit('conflict'); return;
         }
         if (remote !== undefined && !sameLocalClipboard(remote, text) && this.effective('toLocal') === 'auto') {
-          this.check(revision);
+          current();
           startedWrite = true;
-          const written = await writeAndVerifyClipboard(remote, this.client.capabilities, {check:()=>this.check(revision)});
+          const written = await writeAndVerifyClipboard(remote, this.client.capabilities, {check:current});
           if (revision !== this.revision || !this.eligible()) {
             this.emit('clipboard-uncertain'); return;
           }
           // Rich browser writes can sanitize HTML or re-encode PNG. Establish
           // the actual local value once, preventing a normalization echo.
           this.baseline = written;
-          this.check(revision);
+          this.baselineRemoteRevision = remoteRevision;
+          current();
           this.emit('copied-to-local');
         } else {
           if (changed && text.bytes && !text.localOnly && this.effective('toRemote') === 'auto') {
-            this.check(revision);
-            sendClipboard(this.client._display, text, this.client.capabilities);
-            this.lastSent = text;
+            current();
+            if (!destinationRevision(this.baselineRemoteRevision)) throw this.fail('clipboard-ordering-unavailable');
+            startedWrite = true;
+            deadline(clipboardTransferTimeout(text.bytes) + 1000); this.emit('submitting');
+            const accepted = await display.submitClipboard(text.items, this.baselineRemoteRevision);
+            current(); this.baselineRemoteRevision = accepted.revision;
             this.emit('submitted');
           }
           this.baseline = text;
@@ -246,7 +286,7 @@ export class NativeClipboard {
       if (revision === this.revision) {
         if (!paste || error.code !== 'clipboard-size') this.conflict = true;
         if (error.name === 'NotAllowedError') this.permissions[error.clipboardStage || (startedWrite ? 'write' : 'read')] = 'denied';
-        this.emit(startedWrite ? 'clipboard-uncertain' : (typeof error.code === 'string' ? error.code : error.name === 'NotAllowedError' ? 'clipboard-denied' : 'clipboard-unavailable'));
+        this.emit(error.code === 'clipboard-conflict' ? 'clipboard-conflict' : startedWrite ? 'clipboard-uncertain' : (typeof error.code === 'string' ? error.code : error.name === 'NotAllowedError' ? 'clipboard-denied' : 'clipboard-unavailable'));
       } else if (startedWrite) this.emit('clipboard-uncertain');
       if (paste) throw error;
     } finally {
@@ -257,7 +297,7 @@ export class NativeClipboard {
     }
   }
   paste() {
-    if (this.effective('toRemote') !== 'auto') return null;
+    if (!this.explicitPaste()) return null;
     const revision = this.revision;
     const ready = this.busy ? this.busy.done : Promise.resolve();
     return ready.then(() => { this.check(revision); return this.sync({paste:true}); }).then(result => {
@@ -267,8 +307,8 @@ export class NativeClipboard {
       return !result.empty;
     });
   }
-  manualCompleted(phase = 'baseline', baseline) {
-    this.retire(); this.baseline = baseline;
+  manualCompleted(phase = 'baseline', baseline, remoteRevision) {
+    this.retire(); this.baseline = baseline; this.baselineRemoteRevision = remoteRevision;
     if (phase === 'clipboard-uncertain') this.conflict = true;
     this.emit(phase); this.schedule(0);
   }

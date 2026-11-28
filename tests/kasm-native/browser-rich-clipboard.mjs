@@ -109,7 +109,7 @@ try{
  }
 }catch(e){cases.push({name:stage,status:'failed',error:e.code||e.name});console.error(stage+' · '+e.name+': '+String(e.message).split('\n')[0]);process.exitCode=1;}finally{
  await c.evaluate('if(window.richOriginalWrite){navigator.clipboard.write=richOriginalWrite;delete window.richOriginalWrite}window.richClipboardOfferObserver?.disconnect();remoteXAppViewerClipboard.reset()').catch(()=>{});c.close();
- for(const {pid,stem} of owned)remote(['python3','-c',`from pathlib import Path\nimport os,signal\np=Path('/proc/${pid}/cmdline')\nif p.exists() and ${JSON.stringify(helper)}.encode() in p.read_bytes():os.kill(${pid},signal.SIGTERM)\nfor suffix in ['.json','.result','.log']:\n p=Path(${JSON.stringify(stem)}+suffix)\n if p.exists():p.unlink()`]);
+ for(const {pid,stem} of owned)remote(['python3','-c',`from pathlib import Path\nimport os,signal\np=Path('/proc/${pid}/cmdline')\nif p.exists() and ${JSON.stringify(helper)}.encode() in p.read_bytes():os.kill(${pid},signal.SIGTERM)\nfor suffix in ['.json','.result','.result.pending','.log']:\n p=Path(${JSON.stringify(stem)}+suffix)\n if p.exists():p.unlink()`]);
  remote(['python3','-c','from pathlib import Path;import sys;Path(sys.argv[1]).unlink(missing_ok=True)',helper]);
  writeFileSync(join(resultDirectory,wssOnly?'rich-wss-results.json':'rich-clipboard-results.json'),JSON.stringify({schema:1,scope:'dedicated-browser-disposable-writer',status:process.exitCode?'failed':'passed',cases,display,physicalUAT:'not-run'},null,2)+'\n');
 }

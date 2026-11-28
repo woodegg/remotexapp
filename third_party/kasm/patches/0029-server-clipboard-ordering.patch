@@ -1,0 +1,403 @@
+--- /dev/null
++++ b/common/rfb/NativeClipboardOrder.h
+@@ -0,0 +1,70 @@
++// Bounded content-free clipboard ordering on the existing RFB Fence channel.
++#ifndef REMOTEXAPP_NATIVE_CLIPBOARD_ORDER_H
++#define REMOTEXAPP_NATIVE_CLIPBOARD_ORDER_H
++#include <stdint.h>
++#include <string.h>
++struct NativeClipboardFence {
++  char op;
++  uint32_t request;
++  uint64_t revision;
++  static bool owned(const char* data, unsigned len) {
++    return len >= 10 && !memcmp(data, "rx-clip:1:", 10);
++  }
++  static bool parse(const char* data, unsigned len, NativeClipboardFence& out) {
++    if (!owned(data, len) || len != 37 || data[11] != ':' || data[20] != ':') return false;
++    out.op = data[10]; out.request = 0; out.revision = 0;
++    for (unsigned i = 12; i < 37; i++) {
++      if (i == 20) continue;
++      unsigned c = (unsigned char)data[i], digit;
++      if (c >= '0' && c <= '9') digit = c - '0';
++      else if (c >= 'a' && c <= 'f') digit = c - 'a' + 10;
++      else return false;
++      if (i < 20) out.request = (out.request << 4) | digit;
++      else out.revision = (out.revision << 4) | digit;
++    }
++    return true;
++  }
++  static void encode(char op, uint32_t request, uint64_t revision, char data[37]) {
++    memcpy(data, "rx-clip:1:", 10); data[10] = op; data[11] = data[20] = ':';
++    const char* hex = "0123456789abcdef";
++    for (int i = 19; i >= 12; i--) { data[i] = hex[request & 15]; request >>= 4; }
++    for (int i = 36; i >= 21; i--) { data[i] = hex[revision & 15]; revision >>= 4; }
++  }
++};
++struct NativeClipboardAdmission {
++  char status;
++  uint32_t request;
++  NativeClipboardAdmission(char value, uint32_t id) : status(value), request(id) {}
++};
++class NativeClipboardOrder {
++  char mode = 0;
++  uint32_t request = 0, finishing = 0;
++  uint64_t expected = 0;
++public:
++  bool subscribed = false, notificationPending = false;
++  uint64_t notifiedRevision = 0;
++  bool notify(uint64_t revision) {
++    if (!subscribed || notificationPending) return false;
++    notificationPending = true; notifiedRevision = revision; return true;
++  }
++  bool acknowledge(uint64_t revision, uint64_t current) {
++    if (!notificationPending || notifiedRevision != revision) return false;
++    notificationPending = false; return revision != current;
++  }
++  void arm(char value, uint32_t id, uint64_t revision) {
++    // A malformed overlapping client cannot turn an old armed upload into an
++    // unconditional write. State is fixed-size and consumed by the next body.
++    mode = mode || finishing ? 'E' : value; request = id; expected = revision;
++  }
++  void cancel(uint32_t id) { if (mode && request == id) { mode = 0; request = 0; expected = 0; } }
++  NativeClipboardAdmission admit(uint64_t current, bool allowed, bool orderedAllowed = true) {
++    const char active = mode; const uint32_t id = request; const uint64_t revision = expected;
++    mode = 0; request = 0; expected = 0; finishing = 0;
++    if (!active) return NativeClipboardAdmission(allowed ? 'L' : 'E', 0);
++    if (!allowed || !orderedAllowed || !subscribed || !current || active == 'E') return NativeClipboardAdmission('E', id);
++    if (active == 'A' && current != revision) return NativeClipboardAdmission('F', id);
++    finishing = id; return NativeClipboardAdmission('S', id);
++  }
++  uint32_t finish() { uint32_t id = finishing; finishing = 0; return id; }
++};
++#endif
+--- a/common/rfb/SDesktop.h
++++ b/common/rfb/SDesktop.h
+@@ -92,6 +92,7 @@
+     virtual void handleClipboardAnnounceBinary(const unsigned __unused_attr num,
+                                                const char __unused_attr mimes[][32]) {}
+ 
++    virtual bool nativeClipboardOwned() { return false; }
+     virtual void clearLocalClipboards() {}
+ 
+     virtual void receivedUnixRelayData(const char name[], const unsigned char *buf,
+--- a/common/rfb/SMsgHandler.cxx
++++ b/common/rfb/SMsgHandler.cxx
+@@ -79,6 +79,9 @@
+ {
+ }
+ 
++bool SMsgHandler::acceptBinaryClipboard() { return true; }
++void SMsgHandler::finishBinaryClipboard() {}
++
+ void SMsgHandler::clearBinaryClipboard()
+ {
+ }
+--- a/common/rfb/SMsgHandler.h
++++ b/common/rfb/SMsgHandler.h
+@@ -58,6 +58,8 @@
+                                     int scrollX, int scrollY);
+ 
+     virtual void handleClipboardAnnounceBinary(const unsigned num, const char mimes[][32]);
++    virtual bool acceptBinaryClipboard();
++    virtual void finishBinaryClipboard();
+     virtual void clearBinaryClipboard();
+     virtual void addBinaryClipboard(const char mime[], const rdr::U8 *data,
+                                     const rdr::U32 len, const rdr::U32 id);
+--- a/common/rfb/SMsgReader.cxx
++++ b/common/rfb/SMsgReader.cxx
+@@ -292,10 +292,12 @@
+     if (type != 2 && !nativeClipboardUTF8(data[i].data(), length))
+       throw Exception("Native clipboard is not valid UTF-8 text");
+   }
++  if (!handler->acceptBinaryClipboard()) return;
+   handler->clearBinaryClipboard();
+   for (unsigned i = 0; i < count; i++)
+     handler->addBinaryClipboard(mimes[i], data[i].data(), data[i].size(), 0);
+   handler->handleClipboardAnnounceBinary(count, mimes);
++  handler->finishBinaryClipboard();
+ }
+ 
+ void SMsgReader::readExtendedClipboard(rdr::S32 len)
+--- a/common/rfb/VNCSConnectionST.cxx
++++ b/common/rfb/VNCSConnectionST.cxx
+@@ -65,7 +65,7 @@
+     inProcessMessages(false), encodingsReceived(false),
+     pendingSyncFence(false), syncFence(false), fenceFlags(0),
+     fenceDataLen(0), fenceData(nullptr), congestionTimer(this),
+-    losslessTimer(this), kbdLogTimer(this), binclipTimer(this),
++    losslessTimer(this), kbdLogTimer(this), binclipTimer(this), clipboardOrderTimer(this),
+     server(server_), updates(false),
+     updateRenderedCursor(false), removeRenderedCursor(false),
+     continuousUpdates(false), encodeManager(this, &VNCServerST::encCache, FFmpeg::get(), encoder_probe),
+@@ -470,6 +470,7 @@
+ {
+   binclipTimer.stop();
+   nativeClipboardRejected = false;
++  nativeClipboardDataRevision = 0;
+   clearBinaryClipboard();
+ }
+ 
+@@ -506,6 +507,10 @@
+             id);
+     if (state() != RFBSTATE_NORMAL) return;
+ 
++    if (binaryClipboard.empty()) nativeClipboardDataRevision = server->nativeClipboardRevision();
++    if (clipboardOrder.subscribed && nativeClipboardDataRevision != server->nativeClipboardRevision()) {
++      nativeClipboardRejected = true; binclipTimer.stop(); clearBinaryClipboard(); return;
++    }
+     addBinaryClipboard(mime, data, len, id);
+     if (complete) writeBinaryClipboard();
+   } catch(rdr::Exception& e) {
+@@ -1119,9 +1124,69 @@
+                                      server->screenLayout);
+ }
+ 
++bool VNCSConnectionST::clipboardOrderingAllowed()
++{
++  return (accessRights & AccessCutText) && rfb::Server::acceptCutText &&
++         rfb::Server::sendCutText && state() == RFBSTATE_NORMAL;
++}
++
++void VNCSConnectionST::clipboardOrderReply(char op, rdr::U32 request)
++{
++  char data[37];
++  NativeClipboardFence::encode(op, request, clipboardOrderingAllowed() ? server->nativeClipboardRevision() : 0, data);
++  writer()->writeFence(0, sizeof(data), data);
++}
++
++void VNCSConnectionST::nativeClipboardRevisionChanged()
++{
++  // Revisions advance immediately, but a hostile/fast X11 owner cannot queue
++  // one metadata message per event. One timer coalesces to the latest revision.
++  if (clipboardOrder.subscribed && clipboardOrderingAllowed() && !clipboardOrder.notificationPending && !clipboardOrderTimer.isStarted()) clipboardOrderTimer.start(16);
++}
++
++bool VNCSConnectionST::acceptBinaryClipboard()
++{
++  // All representation validation/staging precedes this admission. No event
++  // loop re-entry occurs between comparison and the subsequent X11 commit.
++  const bool allowed = (accessRights & AccessCutText) && rfb::Server::acceptCutText;
++  const NativeClipboardAdmission result = clipboardOrder.admit(server->nativeClipboardRevision(), allowed, clipboardOrderingAllowed());
++  if (result.status == 'S') clipboardCommitRevision = server->nativeClipboardRevision();
++  if (result.status == 'L' || result.status == 'S') return true;
++  if (result.request) clipboardOrderReply(result.status, result.request);
++  return false;
++}
++
++void VNCSConnectionST::finishBinaryClipboard()
++{
++  const rdr::U32 request = clipboardOrder.finish();
++  if (request) {
++    const rdr::U64 current = server->nativeClipboardRevision();
++    const bool committed = current && current != clipboardCommitRevision && server->nativeClipboardOwned();
++    clipboardOrderReply(committed ? 'S' : 'E', request);
++    clipboardCommitRevision = 0;
++  }
++}
++
+ void VNCSConnectionST::fence(rdr::U32 flags, unsigned len, const char data[])
+ {
+   rdr::U8 type;
++
++  if (NativeClipboardFence::owned(data, len)) {
++    NativeClipboardFence message;
++    if (flags != fenceFlagRequest || !NativeClipboardFence::parse(data, len, message) || !message.request)
++      throw Exception("Invalid clipboard ordering Fence");
++    if (message.op == 'H' && !message.revision) {
++      clipboardOrder.subscribed = clipboardOrderingAllowed() && server->nativeClipboardRevision();
++      clipboardOrderReply(clipboardOrder.subscribed ? 'I' : 'E', message.request);
++    } else if (message.op == 'K') {
++      if (clipboardOrder.acknowledge(message.revision, server->nativeClipboardRevision())) nativeClipboardRevisionChanged();
++    } else if (message.op == 'C' && !message.revision) {
++      clipboardOrder.cancel(message.request);
++    } else if ((message.op == 'A' && message.revision) || (message.op == 'U' && !message.revision)) {
++      clipboardOrder.arm(message.op, message.request, message.revision);
++    } else throw Exception("Invalid clipboard ordering operation");
++    return;
++  }
+ 
+   if (flags & fenceFlagRequest) {
+     if (flags & fenceFlagSyncNext) {
+@@ -1256,6 +1321,9 @@
+       flushKeylog(sock->getPeerAddress());
+     else if (t == &binclipTimer)
+       writeBinaryClipboard();
++    else if (t == &clipboardOrderTimer && clipboardOrder.subscribed && clipboardOrderingAllowed()) {
++      if (clipboardOrder.notify(server->nativeClipboardRevision())) clipboardOrderReply('V', 0);
++    }
+   } catch (rdr::Exception& e) {
+     close(e.str());
+   }
+@@ -1660,6 +1728,11 @@
+     return;
+   }
+ 
++  if (clipboardOrder.subscribed && clipboardOrderingAllowed()) {
++    // A delayed old cache must not be relabelled as the new selection.
++    if (!nativeClipboardDataRevision || nativeClipboardDataRevision != server->nativeClipboardRevision()) return;
++    clipboardOrderReply('O', 0);
++  }
+   writer()->writeBinaryClipboard(binaryClipboard);
+ 
+   gettimeofday(&lastClipboardOp, nullptr);
+--- a/common/rfb/VNCSConnectionST.h
++++ b/common/rfb/VNCSConnectionST.h
+@@ -33,6 +33,7 @@
+ #include <rfb/EncodeManager.h>
+ #include <rfb/SConnection.h>
+ #include <rfb/Timer.h>
++#include <rfb/NativeClipboardOrder.h>
+ #include <rfb/unixRelayLimits.h>
+ 
+ #include <rfb/encoders/EncoderProbe.h>
+@@ -82,6 +83,7 @@
+     void setDesktopNameOrClose(const char *name);
+     void setLEDStateOrClose(unsigned int state);
+     void announceClipboardOrClose(bool available);
++    void nativeClipboardRevisionChanged();
+     void clearBinaryClipboardData();
+     void sendBinaryClipboardDataOrClose(const char* mime, const unsigned char *data,
+                                         const unsigned len, const unsigned id, bool complete);
+@@ -255,6 +257,8 @@
+     virtual void setDesktopSize(int fb_width, int fb_height,
+                                 const ScreenSet& layout);
+     virtual void fence(rdr::U32 flags, unsigned len, const char data[]);
++    virtual bool acceptBinaryClipboard();
++    virtual void finishBinaryClipboard();
+     virtual void enableContinuousUpdates(bool enable,
+                                          int x, int y, int w, int h);
+     virtual void handleClipboardAnnounce(bool available);
+@@ -322,7 +326,13 @@
+     Timer losslessTimer;
+     Timer kbdLogTimer;
+     Timer binclipTimer;
++    Timer clipboardOrderTimer;
+     bool nativeClipboardRejected = false;
++    NativeClipboardOrder clipboardOrder;
++    rdr::U64 clipboardCommitRevision = 0;
++    rdr::U64 nativeClipboardDataRevision = 0;
++    bool clipboardOrderingAllowed();
++    void clipboardOrderReply(char op, rdr::U32 request);
+ 
+     VNCServerST* server;
+     SimpleUpdateTracker updates;
+--- a/common/rfb/VNCServerST.cxx
++++ b/common/rfb/VNCServerST.cxx
+@@ -567,6 +567,20 @@
+   }
+ }
+ 
++bool VNCServerST::nativeClipboardOwned() { return desktop->nativeClipboardOwned(); }
++
++void VNCServerST::nativeClipboardChanged()
++{
++  // Zero is permanently unavailable after exhaustion; never wrap into ABA.
++  if (clipboardRevision) clipboardRevision = clipboardRevision == ~(rdr::U64)0 ? 0 : clipboardRevision + 1;
++  std::list<VNCSConnectionST*>::iterator ci, next;
++  for (ci = clients.begin(); ci != clients.end(); ci = next) {
++    next = ci; ++next;
++    try { (*ci)->nativeClipboardRevisionChanged(); }
++    catch (rdr::Exception& error) { (*ci)->close(error.str()); }
++  }
++}
++
+ void VNCServerST::announceClipboard(bool available)
+ {
+   std::list<VNCSConnectionST*>::iterator ci, ci_next;
+--- a/common/rfb/VNCServerST.h
++++ b/common/rfb/VNCServerST.h
+@@ -102,6 +102,9 @@
+     virtual PixelBuffer* getPixelBuffer() const { if (DLPRegion.enabled && blackedpb) return blackedpb; else return pb; }
+     virtual void announceClipboard(bool available);
+     virtual void clearBinaryClipboardData();
++    void nativeClipboardChanged();
++    bool nativeClipboardOwned();
++    rdr::U64 nativeClipboardRevision() const { return clipboardRevision; }
+     virtual void sendBinaryClipboardData(const char* mime, const unsigned char *data,
+                                          const unsigned len, bool complete = true);
+     virtual void getBinaryClipboardData(const char *mime, const unsigned char **ptr,
+@@ -305,6 +308,7 @@
+     void translateDLPRegion(rdr::U16 &x1, rdr::U16 &y1, rdr::U16 &x2, rdr::U16 &y2) const;
+ 
+     rdr::U32 clipboardId;
++    rdr::U64 clipboardRevision = 1;
+ 
+     void checkAPIMessages(network::GetAPIMessager *apimessager,
+                           rdr::U8 &trackingFrameStats, char trackingClient[]);
+--- a/unix/xserver/hw/vnc/XserverDesktop.cc
++++ b/unix/xserver/hw/vnc/XserverDesktop.cc
+@@ -190,6 +190,10 @@
+   vncClearLocalClipboards();
+ }
+ 
++bool XserverDesktop::nativeClipboardOwned() { return vncNativeClipboardOwned(); }
++
++void XserverDesktop::nativeClipboardChanged() { server->nativeClipboardChanged(); }
++
+ void XserverDesktop::announceClipboard(bool available)
+ {
+   try {
+--- a/unix/xserver/hw/vnc/XserverDesktop.h
++++ b/unix/xserver/hw/vnc/XserverDesktop.h
+@@ -64,6 +64,8 @@
+   void requestClipboard();
+   void clearLocalClipboards();
+   void announceClipboard(bool available);
++  void nativeClipboardChanged();
++  virtual bool nativeClipboardOwned();
+   void clearBinaryClipboardData();
+   void sendBinaryClipboardData(const char* mime, const unsigned char *data,
+                                const unsigned len, bool complete);
+--- a/unix/xserver/hw/vnc/vncExtInit.cc
++++ b/unix/xserver/hw/vnc/vncExtInit.cc
+@@ -395,6 +395,12 @@
+     desktop[scr]->setDesktopName(desktopName);
+ }
+ 
++void vncNativeClipboardChanged(void)
++{
++  for (int scr = 0; scr < vncGetScreenCount(); scr++)
++    if (desktop[scr]) desktop[scr]->nativeClipboardChanged();
++}
++
+ void vncAnnounceClipboard(int available)
+ {
+   for (int scr = 0; scr < vncGetScreenCount(); scr++)
+--- a/unix/xserver/hw/vnc/vncExtInit.h
++++ b/unix/xserver/hw/vnc/vncExtInit.h
+@@ -69,6 +69,8 @@
+ 
+ void vncUpdateDesktopName(void);
+ 
++int vncNativeClipboardOwned(void);
++void vncNativeClipboardChanged(void);
+ void vncAnnounceClipboard(int available);
+ void vncClearBinaryClipboardData(void);
+ void vncSendBinaryClipboardData(const char* mime, const unsigned char *data,
+--- a/unix/xserver/hw/vnc/vncSelection.c
++++ b/unix/xserver/hw/vnc/vncSelection.c
+@@ -277,6 +277,13 @@
+   LOG_DEBUG("Created selection window");
+ 
+   return Success;
++}
++
++int vncNativeClipboardOwned(void)
++{
++  Selection *selection;
++  if (!pWindow || dixLookupSelection(&selection, xaCLIPBOARD, serverClient, DixGetAttrAccess) != Success) return FALSE;
++  return selection->client == serverClient && selection->pWin == pWindow;
+ }
+ 
+ static int vncOwnSelection(Atom selection)
+@@ -751,6 +758,9 @@
+ {
+   SelectionInfoRec *info = (SelectionInfoRec *) args;
+ 
++  if (info->selection->selection == xaCLIPBOARD ||
++      (info->selection->selection == xaPRIMARY && vncGetSendPrimary()))
++    vncNativeClipboardChanged();
+   if (snapshot.window && info->selection->selection == snapshot.selection) vncSnapshotCancel();
+   if (info->kind != SelectionSetOwner || info->client == serverClient) return;
+   if (info->selection->selection != xaCLIPBOARD &&

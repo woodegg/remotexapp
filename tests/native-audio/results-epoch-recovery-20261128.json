@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "issue": 117,
+  "purpose": "Scoped real epoch fault evidence; no runtime behavior change or release acceptance implied",
+  "runtime": {
+    "core": "0.17.6",
+    "sdk": "0.37.0",
+    "sourceCommit": "00c97b4dd2262dc083075e23609feb26398fd437",
+    "coreBinarySHA256": "c4428473b251ad08dd9fe74f5a7d6e92fc9a4ad69ac9a78626e11fac67a1ce6b",
+    "componentManifestSHA256": "dc3ea416d068569781cfcd999d597da9709634d0d4b83cedf69bc35abaaf6bc5",
+    "browser": "158.0.8127.88"
+  },
+  "method": {
+    "realBrowser": true,
+    "headless": true,
+    "realKasmViewer": true,
+    "realManagerProcessRestart": true,
+    "realPulseReadback": true,
+    "transport": "WSS on loopback TLS",
+    "syntheticMicrophone": true,
+    "microphoneDSPDisabledForTestTone": true,
+    "speakerSink": "none",
+    "privateHarnessSHA256": "ae7c730ac3ab52e1ef6f46c4262b534d1bc0d4b455d9338c0e607ea8a51f2032"
+  },
+  "status": "passed",
+  "checks": [
+    {
+      "name": "baseline",
+      "status": "passed",
+      "speakerPeak": 0.2593994140625,
+      "micWindows": [
+        {
+          "bytes": 48000,
+          "peak": 6670
+        },
+        {
+          "bytes": 48000,
+          "peak": 6500
+        }
+      ],
+      "captureRequests": 1
+    },
+    {
+      "name": "short-manager-epoch-1",
+      "status": "passed",
+      "recoverySeconds": 1.817766149993986,
+      "serviceEpochChanged": true,
+      "newConnection": true,
+      "sameRuntimeGeneration": true,
+      "samePulseDomain": true,
+      "captureRequests": 1,
+      "speakerPeak": 0.2593994140625,
+      "micWindows": [
+        {
+          "bytes": 48000,
+          "peak": 6500
+        },
+        {
+          "bytes": 48000,
+          "peak": 6500
+        }
+      ]
+    },
+    {
+      "name": "short-manager-epoch-2",
+      "status": "passed",
+      "recoverySeconds": 1.7291481950087473,
+      "serviceEpochChanged": true,
+      "newConnection": true,
+      "sameRuntimeGeneration": true,
+      "samePulseDomain": true,
+      "captureRequests": 1,
+      "speakerPeak": 0.2593994140625,
+      "micWindows": [
+        {
+          "bytes": 48000,
+          "peak": 6500
+        },
+        {
+          "bytes": 48000,
+          "peak": 6531
+        }
+      ]
+    },
+    {
+      "name": "long-manager-epoch",
+      "status": "passed",
+      "stoppedAtLeastSeconds": 15,
+      "serviceEpochChanged": true,
+      "requestedMic": true,
+      "actualMic": false,
+      "actionRequired": true,
+      "noNewCapture": true,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "explicit-mic-resume-after-long-epoch",
+      "status": "passed",
+      "captureRequests": 2,
+      "micWindows": [
+        {
+          "bytes": 48000,
+          "peak": 6500
+        },
+        {
+          "bytes": 48000,
+          "peak": 6500
+        }
+      ]
+    },
+    {
+      "name": "actual-worker-replacement",
+      "status": "passed",
+      "newWorkerTarget": true,
+      "sameServiceEpoch": true,
+      "newConnection": true,
+      "noNewCapture": true,
+      "actionRequired": true,
+      "speakerPeak": 0.2593994140625
+    },
+    {
+      "name": "explicit-mic-resume-after-worker",
+      "status": "passed",
+      "captureRequests": 3,
+      "micWindows": [
+        {
+          "bytes": 48000,
+          "peak": 6500
+        },
+        {
+          "bytes": 48000,
+          "peak": 6500
+        }
+      ]
+    },
+    {
+      "name": "logout",
+      "status": "passed",
+      "released": true
+    }
+  ],
+  "pageErrors": [],
+  "cleanup": {
+    "ownedAppsStoppedOrRemoved": true,
+    "ownedBrowserAndProfileRemoved": true,
+    "testManagerAndControllerRemoved": true,
+    "testContainerReturnedToInitialStoppedState": true
+  },
+  "limits": [
+    "Not a physical microphone/speaker or acoustic-quality test.",
+    "Not a public ingress, identity-change, OS-sleep or WebRTC test.",
+    "The prior transient-unit-unload fixture failure is preserved separately and excluded; no concatenated attempt.",
+    "The clipboard A-B-A bug is not repaired and is not qualified by these audio checks."
+  ]
+}

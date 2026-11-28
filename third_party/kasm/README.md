@@ -3,7 +3,7 @@
 The default recipe remains WSS. The explicitly selected `--transport udp`
 development profile adds patches 0020/0021, authenticated native UDP negotiation,
 loopback-only UDP sockets, bounded client reassembly and measured transport
-counters. It now emits `kasm-routed-udp-clipboard-v3`; it requires Core's bounded endpoint and
+counters. Development recipes now emit `kasm-routed-udp-clipboard-v4`; it requires Core's bounded endpoint and
 Viewer grant contract plus an outside-container trusted edge. See
 [bounded UDP UAT](../../docs/native-udp-uat.md). Neither profile alone qualifies browser integration, audio or QOI workers.
 Rich clipboard integration and its exact candidate tests are tracked in #55/#56.
@@ -193,8 +193,9 @@ remain manual-only. Qualification is tracked in #50 / #54.
 ## Rich clipboard development component
 
 Patches 0023/0024 extend new paired components to `text/plain`, `text/html` and
-`image/png`. New builds use `kasm-wss-clipboard-v3` or
-`kasm-routed-udp-clipboard-v3`. The aggregate limit is 10 MiB on those
+`image/png`. Current development builds use `kasm-wss-clipboard-v4` or
+`kasm-routed-udp-clipboard-v4`, adding conditional native destination admission.
+The earlier v3 pins also provide the large rich formats. The aggregate limit is 10 MiB on those
 component pairs and 2 MiB on existing clipboard-v2 pins.
 Patch 0028 also permits bounded inline PNG in a file-marked selection.
 File references and alternate text or HTML in that selection are omitted.
@@ -217,3 +218,24 @@ ASan/UBSan test in the component provenance. HTML is data, never SDK DOM;
 Browser clipboard sanitization/re-encoding is reconciled by SDK readback.
 The limit covers encoded clipboard representations, not decoded image memory.
 See the [contract and qualification scope](../../docs/native-rich-clipboard.md).
+
+The v4 development pair adds `clipboardConditional`, content-free revision
+metadata and correlated admission on private versioned RFB Fence messages.
+Complete body validation precedes destination comparison and all clipboard
+mutation. One fixed-size arm per connection and one coalescing metadata timer
+bound state; snapshots cannot be relabelled with a later selection revision.
+Explicit source choice remains distinct from conditional automatic upload.
+New server patches require a full rebuild; the client-rebuild helper refuses
+to reuse a parent server whose patch recipe differs. See
+[destination ordering](../../docs/native-clipboard-ordering.md) for uncompleted
+native qualification and older-component manual fallback.
+
+Development patch `0030-server-nonblocking-clipboard.patch` replaces synchronous
+rich-body reads with incremental, bounded staging. Partial input yields the
+shared X11 event loop; a per-connection absolute 50-second timer closes a stalled
+body. Complete validation still precedes the v4 revision admission and mutation.
+A new complete immutable server/client build is required; the prior v4 prototype
+without this patch is not the final qualified pair. See the
+[ordering contract](../../docs/native-clipboard-ordering.md#partial-native-uploads-development-repair)
+and retained native failure. Real split-body/peer, slow-link and resource
+qualification remain required; portable tests do not close those gates.
